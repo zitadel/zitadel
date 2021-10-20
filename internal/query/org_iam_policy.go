@@ -25,6 +25,36 @@ type OrgIAMPolicy struct {
 	IsDefault bool
 }
 
+var (
+	orgIAMTable = table{
+		name: projection.OrgIAMPolicyTable,
+	}
+	OrgIAMColID = Column{
+		name: projection.OrgIAMPolicyIDCol,
+	}
+	OrgIAMColSequence = Column{
+		name: projection.OrgIAMPolicySequenceCol,
+	}
+	OrgIAMColCreationDate = Column{
+		name: projection.OrgIAMPolicyCreationDateCol,
+	}
+	OrgIAMColChangeDate = Column{
+		name: projection.OrgIAMPolicyChangeDateCol,
+	}
+	OrgIAMColResourceOwner = Column{
+		name: projection.OrgIAMPolicyResourceOwnerCol,
+	}
+	OrgIAMColUserLoginMustBeDomain = Column{
+		name: projection.OrgIAMPolicyUserLoginMustBeDomainCol,
+	}
+	OrgIAMColIsDefault = Column{
+		name: projection.OrgIAMPolicyIsDefaultCol,
+	}
+	OrgIAMColState = Column{
+		name: projection.OrgIAMPolicyStateCol,
+	}
+)
+
 func (q *Queries) MyOrgIAMPolicy(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(
@@ -60,36 +90,6 @@ func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	orgIAMTable = table{
-		name: projection.OrgIAMPolicyTable,
-	}
-	OrgIAMColID = Column{
-		name: projection.OrgIAMPolicyIDCol,
-	}
-	OrgIAMColSequence = Column{
-		name: projection.OrgIAMPolicySequenceCol,
-	}
-	OrgIAMColCreationDate = Column{
-		name: projection.OrgIAMPolicyCreationDateCol,
-	}
-	OrgIAMColChangeDate = Column{
-		name: projection.OrgIAMPolicyChangeDateCol,
-	}
-	OrgIAMColResourceOwner = Column{
-		name: projection.OrgIAMPolicyResourceOwnerCol,
-	}
-	OrgIAMColUserLoginMustBeDomain = Column{
-		name: projection.OrgIAMPolicyUserLoginMustBeDomainCol,
-	}
-	OrgIAMColIsDefault = Column{
-		name: projection.OrgIAMPolicyIsDefaultCol,
-	}
-	OrgIAMColState = Column{
-		name: projection.OrgIAMPolicyStateCol,
-	}
-)
 
 func prepareOrgIAMPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgIAMPolicy, error)) {
 	return sq.Select(

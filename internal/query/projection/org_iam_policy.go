@@ -20,6 +20,15 @@ type OrgIAMPolicyProjection struct {
 
 const (
 	OrgIAMPolicyTable = "zitadel.projections.org_iam_policies"
+
+	OrgIAMPolicyCreationDateCol          = "creation_date"
+	OrgIAMPolicyChangeDateCol            = "change_date"
+	OrgIAMPolicySequenceCol              = "sequence"
+	OrgIAMPolicyIDCol                    = "id"
+	OrgIAMPolicyStateCol                 = "state"
+	OrgIAMPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
+	OrgIAMPolicyIsDefaultCol             = "is_default"
+	OrgIAMPolicyResourceOwnerCol         = "resource_owner"
 )
 
 func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgIAMPolicyProjection {
@@ -76,7 +85,7 @@ func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.EventReader) (*han
 		policyEvent = e.OrgIAMPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-XakxJ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-XakxJ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-CSE7A", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -101,7 +110,7 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.EventReader) (*h
 	case *iam.OrgIAMPolicyChangedEvent:
 		policyEvent = e.OrgIAMPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-SvTK0", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-SvTK0", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-qgVug", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{
@@ -122,7 +131,7 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.EventReader) (*h
 func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.OrgIAMPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-ovQya", "seq", event.Sequence(), "expectedType", org.OrgIAMPolicyRemovedEventType).Error("was not an  event")
+		logging.LogWithFields("PROJE-ovQya", "seq", event.Sequence(), "expectedType", org.OrgIAMPolicyRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-JAENd", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
@@ -131,14 +140,3 @@ func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.EventReader) (*h
 			handler.NewCond(OrgIAMPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
-
-const (
-	OrgIAMPolicyCreationDateCol          = "creation_date"
-	OrgIAMPolicyChangeDateCol            = "change_date"
-	OrgIAMPolicySequenceCol              = "sequence"
-	OrgIAMPolicyIDCol                    = "id"
-	OrgIAMPolicyStateCol                 = "state"
-	OrgIAMPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
-	OrgIAMPolicyIsDefaultCol             = "is_default"
-	OrgIAMPolicyResourceOwnerCol         = "resource_owner"
-)
