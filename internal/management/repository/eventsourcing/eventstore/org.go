@@ -285,23 +285,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	return result, nil
 }
 
-func (repo *OrgRepository) GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
-	policy, err := repo.View.PrivacyPolicyByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		return repo.GetDefaultPrivacyPolicy(ctx)
-	}
-	return iam_view_model.PrivacyViewToModel(policy), nil
-}
-
-func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
-	policy, err := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	policy.Default = true
-	return iam_view_model.PrivacyViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
 	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
 	if err != nil {

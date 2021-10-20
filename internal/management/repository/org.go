@@ -28,9 +28,6 @@ type OrgRepository interface {
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 
-	GetPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
-	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
-
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 

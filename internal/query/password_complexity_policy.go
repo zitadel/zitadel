@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -17,6 +18,7 @@ type PasswordComplexityPolicy struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
+	State         domain.PolicyState
 
 	MinLength    uint64
 	HasLowercase bool
@@ -100,6 +102,9 @@ var (
 	PasswordComplexityColIsDefault = Column{
 		name: projection.ComplexityPolicyIsDefaultCol,
 	}
+	PasswordComplexityColState = Column{
+		name: projection.ComplexityPolicyStateCol,
+	}
 )
 
 func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordComplexityPolicy, error)) {
@@ -115,6 +120,7 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			PasswordComplexityColHasNumber.identifier(),
 			PasswordComplexityColHasSymbol.identifier(),
 			PasswordComplexityColIsDefault.identifier(),
+			PasswordComplexityColState.identifier(),
 		).
 			From(passwordComplexityTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PasswordComplexityPolicy, error) {
@@ -131,6 +137,7 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 				&policy.HasNumber,
 				&policy.HasSymbol,
 				&policy.IsDefault,
+				&policy.State,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

@@ -272,33 +272,6 @@ func (repo *IAMRepository) GetCustomMessageText(ctx context.Context, textType, l
 	return result, err
 }
 
-func (repo *IAMRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
-	policy, viewErr := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.PrivacyPolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-84Nfs", "Errors.IAM.PrivacyPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-0p3Fs").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.PrivacyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.PrivacyViewToModel(policy), nil
-		}
-	}
-	result := iam_es_model.PrivacyViewToModel(policy)
-	result.Default = true
-	return result, nil
-}
-
 func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
