@@ -26,7 +26,7 @@ type OrgRepository struct {
 	Eventstore     eventstore.Eventstore
 	View           *auth_view.View
 	SystemDefaults systemdefaults.SystemDefaults
-	Query          query.Queries
+	Query          *query.Queries
 }
 
 func (repo *OrgRepository) GetIDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {

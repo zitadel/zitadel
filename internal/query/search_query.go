@@ -270,6 +270,27 @@ func ListComparisonFromMethod(m domain.SearchMethod) ListComparison {
 	}
 }
 
+type BoolQuery struct {
+	Column Column
+	Value  bool
+}
+
+func NewBoolQuery(c Column, value bool) (*BoolQuery, error) {
+	return &BoolQuery{
+		Column: c,
+		Value:  value,
+	}, nil
+}
+
+func (q *BoolQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	where, args := q.comp()
+	return query.Where(where, args...)
+}
+
+func (s *BoolQuery) comp() (comparison interface{}, args []interface{}) {
+	return sq.Eq{s.Column.identifier(): s.Value}, nil
+}
+
 var (
 	//countColumn represents the default counter for search responses
 	countColumn = Column{

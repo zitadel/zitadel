@@ -162,6 +162,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			View:           view,
 			SystemDefaults: systemDefaults,
 			Eventstore:     es,
+			Query:          queries,
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,

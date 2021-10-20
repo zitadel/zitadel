@@ -75,7 +75,7 @@ type loginPolicyViewProvider interface {
 }
 
 type lockoutPolicyViewProvider interface {
-	MyLockoutPolicy(context.Context, string) (*query.LockoutPolicy, error)
+	LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error)
 }
 
 type idpProviderViewProvider interface {
@@ -903,7 +903,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 }
 
 func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string) (*query.LockoutPolicy, error) {
-	policy, err := repo.LockoutPolicyViewProvider.MyLockoutPolicy(ctx, orgID)
+	policy, err := repo.LockoutPolicyViewProvider.LockoutPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

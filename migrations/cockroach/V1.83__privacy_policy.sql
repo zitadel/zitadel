@@ -1,5 +1,5 @@
-CREATE TABLE zitadel.projections.password_age_policies (
-    id STRING NOT NULL, --TODO: pk
+CREATE TABLE zitadel.projections.privacy_policies (
+    id STRING NOT NULL,
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
     sequence INT8 NULL,
@@ -7,6 +7,8 @@ CREATE TABLE zitadel.projections.password_age_policies (
     resource_owner TEXT,
     
     is_default BOOLEAN,
-    max_age_days INT8 NULL,
-    expire_warn_days INT8 NULL
+    privacy_link TEXT,
+    tos_link TEXT,
+
+    PRIMARY KEY (id)
 );

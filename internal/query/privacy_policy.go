@@ -26,6 +26,39 @@ type PrivacyPolicy struct {
 	IsDefault bool
 }
 
+var (
+	privacyTable = table{
+		name: projection.PrivacyPolicyTable,
+	}
+	PrivacyColID = Column{
+		name: projection.PrivacyPolicyIDCol,
+	}
+	PrivacyColSequence = Column{
+		name: projection.PrivacyPolicySequenceCol,
+	}
+	PrivacyColCreationDate = Column{
+		name: projection.PrivacyPolicyCreationDateCol,
+	}
+	PrivacyColChangeDate = Column{
+		name: projection.PrivacyPolicyChangeDateCol,
+	}
+	PrivacyColResourceOwner = Column{
+		name: projection.PrivacyPolicyResourceOwnerCol,
+	}
+	PrivacyColPrivacyLink = Column{
+		name: projection.PrivacyPolicyPrivacyLinkCol,
+	}
+	PrivacyColTOSLink = Column{
+		name: projection.PrivacyPolicyTOSLinkCol,
+	}
+	PrivacyColIsDefault = Column{
+		name: projection.PrivacyPolicyIsDefaultCol,
+	}
+	PrivacyColState = Column{
+		name: projection.PrivacyPolicyStateCol,
+	}
+)
+
 func (q *Queries) MyPrivacyPolicy(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
@@ -61,39 +94,6 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, err
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	privacyTable = table{
-		name: projection.PrivacyPolicyTable,
-	}
-	PrivacyColID = Column{
-		name: projection.PrivacyPolicyIDCol,
-	}
-	PrivacyColSequence = Column{
-		name: projection.PrivacyPolicySequenceCol,
-	}
-	PrivacyColCreationDate = Column{
-		name: projection.PrivacyPolicyCreationDateCol,
-	}
-	PrivacyColChangeDate = Column{
-		name: projection.PrivacyPolicyChangeDateCol,
-	}
-	PrivacyColResourceOwner = Column{
-		name: projection.PrivacyPolicyResourceOwnerCol,
-	}
-	PrivacyColPrivacyLink = Column{
-		name: projection.PrivacyPolicyPrivacyLinkCol,
-	}
-	PrivacyColTOSLink = Column{
-		name: projection.PrivacyPolicyTOSLinkCol,
-	}
-	PrivacyColIsDefault = Column{
-		name: projection.PrivacyPolicyIsDefaultCol,
-	}
-	PrivacyColState = Column{
-		name: projection.PrivacyPolicyStateCol,
-	}
-)
 
 func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPolicy, error)) {
 	return sq.Select(
