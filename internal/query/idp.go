@@ -55,86 +55,6 @@ type JWTIDP struct {
 	Endpoint     string
 }
 
-//IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
-func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner string) (*IDP, error) {
-	stmt, scan := prepareIDPByIDQuery()
-	query, args, err := stmt.Where(
-		sq.And{
-			sq.Eq{
-				IDPIDCol.identifier(): id,
-			},
-			sq.Or{
-				sq.Eq{
-					IDPResourceOwnerCol.identifier(): resourceOwner,
-				},
-				sq.Eq{
-					IDPResourceOwnerCol.identifier(): q.iamID,
-				},
-			},
-		},
-	).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
-	}
-
-	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
-}
-
-//SearchIDPs searches executes the query in the context of the resource owner and IAM
-func (q *Queries) SearchIDPs(ctx context.Context, resourceOwner string, queries *IDPSearchQueries) (idps *IDPs, err error) {
-	query, scan := prepareIDPsQuery()
-	query = queries.toQuery(query)
-	query = query.Where(
-		sq.Or{
-			sq.Eq{
-				IDPResourceOwnerCol.identifier(): resourceOwner,
-				IDPResourceOwnerCol.identifier(): q.iamID,
-			},
-		},
-	)
-	stmt, args, err := queries.toQuery(query).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-zC6gk", "Errors.Query.InvalidRequest")
-	}
-
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		log.Println(err)
-		return nil, errors.ThrowInternal(err, "QUERY-YTug9", "Errors.Internal")
-	}
-	idps, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	idps.LatestSequence, err = q.latestSequence(ctx, idpTable)
-	return idps, err
-}
-
-type IDPSearchQueries struct {
-	SearchRequest
-	Queries []SearchQuery
-}
-
-func NewIDPIDSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery(IDPIDCol, id, TextEquals)
-}
-
-func NewIDPOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQuery, error) {
-	switch ownerType {
-	case domain.IdentityProviderTypeOrg:
-		return NewBoolQuery(LoginPolicyColumnIsDefault, false)
-	case domain.IdentityProviderTypeSystem:
-		return NewBoolQuery(LoginPolicyColumnIsDefault, true)
-	default:
-		return nil, errors.ThrowUnimplemented(nil, "QUERY-8yZAI", "Errors.Query.InvalidRequest")
-	}
-}
-
-func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(IDPNameCol, value, method)
-}
-
 var (
 	idpTable = table{
 		name: projection.IDPTable,
@@ -248,6 +168,86 @@ var (
 		table: jwtIDPTable,
 	}
 )
+
+//IDPByIDAndResourceOwner searches for the requested id in the context of the resource owner and IAM
+func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner string) (*IDP, error) {
+	stmt, scan := prepareIDPByIDQuery()
+	query, args, err := stmt.Where(
+		sq.And{
+			sq.Eq{
+				IDPIDCol.identifier(): id,
+			},
+			sq.Or{
+				sq.Eq{
+					IDPResourceOwnerCol.identifier(): resourceOwner,
+				},
+				sq.Eq{
+					IDPResourceOwnerCol.identifier(): q.iamID,
+				},
+			},
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-0gocI", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+//SearchIDPs searches executes the query in the context of the resource owner and IAM
+func (q *Queries) SearchIDPs(ctx context.Context, resourceOwner string, queries *IDPSearchQueries) (idps *IDPs, err error) {
+	query, scan := prepareIDPsQuery()
+	query = queries.toQuery(query)
+	query = query.Where(
+		sq.Or{
+			sq.Eq{
+				IDPResourceOwnerCol.identifier(): resourceOwner,
+				IDPResourceOwnerCol.identifier(): q.iamID,
+			},
+		},
+	)
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-zC6gk", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		log.Println(err)
+		return nil, errors.ThrowInternal(err, "QUERY-YTug9", "Errors.Internal")
+	}
+	idps, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	idps.LatestSequence, err = q.latestSequence(ctx, idpTable)
+	return idps, err
+}
+
+type IDPSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
+func NewIDPIDSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(IDPIDCol, id, TextEquals)
+}
+
+func NewIDPOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQuery, error) {
+	switch ownerType {
+	case domain.IdentityProviderTypeOrg:
+		return NewBoolQuery(LoginPolicyColumnIsDefault, false)
+	case domain.IdentityProviderTypeSystem:
+		return NewBoolQuery(LoginPolicyColumnIsDefault, true)
+	default:
+		return nil, errors.ThrowUnimplemented(nil, "QUERY-8yZAI", "Errors.Query.InvalidRequest")
+	}
+}
+
+func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
+	return NewTextQuery(IDPNameCol, value, method)
+}
 
 func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
