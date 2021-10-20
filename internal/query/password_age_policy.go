@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -17,6 +18,7 @@ type PasswordAgePolicy struct {
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
+	State         domain.PolicyState
 
 	ExpireWarnDays uint64
 	MaxAgeDays     uint64
@@ -51,6 +53,9 @@ var (
 	}
 	PasswordAgeColIsDefault = Column{
 		name: projection.AgePolicyIsDefaultCol,
+	}
+	PasswordAgeColState = Column{
+		name: projection.AgePolicyStateCol,
 	}
 )
 
@@ -100,6 +105,7 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 			PasswordAgeColWarnDays.identifier(),
 			PasswordAgeColMaxAge.identifier(),
 			PasswordAgeColIsDefault.identifier(),
+			PasswordAgeColState.identifier(),
 		).
 			From(passwordAgeTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*PasswordAgePolicy, error) {
@@ -113,6 +119,7 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 				&policy.ExpireWarnDays,
 				&policy.MaxAgeDays,
 				&policy.IsDefault,
+				&policy.State,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

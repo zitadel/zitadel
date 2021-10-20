@@ -3,8 +3,6 @@ package eventstore
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -89,33 +87,6 @@ func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*d
 		return nil, err
 	}
 	return append(iam_view_model.CustomTextViewsToDomain(loginTexts), iam_view_model.CustomTextViewsToDomain(orgLoginTexts)...), nil
-}
-
-func (repo *OrgRepository) GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error) {
-	policy, viewErr := repo.View.PrivacyPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.PrivacyPolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-LPJMp", "Errors.IAM.PrivacyPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-1l7bf").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.PrivacyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.PrivacyViewToModel(policy), nil
-		}
-	}
-	result := iam_view_model.PrivacyViewToModel(policy)
-	result.Default = true
-	return result, nil
 }
 
 func (p *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {

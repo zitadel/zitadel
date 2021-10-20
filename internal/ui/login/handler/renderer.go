@@ -353,7 +353,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
 		}
 	} else {
-		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
+		privacyPolicy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
 		}
