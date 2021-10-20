@@ -57,7 +57,7 @@ type AuthRequestRepo struct {
 }
 
 type privacyPolicyProvider interface {
-	MyPrivacyPolicy(context.Context, string) (*query.PrivacyPolicy, error)
+	PrivacyPolicyByOrg(context.Context, string) (*query.PrivacyPolicy, error)
 }
 
 type userSessionViewProvider interface {
@@ -879,7 +879,7 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 }
 
 func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
-	policy, err := repo.PrivacyPolicyProvider.MyPrivacyPolicy(ctx, orgID)
+	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

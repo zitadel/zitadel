@@ -59,7 +59,7 @@ var (
 	}
 )
 
-func (q *Queries) MyPrivacyPolicy(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
+func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
