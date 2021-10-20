@@ -1042,6 +1042,7 @@
         "MEMBERTITLE": "Managers",
         "MEMBERDESC": "These are the managers of the granted organisation. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
+        "GRANTEDORG":"Granted Organisation",
         "RESOURCEOWNER": "Resource Owner"
       },
       "SHOWDETAIL": "Show Details",

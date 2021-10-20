@@ -1040,6 +1040,7 @@
         "MEMBERTITLE": "Berechtigte Manager der Organisation",
         "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
         "PROJECTNAME": "Projektname",
+        "GRANTEDORG":"Berechtigte Organisation",
         "RESOURCEOWNER": "Besitzer"
       },
       "SHOWDETAIL": "Details anzeigen",
