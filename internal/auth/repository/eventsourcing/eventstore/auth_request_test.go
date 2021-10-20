@@ -153,7 +153,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) MyLockoutPolicy(context.Context, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
