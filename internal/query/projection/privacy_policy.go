@@ -20,6 +20,16 @@ type PrivacyPolicyProjection struct {
 
 const (
 	PrivacyPolicyTable = "zitadel.projections.privacy_policies"
+
+	PrivacyPolicyCreationDateCol  = "creation_date"
+	PrivacyPolicyChangeDateCol    = "change_date"
+	PrivacyPolicySequenceCol      = "sequence"
+	PrivacyPolicyIDCol            = "id"
+	PrivacyPolicyStateCol         = "state"
+	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
+	PrivacyPolicyTOSLinkCol       = "tos_link"
+	PrivacyPolicyIsDefaultCol     = "is_default"
+	PrivacyPolicyResourceOwnerCol = "resource_owner"
 )
 
 func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PrivacyPolicyProjection {
@@ -135,15 +145,3 @@ func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.EventReader) (*
 			handler.NewCond(PrivacyPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
-
-const (
-	PrivacyPolicyCreationDateCol  = "creation_date"
-	PrivacyPolicyChangeDateCol    = "change_date"
-	PrivacyPolicySequenceCol      = "sequence"
-	PrivacyPolicyIDCol            = "id"
-	PrivacyPolicyStateCol         = "state"
-	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
-	PrivacyPolicyTOSLinkCol       = "tos_link"
-	PrivacyPolicyIsDefaultCol     = "is_default"
-	PrivacyPolicyResourceOwnerCol = "resource_owner"
-)
