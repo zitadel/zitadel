@@ -68,8 +68,8 @@ func ProjectQueryToModel(apiQuery *proj_pb.ProjectQuery) (query.SearchQuery, err
 	switch q := apiQuery.Query.(type) {
 	case *proj_pb.ProjectQuery_NameQuery:
 		return query.NewProjectNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
-	// case *proj_pb.ProjectQuery_ProjectResourceOwnerQuery:
-	// 	return query.NewProjectResourceOwnerSearchQuery(q.ProjectResourceOwnerQuery.ResourceOwner)
+	case *proj_pb.ProjectQuery_ProjectResourceOwnerQuery:
+		return query.NewProjectResourceOwnerSearchQuery(q.ProjectResourceOwnerQuery.ResourceOwner)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ORG-vR9nC", "List.Query.Invalid")
 	}
