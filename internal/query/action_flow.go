@@ -54,9 +54,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	query, scan := q.prepareFlowQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
 		}).ToSql()
 	if err != nil {
