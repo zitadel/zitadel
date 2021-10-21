@@ -45,8 +45,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			defaults),
-		newOrgIAMPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults),
