@@ -59,7 +59,7 @@ export class UserDetailComponent implements OnInit {
         }
       }).catch(err => {
         this.error = err.message ?? '';
-        this.toast.showError(err)
+        this.toast.showError(err);
       });
 
       this.mgmtUserService.listUserMetadata(id, 0, 100, []).then(resp => {
