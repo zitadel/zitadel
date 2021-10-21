@@ -147,25 +147,6 @@
         </ng-template>
       </div>
       <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
-          [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false"
-          ngDefaultControl [(ngModel)]="loginData.allowExternalIdp">
-          {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
-        </mat-slide-toggle>
-
-        <cnsl-info-section
-          *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false; else idpInfo"
-          [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
-        </cnsl-info-section>
-
-        <ng-template #idpInfo>
-          <cnsl-info-section class="info">
-            {{'POLICY.DATA.ALLOWEXTERNALIDP_DESC' | translate}}
-          </cnsl-info-section>
-        </ng-template>
-      </div>
-      <div class="row">
 
         <mat-slide-toggle class="toggle" color="primary"
           [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false"

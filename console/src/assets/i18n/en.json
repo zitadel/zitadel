@@ -1045,6 +1045,11 @@
         "GRANTEDORG":"Granted Organisation",
         "RESOURCEOWNER": "Resource Owner"
       },
+      "STATE": "State",
+      "STATES": {
+        "1": "Active",
+        "2": "Inactive"
+      },
       "SHOWDETAIL": "Show Details",
       "USER": "User",
       "MEMBERS": "Managers",

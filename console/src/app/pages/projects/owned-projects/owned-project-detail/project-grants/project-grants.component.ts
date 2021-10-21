@@ -5,7 +5,7 @@ import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { tap } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
-import { GrantedProject, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -34,7 +34,9 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   public memberRoleOptions: Role.AsObject[] = [];
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  public displayedColumns: string[] = ['select', 'grantedOrgName', 'dates'];
+  public displayedColumns: string[] = ['select', 'grantedOrgName','state', 'dates'];
+
+  ProjectGrantState: any = ProjectGrantState;
 
   constructor(private mgmtService: ManagementService, private toast: ToastService) { }
 
