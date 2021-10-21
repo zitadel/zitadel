@@ -74,14 +74,11 @@ func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType d
 	stmt, scan := q.prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
-			FlowsTriggersColumnTriggerType.identifier(): triggerType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
+			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
-		}).ToSql()
+		},
+	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
