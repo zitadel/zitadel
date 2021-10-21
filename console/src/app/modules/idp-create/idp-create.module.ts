@@ -14,9 +14,10 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { InfoSectionModule } from '../info-section/info-section.module';
 import { IdpCreateRoutingModule } from './idp-create-routing.module';
 import { IdpCreateComponent } from './idp-create.component';
+import { IdpTypeRadioComponent } from './idp-type-radio/idp-type-radio.component';
 
 @NgModule({
-  declarations: [IdpCreateComponent],
+  declarations: [IdpCreateComponent, IdpTypeRadioComponent],
   imports: [
     IdpCreateRoutingModule,
     CommonModule,

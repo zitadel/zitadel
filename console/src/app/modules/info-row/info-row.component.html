@@ -80,3 +80,33 @@
     </div>
   </div>
 </div>
+
+<div class="info-row" *ngIf="idp">
+  <div class="info width">
+    <p class="title">{{ 'IDP.ID' | translate }}</p>
+    <div class="copy-row">
+      <button [disabled]="copied == idp.id"
+          [matTooltip]="(copied != idp.id ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
+          appCopyToClipboard [valueToCopy]="idp.id" (copiedValue)="copied = $event">
+          {{idp.id}}
+      </button>
+    </div>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'IDP.DETAIL.DATECREATED' | translate }}</p>
+    <p class="desc">{{idp?.details?.creationDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'IDP.DETAIL.DATECHANGED' | translate }}</p>
+    <p class="desc">{{idp?.details?.changeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'IDP.STATE' | translate }}</p>
+    <p *ngIf="idp && idp.state !== undefined" class="state"
+    [ngClass]="{'active': idp.state === IDPState.IDP_STATE_ACTIVE, 'inactive': idp.state === IDPState.IDP_STATE_INACTIVE}">{{'IDP.STATES.'+idp.state
+    | translate}}</p>
+  </div>
+</div>

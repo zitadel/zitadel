@@ -757,6 +757,7 @@
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
+      "ADVANCED":"Erweitert",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
@@ -1039,6 +1040,7 @@
         "MEMBERTITLE": "Berechtigte Manager der Organisation",
         "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
         "PROJECTNAME": "Projektname",
+        "GRANTEDORG":"Berechtigte Organisation",
         "RESOURCEOWNER": "Besitzer"
       },
       "SHOWDETAIL": "Details anzeigen",
@@ -1132,19 +1134,18 @@
   "IDP": {
     "LIST": {
       "TITLE": "Identitäts Provider",
-      "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können."
+      "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können.",
+      "ACTIVETITLE":"Aktive Identitäts Provider"
     },
     "CREATE": {
       "TITLE": "Neuer Identitäts Provider",
-      "DESCRIPTION": "Definieren Sie hier die Zugangsdaten des neuen Identitäts Providers"
+      "DESCRIPTION": "Wählen Sie einen der folgenden Typen von Identitäts Providern"
     },
     "DETAIL": {
       "TITLE": "Identitäts Provider",
       "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers",
-      "OIDC": {
-        "TITLE": "OIDC Konfiguration",
-        "DESCRIPTION": "Geben Sie die korrekte OIDC Konfiguration Ihres Identity Providers an!"
-      }
+      "DATECREATED":"Erstellt",
+      "DATECHANGED":"Geändert"
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1168,9 +1169,11 @@
       "0": "kein Styling",
       "1": "Google"
     },
+    "ADD":"Identity Provider hinzufügen",
     "AUTOREGISTER":"Automatische Registrierung",
     "AUTOREGISTER_DESC":"Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
+    "OWNER":"Besitzer",
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Konfiguration",
@@ -1181,15 +1184,27 @@
     "CLIENTSECRET": "Client Secret",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
+    "DATES":"Datum",
     "CREATIONDATE": "Erstelldatum",
     "CHANGEDATE": "Letzte Änderung",
     "DEACTIVATE": "Deaktivieren",
     "ACTIVATE": "Aktivieren",
     "DELETE": "Löschen",
-    "DELETE_TITLE": "Idp löschen",
+    "DELETE_TITLE": "IDP löschen",
     "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
+    "OIDC": {
+      "TITLE":"OpenId Connect IDP",
+      "DESCRIPTION":"Geben Sie die Daten OIDC Identity Providers ein."
+    },
+    "JWT": {
+      "TITLE":"JWT IDP",
+      "DESCRIPTION":"Geben Sie die Daten JWT Identity Providers ein. ",
+      "HEADERNAME":"Header Name",
+      "JWTENDPOINT":"JWT Endpoint",
+      "JWTKEYSENDPOINT":"JWT Keys Endpoint"
+    },
     "TOAST": {
       "SAVED": "Erfolgreich gespeichert.",
       "REACTIVATED": "Idp reaktiviert.",

@@ -5,7 +5,7 @@ import { IDPQuery } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PolicyComponentServiceType } from '../../policy-component-types.enum';
+import { PolicyComponentServiceType } from '../../../policy-component-types.enum';
 
 @Component({
   selector: 'app-add-idp-dialog',

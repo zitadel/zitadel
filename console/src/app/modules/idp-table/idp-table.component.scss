@@ -8,6 +8,8 @@
 
   .table,
   .paginator {
+    width: 100% !important;
+
     td,
     th {
       padding: 0 1rem;
@@ -34,6 +36,15 @@ td {
     border-radius: .5rem;
     object-fit: contain;
     margin-top: .5rem;
+  }
+
+  .name-col {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      margin-bottom: .5rem;
+    }
   }
 }
 

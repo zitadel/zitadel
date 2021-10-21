@@ -1,15 +1,12 @@
 import { Component, Injector, OnDestroy, Type } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { LoginMethodComponentType } from 'src/app/modules/mfa-table/mfa-table.component';
 import {
   GetLoginPolicyResponse as AdminGetLoginPolicyResponse,
   UpdateLoginPolicyRequest,
   UpdateLoginPolicyResponse,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
 import {
   AddCustomLoginPolicyRequest,
   GetLoginPolicyResponse as MgmtGetLoginPolicyResponse,
@@ -21,7 +18,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { GridPolicy, LOGIN_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-import { AddIdpDialogComponent } from './add-idp-dialog/add-idp-dialog.component';
+import { LoginMethodComponentType } from './mfa-table/mfa-table.component';
 
 @Component({
   selector: 'app-login-policy',
@@ -37,17 +34,14 @@ export class LoginPolicyComponent implements OnDestroy {
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
-  public idps: IDPLoginPolicyLink.AsObject[] = [];
 
   public loading: boolean = false;
   public disabled: boolean = true;
 
-  public IDPStylingType: any = IDPStylingType;
   public currentPolicy: GridPolicy = LOGIN_POLICY;
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
-    private dialog: MatDialog,
     private injector: Injector,
   ) {
     this.sub = this.route.data.pipe(switchMap(data => {
@@ -83,9 +77,7 @@ export class LoginPolicyComponent implements OnDestroy {
         this.disabled = this.isDefault;
       }
     });
-    this.getIdps().then(resp => {
-      this.idps = resp;
-    });
+
   }
 
   public ngOnDestroy(): void {
@@ -99,21 +91,6 @@ export class LoginPolicyComponent implements OnDestroy {
         return (this.service as ManagementService).getLoginPolicy();
       case PolicyComponentServiceType.ADMIN:
         return (this.service as AdminService).getLoginPolicy();
-    }
-  }
-
-  private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).listLoginPolicyIDPs()
-          .then((resp) => {
-            return resp.resultList;
-          });
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).listLoginPolicyIDPs()
-          .then((providers) => {
-            return providers.resultList;
-          });
     }
   }
 
@@ -169,62 +146,6 @@ export class LoginPolicyComponent implements OnDestroy {
       }).catch(error => {
         this.toast.showError(error);
       });
-    }
-  }
-
-  public openDialog(): void {
-    const dialogRef = this.dialog.open(AddIdpDialogComponent, {
-      data: {
-        serviceType: this.serviceType,
-      },
-      width: '400px',
-    });
-
-    dialogRef.afterClosed().subscribe(resp => {
-      if (resp && resp.idp && resp.type) {
-        this.addIdp(resp.idp, resp.type).then(() => {
-          this.loading = true;
-          setTimeout(() => {
-            this.fetchData();
-          }, 2000);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-      }
-    });
-  }
-
-  private addIdp(idp: IDP.AsObject | IDP.AsObject, ownerType: IDPOwnerType): Promise<any> {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, ownerType);
-      case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).addIDPToLoginPolicy(idp.id);
-    }
-  }
-
-  public removeIdp(idp: IDPLoginPolicyLink.AsObject): void {
-    switch (this.serviceType) {
-      case PolicyComponentServiceType.MGMT:
-        (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
-          const index = this.idps.findIndex(temp => temp === idp);
-          if (index > -1) {
-            this.idps.splice(index, 1);
-          }
-        }, error => {
-          this.toast.showError(error);
-        });
-        break;
-      case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
-          const index = this.idps.findIndex(temp => temp === idp);
-          if (index > -1) {
-            this.idps.splice(index, 1);
-          }
-        }, error => {
-          this.toast.showError(error);
-        });
-        break;
     }
   }
 

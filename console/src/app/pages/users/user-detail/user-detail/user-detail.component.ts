@@ -37,6 +37,8 @@ export class UserDetailComponent implements OnInit {
   public EditDialogType: any = EditDialogType;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
+  public error: string = '';
+
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
@@ -56,7 +58,8 @@ export class UserDetailComponent implements OnInit {
           this.user = resp.user;
         }
       }).catch(err => {
-        console.error(err);
+        this.error = err.message ?? '';
+        this.toast.showError(err);
       });
 
       this.mgmtUserService.listUserMetadata(id, 0, 100, []).then(resp => {
