@@ -6,45 +6,42 @@ import (
 )
 
 func TestBackup_Command1(t *testing.T) {
-	timestamp := ""
-	databases := []string{}
+	timestamp := "test1"
 	bucketName := "testBucket"
 	backupName := "testBackup"
+	dbURL := "testDB"
+	dbPort := int32(80)
 
-	cmd := getCommand(timestamp, databases, bucketName, backupName)
-	equals := ""
+	cmd := getCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
+	)
+
+	equals := "export SAJSON=$(cat /secrets/sa.json | base64 | tr -d '\n' ) && cockroach sql --certs-dir=/cockroach/cockroach-certs --host=testDB --port=80 -e \"RESTORE FROM \\\"gs://testBucket/testBackup/test1?AUTH=specified&CREDENTIALS=${SAJSON}\\\";\""
 	assert.Equal(t, equals, cmd)
 }
 
 func TestBackup_Command2(t *testing.T) {
-	timestamp := ""
-	databases := []string{"testDb"}
+	timestamp := "test2"
 	bucketName := "testBucket"
 	backupName := "testBackup"
+	dbURL := "testDB2"
+	dbPort := int32(81)
 
-	cmd := getCommand(timestamp, databases, bucketName, backupName)
-	equals := "/scripts/restore.sh testBucket testBackup  testDb /secrets/sa.json /cockroach/cockroach-certs"
-	assert.Equal(t, equals, cmd)
-}
-
-func TestBackup_Command3(t *testing.T) {
-	timestamp := "test"
-	databases := []string{"testDb"}
-	bucketName := "testBucket"
-	backupName := "testBackup"
-
-	cmd := getCommand(timestamp, databases, bucketName, backupName)
-	equals := "/scripts/restore.sh testBucket testBackup test testDb /secrets/sa.json /cockroach/cockroach-certs"
-	assert.Equal(t, equals, cmd)
-}
-
-func TestBackup_Command4(t *testing.T) {
-	timestamp := ""
-	databases := []string{}
-	bucketName := "test"
-	backupName := "test"
-
-	cmd := getCommand(timestamp, databases, bucketName, backupName)
-	equals := ""
+	cmd := getCommand(
+		timestamp,
+		bucketName,
+		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
+	)
+	equals := "export SAJSON=$(cat /secrets/sa.json | base64 | tr -d '\n' ) && cockroach sql --certs-dir=/cockroach/cockroach-certs --host=testDB2 --port=81 -e \"RESTORE FROM \\\"gs://testBucket/testBackup/test2?AUTH=specified&CREDENTIALS=${SAJSON}\\\";\""
 	assert.Equal(t, equals, cmd)
 }

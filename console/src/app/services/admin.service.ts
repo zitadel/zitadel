@@ -9,6 +9,8 @@ import {
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
+  AddJWTIDPRequest,
+  AddJWTIDPResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddOIDCIDPRequest,
@@ -144,6 +146,8 @@ import {
   UpdateCustomOrgIAMPolicyResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
+  UpdateIDPJWTConfigRequest,
+  UpdateIDPJWTConfigResponse,
   UpdateIDPOIDCConfigRequest,
   UpdateIDPOIDCConfigResponse,
   UpdateIDPRequest,
@@ -675,6 +679,18 @@ export class AdminService {
     const req = new ReactivateIDPRequest;
     req.setIdpId(id);
     return this.grpcService.admin.reactivateIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public addJWTIDP(
+    req: AddJWTIDPRequest,
+  ): Promise<AddJWTIDPResponse.AsObject> {
+    return this.grpcService.admin.addJWTIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public updateIDPJWTConfig(
+    req: UpdateIDPJWTConfigRequest,
+  ): Promise<UpdateIDPJWTConfigResponse.AsObject> {
+    return this.grpcService.admin.updateIDPJWTConfig(req, null).then(resp => resp.toObject());
   }
 
   public listIAMMembers(

@@ -2,53 +2,10 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"testing"
-)
 
-func TestPasswordComplexityPolicyChanges(t *testing.T) {
-	type args struct {
-		existing *PasswordComplexityPolicy
-		new      *PasswordComplexityPolicy
-	}
-	type res struct {
-		changesLen int
-	}
-	tests := []struct {
-		name string
-		args args
-		res  res
-	}{
-		{
-			name: "loginpolicy all attributes change",
-			args: args{
-				existing: &PasswordComplexityPolicy{MinLength: 10, HasUppercase: true, HasLowercase: true, HasNumber: true, HasSymbol: true},
-				new:      &PasswordComplexityPolicy{MinLength: 5, HasUppercase: false, HasLowercase: false, HasNumber: false, HasSymbol: false},
-			},
-			res: res{
-				changesLen: 5,
-			},
-		},
-		{
-			name: "no changes",
-			args: args{
-				existing: &PasswordComplexityPolicy{MinLength: 10, HasUppercase: true, HasLowercase: true, HasNumber: true, HasSymbol: true},
-				new:      &PasswordComplexityPolicy{MinLength: 10, HasUppercase: true, HasLowercase: true, HasNumber: true, HasSymbol: true},
-			},
-			res: res{
-				changesLen: 0,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			changes := tt.args.existing.Changes(tt.args.new)
-			if len(changes) != tt.res.changesLen {
-				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
-			}
-		})
-	}
-}
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+)
 
 func TestAppendAddPasswordComplexityPolicyEvent(t *testing.T) {
 	type args struct {

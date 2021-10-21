@@ -2,13 +2,11 @@ package cmds
 
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/kubernetes/cli"
 	"sort"
 
-	"github.com/spf13/cobra"
-
-	"github.com/caos/orbos/pkg/kubernetes/cli"
-
 	"github.com/caos/zitadel/pkg/databases"
+	"github.com/spf13/cobra"
 )
 
 func BackupListCommand(getRv GetRootValues) *cobra.Command {

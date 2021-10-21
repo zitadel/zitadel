@@ -9,78 +9,147 @@
     </div>
 
     <h1>{{'IDP.CREATE.TITLE' | translate}}</h1>
-    <p>{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
 
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-    <form (ngSubmit)="addIdp()">
-        <ng-container [formGroup]="formGroup">
-            <div class="content">
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="name" />
-                </cnsl-form-field>
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="issuer" />
-                </cnsl-form-field>
-            </div>
+    <ng-container *ngIf="currentCreateStep === 1">
+      <p class="desc">{{'IDP.CREATE.DESCRIPTION' | translate}}</p>
 
-            <cnsl-info-section class="auto-reg-info">
-              <div>
-                <p class="auto-reg-desc">{{'IDP.AUTOREGISTER_DESC' | translate}}</p>
-                <mat-checkbox formControlName="autoRegister">
-                  {{'IDP.AUTOREGISTER' | translate}}
-                </mat-checkbox>
-              </div>
-            </cnsl-info-section>
+      <cnsl-idp-type-radio [types]="idpTypes" (selectedType)="idpType = $event"
+      [selected]="idpType"></cnsl-idp-type-radio>
 
-            <div class="content">
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="clientId" />
-                </cnsl-form-field>
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
-                    <input cnslInput formControlName="clientSecret" />
-                </cnsl-form-field>
-            </div>
-            <div class="content">
-                <cnsl-form-field appearance="outline" class="formfield">
-                    <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
-                    <mat-chip-list #chipScopesList aria-label="scope selection" *ngIf="scopesList">
-                        <mat-chip class="chip" *ngFor="let scope of scopesList.value" selectable="false" removable
-                            (removed)="removeScope(scope)">
-                            {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
-                        </mat-chip>
-                        <input cnslInput [matChipInputFor]="chipScopesList"
-                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
-                            (matChipInputTokenEnd)="addScope($event)">
-                    </mat-chip-list>
-                </cnsl-form-field>
-            </div>
-            <div class="content">
-                <cnsl-form-field class="formfield" appearance="outline">
-                    <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
-                    <mat-select formControlName="idpDisplayNameMapping">
-                        <mat-option *ngFor="let field of mappingFields" [value]="field">
-                            {{ 'IDP.MAPPINGFIELD.'+field | translate }}
-                        </mat-option>
-                    </mat-select>
-                </cnsl-form-field>
-                <cnsl-form-field class="formfield" appearance="outline">
-                    <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
-                    <mat-select formControlName="usernameMapping">
-                        <mat-option *ngFor="let field of mappingFields" [value]="field">
-                            {{ 'IDP.MAPPINGFIELD.'+field | translate }}
-                        </mat-option>
-                    </mat-select>
-                </cnsl-form-field>
-            </div>
-        </ng-container>
+      <div class="actions">
+        <button mat-raised-button [disabled]="!idpType" color="primary"
+            (click)="currentCreateStep = 2">{{'ACTIONS.CONTINUE' | translate}}</button>
+    </div>
+    </ng-container>
 
-        <button color="primary" mat-raised-button class="continue-button" [disabled]="formGroup.invalid" type="submit">
+    <ng-container *ngIf="currentCreateStep === 2 && idpType === OIDC">
+      <p class="desc">{{'IDP.OIDC.DESCRIPTION' | translate}}</p>
+
+      <form  [formGroup]="oidcFormGroup" (ngSubmit)="addOIDCIdp()">
+        <div class="idp-content">
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+                <input cnslInput formControlName="name" />
+            </cnsl-form-field>
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+                <input cnslInput formControlName="issuer" />
+            </cnsl-form-field>
+        </div>
+
+        <cnsl-info-section class="auto-reg-info">
+          <div>
+            <p class="auto-reg-desc">{{'IDP.AUTOREGISTER_DESC' | translate}}</p>
+            <mat-checkbox formControlName="autoRegister">
+              {{'IDP.AUTOREGISTER' | translate}}
+            </mat-checkbox>
+          </div>
+        </cnsl-info-section>
+
+        <div class="idp-content">
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
+                <input cnslInput formControlName="clientId" />
+            </cnsl-form-field>
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'IDP.CLIENTSECRET' | translate }}</cnsl-label>
+                <input cnslInput formControlName="clientSecret" />
+            </cnsl-form-field>
+        </div>
+        <div class="idp-content">
+            <cnsl-form-field appearance="outline" class="formfield">
+                <cnsl-label>{{ 'IDP.SCOPESLIST' | translate }}</cnsl-label>
+                <mat-chip-list #chipScopesList aria-label="scope selection" *ngIf="scopesList">
+                    <mat-chip class="chip" *ngFor="let scope of scopesList.value" selectable="false" removable
+                        (removed)="removeScope(scope)">
+                        {{scope}} <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip>
+                    <input cnslInput [matChipInputFor]="chipScopesList"
+                        [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                        (matChipInputTokenEnd)="addScope($event)">
+                </mat-chip-list>
+            </cnsl-form-field>
+        </div>
+        <div class="idp-content">
+            <cnsl-form-field class="formfield" appearance="outline">
+                <cnsl-label>{{ 'IDP.IDPDISPLAYNAMMAPPING' | translate }}</cnsl-label>
+                <mat-select formControlName="idpDisplayNameMapping">
+                    <mat-option *ngFor="let field of mappingFields" [value]="field">
+                        {{ 'IDP.MAPPINGFIELD.'+field | translate }}
+                    </mat-option>
+                </mat-select>
+            </cnsl-form-field>
+            <cnsl-form-field class="formfield" appearance="outline">
+                <cnsl-label>{{ 'IDP.USERNAMEMAPPING' | translate }}</cnsl-label>
+                <mat-select formControlName="usernameMapping">
+                    <mat-option *ngFor="let field of mappingFields" [value]="field">
+                        {{ 'IDP.MAPPINGFIELD.'+field | translate }}
+                    </mat-option>
+                </mat-select>
+            </cnsl-form-field>
+        </div>
+        
+        <div class="actions">
+          <button color="primary" (click)="currentCreateStep = 1"  mat-stroked-button class="back-button" type="button">
+            {{ 'ACTIONS.BACK' | translate }}
+          </button>
+          <button color="primary" mat-raised-button class="continue-button" [disabled]="oidcFormGroup.invalid" type="submit">
             {{ 'ACTIONS.SAVE' | translate }}
+          </button>
+        </div>
+      </form>
+    </ng-container>
+
+    <ng-container *ngIf="currentCreateStep === 2 && idpType === JWT">
+      <p class="desc">{{'IDP.JWT.DESCRIPTION' | translate}}</p>
+
+      <form [formGroup]="jwtFormGroup" (ngSubmit)="addJWTIdp()">
+        <div class="idp-content">
+          <cnsl-form-field appearance="outline" class="formfield">
+            <cnsl-label>{{ 'IDP.NAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="jwtName" />
+          </cnsl-form-field>
+          <cnsl-form-field appearance="outline" class="formfield">
+            <cnsl-label>{{ 'IDP.JWT.HEADERNAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="jwtHeaderName" />
+          </cnsl-form-field>
+          <cnsl-form-field appearance="outline" class="formfield">
+            <cnsl-label>{{ 'IDP.ISSUER' | translate }}</cnsl-label>
+            <input cnslInput formControlName="jwtIssuer" />
+          </cnsl-form-field>
+        </div>
+
+        <cnsl-info-section class="auto-reg-info">
+          <div>
+            <p class="auto-reg-desc">{{'IDP.AUTOREGISTER_DESC' | translate}}</p>
+            <mat-checkbox formControlName="jwtAutoRegister">
+              {{'IDP.AUTOREGISTER' | translate}}
+            </mat-checkbox>
+          </div>
+        </cnsl-info-section>
+
+        <div class="idp-content">
+          <cnsl-form-field appearance="outline" class="formfield">
+            <cnsl-label>{{ 'IDP.JWT.JWTENDPOINT' | translate }}</cnsl-label>
+            <input cnslInput formControlName="jwtEndpoint" />
+          </cnsl-form-field>
+          <cnsl-form-field appearance="outline" class="formfield">
+            <cnsl-label>{{ 'IDP.JWT.JWTKEYSENDPOINT' | translate }}</cnsl-label>
+            <input cnslInput formControlName="jwtKeysEndpoint" />
+          </cnsl-form-field>
+        </div>
+      
+      <div class="actions">
+        <button color="primary" (click)="currentCreateStep = 1" mat-stroked-button class="back-button" type="button">
+          {{ 'ACTIONS.BACK' | translate }}
         </button>
+        <button color="primary" mat-raised-button class="continue-button" [disabled]="jwtFormGroup.invalid" type="submit">
+          {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+      </div>
     </form>
+    </ng-container>
+
 </div>

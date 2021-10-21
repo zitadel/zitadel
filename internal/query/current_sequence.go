@@ -8,9 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/caos/zitadel/internal/query/projection"
-
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query/projection"
 )
 
 type LatestSequence struct {

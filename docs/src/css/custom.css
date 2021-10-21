@@ -6,35 +6,245 @@
  */
 
 /* You can override the default Infima variables here. */
-@import url('https://fonts.googleapis.com/css2?family=Lato');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 
 :root {
-  --ifm-color-primary: #556cd1;
-  --ifm-color-primary-dark: #3e58cb;
-  --ifm-color-primary-darker: #3550c5;
-  --ifm-color-primary-darkest: #2c42a2;
-  --ifm-color-primary-light: #6c80d7;
-  --ifm-color-primary-lighter: #788ada;
-  --ifm-color-primary-lightest: #9aa8e4;
+  --ifm-navbar-background-color: #ffffff;
+  --ifm-footer-background-color: #f4f4f4;
+  --ifm-menu-color-background-active: #f2f5ff;
+  --ifm-menu-color-active: #5469d4;
+  --ifm-menu-color-background-hover: #f7fafc;
+  --ifm-font-color-base: #6b7280;
+  --ifm-link-color: #5469d4;
+  --ifm-menu-color: #697386;
+  --ifm-footer-link-color: #000000;
+  --ifm-color-primary: #5469d4;
+  --ifm-color-primary-dark: #4d61cf;
+  --ifm-color-primary-darker: #4356c9;
+  --ifm-color-primary-darkest: #3a4cc3; /* 293bb9 */
+  --ifm-color-primary-light: #6e80da;
+  --ifm-color-primary-lighter: #8796e1;
+  --ifm-color-primary-lightest: #aab4ea;
   --ifm-code-font-size: 95%;
   --ifm-font-family-base: 'Lato', sans-serif;
   --ifm-hero-background-color: var(--ifm-color-primary);
   --ifm-hero-text-color: var(--ifm-font-color-base-inverse);
-  --get-started: #FF2069;
+  --get-started: #ff2069;
   --get-started-bg-hover: var(--ifm-hero-background-color);
   --ifm-color-info: #4cb3d4;
+  --ifm-navbar-height: 56px;
+  --ifm-navbar-padding-vertical: 0;
+  --ifm-footer-color: #00000080;
+  --ifm-footer-padding-vertical: 50px;
+  --ifm-heading-font-weight: 500;
+  --ifm-heading-color: #000000;
+  --ifm-font-color-base: #6b7280;
+  --ifm-navbar-link-hover-color: #000000;
+  --ifm-heading-color: #000000;
+  --ifm-color-success-contrast-foreground: #0e6245;
+  --ifm-color-success-contrast-background: #cbf4c9;
+  --ifm-color-success-dark: #0e6245;
+  --ifm-color-info-dark: #6c8eef;
+  --ifm-color-info-contrast-background: #f0f3fa;
+  --ifm-color-secondary-contrast-background: #f0f3fa;
+  --ifm-alert-background-color-highlight: #620e0e;
+  --ifm-color-warning-dark: #ffc1c1;
+  --ifm-color-warning-contrast-background: #ffc1c1;
+  --ifm-color-warning-contrast-foreground: #620e0e;
+  --card-background: #fafafa;
+  --list-background: #f7fafc;
+  --ifm-spacing-horizontal: 1.5rem;
+}
+
+.padding-top--md {
+  padding-top: 3rem !important;
+}
+
+.menu {
+  padding: 3rem .5rem !important;
+}
+
+.menu__link--active {
+  font-weight: 600;
+}
+
+.react-toggle-track {
+  background-color: #ebedf0 !important;
+}
+
+.footer__title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.navbar:not(.navbar-sidebar--show) {
+  background-color: hsla(0,0%,100%,.8);
+  backdrop-filter: saturate(110%) blur(5px);
+}
+
+:root[data-theme="dark"] .navbar:not(.navbar-sidebar--show) {
+  background-color: rgba(31,41,55,.5019607843137255);
+  backdrop-filter: saturate(110%) blur(5px);
+}
+
+.navbar .navbar__items .navbar__item{
+  font-size: 14px;
+  line-height: 1.25rem;
+  font-weight: 550;
+}
+
+.menu__link {
+  font-size: 14px;
+}
+
+.menu__link--sublist:after {
+  opacity: .3;
+}
+
+:root[data-theme="dark"] .react-toggle-track {
+  background-color: #454a66 !important;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #737c8850;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar {
+  background-color: transparent;
+}
+
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background-color: #737c8850;
+}
+
+h1 {
+  font-size: 2.2rem;
+}
+
+h2 {
+  font-size: 1.8rem;
+}
+
+.navbar__brand {
+  height: 40px;
 }
 
 :root[data-theme="dark"] {
+  /* --ifm-menu-color-active: #ffd0df;  */
+  /* 6e80da */
+  --ifm-navbar-background-color: #1b2036;
+  --ifm-footer-background-color: #121430;
+  --ifm-menu-color-background-active: #ffffff10;
+  --ifm-menu-color-active: #ffffff;
+  --ifm-menu-color-background-hover: #3c405850;
+  --ifm-font-color-base: #c1c9d2;
+  --ifm-menu-color: #a3acb9;
+  --ifm-link-color: #ff2069;
+  --docsearch-searchbox-background: #454a66;
+  --docsearch-searchbox-focus-background: #454a66;
+  --docsearch-searchbox-shadow: inset 0 0 0 1px var(--docsearch-primary-color);
+  --docsearch-hit-background: #454a66;
+  --docsearch-highlight-color: #5469d4;
+  --ifm-navbar-shadow: inset 0 -1px #303031;
+  --ifm-footer-link-color: #ffffff;
+  --ifm-color-emphasis-300: #ffffff20;
+  --ifm-color-primary: #ff2069;
+  --ifm-color-primary-dark: #ff1c61;
+  --ifm-color-primary-darker: #ff1856;
+  --ifm-color-primary-darkest: #ff134c;
+  --ifm-color-primary-light: #ff4180;
+  --ifm-color-primary-lighter: #ff6396;
+  --ifm-color-primary-lightest: #ff90b4;
   --ifm-background-color: #141735;
   --ifm-hero-background-color: #0F1022;
   --ifm-hero-text-color: var(--ifm-font-color-base);
-  --get-started-bg: --ifm-font-color-base;
+  --get-started-bg: var(--ifm-font-color-base);
+  --get-started: #059669;
+  --ifm-footer-color: #ffffff50;
+  --ifm-heading-color: #ffffff;
+  --ifm-font-color-base: #c1c9d2;
+  --ifm-navbar-link-hover-color: #ffffff;
+  --ifm-color-success-contrast-foreground: #cbf4c9;
+  --ifm-color-success-contrast-background: #4f566b;
+  --ifm-color-success-dark: #cbf4c9;
+  --ifm-color-info-dark: #6c8eef;
+  --ifm-color-info-contrast-background: #3c4257;
+  --ifm-table-stripe-background: #3c4257;
+  --ifm-color-secondary-contrast-background: #3c4257;
+  --ifm-code-background: #3c4257;
+  --ifm-alert-background-color-highlight: #ffc1c1;
+  --ifm-color-warning-dark: #4f566b;
+  --ifm-color-warning-contrast-background: #4f566b;
+  --ifm-color-warning-contrast-foreground: #ffc1c1;
+  --card-background: #454a66;
+  --list-background: #3c405850;
 }
 
 .menu li li a {
   font-size: 14px;
-  padding: 2px 14px;
+  /* padding: 2px 14px; */
+}
+
+i {
+  font-size: 1.5rem;
+  color: var(--ifm-heading-color);
+}
+
+main .container img {
+  border-radius: .5rem;
+}
+
+.rounded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: .5rem;
+  margin-right: 1rem;
+  border-radius: 50%;
+}
+
+.rounded i {
+  color: white;
+}
+
+.rounded-start {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.rounded-login {
+  background: linear-gradient(40deg, #059669 30%, #047857);
+}
+
+.rounded-privatelabel {
+  background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+}
+
+.rounded-texts {
+  background: linear-gradient(40deg, #dc2626 30%, #db2777);
+}
+
+.rounded-system, .rounded-apis {
+  background: linear-gradient(40deg, #1f2937, #111827);
 }
 
 .docusaurus-highlight-code-line {

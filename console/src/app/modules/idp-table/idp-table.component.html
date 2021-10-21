@@ -38,8 +38,14 @@
 
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef> {{ 'IDP.NAME' | translate }} </th>
-                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp"><strong>{{idp?.name}}</strong>
-                </td>
+                <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+                  <div class="name-col">
+                    <span>{{idp?.name}}</span>
+                    <mat-icon matTooltip="{{'IDP.OIDC.TITLE' | translate}}" *ngIf="idp?.oidcConfig" svgIcon="mdi_openid"></mat-icon>
+                    <mat-icon matTooltip="{{'IDP.JWT.TITLE' | translate}}" *ngIf="idp?.jwtConfig" svgIcon="mdi_jwt"></mat-icon>
+
+                  </div>
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="config">
@@ -62,7 +68,7 @@
             </ng-container>
 
             <ng-container matColumnDef="dates">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CREATIONDATE' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'IDP.DATES' | translate }} </th>
                 <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
                     <div class="date-block">
                         <span class="date-sub">{{ 'IDP.CREATIONDATE' | translate }}:</span>
@@ -76,7 +82,7 @@
             </ng-container>
 
             <ng-container matColumnDef="owner">
-                <th mat-header-cell *matHeaderCellDef> {{ 'IDP.TYPE' | translate }} </th>
+                <th mat-header-cell *matHeaderCellDef> {{ 'IDP.OWNER' | translate }} </th>
                 <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
                     {{'IDP.OWNERTYPES.'+idp.owner | translate }} </td>
             </ng-container>
@@ -88,7 +94,7 @@
                         [disabled]="serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG"
                         mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}"
                         (click)="removeIdp(idp)">
-                        <mat-icon>remove_circle</mat-icon>
+                        <i class="las la-trash"></i>
                     </button>
                 </td>
             </ng-container>

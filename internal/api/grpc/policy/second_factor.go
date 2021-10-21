@@ -2,7 +2,6 @@ package policy
 
 import (
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/iam/model"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 
@@ -17,7 +16,7 @@ func SecondFactorTypeToDomain(secondFactorType policy_pb.SecondFactorType) domai
 	}
 }
 
-func ModelSecondFactorTypesToPb(types []model.SecondFactorType) []policy_pb.SecondFactorType {
+func ModelSecondFactorTypesToPb(types []domain.SecondFactorType) []policy_pb.SecondFactorType {
 	t := make([]policy_pb.SecondFactorType, len(types))
 	for i, typ := range types {
 		t[i] = ModelSecondFactorTypeToPb(typ)
@@ -25,18 +24,18 @@ func ModelSecondFactorTypesToPb(types []model.SecondFactorType) []policy_pb.Seco
 	return t
 }
 
-func ModelSecondFactorTypeToPb(secondFactorType model.SecondFactorType) policy_pb.SecondFactorType {
+func ModelSecondFactorTypeToPb(secondFactorType domain.SecondFactorType) policy_pb.SecondFactorType {
 	switch secondFactorType {
-	case model.SecondFactorTypeOTP:
+	case domain.SecondFactorTypeOTP:
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_OTP
-	case model.SecondFactorTypeU2F:
+	case domain.SecondFactorTypeU2F:
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_U2F
 	default:
 		return policy_pb.SecondFactorType_SECOND_FACTOR_TYPE_UNSPECIFIED
 	}
 }
 
-func ModelMultiFactorTypesToPb(types []model.MultiFactorType) []policy_pb.MultiFactorType {
+func ModelMultiFactorTypesToPb(types []domain.MultiFactorType) []policy_pb.MultiFactorType {
 	t := make([]policy_pb.MultiFactorType, len(types))
 	for i, typ := range types {
 		t[i] = ModelMultiFactorTypeToPb(typ)
@@ -44,9 +43,9 @@ func ModelMultiFactorTypesToPb(types []model.MultiFactorType) []policy_pb.MultiF
 	return t
 }
 
-func ModelMultiFactorTypeToPb(typ model.MultiFactorType) policy_pb.MultiFactorType {
+func ModelMultiFactorTypeToPb(typ domain.MultiFactorType) policy_pb.MultiFactorType {
 	switch typ {
-	case model.MultiFactorTypeU2FWithPIN:
+	case domain.MultiFactorTypeU2FWithPIN:
 		return policy_pb.MultiFactorType_MULTI_FACTOR_TYPE_U2F_WITH_VERIFICATION
 	default:
 		return policy_pb.MultiFactorType_MULTI_FACTOR_TYPE_UNSPECIFIED

@@ -42,16 +42,12 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
 		newOrgMember(
 			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
-		newOrgDomain(
-			handler{view, bulkLimit, configs.cycleDuration("OrgDomain"), errorCount, es}),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
 		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newLoginPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
 		newLabelPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es},
 			staticStorage),
@@ -61,12 +57,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults),
-		newPasswordComplexityPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
-		newPasswordAgePolicy(
-			handler{view, bulkLimit, configs.cycleDuration("PasswordAgePolicy"), errorCount, es}),
-		newLockoutPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LockoutPolicy"), errorCount, es}),
 		newOrgIAMPolicy(
 			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 		newMailTemplate(
@@ -75,8 +65,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
 		newFeatures(
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
-		newPrivacyPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
 		newCustomText(
 			handler{view, bulkLimit, configs.cycleDuration("CustomText"), errorCount, es}),
 		newMetadata(

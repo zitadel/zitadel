@@ -11,17 +11,17 @@ module.exports = {
   themeConfig: {
     zoomSelector: '.markdown :not(em) > img',
     navbar: {
-      title: 'ZITADEL',
+      // title: 'ZITADEL',
       logo: {
         alt: 'ZITADEL logo',
-        src: 'img/zitadel-logo-solo-light.png',
-        srcDark: 'img/zitadel-logo-solo-darkdesign.svg',
+        src: 'img/zitadel-logo-dark.svg',
+        srcDark: 'img/zitadel-logo-light.svg',
       },
       items: [
         {
           type: 'doc',
           label: 'Guides',
-          docId: 'guides/introduction',
+          docId: 'guides/overview',
           position: 'left',
         },
         {
@@ -62,7 +62,6 @@ module.exports = {
       ],
     },
     footer: {
-      style: 'dark',
       links: [
         {
           title: 'Community',
@@ -149,4 +148,7 @@ module.exports = {
     ],
     require.resolve('plugin-image-zoom'),
   ],
+  stylesheets: [
+    "https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css"
+  ]
 };

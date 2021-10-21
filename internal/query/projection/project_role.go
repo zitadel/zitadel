@@ -42,6 +42,10 @@ func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
 					Event:  project.RoleRemovedType,
 					Reduce: p.reduceProjectRoleRemoved,
 				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
 			},
 		},
 	}
@@ -62,7 +66,7 @@ const (
 func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g92Fg", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -84,20 +88,24 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventRea
 func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sM0f", "reduce.wrong.event.type")
 	}
 	if e.DisplayName == nil && e.Group == nil {
 		return crdb.NewNoOpStatement(e), nil
 	}
+	columns := make([]handler.Column, 0, 7)
+	columns = append(columns, handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
+		handler.NewCol(ProjectRoleColumnSequence, e.Sequence()))
+	if e.DisplayName != nil {
+		columns = append(columns, handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName))
+	}
+	if e.Group != nil {
+		columns = append(columns, handler.NewCol(ProjectRoleColumnGroupName, *e.Group))
+	}
 	return crdb.NewUpdateStatement(
 		e,
-		[]handler.Column{
-			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
-			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
-			handler.NewCol(ProjectRoleColumnDisplayName, *e.DisplayName),
-			handler.NewCol(ProjectRoleColumnGroupName, *e.Group),
-		},
+		columns,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
@@ -108,13 +116,27 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("was not an  event")
+		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-L0fJf", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnKey, e.Key),
+			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-l0geG", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
 			handler.NewCond(ProjectRoleColumnProjectID, e.Aggregate().ID),
 		},
 	), nil

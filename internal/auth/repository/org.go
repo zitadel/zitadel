@@ -14,5 +14,4 @@ type OrgRepository interface {
 	GetMyPasswordComplexityPolicy(ctx context.Context) (*iam_model.PasswordComplexityPolicyView, error)
 	GetLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error)
 	GetLoginText(ctx context.Context, orgID string) ([]*domain.CustomText, error)
-	GetDefaultPrivacyPolicy(ctx context.Context) (*iam_model.PrivacyPolicyView, error)
 }
