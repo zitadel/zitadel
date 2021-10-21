@@ -90,8 +90,8 @@
   <div class="info width">
     <p class="title">{{ 'IDP.ID' | translate }}</p>
     <div class="copy-row">
-      <button [disabled]="copied == idp.id"
-        [matTooltip]="(copied != idp.id ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate" cnslCopyToClipboard
+      <button [disabled]="copied === idp.id"
+        [matTooltip]="(copied !== idp.id ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate" cnslCopyToClipboard
         [valueToCopy]="idp.id" (copiedValue)="copied = $event">
         {{idp.id}}
       </button>

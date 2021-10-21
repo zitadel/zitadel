@@ -52,7 +52,7 @@
         <h2 class="setting-title">{{'PROJECT.PAGES.PRIVATELABEL.TITLE' | translate}}</h2>
         <p class="setting-desc">
           <span>{{'PROJECT.PAGES.PRIVATELABEL.'+project.privateLabelingSetting+'.TITLE' | translate}}</span>
-          <button [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async))== false"
+          <button [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
             (click)="openPrivateLabelingDialog()" mat-icon-button><i class="las la-edit"></i></button>
         </p>
       </div>
@@ -87,17 +87,17 @@
             description="{{ 'PROJECT.ROLE.DESCRIPTION' | translate }}">
             <p>{{'PROJECT.ROLE.OPTIONS' | translate}}</p>
             <mat-checkbox [(ngModel)]="project.projectRoleAssertion"
-              [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async))== false"
+              [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
               (change)="saveProject()" color="primary">
               {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
             <p class="desc">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
             <mat-checkbox [(ngModel)]="project.projectRoleCheck"
-              [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async))== false"
+              [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
               (change)="saveProject()" color="primary">
               {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
             <p class="desc">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
             <mat-checkbox [(ngModel)]="project.hasProjectCheck"
-              [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async))== false"
+              [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
               (change)="saveProject()" color="primary">
               {{'PROJECT.HAS_PROJECT' | translate}}</mat-checkbox>
             <p class="desc">{{'PROJECT.HAS_PROJECT_DESCRIPTION' | translate}}</p>

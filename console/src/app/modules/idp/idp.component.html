@@ -11,7 +11,7 @@
         (click)="changeState(IDPState.IDP_STATE_INACTIVE)">
         {{'ACTIONS.DEACTIVATE' | translate}}
       </button>
-      <button mat-menu-item *ngIf="idp?.state == IDPState.IDP_STATE_INACTIVE"
+      <button mat-menu-item *ngIf="idp?.state === IDPState.IDP_STATE_INACTIVE"
         (click)="changeState(IDPState.IDP_STATE_ACTIVE)">
         {{'ACTIONS.REACTIVATE' | translate}}
       </button>
