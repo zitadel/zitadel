@@ -11,6 +11,7 @@ import (
 	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	kuberneteszit "github.com/caos/zitadel/pkg/kubernetes"
 	"github.com/spf13/cobra"
+	macherrs "k8s.io/apimachinery/pkg/api/errors"
 )
 
 func TeardownCommand(getRv GetRootValues) *cobra.Command {
@@ -72,11 +73,11 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 			"version": version,
 		}).Info("Destroying Orb")
 
-		if err := kuberneteszit.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil {
+		if err := kuberneteszit.ScaleZitadelOperator(monitor, k8sClient, 0); err != nil && !macherrs.IsNotFound(err) {
 			return err
 		}
 
-		if err := kuberneteszit.ScaleDatabaseOperator(monitor, k8sClient, 0); err != nil {
+		if err := kuberneteszit.ScaleDatabaseOperator(monitor, k8sClient, 0); err != nil && !macherrs.IsNotFound(err) {
 			return err
 		}
 
@@ -121,13 +122,13 @@ func destroyOperator(monitor mntr.Monitor, gitClient *git.Client, k8sClient kube
 			spec := desired.Spec
 
 			_, del := orbzit.Reconcile(monitor, spec, gitops)
-			if err := del(k8sClient); err != nil {
+			if err := del(k8sClient); err != nil && !macherrs.IsNotFound(err) {
 				return err
 			}
 		}
 	} else {
 		_, del := orbzit.Reconcile(monitor, &orbzit.Spec{}, gitops)
-		if err := del(k8sClient); err != nil {
+		if err := del(k8sClient); err != nil && !macherrs.IsNotFound(err) {
 			return err
 		}
 	}
@@ -148,13 +149,13 @@ func destroyDatabase(monitor mntr.Monitor, gitClient *git.Client, k8sClient kube
 			spec := desired.Spec
 
 			_, del := orbdb.Reconcile(monitor, spec, gitops)
-			if err := del(k8sClient); err != nil {
+			if err := del(k8sClient); err != nil && !macherrs.IsNotFound(err) {
 				return err
 			}
 		}
 	} else {
 		_, del := orbdb.Reconcile(monitor, &orbdb.Spec{}, gitops)
-		if err := del(k8sClient); err != nil {
+		if err := del(k8sClient); err != nil && !macherrs.IsNotFound(err) {
 			return err
 		}
 	}

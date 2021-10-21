@@ -1,4 +1,4 @@
-package chore
+package zitadelctl
 
 import (
 	"bytes"
@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 )
 
-func BuildExecutables(debug bool) error {
+func buildExecutables(debug bool) error {
 
 	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
 	outBuf := new(bytes.Buffer)
@@ -18,7 +19,7 @@ func BuildExecutables(debug bool) error {
 		return err
 	}
 
-	version := strings.TrimSpace(strings.Replace(outBuf.String(), "heads/", "", 1)) + "-dev"
+	version := strings.TrimSpace(strings.Replace(outBuf.String(), "heads/", "", 1))
 
 	cmd = exec.Command("git", "rev-parse", "HEAD")
 	outBuf = new(bytes.Buffer)
@@ -29,10 +30,10 @@ func BuildExecutables(debug bool) error {
 
 	args := []string{"build", "-a"}
 	args = append(args,
-		"-installsuffix cgo",
-		"-ldflags \"-extldflags -static -X main.Version="+version+" -X main.githubClientID="+os.Getenv("GITHUBOAUTHCLIENTID")+" -X main.githubClientSecret="+os.Getenv("GITHUBOAUTHCLIENTSECRET")+"}\"",
-		"-o", "./artifacts/zitadelctl",
-		"./cmd/zitadelctl/main.go",
+		"-installsuffix", "cgo",
+		"-ldflags", "-extldflags -static -X main.Version="+version+" -X main.githubClientID="+os.Getenv("GITHUBOAUTHCLIENTID")+" -X main.githubClientSecret="+os.Getenv("GITHUBOAUTHCLIENTSECRET"),
+		"-o", "./artifacts/zitadelctl-"+runtime.GOOS+"-"+runtime.GOARCH,
+		"../zitadelctl/main.go",
 	)
 	if debug {
 		args = append(args, "--debug")
@@ -40,17 +41,12 @@ func BuildExecutables(debug bool) error {
 
 	cmd = exec.Command("go", args...)
 	cmd.Stdout = os.Stderr
-	// gen-executables
+	cmd.Env = []string{"CGO_ENABLED=0"}
 	if err := run(cmd); err != nil {
 		// error contains --githubclientid and --githubclientsecret values
 		return errors.New("building executables failed")
 	}
-
-	cmd = exec.Command("go", args...)
-	cmd.Stdout = os.Stderr
-	cmd.Env = []string{"CGO_ENABLED=0", "GOOS=linux"}
-	// gen-charts
-	return run(cmd)
+	return nil
 }
 
 func run(cmd *exec.Cmd) error {

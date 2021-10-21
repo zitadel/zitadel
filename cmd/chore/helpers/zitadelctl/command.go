@@ -1,4 +1,4 @@
-package chore
+package zitadelctl
 
 import (
 	"context"
@@ -17,24 +17,24 @@ func Command(debug, reuse, download bool, downloadTag string) (func(context.Cont
 	bin := zitadelctlPath()
 
 	if reuse {
-		return runZitadelctlCmd(debug, bin), nil
+		return runCmd(debug, bin), nil
 	}
 
 	if !download {
-		if err := BuildExecutables(debug); err != nil {
+		if err := buildExecutables(debug); err != nil {
 			return func(context.Context) *exec.Cmd { return nil }, fmt.Errorf("building executables failed: %w", err)
 		}
-		return runZitadelctlCmd(debug, bin), nil
+		return runCmd(debug, bin), nil
 	}
 
 	if err := downloadZitadelctl(bin, downloadTag); err != nil {
 		return nil, fmt.Errorf("downloading zitadelctl release failed: %w", err)
 	}
 
-	return runZitadelctlCmd(debug, bin), nil
+	return runCmd(debug, bin), nil
 }
 
-func runZitadelctlCmd(debug bool, zitadelctlPath string) func(context.Context) *exec.Cmd {
+func runCmd(debug bool, zitadelctlPath string) func(context.Context) *exec.Cmd {
 
 	return func(ctx context.Context) *exec.Cmd {
 		if debug {
@@ -51,5 +51,5 @@ func zitadelctlPath() string {
 		extension = ".exe"
 	}
 
-	return fmt.Sprintf("./artifacts/zitadelctl-%s-amd64%s", runtime.GOOS, extension)
+	return fmt.Sprintf("./artifacts/zitadelctl-%s-%s%s", runtime.GOOS, runtime.GOARCH, extension)
 }

@@ -1,6 +1,8 @@
-package chore_test
+package k8s_test
 
-import "gopkg.in/yaml.v3"
+import (
+	"gopkg.in/yaml.v3"
+)
 
 type cronjob struct {
 	Metadata struct {
@@ -11,15 +13,17 @@ type cronjob struct {
 	}
 }
 
-func getCronJobScheduleWithName(kubectl kubectlCmd, namespace, name string) string {
-	cron, err := getCronJobWithName(kubectl, namespace, name)
-	if err != nil {
-		return ""
+func GetCronJobScheduleWithName(kubectl KubectlCmd, namespace, name string) func() string {
+	return func() string {
+		cron, err := GetCronJobWithName(kubectl, namespace, name)
+		if err != nil {
+			return ""
+		}
+		return cron.Spec.Schedule
 	}
-	return cron.Spec.Schedule
 }
 
-func getCronJobWithName(kubectl kubectlCmd, namespace, name string) (cronjob, error) {
+func GetCronJobWithName(kubectl KubectlCmd, namespace, name string) (cronjob, error) {
 	cronjob := cronjob{}
 	args := []string{
 		"get", "cronjobs",

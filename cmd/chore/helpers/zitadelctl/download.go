@@ -1,4 +1,4 @@
-package chore
+package zitadelctl
 
 import (
 	"fmt"
@@ -24,8 +24,8 @@ func downloadZitadelctl(zitadelctlPath, tag string) error {
 		return err
 	}
 
-	orbctlBase := filepath.Base(zitadelctlPath)
-	url := fmt.Sprintf("https://github.com/caos/zitadel/releases/latest/download/%s", orbctlBase)
+	zitadelctlBase := filepath.Base(zitadelctlPath)
+	url := fmt.Sprintf("https://github.com/caos/zitadel/releases/latest/download/%s", zitadelctlBase)
 
 	if tag != "" {
 		/*
@@ -34,7 +34,7 @@ func downloadZitadelctl(zitadelctlPath, tag string) error {
 				orbctlBase = strings.ReplaceAll(orbctlBase, "-", ".")
 			}*/
 
-		url = fmt.Sprintf("https://github.com/caos/zitadel/releases/download/%s-dev/%s", tag, orbctlBase)
+		url = fmt.Sprintf("https://github.com/caos/zitadel/releases/download/%s-dev/%s", tag, zitadelctlBase)
 	}
 
 	resp, err := http.Get(url)

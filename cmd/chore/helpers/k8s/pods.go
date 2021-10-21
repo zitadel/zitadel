@@ -1,4 +1,4 @@
-package chore_test
+package k8s_test
 
 import (
 	"gopkg.in/yaml.v3"
@@ -19,7 +19,7 @@ type pods struct {
 	}
 }
 
-func countCompletedPods(kubectl kubectlCmd, namespace, selector string) func() (readyPodsCount int8) {
+func CountCompletedPods(kubectl KubectlCmd, namespace, selector string) func() (readyPodsCount int8) {
 	return func() int8 {
 		pods, err := getPodsWithSelector(kubectl, namespace, selector)
 		if err != nil {
@@ -29,7 +29,7 @@ func countCompletedPods(kubectl kubectlCmd, namespace, selector string) func() (
 	}
 }
 
-func countReadyPods(kubectl kubectlCmd, namespace, selector string) func() int8 {
+func CountReadyPods(kubectl KubectlCmd, namespace, selector string) func() int8 {
 	return func() int8 {
 		pods, err := getPodsWithSelector(kubectl, namespace, selector)
 		if err != nil {
@@ -39,7 +39,8 @@ func countReadyPods(kubectl kubectlCmd, namespace, selector string) func() int8 
 	}
 }
 
-func getPodsWithSelector(kubectl kubectlCmd, namespace, selector string) (pods, error) {
+func getPodsWithSelector(kubectl KubectlCmd, namespace, selector string) (pods, error) {
+
 	pods := pods{}
 	args := []string{
 		"get", "pods",

@@ -48,8 +48,14 @@ func BackupList() core.BackupListFunc {
 
 func listFilesWithFilter(akid, secretkey, sessionToken string, region string, endpoint string, bucketName, name string) ([]string, error) {
 	customResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		endpointStr := endpoint
+		if !strings.HasPrefix(endpoint, "http://") &&
+			!strings.HasPrefix(endpoint, "https://") {
+			endpointStr = "https://" + endpoint
+		}
+
 		return aws.Endpoint{
-			URL:           "https://" + endpoint,
+			URL:           endpointStr,
 			SigningRegion: region,
 		}, nil
 	})

@@ -10,7 +10,7 @@ import (
 
 func TestChore(t *testing.T) {
 	os.Setenv("ZITADEL_E2E_TAG", "operator-e2e")
-	os.Setenv("ZITADEL_E2E_SHA", "SHA-c18046530081")
+	os.Setenv("ZITADEL_E2E_SHA", "SHA-40aed4b9f11a")
 	os.Setenv("ZITADEL_E2E_DBUSER", "test")
 	os.Setenv("ZITADEL_E2E_BACKUPSAJSON", "./artifacts/sa.json")
 	os.Setenv("ZITADEL_E2E_BACKUPAKID", "./artifacts/akid")
