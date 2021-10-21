@@ -54,9 +54,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	query, scan := q.prepareFlowQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
 		}).ToSql()
 	if err != nil {
@@ -74,14 +72,11 @@ func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType d
 	stmt, scan := q.prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
-			FlowsTriggersColumnTriggerType.identifier(): triggerType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
+			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
-		}).ToSql()
+		},
+	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}

@@ -141,6 +141,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
+		return
 	}
 	l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 	return
