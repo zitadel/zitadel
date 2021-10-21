@@ -2,8 +2,9 @@ package model
 
 import (
 	"encoding/json"
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"testing"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 func TestOrgIAMPolicyChanges(t *testing.T) {

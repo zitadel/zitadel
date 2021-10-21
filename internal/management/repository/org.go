@@ -23,8 +23,6 @@ type OrgRepository interface {
 	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
 	IDPConfigByID(ctx context.Context, id string) (*iam_model.IDPConfigView, error)
 
-	GetMyOrgIamPolicy(ctx context.Context) (*iam_model.OrgIAMPolicyView, error)
-
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 
