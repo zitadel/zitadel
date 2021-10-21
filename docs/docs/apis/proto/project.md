@@ -102,6 +102,18 @@ title: zitadel/project.proto
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.name_query |  ProjectNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.project_resource_owner_query |  ProjectResourceOwnerQuery | - |  |
+
+
+
+
+### ProjectResourceOwnerQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| resource_owner |  string | - | string.max_len: 200<br />  |
 
 
 

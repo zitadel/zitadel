@@ -40,6 +40,8 @@ import {
   AddOIDCAppResponse,
   AddOrgDomainRequest,
   AddOrgDomainResponse,
+  AddOrgJWTIDPRequest,
+  AddOrgJWTIDPResponse,
   AddOrgMemberRequest,
   AddOrgMemberResponse,
   AddOrgOIDCIDPRequest,
@@ -372,6 +374,8 @@ import {
   UpdateMachineResponse,
   UpdateOIDCAppConfigRequest,
   UpdateOIDCAppConfigResponse,
+  UpdateOrgIDPJWTConfigRequest,
+  UpdateOrgIDPJWTConfigResponse,
   UpdateOrgIDPOIDCConfigRequest,
   UpdateOrgIDPOIDCConfigResponse,
   UpdateOrgIDPRequest,
@@ -771,6 +775,18 @@ export class ManagementService {
     const req = new ReactivateOrgIDPRequest();
     req.setIdpId(idpId);
     return this.grpcService.mgmt.reactivateOrgIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public addOrgJWTIDP(
+    req: AddOrgJWTIDPRequest,
+  ): Promise<AddOrgJWTIDPResponse.AsObject> {
+    return this.grpcService.mgmt.addOrgJWTIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public updateOrgIDPJWTConfig(
+    req: UpdateOrgIDPJWTConfigRequest,
+  ): Promise<UpdateOrgIDPJWTConfigResponse.AsObject> {
+    return this.grpcService.mgmt.updateOrgIDPJWTConfig(req, null).then(resp => resp.toObject());
   }
 
   public addHumanUser(req: AddHumanUserRequest): Promise<AddHumanUserResponse.AsObject> {

@@ -169,7 +169,7 @@ Errors:
       AlreadyExists: Default Message Text already exists
       Invalid: Default Message Text is invalid
     PasswordComplexity:
-      NotFound: Password  Complexity Policy not found
+      NotFound: Password Complexity Policy not found
       Empty: Password Complexity Policy is empty
       NotExisting: Password Complexity Policy doesn't exist
       AlreadyExists: Password Complexity Policy already exists

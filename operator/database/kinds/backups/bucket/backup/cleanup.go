@@ -23,7 +23,7 @@ func GetCleanupFunc(
 		if err := k8sClient.DeleteJob(namespace, GetJobName(backupName)); err != nil {
 			return fmt.Errorf("error while trying to cleanup backup: %w", err)
 		}
-		monitor.Info("restore backup is completed")
+		monitor.Info("cleanup backup is completed")
 		return nil
 	}
 }

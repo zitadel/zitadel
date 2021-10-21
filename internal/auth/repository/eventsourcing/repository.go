@@ -98,6 +98,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		es,
 		userRepo,
 		eventstore.AuthRequestRepo{
+			PrivacyPolicyProvider:      queries,
 			Command:                    command,
 			OrgViewProvider:            queries,
 			AuthRequests:               authReq,
@@ -108,8 +109,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			UserCommandProvider:        command,
 			UserEventProvider:          &userRepo,
 			IDPProviderViewProvider:    view,
-			LoginPolicyViewProvider:    view,
-			LockoutPolicyViewProvider:  view,
+			LockoutPolicyViewProvider:  queries,
+			LoginPolicyViewProvider:    queries,
 			UserGrantProvider:          view,
 			ProjectProvider:            view,
 			IdGenerator:                idGenerator,
@@ -161,6 +162,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			View:           view,
 			SystemDefaults: systemDefaults,
 			Eventstore:     es,
+			Query:          queries,
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,

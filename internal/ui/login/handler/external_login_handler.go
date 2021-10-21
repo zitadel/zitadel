@@ -17,6 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
 const (
@@ -346,7 +347,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.OrgIAMPolicy, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:

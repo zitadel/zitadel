@@ -2,19 +2,19 @@ package policy
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 
-func OrgIAMPolicyToPb(policy *model.OrgIAMPolicyView) *policy_pb.OrgIAMPolicy {
+func OrgIAMPolicyToPb(policy *query.OrgIAMPolicy) *policy_pb.OrgIAMPolicy {
 	return &policy_pb.OrgIAMPolicy{
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-		IsDefault:             policy.Default,
+		IsDefault:             policy.IsDefault,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"", //TODO: resource owner
+			policy.ResourceOwner,
 		),
 	}
 }
