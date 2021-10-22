@@ -1,4 +1,4 @@
-name: "Code scanning - action"
+name: "E2E testing"
 
 on:
   push:
