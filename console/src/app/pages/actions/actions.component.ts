@@ -1,5 +1,5 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
@@ -15,7 +15,7 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
   templateUrl: './actions.component.html',
   styleUrls: ['./actions.component.scss']
 })
-export class ActionsComponent implements OnInit {
+export class ActionsComponent {
   public flow!: Flow.AsObject;
   public flowType: FlowType =  FlowType.FLOW_TYPE_EXTERNAL_AUTHENTICATION;
 
@@ -41,9 +41,6 @@ export class ActionsComponent implements OnInit {
       this.flow = flowResponse.flow;
       console.log(this.flow);
     })
-  }
-
-  ngOnInit(): void {
   }
 
   public clearFlow(): void {
