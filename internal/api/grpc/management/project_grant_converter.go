@@ -37,7 +37,7 @@ func ProjectGrantQueriesToModel(req *mgmt_pb.ListProjectGrantsRequest) (_ []quer
 		}
 		queries = append(queries, q)
 	}
-	projectIDQuery, err := query.NewProjectGrantProjectIDSearchQuery(query.TextEquals, req.ProjectId)
+	projectIDQuery, err := query.NewProjectGrantProjectIDSearchQuery(req.ProjectId)
 	if err != nil {
 		return nil, err
 	}

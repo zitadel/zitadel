@@ -156,7 +156,7 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 		SearchRequest: SearchRequest{},
 		Queries:       make([]SearchQuery, 2),
 	}
-	searchQuery.Queries[0], err = NewProjectGrantProjectIDSearchQuery(TextEquals, projectID)
+	searchQuery.Queries[0], err = NewProjectGrantProjectIDSearchQuery(projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 	return q.SearchProjectGrants(ctx, searchQuery)
 }
 
-func NewProjectGrantProjectIDSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectGrantColumnProjectID, value, method)
+func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantColumnProjectID, value, TextEquals)
 }
 
 func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
