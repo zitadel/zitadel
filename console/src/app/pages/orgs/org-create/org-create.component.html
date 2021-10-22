@@ -5,14 +5,14 @@
         </button>
     </div>
 
-    <ng-template appHasRole [appHasRole]="['iam.write']">
-        <mat-slide-toggle [disabled]="currentCreateStep != 1" class="example-margin" color="primary"
+    <ng-template cnslHasRole [hasRole]="['iam.write']">
+        <mat-slide-toggle [disabled]="currentCreateStep !== 1" class="example-margin" color="primary"
             (change)="changeSelf($event)" [(ngModel)]="forSelf">
             Use your personal account as organisation owner
         </mat-slide-toggle>
 
         <ng-container *ngIf="!forSelf">
-            <ng-container *ngIf="currentCreateStep == 1">
+            <ng-container *ngIf="currentCreateStep === 1">
                 <h1>{{'ORG.PAGES.ORGDETAIL_TITLE' | translate}} </h1>
 
                 <form [formGroup]="orgForm" (ngSubmit)="next()">
@@ -37,7 +37,7 @@
                 </form>
             </ng-container>
 
-            <ng-container *ngIf="currentCreateStep == createSteps">
+            <ng-container *ngIf="currentCreateStep === createSteps">
                 <h1>{{'ORG.PAGES.ORGDETAILUSER_TITLE' | translate}}</h1>
 
                 <div class="user">
@@ -47,35 +47,35 @@
                             <cnsl-form-field class="formfield" appearance="outline">
                                 <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
                                 <input cnslInput formControlName="userName" required />
-                                <span cnsl-error *ngIf="userName?.invalid && userName?.errors?.required">
+                                <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </span>
                             </cnsl-form-field>
                             <cnsl-form-field class="formfield" appearance="outline">
                                 <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}</cnsl-label>
                                 <input cnslInput formControlName="email" required />
-                                <span cnsl-error *ngIf="email?.invalid && email?.errors?.required">
+                                <span cnslError *ngIf="email?.invalid && email?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </span>
                             </cnsl-form-field>
                             <cnsl-form-field class="formfield" appearance="outline">
                                 <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}</cnsl-label>
                                 <input cnslInput formControlName="firstName" required />
-                                <span cnsl-error *ngIf="firstName?.invalid && firstName?.errors?.required">
+                                <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </span>
                             </cnsl-form-field>
                             <cnsl-form-field class="formfield" appearance="outline">
                                 <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}</cnsl-label>
                                 <input cnslInput formControlName="lastName" required />
-                                <span cnsl-error *ngIf="lastName?.invalid && lastName?.errors?.required">
+                                <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </span>
                             </cnsl-form-field>
                             <cnsl-form-field class="formfield" appearance="outline">
                                 <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
                                 <input cnslInput formControlName="nickName" />
-                                <span cnsl-error *ngIf="nickName?.invalid && nickName?.errors?.required">
+                                <span cnslError *ngIf="nickName?.invalid && nickName?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </span>
                             </cnsl-form-field>
@@ -89,7 +89,7 @@
                                         {{ 'GENDERS.'+gender | translate }}
                                     </mat-option>
                                 </mat-select>
-                                <span cnsl-error *ngIf="gender?.invalid && gender?.errors?.required">
+                                <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
                                     {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                 </span>
                             </cnsl-form-field>
@@ -99,7 +99,7 @@
                                     <mat-option *ngFor="let language of languages" [value]="language">
                                         {{ 'LANGUAGES.'+language | translate }}
                                     </mat-option>
-                                    <span cnsl-error
+                                    <span cnslError
                                         *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
                                         {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                     </span>
@@ -113,9 +113,9 @@
                             <ng-container *ngIf="usePassword && pwdForm">
                                 <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
-                                <app-password-complexity-view class="complexity-view" [policy]="this.policy"
+                                <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy"
                                     [password]="password">
-                                </app-password-complexity-view>
+                                </cnsl-password-complexity-view>
 
                                 <form [formGroup]="pwdForm" class="pwd-form">
                                     <cnsl-form-field class="pwd" *ngIf="password" appearance="outline">
@@ -123,7 +123,7 @@
                                         <input cnslInput autocomplete="off" name="firstpassword"
                                             formControlName="password" type="password" />
 
-                                        <span cnsl-error *ngIf="password?.errors?.required">
+                                        <span cnslError *ngIf="password?.errors?.required">
                                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                         </span>
 
@@ -133,10 +133,10 @@
                                         <input cnslInput autocomplete="off" name="confirmPassword"
                                             formControlName="confirmPassword" type="password" />
 
-                                        <span cnsl-error *ngIf="confirmPassword?.errors?.required">
+                                        <span cnslError *ngIf="confirmPassword?.errors?.required">
                                             {{ 'USER.VALIDATION.REQUIRED' | translate }}
                                         </span>
-                                        <span cnsl-error *ngIf="confirmPassword?.errors?.notequal">
+                                        <span cnslError *ngIf="confirmPassword?.errors?.notequal">
                                             {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
                                         </span>
                                     </cnsl-form-field>
@@ -156,9 +156,9 @@
             </ng-container>
         </ng-container>
     </ng-template>
-    <ng-template appHasRole [appHasRole]="['org.create']">
+    <ng-template cnslHasRole [hasRole]="['org.create']">
         <div *ngIf="forSelf">
-            <ng-container *ngIf="currentCreateStep == 1">
+            <ng-container *ngIf="currentCreateStep === 1">
                 <h1>{{'ORG.PAGES.ORGDETAIL_TITLE_WITHOUT_DOMAIN' | translate}} </h1>
 
                 <form [formGroup]="orgForm" (ngSubmit)="createOrgForSelf()">

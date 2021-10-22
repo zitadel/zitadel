@@ -2,17 +2,17 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-    selector: 'app-code-dialog',
-    templateUrl: './code-dialog.component.html',
-    styleUrls: ['./code-dialog.component.scss'],
+  selector: 'cnsl-code-dialog',
+  templateUrl: './code-dialog.component.html',
+  styleUrls: ['./code-dialog.component.scss'],
 })
 export class CodeDialogComponent {
-    public code: string = '';
-    constructor(public dialogRef: MatDialogRef<CodeDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any) { }
+  public code: string = '';
+  constructor(public dialogRef: MatDialogRef<CodeDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any) { }
 
-    closeDialog(code: string = ''): void {
-        this.dialogRef.close(code);
-    }
+  closeDialog(code: string = ''): void {
+    this.dialogRef.close(code);
+  }
 
 }

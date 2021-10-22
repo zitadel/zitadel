@@ -30,7 +30,7 @@ export enum LoginMethodComponentType {
 }
 
 @Component({
-  selector: 'app-mfa-table',
+  selector: 'cnsl-mfa-table',
   templateUrl: './mfa-table.component.html',
   styleUrls: ['./mfa-table.component.scss'],
 })

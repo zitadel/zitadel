@@ -13,11 +13,12 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { COMPLEXITY_POLICY, GridPolicy } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-password-policy',
+  selector: 'cnsl-password-policy',
   templateUrl: './password-complexity-policy.component.html',
   styleUrls: ['./password-complexity-policy.component.scss'],
 })
@@ -32,6 +33,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
   public loading: boolean = false;
   public currentPolicy: GridPolicy = COMPLEXITY_POLICY;
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     private route: ActivatedRoute,

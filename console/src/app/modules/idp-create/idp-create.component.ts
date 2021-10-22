@@ -17,7 +17,7 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
 import { JWT, OIDC, RadioItemIdpType } from './idptypes';
 
 @Component({
-  selector: 'app-idp-create',
+  selector: 'cnsl-idp-create',
   templateUrl: './idp-create.component.html',
   styleUrls: ['./idp-create.component.scss'],
 })

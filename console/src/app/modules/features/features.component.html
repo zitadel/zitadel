@@ -1,4 +1,4 @@
-<app-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/iam/policies' : '/org']"
+<cnsl-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/iam/policies' : '/org']"
   [title]="('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
 
   <h2>{{'FEATURES.TIER.TITLE' | translate}}</h2>
@@ -16,7 +16,7 @@
 
   <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
     <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
-    <div class="detail" *ngIf="stripeCustomer || stripeCustomer == null">
+    <div class="detail" *ngIf="stripeCustomer || stripeCustomer === null">
       <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
         <a (click)="setCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
       </p>
@@ -31,7 +31,7 @@
       </p>
     </div>
 
-    <p class="error" *ngIf="(stripeCustomer || stripeCustomer == null) && !customerValid">
+    <p class="error" *ngIf="(stripeCustomer || stripeCustomer === null) && !customerValid">
       {{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
     <div class="current-tier">
@@ -40,7 +40,7 @@
     </div>
   </ng-container>
 
-  <ng-template appHasRole [appHasRole]="['iam.features.delete']">
+  <ng-template cnslHasRole [hasRole]="['iam.features.delete']">
     <button *ngIf="serviceType === FeatureServiceType.MGMT && !isDefault" matTooltip="{{'POLICY.RESET' | translate}}"
       color="warn" (click)="resetFeatures()" mat-stroked-button>
       {{'POLICY.RESET' | translate}}
@@ -265,8 +265,6 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.FLOWS' | translate}}</p>
-
     <div class="row">
       <div class="featureavatar pink">
         <i class="icon las la-exchange-alt"></i>
@@ -280,11 +278,11 @@
     </div>
   </div>
 
-  <div class="btn-container" *ngIf="(['iam.features.write'] | hasRole | async) == true">
+  <div class="btn-container" *ngIf="(['iam.features.write'] | hasRole | async) === true">
     <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
       }}</button>
   </div>
-</app-detail-layout>
+</cnsl-detail-layout>
 
 <ng-template #templateRef let-active="active">
   <span class="state" [ngClass]="{'active': active, 'inactive': !active}">

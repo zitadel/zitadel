@@ -15,7 +15,7 @@ enum OrgListSearchKey {
 }
 
 @Component({
-  selector: 'app-org-list',
+  selector: 'cnsl-org-list',
   templateUrl: './org-list.component.html',
   styleUrls: ['./org-list.component.scss'],
   animations: [

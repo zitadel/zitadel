@@ -1093,6 +1093,11 @@
         "GRANTEDORG":"Berechtigte Organisation",
         "RESOURCEOWNER": "Besitzer"
       },
+      "STATE": "Status",
+      "STATES": {
+        "1": "Aktiv",
+        "2": "Inaktiv"
+      },
       "SHOWDETAIL": "Details anzeigen",
       "USER": "Benutzer",
       "MEMBERS": "Manager",

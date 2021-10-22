@@ -11,7 +11,7 @@ import { StorageKey, StorageLocation, StorageService } from 'src/app/services/st
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-owned-project-grid',
+  selector: 'cnsl-owned-project-grid',
   templateUrl: './owned-project-grid.component.html',
   styleUrls: ['./owned-project-grid.component.scss'],
   animations: [
@@ -44,7 +44,7 @@ export class OwnedProjectGridComponent implements OnChanges {
 
   @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
   @Output() changedView: EventEmitter<boolean> = new EventEmitter();
-  @Input() loading: boolean = false;
+  @Input() loading: boolean | null = false;
 
   public selection: SelectionModel<Project.AsObject> = new SelectionModel<Project.AsObject>(true, []);
 
@@ -94,9 +94,11 @@ export class OwnedProjectGridComponent implements OnChanges {
     this.getPrefixedItem('pinned-projects').then(storageEntry => {
       if (storageEntry) {
         const array: string[] = JSON.parse(storageEntry);
-        const toSelect: Project.AsObject[] = this.items.filter((item, index) => {
+        const toSelect: Project.AsObject[] = this.items.filter((item) => {
           if (array.includes(item.id)) {
             return true;
+          } else {
+            return false;
           }
         });
         this.selection.select(...toSelect);
