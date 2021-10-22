@@ -156,7 +156,7 @@
                 </a>
               </ng-template>
 
-              <ng-template appHasRole [appHasRole]="['org.read(:[0-9]*)?']">
+              <ng-template cnslHasRole [hasRole]="['org.read(:[0-9]*)?']">
                 <a @navitem matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item"
                   [routerLinkActive]="['active']" [routerLink]="[ '/actions']"
                   [routerLinkActiveOptions]="{ exact: true }">

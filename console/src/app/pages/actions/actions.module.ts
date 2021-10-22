@@ -1,3 +1,4 @@
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -52,6 +53,7 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     FormFieldModule,
     MatSelectModule,
     WarnDialogModule,
+    DragDropModule,
   ]
 })
 export class ActionsModule { }

@@ -7,7 +7,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { Action, ActionState } from 'src/app/proto/generated/zitadel/action_pb';
-import { CreateActionRequest, ListActionsResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import {
+  CreateActionRequest,
+  ListActionsResponse,
+  UpdateActionRequest,
+} from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -94,9 +98,9 @@ export class ActionTableComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe((req: CreateActionRequest) => {
+    dialogRef.afterClosed().subscribe((req: UpdateActionRequest) => {
       if (req) {
-        this.mgmtService.createAction(req).then(resp => {
+        this.mgmtService.updateAction(req).then(resp => {
           this.refreshPage();
         }).catch((error: any) => {
           this.toast.showError(error);

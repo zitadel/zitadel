@@ -1,3 +1,4 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -87,6 +88,23 @@ export class ActionsComponent implements OnInit {
         });
       }
     });
+  }
+
+  drop(triggerActionsListIndex: number, array: any[],event: CdkDragDrop<Action.AsObject[]>) {
+    moveItemInArray(array, event.previousIndex, event.currentIndex);
+    this.saveFlow(triggerActionsListIndex);
+  }
+
+  saveFlow(index: number) {
+    this.mgmtService.setTriggerActions(
+      this.flow.triggerActionsList[index].actionsList.map(action => action.id),
+      this.flowType,
+      this.flow.triggerActionsList[index].triggerType,
+      ).then(updateResponse => {
+      console.log(updateResponse);
+    }).catch(error => {
+      this.toast.showError(error);
+    })
   }
 
 }

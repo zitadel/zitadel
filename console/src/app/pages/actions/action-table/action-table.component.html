@@ -1,4 +1,4 @@
-<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
+<cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource?.data?.length ?? 0"
   [timestamp]="actionsResult?.details?.viewTimestamp" [selection]="selection">
   <div actions>
     <a color="primary" mat-raised-button (click)="openAddAction()">
@@ -63,4 +63,4 @@
       [length]="actionsResult?.details?.totalResult || 0" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]"
       (page)="changePage($event)"></cnsl-paginator>
   </div>
-</app-refresh-table>
+</cnsl-refresh-table>
