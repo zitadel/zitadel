@@ -2,15 +2,8 @@ name: "E2E testing"
 
 on:
   push:
-    branches:
-      - main
-    tags-ignore:
-      - '**'
-  pull_request:
-    branches:
-      - '**'
-  workflow_dispatch:
-
+    branches-ignore:
+      - master
 
 jobs:
   e2e-testing:
