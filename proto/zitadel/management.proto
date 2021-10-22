@@ -4221,6 +4221,7 @@ message GetLoginPolicyRequest {}
 
 message GetLoginPolicyResponse {
     zitadel.policy.v1.LoginPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LoginPolicy
     bool is_default = 2;
 }
 
@@ -4337,6 +4338,7 @@ message GetPasswordComplexityPolicyRequest {}
 
 message GetPasswordComplexityPolicyResponse {
     zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy
     bool is_default = 2;
 }
 
@@ -4383,6 +4385,7 @@ message GetPasswordAgePolicyRequest {}
 
 message GetPasswordAgePolicyResponse {
     zitadel.policy.v1.PasswordAgePolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.PasswordAgePolicy
     bool is_default = 2;
 }
 
@@ -4423,6 +4426,7 @@ message GetLockoutPolicyRequest {}
 
 message GetLockoutPolicyResponse {
     zitadel.policy.v1.LockoutPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LockoutPolicy
     bool is_default = 2;
 }
 
@@ -4500,6 +4504,7 @@ message GetLabelPolicyRequest {}
 
 message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy
     bool is_default = 2;
 }
 
@@ -4508,6 +4513,7 @@ message GetPreviewLabelPolicyRequest {}
 
 message GetPreviewLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy
     bool is_default = 2;
 }
 

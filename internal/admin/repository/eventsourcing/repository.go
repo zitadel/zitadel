@@ -28,7 +28,6 @@ type Config struct {
 
 type EsRepository struct {
 	spooler *es_spol.Spooler
-	eventstore.OrgRepo
 	eventstore.IAMRepository
 	eventstore.AdministratorRepo
 	eventstore.FeaturesRepo
@@ -60,10 +59,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 
 	return &EsRepository{
 		spooler: spool,
-		OrgRepo: eventstore.OrgRepo{
-			View:           view,
-			SystemDefaults: systemDefaults,
-		},
 		IAMRepository: eventstore.IAMRepository{
 			Eventstore:                          es,
 			View:                                view,

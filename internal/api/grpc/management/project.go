@@ -63,7 +63,7 @@ func (s *Server) ListGrantedProjects(ctx context.Context, req *mgmt_pb.ListGrant
 	if err != nil {
 		return nil, err
 	}
-	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	err = queries.AppendGrantedOrgQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

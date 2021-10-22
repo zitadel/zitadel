@@ -16,15 +16,6 @@ type PasswordAgePolicy struct {
 	ExpireWarnDays uint64 `json:"expireWarnDays"`
 }
 
-func PasswordAgePolicyFromModel(policy *iam_model.PasswordAgePolicy) *PasswordAgePolicy {
-	return &PasswordAgePolicy{
-		ObjectRoot:     policy.ObjectRoot,
-		State:          int32(policy.State),
-		MaxAgeDays:     policy.MaxAgeDays,
-		ExpireWarnDays: policy.ExpireWarnDays,
-	}
-}
-
 func PasswordAgePolicyToModel(policy *PasswordAgePolicy) *iam_model.PasswordAgePolicy {
 	return &iam_model.PasswordAgePolicy{
 		ObjectRoot:     policy.ObjectRoot,

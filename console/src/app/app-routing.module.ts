@@ -26,7 +26,7 @@ const routes: Routes = [
             .then(m => m.GrantedProjectsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
-            roles: ['project.read'],
+            roles: ['project.grant.read'],
         },
     },
     {

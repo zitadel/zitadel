@@ -1,57 +1,64 @@
 <app-detail-layout [backRouterLink]="[ '/projects', projectid]" title="{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}"
-    description="{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}">
-    <div class="master-row">
-        <div class="left-col">
-            <div class="row">
-                <span class="first">{{'PROJECT.GRANT.DETAIL.PROJECTNAME' | translate}}</span>
-                <span class="fill-space"></span>
-                <span>{{grant?.projectName}}</span>
-            </div>
-            <div class="row">
-                <span class="first">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
-                <span class="fill-space"></span>
-                <span>{{grant?.details?.resourceOwner}}</span>
-            </div>
-        </div>
-
+  description="{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}">
+  <div class="master-row">
+    <div class="left-col">
+      <div class="row">
+        <span class="first">{{'PROJECT.GRANT.DETAIL.PROJECTNAME' | translate}}</span>
         <span class="fill-space"></span>
-
-        <div>
-            <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE"
-                (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' | translate}}</button>
-            <button mat-stroked-button color="warn"
-                *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE"
-                (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
-        </div>
+        <span>{{grant?.projectName}}</span>
+      </div>
+      <div class="row">
+        <span class="first">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
+        <span class="fill-space"></span>
+        <span>{{grant?.projectOwnerName}}</span>
+      </div>
+      <div class="row">
+        <span class="first">{{'PROJECT.GRANT.DETAIL.GRANTEDORG' | translate}}</span>
+        <span class="fill-space"></span>
+        <span>{{grant?.grantedOrgName}}</span>
+      </div>
     </div>
 
-    <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
-        <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-        <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event)">
-            <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
-                {{role.key}}
-            </mat-option>
-        </mat-select>
-    </cnsl-form-field>
+    <span class="fill-space"></span>
 
-    <div class="divider"></div>
+    <div>
+      <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_ACTIVE"
+        (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
+        translate}}</button>
+      <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECTGRANTSTATE_INACTIVE"
+        (click)="changeState(ProjectGrantState.PROJECTGRANTSTATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' |
+        translate}}</button>
+    </div>
+  </div>
 
-    <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
-    <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
+  <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
+    <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
+    <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event)">
+      <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
+        {{role.key}}
+      </mat-option>
+    </mat-select>
+  </cnsl-form-field>
 
-    <app-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource" [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async"
-        [memberRoleOptions]="memberRoleOptions" (updateRoles)="updateMemberRoles($event.member, $event.change)"
-        [factoryLoadFunc]="changePageFactory" (changedSelection)="selection = $event" [refreshTrigger]="changePage">
-        <button selectactions (click)="removeProjectMemberSelection()"
-            [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async) == false"
-            matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" color="warn" mat-raised-button>
-            <i class="las la-trash"></i>
-            {{'ACTIONS.SELECTIONDELETE' | translate}}
-        </button>
-        <a writeactions color="primary"
-            [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async) == false"
-            (click)="openAddMember()" color="primary" mat-raised-button>
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-        </a>
-    </app-members-table>
+  <div class="divider"></div>
+
+  <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
+  <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
+
+  <app-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource"
+    [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async"
+    [memberRoleOptions]="memberRoleOptions" (updateRoles)="updateMemberRoles($event.member, $event.change)"
+    [factoryLoadFunc]="changePageFactory" (changedSelection)="selection = $event" [refreshTrigger]="changePage">
+    <button selectactions (click)="removeProjectMemberSelection()"
+      [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async) == false"
+      matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" color="warn" mat-raised-button>
+      <i class="las la-trash"></i>
+      {{'ACTIONS.SELECTIONDELETE' | translate}}
+    </button>
+    <a writeactions color="primary"
+      [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async) == false"
+      (click)="openAddMember()" color="primary" mat-raised-button>
+      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+    </a>
+  </app-members-table>
 </app-detail-layout>

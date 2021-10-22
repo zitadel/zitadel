@@ -17,6 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
 const (
@@ -141,6 +142,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 			return
 		}
 		l.handleExternalUserAuthenticated(w, r, authReq, idpConfig, userAgentID, tokens)
+		return
 	}
 	l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
 	return
@@ -346,7 +348,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *iam_model.OrgIAMPolicyView, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.OrgIAMPolicy, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:

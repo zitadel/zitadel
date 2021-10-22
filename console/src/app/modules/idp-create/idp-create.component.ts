@@ -6,14 +6,15 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
+import { AddJWTIDPRequest, AddOIDCIDPRequest } from 'src/app/proto/generated/zitadel/admin_pb';
 import { OIDCMappingField } from 'src/app/proto/generated/zitadel/idp_pb';
-import { AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { AddOrgJWTIDPRequest, AddOrgOIDCIDPRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policies/policy-component-types.enum';
+import { JWT, OIDC, RadioItemIdpType } from './idptypes';
 
 @Component({
   selector: 'app-idp-create',
@@ -29,10 +30,23 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   public projectId: string = '';
 
-  public formGroup!: FormGroup;
-  public createSteps: number = 1;
+  public oidcFormGroup!: FormGroup;
+  public jwtFormGroup!: FormGroup;
+
+  public createSteps: number = 2;
   public currentCreateStep: number = 1;
   public loading: boolean = false;
+
+  public idpTypes: RadioItemIdpType[] = [
+    OIDC,
+    JWT,
+  ];
+
+  OIDC: any = OIDC;
+  JWT: any = JWT;
+
+  public idpType!: RadioItemIdpType;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -40,7 +54,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private _location: Location,
   ) {
-    this.formGroup = new FormGroup({
+    this.oidcFormGroup = new FormGroup({
       name: new FormControl('', [Validators.required]),
       clientId: new FormControl('', [Validators.required]),
       clientSecret: new FormControl('', [Validators.required]),
@@ -49,6 +63,16 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
       idpDisplayNameMapping: new FormControl(0),
       usernameMapping: new FormControl(0),
       autoRegister: new FormControl(false),
+    });
+
+    this.jwtFormGroup = new FormGroup({
+      jwtName: new FormControl('', [Validators.required]),
+      jwtHeaderName: new FormControl('', [Validators.required]),
+      jwtIssuer: new FormControl('', [Validators.required]),
+      jwtEndpoint: new FormControl('', [Validators.required]),
+      jwtKeysEndpoint: new FormControl('', [Validators.required]),
+      jwtStylingType: new FormControl(0),
+      jwtAutoRegister: new FormControl(false),
     });
 
     this.route.data.pipe(take(1)).subscribe(data => {
@@ -82,7 +106,7 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     this.projectId = projectid;
   }
 
-  public addIdp(): void {
+  public addOIDCIdp(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       const req = new AddOrgOIDCIDPRequest();
 
@@ -133,6 +157,56 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
     }
   }
 
+  public addJWTIdp(): void {
+    if (this.serviceType === PolicyComponentServiceType.MGMT) {
+      const req = new AddOrgJWTIDPRequest();
+
+      req.setName(this.jwtName?.value);
+      req.setHeaderName(this.jwtHeaderName?.value);
+      req.setIssuer(this.jwtIssuer?.value);
+      req.setJwtEndpoint(this.jwtEndpoint?.value);
+      req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+      req.setAutoRegister(this.jwtAutoRegister?.value);
+      req.setStylingType(this.jwtStylingType?.value);
+
+      this.loading = true;
+      (this.service as ManagementService).addOrgJWTIDP(req).then((idp) => {
+        setTimeout(() => {
+          this.loading = false;
+          this.router.navigate([
+            (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
+              this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
+            'policy', 'login']);
+        }, 2000);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
+    } else if (PolicyComponentServiceType.ADMIN) {
+      const req = new AddJWTIDPRequest();
+
+      req.setName(this.jwtName?.value);
+      req.setHeaderName(this.jwtHeaderName?.value);
+      req.setIssuer(this.jwtIssuer?.value);
+      req.setJwtEndpoint(this.jwtEndpoint?.value);
+      req.setKeysEndpoint(this.jwtKeysEndpoint?.value);
+      req.setAutoRegister(this.jwtAutoRegister?.value);
+      req.setStylingType(this.jwtStylingType?.value);
+
+      this.loading = true;
+      (this.service as AdminService).addJWTIDP(req).then((idp) => {
+        setTimeout(() => {
+          this.loading = false;
+          this.router.navigate([
+            (this.serviceType === PolicyComponentServiceType.MGMT ? 'org' :
+              this.serviceType === PolicyComponentServiceType.ADMIN ? 'iam' : ''),
+            'policy', 'login']);
+        }, 2000);
+      }).catch(error => {
+        this.toast.showError(error);
+      });
+    }
+  }
+
   public close(): void {
     this._location.back();
   }
@@ -162,35 +236,62 @@ export class IdpCreateComponent implements OnInit, OnDestroy {
   }
 
   public get name(): AbstractControl | null {
-    return this.formGroup.get('name');
+    return this.oidcFormGroup.get('name');
   }
 
   public get clientId(): AbstractControl | null {
-    return this.formGroup.get('clientId');
+    return this.oidcFormGroup.get('clientId');
   }
 
   public get clientSecret(): AbstractControl | null {
-    return this.formGroup.get('clientSecret');
+    return this.oidcFormGroup.get('clientSecret');
   }
 
   public get issuer(): AbstractControl | null {
-    return this.formGroup.get('issuer');
+    return this.oidcFormGroup.get('issuer');
   }
 
   public get scopesList(): AbstractControl | null {
-    return this.formGroup.get('scopesList');
+    return this.oidcFormGroup.get('scopesList');
   }
 
   public get autoRegister(): AbstractControl | null {
-    return this.formGroup.get('autoRegister');
+    return this.oidcFormGroup.get('autoRegister');
   }
 
   public get idpDisplayNameMapping(): AbstractControl | null {
-    return this.formGroup.get('idpDisplayNameMapping');
+    return this.oidcFormGroup.get('idpDisplayNameMapping');
   }
 
   public get usernameMapping(): AbstractControl | null {
-    return this.formGroup.get('usernameMapping');
+    return this.oidcFormGroup.get('usernameMapping');
   }
 
+  public get jwtName(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtName');
+  }
+
+  public get jwtHeaderName(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtHeaderName');
+  }
+
+  public get jwtIssuer(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtIssuer');
+  }
+
+  public get jwtEndpoint(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtEndpoint');
+  }
+
+  public get jwtKeysEndpoint(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtKeysEndpoint');
+  }
+
+  public get jwtStylingType(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtStylingType');
+  }
+
+  public get jwtAutoRegister(): AbstractControl | null {
+    return this.jwtFormGroup.get('jwtAutoRegister');
+  }
 }
