@@ -162,7 +162,7 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, err
 	return factors, err
 }
 
-func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFactors, error) {
+func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (*MultiFactors, error) {
 	query, scan := prepareLoginPolicyMFAsQuery()
 	stmt, args, err := query.Where(
 		sq.Or{
@@ -180,7 +180,12 @@ func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFac
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	factors, err := scan(row)
+	if err != nil {
+		return nil, err
+	}
+	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	return factors, err
 }
 
 func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error) {
@@ -193,7 +198,12 @@ func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	factors, err := scan(row)
+	if err != nil {
+		return nil, err
+	}
+	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	return factors, err
 }
 
 func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, error)) {
@@ -278,14 +288,12 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 
 func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFactors, error)) {
 	return sq.Select(
-			LoginPolicyColumnSequence.identifier(),
 			LoginPolicyColumnMultiFactors.identifier(),
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*MultiFactors, error) {
 			p := new(MultiFactors)
 			multiFactors := pq.Int32Array{}
 			err := row.Scan(
-				&p.Sequence,
 				&multiFactors,
 			)
 			if err != nil {
@@ -296,6 +304,7 @@ func prepareLoginPolicyMFAsQuery() (sq.SelectBuilder, func(*sql.Row) (*MultiFact
 			}
 
 			p.Factors = make([]domain.MultiFactorType, len(multiFactors))
+			p.Count = uint64(len(multiFactors))
 			for i, mfa := range multiFactors {
 				p.Factors[i] = domain.MultiFactorType(mfa)
 			}

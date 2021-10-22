@@ -138,7 +138,7 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgm
 }
 
 func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicyMultiFactorsRequest) (*mgmt_pb.ListLoginPolicyMultiFactorsResponse, error) {
-	res, err := s.query.MultiFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
+	res, err := s.query.MultiFactorsByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
