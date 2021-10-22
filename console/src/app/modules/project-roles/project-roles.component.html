@@ -1,8 +1,8 @@
-<app-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult"
+<cnsl-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult ?? 0"
     [emitRefreshOnPreviousRoutes]="['/projects/'+projectId+'/roles/create']" [selection]="selection"
     [loading]="dataSource?.loading$ | async" [timestamp]="dataSource?.viewTimestamp">
    
-    <ng-template appHasRole [appHasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
+    <ng-template cnslHasRole [hasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
         <a *ngIf="actionsVisible" [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'roles', 'create']"
             color="primary" mat-raised-button>
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
@@ -55,7 +55,7 @@
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let role">
                     <button
-                        [disabled]="disabled || (['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) == false"
+                        [disabled]="disabled || (['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"
                         mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}"
                         (click)="deleteRole(role)">
                         <i class="las la-trash"></i>
@@ -67,7 +67,7 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
 
-        <div *ngIf="(dataSource.loading$ | async) == false && !dataSource?.totalResult" class="no-content-row">
+        <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
             <i class="las la-exclamation"></i>
             <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
         </div>
@@ -76,4 +76,4 @@
             [pageSizeOptions]="[25, 50, 100, 250]">
         </cnsl-paginator>
     </div>
-</app-refresh-table>
+</cnsl-refresh-table>

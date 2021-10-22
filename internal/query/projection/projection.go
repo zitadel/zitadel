@@ -2,25 +2,21 @@ package projection
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/query/projection/org/owner"
 )
 
 const (
-	currentSeqTable   = "projections.current_sequences"
+	CurrentSeqTable   = "projections.current_sequences"
 	locksTable        = "projections.locks"
 	failedEventsTable = "projections.failed_events"
 )
 
-func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error {
-	sqlClient, err := config.CRDB.Start()
-	if err != nil {
-		return err
-	}
-
+func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config) error {
 	projectionConfig := crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
@@ -30,7 +26,7 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 			RetryFailedAfter: config.RetryFailedAfter.Duration,
 		},
 		Client:            sqlClient,
-		SequenceTable:     currentSeqTable,
+		SequenceTable:     CurrentSeqTable,
 		LockTable:         locksTable,
 		FailedEventsTable: failedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
@@ -38,8 +34,21 @@ func Start(ctx context.Context, es *eventstore.Eventstore, config Config) error 
 	}
 
 	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
+	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
+	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
 	NewProjectProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["projects"]))
-	owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
+	NewPasswordComplexityProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_complexities"]))
+	NewPasswordAgeProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["password_age_policy"]))
+	NewLockoutPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["lockout_policy"]))
+	NewPrivacyPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["privacy_policy"]))
+	NewOrgIAMPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_iam_policy"]))
+	NewProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
+	NewProjectRoleProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles"]))
+	// owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
+	NewOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
+	NewLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
+	NewIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
+
 	return nil
 }
 
@@ -58,4 +67,21 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 	}
 
 	return config
+}
+
+func iteratorPool(workerCount int) chan func() {
+	if workerCount <= 0 {
+		return nil
+	}
+
+	queue := make(chan func())
+	for i := 0; i < workerCount; i++ {
+		go func() {
+			for iteration := range queue {
+				iteration()
+				time.Sleep(2 * time.Second)
+			}
+		}()
+	}
+	return queue
 }

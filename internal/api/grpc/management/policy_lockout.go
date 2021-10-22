@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
@@ -9,15 +10,15 @@ import (
 )
 
 func (s *Server) GetLockoutPolicy(ctx context.Context, req *mgmt_pb.GetLockoutPolicyRequest) (*mgmt_pb.GetLockoutPolicyResponse, error) {
-	policy, err := s.org.GetLockoutPolicy(ctx)
+	policy, err := s.query.LockoutPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetLockoutPolicyResponse{Policy: policy_grpc.ModelLockoutPolicyToPb(policy), IsDefault: policy.Default}, nil
+	return &mgmt_pb.GetLockoutPolicyResponse{Policy: policy_grpc.ModelLockoutPolicyToPb(policy), IsDefault: policy.IsDefault}, nil
 }
 
 func (s *Server) GetDefaultLockoutPolicy(ctx context.Context, req *mgmt_pb.GetDefaultLockoutPolicyRequest) (*mgmt_pb.GetDefaultLockoutPolicyResponse, error) {
-	policy, err := s.org.GetDefaultLockoutPolicy(ctx)
+	policy, err := s.query.DefaultLockoutPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func (s *Server) UpdateCustomLockoutPolicy(ctx context.Context, req *mgmt_pb.Upd
 }
 
 func (s *Server) ResetLockoutPolicyToDefault(ctx context.Context, req *mgmt_pb.ResetLockoutPolicyToDefaultRequest) (*mgmt_pb.ResetLockoutPolicyToDefaultResponse, error) {
-	objectDetails, err := s.command.RemovePasswordComplexityPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	objectDetails, err := s.command.RemoveLockoutPolicy(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

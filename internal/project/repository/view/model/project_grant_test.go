@@ -33,34 +33,34 @@ func TestProjectGrantAppendEvent(t *testing.T) {
 		{
 			name: "append added project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantAdded, ResourceOwner: "OrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: pq.StringArray{"Role"}})},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantAdded, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", GrantedOrgID: "GrantedOrgID", RoleKeys: pq.StringArray{"Role"}})},
 				project: &ProjectGrantView{},
 			},
-			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
+			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
 		},
 		{
 			name: "append change project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantChanged, ResourceOwner: "OrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", RoleKeys: pq.StringArray{"RoleChanged"}})},
-				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantChanged, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID", RoleKeys: pq.StringArray{"RoleChanged"}})},
+				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
 			},
-			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"RoleChanged"}},
+			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"RoleChanged"}},
 		},
 		{
 			name: "append deactivate project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantDeactivated, ResourceOwner: "OrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
-				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantDeactivated, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
+				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
 			},
-			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateInactive), GrantedRoleKeys: pq.StringArray{"Role"}},
+			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateInactive), GrantedRoleKeys: pq.StringArray{"Role"}},
 		},
 		{
 			name: "append reactivate project grant event",
 			args: args{
-				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantReactivated, ResourceOwner: "OrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
-				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateInactive), GrantedRoleKeys: pq.StringArray{"Role"}},
+				event:   &es_models.Event{AggregateID: "AggregateID", Sequence: 1, Type: es_model.ProjectGrantReactivated, ResourceOwner: "GrantedOrgID", Data: mockProjectGrantData(&es_model.ProjectGrant{GrantID: "ProjectGrantID"})},
+				project: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateInactive), GrantedRoleKeys: pq.StringArray{"Role"}},
 			},
-			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "OrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
+			result: &ProjectGrantView{ProjectID: "AggregateID", ResourceOwner: "GrantedOrgID", OrgID: "GrantedOrgID", State: int32(model.ProjectStateActive), GrantedRoleKeys: pq.StringArray{"Role"}},
 		},
 	}
 	for _, tt := range tests {

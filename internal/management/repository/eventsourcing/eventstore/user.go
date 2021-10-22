@@ -4,24 +4,21 @@ import (
 	"context"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
-
-	"github.com/caos/zitadel/internal/domain"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-
 	"github.com/caos/logging"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
@@ -36,16 +33,16 @@ type UserRepo struct {
 
 func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
 	user, viewErr := repo.View.UserByID(id)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
 		return nil, viewErr
 	}
-	if caos_errs.IsNotFound(viewErr) {
+	if errors.IsNotFound(viewErr) {
 		user = new(model.UserView)
 	}
 
 	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
 	}
 	if esErr != nil {
 		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
@@ -58,7 +55,36 @@ func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserV
 		}
 	}
 	if userCopy.State == int32(usr_model.UserStateDeleted) {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
+		return nil, errors.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
+	}
+	return model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
+}
+
+func (repo *UserRepo) UserByIDAndResourceOwner(ctx context.Context, id, resourceOwner string) (*usr_model.UserView, error) {
+	user, viewErr := repo.View.UserByIDAndResourceOwner(id, resourceOwner)
+	if viewErr != nil && !errors.IsNotFound(viewErr) {
+		return nil, viewErr
+	}
+	if errors.IsNotFound(viewErr) {
+		user = new(model.UserView)
+	}
+
+	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
+	if errors.IsNotFound(viewErr) && len(events) == 0 {
+		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
+	}
+	if esErr != nil {
+		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
+		return model.UserToModel(user, repo.PrefixAvatarURL), nil
+	}
+	userCopy := *user
+	for _, event := range events {
+		if err := userCopy.AppendEvent(event); err != nil {
+			return model.UserToModel(user, repo.PrefixAvatarURL), nil
+		}
+	}
+	if userCopy.State == int32(usr_model.UserStateDeleted) || userCopy.ResourceOwner != resourceOwner {
+		return nil, errors.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
 	}
 	return model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }

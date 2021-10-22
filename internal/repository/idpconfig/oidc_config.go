@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	OIDCConfigAddedEventType eventstore.EventType = "oidc.config.added"
-	ConfigChangedEventType   eventstore.EventType = "oidc.config.changed"
+	OIDCConfigAddedEventType   eventstore.EventType = "oidc.config.added"
+	OIDCConfigChangedEventType eventstore.EventType = "oidc.config.changed"
 )
 
 type OIDCConfigAddedEvent struct {

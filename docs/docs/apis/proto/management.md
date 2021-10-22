@@ -2595,6 +2595,18 @@ Provider must be OIDC compliant
     POST: /idps/oidc
 
 
+### AddOrgJWTIDP
+
+> **rpc** AddOrgJWTIDP([AddOrgJWTIDPRequest](#addorgjwtidprequest))
+[AddOrgJWTIDPResponse](#addorgjwtidpresponse)
+
+Add a new jwt identity provider configuration in the organisation
+
+
+
+    POST: /idps/jwt
+
+
 ### DeactivateOrgIDP
 
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
@@ -2659,12 +2671,133 @@ Change OIDC identity provider configuration of the organisation
     PUT: /idps/{idp_id}/oidc_config
 
 
+### UpdateOrgIDPJWTConfig
+
+> **rpc** UpdateOrgIDPJWTConfig([UpdateOrgIDPJWTConfigRequest](#updateorgidpjwtconfigrequest))
+[UpdateOrgIDPJWTConfigResponse](#updateorgidpjwtconfigresponse)
+
+Change JWT identity provider configuration of the organisation
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
+
+
+### ListActions
+
+> **rpc** ListActions([ListActionsRequest](#listactionsrequest))
+[ListActionsResponse](#listactionsresponse)
+
+
+
+
+
+    POST: /actions/_search
+
+
+### GetAction
+
+> **rpc** GetAction([GetActionRequest](#getactionrequest))
+[GetActionResponse](#getactionresponse)
+
+
+
+
+
+    GET: /actions/{id}
+
+
+### CreateAction
+
+> **rpc** CreateAction([CreateActionRequest](#createactionrequest))
+[CreateActionResponse](#createactionresponse)
+
+
+
+
+
+    POST: /actions
+
+
+### UpdateAction
+
+> **rpc** UpdateAction([UpdateActionRequest](#updateactionrequest))
+[UpdateActionResponse](#updateactionresponse)
+
+
+
+
+
+    PUT: /actions/{id}
+
+
+### DeleteAction
+
+> **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
+[DeleteActionResponse](#deleteactionresponse)
+
+
+
+
+
+    DELETE: /actions/{id}
+
+
+### GetFlow
+
+> **rpc** GetFlow([GetFlowRequest](#getflowrequest))
+[GetFlowResponse](#getflowresponse)
+
+
+
+
+
+    GET: /flows/{type}
+
+
+### ClearFlow
+
+> **rpc** ClearFlow([ClearFlowRequest](#clearflowrequest))
+[ClearFlowResponse](#clearflowresponse)
+
+
+
+
+
+    POST: /flows/{type}/_clear
+
+
+### SetTriggerActions
+
+> **rpc** SetTriggerActions([SetTriggerActionsRequest](#settriggeractionsrequest))
+[SetTriggerActionsResponse](#settriggeractionsresponse)
+
+
+
+
+
+    POST: /flows/{flow_type}/trigger/{trigger_type}
+
+
 
 
 
 
 
 ## Messages
+
+
+### ActionQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.action_id_query |  zitadel.action.v1.ActionIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.action_name_query |  zitadel.action.v1.ActionNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.action_state_query |  zitadel.action.v1.ActionStateQuery | - |  |
+
+
 
 
 ### ActivateCustomLabelPolicyRequest
@@ -3117,6 +3250,35 @@ This is an empty request
 
 
 
+### AddOrgJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddOrgJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddOrgMemberRequest
 
 
@@ -3154,6 +3316,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -3478,6 +3641,76 @@ This is an empty request
 
 
 
+### ClearFlowRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.action.v1.FlowType | - |  |
+
+
+
+
+### ClearFlowResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### CreateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| script |  string | - | string.min_len: 1<br /> string.max_len: 2000<br />  |
+| timeout |  google.protobuf.Duration | - | duration.lte.seconds: 20<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
+| allowed_to_fail |  bool | - |  |
+
+
+
+
+### CreateActionResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### DeactivateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### DeactivateActionResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### DeactivateAppRequest
 
 
@@ -3630,6 +3863,23 @@ This is an empty request
 
 
 
+### DeleteActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### DeleteActionResponse
+
+
+
+
+
 ### GenerateOrgDomainValidationRequest
 
 
@@ -3650,6 +3900,28 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | token |  string | - |  |
 | url |  string | - |  |
+
+
+
+
+### GetActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### GetActionResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| action |  zitadel.action.v1.Action | - |  |
 
 
 
@@ -4124,6 +4396,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | features |  zitadel.features.v1.Features | - |  |
+
+
+
+
+### GetFlowRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.action.v1.FlowType | - |  |
+
+
+
+
+### GetFlowResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| flow |  zitadel.action.v1.Flow | - |  |
 
 
 
@@ -4760,6 +5054,32 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | is_unique |  bool | - |  |
+
+
+
+
+### ListActionsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| sorting_column |  zitadel.action.v1.ActionFieldName | the field the result is sorted |  |
+| queries | repeated ActionQuery | criteria the client is looking for |  |
+
+
+
+
+### ListActionsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.action.v1.ActionFieldName | - |  |
+| result | repeated zitadel.action.v1.Action | - |  |
 
 
 
@@ -5481,6 +5801,28 @@ This is an empty request
 
 
 ### LockUserResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ReactivateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### ReactivateActionResponse
 
 
 
@@ -6959,6 +7301,30 @@ This is an empty request
 
 
 
+### SetTriggerActionsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| flow_type |  zitadel.action.v1.FlowType | - |  |
+| trigger_type |  zitadel.action.v1.TriggerType | - |  |
+| action_ids | repeated string | - |  |
+
+
+
+
+### SetTriggerActionsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetUserMetadataRequest
 
 
@@ -7020,6 +7386,32 @@ This is an empty request
 
 
 ### UpdateAPIAppConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| script |  string | - | string.min_len: 1<br /> string.max_len: 2000<br />  |
+| timeout |  google.protobuf.Duration | - | duration.lte.seconds: 20<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
+| allowed_to_fail |  bool | - |  |
+
+
+
+
+### UpdateActionResponse
 
 
 
@@ -7342,6 +7734,32 @@ This is an empty request
 
 
 
+### UpdateOrgIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateOrgIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateOrgIDPOIDCConfigRequest
 
 
@@ -7379,6 +7797,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 

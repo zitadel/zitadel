@@ -125,5 +125,28 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secrets[secretKey] = conf.AssetStorage.SecretAccessKey
 	existing[secretKey] = conf.AssetStorage.ExistingSecretAccessKey
 
+	if conf.Proxy == nil {
+		conf.Proxy = &configuration.Proxy{}
+	}
+	if conf.Proxy.HTTP == nil {
+		conf.Proxy.HTTP = &secret.Secret{}
+	}
+	if conf.Proxy.ExistingHTTP == nil {
+		conf.Proxy.ExistingHTTP = &secret.Existing{}
+	}
+	if conf.Proxy.HTTPS == nil {
+		conf.Proxy.HTTPS = &secret.Secret{}
+	}
+	if conf.Proxy.ExistingHTTPS == nil {
+		conf.Proxy.ExistingHTTPS = &secret.Existing{}
+	}
+	httpProxy := "httpproxy"
+	secrets[httpProxy] = conf.Proxy.HTTP
+	existing[httpProxy] = conf.Proxy.ExistingHTTP
+
+	httpsProxy := "httpsproxy"
+	secrets[httpsProxy] = conf.Proxy.HTTPS
+	existing[httpsProxy] = conf.Proxy.ExistingHTTPS
+
 	return secrets, existing
 }

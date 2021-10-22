@@ -438,6 +438,7 @@ title: zitadel/text.proto
 | description |  string | - | string.max_len: 500<br />  |
 | next_button_text |  string | - | string.max_len: 100<br />  |
 | cancel_button_text |  string | - | string.max_len: 100<br />  |
+| description_close |  string | - | string.max_len: 100<br />  |
 
 
 

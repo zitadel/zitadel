@@ -12,10 +12,11 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-password-lockout-policy',
+  selector: 'cnsl-password-lockout-policy',
   templateUrl: './password-lockout-policy.component.html',
   styleUrls: ['./password-lockout-policy.component.scss'],
 })
@@ -23,11 +24,11 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
   @Input() public service!: ManagementService | AdminService;
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
-
   public lockoutForm!: FormGroup;
   public lockoutData!: LockoutPolicy.AsObject;
   private sub: Subscription = new Subscription();
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     private route: ActivatedRoute,

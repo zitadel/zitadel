@@ -12,10 +12,12 @@ type IDPConfigReadModel struct {
 	State        domain.IDPConfigState
 	ConfigID     string
 	Name         string
+	AutoRegister bool
 	StylingType  domain.IDPConfigStylingType
 	ProviderType domain.IdentityProviderType
 
 	OIDCConfig *OIDCConfigReadModel
+	JWTConfig  *JWTConfigReadModel
 }
 
 func NewIDPConfigReadModel(configID string) *IDPConfigReadModel {
@@ -44,6 +46,13 @@ func (rm *IDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
 		case *idpconfig.OIDCConfigChangedEvent:
 			rm.ReadModel.AppendEvents(e)
 			rm.OIDCConfig.AppendEvents(event)
+		case *idpconfig.JWTConfigAddedEvent:
+			rm.JWTConfig = &JWTConfigReadModel{}
+			rm.ReadModel.AppendEvents(e)
+			rm.JWTConfig.AppendEvents(event)
+		case *idpconfig.JWTConfigChangedEvent:
+			rm.ReadModel.AppendEvents(e)
+			rm.JWTConfig.AppendEvents(event)
 		}
 	}
 }
@@ -69,6 +78,11 @@ func (rm *IDPConfigReadModel) Reduce() error {
 			return err
 		}
 	}
+	if rm.JWTConfig != nil {
+		if err := rm.JWTConfig.Reduce(); err != nil {
+			return err
+		}
+	}
 	return rm.ReadModel.Reduce()
 }
 
@@ -77,6 +91,7 @@ func (rm *IDPConfigReadModel) reduceConfigAddedEvent(e *idpconfig.IDPConfigAdded
 	rm.Name = e.Name
 	rm.StylingType = e.StylingType
 	rm.State = domain.IDPConfigStateActive
+	rm.AutoRegister = e.AutoRegister
 }
 
 func (rm *IDPConfigReadModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigChangedEvent) {
@@ -85,6 +100,9 @@ func (rm *IDPConfigReadModel) reduceConfigChangedEvent(e *idpconfig.IDPConfigCha
 	}
 	if e.StylingType != nil && e.StylingType.Valid() {
 		rm.StylingType = *e.StylingType
+	}
+	if e.AutoRegister != nil {
+		rm.AutoRegister = *e.AutoRegister
 	}
 }
 

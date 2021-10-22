@@ -15,15 +15,15 @@ import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolba
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
-import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
+
 @Component({
-  selector: 'app-root',
+  selector: 'cnsl-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   animations: [
@@ -47,7 +47,7 @@ export class AppComponent implements OnDestroy {
   public showAccount: boolean = false;
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
-  public user!: User.AsObject;
+  // public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -160,6 +160,16 @@ export class AppComponent implements OnDestroy {
     );
 
     this.matIconRegistry.addSvgIcon(
+      'mdi_openid',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/openid.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_jwt',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
       'mdi_symbol',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'),
     );
@@ -242,8 +252,8 @@ export class AppComponent implements OnDestroy {
       const darkPrimary = '#5282c1';
       const lightPrimary = '#5282c1';
 
-      const darkWarn = '#F44336';
-      const lightWarn = '#F44336';
+      const darkWarn = '#cd3d56';
+      const lightWarn = '#cd3d56';
 
       const darkBackground = '#212224';
       const lightBackground = '#fafafa';
@@ -267,8 +277,8 @@ export class AppComponent implements OnDestroy {
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
 
-        const darkWarn = this.labelpolicy?.warnColorDark || '#F44336';
-        const lightWarn = this.labelpolicy?.warnColor || '#F44336';
+        const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
+        const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
         const darkBackground = this.labelpolicy?.backgroundColorDark || '#212224';
         const lightBackground = this.labelpolicy?.backgroundColor || '#fafafa';
@@ -307,7 +317,7 @@ export class AppComponent implements OnDestroy {
     this.orgLoading$.next(true);
     this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
       map(resp => {
-        return resp.resultList;
+        return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
       }),
       catchError(() => of([])),
       finalize(() => {
@@ -339,7 +349,7 @@ export class AppComponent implements OnDestroy {
 
     this.authService.user.subscribe(userprofile => {
       if (userprofile) {
-        this.user = userprofile;
+        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
         const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
 

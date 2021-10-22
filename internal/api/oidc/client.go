@@ -88,7 +88,7 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 		scope := scopes[i]
 		if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
 			var orgID string
-			org, err := o.repo.OrgByPrimaryDomain(strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
 			if err == nil {
 				orgID = org.ID
 			}
@@ -310,14 +310,18 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	resourceOwner, err := o.repo.OrgByUserID(ctx, userID)
+	user, err := o.repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return map[string]string{
-		ClaimResourceOwner + "id":             resourceOwner.AggregateID,
+		ClaimResourceOwner + "id":             resourceOwner.ID,
 		ClaimResourceOwner + "name":           resourceOwner.Name,
-		ClaimResourceOwner + "primary_domain": resourceOwner.PrimaryDomain,
+		ClaimResourceOwner + "primary_domain": resourceOwner.Domain,
 	}, nil
 }
 

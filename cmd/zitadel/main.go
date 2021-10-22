@@ -145,6 +145,11 @@ func startZitadel(configPaths []string) {
 	err := config.Read(conf, configPaths...)
 	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
 
+	logging.LogWithFields("MAIN-dsfg2",
+		"HTTP_PROXY", os.Getenv("HTTP_PROXY") != "",
+		"HTTPS_PROXY", os.Getenv("HTTPS_PROXY") != "",
+		"NO_PROXY", os.Getenv("NO_PROXY")).Info("http proxy settings")
+
 	ctx := context.Background()
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
 	if err != nil {
@@ -174,7 +179,15 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
-	verifier := internal_authz.Start(authZRepo)
+	repo := struct {
+		authz_repo.EsRepository
+		query.Queries
+	}{
+		*authZRepo,
+		*queries,
+	}
+
+	verifier := internal_authz.Start(&repo)
 	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store)
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
@@ -208,7 +221,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, roles, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
-	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
+	apis := api.Create(conf.API, conf.InternalAuthZ, query, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
 		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))

@@ -1,32 +1,32 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
 
 @Directive({
-    selector: '[appScrollable]',
+  selector: '[cnslScrollable]',
 })
 export class ScrollableDirective {
-    // when using this directive, add overflow-y scroll to css
-    @Output() scrollPosition: EventEmitter<any> = new EventEmitter();
+  // when using this directive, add overflow-y scroll to css
+  @Output() scrollPosition: EventEmitter<any> = new EventEmitter();
 
-    constructor(public el: ElementRef) { }
+  constructor(public el: ElementRef) { }
 
-    @HostListener('scroll', ['$event'])
-    public onScroll(event: any): void {
-        try {
-            const top = event.target.scrollTop;
-            const height = this.el.nativeElement.scrollHeight;
-            const offset = this.el.nativeElement.offsetHeight;
+  @HostListener('scroll', ['$event'])
+  public onScroll(event: any): void {
+    try {
+      const top = event.target.scrollTop;
+      const height = this.el.nativeElement.scrollHeight;
+      const offset = this.el.nativeElement.offsetHeight;
 
-            // emit bottom event
-            if (top > height - offset - 1) {
-                this.scrollPosition.emit('bottom');
-            }
+      // emit bottom event
+      if (top > height - offset - 1) {
+        this.scrollPosition.emit('bottom');
+      }
 
-            // emit top event
-            if (top === 0) {
-                this.scrollPosition.emit('top');
-            }
+      // emit top event
+      if (top === 0) {
+        this.scrollPosition.emit('top');
+      }
 
-        } catch (err) { }
-    }
+    } catch (err) { }
+  }
 
 }

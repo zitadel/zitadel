@@ -12,12 +12,13 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	org_model "github.com/caos/zitadel/internal/org/model"
+	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {
-	org, err := s.org.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
+	org, err := s.query.OrgByID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,10 +26,11 @@ func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*m
 }
 
 func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgByDomainGlobalRequest) (*mgmt_pb.GetOrgByDomainGlobalResponse, error) {
-	org, err := s.org.OrgByDomainGlobal(ctx, req.Domain)
+	org, err := s.query.OrgByDomainGlobal(ctx, req.Domain)
 	if err != nil {
 		return nil, err
 	}
+
 	return &mgmt_pb.GetOrgByDomainGlobalResponse{Org: org_grpc.OrgViewToPb(org)}, nil
 }
 
@@ -103,7 +105,7 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 }
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, req *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.org.GetMyOrgIamPolicy(ctx)
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -117,14 +119,20 @@ func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomains
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.org.SearchMyOrgDomains(ctx, queries)
+	orgIDQuery, err := query.NewOrgDomainOrgIDSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries.Queries = append(queries.Queries, orgIDQuery)
+
+	domains, err := s.query.SearchOrgDomains(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgDomainsResponse{
-		Result: org_grpc.DomainsToPb(domains.Result),
+		Result: org_grpc.DomainsToPb(domains.Domains),
 		Details: object.ToListDetails(
-			domains.TotalResult,
+			domains.Count,
 			domains.Sequence,
 			domains.Timestamp,
 		),

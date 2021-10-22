@@ -24,13 +24,11 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  constructor(private mgmtService: ManagementService) {
+  constructor(private service: ManagementService) {
     super();
   }
 
-  public loadMembers(projectId: string,
-    projectType: ProjectType,
-    pageIndex: number, pageSize: number, grantId?: string): void {
+  public loadMembers(projectId: string, projectType: ProjectType, pageIndex: number, pageSize: number, grantId?: string): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
@@ -40,9 +38,9 @@ export class ProjectMembersDataSource extends DataSource<Member.AsObject> {
       Promise<ListProjectGrantMembersResponse.AsObject>
       | undefined =
       projectType === ProjectType.PROJECTTYPE_OWNED ?
-        this.mgmtService.listProjectMembers(projectId, pageSize, offset) :
+        this.service.listProjectMembers(projectId, pageSize, offset) :
         projectType === ProjectType.PROJECTTYPE_GRANTED && grantId ?
-          this.mgmtService.listProjectGrantMembers(projectId,
+          this.service.listProjectGrantMembers(projectId,
             grantId, pageSize, offset) : undefined;
     if (promise) {
       from(promise).pipe(

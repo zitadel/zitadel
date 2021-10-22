@@ -11,15 +11,23 @@
 
   .detail-container {
     display: flex;
+    flex-direction: column;
     padding-bottom: 3rem;
+
+    @media only screen and (min-width: 550px) {
+      flex-direction: row;
+    }
 
     .detail-left {
       align-self: flex-start;
-      width: 100px;
       display: flex;
       padding: 1rem;
       padding-top: 0;
       justify-content: center;
+
+      @media only screen and (min-width: 550px) {
+        width: 100px;
+      }
 
       a {
         margin-top: 13px;
@@ -38,15 +46,26 @@
       .head {
         margin-bottom: 2rem;
 
-        h1 {
-          font-size: 1.5rem;
-          margin-top: 10px;
+        .top-view {
+          display: flex;
+          justify-content: space-between;
         }
 
-        .desc {
-          display: block;
-          font-size: .9rem;
-          color: var(--grey);
+        div {
+          h1 {
+            font-size: 1.5rem;
+            margin-top: 10px;
+          }
+
+          .head-desc {
+            display: block;
+            font-size: .9rem;
+            color: var(--grey);
+          }
+        }
+
+        .actions-wrap {
+          padding-top: .5rem;
         }
       }
     }

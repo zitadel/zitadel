@@ -5,9 +5,11 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -16,12 +18,13 @@ import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-di
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 
 @Component({
-  selector: 'app-user-detail',
+  selector: 'cnsl-user-detail',
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss'],
 })
 export class UserDetailComponent implements OnInit {
   public user!: User.AsObject;
+  public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
   public languages: string[] = ['de', 'en'];
 
@@ -34,6 +37,9 @@ export class UserDetailComponent implements OnInit {
 
   public EditDialogType: any = EditDialogType;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
+  public InfoSectionType: any = InfoSectionType;
+
+  public error: string = '';
 
   constructor(
     public translate: TranslateService,
@@ -52,6 +58,15 @@ export class UserDetailComponent implements OnInit {
       this.mgmtUserService.getUserByID(id).then(resp => {
         if (resp.user) {
           this.user = resp.user;
+        }
+      }).catch(err => {
+        this.error = err.message ?? '';
+        this.toast.showError(err);
+      });
+
+      this.mgmtUserService.listUserMetadata(id, 0, 100, []).then(resp => {
+        if (resp.resultList) {
+          this.metadata = resp.resultList;
         }
       }).catch(err => {
         console.error(err);

@@ -16,7 +16,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
-  selector: 'app-client-keys',
+  selector: 'cnsl-client-keys',
   templateUrl: './client-keys.component.html',
   styleUrls: ['./client-keys.component.scss'],
 })
@@ -79,7 +79,7 @@ export class ClientKeysComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const type: KeyType = resp.type;
 
@@ -96,7 +96,7 @@ export class ClientKeysComponent implements OnInit {
         }
 
         if (type) {
-          return this.mgmtService.addAppKey(
+          this.mgmtService.addAppKey(
             this.projectId,
             this.appId,
             type,

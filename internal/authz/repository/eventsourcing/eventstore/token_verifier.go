@@ -109,11 +109,6 @@ func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context
 	return app.ProjectID, app.OriginAllowList, nil
 }
 
-func (repo *TokenVerifierRepo) ExistsOrg(ctx context.Context, orgID string) error {
-	_, err := repo.View.OrgByID(orgID)
-	return err
-}
-
 func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
 	features, err := repo.View.FeaturesByAggregateID(orgID)
 	if caos_errs.IsNotFound(err) {
@@ -169,8 +164,20 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 			}
 			continue
 		}
+		if requiredFeature == domain.FeatureLockoutPolicy {
+			if !features.LockoutPolicy {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
 		if requiredFeature == domain.FeatureMetadataUser {
 			if !features.MetadataUser {
+				return MissingFeatureErr(requiredFeature)
+			}
+			continue
+		}
+		if requiredFeature == domain.FeatureActions {
+			if !features.Actions {
 				return MissingFeatureErr(requiredFeature)
 			}
 			continue

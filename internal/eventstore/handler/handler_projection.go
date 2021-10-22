@@ -18,11 +18,11 @@ type ProjectionHandlerConfig struct {
 }
 
 //Update updates the projection with the given statements
-type Update func(context.Context, []Statement, Reduce) (unexecutedStmts []Statement, err error)
+type Update func(context.Context, []*Statement, Reduce) (unexecutedStmts []*Statement, err error)
 
 //Reduce reduces the given event to a statement
 //which is used to update the projection
-type Reduce func(eventstore.EventReader) ([]Statement, error)
+type Reduce func(eventstore.EventReader) (*Statement, error)
 
 //Lock is used for mutex handling if needed on the projection
 type Lock func(context.Context, time.Duration) <-chan error
@@ -46,7 +46,7 @@ type ProjectionHandler struct {
 	ProjectionName string
 
 	lockMu sync.Mutex
-	stmts  []Statement
+	stmts  []*Statement
 }
 
 func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
@@ -120,6 +120,7 @@ func (h *ProjectionHandler) Process(
 			return
 		case event := <-h.Handler.EventQueue:
 			if err := h.processEvent(ctx, event, reduce); err != nil {
+				logging.LogWithFields("HANDL-TUk5J", "projection", h.ProjectionName).WithError(err).Warn("process failed")
 				continue
 			}
 			h.triggerShouldPush(0)
@@ -137,6 +138,7 @@ func (h *ProjectionHandler) Process(
 				return
 			case event := <-h.Handler.EventQueue:
 				if err := h.processEvent(ctx, event, reduce); err != nil {
+					logging.LogWithFields("HANDL-horKq", "projection", h.ProjectionName).WithError(err).Warn("process failed")
 					continue
 				}
 				h.triggerShouldPush(0)
@@ -156,7 +158,7 @@ func (h *ProjectionHandler) processEvent(
 	event eventstore.EventReader,
 	reduce Reduce,
 ) error {
-	stmts, err := reduce(event)
+	stmt, err := reduce(event)
 	if err != nil {
 		logging.Log("EVENT-PTr4j").WithError(err).Warn("unable to process event")
 		return err
@@ -165,7 +167,7 @@ func (h *ProjectionHandler) processEvent(
 	h.lockMu.Lock()
 	defer h.lockMu.Unlock()
 
-	h.stmts = append(h.stmts, stmts...)
+	h.stmts = append(h.stmts, stmt)
 
 	return nil
 }

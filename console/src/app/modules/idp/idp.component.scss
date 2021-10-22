@@ -5,15 +5,20 @@
   @media only screen and (max-width: 450px) {
     padding: 4rem 1rem 2rem 1rem;
   }
+
+  .idp-form {
+    border-top: 1px solid #ffffff20;
+    padding-top: 1rem;
+  }
 }
 
-.content {
+.idp-content {
   display: flex;
   flex-direction: row;
   margin: 0 -.5rem;
   flex-wrap: wrap;
 
-  .desc {
+  .idp-desc {
     flex-basis: 100%;
     margin: 0 .5rem;
     margin-bottom: 1rem;
@@ -36,6 +41,16 @@
 
     @media only screen and (max-width: 450px) {
       flex-basis: 100%;
+    }
+  }
+
+  .auto-reg-info {
+    margin: 0 .5rem 1rem .5rem;
+    display: block;
+    width: 100%;
+
+    .auto-reg-desc {
+      margin: 0 0 1rem 0;
     }
   }
 

@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 import { AddAppKeyResponse, AddMachineKeyResponse } from 'src/app/proto/generated/zitadel/management_pb';
 
 @Component({
-  selector: 'app-show-key-dialog',
+  selector: 'cnsl-show-key-dialog',
   templateUrl: './show-key-dialog.component.html',
   styleUrls: ['./show-key-dialog.component.scss'],
 })

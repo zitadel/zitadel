@@ -10,7 +10,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 
 
 @Component({
-  selector: 'app-search-roles-autocomplete',
+  selector: 'cnsl-search-roles-autocomplete',
   templateUrl: './search-roles-autocomplete.component.html',
   styleUrls: ['./search-roles-autocomplete.component.scss'],
 })
@@ -62,8 +62,8 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
     this.unsubscribed$.next();
   }
 
-  public displayFn(project?: Role.AsObject): string | undefined {
-    return project ? `${project.displayName}` : undefined;
+  public displayFn(project?: Role.AsObject): string {
+    return project ? `${project.displayName}` : '';
   }
 
   public add(event: MatChipInputEvent): void {
@@ -75,6 +75,8 @@ export class SearchRolesAutocompleteComponent implements OnDestroy {
         const index = this.filteredRoles.findIndex((role) => {
           if (role.key) {
             return role.key === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {

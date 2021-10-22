@@ -220,10 +220,14 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 }
 
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+	if authReq == nil {
+		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
+		return
+	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-sio0W", "could not get authreq"))
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
@@ -257,6 +261,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
+	case *domain.RedirectToExternalIDPStep:
+		l.handleIDP(w, r, authReq, authReq.SelectedIDPConfigID)
 	case *domain.InitPasswordStep:
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *domain.PasswordStep:
@@ -347,7 +353,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
 		}
 	} else {
-		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
+		privacyPolicy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
 		}

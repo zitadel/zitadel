@@ -39,6 +39,8 @@ type FeaturesSetEvent struct {
 	MetadataUser             *bool                 `json:"metadataUser,omitempty"`
 	CustomTextMessage        *bool                 `json:"customTextMessage,omitempty"`
 	CustomTextLogin          *bool                 `json:"customTextLogin,omitempty"`
+	LockoutPolicy            *bool                 `json:"lockoutPolicy,omitempty"`
+	Actions                  *bool                 `json:"actions,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -178,6 +180,18 @@ func ChangeCustomTextMessage(customTextMessage bool) func(event *FeaturesSetEven
 func ChangeCustomTextLogin(customTextLogin bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.CustomTextLogin = &customTextLogin
+	}
+}
+
+func ChangeLockoutPolicy(lockoutPolicy bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.LockoutPolicy = &lockoutPolicy
+	}
+}
+
+func ChangeActions(actions bool) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.Actions = &actions
 	}
 }
 

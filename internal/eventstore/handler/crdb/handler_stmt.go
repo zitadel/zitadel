@@ -116,7 +116,7 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 }
 
 //Update implements handler.Update
-func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement, reduce handler.Reduce) (unexecutedStmts []handler.Statement, err error) {
+func (h *StatementHandler) Update(ctx context.Context, stmts []*handler.Statement, reduce handler.Reduce) (unexecutedStmts []*handler.Statement, err error) {
 	tx, err := h.client.BeginTx(ctx, nil)
 	if err != nil {
 		return stmts, errors.ThrowInternal(err, "CRDB-e89Gq", "begin failed")
@@ -158,7 +158,7 @@ func (h *StatementHandler) Update(ctx context.Context, stmts []handler.Statement
 		return stmts, handler.ErrSomeStmtsFailed
 	}
 
-	unexecutedStmts = make([]handler.Statement, len(stmts)-(lastSuccessfulIdx+1))
+	unexecutedStmts = make([]*handler.Statement, len(stmts)-(lastSuccessfulIdx+1))
 	copy(unexecutedStmts, stmts[lastSuccessfulIdx+1:])
 	stmts = nil
 
@@ -174,7 +174,7 @@ func (h *StatementHandler) fetchPreviousStmts(
 	stmtSeq uint64,
 	sequences currentSequences,
 	reduce handler.Reduce,
-) (previousStmts []handler.Statement, err error) {
+) (previousStmts []*handler.Statement, err error) {
 
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent)
 	queriesAdded := false
@@ -202,18 +202,18 @@ func (h *StatementHandler) fetchPreviousStmts(
 	}
 
 	for _, event := range events {
-		stmts, err := reduce(event)
+		stmt, err := reduce(event)
 		if err != nil {
 			return nil, err
 		}
-		previousStmts = append(previousStmts, stmts...)
+		previousStmts = append(previousStmts, stmt)
 	}
 	return previousStmts, nil
 }
 
 func (h *StatementHandler) executeStmts(
 	tx *sql.Tx,
-	stmts []handler.Statement,
+	stmts []*handler.Statement,
 	sequences currentSequences,
 ) int {
 
@@ -244,7 +244,7 @@ func (h *StatementHandler) executeStmts(
 
 //executeStmt handles sql statements
 //an error is returned if the statement could not be inserted properly
-func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt handler.Statement) error {
+func (h *StatementHandler) executeStmt(tx *sql.Tx, stmt *handler.Statement) error {
 	if stmt.IsNoop() {
 		return nil
 	}

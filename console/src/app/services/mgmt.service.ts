@@ -40,6 +40,8 @@ import {
   AddOIDCAppResponse,
   AddOrgDomainRequest,
   AddOrgDomainResponse,
+  AddOrgJWTIDPRequest,
+  AddOrgJWTIDPResponse,
   AddOrgMemberRequest,
   AddOrgMemberResponse,
   AddOrgOIDCIDPRequest,
@@ -64,6 +66,8 @@ import {
   BulkAddProjectRolesResponse,
   BulkRemoveUserGrantRequest,
   BulkRemoveUserGrantResponse,
+  BulkSetUserMetadataRequest,
+  BulkSetUserMetadataResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -160,6 +164,8 @@ import {
   GetUserByLoginNameGlobalResponse,
   GetUserGrantByIDRequest,
   GetUserGrantByIDResponse,
+  GetUserMetadataRequest,
+  GetUserMetadataResponse,
   IDPQuery,
   ListAppChangesRequest,
   ListAppChangesResponse,
@@ -214,6 +220,8 @@ import {
   ListUserGrantResponse,
   ListUserMembershipsRequest,
   ListUserMembershipsResponse,
+  ListUserMetadataRequest,
+  ListUserMetadataResponse,
   ListUsersRequest,
   ListUsersResponse,
   ReactivateAppRequest,
@@ -282,6 +290,8 @@ import {
   RemoveSecondFactorFromLoginPolicyResponse,
   RemoveUserGrantRequest,
   RemoveUserGrantResponse,
+  RemoveUserMetadataRequest,
+  RemoveUserMetadataResponse,
   RemoveUserRequest,
   RemoveUserResponse,
   ResendHumanEmailVerificationRequest,
@@ -334,6 +344,8 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  SetUserMetadataRequest,
+  SetUserMetadataResponse,
   UnlockUserRequest,
   UnlockUserResponse,
   UpdateAPIAppConfigRequest,
@@ -362,6 +374,8 @@ import {
   UpdateMachineResponse,
   UpdateOIDCAppConfigRequest,
   UpdateOIDCAppConfigResponse,
+  UpdateOrgIDPJWTConfigRequest,
+  UpdateOrgIDPJWTConfigResponse,
   UpdateOrgIDPOIDCConfigRequest,
   UpdateOrgIDPOIDCConfigResponse,
   UpdateOrgIDPRequest,
@@ -384,6 +398,7 @@ import {
   ValidateOrgDomainResponse,
 } from '../proto/generated/zitadel/management_pb';
 import { SearchQuery } from '../proto/generated/zitadel/member_pb';
+import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
@@ -760,6 +775,18 @@ export class ManagementService {
     const req = new ReactivateOrgIDPRequest();
     req.setIdpId(idpId);
     return this.grpcService.mgmt.reactivateOrgIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public addOrgJWTIDP(
+    req: AddOrgJWTIDPRequest,
+  ): Promise<AddOrgJWTIDPResponse.AsObject> {
+    return this.grpcService.mgmt.addOrgJWTIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public updateOrgIDPJWTConfig(
+    req: UpdateOrgIDPJWTConfigRequest,
+  ): Promise<UpdateOrgIDPJWTConfigResponse.AsObject> {
+    return this.grpcService.mgmt.updateOrgIDPJWTConfig(req, null).then(resp => resp.toObject());
   }
 
   public addHumanUser(req: AddHumanUserRequest): Promise<AddHumanUserResponse.AsObject> {
@@ -1175,6 +1202,7 @@ export class ManagementService {
   ): Promise<UpdateCustomLockoutPolicyResponse.AsObject> {
     const req = new UpdateCustomLockoutPolicyRequest();
     req.setMaxPasswordAttempts(maxAttempts);
+
     return this.grpcService.mgmt.updateCustomLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
@@ -1194,6 +1222,54 @@ export class ManagementService {
     const req = new GetUserByIDRequest();
     req.setId(id);
     return this.grpcService.mgmt.getUserByID(req, null).then(resp => resp.toObject());
+  }
+
+  public listUserMetadata(userId: string, offset?: number, limit?: number, queryList?: MetadataQuery[]):
+    Promise<ListUserMetadataResponse.AsObject> {
+    const req = new ListUserMetadataRequest();
+
+    req.setId(userId);
+    const metadata = new ListQuery();
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.mgmt.listUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public getUserMetadata(userId: string, key: string): Promise<GetUserMetadataResponse.AsObject> {
+    const req = new GetUserMetadataRequest();
+    req.setId(userId);
+    req.setKey(key);
+    return this.grpcService.mgmt.getUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public setUserMetadata(key: string, value: string, userId: string): Promise<SetUserMetadataResponse.AsObject> {
+    const req = new SetUserMetadataRequest();
+    req.setKey(key);
+    req.setValue(value);
+    req.setId(userId);
+    return this.grpcService.mgmt.setUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public bulkSetUserMetadata(list: BulkSetUserMetadataRequest.Metadata[], userId: string):
+    Promise<BulkSetUserMetadataResponse.AsObject> {
+    const req = new BulkSetUserMetadataRequest();
+    req.setMetadataList(list);
+    req.setId(userId);
+    return this.grpcService.mgmt.bulkSetUserMetadata(req, null).then(resp => resp.toObject());
+  }
+
+  public removeUserMetadata(key: string, userId: string): Promise<RemoveUserMetadataResponse.AsObject> {
+    const req = new RemoveUserMetadataRequest();
+    req.setKey(key);
+    req.setId(userId);
+    return this.grpcService.mgmt.removeUserMetadata(req, null).then(resp => resp.toObject());
   }
 
   public removeUser(id: string): Promise<RemoveUserResponse.AsObject> {

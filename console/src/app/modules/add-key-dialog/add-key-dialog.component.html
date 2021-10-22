@@ -27,7 +27,7 @@
         {{'ACTIONS.CANCEL' | translate}}
     </button>
 
-    <button color="primary" mat-raised-button class="ok-button" [disabled]="type == undefined || dateControl.invalid"
+    <button color="primary" mat-raised-button class="ok-button" [disabled]="type === undefined || dateControl.invalid"
         (click)="closeDialogWithSuccess()">
         {{'ACTIONS.ADD' | translate}}
     </button>

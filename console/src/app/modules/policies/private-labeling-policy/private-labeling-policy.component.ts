@@ -21,10 +21,11 @@ import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, PRIVATELABEL_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
@@ -48,11 +49,10 @@ export enum ColorType {
   BACKGROUNDLIGHT,
 }
 
-const ORG_STORAGE_KEY = 'organization';
 const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 
 @Component({
-  selector: 'app-private-labeling-policy',
+  selector: 'cnsl-private-labeling-policy',
   templateUrl: './private-labeling-policy.component.html',
   styleUrls: ['./private-labeling-policy.component.scss'],
 })
@@ -89,6 +89,7 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
   public loadingImages: boolean = false;
   private org!: Org.AsObject;
   public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
@@ -96,10 +97,10 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     private injector: Injector,
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
-    private storageService: StorageService,
+    private storage: StorageService,
     private themeService: ThemeService,
   ) {
-    const org: Org.AsObject | null = (this.storageService.getItem(ORG_STORAGE_KEY));
+    const org: Org.AsObject | null = (this.storage.getItem(StorageKey.organization, StorageLocation.session));
 
     if (org) {
       this.org = org;
@@ -165,16 +166,18 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     }
   }
 
-  public onDropFont(filelist: FileList): Promise<any> | void {
-    const file = filelist.item(0);
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
-        case PolicyComponentServiceType.ADMIN:
-          return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+  public onDropFont(filelist: FileList | null): Promise<any> | void {
+    if (filelist) {
+      const file = filelist.item(0);
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        switch (this.serviceType) {
+          case PolicyComponentServiceType.MGMT:
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.MGMTFONT, formData, this.org.id));
+          case PolicyComponentServiceType.ADMIN:
+            return this.handleFontUploadPromise(this.assetService.upload(AssetEndpoint.IAMFONT, formData, this.org.id));
+        }
       }
     }
   }
@@ -629,8 +632,8 @@ export class PrivateLabelingPolicyComponent implements OnDestroy {
     const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
     const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
 
-    const darkWarn = labelpolicy?.warnColorDark || '#F44336';
-    const lightWarn = labelpolicy?.warnColor || '#F44336';
+    const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
+    const lightWarn = labelpolicy?.warnColor || '#cd3d56';
 
     const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
     const lightBackground = labelpolicy?.backgroundColor || '#fafafa';

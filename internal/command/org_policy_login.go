@@ -6,7 +6,6 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -131,7 +130,7 @@ func (c *Commands) checkLoginPolicyAllowed(ctx context.Context, resourceOwner st
 	if defaultPolicy.HidePasswordReset != policy.HidePasswordReset {
 		requiredFeatures = append(requiredFeatures, domain.FeatureLoginPolicyPasswordReset)
 	}
-	return authz.CheckOrgFeatures(ctx, c.tokenVerifier, resourceOwner, requiredFeatures...)
+	return c.tokenVerifier.CheckOrgFeatures(ctx, resourceOwner, requiredFeatures...)
 }
 
 func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain.ObjectDetails, error) {
@@ -165,7 +164,14 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
 	}
-	var err error
+	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-Ffgw2", "Errors.Org.LoginPolicy.NotFound")
+	}
+
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
@@ -202,8 +208,16 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66m9s", "Errors.Org.LoginPolicy.IDP.Invalid")
 	}
+	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-GVDfe", "Errors.Org.LoginPolicy.NotFound")
+	}
+
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}

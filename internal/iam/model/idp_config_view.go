@@ -13,6 +13,7 @@ type IDPConfigView struct {
 	IDPConfigID     string
 	Name            string
 	StylingType     IDPStylingType
+	AutoRegister    bool
 	State           IDPConfigState
 	CreationDate    time.Time
 	ChangeDate      time.Time
@@ -28,6 +29,10 @@ type IDPConfigView struct {
 	OIDCUsernameMapping        OIDCMappingField
 	OAuthAuthorizationEndpoint string
 	OAuthTokenEndpoint         string
+	JWTEndpoint                string
+	JWTIssuer                  string
+	JWTKeysEndpoint            string
+	JWTHeaderName              string
 }
 
 type IDPConfigSearchRequest struct {
