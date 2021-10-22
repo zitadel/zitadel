@@ -122,6 +122,7 @@ var _ = Describe("zitadelctl", func() {
 		Expect(tag).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+tagEnv))
 		Expect(sha).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+shaEnv))
 		Expect(user).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+userEnv))
+		Expect(orbconfigPath).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+orbconfigEnv))
 		Expect(backupSAJson).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+backupSAJSONPathEnv))
 		Expect(backupAKID).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+backupAKIDPathEnv))
 		Expect(backupSAK).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+backupSAKPathEnv))

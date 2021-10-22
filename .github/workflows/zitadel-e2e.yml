@@ -64,6 +64,7 @@ jobs:
           ZITADEL_E2E_BACKUPSAK: "./artifacts/sak"
           ZITADEL_E2E_TAG: ${{ steps.refs.outputs.short_ref }}
           ZITADEL_E2E_SHA: ${{ steps.refs.outputs.sha_short }}
+          E2E_FOLDER: "./cmd/chore"
         run: |
           go get github.com/onsi/ginkgo/ginkgo
           go get github.com/onsi/gomega/...
@@ -76,10 +77,12 @@ jobs:
           echo "${ZITADEL_E2E_TAG}"
           echo "${ZITADEL_E2E_SHA}"
 
+          cd ${E2E_FOLDER}
+          
           mkdir -p ./artifacts
           echo "${E2E_ORBCONFIG}" > ${ZITADEL_E2E_ORBCONFIG}
           echo "${E2E_BACKUP_GCS_SAJSON}" > ${ZITADEL_E2E_BACKUPSAJSON}
           echo "${E2E_BACKUP_S3_ACCESSKEYID}" > ${ZITADEL_E2E_BACKUPAKID}
           echo "${E2E_BACKUP_S3_SECRETACCESSKEY}" > ${ZITADEL_E2E_BACKUPSAK}
 
-          ginkgo -race -v ./cmd/chore/... --failFast
+          ginkgo -race -v ./... --failFast
