@@ -118,7 +118,7 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) 
 	return scan(row)
 }
 
-func (q *Queries) SecondFactorsByID(ctx context.Context, orgID string) (*SecondFactors, error) {
+func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*SecondFactors, error) {
 	query, scan := prepareLoginPolicy2FAsQuery()
 	stmt, args, err := query.Where(
 		sq.Or{
@@ -136,7 +136,12 @@ func (q *Queries) SecondFactorsByID(ctx context.Context, orgID string) (*SecondF
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	factors, err := scan(row)
+	if err != nil {
+		return nil, err
+	}
+	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	return factors, err
 }
 
 func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, error) {
@@ -149,7 +154,12 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, err
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	factors, err := scan(row)
+	if err != nil {
+		return nil, err
+	}
+	factors.LatestSequence, err = q.latestSequence(ctx, loginPolicyTable)
+	return factors, err
 }
 
 func (q *Queries) MultiFactorsByID(ctx context.Context, orgID string) (*MultiFactors, error) {
@@ -242,14 +252,12 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 
 func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFactors, error)) {
 	return sq.Select(
-			LoginPolicyColumnSequence.identifier(),
 			LoginPolicyColumnSecondFactors.identifier(),
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecondFactors, error) {
 			p := new(SecondFactors)
 			secondFactors := pq.Int32Array{}
 			err := row.Scan(
-				&p.Sequence,
 				&secondFactors,
 			)
 			if err != nil {
@@ -260,6 +268,7 @@ func prepareLoginPolicy2FAsQuery() (sq.SelectBuilder, func(*sql.Row) (*SecondFac
 			}
 
 			p.Factors = make([]domain.SecondFactorType, len(secondFactors))
+			p.Count = uint64(len(secondFactors))
 			for i, mfa := range secondFactors {
 				p.Factors[i] = domain.SecondFactorType(mfa)
 			}
