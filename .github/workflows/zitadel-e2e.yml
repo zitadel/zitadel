@@ -1,0 +1,84 @@
+name: "Code scanning - action"
+
+on:
+  push:
+    tags-ignore:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  e2e-testing:
+    name: E2E-testing with an ORBOS cluster
+    runs-on: ubuntu-18.04
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Source checkout
+        uses: actions/checkout@v2
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          dry_run: true
+          semantic_version: 17.0.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+###############################################################################################
+# !!! copied from the ZITADEL workflow !!!
+###############################################################################################
+      - name: Set outputs
+        id: refs
+        run: |
+          export BRANCH=${GITHUB_REF#refs/*/}
+          echo "branch: ${BRANCH}"
+
+          export BRANCHTRANSLATED=$(echo ${BRANCH} | tr '/' '_')
+          echo "short_ref: ${BRANCHTRANSLATED}"
+
+          export VERSION=""
+          if ${{ steps.semantic.outputs.new_release_published == 'true' }}; then
+            export VERSION=${{ steps.semantic.outputs.new_release_version }}
+          else
+            export VERSION=${BRANCHTRANSLATED}
+          fi
+          echo "New semantic release: ${{ steps.semantic.outputs.new_release_published }}"
+          echo "version: ${VERSION}"
+
+          echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
+          echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
+          echo "::set-output name=version::${VERSION}"
+###############################################################################################
+# !!! copied from the ZITADEL workflow !!!
+###############################################################################################
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16.7'
+      - name: e2e testing
+        env:
+          E2E_BACKUP_GCS_SAJSON: ${{ secrets.E2E_BACKUP_GCS_SAJSON }}
+          E2E_BACKUP_S3_ACCESSKEYID: ${{ secrets.E2E_BACKUP_S3_ACCESSKEYID }}
+          E2E_BACKUP_S3_SECRETACCESSKEY: ${{ secrets.E2E_BACKUP_S3_SECRETACCESSKEY }}
+          ZITADEL_E2E_DBUSER: "test"
+          ZITADEL_E2E_BACKUPSAJSON: "./artifacts/sa.json"
+          ZITADEL_E2E_BACKUPAKID: "./artifacts/akid"
+          ZITADEL_E2E_BACKUPSAK: "./artifacts/sak"
+          ZITADEL_E2E_TAG: ${{ steps.refs.outputs.short_ref }}
+          ZITADEL_E2E_SHA: ${{ steps.refs.outputs.sha_short }}
+        run: |
+          go get github.com/onsi/ginkgo/ginkgo
+          go get github.com/onsi/gomega/...
+
+          echo ${ZITADEL_E2E_DBUSER}
+          echo ${ZITADEL_E2E_BACKUPSAJSON}
+          echo ${ZITADEL_E2E_BACKUPAKID}
+          echo ${ZITADEL_E2E_BACKUPSAK}
+          echo ${ZITADEL_E2E_TAG}
+          echo ${ZITADEL_E2E_SHA}
+
+          echo "${E2E_BACKUP_GCS_SAJSON}" > ${ZITADEL_E2E_BACKUPSAJSON}
+          echo "${E2E_BACKUP_S3_ACCESSKEYID}" > ${ZITADEL_E2E_BACKUPAKID}
+          echo "${E2E_BACKUP_S3_SECRETACCESSKEY}" > ${ZITADEL_E2E_BACKUPSAK}
+
+          ginkgo -race -v ./cmd/chore/...

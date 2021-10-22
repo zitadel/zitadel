@@ -58,6 +58,30 @@ func LocalToRemoteFile(orbctlGitops ZitadelctlGitopsCmd, remoteFile, localFile s
 	writeRemoteFile(orbctlGitops, remoteFile, contentBytes, env)
 }
 
+type AwaitReadyNodes func(count int, timeout time.Duration)
+
+func AwaitReadyNodesFunc(kubectl k8s_test.KubectlCmd) AwaitReadyNodes {
+	return func(count int, timeout time.Duration) {
+		getReadyNodes := func() int {
+			cmd := kubectl("get", "nodes")
+			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+			Expect(err).ToNot(HaveOccurred())
+			Eventually(session, 1*time.Minute, 5*time.Second).Should(gexec.Exit(0))
+
+			content := session.Out.Contents()
+			lines := strings.Split(string(content), "\n")
+			readyNodes := 0
+			for _, line := range lines {
+				if strings.Contains(line, "Ready") && !strings.Contains(line, "NotReady") {
+					readyNodes++
+				}
+			}
+			return readyNodes
+		}
+		Eventually(getReadyNodes(), timeout).Should(Equal(count))
+	}
+}
+
 type ApplyFile func(file []byte)
 
 func ApplyFileFunc(kubectl k8s_test.KubectlCmd) ApplyFile {

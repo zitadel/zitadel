@@ -63,6 +63,7 @@ var _ = Describe("zitadelctl", func() {
 		AwaitReadyPods                                                                                 helpers_test.AwaitReadyPods
 		AwaitSecret                                                                                    helpers_test.AwaitSecret
 		AwaitCronJobScheduled                                                                          helpers_test.AwaitCronJobScheduled
+		AwaitReadyNodes                                                                                helpers_test.AwaitReadyNodes
 		DeleteResource                                                                                 helpers_test.DeleteResource
 		DeleteNamespacedResource                                                                       helpers_test.DeleteNamespacedResource
 	)
@@ -94,6 +95,7 @@ var _ = Describe("zitadelctl", func() {
 			OnError:        mntr.LogError,
 			OnRecoverPanic: mntr.LogPanic,
 		}
+		AwaitReadyNodes = helpers_test.AwaitReadyNodesFunc(kubectl)
 		ApplyFile = helpers_test.ApplyFileFunc(kubectl)
 		DeleteFile = helpers_test.DeleteFileFunc(kubectl)
 		AwaitCompletedPod = helpers_test.AwaitCompletedPodFunc(kubectl)
@@ -184,6 +186,9 @@ var _ = Describe("zitadelctl", func() {
 				k8sClientT, _ := kubernetes.NewK8sClient(monitor, &kubeconfigStr)
 				k8sClient = k8sClientT
 			})
+			It("scales up the nodes", func() {
+				AwaitReadyNodes(4, 10*time.Minute)
+			})
 			It("cleanup caos-zitadel", func() {
 				DeleteNamespacedResource("deploy", "caos-system", "database-operator")
 				DeleteNamespacedResource("deploy", "caos-system", "zitadel-operator")
@@ -211,7 +216,6 @@ var _ = Describe("zitadelctl", func() {
 	})
 
 	Context("database", func() {
-
 		When("bootstraping", func() {
 			It("succeeds when creating the initial "+databaseFile, func() {
 				helpers_test.LocalToRemoteFile(zitadelctlGitops, databaseFile, "./templates/database.yml", os.Getenv)
@@ -308,13 +312,13 @@ var _ = Describe("zitadelctl", func() {
 			It("deploys zitadel with 1 node", func() {
 				session, err := gexec.Start(zitadelctlGitops("takeoff"), os.Stdout, GinkgoWriter)
 				Expect(err).ToNot(HaveOccurred())
-				Eventually(session, 1*time.Minute, 5*time.Second).Should(gexec.Exit(0))
+				Eventually(session, 2*time.Minute, 5*time.Second).Should(gexec.Exit(0))
 			})
 			It("runs migrations", func() {
-				AwaitCompletedPod(zitadelNamespace, "job-name=cockroachdb-cluster-migration-ensure", 10*time.Minute)
+				AwaitCompletedPod(zitadelNamespace, "job-name=cockroachdb-cluster-migration-ensure", 15*time.Minute)
 			})
 			It("runs setup", func() {
-				AwaitCompletedPod(zitadelNamespace, "job-name=zitadel-setup-ensure", 10*time.Minute)
+				AwaitCompletedPod(zitadelNamespace, "job-name=zitadel-setup-ensure", 15*time.Minute)
 			})
 			It("runs 1 zitadel pod", func() {
 				AwaitReadyPods(zitadelNamespace, "app.kubernetes.io/name=zitadel", 1, 2*time.Minute)
