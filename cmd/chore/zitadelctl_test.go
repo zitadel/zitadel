@@ -38,6 +38,7 @@ var _ = Describe("zitadelctl", func() {
 		backupSAJSONPathEnv = "BACKUPSAJSON"
 		backupAKIDPathEnv   = "BACKUPAKID"
 		backupSAKPathEnv    = "BACKUPSAK"
+		orbconfigEnv        = "ORBCONFIG"
 		cleanupAfterEnv     = envPrefix + "CLEANUP_AFTER"
 		reuseOrbEnv         = envPrefix + "REUSE_ORB"
 	)
@@ -80,7 +81,7 @@ var _ = Describe("zitadelctl", func() {
 		s3Region = "LPG"
 		workfolder = "./artifacts"
 		kubeconfigPath = filepath.Join(workfolder, "kubeconfig")
-		orbconfigPath = filepath.Join(workfolder, "orbconfig")
+		orbconfigPath = helpers_test.PrefixedEnv(orbconfigEnv)
 		tag = helpers_test.PrefixedEnv(tagEnv)
 		sha = helpers_test.PrefixedEnv(shaEnv)
 		user = helpers_test.PrefixedEnv(userEnv)
