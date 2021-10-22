@@ -34,7 +34,7 @@
     "file-saver": "^2.0.5",
     "google-proto-files": "^2.4.0",
     "google-protobuf": "^3.18.0",
-    "grpc-web": "^1.2.1",
+    "grpc-web": "^1.3.0",
     "libphonenumber-js": "^1.9.34",
     "moment": "^2.29.1",
     "ngx-color": "^7.2.0",
@@ -48,6 +48,14 @@
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
+    "@angular-eslint/builder": "12.5.0",
+    "@angular-eslint/eslint-plugin": "12.5.0",
+    "@angular-eslint/eslint-plugin-template": "12.5.0",
+    "@angular-eslint/schematics": "12.5.0",
+    "@angular-eslint/template-parser": "12.5.0",
+    "@typescript-eslint/eslint-plugin": "4.28.2",
+    "@typescript-eslint/parser": "4.28.2",
+    "eslint": "^7.26.0",
     "@angular-devkit/build-angular": "~12.2.8",
     "@angular/cli": "~12.2.8",
     "@angular/compiler-cli": "~12.2.8",
@@ -69,7 +77,6 @@
     "stylelint-config-standard": "^22.0.0",
     "stylelint-scss": "^3.21.0",
     "ts-node": "~10.2.1",
-    "tslint": "~6.1.3",
     "typescript": "^4.2.4"
   }
 }
