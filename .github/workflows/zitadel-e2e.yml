@@ -66,13 +66,14 @@ jobs:
           go get github.com/onsi/ginkgo/ginkgo
           go get github.com/onsi/gomega/...
 
-          echo ${ZITADEL_E2E_DBUSER}
-          echo ${ZITADEL_E2E_BACKUPSAJSON}
-          echo ${ZITADEL_E2E_BACKUPAKID}
-          echo ${ZITADEL_E2E_BACKUPSAK}
-          echo ${ZITADEL_E2E_TAG}
-          echo ${ZITADEL_E2E_SHA}
+          echo "${ZITADEL_E2E_DBUSER}"
+          echo "${ZITADEL_E2E_BACKUPSAJSON}"
+          echo "${ZITADEL_E2E_BACKUPAKID}"
+          echo "${ZITADEL_E2E_BACKUPSAK}"
+          echo "${ZITADEL_E2E_TAG}"
+          echo "${ZITADEL_E2E_SHA}"
 
+          mkdir -p ./artifacts
           echo "${E2E_BACKUP_GCS_SAJSON}" > ${ZITADEL_E2E_BACKUPSAJSON}
           echo "${E2E_BACKUP_S3_ACCESSKEYID}" > ${ZITADEL_E2E_BACKUPAKID}
           echo "${E2E_BACKUP_S3_SECRETACCESSKEY}" > ${ZITADEL_E2E_BACKUPSAK}
