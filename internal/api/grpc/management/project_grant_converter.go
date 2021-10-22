@@ -14,7 +14,7 @@ import (
 
 func listProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := ProjectGrantQueriesToModel(req.Queries)
+	queries, err := ProjectGrantQueriesToModel(req)
 	if err != nil {
 		return nil, err
 	}
@@ -28,15 +28,22 @@ func listProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*qu
 	}, nil
 }
 
-func ProjectGrantQueriesToModel(queries []*proj_pb.ProjectGrantQuery) (_ []query.SearchQuery, err error) {
-	q := make([]query.SearchQuery, len(queries))
-	for i, query := range queries {
-		q[i], err = ProjectGrantQueryToModel(query)
+func ProjectGrantQueriesToModel(req *mgmt_pb.ListProjectGrantsRequest) (_ []query.SearchQuery, err error) {
+	queries := make([]query.SearchQuery, 0, len(req.Queries)+1)
+	for _, query := range req.Queries {
+		q, err := ProjectGrantQueryToModel(query)
 		if err != nil {
 			return nil, err
 		}
+		queries = append(queries, q)
 	}
-	return q, nil
+	projectIDQuery, err := query.NewProjectGrantProjectIDSearchQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, projectIDQuery)
+
+	return queries, nil
 }
 
 func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.SearchQuery, error) {
