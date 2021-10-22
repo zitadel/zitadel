@@ -39,7 +39,7 @@ h1 {
   .topelements {
     border: 3px solid var(--color-main);
     border-radius: 1rem;
-    padding: 0rem .5rem;
+    padding: 0 .5rem;
   }
 
   .trigger-wrapper {
@@ -105,9 +105,10 @@ h1 {
   border-radius: .5rem;
   padding: 0 .5rem;
   background-color: var(--color-main);
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 5px 5px -3px rgba(0, 0, 0, .2),
+    0 8px 10px 1px rgba(0, 0, 0, .14),
+    0 3px 14px 2px rgba(0, 0, 0, .12);
 
   i {
     margin-right: .5rem;
@@ -119,5 +120,5 @@ h1 {
 }
 
 .cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 250ms cubic-bezier(0, 0, .2, 1);
 }
