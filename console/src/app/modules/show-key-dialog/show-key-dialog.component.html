@@ -10,16 +10,16 @@
 
         <div class="row">
             <p class="left">{{'USER.MACHINE.CREATIONDATE' | translate}}</p>
-            <p class="right">{{keyResponse?.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY,
-                HH:mm' }}
+            <p *ngIf="keyResponse.details && keyResponse.details.creationDate" class="right">
+              {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
             </p>
         </div>
-        <div class="row">
+        <!-- <div class="row">
             <p class="left">{{'USER.MACHINE.EXPIRATIONDATE' | translate}}</p>
-            <p class="right">{{keyResponse?.details.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY,
-                HH:mm'}}
+            <p *ngIf="keyResponse.details && keyResponse.details.expirationDate" class="right">
+              {{ keyResponse.details.expirationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
             </p>
-        </div>
+        </div> -->
         <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
     </ng-container>
 </div>

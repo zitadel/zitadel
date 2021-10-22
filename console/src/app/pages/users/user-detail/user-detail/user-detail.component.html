@@ -1,6 +1,8 @@
-<div class="max-width-container" *ngIf="error">{{error}}</div>
+<div *ngIf="error" class="max-width-container">
+  <p>{{error}}</p>
+</div>
 
-<app-meta-layout *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
+<cnsl-meta-layout *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
   <div class="max-width-container">
     <div class="head">
       <a (click)="navigateBack()" mat-icon-button>
@@ -12,7 +14,7 @@
       </div>
 
       <span class="fill-space"></span>
-      <ng-template appHasRole [appHasRole]="['user.write$', 'user.write:'+user?.id]">
+      <ng-template cnslHasRole [hasRole]="['user.write$', 'user.write:'+user?.id]">
         <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
           <span>{{'ACTIONS.ACTIONS' | translate}}</span>
           <mat-icon class="icon">keyboard_arrow_down</mat-icon>
@@ -24,9 +26,9 @@
           <button mat-menu-item *ngIf="user?.state !== UserState.USER_STATE_INACTIVE"
             (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
             translate}}</button>
-          <button mat-menu-item *ngIf="user?.state == UserState.USER_STATE_INACTIVE"
+          <button mat-menu-item *ngIf="user?.state === UserState.USER_STATE_INACTIVE"
             (click)="changeState(UserState.USER_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' | translate}}</button>
-          <ng-template appHasRole [appHasRole]="['user.delete$', 'user.delete:'+user?.id]">
+          <ng-template cnslHasRole [hasRole]="['user.delete$', 'user.delete:'+user?.id]">
             <button mat-menu-item matTooltip="{{'USER.PAGES.DELETE' | translate}}" (click)="deleteUser()"><span
                 [style.color]="'var(--warn)'">{{'USER.PAGES.DELETE' | translate}}</span></button>
           </ng-template>
@@ -36,67 +38,68 @@
 
     <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-    <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" type="WARN">
+    <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED" [type]="InfoSectionType.WARN">
       {{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
     <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
     <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
 
-    <ng-template appHasRole [appHasRole]="['user.read$', 'user.read:'+user?.id]">
-      <app-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
-        <app-detail-form [preferredLoginName]="user.preferredLoginName" [disabled]="(canWrite$ | async) == false"
+    <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:'+user?.id]">
+      <cnsl-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
+        <cnsl-detail-form [preferredLoginName]="user.preferredLoginName" [disabled]="(canWrite$ | async) === false"
           [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
           (submitData)="saveProfile($event)">
-        </app-detail-form>
-      </app-card>
+        </cnsl-detail-form>
+      </cnsl-card>
 
-      <app-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
+      <cnsl-card *ngIf="user.human" title="{{ 'USER.LOGINMETHODS.TITLE' | translate }}"
         description="{{ 'USER.LOGINMETHODS.DESCRIPTION' | translate }}">
         <button card-actions class="icon-button" mat-icon-button (click)="refreshUser()"
           matTooltip="{{'ACTIONS.REFRESH' | translate}}">
           <mat-icon class="icon">refresh</mat-icon>
         </button>
-        <app-contact disablePhoneCode="true" [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)"
-          *ngIf="user?.human" [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
+        <cnsl-contact [disablePhoneCode]="true"
+          [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
+          [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
           (resendEmailVerification)="resendEmailVerification()" (resendPhoneVerification)="resendPhoneVerification()">
-          <button pwdAction [disabled]="(canWrite$ | async) == false" (click)="sendSetPasswordNotification()"
+          <button pwdAction [disabled]="(canWrite$ | async) === false" (click)="sendSetPasswordNotification()"
             mat-stroked-button color="primary" *ngIf="user.state === UserState.USER_STATE_INITIAL">{{
             'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-          <button emailAction class="resendemail" *ngIf="user.state == UserState.USER_STATE_INITIAL" mat-stroked-button
+          <button emailAction class="resendemail" *ngIf="user.state === UserState.USER_STATE_INITIAL" mat-stroked-button
             color="primary" (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' |
             translate}}</button>
-        </app-contact>
-      </app-card>
+        </cnsl-contact>
+      </cnsl-card>
 
-      <app-external-idps *ngIf="user && user.human && user.id" [userId]="user.id" [service]="mgmtUserService">
-      </app-external-idps>
+      <cnsl-external-idps *ngIf="user && user.human && user.id" [userId]="user.id" [service]="mgmtUserService">
+      </cnsl-external-idps>
 
-      <app-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
-        <app-detail-form-machine [disabled]="(canWrite$ | async) == false" [username]="user.userName"
+      <cnsl-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
+        <cnsl-detail-form-machine [disabled]="(canWrite$ | async) === false" [username]="user.userName"
           [user]="user.machine" (submitData)="saveMachine($event)">
-        </app-detail-form-machine>
-      </app-card>
+        </cnsl-detail-form-machine>
+      </cnsl-card>
 
-      <app-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
+      <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
         description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
-        <app-machine-keys [userId]="user.id"></app-machine-keys>
-      </app-card>
+        <cnsl-machine-keys [userId]="user.id"></cnsl-machine-keys>
+      </cnsl-card>
     </ng-template>
 
-    <app-passwordless *ngIf="user && user.human" [user]="user"></app-passwordless>
+    <cnsl-passwordless *ngIf="user && user.human" [user]="user"></cnsl-passwordless>
 
-    <app-user-mfa *ngIf="user && user.human" [user]="user"></app-user-mfa>
+    <cnsl-user-mfa *ngIf="user && user.human" [user]="user"></cnsl-user-mfa>
 
-    <app-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
+    <cnsl-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
       description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
-      <app-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
+      <cnsl-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
         [displayedColumns]="['select', 'projectId', 'dates', 'roleNamesList']"
-        [disableWrite]="((['user.grant.write$'] | hasRole) | async) == false"
-        [disableDelete]="((['user.grant.delete$'] | hasRole) | async) == false">
-      </app-user-grants>
-    </app-card>
+        [disableWrite]="((['user.grant.write$'] | hasRole) | async) === false"
+        [disableDelete]="((['user.grant.delete$'] | hasRole) | async) === false">
+      </cnsl-user-grants>
+    </cnsl-card>
 
-    <ng-template appHasFeature [appHasFeature]="['metadata.user']">
+    <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
       <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>
     </ng-template>
   </div>
@@ -119,18 +122,18 @@
       </div>
     </div>
 
-    <mat-tab-group mat-stretch-tabs class="tab-group" disablePagination="true">
+    <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
       <mat-tab label="Details">
         <div class="side-padding">
-          <ng-template appHasRole [appHasRole]="['user.membership.read']">
-            <app-memberships [user]="user" [disabled]="(canWrite$ | async) == false"></app-memberships>
+          <ng-template cnslHasRole [hasRole]="['user.membership.read']">
+            <cnsl-memberships [user]="user" [disabled]="(canWrite$ | async) === false"></cnsl-memberships>
           </ng-template>
         </div>
       </mat-tab>
       <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
-        <app-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
-        </app-changes>
+        <cnsl-changes class="changes" [refresh]="refreshChanges$" [changeType]="ChangeType.USER" [id]="user.id">
+        </cnsl-changes>
       </mat-tab>
     </mat-tab-group>
   </div>
-</app-meta-layout>
+</cnsl-meta-layout>

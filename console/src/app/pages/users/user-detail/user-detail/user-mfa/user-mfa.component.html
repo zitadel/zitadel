@@ -1,8 +1,8 @@
-<app-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
+<cnsl-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
   <button card-actions mat-icon-button (click)="getMFAs()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <app-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()" [dataSize]="dataSource?.data?.length">
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()" [dataSize]="dataSource?.data?.length ?? 0">
         <table class="table" mat-table [dataSource]="dataSource">
             <ng-container matColumnDef="type">
                 <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>
@@ -44,10 +44,10 @@
             <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
             </tr>
         </table>
-    </app-refresh-table>
+    </cnsl-refresh-table>
     <div class="table-wrapper">
         <div class="spinner-container" *ngIf="loading$ | async">
             <mat-spinner diameter="50"></mat-spinner>
         </div>
     </div>
-</app-card>
+</cnsl-card>

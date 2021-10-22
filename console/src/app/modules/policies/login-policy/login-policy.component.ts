@@ -16,12 +16,13 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, LOGIN_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { LoginMethodComponentType } from './mfa-table/mfa-table.component';
 
 @Component({
-  selector: 'app-login-policy',
+  selector: 'cnsl-login-policy',
   templateUrl: './login-policy.component.html',
   styleUrls: ['./login-policy.component.scss'],
 })
@@ -39,6 +40,7 @@ export class LoginPolicyComponent implements OnDestroy {
   public disabled: boolean = true;
 
   public currentPolicy: GridPolicy = LOGIN_POLICY;
+  public InfoSectionType: any = InfoSectionType;
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,

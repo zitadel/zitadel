@@ -15,7 +15,7 @@ import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-org-iam-policy',
+  selector: 'cnsl-org-iam-policy',
   templateUrl: './org-iam-policy.component.html',
   styleUrls: ['./org-iam-policy.component.scss'],
 })
@@ -65,7 +65,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     });
   }
 
-  private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | undefined> {
+  private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getOrgIAMPolicy();
@@ -74,6 +74,8 @@ export class OrgIamPolicyComponent implements OnDestroy {
           return this.adminService.getCustomOrgIAMPolicy(this.org.id);
         }
         break;
+      default:
+        return Promise.reject();
     }
   }
 

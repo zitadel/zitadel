@@ -11,7 +11,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
 @Component({
-  selector: 'app-auth-user-detail',
+  selector: 'cnsl-auth-user-detail',
   templateUrl: './auth-user-detail.component.html',
   styleUrls: ['./auth-user-detail.component.scss'],
 })

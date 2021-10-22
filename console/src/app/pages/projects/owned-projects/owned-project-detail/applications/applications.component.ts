@@ -10,7 +10,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ProjectApplicationsDataSource } from './applications-datasource';
 
 @Component({
-  selector: 'app-applications',
+  selector: 'cnsl-applications',
   templateUrl: './applications.component.html',
   styleUrls: ['./applications.component.scss'],
 })

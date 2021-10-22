@@ -2,10 +2,10 @@
     <h1>{{ 'ORG.PAGES.LIST' | translate }}</h1>
     <p class="top-desc">{{'ORG.PAGES.LISTDESCRIPTION' | translate}}</p>
 
-    <app-refresh-table *ngIf="dataSource" (refreshed)="refresh()" [dataSize]="dataSource.data.length"
+    <cnsl-refresh-table *ngIf="dataSource" (refreshed)="refresh()" [dataSize]="dataSource.data.length"
         [loading]="loading$ | async">
 
-        <cnsl-form-field @appearfade *ngIf="orgSearchKey != undefined" actions class="filter">
+        <cnsl-form-field @appearfade *ngIf="orgSearchKey !== undefined" actions class="filter">
             <cnsl-label>{{'ORG.PAGES.FILTER' | translate}}</cnsl-label>
             <input cnslInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
                 #input>
@@ -19,7 +19,7 @@
                 </th>
                 <td class="selection" mat-cell *matCellDef="let row">
                     <mat-radio-button (change)="selectOrg(row)" color="primary" (click)="$event.stopPropagation()"
-                        [checked]="row.id == activeOrg.id">
+                        [checked]="row.id === activeOrg.id">
                     </mat-radio-button>
                 </td>
             </ng-container>
@@ -31,7 +31,7 @@
 
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    [ngClass]="{'search-active': this.orgSearchKey == OrgListSearchKey.NAME}">
+                    [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
                     {{ 'ORG.PAGES.NAME' | translate }}
                     <template [ngTemplateOutlet]="templateRef"
                         [ngTemplateOutletContext]="{key: OrgListSearchKey.NAME}"></template>
@@ -41,7 +41,7 @@
 
             <ng-container matColumnDef="creationDate">
               <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  [ngClass]="{'search-active': this.orgSearchKey == OrgListSearchKey.NAME}">
+                  [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
                   {{ 'ORG.PAGES.CREATIONDATE' | translate }}
               </th>
               <td mat-cell *matCellDef="let org">
@@ -54,12 +54,12 @@
         </table>
         <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
         </mat-paginator>
-    </app-refresh-table>
+    </cnsl-refresh-table>
 </div>
 
 <ng-template #templateRef let-key="key">
     <button class="search-button" mat-icon-button (click)="setFilter(key)">
-        <mat-icon *ngIf="this.orgSearchKey != key">search</mat-icon>
-        <mat-icon *ngIf="this.orgSearchKey == key">search_off</mat-icon>
+        <mat-icon *ngIf="this.orgSearchKey !== key">search</mat-icon>
+        <mat-icon *ngIf="this.orgSearchKey === key">search_off</mat-icon>
     </button>
 </ng-template>
