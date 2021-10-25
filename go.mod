@@ -22,17 +22,25 @@ require (
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v0.15.11
-	github.com/caos/orbos v1.5.14-0.20210803090517-905668247c09
+	github.com/caos/orbos v1.5.14-0.20211022145449-6bd09d384fa8
 	github.com/cockroachdb/cockroach-go/v2 v2.2.1
+	github.com/docker/docker v0.7.3-0.20190327010347-be7ac8be2ae0 // indirect
+	github.com/docker/spdystream v0.0.0-20160310174837-449fdfce4d96 // indirect
 	github.com/dop251/goja v0.0.0-20211019164913-00bb30d12573
 	github.com/dop251/goja_nodejs v0.0.0-20210920152751-582170a1676b
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
 	github.com/envoyproxy/protoc-gen-validate v0.6.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/ghodss/yaml v1.0.0
+	github.com/go-openapi/spec v0.19.5 // indirect
+	github.com/go-openapi/strfmt v0.19.5 // indirect
+	github.com/go-openapi/validate v0.19.8 // indirect
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
+	github.com/golangplus/bytes v0.0.0-20160111154220-45c989fe5450 // indirect
+	github.com/golangplus/fmt v0.0.0-20150411045040-2a5d6d7d2995 // indirect
+	github.com/gophercloud/gophercloud v0.1.0 // indirect
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
@@ -40,6 +48,8 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
+	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
@@ -48,6 +58,7 @@ require (
 	github.com/lib/pq v1.10.3
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/manifoldco/promptui v0.8.0
+	github.com/markbates/pkger v0.17.1 // indirect
 	github.com/mattn/go-colorable v0.1.11 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/minio/minio-go/v7 v7.0.15
@@ -63,6 +74,9 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1
+	github.com/urfave/cli v1.22.4 // indirect
+	github.com/xlab/handysort v0.0.0-20150421192137-fb3537ed64a1 // indirect
+	go.etcd.io/etcd v0.5.0-alpha.5.0.20200910180754-dd1b699fc489 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.25.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.25.0
 	go.opentelemetry.io/otel v1.0.1
@@ -84,11 +98,16 @@ require (
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
+	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.22.2
 	k8s.io/apiextensions-apiserver v0.22.2
 	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v0.22.2
+	k8s.io/klog v1.0.0 // indirect
 	sigs.k8s.io/controller-runtime v0.10.2
+	sigs.k8s.io/kustomize v2.0.3+incompatible // indirect
+	sigs.k8s.io/structured-merge-diff/v3 v3.0.0 // indirect
+	vbom.ml/util v0.0.0-20160121211510-db5cfe13f5cc // indirect
 )
