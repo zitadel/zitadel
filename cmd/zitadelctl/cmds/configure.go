@@ -85,6 +85,7 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 			rv.GitClient,
 			rv.OrbConfig.Masterkey,
 			append(cfg.ORBOSConfigurers(
+				rv.Ctx,
 				rv.Monitor,
 				rv.OrbConfig,
 				rv.GitClient,
