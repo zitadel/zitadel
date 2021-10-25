@@ -78,11 +78,15 @@ jobs:
           echo "${ZITADEL_E2E_SHA}"
 
           cd ${E2E_FOLDER}
-          
+
           mkdir -p ./artifacts
-          echo "${E2E_ORBCONFIG}" > ${ZITADEL_E2E_ORBCONFIG}
-          echo "${E2E_BACKUP_GCS_SAJSON}" > ${ZITADEL_E2E_BACKUPSAJSON}
-          echo "${E2E_BACKUP_S3_ACCESSKEYID}" > ${ZITADEL_E2E_BACKUPAKID}
-          echo "${E2E_BACKUP_S3_SECRETACCESSKEY}" > ${ZITADEL_E2E_BACKUPSAK}
+          echo -n "${E2E_ORBCONFIG}" > ${ZITADEL_E2E_ORBCONFIG}
+          chmod 0600 ${ZITADEL_E2E_ORBCONFIG}
+          echo -n "${E2E_BACKUP_GCS_SAJSON}" > ${ZITADEL_E2E_BACKUPSAJSON}
+          chmod 0600 ${ZITADEL_E2E_BACKUPSAJSON}
+          echo -n "${E2E_BACKUP_S3_ACCESSKEYID}" > ${ZITADEL_E2E_BACKUPAKID}
+          chmod 0600 ${ZITADEL_E2E_BACKUPAKID}
+          echo -n "${E2E_BACKUP_S3_SECRETACCESSKEY}" > ${ZITADEL_E2E_BACKUPSAK}
+          chmod 0600 ${ZITADEL_E2E_BACKUPSAK}
 
           ginkgo -race -v ./... --failFast
