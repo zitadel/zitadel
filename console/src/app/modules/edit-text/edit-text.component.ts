@@ -3,6 +3,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { InfoSectionType } from '../info-section/info-section.component';
+
 @Component({
   selector: 'cnsl-edit-text',
   templateUrl: './edit-text.component.html',
@@ -23,6 +25,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
   @Input() public disabled: boolean = true;
 
   public copied: string = '';
+  public InfoSectionType: any = InfoSectionType;
 
   public ngOnInit(): void {
     this.current$.pipe(takeUntil(this.destroy$)).subscribe(value => {

@@ -2,12 +2,12 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@a
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { Gender, Human, User } from 'src/app/proto/generated/zitadel/user_pb';
+import { Gender, Human, Profile } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
 @Component({
-  selector: 'app-detail-form',
+  selector: 'cnsl-detail-form',
   templateUrl: './detail-form.component.html',
   styleUrls: ['./detail-form.component.scss'],
 })
@@ -19,7 +19,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Input() public disabled: boolean = false;
   @Input() public genders: Gender[] = [];
   @Input() public languages: string[] = ['de', 'en'];
-  @Output() public submitData: EventEmitter<User> = new EventEmitter<User>();
+  @Output() public submitData: EventEmitter<Profile.AsObject> = new EventEmitter<Profile.AsObject>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
 
   public profileForm!: FormGroup;

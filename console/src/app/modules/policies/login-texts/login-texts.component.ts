@@ -19,12 +19,13 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, LOGIN_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 import { mapRequestValues } from './helper';
 
-// tslint:disable
+/* eslint-disable */
 const KeyNamesArray = [
   'emailVerificationDoneText',
   'emailVerificationText',
@@ -59,8 +60,9 @@ const KeyNamesArray = [
   'passwordlessRegistrationDoneText',
   'passwordlessRegistrationText',
   'passwordlessText',
+  'externalRegistrationUserOverviewText'
 ];
-// tslint:enable
+/* eslint-enable */
 
 const REQUESTMAP = {
   [PolicyComponentServiceType.MGMT]: {
@@ -87,7 +89,7 @@ const REQUESTMAP = {
   },
 };
 @Component({
-  selector: 'app-login-texts',
+  selector: 'cnsl-login-texts',
   templateUrl: './login-texts.component.html',
   styleUrls: ['./login-texts.component.scss'],
 })
@@ -113,6 +115,7 @@ export class LoginTextsComponent implements OnDestroy {
   public currentPolicy: GridPolicy = LOGIN_TEXTS_POLICY;
 
   public destroy$: Subject<void> = new Subject();
+  public InfoSectionType: any = InfoSectionType;
 
   public form: FormGroup = new FormGroup({
     currentSubMap: new FormControl('emailVerificationDoneText'),

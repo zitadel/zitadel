@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 
 export interface CnslLinks {
@@ -7,7 +7,7 @@ export interface CnslLinks {
   routerLink?: any;
   href?: string;
   iconClasses?: string;
-  withRole?: Array<string | RegExp>;
+  withRole?: string[] | RegExp[];
 }
 
 @Component({
@@ -15,11 +15,6 @@ export interface CnslLinks {
   templateUrl: './links.component.html',
   styleUrls: ['./links.component.scss'],
 })
-export class LinksComponent implements OnInit {
+export class LinksComponent {
   @Input() links: Array<CnslLinks> = [];
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
 }

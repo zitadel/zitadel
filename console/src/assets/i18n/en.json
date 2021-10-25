@@ -759,6 +759,7 @@
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+      "ADVANCED":"Advanced",
       "SAVED": "Saved successfully!"
     },
     "PRIVACY_POLICY": {
@@ -822,7 +823,8 @@
         "passwordlessPromptText":"Passwordless Prompt",
         "passwordlessRegistrationDoneText":"Passwordless Registration Done",
         "passwordlessRegistrationText":"Passwordless Registration",
-        "passwordlessText":"Passwordless"
+        "passwordlessText":"Passwordless",
+        "externalRegistrationUserOverviewText":"External Registration User Overview"
       }
     },
     "MESSAGE_TEXTS": {
@@ -1040,7 +1042,13 @@
         "MEMBERTITLE": "Managers",
         "MEMBERDESC": "These are the managers of the granted organisation. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
+        "GRANTEDORG":"Granted Organisation",
         "RESOURCEOWNER": "Resource Owner"
+      },
+      "STATE": "State",
+      "STATES": {
+        "1": "Active",
+        "2": "Inactive"
       },
       "SHOWDETAIL": "Show Details",
       "USER": "User",
@@ -1133,19 +1141,18 @@
   "IDP": {
     "LIST": {
       "TITLE": "Identity Providers",
-      "DESCRIPTION": "Define additional Identity Providers, which can be used to authenticate in your organisations."
+      "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Policy.",
+      "ACTIVETITLE":"Active Identity Providers"
     },
     "CREATE": {
       "TITLE": "New Identity Provider",
-      "DESCRIPTION": "Configure the Endpoint of your new service provider."
+      "DESCRIPTION": "Choose one of the following Identity Provider types."
     },
     "DETAIL": {
       "TITLE": "Identity Provider",
       "DESCRIPTION": "General Configuration of your identity provider.",
-      "OIDC": {
-        "TITLE": "OIDC Configuration",
-        "DESCRIPTION": "Provide the correct OIDC Configuration for your identity Provider below!"
-      }
+      "DATECREATED":"Created",
+      "DATECHANGED":"Changed"
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1169,9 +1176,11 @@
       "0": "No Styling",
       "1": "Google"
     },
+    "ADD":"Add Identity Provider",
     "AUTOREGISTER":"Auto Register",
     "AUTOREGISTER_DESC":"If selected and no account exists yet, one will be created.",
     "TYPE": "Type",
+    "OWNER":"Owner",
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Configuration",
@@ -1182,6 +1191,7 @@
     "CLIENTSECRET": "Client Secret",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
+    "DATES":"Dates",
     "CREATIONDATE": "Created At",
     "CHANGEDATE": "Last Modified",
     "DEACTIVATE": "Deactivate",
@@ -1191,6 +1201,17 @@
     "DELETE_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "DELETE_SELECTION_TITLE": "Delete Idp",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
+    "OIDC": {
+      "TITLE":"OpenId Connect IDP",
+      "DESCRIPTION":"Enter the data for OIDC Identity Provider."
+    },
+    "JWT": {
+      "TITLE":"JWT IDP",
+      "DESCRIPTION":"Enter the data for JWT Identity Provider.",
+      "HEADERNAME":"Header Name",
+      "JWTENDPOINT":"JWT Endpoint",
+      "JWTKEYSENDPOINT":"JWT Keys Endpoint"
+    },
     "TOAST": {
       "SAVED": "Successfully saved.",
       "REACTIVATED": "Idp reactivated.",

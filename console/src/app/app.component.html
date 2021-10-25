@@ -1,4 +1,4 @@
-<ng-container *ngIf="(authService.user | async) || {} as user">
+<ng-container *ngIf="$any(authService.user | async) || {} as user">
     <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
         <mat-toolbar class="root-header">
             <button *ngIf="authenticationService.authenticated" aria-label="Toggle sidenav" mat-icon-button
@@ -7,7 +7,7 @@
             </button>
             <ng-container *ngIf="labelpolicy && !labelpolicy?.disableWatermark">
               <a  class="title" [routerLink]="['/']">
-                  <img class="logo" alt="zitadel logo" *ngIf="componentCssClass == 'dark-theme'; else lighttheme"
+                  <img class="logo" alt="zitadel logo" *ngIf="componentCssClass === 'dark-theme'; else lighttheme"
                       src="../assets/images/zitadel-logo-solo-light.svg" />
                   <ng-template #lighttheme>
                       <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
@@ -48,7 +48,7 @@
                 <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
                     translate}}</button>
 
-                <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
+                <ng-template cnslHasRole [hasRole]="['org.create','iam.write']">
                     <button mat-menu-item [routerLink]="[ '/org/create' ]">
                         <mat-icon class="avatar">add</mat-icon>
                         {{'MENU.NEWORG' | translate}}
@@ -60,20 +60,20 @@
             <a class="doc-link" href="https://docs.zitadel.ch" mat-stroked-button target="_blank">{{'MENU.DOCUMENTATION'
                 | translate}}</a>
             <div (clickOutside)="closeAccountCard()" class="icon-container">
-                <app-avatar
+                <cnsl-avatar
                     *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
                     class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"  [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName"
                     [name]="user.human.profile.displayName ? user.human.profile.displayName : (user.human.profile.firstName + ' '+ user.human.profile.lastName)"
                     [size]="38">
-                </app-avatar>
-                <app-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
-                    (close)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
-                </app-accounts-card>
+                </cnsl-avatar>
+                <cnsl-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount"
+                    (closedCard)="showAccount = false" [user]="user" [iamuser]="iamuser$ | async">
+                </cnsl-accounts-card>
             </div>
         </mat-toolbar>
         <mat-drawer-container class="main-container">
             <mat-drawer #drawer class="sidenav" [mode]="(isHandset$ | async) ? 'over' : 'side'"
-                [opened]="!(isHandset$ | async) && authenticationService.authenticated">
+                [opened]="(isHandset$ | async) === false && authenticationService.authenticated">
                 <div class="side-column">
                     <div class="list">
                         <a @navitem class="nav-item" [routerLinkActive]="['active']"
@@ -92,8 +92,7 @@
                         </ng-container>
 
                         <div *ngIf="org" [@navAnimation]="org">
-                            <ng-template appHasRole
-                                [appHasRole]="['org.read']">
+                            <ng-template cnslHasRole [hasRole]="['org.read']">
                                 <div @navitem class="divider">
                                     <div class="line"></div>
                                     <span>{{org?.name ? org.name : ('MENU.ORGSECTION' | translate)}}</span>
@@ -101,7 +100,7 @@
                                 </div>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['org.read']">
+                            <ng-template cnslHasRole [hasRole]="['org.read']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/org']">
                                     <i class="icon las la-cog"></i>
@@ -109,7 +108,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
+                            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
                                     <i class="icon las la-layer-group"></i>
@@ -133,7 +132,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+                            <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/users/list/humans']"
                                     [routerLinkActiveOptions]="{ exact: true }">
@@ -149,7 +148,7 @@
                                 </a>
                             </ng-template>
 
-                            <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
+                            <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
                                 <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item"
                                     [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
                                     [routerLinkActiveOptions]="{ exact: true }">

@@ -15,14 +15,6 @@ type OrgIAMPolicy struct {
 	UserLoginMustBeDomain bool  `json:"userLoginMustBeDomain"`
 }
 
-func OrgIAMPolicyFromModel(policy *iam_model.OrgIAMPolicy) *OrgIAMPolicy {
-	return &OrgIAMPolicy{
-		ObjectRoot:            policy.ObjectRoot,
-		State:                 int32(policy.State),
-		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-	}
-}
-
 func OrgIAMPolicyToModel(policy *OrgIAMPolicy) *iam_model.OrgIAMPolicy {
 	return &iam_model.OrgIAMPolicy{
 		ObjectRoot:            policy.ObjectRoot,

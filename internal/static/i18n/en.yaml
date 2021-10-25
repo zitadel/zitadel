@@ -169,7 +169,7 @@ Errors:
       AlreadyExists: Default Message Text already exists
       Invalid: Default Message Text is invalid
     PasswordComplexity:
-      NotFound: Password  Complexity Policy not found
+      NotFound: Password Complexity Policy not found
       Empty: Password Complexity Policy is empty
       NotExisting: Password Complexity Policy doesn't exist
       AlreadyExists: Password Complexity Policy already exists
@@ -365,6 +365,21 @@ Errors:
     NoData: Metadata list is empty
     Invalid: Metadata is invalid
     KeyNotExisting: One or more keys do not exist
+  Action:
+    Invalid: Action is invalid
+    NotFound: Action not found
+    NotActive: Action is not active
+    NotInactive: Action is not inactive
+  Flow:
+    FlowTypeMissing: FlowType missing
+    Empty: Flow is already empty
+    WrongTriggerType: TriggerType is invalid
+    NoChanges: No Changes
+    ActionIDsNotExist: ActionIDs do not exist
+  Query:
+    CloseRows: SQL Statement could not be finished
+    SQLStatement: SQL Statement coud not be created
+    InvalidRequest: Request is invalid
 EventTypes:
   user:
     added: User added
@@ -654,6 +669,12 @@ EventTypes:
         added: Privacy policy and TOS added
         changed: Privacy policy and TOS changed
         removed: Privacy policy and TOS removed
+    flow:
+      trigger_actions:
+        set: Action set
+        cascade:
+          removed: Actions cascade removed
+        removed: Actions removed
   project:
     added: Project added
     changed: Project changed
@@ -781,6 +802,12 @@ EventTypes:
           removed: Assets removed from Label Policy
   key_pair:
     added: Key pair added
+  action:
+    added: Action added
+    changed: Action changed
+    deactivated: Action deactivated
+    reactivated: Action reactivated
+    removed: Action removed
 Application:
   OIDC:
     V1:

@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetLockoutPolicy(ctx context.Context, req *admin_pb.GetLockoutPolicyRequest) (*admin_pb.GetLockoutPolicyResponse, error) {
-	policy, err := s.iam.GetDefaultLockoutPolicy(ctx)
+	policy, err := s.query.DefaultLockoutPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}

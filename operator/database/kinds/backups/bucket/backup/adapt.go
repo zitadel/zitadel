@@ -19,6 +19,7 @@ const (
 	secretPath               = "/secrets/sa.json"
 	backupPath               = "/cockroach"
 	backupNameEnv            = "BACKUP_NAME"
+	saJsonBase64Env          = "SAJSON"
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
 	rootSecretName           = "cockroachdb.client.root"
@@ -32,7 +33,6 @@ func AdaptFunc(
 	backupName string,
 	namespace string,
 	componentLabels *labels.Component,
-	databases []string,
 	checkDBReady operator.EnsureFunc,
 	bucketName string,
 	cron string,
@@ -41,6 +41,8 @@ func AdaptFunc(
 	timestamp string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
+	dbURL string,
+	dbPort int32,
 	features []string,
 	image string,
 ) (
@@ -51,9 +53,12 @@ func AdaptFunc(
 
 	command := getBackupCommand(
 		timestamp,
-		databases,
 		bucketName,
 		backupName,
+		certPath,
+		secretPath,
+		dbURL,
+		dbPort,
 	)
 
 	jobSpecDef := getJobSpecDef(

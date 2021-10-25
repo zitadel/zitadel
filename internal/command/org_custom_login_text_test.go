@@ -703,6 +703,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
@@ -1339,6 +1344,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					PasswordlessRegistrationDone: domain.PasswordlessRegistrationDoneScreenText{
 						Title:            "Title",
 						Description:      "Description",
+						DescriptionClose: "DescriptionClose",
 						NextButtonText:   "NextButtonText",
 						CancelButtonText: "CancelButtonText",
 					},
@@ -2098,6 +2104,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3191,6 +3202,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							eventFromEventPusher(
 								org.NewCustomTextRemovedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextRemovedEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -4342,6 +4358,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							org.NewCustomTextSetEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextSetEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
@@ -5428,6 +5449,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 						eventFromEventPusher(
 							org.NewCustomTextRemovedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							org.NewCustomTextRemovedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -6525,6 +6551,11 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								org.NewCustomTextSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+								),
+							),
+							eventFromEventPusher(
+								org.NewCustomTextSetEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
@@ -7161,6 +7192,7 @@ func TestCommandSide_SetCustomOrgLoginText(t *testing.T) {
 					PasswordlessRegistrationDone: domain.PasswordlessRegistrationDoneScreenText{
 						Title:            "Title",
 						Description:      "Description",
+						DescriptionClose: "DescriptionClose",
 						NextButtonText:   "NextButtonText",
 						CancelButtonText: "CancelButtonText",
 					},

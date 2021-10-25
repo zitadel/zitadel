@@ -184,7 +184,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
      * Implemented as part of MatFormFieldControl.
      * @docs-private
      */
-    // tslint:disable-next-line:no-input-rename
+    // eslint-disable-next-line @angular-eslint/no-input-rename
     @Input('aria-describedby') userAriaDescribedBy!: string;
 
     /**
@@ -319,10 +319,10 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // In Ivy the `host` bindings will be merged when this class is extended, whereas in
     // ViewEngine they're overwritten.
     /** Callback for the cases where the focused state of the input changes. */
-    // tslint:disable:no-host-decorator-in-concrete
+    /* eslint-disable  */
     @HostListener('focus', ['true'])
     @HostListener('blur', ['false'])
-    // tslint:enable:no-host-decorator-in-concrete
+    /* eslint-enable  */
     _focusChanged(isFocused: boolean): void {
         if (isFocused !== this.focused && (!this.readonly || !isFocused)) {
             this.focused = isFocused;
@@ -333,7 +333,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // We have to use a `HostListener` here in order to support both Ivy and ViewEngine.
     // In Ivy the `host` bindings will be merged when this class is extended, whereas in
     // ViewEngine they're overwritten.
-    // tslint:disable-next-line:no-host-decorator-in-concrete
+    // eslint-disable-next-line
     @HostListener('input')
     _onInput(): void {
         // This is a noop function and is used to let Angular know whenever the value changes.
@@ -441,7 +441,7 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
             this.focus();
         }
     }
-    // tslint:disable
+    /* eslint-disable */
     static ngAcceptInputType_disabled: BooleanInput;
     static ngAcceptInputType_readonly: BooleanInput;
     static ngAcceptInputType_required: BooleanInput;
@@ -449,5 +449,5 @@ export class InputDirective extends _MatInputMixinBase implements MatFormFieldCo
     // Accept `any` to avoid conflicts with other directives on `<input>` that may
     // accept different types.
     static ngAcceptInputType_value: any;
-    // tslint:enable
+    /* eslint-enable */
 }

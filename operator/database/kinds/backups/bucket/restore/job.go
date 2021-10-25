@@ -46,7 +46,7 @@ func getJob(
 							SubPath:   secretKey,
 							MountPath: secretPath,
 						}},
-						ImagePullPolicy: corev1.PullAlways,
+						ImagePullPolicy: corev1.PullIfNotPresent,
 					}},
 					Volumes: []corev1.Volume{{
 						Name: internalSecretName,

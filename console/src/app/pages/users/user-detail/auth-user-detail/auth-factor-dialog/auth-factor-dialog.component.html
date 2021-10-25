@@ -2,7 +2,7 @@
     <span class="title">{{'USER.MFA.DIALOG.ADD_MFA_TITLE' | translate}} {{data?.number}}</span>
 </h1>
 <div mat-dialog-content>
-    <ng-container *ngIf="selectedType == undefined">
+    <ng-container *ngIf="selectedType === undefined">
         <p class="desc">{{'USER.MFA.DIALOG.ADD_MFA_DESCRIPTION' | translate}}</p>
 
         <div class="type-selection">
@@ -25,7 +25,7 @@
         </div>
     </ng-container>
 
-    <div class="otp" *ngIf="selectedType == AuthFactorType.OTP">
+    <div class="otp" *ngIf="selectedType === AuthFactorType.OTP">
         <p class="desc">{{'USER.MFA.OTP_DIALOG_DESCRIPTION' | translate}}</p>
 
         <div class="qrcode-wrapper">
@@ -38,7 +38,7 @@
         </cnsl-form-field>
     </div>
 
-    <div class="u2f" *ngIf="selectedType == AuthFactorType.U2F">
+    <div class="u2f" *ngIf="selectedType === AuthFactorType.U2F">
         <p>{{'USER.MFA.U2F_DIALOG_DESCRIPTION' | translate}}</p>
 
         <cnsl-form-field class="form-field" label="Name" required="true">

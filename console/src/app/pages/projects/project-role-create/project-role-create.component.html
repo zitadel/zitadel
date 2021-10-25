@@ -14,7 +14,7 @@
     </button>
     <form @list (ngSubmit)="addRole()">
         <div @animate *ngFor="let formGroup of formArray.controls; index as i" class="content">
-            <ng-container [formGroup]="formGroup">
+            <ng-container [formGroup]="$any(formGroup)">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'PROJECT.ROLE.KEY' | translate }}</cnsl-label>
                     <input cnslInput formControlName="key" />

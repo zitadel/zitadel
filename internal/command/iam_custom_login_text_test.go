@@ -686,6 +686,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
@@ -1320,6 +1325,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					PasswordlessRegistrationDone: domain.PasswordlessRegistrationDoneScreenText{
 						Title:            "Title",
 						Description:      "Description",
+						DescriptionClose: "DescriptionClose",
 						NextButtonText:   "NextButtonText",
 						CancelButtonText: "CancelButtonText",
 					},
@@ -2079,6 +2085,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -3172,6 +3183,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -4322,6 +4338,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 							),
 						),
@@ -5409,6 +5430,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -6506,6 +6532,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
 								),
 							),
@@ -7141,6 +7172,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 					PasswordlessRegistrationDone: domain.PasswordlessRegistrationDoneScreenText{
 						Title:            "Title",
 						Description:      "Description",
+						DescriptionClose: "DescriptionClose",
 						NextButtonText:   "NextButtonText",
 						CancelButtonText: "CancelButtonText",
 					},

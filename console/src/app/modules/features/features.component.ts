@@ -13,7 +13,7 @@ import { GetFeaturesResponse } from 'src/app/proto/generated/zitadel/management_
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { StripeCustomer, SubscriptionService } from 'src/app/services/subscription.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -26,7 +26,7 @@ export enum FeatureServiceType {
 }
 
 @Component({
-  selector: 'app-features',
+  selector: 'cnsl-features',
   templateUrl: './features.component.html',
   styleUrls: ['./features.component.scss'],
 })
@@ -49,13 +49,14 @@ export class FeaturesComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
-    private sessionStorage: StorageService,
+    private storage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
     private subService: SubscriptionService,
     private dialog: MatDialog,
   ) {
-    const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
+    const temporg: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
+
     if (temporg) {
       this.org = temporg;
     }
@@ -132,15 +133,16 @@ export class FeaturesComponent implements OnDestroy {
     });
   }
 
-  private async getData(): Promise<GetFeaturesResponse.AsObject | GetOrgFeaturesResponse.AsObject | undefined> {
+  private async getData(): Promise<GetFeaturesResponse.AsObject | GetOrgFeaturesResponse.AsObject> {
     switch (this.serviceType) {
       case FeatureServiceType.MGMT:
         return this.managementService.getFeatures();
       case FeatureServiceType.ADMIN:
         if (this.org?.id) {
           return this.adminService.getDefaultFeatures();
+        } else {
+          return Promise.reject();
         }
-        break;
     }
   }
 

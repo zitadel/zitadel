@@ -5,10 +5,10 @@
         <div class="i-wrapper" *ngIf="showEditImage">
           <i class="las la-camera"></i>
         </div>
-          <app-avatar
-          *ngIf="user && user.profile?.displayName && user.profile?.firstName && user?.profile.lastName"
-          class="avatar" [name]="user.profile?.displayName" [avatarUrl]="user?.profile?.avatarUrl || ''" [forColor]="preferredLoginName" [size]="80">
-        </app-avatar>
+          <cnsl-avatar
+          *ngIf="user && user.profile?.displayName && user.profile?.firstName && user.profile?.lastName"
+          class="avatar" [name]="user.profile?.displayName ?? ''" [avatarUrl]="user?.profile?.avatarUrl || ''" [forColor]="preferredLoginName" [size]="80">
+        </cnsl-avatar>
       </button>
 
         <cnsl-form-field class="formfield">

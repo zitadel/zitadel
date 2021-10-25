@@ -1,42 +1,42 @@
-<div class="card" appOutsideClick (clickOutside)="closeCard($event)">
-    <app-avatar
-        *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-        class="avatar"
-        [forColor]="user.preferredLoginName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-        [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
-        [size]="80">
-    </app-avatar>
+<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+  <cnsl-avatar
+    *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
+    class="avatar" [forColor]="user.preferredLoginName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+    [name]="(user.human && user.human.profile && user.human.profile.displayName) ? user.human.profile.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
+    [size]="80">
+  </cnsl-avatar>
 
-    <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
-    <span class="u-email">{{user.human?.profile?.preferredLoginName}}</span>
-    <span class="iamuser" *ngIf="iamuser">IAM USER</span>
+  <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
+  <span class="u-email" *ngIf="user.preferredLoginName">{{user.preferredLoginName}}</span>
+  <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
-    <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
-    <div class="l-accounts">
-        <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
-        <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
-            <app-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''" [forColor]="session.loginName" [size]="32">
-            </app-avatar>
+  <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+  <div class="l-accounts">
+    <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
+    <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
+      <cnsl-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''"
+        [forColor]="session.loginName" [size]="32">
+      </cnsl-avatar>
 
-            <div class="col">
-                <span class="user-title">{{session.displayName ? session.displayName : session.userName}} </span>
-                <span class="loginname">{{session.loginName}}</span>
-                <span class="email">{{'USER.STATE.'+session.authState | translate}}</span>
-            </div>
-            <span class="fill-space"></span>
-            <mat-icon>keyboard_arrow_right</mat-icon>
-        </a>
-        <a class="row" (click)="selectNewAccount()">
-            <div class="icon-wrapper">
-                <i class="las la-user-plus"></i>
-            </div>
-            <span class="col">
-                <span class="user-title">{{'USER.ADDACCOUNT' | translate}}</span>
-            </span>
-            <span class="fill-space"></span>
-            <mat-icon>keyboard_arrow_right</mat-icon>
-        </a>
-    </div>
+      <div class="col">
+        <span class="user-title">{{session.displayName ? session.displayName : session.userName}} </span>
+        <span class="loginname">{{session.loginName}}</span>
+        <span class="email">{{'USER.STATE.'+session.authState | translate}}</span>
+      </div>
+      <span class="fill-space"></span>
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </a>
+    <a class="row" (click)="selectNewAccount()">
+      <div class="icon-wrapper">
+        <i class="las la-user-plus"></i>
+      </div>
+      <span class="col">
+        <span class="user-title">{{'USER.ADDACCOUNT' | translate}}</span>
+      </span>
+      <span class="fill-space"></span>
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </a>
+  </div>
 
-    <button (click)="logout()" color="primary" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
+  <button (click)="logout()" color="primary" mat-stroked-button>{{'MENU.LOGOUT' | translate}}</button>
 </div>

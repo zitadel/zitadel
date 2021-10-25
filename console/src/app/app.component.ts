@@ -10,11 +10,11 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
+
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
-import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -23,7 +23,7 @@ import { UpdateService } from './services/update.service';
 
 
 @Component({
-  selector: 'app-root',
+  selector: 'cnsl-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   animations: [
@@ -47,7 +47,7 @@ export class AppComponent implements OnDestroy {
   public showAccount: boolean = false;
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
-  public user!: User.AsObject;
+  // public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -157,6 +157,16 @@ export class AppComponent implements OnDestroy {
     this.matIconRegistry.addSvgIcon(
       'mdi_counter',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/counter.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_openid',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/openid.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_jwt',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'),
     );
 
     this.matIconRegistry.addSvgIcon(
@@ -339,7 +349,7 @@ export class AppComponent implements OnDestroy {
 
     this.authService.user.subscribe(userprofile => {
       if (userprofile) {
-        this.user = userprofile;
+        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
         const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
 

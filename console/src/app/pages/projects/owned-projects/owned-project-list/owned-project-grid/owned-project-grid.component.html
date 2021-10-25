@@ -13,19 +13,15 @@
         (click)="navigateToProject(item.id, $event)"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
         <div class="text-part">
-            <span *ngIf="item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
-                {{
-                item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-                }}</span>
+            <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+                {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <div class="name-row">
               <span class="name" *ngIf="item.name">{{ item.name }}</span>
               <div class="state-dot" [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}"></div>
             </div>
 
-            <span *ngIf="item.details.changeDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-                {{
-                item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-                }}</span>
+            <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+                {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <span class="fill-space"></span>
         </div>
 
@@ -40,16 +36,14 @@
     <div class="item card" *ngFor="let item of notPinned; index as i" (click)="navigateToProject(item.id, $event)"
         [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
         <div class="text-part">
-            <span *ngIf="item.details?.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
-                {{
-                item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-                }}</span>
+            <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+                {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
             <div class="name-row">
               <span class="name" *ngIf="item.name">{{ item.name }}</span>
               <div class="state-dot" [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}"></div>
             </div>
 
-            <span *ngIf="item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
+            <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
                 {{
                 item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
                 }}</span>
@@ -62,7 +56,7 @@
 
     <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
 
-    <ng-template appHasRole [appHasRole]="['project.create']">
+    <ng-template cnslHasRole [hasRole]="['project.create']">
         <div class="add-project-button card" (click)="addItem()">
             <mat-icon class="icon">add</mat-icon>
             <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>

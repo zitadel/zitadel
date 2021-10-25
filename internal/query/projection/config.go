@@ -9,6 +9,7 @@ type Config struct {
 	BulkLimit        uint64
 	CRDB             types.SQL
 	Customizations   map[string]CustomConfig
+	MaxIterators     int
 }
 
 type CustomConfig struct {

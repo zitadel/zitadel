@@ -13,6 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/repository/mock"
+	action_repo "github.com/caos/zitadel/internal/repository/action"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	key_repo "github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -35,6 +36,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	proj_repo.RegisterEventMappers(es)
 	usergrant.RegisterEventMappers(es)
 	key_repo.RegisterEventMappers(es)
+	action_repo.RegisterEventMappers(es)
 	return es
 }
 
@@ -180,10 +182,10 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 	return generator
 }
 
-func GetMockVerifier(t *testing.T, features ...string) *authz.TokenVerifier {
-	return authz.Start(&testVerifier{
+func GetMockVerifier(t *testing.T, features ...string) *testVerifier {
+	return &testVerifier{
 		features: features,
-	})
+	}
 }
 
 type testVerifier struct {
