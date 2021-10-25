@@ -4,12 +4,13 @@ on:
   push:
     branches-ignore:
       - master
+  workflow_dispatch:
 
 jobs:
   e2e-testing:
     name: E2E-testing with an ORBOS cluster
     runs-on: ubuntu-18.04
-    #if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -89,4 +90,4 @@ jobs:
           echo -n "${E2E_BACKUP_S3_SECRETACCESSKEY}" > ${ZITADEL_E2E_BACKUPSAK}
           chmod 0600 ${ZITADEL_E2E_BACKUPSAK}
 
-          ginkgo -race -v ./... --failFast
+          ginkgo -race -v -failFast ./...

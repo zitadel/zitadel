@@ -20,6 +20,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -128,6 +129,24 @@ var _ = Describe("zitadelctl", func() {
 		Expect(backupSAK).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+backupSAKPathEnv))
 	})
 	Context("version", func() {
+		When("the tests are started", func() {
+			It("the docker images should be existing in a specific version", func() {
+				cmd := exec.Command("/bin/bash", "-c", "docker pull ghcr.io/caos/zitadel-crbackup:"+tag)
+				session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute, 1*time.Second).Should(gexec.Exit(0))
+
+				cmd = exec.Command("/bin/bash", "-c", "docker pull ghcr.io/caos/zitadel-operator:"+tag)
+				session, err = gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute, 1*time.Second).Should(gexec.Exit(0))
+
+				cmd = exec.Command("/bin/bash", "-c", "docker pull ghcr.io/caos/zitadel:"+tag)
+				session, err = gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(session, 1*time.Minute, 1*time.Second).Should(gexec.Exit(0))
+			})
+		})
 		When("the orbctl is downloaded from github releases", func() {
 			It("contains the tag read from networking.yml", func() {
 				cmdFunc, err := orbctl.Command(false, false, true, orbctlVersion)
