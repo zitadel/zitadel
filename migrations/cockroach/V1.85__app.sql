@@ -9,7 +9,8 @@ CREATE TABLE zitadel.projections.apps(
     
     name STRING,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    INDEX idx_project_id (project_id)
 );
 
 CREATE TABLE zitadel.projections.apps_api_configs(
