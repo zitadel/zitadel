@@ -97,7 +97,7 @@ const (
 
 	APIConfigColumnAppID        = "app_id"
 	APIConfigColumnClientID     = "client_id"
-	APIConfigColumnClientSecret = "client_secert"
+	APIConfigColumnClientSecret = "client_secret"
 	APIConfigColumnAuthMethod   = "auth_method"
 
 	OIDCConfigColumnAppID                    = "app_id"
@@ -251,7 +251,7 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.EventReader) (*h
 		cols = append(cols, handler.NewCol(APIConfigColumnClientSecret, e.ClientSecret))
 	}
 	if e.AuthMethodType != nil {
-		cols = append(cols, handler.NewCol(APIConfigColumnAuthMethod, e.AuthMethodType))
+		cols = append(cols, handler.NewCol(APIConfigColumnAuthMethod, *e.AuthMethodType))
 	}
 	if len(cols) == 0 {
 		return crdb.NewNoOpStatement(e), nil
@@ -283,17 +283,12 @@ func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.EventReade
 		logging.LogWithFields("HANDL-dssSI", "seq", event.Sequence(), "expectedType", project.APIConfigSecretChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ttb0I", "reduce.wrong.event.type")
 	}
-	cols := make([]handler.Column, 0, 1)
-	if e.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(APIConfigColumnClientSecret, e.ClientSecret))
-	}
-	if len(cols) == 0 {
-		return crdb.NewNoOpStatement(e), nil
-	}
 	return crdb.NewMultiStatement(
 		e,
 		crdb.AddUpdateStatement(
-			cols,
+			[]handler.Column{
+				handler.NewCol(APIConfigColumnClientSecret, e.ClientSecret),
+			},
 			[]handler.Condition{
 				handler.NewCond(APIConfigColumnAppID, e.AppID),
 			},

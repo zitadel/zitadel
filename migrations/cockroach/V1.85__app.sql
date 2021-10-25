@@ -17,7 +17,7 @@ CREATE TABLE zitadel.projections.apps_api_configs(
 	app_id STRING REFERENCES zitadel.projections.apps (id) ON DELETE CASCADE,
 	
     client_id STRING NOT NULL,
-	client_secert JSONB,
+	client_secret JSONB,
 	auth_method INT2,
 
     PRIMARY KEY (app_id)
