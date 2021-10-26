@@ -93,4 +93,4 @@ require (
 	sigs.k8s.io/controller-runtime v0.10.2
 )
 
-replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.3
+replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
