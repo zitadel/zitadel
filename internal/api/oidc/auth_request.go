@@ -116,6 +116,9 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
+		if errors.IsErrorInvalidArgument(err) {
+			err = oidc.ErrInvalidGrant().WithParent(err)
+		}
 		return "", "", time.Time{}, err
 	}
 	return resp.TokenID, token, resp.Expiration, nil
