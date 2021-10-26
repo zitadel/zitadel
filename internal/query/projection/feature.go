@@ -79,7 +79,7 @@ const (
 	FeatureLabelPolicyWatermarkCol     = "label_policy_watermark"
 	FeatureCustomDomainCol             = "custom_domain"
 	FeaturePrivacyPolicyCol            = "privacy_policy"
-	FeatureMetadataUserCol             = "meta_data_user"
+	FeatureMetadataUserCol             = "metadata_user"
 	FeatureCustomTextMessageCol        = "custom_text_message"
 	FeatureCustomTextLoginCol          = "custom_text_login"
 	FeatureLockoutPolicyCol            = "lockout_policy"
@@ -101,34 +101,79 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.EventReader) (*han
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-K0erf", "reduce.wrong.event.type")
 	}
 
-	return crdb.NewCreateStatement(&featureEvent, []handler.Column{
+	cols := []handler.Column{
 		handler.NewCol(FeatureAggregateIDCol, featureEvent.Aggregate().ID),
 		handler.NewCol(FeatureCreationDateCol, featureEvent.CreationDate()),
 		handler.NewCol(FeatureChangeDateCol, featureEvent.CreationDate()),
 		handler.NewCol(FeatureSequenceCol, featureEvent.Sequence()),
 		handler.NewCol(FeatureIsDefaultCol, isDefault),
-		handler.NewCol(FeatureTierNameCol, featureEvent.TierName),
-		handler.NewCol(FeatureTierDescriptionCol, featureEvent.TierDescription),
-		handler.NewCol(FeatureStateCol, featureEvent.State),
-		handler.NewCol(FeatureStateDescriptionCol, featureEvent.StateDescription),
-		handler.NewCol(FeatureAuditLogRetentionCol, featureEvent.AuditLogRetention),
-		handler.NewCol(FeatureLoginPolicyFactorsCol, featureEvent.LoginPolicyFactors),
-		handler.NewCol(FeatureLoginPolicyIDPCol, featureEvent.LoginPolicyIDP),
-		handler.NewCol(FeatureLoginPolicyPasswordlessCol, featureEvent.LoginPolicyPasswordless),
-		handler.NewCol(FeatureLoginPolicyRegistrationCol, featureEvent.LoginPolicyRegistration),
-		handler.NewCol(FeatureLoginPolicyUsernameLoginCol, featureEvent.LoginPolicyUsernameLogin),
-		handler.NewCol(FeatureLoginPolicyPasswordResetCol, featureEvent.LoginPolicyPasswordReset),
-		handler.NewCol(FeaturePasswordComplexityPolicyCol, featureEvent.PasswordComplexityPolicy),
-		handler.NewCol(FeatureLabelPolicyPrivateLabelCol, featureEvent.LabelPolicyPrivateLabel),
-		handler.NewCol(FeatureLabelPolicyWatermarkCol, featureEvent.LabelPolicyWatermark),
-		handler.NewCol(FeatureCustomDomainCol, featureEvent.CustomDomain),
-		handler.NewCol(FeaturePrivacyPolicyCol, featureEvent.PrivacyPolicy),
-		handler.NewCol(FeatureMetadataUserCol, featureEvent.MetadataUser),
-		handler.NewCol(FeatureCustomTextMessageCol, featureEvent.CustomTextMessage),
-		handler.NewCol(FeatureCustomTextLoginCol, featureEvent.CustomTextLogin),
-		handler.NewCol(FeatureLockoutPolicyCol, featureEvent.LockoutPolicy),
-		handler.NewCol(FeatureActionsCol, featureEvent.Actions),
-	}), nil
+	}
+	if featureEvent.TierName != nil {
+		cols = append(cols, handler.NewCol(FeatureTierNameCol, *featureEvent.TierName))
+	}
+	if featureEvent.TierDescription != nil {
+		cols = append(cols, handler.NewCol(FeatureTierDescriptionCol, *featureEvent.TierDescription))
+	}
+	if featureEvent.State != nil {
+		cols = append(cols, handler.NewCol(FeatureStateCol, *featureEvent.State))
+	}
+	if featureEvent.StateDescription != nil {
+		cols = append(cols, handler.NewCol(FeatureStateDescriptionCol, *featureEvent.StateDescription))
+	}
+	if featureEvent.AuditLogRetention != nil {
+		cols = append(cols, handler.NewCol(FeatureAuditLogRetentionCol, *featureEvent.AuditLogRetention))
+	}
+	if featureEvent.LoginPolicyFactors != nil {
+		cols = append(cols, handler.NewCol(FeatureLoginPolicyFactorsCol, *featureEvent.LoginPolicyFactors))
+	}
+	if featureEvent.LoginPolicyIDP != nil {
+		cols = append(cols, handler.NewCol(FeatureLoginPolicyIDPCol, *featureEvent.LoginPolicyIDP))
+	}
+	if featureEvent.LoginPolicyPasswordless != nil {
+		cols = append(cols, handler.NewCol(FeatureLoginPolicyPasswordlessCol, *featureEvent.LoginPolicyPasswordless))
+	}
+	if featureEvent.LoginPolicyRegistration != nil {
+		cols = append(cols, handler.NewCol(FeatureLoginPolicyRegistrationCol, *featureEvent.LoginPolicyRegistration))
+	}
+	if featureEvent.LoginPolicyUsernameLogin != nil {
+		cols = append(cols, handler.NewCol(FeatureLoginPolicyUsernameLoginCol, *featureEvent.LoginPolicyUsernameLogin))
+	}
+	if featureEvent.LoginPolicyPasswordReset != nil {
+		cols = append(cols, handler.NewCol(FeatureLoginPolicyPasswordResetCol, *featureEvent.LoginPolicyPasswordReset))
+	}
+	if featureEvent.PasswordComplexityPolicy != nil {
+		cols = append(cols, handler.NewCol(FeaturePasswordComplexityPolicyCol, *featureEvent.PasswordComplexityPolicy))
+	}
+	if featureEvent.LabelPolicyPrivateLabel != nil {
+		cols = append(cols, handler.NewCol(FeatureLabelPolicyPrivateLabelCol, *featureEvent.LabelPolicyPrivateLabel))
+	}
+	if featureEvent.LabelPolicyWatermark != nil {
+		cols = append(cols, handler.NewCol(FeatureLabelPolicyWatermarkCol, *featureEvent.LabelPolicyWatermark))
+	}
+	if featureEvent.CustomDomain != nil {
+		cols = append(cols, handler.NewCol(FeatureCustomDomainCol, *featureEvent.CustomDomain))
+	}
+	if featureEvent.PrivacyPolicy != nil {
+		cols = append(cols, handler.NewCol(FeaturePrivacyPolicyCol, *featureEvent.PrivacyPolicy))
+	}
+	if featureEvent.MetadataUser != nil {
+		cols = append(cols, handler.NewCol(FeatureMetadataUserCol, *featureEvent.MetadataUser))
+	}
+	if featureEvent.CustomTextMessage != nil {
+		cols = append(cols, handler.NewCol(FeatureCustomTextMessageCol, *featureEvent.CustomTextMessage))
+	}
+	if featureEvent.CustomTextLogin != nil {
+		cols = append(cols, handler.NewCol(FeatureCustomTextLoginCol, *featureEvent.CustomTextLogin))
+	}
+	if featureEvent.LockoutPolicy != nil {
+		cols = append(cols, handler.NewCol(FeatureLockoutPolicyCol, *featureEvent.LockoutPolicy))
+	}
+	if featureEvent.Actions != nil {
+		cols = append(cols, handler.NewCol(FeatureActionsCol, *featureEvent.Actions))
+	}
+	return crdb.NewUpsertStatement(
+		&featureEvent,
+		cols), nil
 }
 
 func (p *FeatureProjection) reduceFeatureRemoved(event eventstore.EventReader) (*handler.Statement, error) {

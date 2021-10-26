@@ -22,7 +22,7 @@ CREATE TABLE zitadel.projections.features
     label_policy_watermark      BOOLEAN,
     custom_domain               BOOLEAN,
     privacy_policy              BOOLEAN,
-    meta_data_user              BOOLEAN,
+    metadata_user              BOOLEAN,
     custom_text_message         BOOLEAN,
     custom_text_login           BOOLEAN,
     lockout_policy              BOOLEAN,
