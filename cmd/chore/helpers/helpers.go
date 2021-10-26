@@ -24,8 +24,8 @@ func PrefixedEnv(env string) string {
 
 type ZitadelctlGitopsCmd func(args ...string) *exec.Cmd
 
-func ZitadelctlGitopsFunc(orbconfig string) ZitadelctlGitopsCmd {
-	cmdFunc, error := zitadelctl.Command(false, true, false, "")
+func ZitadelctlGitopsFunc(orbconfig string, tag string) ZitadelctlGitopsCmd {
+	cmdFunc, error := zitadelctl.Command(false, true, false, tag)
 	Expect(error).ToNot(HaveOccurred())
 	return func(args ...string) *exec.Cmd {
 		cmd := cmdFunc(context.Background())

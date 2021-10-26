@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/cmd/chore/helpers"
 	k8s_test "github.com/caos/zitadel/cmd/chore/helpers/k8s"
 	"github.com/caos/zitadel/cmd/chore/helpers/orbctl"
-	"github.com/caos/zitadel/cmd/chore/helpers/zitadelctl"
 	"github.com/caos/zitadel/pkg/backup"
 	"github.com/caos/zitadel/pkg/databases"
 	. "github.com/onsi/ginkgo"
@@ -70,6 +69,7 @@ var _ = Describe("zitadelctl", func() {
 		DeleteNamespacedResource                                                                       helpers_test.DeleteNamespacedResource
 	)
 	BeforeSuite(func() {
+
 		databaseFile = "database.yml"
 		zitadelFile = "zitadel.yml"
 		backupName = "e2e-test"
@@ -117,7 +117,7 @@ var _ = Describe("zitadelctl", func() {
 
 		data := gitClient.Read("networking.yml")
 		orbctlVersion = orbctl.GetVersion(data)
-		zitadelctlGitops = helpers_test.ZitadelctlGitopsFunc(orbconfigPath)
+		zitadelctlGitops = helpers_test.ZitadelctlGitopsFunc(orbconfigPath, tag)
 		orbctlGitops = helpers_test.OrbctlGitopsFunc(orbconfigPath, orbctlVersion)
 
 		Expect(tag).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+tagEnv))
@@ -164,16 +164,10 @@ var _ = Describe("zitadelctl", func() {
 		When("the zitadelctl is downloaded from github releases", func() {
 			It("contains the tag read from environment variable", func() {
 
-				cmdFunc, err := zitadelctl.Command(false, false, false, tag)
-				Expect(err).ToNot(HaveOccurred())
-
-				cmd := cmdFunc(context.Background())
-				cmd.Args = append(cmd.Args, "--version")
-
-				session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
+				session, err := gexec.Start(zitadelctlGitops("--version"), GinkgoWriter, GinkgoWriter)
 				Expect(err).ToNot(HaveOccurred())
 				Eventually(session, 1*time.Minute, 1*time.Second).Should(gexec.Exit(0))
-				Eventually(session, 1*time.Minute, 1*time.Second).Should(gbytes.Say(regexp.QuoteMeta(fmt.Sprintf("zitadelctl version %s", tag))))
+				Eventually(string(session.Out.Contents()), 1*time.Minute, 1*time.Second).Should(ContainSubstring(regexp.QuoteMeta(fmt.Sprintf("zitadelctl version %s", tag))))
 			})
 		})
 	})
