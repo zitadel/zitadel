@@ -81,6 +81,10 @@ func (a *AuthRequest) GetResponseType() oidc.ResponseType {
 	return ResponseTypeToOIDC(a.oidc().ResponseType)
 }
 
+func (a *AuthRequest) GetResponseMode() oidc.ResponseMode {
+	return ""
+}
+
 func (a *AuthRequest) GetScopes() []string {
 	return a.oidc().Scopes
 }
