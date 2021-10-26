@@ -144,7 +144,8 @@ func HumanRefreshTokenRenewedEventEventMapper(event *repository.Event) (eventsto
 type HumanRefreshTokenRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TokenID string `json:"tokenId"`
+	TokenID            string `json:"tokenId"`
+	RevokeAccessTokens bool   `json:"revokeAccessTokens,omitempty"`
 }
 
 func (e *HumanRefreshTokenRemovedEvent) Data() interface{} {
@@ -163,6 +164,7 @@ func NewHumanRefreshTokenRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tokenID string,
+	revokeAccessTokens bool,
 ) *HumanRefreshTokenRemovedEvent {
 	return &HumanRefreshTokenRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -170,7 +172,8 @@ func NewHumanRefreshTokenRemovedEvent(
 			aggregate,
 			HumanRefreshTokenRemovedType,
 		),
-		TokenID: tokenID,
+		TokenID:            tokenID,
+		RevokeAccessTokens: revokeAccessTokens,
 	}
 }
 

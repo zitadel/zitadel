@@ -27,7 +27,7 @@ func (s *Server) ListMyRefreshTokens(ctx context.Context, req *auth.ListMyRefres
 
 func (s *Server) RevokeMyRefreshToken(ctx context.Context, req *auth.RevokeMyRefreshTokenRequest) (*auth.RevokeMyRefreshTokenResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	details, err := s.command.RevokeRefreshToken(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Id)
+	details, err := s.command.RevokeRefreshToken(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Id, req.RevokeAccessTokens)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (s *Server) RevokeMyRefreshToken(ctx context.Context, req *auth.RevokeMyRef
 	}, nil
 }
 
-func (s *Server) RevokeAllMyRefreshTokens(ctx context.Context, _ *auth.RevokeAllMyRefreshTokensRequest) (*auth.RevokeAllMyRefreshTokensResponse, error) {
+func (s *Server) RevokeAllMyRefreshTokens(ctx context.Context, req *auth.RevokeAllMyRefreshTokensRequest) (*auth.RevokeAllMyRefreshTokensResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	res, err := s.repo.SearchMyRefreshTokens(ctx, ctxData.UserID, ListMyRefreshTokensRequestToModel(nil))
 	if err != nil {
@@ -46,7 +46,7 @@ func (s *Server) RevokeAllMyRefreshTokens(ctx context.Context, _ *auth.RevokeAll
 	for i, view := range res.Result {
 		tokenIDs[i] = view.ID
 	}
-	err = s.command.RevokeRefreshTokens(ctx, ctxData.UserID, ctxData.ResourceOwner, tokenIDs)
+	err = s.command.RevokeRefreshTokens(ctx, ctxData.UserID, ctxData.ResourceOwner, tokenIDs, req.RevokeAccessTokens)
 	if err != nil {
 		return nil, err
 	}

@@ -165,6 +165,29 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	return err
 }
 
+func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) error {
+	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	if err == nil {
+		if refreshToken.ClientID != clientID {
+			return errors.ThrowPermissionDenied(nil, "OIDC-SDff2", "token was not issued for this client")
+		}
+		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID, true)
+		return err
+	}
+	accessToken, err := o.repo.TokenByID(ctx, userID, token)
+	if err != nil {
+		if !errors.IsNotFound(err) {
+			return err
+		}
+		return nil
+	}
+	if accessToken.ApplicationID == clientID {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dfbb3", "token was not issued for this client")
+	}
+	_, err = o.command.RevokeAccessToken(ctx, userID, accessToken.ID)
+	return err
+}
+
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
 	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
 }

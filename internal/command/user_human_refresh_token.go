@@ -90,8 +90,8 @@ func (c *Commands) renewRefreshToken(ctx context.Context, userID, orgID, refresh
 	return user.NewHumanRefreshTokenRenewedEvent(ctx, userAgg, tokenID, newToken, idleExpiration), newRefreshToken, nil
 }
 
-func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenID string) (*domain.ObjectDetails, error) {
-	removeEvent, refreshTokenWriteModel, err := c.removeRefreshToken(ctx, userID, orgID, tokenID)
+func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenID string, revokeAccess bool) (*domain.ObjectDetails, error) {
+	removeEvent, refreshTokenWriteModel, err := c.removeRefreshToken(ctx, userID, orgID, tokenID, revokeAccess)
 	if err != nil {
 		return nil, err
 	}
@@ -106,13 +106,13 @@ func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenI
 	return writeModelToObjectDetails(&refreshTokenWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string, tokenIDs []string) (err error) {
+func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string, tokenIDs []string, revokeAccessTokens bool) (err error) {
 	if len(tokenIDs) == 0 {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfj42", "Errors.IDMissing")
 	}
 	events := make([]eventstore.EventPusher, len(tokenIDs))
 	for i, tokenID := range tokenIDs {
-		event, _, err := c.removeRefreshToken(ctx, userID, orgID, tokenID)
+		event, _, err := c.removeRefreshToken(ctx, userID, orgID, tokenID, revokeAccessTokens)
 		if err != nil {
 			return err
 		}
@@ -122,7 +122,7 @@ func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string
 	return err
 }
 
-func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenID string) (*user.HumanRefreshTokenRemovedEvent, *HumanRefreshTokenWriteModel, error) {
+func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenID string, revokeAccessTokens bool) (*user.HumanRefreshTokenRemovedEvent, *HumanRefreshTokenWriteModel, error) {
 	if userID == "" || orgID == "" || tokenID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GVDgf", "Errors.IDMissing")
 	}
@@ -135,5 +135,5 @@ func (c *Commands) removeRefreshToken(ctx context.Context, userID, orgID, tokenI
 		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-BHt2w", "Errors.User.RefreshToken.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&refreshTokenWriteModel.WriteModel)
-	return user.NewHumanRefreshTokenRemovedEvent(ctx, userAgg, tokenID), refreshTokenWriteModel, nil
+	return user.NewHumanRefreshTokenRemovedEvent(ctx, userAgg, tokenID, revokeAccessTokens), refreshTokenWriteModel, nil
 }

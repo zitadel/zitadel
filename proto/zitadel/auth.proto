@@ -685,14 +685,16 @@ message ListMyRefreshTokensResponse {
 
 message RevokeMyRefreshTokenRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool revoke_access_tokens = 2;
 }
 
 message RevokeMyRefreshTokenResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-//This is an empty request
-message RevokeAllMyRefreshTokensRequest {}
+message RevokeAllMyRefreshTokensRequest {
+    bool revoke_access_tokens = 1;
+}
 
 //This is an empty response
 message RevokeAllMyRefreshTokensResponse {}
