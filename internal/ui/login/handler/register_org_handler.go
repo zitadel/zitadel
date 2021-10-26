@@ -65,7 +65,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), userIDs)
+	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), userIDs, true)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -106,10 +106,10 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 			data.HasNumber = NumberRegex
 		}
 	}
-	orgPolicy, err := l.getDefaultOrgIamPolicy(r)
+	orgPolicy, _ := l.getDefaultOrgIamPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = orgPolicy.IAMDomain
+		data.IamDomain = l.iamDomain
 	}
 
 	translator := l.getTranslator(authRequest)

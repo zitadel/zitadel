@@ -67,8 +67,12 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	labelPolicyPrivateLabel,
 	labelPolicyWatermark,
 	customDomain,
-	customText,
-	privacyPolicy bool,
+	privacyPolicy,
+	metadataUser,
+	customTextMessage,
+	customTextLogin,
+	lockoutPolicy,
+	actions bool,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -115,11 +119,23 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if wm.CustomDomain != customDomain {
 		changes = append(changes, features.ChangeCustomDomain(customDomain))
 	}
-	if wm.CustomText != customText {
-		changes = append(changes, features.ChangeCustomText(customText))
-	}
 	if wm.PrivacyPolicy != privacyPolicy {
 		changes = append(changes, features.ChangePrivacyPolicy(privacyPolicy))
+	}
+	if wm.MetadataUser != metadataUser {
+		changes = append(changes, features.ChangeMetadataUser(metadataUser))
+	}
+	if wm.CustomTextMessage != customTextMessage {
+		changes = append(changes, features.ChangeCustomTextMessage(customTextMessage))
+	}
+	if wm.CustomTextLogin != customTextLogin {
+		changes = append(changes, features.ChangeCustomTextLogin(customTextLogin))
+	}
+	if wm.LockoutPolicy != lockoutPolicy {
+		changes = append(changes, features.ChangeLockoutPolicy(lockoutPolicy))
+	}
+	if wm.Actions != actions {
+		changes = append(changes, features.ChangeActions(actions))
 	}
 	if len(changes) == 0 {
 		return nil, false

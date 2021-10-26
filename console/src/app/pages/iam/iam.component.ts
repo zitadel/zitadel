@@ -12,7 +12,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-iam',
+  selector: 'cnsl-iam',
   templateUrl: './iam.component.html',
   styleUrls: ['./iam.component.scss'],
 })

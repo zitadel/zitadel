@@ -13,7 +13,6 @@ import (
 	"golang.org/x/text/language"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
@@ -62,6 +61,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		tmplChangePasswordDone:           "change_password_done.html",
 		tmplRegisterOption:               "register_option.html",
 		tmplRegister:                     "register.html",
+		tmplExternalRegisterOverview:     "external_register_overview.html",
 		tmplLogoutDone:                   "logout_done.html",
 		tmplRegisterOrg:                  "register_org.html",
 		tmplChangeUsername:               "change_username.html",
@@ -148,7 +148,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"mfaPromptUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
-		"mfaPromptChangeUrl": func(id string, provider model.MFAType) string {
+		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
 			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, queryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
@@ -181,11 +181,14 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 		"orgRegistrationUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointRegisterOrg)
 		},
+		"externalRegistrationUrl": func() string {
+			return path.Join(r.pathPrefix, EndpointExternalRegister)
+		},
 		"changeUsernameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointChangeUsername)
 		},
-		"externalNotFoundOptionUrl": func() string {
-			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption)
+		"externalNotFoundOptionUrl": func(action string) string {
+			return path.Join(r.pathPrefix, EndpointExternalNotFoundOption+"?"+action+"=true")
 		},
 		"selectedLanguage": func(l string) bool {
 			return false
@@ -217,10 +220,14 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 }
 
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+	if authReq == nil {
+		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
+		return
+	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
-		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-sio0W", "could not get authreq"))
+		l.renderInternalError(w, r, authReq, err)
 		return
 	}
 	if len(authReq.PossibleSteps) == 0 {
@@ -231,6 +238,10 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 }
 
 func (l *Login) renderError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+	if err != nil {
+		l.renderInternalError(w, r, authReq, err)
+		return
+	}
 	if authReq == nil || len(authReq.PossibleSteps) == 0 {
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(err, "APP-OVOiT", "no possible steps"))
 		return
@@ -250,6 +261,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderRegisterOption(w, r, authReq, nil)
 	case *domain.SelectUserStep:
 		l.renderUserSelection(w, r, authReq, step)
+	case *domain.RedirectToExternalIDPStep:
+		l.handleIDP(w, r, authReq, authReq.SelectedIDPConfigID)
 	case *domain.InitPasswordStep:
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 	case *domain.PasswordStep:
@@ -284,6 +297,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-asb43", "Errors.User.GrantRequired"))
+	case *domain.ProjectRequiredStep:
+		l.renderInternalError(w, r, authReq, caos_errs.ThrowPreconditionFailed(nil, "APP-m92d", "Errors.User.ProjectRequired"))
 	default:
 		l.renderInternalError(w, r, authReq, caos_errs.ThrowInternal(nil, "APP-ds3QF", "step no possible"))
 	}
@@ -292,7 +307,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 func (l *Login) renderInternalError(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	var msg string
 	if err != nil {
-		msg = err.Error()
+		_, msg = l.getErrorMessage(r, err)
 	}
 	data := l.getBaseData(r, authReq, "Error", "Internal", msg)
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplError], data, nil)
@@ -320,6 +335,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		Theme:                  l.getTheme(r),
 		ThemeMode:              l.getThemeMode(r),
 		DarkMode:               l.isDarkMode(r),
+		PrivateLabelingOrgID:   l.getPrivateLabelingID(authReq),
 		OrgID:                  l.getOrgID(authReq),
 		OrgName:                l.getOrgName(authReq),
 		PrimaryDomain:          l.getOrgPrimaryDomain(authReq),
@@ -337,7 +353,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
 		}
 	} else {
-		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
+		privacyPolicy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
 		}
@@ -414,6 +430,25 @@ func (l *Login) getOrgID(authReq *domain.AuthRequest) string {
 	return authReq.UserOrgID
 }
 
+func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
+	privateLabelingOrgID := domain.IAMID
+	if authReq == nil {
+		return privateLabelingOrgID
+	}
+	if authReq.PrivateLabelingSetting != domain.PrivateLabelingSettingUnspecified {
+		privateLabelingOrgID = authReq.ApplicationResourceOwner
+	}
+	if authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy || authReq.PrivateLabelingSetting == domain.PrivateLabelingSettingUnspecified {
+		if authReq.UserOrgID != "" {
+			privateLabelingOrgID = authReq.UserOrgID
+		}
+	}
+	if authReq.RequestedOrgID != "" {
+		privateLabelingOrgID = authReq.RequestedOrgID
+	}
+	return privateLabelingOrgID
+}
+
 func (l *Login) getOrgName(authReq *domain.AuthRequest) string {
 	if authReq == nil {
 		return ""
@@ -476,6 +511,7 @@ type baseData struct {
 	Theme                  string
 	ThemeMode              string
 	DarkMode               bool
+	PrivateLabelingOrgID   string
 	OrgID                  string
 	OrgName                string
 	PrimaryDomain          string

@@ -314,10 +314,41 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+				},
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
 			name: "config not existing, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLoginPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
 					expectFilter(),
 				),
 			},
@@ -338,17 +369,6 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewIDPConfigAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								"config1",
-								"name",
-								domain.IDPConfigTypeOIDC,
-								domain.IDPConfigStylingTypeUnspecified,
-							),
-						),
-					),
-					expectFilter(
-						eventFromEventPusher(
 							iam.NewLoginPolicyAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								true,
@@ -359,6 +379,20 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewIDPConfigAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"config1",
+								"name",
+								domain.IDPConfigTypeOIDC,
+								domain.IDPConfigStylingTypeUnspecified,
+								true,
+							),
+						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							iam.NewIdentityProviderAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
@@ -385,12 +419,26 @@ func TestCommandSide_AddIDPProviderDefaultLoginPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
+							iam.NewLoginPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
 							iam.NewIDPConfigAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"config1",
 								"name",
 								domain.IDPConfigTypeOIDC,
 								domain.IDPConfigStylingTypeUnspecified,
+								true,
 							),
 						),
 					),
@@ -477,10 +525,41 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 			},
 		},
 		{
+			name: "login policy not existing, not found error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				provider: &domain.IDPProvider{
+					IDPConfigID: "config1",
+				},
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
+		{
 			name: "provider not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLoginPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								true,
+								true,
+								true,
+								true,
+								true,
+								domain.PasswordlessTypeAllowed,
+							),
+						),
+					),
 					expectFilter(),
 				),
 			},
@@ -511,6 +590,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							iam.NewIdentityProviderAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
@@ -553,6 +634,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							iam.NewIdentityProviderAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
@@ -600,6 +683,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							iam.NewIdentityProviderAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
@@ -655,6 +740,8 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 							),
 						),
+					),
+					expectFilter(
 						eventFromEventPusher(
 							iam.NewIdentityProviderAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,

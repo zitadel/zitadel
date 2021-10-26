@@ -29,6 +29,9 @@ export interface MappedChange {
     dates: Timestamp.AsObject[];
     editorId: string;
     editorName: string;
+    editorDisplayName: string;
+    editorAvatarUrl: string;
+    editorPreferredLoginName: string;
     eventTypes: Array<{ key: string; localizedMessage: string; }>;
     sequences: number[];
   }>;
@@ -41,7 +44,7 @@ type ListChanges = ListMyUserChangesResponse.AsObject |
   ListAppChangesResponse.AsObject;
 
 @Component({
-  selector: 'app-changes',
+  selector: 'cnsl-changes',
   templateUrl: './changes.component.html',
   styleUrls: ['./changes.component.scss'],
 })
@@ -253,7 +256,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
   }
 
   // Order by ascending property value
-  // tslint:disable
+  /* eslint-disable */
   valueAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.value.localeCompare(b.value);
   };
@@ -262,5 +265,5 @@ export class ChangesComponent implements OnInit, OnDestroy {
   keyDescOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.key > b.key ? -1 : (b.key > a.key ? 1 : 0);
   };
-  // tslint:enable
+  /* eslint-enable */
 }

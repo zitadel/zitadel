@@ -616,6 +616,91 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 								),
 							),
@@ -788,6 +873,85 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, "BackButtonText", language.English,
 								),
+							), eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
+								),
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
@@ -902,6 +1066,31 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -1117,6 +1306,29 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						NotSupported:            "NotSupported",
 						ErrorRetry:              "ErrorRetry",
 					},
+					PasswordlessPrompt: domain.PasswordlessPromptScreenText{
+						Title:                  "Title",
+						Description:            "Description",
+						DescriptionInit:        "DescriptionInit",
+						PasswordlessButtonText: "PasswordlessButtonText",
+						NextButtonText:         "NextButtonText",
+						SkipButtonText:         "SkipButtonText",
+					},
+					PasswordlessRegistration: domain.PasswordlessRegistrationScreenText{
+						Title:                   "Title",
+						Description:             "Description",
+						RegisterTokenButtonText: "RegisterTokenButtonText",
+						TokenNameLabel:          "TokenNameLabel",
+						NotSupported:            "NotSupported",
+						ErrorRetry:              "ErrorRetry",
+					},
+					PasswordlessRegistrationDone: domain.PasswordlessRegistrationDoneScreenText{
+						Title:            "Title",
+						Description:      "Description",
+						DescriptionClose: "DescriptionClose",
+						NextButtonText:   "NextButtonText",
+						CancelButtonText: "CancelButtonText",
+					},
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
@@ -1162,6 +1374,24 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						NextButtonText:         "NextButtonText",
 						BackButtonText:         "BackButtonText",
 					},
+					ExternalRegistrationUserOverview: domain.ExternalRegistrationUserOverviewScreenText{
+						Title:              "Title",
+						Description:        "Description",
+						EmailLabel:         "EmailLabel",
+						UsernameLabel:      "UsernameLabel",
+						FirstnameLabel:     "FirstnameLabel",
+						LastnameLabel:      "LastnameLabel",
+						NicknameLabel:      "NicknameLabel",
+						LanguageLabel:      "LanguageLabel",
+						PhoneLabel:         "PhoneLabel",
+						TOSAndPrivacyLabel: "TOSAndPrivacyLabel",
+						TOSConfirm:         "TOSConfirm",
+						TOSLinkText:        "TOSLinkText",
+						TOSConfirmAnd:      "TOSConfirmAnd",
+						PrivacyLinkText:    "PrivacyLinkText",
+						BackButtonText:     "BackButtonText",
+						NextButtonText:     "NextButtonText",
+					},
 					RegistrationOrg: domain.RegistrationOrgScreenText{
 						Title:                "Title",
 						Description:          "Description",
@@ -1190,6 +1420,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",
 						AutoRegisterButtonText: "AutoRegisterButtonText",
+						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
+						TOSConfirm:             "TOSConfirm",
+						TOSLinkText:            "TOSLinkText",
+						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyLinkText:        "PrivacyLinkText",
 					},
 					LoginSuccess: domain.SuccessLoginScreenText{
 						Title:                   "Title",
@@ -1784,6 +2019,91 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 							),
 						),
@@ -1959,6 +2279,86 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
 							),
 						),
@@ -2070,6 +2470,31 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -2692,6 +3117,91 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, language.English,
 								),
 							),
@@ -2867,6 +3377,86 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, language.English,
 								),
 							),
@@ -2982,6 +3572,31 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeySuccessLoginTitle, language.English,
 								),
 							),
@@ -3042,37 +3657,41 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				config: &domain.CustomLoginText{
-					Language:               language.English,
-					SelectAccount:          domain.SelectAccountScreenText{},
-					Login:                  domain.LoginScreenText{},
-					Password:               domain.PasswordScreenText{},
-					UsernameChange:         domain.UsernameChangeScreenText{},
-					UsernameChangeDone:     domain.UsernameChangeDoneScreenText{},
-					InitPassword:           domain.InitPasswordScreenText{},
-					InitPasswordDone:       domain.InitPasswordDoneScreenText{},
-					EmailVerification:      domain.EmailVerificationScreenText{},
-					EmailVerificationDone:  domain.EmailVerificationDoneScreenText{},
-					InitUser:               domain.InitializeUserScreenText{},
-					InitUserDone:           domain.InitializeUserDoneScreenText{},
-					InitMFAPrompt:          domain.InitMFAPromptScreenText{},
-					InitMFAOTP:             domain.InitMFAOTPScreenText{},
-					InitMFAU2F:             domain.InitMFAU2FScreenText{},
-					InitMFADone:            domain.InitMFADoneScreenText{},
-					MFAProvider:            domain.MFAProvidersText{},
-					VerifyMFAOTP:           domain.VerifyMFAOTPScreenText{},
-					VerifyMFAU2F:           domain.VerifyMFAU2FScreenText{},
-					Passwordless:           domain.PasswordlessScreenText{},
-					PasswordChange:         domain.PasswordChangeScreenText{},
-					PasswordChangeDone:     domain.PasswordChangeDoneScreenText{},
-					PasswordResetDone:      domain.PasswordResetDoneScreenText{},
-					RegisterOption:         domain.RegistrationOptionScreenText{},
-					RegistrationUser:       domain.RegistrationUserScreenText{},
-					RegistrationOrg:        domain.RegistrationOrgScreenText{},
-					LinkingUsersDone:       domain.LinkingUserDoneScreenText{},
-					ExternalNotFoundOption: domain.ExternalUserNotFoundScreenText{},
-					LoginSuccess:           domain.SuccessLoginScreenText{},
-					LogoutDone:             domain.LogoutDoneScreenText{},
-					Footer:                 domain.FooterText{},
+					Language:                         language.English,
+					SelectAccount:                    domain.SelectAccountScreenText{},
+					Login:                            domain.LoginScreenText{},
+					Password:                         domain.PasswordScreenText{},
+					UsernameChange:                   domain.UsernameChangeScreenText{},
+					UsernameChangeDone:               domain.UsernameChangeDoneScreenText{},
+					InitPassword:                     domain.InitPasswordScreenText{},
+					InitPasswordDone:                 domain.InitPasswordDoneScreenText{},
+					EmailVerification:                domain.EmailVerificationScreenText{},
+					EmailVerificationDone:            domain.EmailVerificationDoneScreenText{},
+					InitUser:                         domain.InitializeUserScreenText{},
+					InitUserDone:                     domain.InitializeUserDoneScreenText{},
+					InitMFAPrompt:                    domain.InitMFAPromptScreenText{},
+					InitMFAOTP:                       domain.InitMFAOTPScreenText{},
+					InitMFAU2F:                       domain.InitMFAU2FScreenText{},
+					InitMFADone:                      domain.InitMFADoneScreenText{},
+					MFAProvider:                      domain.MFAProvidersText{},
+					VerifyMFAOTP:                     domain.VerifyMFAOTPScreenText{},
+					VerifyMFAU2F:                     domain.VerifyMFAU2FScreenText{},
+					Passwordless:                     domain.PasswordlessScreenText{},
+					PasswordlessPrompt:               domain.PasswordlessPromptScreenText{},
+					PasswordlessRegistration:         domain.PasswordlessRegistrationScreenText{},
+					PasswordlessRegistrationDone:     domain.PasswordlessRegistrationDoneScreenText{},
+					PasswordChange:                   domain.PasswordChangeScreenText{},
+					PasswordChangeDone:               domain.PasswordChangeDoneScreenText{},
+					PasswordResetDone:                domain.PasswordResetDoneScreenText{},
+					RegisterOption:                   domain.RegistrationOptionScreenText{},
+					RegistrationUser:                 domain.RegistrationUserScreenText{},
+					ExternalRegistrationUserOverview: domain.ExternalRegistrationUserOverviewScreenText{},
+					RegistrationOrg:                  domain.RegistrationOrgScreenText{},
+					LinkingUsersDone:                 domain.LinkingUserDoneScreenText{},
+					ExternalNotFoundOption:           domain.ExternalUserNotFoundScreenText{},
+					LoginSuccess:                     domain.SuccessLoginScreenText{},
+					LogoutDone:                       domain.LogoutDoneScreenText{},
+					Footer:                           domain.FooterText{},
 				},
 			},
 			res: res{
@@ -3649,6 +4268,91 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 							),
 						),
@@ -3822,6 +4526,87 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegistrationUserBackButtonText, "BackButtonText", language.English,
 							),
 						),
+
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
+							),
+						),
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
@@ -3935,6 +4720,31 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextSetEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextSetEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -4554,6 +5364,91 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, language.English,
 							),
 						),
@@ -4729,6 +5624,86 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						),
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, language.English,
 							),
 						),
@@ -4840,6 +5815,31 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, language.English,
+							),
+						),
+						eventFromEventPusher(
+							iam.NewCustomTextRemovedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, language.English,
 							),
 						),
 						eventFromEventPusher(
@@ -5462,6 +6462,91 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptDescriptionInit, "DescriptionInit", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptPasswordlessButtonText, "PasswordlessButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptNextButtonText, "NextButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessPromptSkipButtonText, "SkipButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationRegisterTokenButtonText, "RegisterTokenButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationTokenNameLabel, "TokenNameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationNotSupported, "NotSupported", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationErrorRetry, "ErrorRetry", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose, "DescriptionClose", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneNextButtonText, "NextButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordlessRegistrationDoneCancelButtonText, "CancelButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyPasswordChangeTitle, "Title", language.English,
 								),
 							),
@@ -5637,6 +6722,86 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTitle, "Title", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewDescription, "Description", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewEmailLabel, "EmailLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewUsernameLabel, "UsernameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewFirstnameLabel, "FirstnameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLastnameLabel, "LastnameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNicknameLabel, "NicknameLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewLanguageLabel, "LanguageLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPhoneLabel, "PhoneLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirm, "TOSConfirm", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSLinkText, "TOSLinkText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewPrivacyLinkText, "PrivacyLinkText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewBackButtonText, "BackButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalRegistrationUserOverviewNextButtonText, "NextButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyRegisterOrgTitle, "Title", language.English,
 								),
 							),
@@ -5748,6 +6913,31 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewCustomTextSetEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundAutoRegisterButtonText, "AutoRegisterButtonText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSAndPrivacyLabel, "TOSAndPrivacyLabel", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirm, "TOSConfirm", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSLinkText, "TOSLinkText", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundTOSConfirmAnd, "TOSConfirmAnd", language.English,
+								),
+							),
+							eventFromEventPusher(
+								iam.NewCustomTextSetEvent(context.Background(),
+									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyExternalNotFoundPrivacyLinkText, "PrivacyLinkText", language.English,
 								),
 							),
 							eventFromEventPusher(
@@ -5963,6 +7153,29 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						NotSupported:            "NotSupported",
 						ErrorRetry:              "ErrorRetry",
 					},
+					PasswordlessPrompt: domain.PasswordlessPromptScreenText{
+						Title:                  "Title",
+						Description:            "Description",
+						DescriptionInit:        "DescriptionInit",
+						PasswordlessButtonText: "PasswordlessButtonText",
+						NextButtonText:         "NextButtonText",
+						SkipButtonText:         "SkipButtonText",
+					},
+					PasswordlessRegistration: domain.PasswordlessRegistrationScreenText{
+						Title:                   "Title",
+						Description:             "Description",
+						RegisterTokenButtonText: "RegisterTokenButtonText",
+						TokenNameLabel:          "TokenNameLabel",
+						NotSupported:            "NotSupported",
+						ErrorRetry:              "ErrorRetry",
+					},
+					PasswordlessRegistrationDone: domain.PasswordlessRegistrationDoneScreenText{
+						Title:            "Title",
+						Description:      "Description",
+						DescriptionClose: "DescriptionClose",
+						NextButtonText:   "NextButtonText",
+						CancelButtonText: "CancelButtonText",
+					},
 					PasswordChange: domain.PasswordChangeScreenText{
 						Title:                   "Title",
 						Description:             "Description",
@@ -6008,6 +7221,24 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						NextButtonText:         "NextButtonText",
 						BackButtonText:         "BackButtonText",
 					},
+					ExternalRegistrationUserOverview: domain.ExternalRegistrationUserOverviewScreenText{
+						Title:              "Title",
+						Description:        "Description",
+						EmailLabel:         "EmailLabel",
+						UsernameLabel:      "UsernameLabel",
+						FirstnameLabel:     "FirstnameLabel",
+						LastnameLabel:      "LastnameLabel",
+						LanguageLabel:      "LanguageLabel",
+						NicknameLabel:      "NicknameLabel",
+						PhoneLabel:         "PhoneLabel",
+						TOSAndPrivacyLabel: "TOSAndPrivacyLabel",
+						TOSConfirm:         "TOSConfirm",
+						TOSLinkText:        "TOSLinkText",
+						TOSConfirmAnd:      "TOSConfirmAnd",
+						PrivacyLinkText:    "PrivacyLinkText",
+						BackButtonText:     "BackButtonText",
+						NextButtonText:     "NextButtonText",
+					},
 					RegistrationOrg: domain.RegistrationOrgScreenText{
 						Title:                "Title",
 						Description:          "Description",
@@ -6036,6 +7267,11 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						Description:            "Description",
 						LinkButtonText:         "LinkButtonText",
 						AutoRegisterButtonText: "AutoRegisterButtonText",
+						TOSAndPrivacyLabel:     "TOSAndPrivacyLabel",
+						TOSConfirm:             "TOSConfirm",
+						TOSLinkText:            "TOSLinkText",
+						TOSConfirmAnd:          "TOSConfirmAnd",
+						PrivacyLinkText:        "PrivacyLinkText",
 					},
 					LoginSuccess: domain.SuccessLoginScreenText{
 						Title:                   "Title",

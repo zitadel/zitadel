@@ -6,10 +6,12 @@ import (
 
 func projectWriteModelToProject(writeModel *ProjectWriteModel) *domain.Project {
 	return &domain.Project{
-		ObjectRoot:           writeModelToObjectRoot(writeModel.WriteModel),
-		Name:                 writeModel.Name,
-		ProjectRoleAssertion: writeModel.ProjectRoleAssertion,
-		ProjectRoleCheck:     writeModel.ProjectRoleCheck,
+		ObjectRoot:             writeModelToObjectRoot(writeModel.WriteModel),
+		Name:                   writeModel.Name,
+		ProjectRoleAssertion:   writeModel.ProjectRoleAssertion,
+		ProjectRoleCheck:       writeModel.ProjectRoleCheck,
+		HasProjectCheck:        writeModel.HasProjectCheck,
+		PrivateLabelingSetting: writeModel.PrivateLabelingSetting,
 	}
 }
 

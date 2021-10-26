@@ -6,7 +6,7 @@ ARG ENV=prod
 ## Go base build
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
-FROM golang:1.15 as go-base
+FROM golang:1.16 as go-base
 
 WORKDIR src/github.com/caos/zitadel/
 COPY go.mod go.sum ./

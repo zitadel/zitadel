@@ -2,20 +2,19 @@ package policy
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 
-func ModelPasswordLockoutPolicyToPb(policy *model.PasswordLockoutPolicyView) *policy_pb.PasswordLockoutPolicy {
-	return &policy_pb.PasswordLockoutPolicy{
-		IsDefault:          policy.Default,
-		MaxAttempts:        policy.MaxAttempts,
-		ShowLockoutFailure: policy.ShowLockOutFailures,
+func ModelLockoutPolicyToPb(policy *query.LockoutPolicy) *policy_pb.LockoutPolicy {
+	return &policy_pb.LockoutPolicy{
+		IsDefault:           policy.IsDefault,
+		MaxPasswordAttempts: policy.MaxPasswordAttempts,
 		Details: object.ToViewDetailsPb(
 			policy.Sequence,
 			policy.CreationDate,
 			policy.ChangeDate,
-			"", //TODO: resourceowner
+			policy.ResourceOwner,
 		),
 	}
 }

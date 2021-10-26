@@ -361,7 +361,7 @@ func DestroyZitadelOperator(
 
 func ScaleZitadelOperator(
 	monitor mntr.Monitor,
-	client *kubernetes.Client,
+	client kubernetes.ClientInt,
 	replicaCount int,
 ) error {
 	monitor.Debug("Scaling zitadel-operator")
@@ -370,7 +370,7 @@ func ScaleZitadelOperator(
 
 func ScaleDatabaseOperator(
 	monitor mntr.Monitor,
-	client *kubernetes.Client,
+	client kubernetes.ClientInt,
 	replicaCount int,
 ) error {
 	monitor.Debug("Scaling database-operator")

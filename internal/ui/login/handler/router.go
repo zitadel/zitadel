@@ -13,6 +13,8 @@ const (
 	EndpointLogin                    = "/login"
 	EndpointExternalLogin            = "/login/externalidp"
 	EndpointExternalLoginCallback    = "/login/externalidp/callback"
+	EndpointJWTAuthorize             = "/login/jwt/authorize"
+	EndpointJWTCallback              = "/login/jwt/callback"
 	EndpointPasswordlessLogin        = "/login/passwordless"
 	EndpointPasswordlessRegistration = "/login/passwordless/init"
 	EndpointPasswordlessPrompt       = "/login/passwordless/prompt"
@@ -53,6 +55,8 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointLogin, login.handleLogin).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc(EndpointExternalLogin, login.handleExternalLogin).Methods(http.MethodGet)
 	router.HandleFunc(EndpointExternalLoginCallback, login.handleExternalLoginCallback).Methods(http.MethodGet)
+	router.HandleFunc(EndpointJWTAuthorize, login.handleJWTRequest).Methods(http.MethodGet)
+	router.HandleFunc(EndpointJWTCallback, login.handleJWTCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointPasswordlessLogin, login.handlePasswordlessVerification).Methods(http.MethodPost)
 	router.HandleFunc(EndpointPasswordlessRegistration, login.handlePasswordlessRegistration).Methods(http.MethodGet)
 	router.HandleFunc(EndpointPasswordlessRegistration, login.handlePasswordlessRegistrationCheck).Methods(http.MethodPost)
@@ -82,6 +86,7 @@ func CreateRouter(login *Login, staticDir http.FileSystem, interceptors ...mux.M
 	router.HandleFunc(EndpointRegister, login.handleRegister).Methods(http.MethodGet)
 	router.HandleFunc(EndpointRegister, login.handleRegisterCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointExternalRegister, login.handleExternalRegister).Methods(http.MethodGet)
+	router.HandleFunc(EndpointExternalRegister, login.handleExternalRegisterCheck).Methods(http.MethodPost)
 	router.HandleFunc(EndpointExternalRegisterCallback, login.handleExternalRegisterCallback).Methods(http.MethodGet)
 	router.HandleFunc(EndpointLogoutDone, login.handleLogoutDone).Methods(http.MethodGet)
 	router.HandleFunc(EndpointDynamicResources, login.handleDynamicResources).Methods(http.MethodGet)

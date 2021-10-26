@@ -10,13 +10,13 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type IAMPasswordLockoutPolicyWriteModel struct {
-	PasswordLockoutPolicyWriteModel
+type IAMLockoutPolicyWriteModel struct {
+	LockoutPolicyWriteModel
 }
 
-func NewIAMPasswordLockoutPolicyWriteModel() *IAMPasswordLockoutPolicyWriteModel {
-	return &IAMPasswordLockoutPolicyWriteModel{
-		PasswordLockoutPolicyWriteModel{
+func NewIAMLockoutPolicyWriteModel() *IAMLockoutPolicyWriteModel {
+	return &IAMLockoutPolicyWriteModel{
+		LockoutPolicyWriteModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
 				ResourceOwner: domain.IAMID,
@@ -25,40 +25,40 @@ func NewIAMPasswordLockoutPolicyWriteModel() *IAMPasswordLockoutPolicyWriteModel
 	}
 }
 
-func (wm *IAMPasswordLockoutPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMLockoutPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *iam.PasswordLockoutPolicyAddedEvent:
-			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyAddedEvent)
-		case *iam.PasswordLockoutPolicyChangedEvent:
-			wm.PasswordLockoutPolicyWriteModel.AppendEvents(&e.PasswordLockoutPolicyChangedEvent)
+		case *iam.LockoutPolicyAddedEvent:
+			wm.LockoutPolicyWriteModel.AppendEvents(&e.LockoutPolicyAddedEvent)
+		case *iam.LockoutPolicyChangedEvent:
+			wm.LockoutPolicyWriteModel.AppendEvents(&e.LockoutPolicyChangedEvent)
 		}
 	}
 }
 
-func (wm *IAMPasswordLockoutPolicyWriteModel) Reduce() error {
-	return wm.PasswordLockoutPolicyWriteModel.Reduce()
+func (wm *IAMLockoutPolicyWriteModel) Reduce() error {
+	return wm.LockoutPolicyWriteModel.Reduce()
 }
 
-func (wm *IAMPasswordLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *IAMLockoutPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(iam.AggregateType).
-		AggregateIDs(wm.PasswordLockoutPolicyWriteModel.AggregateID).
+		AggregateIDs(wm.LockoutPolicyWriteModel.AggregateID).
 		EventTypes(
-			iam.PasswordLockoutPolicyAddedEventType,
-			iam.PasswordLockoutPolicyChangedEventType).
+			iam.LockoutPolicyAddedEventType,
+			iam.LockoutPolicyChangedEventType).
 		Builder()
 }
 
-func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(
+func (wm *IAMLockoutPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	maxAttempts uint64,
-	showLockoutFailure bool) (*iam.PasswordLockoutPolicyChangedEvent, bool) {
-	changes := make([]policy.PasswordLockoutPolicyChanges, 0)
-	if wm.MaxAttempts != maxAttempts {
+	showLockoutFailure bool) (*iam.LockoutPolicyChangedEvent, bool) {
+	changes := make([]policy.LockoutPolicyChanges, 0)
+	if wm.MaxPasswordAttempts != maxAttempts {
 		changes = append(changes, policy.ChangeMaxAttempts(maxAttempts))
 	}
 	if wm.ShowLockOutFailures != showLockoutFailure {
@@ -67,7 +67,7 @@ func (wm *IAMPasswordLockoutPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := iam.NewPasswordLockoutPolicyChangedEvent(ctx, aggregate, changes)
+	changedEvent, err := iam.NewLockoutPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}

@@ -153,6 +153,7 @@ PasswordlessRegistration:
 PasswordlessRegistrationDone:
   Title: Passwortloser Login erstellt
   Description: Token für passwortlosen Login erfolgreich hinzugefügt.
+  DescriptionClose: Du kannst das Fenster nun schliessen.
   NextButtonText: weiter
   CancelButtonText: abbrechen
 
@@ -221,6 +222,26 @@ RegistrationUser:
   BackButtonText: zurück
   NextButtonText: weiter
 
+ExternalRegistrationUserOverview:
+  Title: Externer Benutzer Registration
+  Description: Deine Benutzerangaben werden vom ausgewählten Provider übernommen. Du kannst sie hier ändern und ergänzen, bevor dein Benutzer angelegt wird.
+  EmailLabel: E-Mail
+  UsernameLabel: Benutzername
+  FirstnameLabel: Vorname
+  LastnameLabel: Nachname
+  NicknameLabel: Nachname
+  PhoneLabel: Telefonnummer
+  LanguageLabel: Sprache
+  German: Deutsch
+  English: English
+  TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
+  TosConfirm: Ich akzeptiere die
+  TosLinkText: AGBs
+  TosConfirmAnd: und die
+  PrivacyLinkText: Datenschutzerklärung
+  BackButtonText: zurück
+  NextButtonText: speichern
+
 RegistrationOrg:
   Title: Organisations Registration
   Description: Gib deinen Organisationsnamen und deine Benutzerangaben an.
@@ -260,6 +281,11 @@ ExternalNotFoundOption:
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
   AutoRegisterButtonText: Automatisches registrieren
+  TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
+  TosConfirm: Ich akzeptiere die
+  TosLinkText: AGBs
+  TosConfirmAnd: und die
+  PrivacyLinkText: Datenschutzerklärung
 
 Footer:
   PoweredBy: Powered By
@@ -273,7 +299,10 @@ Errors:
   AuthRequest:
     NotFound: AuthRequest konnte nicht gefunden werden
     UserAgentNotCorresponding: User Agent stimmt nicht überein
+    UserAgentNotFound: User Agent ID nicht gefunden
+    TokenNotFound: Token nicht gefunden
     RequestTypeNotSupported: Requesttyp wird nicht unterstürzt
+    MissingParameters: Benötigte Parameter fehlen
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     Inactive: Benutzer ist inaktiv
@@ -288,6 +317,7 @@ Errors:
       ConfirmationWrong: Passwort Bestätigung stimmt nicht überein
       Empty: Passwort ist leer
       Invalid: Passwort ungültig
+      InvalidAndLocked: Password ist undgültig und Benutzer wurde gesperrt, melden Sie sich bei ihrem Administrator.
     PasswordComplexityPolicy:
       NotFound: Passwort Policy konnte nicht gefunden werden
       MinLength: Passwort ist zu kurz
@@ -304,6 +334,8 @@ Errors:
       GeneratorAlgNotSupported: Generator Algorithums wird nicht unterstützt
     EmailVerify:
       UserIDEmpty: UserID ist leer
+    ExternalData:
+      CouldNotRead: Externe Daten konnten nicht korrekt gelesen werden
     MFA:
       NoProviders: Es stehen keine Multifaktorprovider zur Verfügung
       OTP:
@@ -312,12 +344,21 @@ Errors:
         InvalidCode: Code ist ungültig
         NotReady: Multifaktor OTP (OneTimePassword) ist nicht bereit
     Locked: Benutzer ist gesperrt
+    SomethingWentWrong: Irgendetwas ist schief gelaufen
     NotActive: Benutzer ist nicht aktiv
     ExternalIDP:
       IDPTypeNotImplemented: IDP Typ ist nicht implementiert
       NotAllowed: Externer Login Provider ist nicht erlaubt
+      IDPConfigIDEmpty: Identity Provider ID ist leer
+      ExternalUserIDEmpty: Externe User ID  ist leer
+      UserDisplayNameEmpty: Benutzer Anzeige Name ist leer
+      NoExternalUserData: Keine externe User Daten erhalten
     GrantRequired: Der Login an diese Applikation ist nicht möglich. Der Benutzer benötigt mindestens eine Berechtigung an der Applikation. Bitte melde dich bei deinem Administrator.
+    ProjectRequired: Der Login an diese Applikation ist nicht möglich. Die Organisation des Benutzer benötigt Berechtigung auf das Projekt. Bitte melde dich bei deinem Administrator.
   IdentityProvider:
     InvalidConfig: Identitäts Provider Konfiguration ist ungültig
+  IAM:
+    LockoutPolicy:
+      NotExisting: Lockout Policy existiert nicht
 
 optional: (optional)

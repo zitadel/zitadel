@@ -18,13 +18,14 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { CnslLinks } from '../../links/links.component';
 import { GridPolicy, PRIVACY_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-privacy-policy',
+  selector: 'cnsl-privacy-policy',
   templateUrl: './privacy-policy.component.html',
   styleUrls: ['./privacy-policy.component.scss'],
 })
@@ -39,6 +40,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public privacyPolicy!: PrivacyPolicy.AsObject;
   public form!: FormGroup;
   public currentPolicy: GridPolicy = PRIVACY_POLICY;
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     private route: ActivatedRoute,
@@ -143,5 +145,13 @@ export class PrivacyPolicyComponent implements OnDestroy {
 
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
+  }
+
+  public get isDefault(): boolean {
+    if (this.privacyPolicy && this.serviceType === PolicyComponentServiceType.MGMT) {
+      return (this.privacyPolicy as PrivacyPolicy.AsObject).isDefault;
+    } else {
+      return false;
+    }
   }
 }

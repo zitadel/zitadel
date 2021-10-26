@@ -92,6 +92,7 @@ Errors:
       NotAllowed: Externer IDP ist auf dieser Organisation nicht erlaubt.
       MinimumExternalIDPNeeded: Mindestens ein IDP muss hinzugefügt werden.
       AlreadyExists: External IDP ist bereits vergeben
+      NotFound: Externe IDP nicht gefunden
     MFA:
       OTP:
         AlreadyReady: Multifaktor OTP (OneTimePassword) ist bereits eingerichtet
@@ -115,7 +116,7 @@ Errors:
       Invalid: Refresh Token ist ungültig
       NotFound: Refresh Token nicht gefunden
   Org:
-    AlreadyExist: Organisationsname existiert bereits
+    AlreadyExists: Organisationsname existiert bereits
     Invalid: Organisation ist ungültig
     AlreadyDeactivated: Organisation ist bereits deaktiviert
     AlreadyActive: Organisation ist bereits aktiv
@@ -359,6 +360,26 @@ Errors:
     ReadError: Übersetzungsdatei konnte nicht gelesen werden
     MergeError: Übersetzungsdatei konnte nicht mit benutzerdefinierten Übersetzungen zusammengeführt werden
     NotFound: Übersetzungsdatei existiert nicht
+  MetaData:
+    NotFound: Meta Daten konnten nicht gefunden werden
+    NoData: Meta Daten Liste ist leer
+    Invalid: Meta Daten sind ungültig
+    KeyNotExisting: Ein oder mehrere Keys existiert nicht
+  Action:
+    Invalid: Action ist ungültig
+    NotFound: Action wurde nicht gefunden
+    NotActive: Action ist nicht aktiv
+    NotInactive: Action ist nicht inaktiv
+  Flow:
+    FlowTypeMissing: FlowType fehlt
+    Empty: Flow ist bereits leer
+    WrongTriggerType: TriggerType ist ungültig
+    NoChanges: Keine Änderungen
+    ActionIDsNotExist: ActionIDs existieren nicht
+  Query:
+    CloseRows: SQL Statement konnte nicht abgeschlossen werden
+    SQLStatement: SQL Statement konnte nicht erstellt werden
+    InvalidRequest: Anfage ist ungültig
 EventTypes:
   user:
     added: Benutzer hinzugefügt
@@ -478,6 +499,14 @@ EventTypes:
             failed: Verifikation für Passwortlos Login fehlgeschlagen
           signcount:
             changed: Prüfsumme des Tokens für Passwortlos Login wurde verändert
+        initialization:
+          code:
+            added: Passwortlos Initialisierungcode wurde hinzugefügt
+            sent: Passwortlos Initialisierungcode wurde versendet
+            requested: Passwortlos Initialisierungcode wurde angefordert
+            check:
+              succeeded: Passwortlos Initialisierungcode wurde erfolgreich geprüft
+              failed: Passwortlos Initialisierungcode Überprüfung ist fehlgeschlagen
       signed:
         out: Benutzer erfolgreich abgemeldet
       refresh:
@@ -640,6 +669,12 @@ EventTypes:
         added: Datenschutzbestimmung und AGB hinzugefügt
         changed: Datenschutzbestimmung und AGB geändert
         removed: Datenschutzbestimmung und AGB entfernt
+    flow:
+      trigger_actions:
+        set: Aktionen festgelegt
+        cascade:
+          removed: Aktionen kaskadiert entfernt
+        removed: Aktionen entfernt
   project:
     added: Projekt hinzugefügt
     changed: Project geändert
@@ -770,6 +805,12 @@ EventTypes:
           removed: Bilder und Schrift von Label Richtlinie entfernt
   key_pair:
     added: Schlüsselpaar hinzugefügt
+  action:
+    added: Aktion hinzugefügt
+    changed: Aktion geändert
+    deactivated: Aktion deaktiviert
+    reactivated: Aktion reaktiviert
+    removed: Aktion gelöscht
 Application:
   OIDC:
     V1:

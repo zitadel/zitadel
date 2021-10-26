@@ -19,6 +19,7 @@ type Configuration struct {
 	DNS                 *DNS           `yaml:"dns"`
 	ClusterDNS          string         `yaml:"clusterdns"`
 	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
+	Proxy               *Proxy         `yaml:"proxy,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
@@ -141,4 +142,12 @@ type Cache struct {
 	SharedMaxAge      string `yaml:"sharedMaxAge,omitempty"`
 	ShortMaxAge       string `yaml:"shortMaxAge,omitempty"`
 	ShortSharedMaxAge string `yaml:"shortSharedMaxAge,omitempty"`
+}
+
+type Proxy struct {
+	NoProxy       []string         `yaml:"noProxy,omitempty"`
+	HTTP          *secret.Secret   `yaml:"http,omitempty"`
+	HTTPS         *secret.Secret   `yaml:"https,omitempty"`
+	ExistingHTTP  *secret.Existing `yaml:"existingHTTP,omitempty"`
+	ExistingHTTPS *secret.Existing `yaml:"existingHTTPS,omitempty"`
 }

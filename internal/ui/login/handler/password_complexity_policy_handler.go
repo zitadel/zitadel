@@ -5,9 +5,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
 
@@ -73,31 +71,4 @@ func (l *Login) generatePolicyDescription(r *http.Request, authReq *domain.AuthR
 
 	description += "</ul>"
 	return description, nil
-}
-
-func (l *Login) checkPasswordComplexityPolicy(password string, r *http.Request, authReq *model.AuthRequest) error {
-	policy, err := l.authRepo.GetMyPasswordComplexityPolicy(setContext(r.Context(), authReq.UserOrgID))
-	if err != nil {
-		return nil
-	}
-	if policy.MinLength != 0 && uint64(len(password)) < policy.MinLength {
-		return errors.ThrowInvalidArgument(nil, "POLICY-LSo0p", "Errors.User.PasswordComplexityPolicy.MinLength")
-	}
-
-	if policy.HasLowercase && !hasStringLowerCase(password) {
-		return errors.ThrowInvalidArgument(nil, "POLICY-4Sjsf", "Errors.User.PasswordComplexityPolicy.HasLower")
-	}
-
-	if policy.HasUppercase && !hasStringUpperCase(password) {
-		return errors.ThrowInvalidArgument(nil, "POLICY-6Sjc9", "Errors.User.PasswordComplexityPolicy.HasUpper")
-	}
-
-	if policy.HasNumber && !hasNumber(password) {
-		return errors.ThrowInvalidArgument(nil, "POLICY-2Fksi", "Errors.User.PasswordComplexityPolicy.HasNumber")
-	}
-
-	if policy.HasSymbol && !hasSymbol(password) {
-		return errors.ThrowInvalidArgument(nil, "POLICY-0Js6e", "Errors.User.PasswordComplexityPolicy.HasSymbol")
-	}
-	return nil
 }

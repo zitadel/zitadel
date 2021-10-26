@@ -13,6 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/repository/mock"
+	action_repo "github.com/caos/zitadel/internal/repository/action"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	key_repo "github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -35,6 +36,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	proj_repo.RegisterEventMappers(es)
 	usergrant.RegisterEventMappers(es)
 	key_repo.RegisterEventMappers(es)
+	action_repo.RegisterEventMappers(es)
 	return es
 }
 
@@ -47,7 +49,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.EventPusher) []*repository.E
 		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
-			AggregateType: repository.AggregateType(event.Aggregate().Typ),
+			AggregateType: repository.AggregateType(event.Aggregate().Type),
 			ResourceOwner: event.Aggregate().ResourceOwner,
 			EditorService: event.EditorService(),
 			EditorUser:    event.EditorUser(),
@@ -138,18 +140,19 @@ func expectFilterOrgMemberNotFound() expect {
 func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
-		ID:               "",
-		Sequence:         0,
-		PreviousSequence: 0,
-		CreationDate:     time.Time{},
-		Type:             repository.EventType(event.Type()),
-		Data:             data,
-		EditorService:    event.EditorService(),
-		EditorUser:       event.EditorUser(),
-		Version:          repository.Version(event.Aggregate().Version),
-		AggregateID:      event.Aggregate().ID,
-		AggregateType:    repository.AggregateType(event.Aggregate().Typ),
-		ResourceOwner:    event.Aggregate().ResourceOwner,
+		ID:                            "",
+		Sequence:                      0,
+		PreviousAggregateSequence:     0,
+		PreviousAggregateTypeSequence: 0,
+		CreationDate:                  time.Time{},
+		Type:                          repository.EventType(event.Type()),
+		Data:                          data,
+		EditorService:                 event.EditorService(),
+		EditorUser:                    event.EditorUser(),
+		Version:                       repository.Version(event.Aggregate().Version),
+		AggregateID:                   event.Aggregate().ID,
+		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
+		ResourceOwner:                 event.Aggregate().ResourceOwner,
 	}
 }
 
@@ -179,10 +182,10 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 	return generator
 }
 
-func GetMockVerifier(t *testing.T, features ...string) *authz.TokenVerifier {
-	return authz.Start(&testVerifier{
+func GetMockVerifier(t *testing.T, features ...string) *testVerifier {
+	return &testVerifier{
 		features: features,
-	})
+	}
 }
 
 type testVerifier struct {

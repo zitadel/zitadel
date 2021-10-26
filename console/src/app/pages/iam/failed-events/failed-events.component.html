@@ -1,5 +1,5 @@
 <div class="table-wrapper">
-    <app-refresh-table *ngIf="eventDataSource" (refreshed)="loadEvents()" [dataSize]="eventDataSource.data.length"
+    <cnsl-refresh-table *ngIf="eventDataSource" (refreshed)="loadEvents()" [dataSize]="eventDataSource.data.length"
         [loading]="loading$ | async">
 
         <table [dataSource]="eventDataSource" mat-table class="table " aria-label="Elements">
@@ -49,5 +49,5 @@
         </table>
         <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
         </mat-paginator>
-    </app-refresh-table>
+    </cnsl-refresh-table>
 </div>

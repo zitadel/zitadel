@@ -29,6 +29,10 @@ message Project {
     bool project_role_assertion = 5;
     // ZITADEL checks if the user has at least one on this project
     bool project_role_check = 6;
+    // ZITADEL checks if the org of the user has permission to this project
+    bool has_project_check = 7;
+    // Defines from where the private labeling should be triggered
+    PrivateLabelingSetting private_labeling_setting = 8;
 }
 
 message GrantedProject {
@@ -57,7 +61,7 @@ message GrantedProject {
             description: "current state of the project grant";
         }
     ];
-    
+
     string project_id = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\""
@@ -88,6 +92,12 @@ enum ProjectState {
     PROJECT_STATE_INACTIVE = 2;
 }
 
+enum PrivateLabelingSetting {
+    PRIVATE_LABELING_SETTING_UNSPECIFIED = 0;
+    PRIVATE_LABELING_SETTING_ENFORCE_PROJECT_RESOURCE_OWNER_POLICY = 1;
+    PRIVATE_LABELING_SETTING_ALLOW_LOGIN_USER_RESOURCE_OWNER_POLICY = 2;
+}
+
 enum ProjectGrantState {
     PROJECT_GRANT_STATE_UNSPECIFIED = 0;
     PROJECT_GRANT_STATE_ACTIVE = 1;
@@ -99,6 +109,7 @@ message ProjectQuery {
         option (validate.required) = true;
 
         ProjectNameQuery name_query = 1;
+        ProjectResourceOwnerQuery project_resource_owner_query = 2;
     }
 }
 
@@ -113,6 +124,15 @@ message ProjectNameQuery {
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message ProjectResourceOwnerQuery {
+    string resource_owner = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
         }
     ];
 }

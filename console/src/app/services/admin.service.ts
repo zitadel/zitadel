@@ -9,6 +9,8 @@ import {
   AddIAMMemberResponse,
   AddIDPToLoginPolicyRequest,
   AddIDPToLoginPolicyResponse,
+  AddJWTIDPRequest,
+  AddJWTIDPResponse,
   AddMultiFactorToLoginPolicyRequest,
   AddMultiFactorToLoginPolicyResponse,
   AddOIDCIDPRequest,
@@ -27,6 +29,8 @@ import {
   GetCustomLoginTextsResponse,
   GetCustomOrgIAMPolicyRequest,
   GetCustomOrgIAMPolicyResponse,
+  GetCustomPasswordlessRegistrationMessageTextRequest,
+  GetCustomPasswordlessRegistrationMessageTextResponse,
   GetCustomPasswordResetMessageTextRequest,
   GetCustomPasswordResetMessageTextResponse,
   GetCustomVerifyEmailMessageTextRequest,
@@ -41,6 +45,8 @@ import {
   GetDefaultInitMessageTextResponse,
   GetDefaultLoginTextsRequest,
   GetDefaultLoginTextsResponse,
+  GetDefaultPasswordlessRegistrationMessageTextRequest,
+  GetDefaultPasswordlessRegistrationMessageTextResponse,
   GetDefaultPasswordResetMessageTextRequest,
   GetDefaultPasswordResetMessageTextResponse,
   GetDefaultVerifyEmailMessageTextRequest,
@@ -51,6 +57,8 @@ import {
   GetIDPByIDResponse,
   GetLabelPolicyRequest,
   GetLabelPolicyResponse,
+  GetLockoutPolicyRequest,
+  GetLockoutPolicyResponse,
   GetLoginPolicyRequest,
   GetLoginPolicyResponse,
   GetOrgFeaturesRequest,
@@ -61,8 +69,6 @@ import {
   GetPasswordAgePolicyResponse,
   GetPasswordComplexityPolicyRequest,
   GetPasswordComplexityPolicyResponse,
-  GetPasswordLockoutPolicyRequest,
-  GetPasswordLockoutPolicyResponse,
   GetPreviewLabelPolicyRequest,
   GetPreviewLabelPolicyResponse,
   GetPrivacyPolicyRequest,
@@ -124,6 +130,8 @@ import {
   SetDefaultFeaturesResponse,
   SetDefaultInitMessageTextRequest,
   SetDefaultInitMessageTextResponse,
+  SetDefaultPasswordlessRegistrationMessageTextRequest,
+  SetDefaultPasswordlessRegistrationMessageTextResponse,
   SetDefaultPasswordResetMessageTextRequest,
   SetDefaultPasswordResetMessageTextResponse,
   SetDefaultVerifyEmailMessageTextRequest,
@@ -138,12 +146,16 @@ import {
   UpdateCustomOrgIAMPolicyResponse,
   UpdateIAMMemberRequest,
   UpdateIAMMemberResponse,
+  UpdateIDPJWTConfigRequest,
+  UpdateIDPJWTConfigResponse,
   UpdateIDPOIDCConfigRequest,
   UpdateIDPOIDCConfigResponse,
   UpdateIDPRequest,
   UpdateIDPResponse,
   UpdateLabelPolicyRequest,
   UpdateLabelPolicyResponse,
+  UpdateLockoutPolicyRequest,
+  UpdateLockoutPolicyResponse,
   UpdateLoginPolicyRequest,
   UpdateLoginPolicyResponse,
   UpdateOrgIAMPolicyRequest,
@@ -152,8 +164,6 @@ import {
   UpdatePasswordAgePolicyResponse,
   UpdatePasswordComplexityPolicyRequest,
   UpdatePasswordComplexityPolicyResponse,
-  UpdatePasswordLockoutPolicyRequest,
-  UpdatePasswordLockoutPolicyResponse,
   UpdatePrivacyPolicyRequest,
   UpdatePrivacyPolicyResponse,
 } from '../proto/generated/zitadel/admin_pb';
@@ -273,6 +283,22 @@ export class AdminService {
   public setDefaultDomainClaimedMessageText(req: SetDefaultDomainClaimedMessageTextRequest):
     Promise<SetDefaultDomainClaimedMessageTextResponse.AsObject> {
     return this.grpcService.admin.setDefaultDomainClaimedMessageText(req, null).then(resp => resp.toObject());
+  }
+
+
+  public getDefaultPasswordlessRegistrationMessageText(req: GetDefaultPasswordlessRegistrationMessageTextRequest):
+    Promise<GetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getDefaultPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public getCustomPasswordlessRegistrationMessageText(req: GetCustomPasswordlessRegistrationMessageTextRequest):
+    Promise<GetCustomPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.admin.getCustomPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
+  }
+
+  public setDefaultPasswordlessRegistrationMessageText(req: SetDefaultPasswordlessRegistrationMessageTextRequest):
+    Promise<SetDefaultPasswordlessRegistrationMessageTextResponse.AsObject> {
+    return this.grpcService.admin.setDefaultPasswordlessRegistrationMessageText(req, null).then(resp => resp.toObject());
   }
 
   public SetUpOrg(
@@ -431,20 +457,18 @@ export class AdminService {
 
   /* lockout */
 
-  public getPasswordLockoutPolicy(): Promise<GetPasswordLockoutPolicyResponse.AsObject> {
-    const req = new GetPasswordLockoutPolicyRequest();
-    return this.grpcService.admin.getPasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+  public getLockoutPolicy(): Promise<GetLockoutPolicyResponse.AsObject> {
+    const req = new GetLockoutPolicyRequest();
+    return this.grpcService.admin.getLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
-  public updatePasswordLockoutPolicy(
+  public updateLockoutPolicy(
     maxAttempts: number,
-    showLockoutFailures: boolean,
-  ): Promise<UpdatePasswordLockoutPolicyResponse.AsObject> {
-    const req = new UpdatePasswordLockoutPolicyRequest();
-    req.setMaxAttempts(maxAttempts);
-    req.setShowLockoutFailure(showLockoutFailures);
+  ): Promise<UpdateLockoutPolicyResponse.AsObject> {
+    const req = new UpdateLockoutPolicyRequest();
+    req.setMaxPasswordAttempts(maxAttempts);
 
-    return this.grpcService.admin.updatePasswordLockoutPolicy(req, null).then(resp => resp.toObject());
+    return this.grpcService.admin.updateLockoutPolicy(req, null).then(resp => resp.toObject());
   }
 
   /* label */
@@ -655,6 +679,18 @@ export class AdminService {
     const req = new ReactivateIDPRequest;
     req.setIdpId(id);
     return this.grpcService.admin.reactivateIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public addJWTIDP(
+    req: AddJWTIDPRequest,
+  ): Promise<AddJWTIDPResponse.AsObject> {
+    return this.grpcService.admin.addJWTIDP(req, null).then(resp => resp.toObject());
+  }
+
+  public updateIDPJWTConfig(
+    req: UpdateIDPJWTConfigRequest,
+  ): Promise<UpdateIDPJWTConfigResponse.AsObject> {
+    return this.grpcService.admin.updateIDPJWTConfig(req, null).then(resp => resp.toObject());
   }
 
   public listIAMMembers(

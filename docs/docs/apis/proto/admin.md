@@ -32,18 +32,6 @@ Returns the default languages
     GET: /languages
 
 
-### IsOrgUnique
-
-> **rpc** IsOrgUnique([IsOrgUniqueRequest](#isorguniquerequest))
-[IsOrgUniqueResponse](#isorguniqueresponse)
-
-Checks whether an organisation exists by the given parameters
-
-
-
-    GET: /orgs/_is_unique
-
-
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -54,6 +42,18 @@ Returns an organisation by id
 
 
     GET: /orgs/{id}
+
+
+### IsOrgUnique
+
+> **rpc** IsOrgUnique([IsOrgUniqueRequest](#isorguniquerequest))
+[IsOrgUniqueResponse](#isorguniqueresponse)
+
+Checks whether an organisation exists by the given parameters
+
+
+
+    GET: /orgs/_is_unique
 
 
 ### ListOrgs
@@ -118,6 +118,18 @@ Adds a new oidc identity provider configuration the IAM
     POST: /idps/oidc
 
 
+### AddJWTIDP
+
+> **rpc** AddJWTIDP([AddJWTIDPRequest](#addjwtidprequest))
+[AddJWTIDPResponse](#addjwtidpresponse)
+
+Adds a new jwt identity provider configuration the IAM
+
+
+
+    POST: /idps/jwt
+
+
 ### UpdateIDP
 
 > **rpc** UpdateIDP([UpdateIDPRequest](#updateidprequest))
@@ -180,6 +192,19 @@ all fields are updated. If no value is provided the field will be empty afterwar
 
 
     PUT: /idps/{idp_id}/oidc_config
+
+
+### UpdateIDPJWTConfig
+
+> **rpc** UpdateIDPJWTConfig([UpdateIDPJWTConfigRequest](#updateidpjwtconfigrequest))
+[UpdateIDPJWTConfigResponse](#updateidpjwtconfigresponse)
+
+Updates the jwt configuration of the specified idp
+all fields are updated. If no value is provided the field will be empty afterwards.
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
 
 
 ### GetDefaultFeatures
@@ -615,24 +640,24 @@ it impacts all organisations without a customised policy
     PUT: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
-Returns the password lockout policy defined by the administrators of ZITADEL
-
-
-
-    GET: /policies/password/lockout
+Returns the lockout policy defined by the administrators of ZITADEL
 
 
-### UpdatePasswordLockoutPolicy
 
-> **rpc** UpdatePasswordLockoutPolicy([UpdatePasswordLockoutPolicyRequest](#updatepasswordlockoutpolicyrequest))
-[UpdatePasswordLockoutPolicyResponse](#updatepasswordlockoutpolicyresponse)
+    GET: /policies/lockout
 
-Updates the default password lockout policy of ZITADEL
+
+### UpdateLockoutPolicy
+
+> **rpc** UpdateLockoutPolicy([UpdateLockoutPolicyRequest](#updatelockoutpolicyrequest))
+[UpdateLockoutPolicyResponse](#updatelockoutpolicyresponse)
+
+Updates the default lockout policy of ZITADEL
 it impacts all organisations without a customised policy
 
 
@@ -1165,6 +1190,35 @@ This is an empty request
 
 
 
+### AddJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddMultiFactorToLoginPolicyRequest
 
 
@@ -1201,6 +1255,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -1681,6 +1736,23 @@ This is an empty request
 
 
 
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 This is an empty request
 
@@ -1789,23 +1861,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-
-
-
-
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
@@ -2437,6 +2492,7 @@ This is an empty request
 | passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
 | passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -2503,6 +2559,11 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
+| custom_text_message |  bool | - |  |
+| custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
+| actions |  bool | - |  |
 
 
 
@@ -2688,6 +2749,11 @@ This is an empty request
 | label_policy_watermark |  bool | - |  |
 | custom_text |  bool | - |  |
 | privacy_policy |  bool | - |  |
+| metadata_user |  bool | - |  |
+| custom_text_message |  bool | - |  |
+| custom_text_login |  bool | - |  |
+| lockout_policy |  bool | - |  |
+| actions |  bool | - |  |
 
 
 
@@ -2841,6 +2907,32 @@ This is an empty request
 
 
 
+### UpdateIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateIDPOIDCConfigRequest
 
 
@@ -2878,6 +2970,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -2914,6 +3007,28 @@ This is an empty request
 
 
 ### UpdateLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | failed attempts until a user gets locked |  |
+
+
+
+
+### UpdateLockoutPolicyResponse
 
 
 
@@ -3012,29 +3127,6 @@ This is an empty request
 
 
 ### UpdatePasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdatePasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | failed attempts until a user gets locked |  |
-| show_lockout_failure |  bool | If an error should be displayed during a lockout or not |  |
-
-
-
-
-### UpdatePasswordLockoutPolicyResponse
 
 
 

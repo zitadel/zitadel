@@ -6,24 +6,24 @@ import { FormControl } from '@angular/forms';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
-import { catchError, debounceTime, finalize, map, take } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
+import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
-import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
+
 @Component({
-  selector: 'app-root',
+  selector: 'cnsl-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   animations: [
@@ -47,7 +47,7 @@ export class AppComponent implements OnDestroy {
   public showAccount: boolean = false;
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
-  public user!: User.AsObject;
+  // public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -55,8 +55,7 @@ export class AppComponent implements OnDestroy {
   public showProjectSection: boolean = false;
 
   public filterControl: FormControl = new FormControl('');
-  private authSub: Subscription = new Subscription();
-  private orgSub: Subscription = new Subscription();
+  private destroy$: Subject<void> = new Subject();
   public labelpolicy!: LabelPolicy.AsObject;
 
   public hideAdminWarn: boolean = true;
@@ -76,6 +75,7 @@ export class AppComponent implements OnDestroy {
     public domSanitizer: DomSanitizer,
     private router: Router,
     update: UpdateService,
+    private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
     console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px');
@@ -160,6 +160,16 @@ export class AppComponent implements OnDestroy {
     );
 
     this.matIconRegistry.addSvgIcon(
+      'mdi_openid',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/openid.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_jwt',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
       'mdi_symbol',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'),
     );
@@ -174,16 +184,27 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'),
     );
 
+    this.activatedRoute.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(route => {
+        const { org } = route;
+        if (org) {
+          this.authService.getActiveOrg(org).then(queriedOrg => {
+            this.org = queriedOrg;
+          });
+        }
+      });
+
     this.loadPrivateLabelling();
 
     this.getProjectCount();
 
-    this.orgSub = this.authService.activeOrgChanged.subscribe(org => {
+    this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe(org => {
       this.org = org;
       this.getProjectCount();
     });
 
-    this.authSub = this.authenticationService.authenticationChanged.subscribe((authenticated) => {
+    this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
       if (authenticated) {
         this.authService.getActiveOrg().then(org => {
           this.org = org;
@@ -217,8 +238,8 @@ export class AppComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.authSub.unsubscribe();
-    this.orgSub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public toggleAdminHide(): void {
@@ -231,8 +252,8 @@ export class AppComponent implements OnDestroy {
       const darkPrimary = '#5282c1';
       const lightPrimary = '#5282c1';
 
-      const darkWarn = '#F44336';
-      const lightWarn = '#F44336';
+      const darkWarn = '#cd3d56';
+      const lightWarn = '#cd3d56';
 
       const darkBackground = '#212224';
       const lightBackground = '#fafafa';
@@ -256,8 +277,8 @@ export class AppComponent implements OnDestroy {
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
 
-        const darkWarn = this.labelpolicy?.warnColorDark || '#F44336';
-        const lightWarn = this.labelpolicy?.warnColor || '#F44336';
+        const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
+        const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
         const darkBackground = this.labelpolicy?.backgroundColorDark || '#212224';
         const lightBackground = this.labelpolicy?.backgroundColor || '#fafafa';
@@ -296,7 +317,7 @@ export class AppComponent implements OnDestroy {
     this.orgLoading$.next(true);
     this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
       map(resp => {
-        return resp.resultList;
+        return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
       }),
       catchError(() => of([])),
       finalize(() => {
@@ -328,7 +349,7 @@ export class AppComponent implements OnDestroy {
 
     this.authService.user.subscribe(userprofile => {
       if (userprofile) {
-        this.user = userprofile;
+        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
         const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
 

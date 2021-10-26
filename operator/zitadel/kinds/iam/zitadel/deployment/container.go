@@ -78,6 +78,20 @@ func GetContainer(
 					Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
 				},
 			}},
+		{Name: "HTTP_PROXY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "HTTP_PROXY",
+				},
+			}},
+		{Name: "HTTPS_PROXY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "HTTPS_PROXY",
+				},
+			}},
 		{Name: "SENTRY_DSN",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{

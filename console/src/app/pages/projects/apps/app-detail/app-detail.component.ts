@@ -1,8 +1,7 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +12,9 @@ import { Subject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { RadioItemAuthType } from 'src/app/modules/app-radio/app-auth-method-radio/app-auth-method-radio.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { CnslLinks } from 'src/app/modules/links/links.component';
+import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
   APIAuthMethodType,
@@ -50,7 +51,7 @@ import {
 } from '../authmethods';
 
 @Component({
-  selector: 'app-app-detail',
+  selector: 'cnsl-app-detail',
   templateUrl: './app-detail.component.html',
   styleUrls: ['./app-detail.component.scss'],
 })
@@ -62,7 +63,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public errorMessage: string = '';
   public removable: boolean = true;
   public addOnBlur: boolean = true;
+
   public showAdditionalOrigins: boolean = false;
+  public showRedirects: boolean = false;
+
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
   public authMethods: RadioItemAuthType[] = [];
@@ -98,7 +102,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   ];
 
   public AppState: any = AppState;
-  public appNameForm!: FormGroup;
   public oidcForm!: FormGroup;
   public apiForm!: FormGroup;
 
@@ -119,8 +122,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public requestRedirectValuesSubject$: Subject<void> = new Subject();
   public copiedKey: any = '';
-  public environmentMap: { [key: string]: string; } = {};
   public nextLinks: Array<CnslLinks> = [];
+  public InfoSectionType: any = InfoSectionType;
 
   constructor(
     public translate: TranslateService,
@@ -132,25 +135,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private mgmtService: ManagementService,
     private authService: GrpcAuthService,
     private router: Router,
-    private http: HttpClient,
     private snackbar: MatSnackBar,
   ) {
-    this.http.get('./assets/environment.json')
-      .toPromise().then((env: any) => {
-
-        this.environmentMap = {
-          issuer: env.issuer,
-          adminServiceUrl: env.adminServiceUrl,
-          mgmtServiceUrl: env.mgmtServiceUrl,
-          authServiceUrl: env.adminServiceUrl,
-        };
-      });
-
-    this.appNameForm = this.fb.group({
-      state: [{ value: '', disabled: true }, []],
-      name: [{ value: '', disabled: true }, [Validators.required]],
-    });
-
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }, []],
       clientId: [{ value: '', disabled: true }],
@@ -174,6 +160,25 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return seconds + 's';
   }
 
+  public openNameDialog(): void {
+    const dialogRef = this.dialog.open(NameDialogComponent, {
+      data: {
+        name: this.app.name,
+        titleKey: 'APP.NAMEDIALOG.TITLE',
+        descKey: 'APP.NAMEDIALOG.DESCRIPTION',
+        labelKey: 'APP.NAMEDIALOG.NAME',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe(name => {
+      if (name) {
+        this.app.name = name;
+        this.saveApp();
+      }
+    });
+  }
+
   public ngOnInit(): void {
     this.subscription = this.route.params.subscribe(params => this.getData(params));
   }
@@ -188,15 +193,18 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         i18nTitle: 'APP.PAGES.NEXTSTEPS.0.TITLE',
         i18nDesc: 'APP.PAGES.NEXTSTEPS.0.DESC',
         routerLink: ['/projects', this.projectId],
+        iconClasses: 'las la-user-tag',
       },
       {
         i18nTitle: 'APP.PAGES.NEXTSTEPS.1.TITLE',
         i18nDesc: 'APP.PAGES.NEXTSTEPS.1.DESC',
         routerLink: ['/users', 'create'],
+        iconClasses: 'las la-user-plus',
       }, {
         i18nTitle: 'APP.PAGES.NEXTSTEPS.2.TITLE',
         i18nDesc: 'APP.PAGES.NEXTSTEPS.2.DESC',
         href: 'https://docs.zitadel.ch',
+        iconClasses: 'las la-people-carry',
       },
     ];
   }
@@ -216,8 +224,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
         this.mgmtService.getAppByID(projectid, id).then(app => {
           if (app.app) {
             this.app = app.app;
-            this.appNameForm.patchValue(this.app);
-
             if (this.app.oidcConfig) {
               this.getAuthMethodOptions('OIDC');
 
@@ -245,7 +251,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
             }
 
             if (allowed) {
-              this.appNameForm.enable();
               this.oidcForm.enable();
               this.apiForm.enable();
             }
@@ -426,19 +431,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   }
 
   public saveApp(): void {
-    if (this.appNameForm.valid) {
-      this.app.name = this.name?.value;
-
-      this.mgmtService
-        .updateApp(this.projectId, this.app.id, this.name?.value)
-        .then(() => {
-          this.toast.showInfo('APP.TOAST.UPDATED', true);
-          this.editState = false;
-        })
-        .catch(error => {
-          this.toast.showError(error);
-        });
-    }
+    this.mgmtService
+      .updateApp(this.projectId, this.app.id, this.app.name)
+      .then(() => {
+        this.toast.showInfo('APP.TOAST.UPDATED', true);
+        this.editState = false;
+      })
+      .catch(error => {
+        this.toast.showError(error);
+      });
   }
 
   public toggleRefreshToken(event: MatCheckboxChange): void {
@@ -462,10 +463,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public saveOIDCApp(): void {
     this.requestRedirectValuesSubject$.next();
-    if (this.appNameForm.valid) {
-      this.app.name = this.name?.value;
-    }
-
     if (this.oidcForm.valid) {
       if (this.app.oidcConfig) {
         this.app.oidcConfig.responseTypesList = this.responseTypesList?.value;
@@ -577,10 +574,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     this._location.back();
   }
 
-  public get name(): AbstractControl | null {
-    return this.appNameForm.get('name');
-  }
-
   public get clientId(): AbstractControl | null {
     return this.oidcForm.get('clientId');
   }
@@ -605,8 +598,8 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     return this.apiForm.get('authMethodType');
   }
 
-  public get devMode(): AbstractControl | null {
-    return this.oidcForm.get('devMode');
+  public get devMode(): FormControl | null {
+    return this.oidcForm.get('devMode') as FormControl;
   }
 
   public get accessTokenType(): AbstractControl | null {

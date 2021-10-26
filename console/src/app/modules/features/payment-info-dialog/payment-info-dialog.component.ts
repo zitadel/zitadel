@@ -17,7 +17,7 @@ function compare(a: Country, b: Country): number {
 }
 
 @Component({
-  selector: 'app-payment-info-dialog',
+  selector: 'cnsl-payment-info-dialog',
   templateUrl: './payment-info-dialog.component.html',
   styleUrls: ['./payment-info-dialog.component.scss'],
 })

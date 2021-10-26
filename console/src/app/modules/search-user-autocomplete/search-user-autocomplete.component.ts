@@ -27,7 +27,7 @@ export enum UserTarget {
 }
 
 @Component({
-  selector: 'app-search-user-autocomplete',
+  selector: 'cnsl-search-user-autocomplete',
   templateUrl: './search-user-autocomplete.component.html',
   styleUrls: ['./search-user-autocomplete.component.scss'],
 })
@@ -95,8 +95,8 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
     });
   }
 
-  public displayFn(user?: User.AsObject): string | undefined {
-    return user ? `${user.preferredLoginName}` : undefined;
+  public displayFn(user?: User.AsObject): string {
+    return user ? `${user.preferredLoginName}` : '';
   }
 
   public add(event: MatChipInputEvent): void {
@@ -108,6 +108,8 @@ export class SearchUserAutocompleteComponent implements OnInit, AfterContentChec
         const index = this.filteredUsers.findIndex((user) => {
           if (user.preferredLoginName) {
             return user.preferredLoginName === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {

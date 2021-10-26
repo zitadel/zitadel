@@ -3,9 +3,9 @@ package org
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -133,15 +133,9 @@ func NewOrgDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 }
 
 func OrgDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	orgChanged := &OrgDeactivatedEvent{
+	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, orgChanged)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
-	}
-
-	return orgChanged, nil
+	}, nil
 }
 
 type OrgReactivatedEvent struct {
@@ -167,15 +161,9 @@ func NewOrgReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 }
 
 func OrgReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	orgChanged := &OrgReactivatedEvent{
+	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}
-	err := json.Unmarshal(event.Data, orgChanged)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "ORG-DAfbs", "unable to unmarshal org deactivated")
-	}
-
-	return orgChanged, nil
+	}, nil
 }
 
 type OrgRemovedEvent struct {

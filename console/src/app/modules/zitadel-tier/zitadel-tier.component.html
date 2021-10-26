@@ -6,7 +6,7 @@
   <div class="text" *ngIf="features.tier">
       <p class="title"><strong>{{features.tier.name}}</strong></p>
       <p>{{features.tier?.description}}</p>
-      <p class="state" [ngClass]="{'active': features.tier.state == FeaturesState.FEATURES_STATE_ACTIVE}">{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
+      <p class="state" [ngClass]="{'active': features.tier.state === FeaturesState.FEATURES_STATE_ACTIVE}">{{'FEATURES.TIERSTATES.'+features.tier.state | translate}}</p>
       <p >{{features.tier?.statusInfo}}</p>
   </div>
   <span class="fill-space"></span>

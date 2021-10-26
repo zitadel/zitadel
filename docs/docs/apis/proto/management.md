@@ -236,6 +236,78 @@ Changes the username
     GET: /users/{user_id}/username
 
 
+### SetUserMetadata
+
+> **rpc** SetUserMetadata([SetUserMetadataRequest](#setusermetadatarequest))
+[SetUserMetadataResponse](#setusermetadataresponse)
+
+Sets a user metadata by key
+
+
+
+    POST: /users/{id}/metadata/{key}
+
+
+### BulkSetUserMetadata
+
+> **rpc** BulkSetUserMetadata([BulkSetUserMetadataRequest](#bulksetusermetadatarequest))
+[BulkSetUserMetadataResponse](#bulksetusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    POST: /users/{id}/metadata/_bulk
+
+
+### ListUserMetadata
+
+> **rpc** ListUserMetadata([ListUserMetadataRequest](#listusermetadatarequest))
+[ListUserMetadataResponse](#listusermetadataresponse)
+
+Returns the user metadata
+
+
+
+    POST: /users/{id}/metadata/_search
+
+
+### GetUserMetadata
+
+> **rpc** GetUserMetadata([GetUserMetadataRequest](#getusermetadatarequest))
+[GetUserMetadataResponse](#getusermetadataresponse)
+
+Returns the user metadata by key
+
+
+
+    GET: /users/{id}/metadata/{key}
+
+
+### RemoveUserMetadata
+
+> **rpc** RemoveUserMetadata([RemoveUserMetadataRequest](#removeusermetadatarequest))
+[RemoveUserMetadataResponse](#removeusermetadataresponse)
+
+Removes a user metadata by key
+
+
+
+    DELETE: /users/{id}/metadata/{key}
+
+
+### BulkRemoveUserMetadata
+
+> **rpc** BulkRemoveUserMetadata([BulkRemoveUserMetadataRequest](#bulkremoveusermetadatarequest))
+[BulkRemoveUserMetadataResponse](#bulkremoveusermetadataresponse)
+
+Set a list of user metadata
+
+
+
+    DELETE: /users/{id}/metadata/_bulk
+
+
 ### GetHumanProfile
 
 > **rpc** GetHumanProfile([GetHumanProfileRequest](#gethumanprofilerequest))
@@ -1854,64 +1926,64 @@ The password age policy is not used at the moment
     DELETE: /policies/password/age
 
 
-### GetPasswordLockoutPolicy
+### GetLockoutPolicy
 
-> **rpc** GetPasswordLockoutPolicy([GetPasswordLockoutPolicyRequest](#getpasswordlockoutpolicyrequest))
-[GetPasswordLockoutPolicyResponse](#getpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetLockoutPolicy([GetLockoutPolicyRequest](#getlockoutpolicyrequest))
+[GetLockoutPolicyResponse](#getlockoutpolicyresponse)
 
 
 
-    GET: /policies/password/lockout
 
 
-### GetDefaultPasswordLockoutPolicy
-
-> **rpc** GetDefaultPasswordLockoutPolicy([GetDefaultPasswordLockoutPolicyRequest](#getdefaultpasswordlockoutpolicyrequest))
-[GetDefaultPasswordLockoutPolicyResponse](#getdefaultpasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/lockout
 
 
+### GetDefaultLockoutPolicy
 
-    GET: /policies/default/password/lockout
-
-
-### AddCustomPasswordLockoutPolicy
-
-> **rpc** AddCustomPasswordLockoutPolicy([AddCustomPasswordLockoutPolicyRequest](#addcustompasswordlockoutpolicyrequest))
-[AddCustomPasswordLockoutPolicyResponse](#addcustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** GetDefaultLockoutPolicy([GetDefaultLockoutPolicyRequest](#getdefaultlockoutpolicyrequest))
+[GetDefaultLockoutPolicyResponse](#getdefaultlockoutpolicyresponse)
 
 
 
-    POST: /policies/password/lockout
 
 
-### UpdateCustomPasswordLockoutPolicy
-
-> **rpc** UpdateCustomPasswordLockoutPolicy([UpdateCustomPasswordLockoutPolicyRequest](#updatecustompasswordlockoutpolicyrequest))
-[UpdateCustomPasswordLockoutPolicyResponse](#updatecustompasswordlockoutpolicyresponse)
-
-The password lockout policy is not used at the moment
+    GET: /policies/default/lockout
 
 
+### AddCustomLockoutPolicy
 
-    PUT: /policies/password/lockout
-
-
-### ResetPasswordLockoutPolicyToDefault
-
-> **rpc** ResetPasswordLockoutPolicyToDefault([ResetPasswordLockoutPolicyToDefaultRequest](#resetpasswordlockoutpolicytodefaultrequest))
-[ResetPasswordLockoutPolicyToDefaultResponse](#resetpasswordlockoutpolicytodefaultresponse)
-
-The password lockout policy is not used at the moment
+> **rpc** AddCustomLockoutPolicy([AddCustomLockoutPolicyRequest](#addcustomlockoutpolicyrequest))
+[AddCustomLockoutPolicyResponse](#addcustomlockoutpolicyresponse)
 
 
 
-    DELETE: /policies/password/lockout
+
+
+    POST: /policies/lockout
+
+
+### UpdateCustomLockoutPolicy
+
+> **rpc** UpdateCustomLockoutPolicy([UpdateCustomLockoutPolicyRequest](#updatecustomlockoutpolicyrequest))
+[UpdateCustomLockoutPolicyResponse](#updatecustomlockoutpolicyresponse)
+
+
+
+
+
+    PUT: /policies/lockout
+
+
+### ResetLockoutPolicyToDefault
+
+> **rpc** ResetLockoutPolicyToDefault([ResetLockoutPolicyToDefaultRequest](#resetlockoutpolicytodefaultrequest))
+[ResetLockoutPolicyToDefaultResponse](#resetlockoutpolicytodefaultresponse)
+
+
+
+
+
+    DELETE: /policies/lockout
 
 
 ### GetPrivacyPolicy
@@ -2523,6 +2595,18 @@ Provider must be OIDC compliant
     POST: /idps/oidc
 
 
+### AddOrgJWTIDP
+
+> **rpc** AddOrgJWTIDP([AddOrgJWTIDPRequest](#addorgjwtidprequest))
+[AddOrgJWTIDPResponse](#addorgjwtidpresponse)
+
+Add a new jwt identity provider configuration in the organisation
+
+
+
+    POST: /idps/jwt
+
+
 ### DeactivateOrgIDP
 
 > **rpc** DeactivateOrgIDP([DeactivateOrgIDPRequest](#deactivateorgidprequest))
@@ -2587,12 +2671,133 @@ Change OIDC identity provider configuration of the organisation
     PUT: /idps/{idp_id}/oidc_config
 
 
+### UpdateOrgIDPJWTConfig
+
+> **rpc** UpdateOrgIDPJWTConfig([UpdateOrgIDPJWTConfigRequest](#updateorgidpjwtconfigrequest))
+[UpdateOrgIDPJWTConfigResponse](#updateorgidpjwtconfigresponse)
+
+Change JWT identity provider configuration of the organisation
+
+
+
+    PUT: /idps/{idp_id}/jwt_config
+
+
+### ListActions
+
+> **rpc** ListActions([ListActionsRequest](#listactionsrequest))
+[ListActionsResponse](#listactionsresponse)
+
+
+
+
+
+    POST: /actions/_search
+
+
+### GetAction
+
+> **rpc** GetAction([GetActionRequest](#getactionrequest))
+[GetActionResponse](#getactionresponse)
+
+
+
+
+
+    GET: /actions/{id}
+
+
+### CreateAction
+
+> **rpc** CreateAction([CreateActionRequest](#createactionrequest))
+[CreateActionResponse](#createactionresponse)
+
+
+
+
+
+    POST: /actions
+
+
+### UpdateAction
+
+> **rpc** UpdateAction([UpdateActionRequest](#updateactionrequest))
+[UpdateActionResponse](#updateactionresponse)
+
+
+
+
+
+    PUT: /actions/{id}
+
+
+### DeleteAction
+
+> **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
+[DeleteActionResponse](#deleteactionresponse)
+
+
+
+
+
+    DELETE: /actions/{id}
+
+
+### GetFlow
+
+> **rpc** GetFlow([GetFlowRequest](#getflowrequest))
+[GetFlowResponse](#getflowresponse)
+
+
+
+
+
+    GET: /flows/{type}
+
+
+### ClearFlow
+
+> **rpc** ClearFlow([ClearFlowRequest](#clearflowrequest))
+[ClearFlowResponse](#clearflowresponse)
+
+
+
+
+
+    POST: /flows/{type}/_clear
+
+
+### SetTriggerActions
+
+> **rpc** SetTriggerActions([SetTriggerActionsRequest](#settriggeractionsrequest))
+[SetTriggerActionsResponse](#settriggeractionsresponse)
+
+
+
+
+
+    POST: /flows/{flow_type}/trigger/{trigger_type}
+
+
 
 
 
 
 
 ## Messages
+
+
+### ActionQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.action_id_query |  zitadel.action.v1.ActionIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.action_name_query |  zitadel.action.v1.ActionNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.action_state_query |  zitadel.action.v1.ActionStateQuery | - |  |
+
+
 
 
 ### ActivateCustomLabelPolicyRequest
@@ -2697,6 +2902,28 @@ This is an empty request
 
 
 
+### AddCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+
+
+
+
+### AddCustomLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddCustomLoginPolicyRequest
 
 
@@ -2763,29 +2990,6 @@ This is an empty request
 
 
 ### AddCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### AddCustomPasswordLockoutPolicyResponse
 
 
 
@@ -3046,6 +3250,35 @@ This is an empty request
 
 
 
+### AddOrgJWTIDPRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| auto_register |  bool | - |  |
+
+
+
+
+### AddOrgJWTIDPResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| idp_id |  string | - |  |
+
+
+
+
 ### AddOrgMemberRequest
 
 
@@ -3083,6 +3316,7 @@ This is an empty request
 | scopes | repeated string | - |  |
 | display_name_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
 | username_mapping |  zitadel.idp.v1.OIDCMappingField | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -3205,6 +3439,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
+| has_project_check |  bool | - |  |
+| private_labeling_setting |  zitadel.project.v1.PrivateLabelingSetting | - | enum.defined_only: true<br />  |
 
 
 
@@ -3343,6 +3579,134 @@ This is an empty request
 
 ### BulkRemoveUserGrantResponse
 
+
+
+
+
+### BulkRemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys | repeated string | - | repeated.items.string.min_len: 1<br /> repeated.items.string.max_len: 200<br />  |
+
+
+
+
+### BulkRemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| metadata | repeated BulkSetUserMetadataRequest.Metadata | - |  |
+
+
+
+
+### BulkSetUserMetadataRequest.Metadata
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### BulkSetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ClearFlowRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.action.v1.FlowType | - |  |
+
+
+
+
+### ClearFlowResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### CreateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| script |  string | - | string.min_len: 1<br /> string.max_len: 2000<br />  |
+| timeout |  google.protobuf.Duration | - | duration.lte.seconds: 20<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
+| allowed_to_fail |  bool | - |  |
+
+
+
+
+### CreateActionResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
+### DeactivateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### DeactivateActionResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -3499,6 +3863,23 @@ This is an empty request
 
 
 
+### DeleteActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### DeleteActionResponse
+
+
+
+
+
 ### GenerateOrgDomainValidationRequest
 
 
@@ -3519,6 +3900,28 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | token |  string | - |  |
 | url |  string | - |  |
+
+
+
+
+### GetActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### GetActionResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| action |  zitadel.action.v1.Action | - |  |
 
 
 
@@ -3785,6 +4188,23 @@ This is an empty request
 
 
 
+### GetDefaultLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetDefaultLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
 ### GetDefaultLoginPolicyRequest
 
 
@@ -3854,23 +4274,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-
-
-
-
-### GetDefaultPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetDefaultPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
 
 
 
@@ -3993,6 +4396,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | features |  zitadel.features.v1.Features | - |  |
+
+
+
+
+### GetFlowRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| type |  zitadel.action.v1.FlowType | - |  |
+
+
+
+
+### GetFlowResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| flow |  zitadel.action.v1.Flow | - |  |
 
 
 
@@ -4120,6 +4545,24 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
+| is_default |  bool | - |  |
+
+
+
+
+### GetLockoutPolicyRequest
+This is an empty request
+
+
+
+
+### GetLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.LockoutPolicy | - |  |
 | is_default |  bool | - |  |
 
 
@@ -4298,24 +4741,6 @@ This is an empty request
 
 
 
-### GetPasswordLockoutPolicyRequest
-This is an empty request
-
-
-
-
-### GetPasswordLockoutPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.PasswordLockoutPolicy | - |  |
-| is_default |  bool | - |  |
-
-
-
-
 ### GetPreviewLabelPolicyRequest
 This is an empty request
 
@@ -4480,6 +4905,29 @@ This is an empty request
 
 
 
+### GetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| metadata |  zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### HealthzRequest
 This is an empty request
 
@@ -4606,6 +5054,32 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | is_unique |  bool | - |  |
+
+
+
+
+### ListActionsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| sorting_column |  zitadel.action.v1.ActionFieldName | the field the result is sorted |  |
+| queries | repeated ActionQuery | criteria the client is looking for |  |
+
+
+
+
+### ListActionsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| sorting_column |  zitadel.action.v1.ActionFieldName | - |  |
+| result | repeated zitadel.action.v1.Action | - |  |
 
 
 
@@ -5264,6 +5738,31 @@ This is an empty request
 
 
 
+### ListUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | - |  |
+| queries | repeated zitadel.metadata.v1.MetadataQuery | - |  |
+
+
+
+
+### ListUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.metadata.v1.Metadata | - |  |
+
+
+
+
 ### ListUsersRequest
 
 
@@ -5302,6 +5801,28 @@ This is an empty request
 
 
 ### LockUserResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ReactivateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+
+
+
+
+### ReactivateActionResponse
 
 
 
@@ -6068,6 +6589,29 @@ This is an empty response
 
 
 
+### RemoveUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveUserRequest
 
 
@@ -6246,7 +6790,7 @@ This is an empty request
 
 
 ### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
@@ -6328,6 +6872,23 @@ This is an empty request
 
 
 
+### ResetLockoutPolicyToDefaultRequest
+This is an empty request
+
+
+
+
+### ResetLockoutPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetLoginPolicyToDefaultRequest
 
 
@@ -6369,23 +6930,6 @@ This is an empty request
 
 
 ### ResetPasswordComplexityPolicyToDefaultResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultRequest
-This is an empty request
-
-
-
-
-### ResetPasswordLockoutPolicyToDefaultResponse
 
 
 
@@ -6556,6 +7100,7 @@ This is an empty request
 | passwordless_prompt_text |  zitadel.text.v1.PasswordlessPromptScreenText | - |  |
 | passwordless_registration_text |  zitadel.text.v1.PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  zitadel.text.v1.PasswordlessRegistrationDoneScreenText | - |  |
+| external_registration_user_overview_text |  zitadel.text.v1.ExternalRegistrationUserOverviewScreenText | - |  |
 
 
 
@@ -6756,6 +7301,55 @@ This is an empty request
 
 
 
+### SetTriggerActionsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| flow_type |  zitadel.action.v1.FlowType | - |  |
+| trigger_type |  zitadel.action.v1.TriggerType | - |  |
+| action_ids | repeated string | - |  |
+
+
+
+
+### SetTriggerActionsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetUserMetadataRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| key |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| value |  bytes | - | bytes.min_len: 1<br /> bytes.max_len: 500000<br />  |
+
+
+
+
+### SetUserMetadataResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UnlockUserRequest
 
 
@@ -6792,6 +7386,32 @@ This is an empty request
 
 
 ### UpdateAPIAppConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateActionRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| script |  string | - | string.min_len: 1<br /> string.max_len: 2000<br />  |
+| timeout |  google.protobuf.Duration | - | duration.lte.seconds: 20<br /> duration.lte.nanos: 0<br /> duration.gte.seconds: 0<br /> duration.gte.nanos: 0<br />  |
+| allowed_to_fail |  bool | - |  |
+
+
+
+
+### UpdateActionResponse
 
 
 
@@ -6847,6 +7467,28 @@ This is an empty request
 
 
 ### UpdateCustomLabelPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateCustomLockoutPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| max_password_attempts |  uint32 | - |  |
+
+
+
+
+### UpdateCustomLockoutPolicyResponse
 
 
 
@@ -6923,29 +7565,6 @@ This is an empty request
 
 
 ### UpdateCustomPasswordComplexityPolicyResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| max_attempts |  uint32 | - |  |
-| show_lockout_failure |  bool | - |  |
-
-
-
-
-### UpdateCustomPasswordLockoutPolicyResponse
 
 
 
@@ -7115,6 +7734,32 @@ This is an empty request
 
 
 
+### UpdateOrgIDPJWTConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| jwt_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| issuer |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| keys_endpoint |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| header_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateOrgIDPJWTConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateOrgIDPOIDCConfigRequest
 
 
@@ -7152,6 +7797,7 @@ This is an empty request
 | idp_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | styling_type |  zitadel.idp.v1.IDPStylingType | - | enum.defined_only: true<br />  |
+| auto_register |  bool | - |  |
 
 
 
@@ -7295,6 +7941,8 @@ This is an empty request
 | name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | project_role_assertion |  bool | - |  |
 | project_role_check |  bool | - |  |
+| has_project_check |  bool | - |  |
+| private_labeling_setting |  zitadel.project.v1.PrivateLabelingSetting | - | enum.defined_only: true<br />  |
 
 
 

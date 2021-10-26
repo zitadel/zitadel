@@ -3,11 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
-
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 )
 
@@ -39,8 +38,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),
 		newApplication(
 			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
-		newOrg(
-			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newFeatures(
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}

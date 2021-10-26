@@ -12,12 +12,9 @@ import (
 	secretpkg "github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/orbos/pkg/tree"
-	coreDB "github.com/caos/zitadel/operator/database/kinds/databases/core"
-
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 )
 
@@ -35,6 +32,8 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	version string,
+	dbURL string,
+	dbPort int32,
 	features []string,
 	customImageRegistry string,
 ) operator.AdaptFunc {
@@ -78,7 +77,6 @@ func AdaptFunc(
 			name,
 			namespace,
 			componentLabels,
-			[]string{},
 			checkDBReady,
 			desiredKind.Spec.Bucket,
 			desiredKind.Spec.Cron,
@@ -87,6 +85,8 @@ func AdaptFunc(
 			timestamp,
 			nodeselector,
 			tolerations,
+			dbURL,
+			dbPort,
 			features,
 			image,
 		)
@@ -99,7 +99,6 @@ func AdaptFunc(
 			name,
 			namespace,
 			componentLabels,
-			[]string{},
 			desiredKind.Spec.Bucket,
 			timestamp,
 			nodeselector,
@@ -107,13 +106,15 @@ func AdaptFunc(
 			checkDBReady,
 			secretName,
 			secretKey,
+			dbURL,
+			dbPort,
 			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		_, destroyC, err := clean.AdaptFunc(
+		/*_, destroyC, err := clean.AdaptFunc(
 			monitor,
 			name,
 			namespace,
@@ -129,7 +130,7 @@ func AdaptFunc(
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
-		}
+		}*/
 
 		destroyers := make([]operator.DestroyFunc, 0)
 		for _, feature := range features {
@@ -139,10 +140,10 @@ func AdaptFunc(
 					operator.ResourceDestroyToZitadelDestroy(destroyS),
 					destroyB,
 				)
-			case clean.Instant:
-				destroyers = append(destroyers,
-					destroyC,
-				)
+			/*case clean.Instant:
+			destroyers = append(destroyers,
+				destroyC,
+			)*/
 			case restore.Instant:
 				destroyers = append(destroyers,
 					destroyR,
@@ -154,21 +155,6 @@ func AdaptFunc(
 
 				if err := desiredKind.validateSecrets(); err != nil {
 					return nil, err
-				}
-
-				currentDB, err := coreDB.ParseQueriedForDatabase(queried)
-				if err != nil {
-					return nil, err
-				}
-
-				databases, err := currentDB.GetListDatabasesFunc()(k8sClient)
-				if err != nil {
-					databases = []string{}
-				}
-
-				users, err := currentDB.GetListUsersFunc()(k8sClient)
-				if err != nil {
-					users = []string{}
 				}
 
 				value, err := read.GetSecretValue(k8sClient, desiredKind.Spec.ServiceAccountJSON, desiredKind.Spec.ExistingServiceAccountJSON)
@@ -186,7 +172,6 @@ func AdaptFunc(
 					name,
 					namespace,
 					componentLabels,
-					databases,
 					checkDBReady,
 					desiredKind.Spec.Bucket,
 					desiredKind.Spec.Cron,
@@ -195,6 +180,8 @@ func AdaptFunc(
 					timestamp,
 					nodeselector,
 					tolerations,
+					dbURL,
+					dbPort,
 					features,
 					image,
 				)
@@ -207,7 +194,6 @@ func AdaptFunc(
 					name,
 					namespace,
 					componentLabels,
-					databases,
 					desiredKind.Spec.Bucket,
 					timestamp,
 					nodeselector,
@@ -215,13 +201,15 @@ func AdaptFunc(
 					checkDBReady,
 					secretName,
 					secretKey,
+					dbURL,
+					dbPort,
 					image,
 				)
 				if err != nil {
 					return nil, err
 				}
 
-				queryC, _, err := clean.AdaptFunc(
+				/*queryC, _, err := clean.AdaptFunc(
 					monitor,
 					name,
 					namespace,
@@ -237,43 +225,41 @@ func AdaptFunc(
 				)
 				if err != nil {
 					return nil, err
-				}
+				}*/
 
 				queriers := make([]operator.QueryFunc, 0)
 				cleanupQueries := make([]operator.QueryFunc, 0)
-				if databases != nil && len(databases) != 0 {
-					for _, feature := range features {
-						switch feature {
-						case backup.Normal:
-							queriers = append(queriers,
-								operator.ResourceQueryToZitadelQuery(queryS),
-								queryB,
-							)
-						case backup.Instant:
-							queriers = append(queriers,
-								operator.ResourceQueryToZitadelQuery(queryS),
-								queryB,
-							)
-							cleanupQueries = append(cleanupQueries,
-								operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
-							)
-						case clean.Instant:
-							queriers = append(queriers,
-								operator.ResourceQueryToZitadelQuery(queryS),
-								queryC,
-							)
-							cleanupQueries = append(cleanupQueries,
-								operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
-							)
-						case restore.Instant:
-							queriers = append(queriers,
-								operator.ResourceQueryToZitadelQuery(queryS),
-								queryR,
-							)
-							cleanupQueries = append(cleanupQueries,
-								operator.EnsureFuncToQueryFunc(restore.GetCleanupFunc(monitor, namespace, name)),
-							)
-						}
+				for _, feature := range features {
+					switch feature {
+					case backup.Normal:
+						queriers = append(queriers,
+							operator.ResourceQueryToZitadelQuery(queryS),
+							queryB,
+						)
+					case backup.Instant:
+						queriers = append(queriers,
+							operator.ResourceQueryToZitadelQuery(queryS),
+							queryB,
+						)
+						cleanupQueries = append(cleanupQueries,
+							operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
+						)
+					/*case clean.Instant:
+					queriers = append(queriers,
+						operator.ResourceQueryToZitadelQuery(queryS),
+						queryC,
+					)
+					cleanupQueries = append(cleanupQueries,
+						operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
+					)*/
+					case restore.Instant:
+						queriers = append(queriers,
+							operator.ResourceQueryToZitadelQuery(queryS),
+							queryR,
+						)
+						cleanupQueries = append(cleanupQueries,
+							operator.EnsureFuncToQueryFunc(restore.GetCleanupFunc(monitor, namespace, name)),
+						)
 					}
 				}
 

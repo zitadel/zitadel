@@ -38,7 +38,7 @@ import { API_TYPE, AppCreateType, NATIVE_TYPE, RadioItemAppType, USER_AGENT_TYPE
 
 
 @Component({
-  selector: 'app-app-create',
+  selector: 'cnsl-app-create',
   templateUrl: './app-create.component.html',
   styleUrls: ['./app-create.component.scss'],
 })

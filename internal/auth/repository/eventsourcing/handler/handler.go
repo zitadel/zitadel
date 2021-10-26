@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"time"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	key_model "github.com/caos/zitadel/internal/key/model"
 )
@@ -45,15 +45,11 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
 			keyChan),
 		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
-		newOrg(
-			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			systemDefaults.IamID),
 		newAuthNKeys(
 			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
-		newLoginPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LoginPolicy"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(
@@ -62,16 +58,13 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			systemDefaults),
-		newPasswordComplexityPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("PasswordComplexityPolicy"), errorCount, es}),
-		newOrgIAMPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("OrgIAMPolicy"), errorCount, es}),
 		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
 		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
 		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
-		newPrivacyPolicy(handler{view, bulkLimit, configs.cycleDuration("PrivacyPolicy"), errorCount, es}),
 		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
+		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
+		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
 }
 

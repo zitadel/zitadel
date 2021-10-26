@@ -9,13 +9,13 @@ import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-m
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
-import { GrantedProject, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, ProjectGrantState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-granted-project-detail',
+  selector: 'cnsl-granted-project-detail',
   templateUrl: './granted-project-detail.component.html',
   styleUrls: ['./granted-project-detail.component.scss'],
 })
@@ -24,7 +24,7 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   public grantId: string = '';
   public project!: GrantedProject.AsObject;
 
-  public ProjectState: any = ProjectState;
+  public ProjectGrantState: any = ProjectGrantState;
   public ChangeType: any = ChangeType;
 
   private subscription?: Subscription;

@@ -2,29 +2,31 @@ package api
 
 import (
 	"context"
-	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
-	view_model "github.com/caos/zitadel/internal/view/model"
-	sentryhttp "github.com/getsentry/sentry-go/http"
-	"go.opentelemetry.io/otel/api/metric"
 	"net/http"
 
 	"github.com/caos/logging"
+	sentryhttp "github.com/getsentry/sentry-go/http"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/grpc"
 
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/authz"
 	grpc_util "github.com/caos/zitadel/internal/api/grpc"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/oidc"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
+	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	view_model "github.com/caos/zitadel/internal/view/model"
 )
 
 type Config struct {
@@ -57,11 +59,20 @@ type admin interface {
 	GetSpoolerDiv(database, viewName string) int64
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
-	api.verifier = authz.Start(authZRepo)
+
+	repo := struct {
+		authz_es.EsRepository
+		query.Queries
+	}{
+		*authZRepo,
+		*q,
+	}
+
+	api.verifier = authz.Start(&repo)
 	api.health = authZRepo
 	api.auth = authRepo
 	api.admin = adminRepo
@@ -185,9 +196,9 @@ func (a *API) registerSpoolerDivCounters() {
 		metrics.SpoolerDivCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {
 			for _, view := range views {
-				labels := map[string]interface{}{
-					metrics.Database: view.Database,
-					metrics.ViewName: view.ViewName,
+				labels := map[string]attribute.Value{
+					metrics.Database: attribute.StringValue(view.Database),
+					metrics.ViewName: attribute.StringValue(view.ViewName),
 				}
 				result.Observe(
 					a.admin.GetSpoolerDiv(view.Database, view.ViewName),

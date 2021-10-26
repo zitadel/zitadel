@@ -17,7 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	es2 "github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
 	key_model "github.com/caos/zitadel/internal/key/model"
@@ -98,17 +98,21 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		es,
 		userRepo,
 		eventstore.AuthRequestRepo{
+			PrivacyPolicyProvider:      queries,
 			Command:                    command,
+			OrgViewProvider:            queries,
 			AuthRequests:               authReq,
 			View:                       view,
+			Eventstore:                 es,
 			UserSessionViewProvider:    view,
 			UserViewProvider:           view,
 			UserCommandProvider:        command,
 			UserEventProvider:          &userRepo,
-			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,
-			LoginPolicyViewProvider:    view,
+			LockoutPolicyViewProvider:  queries,
+			LoginPolicyViewProvider:    queries,
 			UserGrantProvider:          view,
+			ProjectProvider:            view,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
@@ -151,11 +155,14 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IamID:       systemDefaults.IamID,
 			Auth:        authZ,
 			AuthZRepo:   authZRepo,
+			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
 			View:           view,
 			SystemDefaults: systemDefaults,
+			Eventstore:     es,
+			Query:          queries,
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,

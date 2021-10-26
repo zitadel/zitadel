@@ -25,7 +25,7 @@ type ReadModel struct {
 	DefaultOrgIAMPolicy             IAMOrgIAMPolicyReadModel
 	DefaultPasswordComplexityPolicy IAMPasswordComplexityPolicyReadModel
 	DefaultPasswordAgePolicy        IAMPasswordAgePolicyReadModel
-	DefaultPasswordLockoutPolicy    IAMPasswordLockoutPolicyReadModel
+	DefaultPasswordLockoutPolicy    IAMLockoutPolicyReadModel
 }
 
 func NewReadModel(id string) *ReadModel {
@@ -80,8 +80,8 @@ func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
 			*policy.PasswordAgePolicyChangedEvent:
 
 			rm.DefaultPasswordAgePolicy.AppendEvents(event)
-		case *policy.PasswordLockoutPolicyAddedEvent,
-			*policy.PasswordLockoutPolicyChangedEvent:
+		case *policy.LockoutPolicyAddedEvent,
+			*policy.LockoutPolicyChangedEvent:
 
 			rm.DefaultPasswordLockoutPolicy.AppendEvents(event)
 		}

@@ -16,12 +16,13 @@ type SearchQueryBuilder struct {
 }
 
 type SearchQuery struct {
-	builder        *SearchQueryBuilder
-	aggregateTypes []AggregateType
-	aggregateIDs   []string
-	eventSequence  uint64
-	eventTypes     []EventType
-	eventData      map[string]interface{}
+	builder              *SearchQueryBuilder
+	aggregateTypes       []AggregateType
+	aggregateIDs         []string
+	eventSequenceGreater uint64
+	eventSequenceLess    uint64
+	eventTypes           []EventType
+	eventData            map[string]interface{}
 }
 
 // Columns defines which fields of the event are needed for the query
@@ -40,7 +41,7 @@ type AggregateType repository.AggregateType
 // EventType is the description of the change
 type EventType repository.EventType
 
-// NewSearchQueryBuilder creates a new factory for event filters
+// NewSearchQueryBuilder creates a new builder for event filters
 // aggregateTypes must contain at least one aggregate type
 func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	return &SearchQueryBuilder{
@@ -103,7 +104,13 @@ func (query *SearchQuery) AggregateTypes(types ...AggregateType) *SearchQuery {
 
 //SequenceGreater filters for events with sequence greater the requested sequence
 func (query *SearchQuery) SequenceGreater(sequence uint64) *SearchQuery {
-	query.eventSequence = sequence
+	query.eventSequenceGreater = sequence
+	return query
+}
+
+//SequenceLess filters for events with sequence less the requested sequence
+func (query *SearchQuery) SequenceLess(sequence uint64) *SearchQuery {
+	query.eventSequenceLess = sequence
 	return query
 }
 
@@ -131,21 +138,22 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (factory *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
-	if factory == nil ||
-		len(factory.queries) < 1 ||
-		factory.columns.Validate() != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "factory invalid")
+func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
+	if builder == nil ||
+		len(builder.queries) < 1 ||
+		builder.columns.Validate() != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
-	filters := make([][]*repository.Filter, len(factory.queries))
+	filters := make([][]*repository.Filter, len(builder.queries))
 
-	for i, query := range factory.queries {
+	for i, query := range builder.queries {
 		for _, f := range []func() *repository.Filter{
 			query.aggregateTypeFilter,
 			query.aggregateIDFilter,
-			query.eventSequenceFilter,
 			query.eventTypeFilter,
 			query.eventDataFilter,
+			query.eventSequenceGreaterFilter,
+			query.eventSequenceLessFilter,
 			query.builder.resourceOwnerFilter,
 		} {
 			if filter := f(); filter != nil {
@@ -159,9 +167,9 @@ func (factory *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 	}
 
 	return &repository.SearchQuery{
-		Columns: factory.columns,
-		Limit:   factory.limit,
-		Desc:    factory.desc,
+		Columns: builder.columns,
+		Limit:   builder.limit,
+		Desc:    builder.desc,
 		Filters: filters,
 	}, nil
 }
@@ -201,22 +209,33 @@ func (query *SearchQuery) aggregateTypeFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldAggregateType, aggregateTypes, repository.OperationIn)
 }
 
-func (query *SearchQuery) eventSequenceFilter() *repository.Filter {
-	if query.eventSequence == 0 {
+func (query *SearchQuery) eventSequenceGreaterFilter() *repository.Filter {
+	if query.eventSequenceGreater == 0 {
 		return nil
 	}
 	sortOrder := repository.OperationGreater
 	if query.builder.desc {
 		sortOrder = repository.OperationLess
 	}
-	return repository.NewFilter(repository.FieldSequence, query.eventSequence, sortOrder)
+	return repository.NewFilter(repository.FieldSequence, query.eventSequenceGreater, sortOrder)
 }
 
-func (factory *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
-	if factory.resourceOwner == "" {
+func (query *SearchQuery) eventSequenceLessFilter() *repository.Filter {
+	if query.eventSequenceLess == 0 {
 		return nil
 	}
-	return repository.NewFilter(repository.FieldResourceOwner, factory.resourceOwner, repository.OperationEquals)
+	sortOrder := repository.OperationLess
+	if query.builder.desc {
+		sortOrder = repository.OperationGreater
+	}
+	return repository.NewFilter(repository.FieldSequence, query.eventSequenceLess, sortOrder)
+}
+
+func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
+	if builder.resourceOwner == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldResourceOwner, builder.resourceOwner, repository.OperationEquals)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

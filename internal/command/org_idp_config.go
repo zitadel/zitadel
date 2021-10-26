@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -16,7 +17,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-0j8gs", "Errors.ResourceOwnerMissing")
 	}
-	if config.OIDCConfig == nil {
+	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "Org-eUpQU", "Errors.idp.config.notset")
 	}
 
@@ -25,11 +26,6 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 		return nil, err
 	}
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
-
-	clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
-	if err != nil {
-		return nil, err
-	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.EventPusher{
@@ -40,8 +36,15 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			config.Name,
 			config.Type,
 			config.StylingType,
+			config.AutoRegister,
 		),
-		org_repo.NewIDPOIDCConfigAddedEvent(
+	}
+	if config.OIDCConfig != nil {
+		clientSecret, err := crypto.Crypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, org_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
 			orgAgg,
 			config.OIDCConfig.ClientID,
@@ -52,7 +55,17 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			clientSecret,
 			config.OIDCConfig.IDPDisplayNameMapping,
 			config.OIDCConfig.UsernameMapping,
-			config.OIDCConfig.Scopes...),
+			config.OIDCConfig.Scopes...))
+	} else if config.JWTConfig != nil {
+		events = append(events, org_repo.NewIDPJWTConfigAddedEvent(
+			ctx,
+			orgAgg,
+			idpConfigID,
+			config.JWTConfig.JWTEndpoint,
+			config.JWTConfig.Issuer,
+			config.JWTConfig.KeysEndpoint,
+			config.JWTConfig.HeaderName,
+		))
 	}
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
@@ -69,12 +82,12 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Gh8ds", "Errors.ResourceOwnerMissing")
 	}
-	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, config.AggregateID)
+	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, config.IDPConfigID, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "Org-1J9fs", "Errors.Org.IDPConfig.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
@@ -83,7 +96,8 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 		orgAgg,
 		config.IDPConfigID,
 		config.Name,
-		config.StylingType)
+		config.StylingType,
+		config.AutoRegister)
 
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
@@ -105,7 +119,7 @@ func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9so", "Errors.Org.IDPConfig.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-BBmd0", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
@@ -163,17 +177,14 @@ func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfi
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
 	}
-	if existingIDP.State != domain.IDPConfigStateInactive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
-	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
 	events := []eventstore.EventPusher{
-		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, existingIDP.AggregateID, existingIDP.Name),
+		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, existingIDP.ConfigID, existingIDP.Name),
 	}
 
 	if cascadeRemoveProvider {
-		removeIDPEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, existingIDP.AggregateID, true, cascadeExternalIDPs...)
+		removeIDPEvents := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, existingIDP.ConfigID, true, cascadeExternalIDPs...)
 		events = append(events, removeIDPEvents...)
 	}
 	return events, nil
@@ -185,7 +196,7 @@ func (c *Commands) getOrgIDPConfigByID(ctx context.Context, idpID, orgID string)
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-4M9so", "Errors.Org.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-2m90f", "Errors.Org.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }

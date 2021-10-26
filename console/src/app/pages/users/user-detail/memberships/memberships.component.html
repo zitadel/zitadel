@@ -3,7 +3,7 @@
     <div class="people" *ngIf="memberships">
         <div class="img-list" [@cardAnimation]="totalResult">
             <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-            <ng-container *ngIf="totalResult < 8; else compact">
+            <ng-container *ngIf="totalResult < 8 && memberships && memberships.length; else compact">
                 <ng-container *ngFor="let membership of memberships; index as i">
                     <div @animate class="avatar-circle" (click)="navigateToObject()"
                         matTooltip="{{ membership.displayName }} | {{membership.rolesList?.join(' ')}}"

@@ -13,7 +13,7 @@ import { ManagementService } from '../../../../services/mgmt.service';
 import { ToastService } from '../../../../services/toast.service';
 
 @Component({
-  selector: 'app-external-idps',
+  selector: 'cnsl-external-idps',
   templateUrl: './external-idps.component.html',
   styleUrls: ['./external-idps.component.scss'],
 })
@@ -91,8 +91,8 @@ export class ExternalIdpsComponent implements OnInit {
       data: {
         confirmKey: 'ACTIONS.REMOVE',
         cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'USER.EXTERNALIDP.DIALOG.DELETE_TITLE',
-        descriptionKey: 'USER.EXTERNALIDP.DIALOG.DELETE_DESCRIPTION',
+        titleKey: 'USER.EXTERNALIDP.DIALOG.REMOVE_TITLE',
+        descriptionKey: 'USER.EXTERNALIDP.DIALOG.REMOVE_DESCRIPTION',
       },
       width: '400px',
     });
@@ -102,10 +102,10 @@ export class ExternalIdpsComponent implements OnInit {
         let promise;
         if (this.service instanceof ManagementService) {
           promise = (this.service as ManagementService)
-            .removeHumanLinkedIDP(idp.providedUserId, idp.idpId, idp.userId);
+            .removeHumanLinkedIDP(idp.idpId, idp.providedUserId, idp.userId);
         } else if (this.service instanceof GrpcAuthService) {
           promise = (this.service as GrpcAuthService)
-            .removeMyLinkedIDP(idp.providedUserId, idp.idpId);
+            .removeMyLinkedIDP(idp.idpId, idp.providedUserId);
         }
 
         if (promise) {

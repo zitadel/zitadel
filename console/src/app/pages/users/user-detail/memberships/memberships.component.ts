@@ -11,7 +11,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-  selector: 'app-memberships',
+  selector: 'cnsl-memberships',
   templateUrl: './memberships.component.html',
   styleUrls: ['./memberships.component.scss'],
   animations: [
@@ -33,7 +33,7 @@ import { ToastService } from 'src/app/services/toast.service';
 })
 export class MembershipsComponent implements OnInit {
   public loading: boolean = false;
-  public memberships!: Membership.AsObject[] | UserGrant.AsObject[];
+  public memberships: Membership.AsObject[] = [];
   public totalResult: number = 0;
 
   @Input() public auth: boolean = false;
@@ -55,7 +55,7 @@ export class MembershipsComponent implements OnInit {
 
   public async loadManager(userId: string): Promise<void> {
     if (this.auth) {
-      this.authService.listMyUserGrants(100, 0, []).then(resp => {
+      this.authService.listMyMemberships(100, 0, []).then(resp => {
         this.memberships = resp.resultList;
         this.totalResult = resp.details?.totalResult || 0;
         this.loading = false;
@@ -181,7 +181,7 @@ export class MembershipsComponent implements OnInit {
     }
   }
 
-  getColor(type: Membership.AsObject[] | UserGrant.AsObject[]): string {
+  getColor(type: Membership.AsObject | UserGrant.AsObject): string {
     const gen = type.toString();
     const colors = [
       'rgb(201, 115, 88)',
@@ -194,9 +194,9 @@ export class MembershipsComponent implements OnInit {
       return colors[hash];
     }
     for (let i = 0; i < gen.length; i++) {
-      // tslint:disable-next-line: no-bitwise
+      // eslint-disable-next-line no-bitwise
       hash = gen.charCodeAt(i) + ((hash << 5) - hash);
-      // tslint:disable-next-line: no-bitwise
+      // eslint-disable-next-line no-bitwise
       hash = hash & hash;
     }
     hash = ((hash % colors.length) + colors.length) % colors.length;

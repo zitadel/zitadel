@@ -1082,6 +1082,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 		resourceOwner string
 		password      string
 		authReq       *domain.AuthRequest
+		lockoutPolicy *domain.LockoutPolicy
 	}
 	type res struct {
 		err func(error) bool
@@ -1177,7 +1178,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 		},
 		{
-			name: "password not matching, precondition error",
+			name: "password not matching lockout policy not relevant, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -1237,6 +1238,82 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				authReq: &domain.AuthRequest{
 					ID:      "request1",
 					AgentID: "agent1",
+				},
+				lockoutPolicy: &domain.LockoutPolicy{},
+			},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "password not matching, max password attempts reached - user locked, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewHumanAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"username",
+								"firstname",
+								"lastname",
+								"nickname",
+								"displayname",
+								language.German,
+								domain.GenderUnspecified,
+								"email@test.ch",
+								true,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanEmailVerifiedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+							),
+						),
+						eventFromEventPusher(
+							user.NewHumanPasswordChangedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeHash,
+									Algorithm:  "hash",
+									KeyID:      "",
+									Crypted:    []byte("password"),
+								},
+								false,
+								"")),
+					),
+					expectPush(
+						[]*repository.Event{
+							eventFromEventPusher(
+								user.NewHumanPasswordCheckFailedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+									&user.AuthRequestInfo{
+										ID:          "request1",
+										UserAgentID: "agent1",
+									},
+								),
+							),
+							eventFromEventPusher(
+								user.NewUserLockedEvent(context.Background(),
+									&user.NewAggregate("user1", "org1").Aggregate,
+								),
+							),
+						},
+					),
+				),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				password:      "password1",
+				resourceOwner: "org1",
+				authReq: &domain.AuthRequest{
+					ID:      "request1",
+					AgentID: "agent1",
+				},
+				lockoutPolicy: &domain.LockoutPolicy{
+					MaxPasswordAttempts: 1,
 				},
 			},
 			res: res{
@@ -1315,7 +1392,7 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 				eventstore:      tt.fields.eventstore,
 				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq)
+			err := r.HumanCheckPassword(tt.args.ctx, tt.args.resourceOwner, tt.args.userID, tt.args.password, tt.args.authReq, tt.args.lockoutPolicy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

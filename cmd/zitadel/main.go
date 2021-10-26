@@ -32,6 +32,7 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/setup"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
@@ -57,6 +58,7 @@ type Config struct {
 	EventstoreBase types.SQLBase
 	Commands       command.Config
 	Queries        query.Config
+	Projections    projection.Config
 
 	AuthZ authz.Config
 	Auth  auth_es.Config
@@ -143,22 +145,26 @@ func startZitadel(configPaths []string) {
 	err := config.Read(conf, configPaths...)
 	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
 
+	logging.LogWithFields("MAIN-dsfg2",
+		"HTTP_PROXY", os.Getenv("HTTP_PROXY") != "",
+		"HTTPS_PROXY", os.Getenv("HTTPS_PROXY") != "",
+		"NO_PROXY", os.Getenv("NO_PROXY")).Info("http proxy settings")
+
 	ctx := context.Background()
 	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
 	if err != nil {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
-	queries, err := query.StartQueries(esQueries, conf.SystemDefaults)
-	if err != nil {
-		logging.Log("ZITAD-WpeJY").OnError(err).Fatal("cannot start queries")
-	}
+
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
+	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
+
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
-	verifier := internal_authz.Start(authZRepo)
+
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
-	if err != nil {
-		logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
-	}
+	logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
+
 	store, err := conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
@@ -166,12 +172,22 @@ func startZitadel(configPaths []string) {
 	if err != nil {
 		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
 	}
+
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
 		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
+	repo := struct {
+		authz_repo.EsRepository
+		query.Queries
+	}{
+		*authZRepo,
+		*queries,
+	}
+
+	verifier := internal_authz.Start(&repo)
 	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store)
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
@@ -202,10 +218,10 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
 	}
-	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, static, roles, *localDevMode)
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, roles, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
-	apis := api.Create(conf.API, conf.InternalAuthZ, authZRepo, authRepo, repo, conf.SystemDefaults)
+	apis := api.Create(conf.API, conf.InternalAuthZ, query, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
 		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))

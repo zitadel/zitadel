@@ -1,25 +1,54 @@
 .head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  padding-bottom: .5rem;
+  padding-bottom: 2rem;
 
   a {
     display: block;
     margin-right: 2rem;
   }
 
-  h1 {
-    margin: 0;
-    margin-right: 1rem;
+  .head-row {
+    display: flex;
+    flex-direction: column;
+
+    h1 {
+      margin: 0;
+      margin-right: 1rem;
+    }
+
+    p {
+      margin: .5rem 0;
+      font-size: 14px;
+      color: var(--grey);
+    }
   }
 
   .fill-space {
     flex: 1;
   }
 
-  .state-button {
-    margin-left: .5rem;
+  .actions-trigger {
+    margin-top: .25rem;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      margin-left: .5rem;
+      margin-right: -.5rem;
+    }
+  }
+}
+
+.locked {
+  display: block;
+  margin: 1rem 0;
+}
+
+.icon-button {
+  .icon {
+    font-size: 1.2rem;
   }
 }
 
@@ -32,4 +61,8 @@
     flex: 1;
     min-height: 0;
   }
+}
+
+.side-padding {
+  padding-top: 1rem;
 }

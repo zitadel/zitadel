@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *admin_pb.GetPrivacyPolicyRequest) (*admin_pb.GetPrivacyPolicyResponse, error) {
-	policy, err := s.iam.GetDefaultPrivacyPolicy(ctx)
+	policy, err := s.query.DefaultPrivacyPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}

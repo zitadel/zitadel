@@ -27,8 +27,13 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		CustomDomain:             features.CustomDomain,
 		LabelPolicyPrivateLabel:  features.LabelPolicyPrivateLabel,
 		LabelPolicyWatermark:     features.LabelPolicyWatermark,
-		CustomText:               features.CustomText,
 		PrivacyPolicy:            features.PrivacyPolicy,
+		CustomText:               features.CustomTextMessage,
+		CustomTextMessage:        features.CustomTextMessage,
+		CustomTextLogin:          features.CustomTextLogin,
+		MetadataUser:             features.MetadataUser,
+		LockoutPolicy:            features.LockoutPolicy,
+		Actions:                  features.Actions,
 	}
 }
 
