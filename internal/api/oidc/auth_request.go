@@ -165,27 +165,33 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	return err
 }
 
-func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) error {
+func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) *oidc.Error {
 	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
 	if err == nil {
 		if refreshToken.ClientID != clientID {
-			return errors.ThrowPermissionDenied(nil, "OIDC-SDff2", "token was not issued for this client")
+			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
-		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID, true)
-		return err
+		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
+		if errors.IsNotFound(err) {
+			return nil
+		}
+		return oidc.ErrServerError().WithParent(err)
 	}
 	accessToken, err := o.repo.TokenByID(ctx, userID, token)
 	if err != nil {
-		if !errors.IsNotFound(err) {
-			return err
+		if errors.IsNotFound(err) {
+			return nil
 		}
+		return oidc.ErrServerError().WithParent(err)
+	}
+	if accessToken.ApplicationID != clientID {
+		return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+	}
+	_, err = o.command.RevokeAccessToken(ctx, userID, accessToken.ResourceOwner, accessToken.ID)
+	if errors.IsNotFound(err) {
 		return nil
 	}
-	if accessToken.ApplicationID == clientID {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dfbb3", "token was not issued for this client")
-	}
-	_, err = o.command.RevokeAccessToken(ctx, userID, accessToken.ID)
-	return err
+	return oidc.ErrServerError().WithParent(err)
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {

@@ -21,6 +21,7 @@ const (
 	UserReactivatedType       = userEventTypePrefix + "reactivated"
 	UserRemovedType           = userEventTypePrefix + "removed"
 	UserTokenAddedType        = userEventTypePrefix + "token.added"
+	UserTokenRemovedType      = userEventTypePrefix + "token.removed"
 	UserDomainClaimedType     = userEventTypePrefix + "domain.claimed"
 	UserDomainClaimedSentType = userEventTypePrefix + "domain.claimed.sent"
 	UserUserNameChangedType   = userEventTypePrefix + "username.changed"
@@ -213,6 +214,7 @@ type UserTokenAddedEvent struct {
 	TokenID           string    `json:"tokenId"`
 	ApplicationID     string    `json:"applicationId"`
 	UserAgentID       string    `json:"userAgentId"`
+	RefreshTokenID    string    `json:"refreshTokenID,omitempty"`
 	Audience          []string  `json:"audience"`
 	Scopes            []string  `json:"scopes"`
 	Expiration        time.Time `json:"expiration"`
@@ -233,7 +235,8 @@ func NewUserTokenAddedEvent(
 	tokenID,
 	applicationID,
 	userAgentID,
-	preferredLanguage string,
+	preferredLanguage,
+	refreshTokenID string,
 	audience,
 	scopes []string,
 	expiration time.Time,
@@ -247,6 +250,7 @@ func NewUserTokenAddedEvent(
 		TokenID:           tokenID,
 		ApplicationID:     applicationID,
 		UserAgentID:       userAgentID,
+		RefreshTokenID:    refreshTokenID,
 		Audience:          audience,
 		Scopes:            scopes,
 		Expiration:        expiration,
@@ -264,6 +268,47 @@ func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader,
 	}
 
 	return tokenAdded, nil
+}
+
+type UserTokenRemovedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	TokenID string `json:"tokenId"`
+}
+
+func (e *UserTokenRemovedEvent) Data() interface{} {
+	return e
+}
+
+func (e *UserTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func NewUserTokenRemovedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	tokenID string,
+) *UserTokenRemovedEvent {
+	return &UserTokenRemovedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			UserTokenRemovedType,
+		),
+		TokenID: tokenID,
+	}
+}
+
+func UserTokenRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	tokenRemoved := &UserTokenRemovedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, tokenRemoved)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "USER-7M9sd", "unable to unmarshal token added")
+	}
+
+	return tokenRemoved, nil
 }
 
 type DomainClaimedEvent struct {

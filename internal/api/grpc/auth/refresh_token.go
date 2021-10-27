@@ -27,7 +27,7 @@ func (s *Server) ListMyRefreshTokens(ctx context.Context, req *auth.ListMyRefres
 
 func (s *Server) RevokeMyRefreshToken(ctx context.Context, req *auth.RevokeMyRefreshTokenRequest) (*auth.RevokeMyRefreshTokenResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	details, err := s.command.RevokeRefreshToken(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Id, req.RevokeAccessTokens)
+	details, err := s.command.RevokeRefreshToken(ctx, ctxData.UserID, ctxData.ResourceOwner, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Server) RevokeAllMyRefreshTokens(ctx context.Context, req *auth.RevokeA
 	for i, view := range res.Result {
 		tokenIDs[i] = view.ID
 	}
-	err = s.command.RevokeRefreshTokens(ctx, ctxData.UserID, ctxData.ResourceOwner, tokenIDs, req.RevokeAccessTokens)
+	err = s.command.RevokeRefreshTokens(ctx, ctxData.UserID, ctxData.ResourceOwner, tokenIDs)
 	if err != nil {
 		return nil, err
 	}
