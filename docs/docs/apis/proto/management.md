@@ -1379,6 +1379,19 @@ Limit should always be set, there is a default limit set by the service
     POST: /projects/{project_id}/grants/_search
 
 
+### ListAllProjectGrants
+
+> **rpc** ListAllProjectGrants([ListAllProjectGrantsRequest](#listallprojectgrantsrequest))
+[ListAllProjectGrantsResponse](#listallprojectgrantsresponse)
+
+Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /projectgrants/_search
+
+
 ### AddProjectGrant
 
 > **rpc** AddProjectGrant([AddProjectGrantRequest](#addprojectgrantrequest))
@@ -4545,7 +4558,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy |  |
 
 
 
@@ -4563,7 +4576,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LockoutPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LockoutPolicy |  |
 
 
 
@@ -4581,7 +4594,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LoginPolicy |  |
 
 
 
@@ -4718,7 +4731,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.PasswordAgePolicy |  |
 
 
 
@@ -4736,7 +4749,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy |  |
 
 
 
@@ -4754,7 +4767,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy |  |
 
 
 
@@ -5080,6 +5093,30 @@ This is an empty response
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.action.v1.ActionFieldName | - |  |
 | result | repeated zitadel.action.v1.Action | - |  |
+
+
+
+
+### ListAllProjectGrantsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.ProjectGrantQuery | criterias the client is looking for |  |
+
+
+
+
+### ListAllProjectGrantsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.GrantedProject | - |  |
 
 
 

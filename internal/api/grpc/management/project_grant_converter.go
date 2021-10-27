@@ -46,6 +46,34 @@ func ProjectGrantQueriesToModel(req *mgmt_pb.ListProjectGrantsRequest) (_ []quer
 	return queries, nil
 }
 
+func listAllProjectGrantsRequestToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := AllProjectGrantQueriesToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func AllProjectGrantQueriesToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (_ []query.SearchQuery, err error) {
+	queries := make([]query.SearchQuery, 0, len(req.Queries))
+	for _, query := range req.Queries {
+		q, err := ProjectGrantQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, q)
+	}
+	return queries, nil
+}
+
 func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.SearchQuery, error) {
 	switch q := apiQuery.Query.(type) {
 	case *proj_pb.ProjectGrantQuery_ProjectNameQuery:

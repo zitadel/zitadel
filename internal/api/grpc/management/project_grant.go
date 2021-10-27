@@ -41,6 +41,26 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	}, nil
 }
 
+func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllProjectGrantsRequest) (*mgmt_pb.ListAllProjectGrantsResponse, error) {
+	queries, err := listAllProjectGrantsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListAllProjectGrantsResponse{
+		Result: proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
+		Details: object_grpc.ToListDetails(
+			grants.Count,
+			grants.Sequence,
+			grants.Timestamp,
+		),
+	}, nil
+}
+
 func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGrantRequest) (*mgmt_pb.AddProjectGrantResponse, error) {
 	grant, err := s.command.AddProjectGrant(ctx, AddProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
