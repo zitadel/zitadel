@@ -49,6 +49,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
 	NewIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
 	NewAppProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["apps"]))
+	NewIDPUserLinkProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idp_user_links"]))
 
 	return nil
 }
