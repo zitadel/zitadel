@@ -204,6 +204,17 @@ message ProjectGrantQuery {
     }
 }
 
+message AllProjectGrantQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        GrantProjectNameQuery project_name_query = 1;
+        GrantRoleKeyQuery role_key_query = 2;
+        ProjectIDQuery project_id_query = 3;
+        GrantedOrgIDQuery granted_org_id_query = 4;
+    }
+}
+
 message GrantProjectNameQuery {
     string name = 1 [
         (validate.rules).string = {max_len: 200},
@@ -230,6 +241,24 @@ message GrantRoleKeyQuery {
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which text equality method is used"
+        }
+    ];
+}
+
+message ProjectIDQuery {
+    string project_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+}
+
+message GrantedOrgIDQuery {
+    string granted_org_id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
         }
     ];
 }
