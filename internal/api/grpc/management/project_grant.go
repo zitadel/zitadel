@@ -47,6 +47,7 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 		return nil, err
 	}
 	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
 	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err

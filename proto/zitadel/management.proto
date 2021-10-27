@@ -4044,7 +4044,7 @@ message ListAllProjectGrantsRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     //criterias the client is looking for
-    repeated zitadel.project.v1.ProjectGrantQuery queries = 2;
+    repeated zitadel.project.v1.AllProjectGrantQuery queries = 2;
 }
 
 message ListAllProjectGrantsResponse {

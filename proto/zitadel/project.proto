@@ -201,6 +201,15 @@ message ProjectGrantQuery {
 
         GrantProjectNameQuery project_name_query = 1;
         GrantRoleKeyQuery role_key_query = 2;
+    }
+}
+
+message AllProjectGrantQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        GrantProjectNameQuery project_name_query = 1;
+        GrantRoleKeyQuery role_key_query = 2;
         ProjectIDQuery project_id_query = 3;
         GrantedOrgIDQuery granted_org_id_query = 4;
     }

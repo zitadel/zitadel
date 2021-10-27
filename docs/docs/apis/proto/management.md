@@ -5104,7 +5104,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | query |  zitadel.v1.ListQuery | list limitations and ordering |  |
-| queries | repeated zitadel.project.v1.ProjectGrantQuery | criterias the client is looking for |  |
+| queries | repeated zitadel.project.v1.AllProjectGrantQuery | criterias the client is looking for |  |
 
 
 
