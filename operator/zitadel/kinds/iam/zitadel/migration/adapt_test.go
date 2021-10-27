@@ -110,9 +110,7 @@ func TestMigration_AdaptFunc(t *testing.T) {
 						"",
 						version,
 						dbCertsCockroach,
-						runAsUserCockroach,
 						dbCertsFlyway,
-						runAsUserFlyway,
 					),
 					Containers: []corev1.Container{
 						getMigrationContainer(
@@ -123,7 +121,6 @@ func TestMigration_AdaptFunc(t *testing.T) {
 							users,
 							"",
 							dbCertsFlyway,
-							runAsUserFlyway,
 						),
 					},
 					RestartPolicy:                 "Never",

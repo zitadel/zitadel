@@ -56,7 +56,6 @@ func TestBackup_Adapt1(t *testing.T) {
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
-		common.ZITADELCockroachImage.Reference("", version),
 		getCommand(
 			timestamp,
 			bucketName,
@@ -70,6 +69,8 @@ func TestBackup_Adapt1(t *testing.T) {
 			dbURL,
 			dbPort,
 		),
+		common.ZITADELCockroachImage.Reference("", version),
+		common.ZITADELCockroachImage.RunAsUser(),
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -96,6 +97,7 @@ func TestBackup_Adapt1(t *testing.T) {
 		dbURL,
 		dbPort,
 		common.ZITADELCockroachImage.Reference("", version),
+		common.ZITADELCockroachImage.RunAsUser(),
 	)
 
 	assert.NoError(t, err)
@@ -146,7 +148,6 @@ func TestBackup_Adapt2(t *testing.T) {
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
-		common.ZITADELCockroachImage.Reference("", version),
 		getCommand(
 			timestamp,
 			bucketName,
@@ -160,6 +161,8 @@ func TestBackup_Adapt2(t *testing.T) {
 			dbURL,
 			dbPort,
 		),
+		common.ZITADELCockroachImage.Reference("", version),
+		common.ZITADELCockroachImage.RunAsUser(),
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -186,6 +189,7 @@ func TestBackup_Adapt2(t *testing.T) {
 		dbURL,
 		dbPort,
 		common.ZITADELCockroachImage.Reference("", version),
+		common.ZITADELCockroachImage.RunAsUser(),
 	)
 
 	assert.NoError(t, err)

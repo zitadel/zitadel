@@ -2,7 +2,6 @@ package migration
 
 import (
 	"github.com/caos/zitadel/operator/helpers"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	"strings"
 
 	"github.com/caos/zitadel/operator/common"
@@ -20,28 +19,25 @@ func getPreContainer(
 	customImageRegistry string,
 	version string,
 	dbCertsCockroach string,
-	runAsUserCockroach int64,
 	dbCertsFlyway string,
-	runAsUserFlyway int64,
 ) []corev1.Container {
-	certsCockroach := deployment.GetInitContainer(
+	certsCockroach := common.GetInitContainer(
 		"cockroach",
 		rootUserInternal,
 		dbCertsCockroach,
 		[]string{"root"},
-		runAsUserCockroach,
-		customImageRegistry,
-		version,
+		common.ZITADELCockroachImage.RunAsUser(),
+		common.ZITADELCockroachImage.Reference(customImageRegistry, version),
 	)
-	certsFlyway := deployment.GetInitContainer(
+	certsFlyway := common.GetInitContainer(
 		"flyway",
 		rootUserInternal,
 		dbCertsFlyway,
 		[]string{"root"},
-		runAsUserFlyway,
-		customImageRegistry,
-		version,
+		common.ZITADELImage.RunAsUser(),
+		common.ZITADELCockroachImage.Reference(customImageRegistry, version),
 	)
+	runAsUser := common.ZITADELCockroachImage.RunAsUser()
 	return []corev1.Container{
 		certsCockroach,
 		certsFlyway,
@@ -65,8 +61,8 @@ func getPreContainer(
 					";"),
 			},
 			SecurityContext: &corev1.SecurityContext{
-				RunAsUser:  helpers.PointerInt64(runAsUserCockroach),
-				RunAsGroup: helpers.PointerInt64(runAsUserCockroach),
+				RunAsUser:  helpers.PointerInt64(runAsUser),
+				RunAsGroup: helpers.PointerInt64(runAsUser),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: corev1.TerminationMessageReadFile,

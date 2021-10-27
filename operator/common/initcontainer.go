@@ -1,11 +1,9 @@
-package deployment
+package common
 
 import (
 	"github.com/caos/zitadel/operator/helpers"
 	"sort"
 	"strings"
-
-	"github.com/caos/zitadel/operator/common"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -13,6 +11,8 @@ import (
 const (
 	certMountPath     = "/dbsecrets"
 	certTempMountPath = "/tmp/dbsecrets"
+	rootSecret        = "client-root"
+	dbSecrets         = "db-secrets"
 )
 
 func GetInitContainer(
@@ -21,8 +21,7 @@ func GetInitContainer(
 	dbSecrets string,
 	users []string,
 	runAsUser int64,
-	customImageRegistry string,
-	version string,
+	image string,
 ) corev1.Container {
 	initVolumeMounts := []corev1.VolumeMount{
 		{Name: rootSecret, MountPath: certMountPath + "/client_root"},
@@ -69,7 +68,7 @@ func GetInitContainer(
 
 	return corev1.Container{
 		Name:                     name,
-		Image:                    common.ZITADELCockroachImage.Reference(customImageRegistry, version),
+		Image:                    image,
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -78,7 +77,7 @@ func GetInitContainer(
 		TerminationMessagePath:   "/dev/termination-log",
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:  helpers.PointerInt64(runAsUser),
-			RunAsGroup: helpers.PointerInt64(InitRunAsUser),
+			RunAsGroup: helpers.PointerInt64(runAsUser),
 		},
 	}
 }

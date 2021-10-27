@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"time"
 
 	"github.com/caos/orbos/mntr"
@@ -20,7 +21,6 @@ const (
 	dbSecrets     = "db-secrets"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
-	InitRunAsUser = int64(1000)
 	//zitadelImage can be found in github.com/caos/zitadel repo
 	timeout = 60 * time.Second
 )
@@ -177,21 +177,20 @@ func deploymentDef(
 					Tolerations:  tolerations,
 					Affinity:     affinity.K8s(),
 					InitContainers: []corev1.Container{
-						GetInitContainer(
+						common.GetInitContainer(
 							"zitadel",
 							rootSecret,
 							dbSecrets,
 							users,
-							RunAsUser,
-							customImageRegistry,
-							*version,
+							common.ZITADELImage.RunAsUser(),
+							common.ZITADELCockroachImage.Reference(customImageRegistry, *version),
 						),
 					},
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
 							*version,
-							RunAsUser,
+							common.ZITADELImage.RunAsUser(),
 							GetResourcesFromDefault(resources),
 							cmName,
 							certPath,

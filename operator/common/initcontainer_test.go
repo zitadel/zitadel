@@ -1,7 +1,6 @@
-package deployment
+package common
 
 import (
-	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
 	"strings"
 	"testing"
@@ -34,7 +33,7 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 			RunAsGroup: helpers.PointerInt64(1000),
 		},
 		Name:                     "fix-permissions-zitadel",
-		Image:                    common.ZITADELCockroachImage.Reference("", version),
+		Image:                    ZITADELCockroachImage.Reference("", version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -43,7 +42,7 @@ func TestDeployment_GetInitContainer(t *testing.T) {
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 
-	init := GetInitContainer("zitadel", rootSecret, dbSecrets, users, RunAsUser, "", version)
+	init := GetInitContainer("zitadel", rootSecret, dbSecrets, users, ZITADELCockroachImage.RunAsUser(), ZITADELCockroachImage.Reference("", version))
 
 	assert.Equal(t, equals, init)
 }
@@ -72,7 +71,7 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 			RunAsGroup: helpers.PointerInt64(1000),
 		},
 		Name:                     "fix-permissions-zitadel",
-		Image:                    common.ZITADELCockroachImage.Reference("", version),
+		Image:                    ZITADELCockroachImage.Reference("", version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -81,7 +80,7 @@ func TestDeployment_GetInitContainer1(t *testing.T) {
 		ImagePullPolicy:          corev1.PullIfNotPresent,
 	}
 
-	init := GetInitContainer("zitadel", rootSecret, dbSecrets, users, RunAsUser, "", version)
+	init := GetInitContainer("zitadel", rootSecret, dbSecrets, users, ZITADELCockroachImage.RunAsUser(), ZITADELCockroachImage.Reference("", version))
 
 	assert.Equal(t, equals, init)
 }
@@ -113,7 +112,7 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 			RunAsGroup: helpers.PointerInt64(1000),
 		},
 		Name:                     "fix-permissions-zitadel",
-		Image:                    common.ZITADELCockroachImage.Reference("", version),
+		Image:                    ZITADELCockroachImage.Reference("", version),
 		Command:                  []string{"/bin/sh", "-c"},
 		Args:                     []string{strings.Join(initCommands, " && ")},
 		VolumeMounts:             initVolumeMounts,
@@ -122,7 +121,7 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 		TerminationMessagePath:   "/dev/termination-log",
 	}
 
-	init := GetInitContainer("zitadel", rootSecret, dbSecrets, users, RunAsUser, "", version)
+	init := GetInitContainer("zitadel", rootSecret, dbSecrets, users, ZITADELCockroachImage.RunAsUser(), ZITADELCockroachImage.Reference("", version))
 
 	assert.Equal(t, equals, init)
 }

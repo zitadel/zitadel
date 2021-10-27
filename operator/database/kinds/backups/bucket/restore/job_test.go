@@ -1,6 +1,7 @@
 package restore
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"testing"
 
 	"github.com/caos/orbos/pkg/labels"
@@ -21,6 +22,7 @@ func TestBackup_Job1(t *testing.T) {
 	jobName := "testJob"
 	namespace := "testNs"
 	image := "testImage"
+	runAsUser := int64(100)
 	k8sLabels := map[string]string{
 		"app.kubernetes.io/component":  "testComponent",
 		"app.kubernetes.io/managed-by": "testOp",
@@ -45,6 +47,16 @@ func TestBackup_Job1(t *testing.T) {
 						RestartPolicy: corev1.RestartPolicyNever,
 						NodeSelector:  nodeselector,
 						Tolerations:   tolerations,
+						InitContainers: []corev1.Container{
+							common.GetInitContainer(
+								"backup",
+								internalSecretName,
+								dbSecrets,
+								[]string{"root"},
+								runAsUser,
+								image,
+							),
+						},
 						Containers: []corev1.Container{{
 							Name:  jobName,
 							Image: image,
@@ -54,7 +66,7 @@ func TestBackup_Job1(t *testing.T) {
 								command,
 							},
 							VolumeMounts: []corev1.VolumeMount{{
-								Name:      internalSecretName,
+								Name:      dbSecrets,
 								MountPath: certPath,
 							}, {
 								Name:      secretKey,
@@ -68,15 +80,21 @@ func TestBackup_Job1(t *testing.T) {
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
 									SecretName:  rootSecretName,
-									DefaultMode: helpers.PointerInt32(defaultMode),
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: secretKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: secretName,
+									SecretName:  secretName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
+							},
+						}, {
+							Name: dbSecrets,
+							VolumeSource: corev1.VolumeSource{
+								EmptyDir: &corev1.EmptyDirVolumeSource{},
 							},
 						}},
 					},
@@ -84,7 +102,7 @@ func TestBackup_Job1(t *testing.T) {
 			},
 		}
 
-	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image))
+	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image, runAsUser))
 }
 
 func TestBackup_Job2(t *testing.T) {
@@ -96,7 +114,8 @@ func TestBackup_Job2(t *testing.T) {
 	secretName := "testSecretName2"
 	jobName := "testJob2"
 	namespace := "testNs2"
-	testImage := "testImage2"
+	image := "testImage2"
+	runAsUser := int64(100)
 	k8sLabels := map[string]string{
 		"app.kubernetes.io/component":  "testComponent2",
 		"app.kubernetes.io/managed-by": "testOp2",
@@ -121,16 +140,26 @@ func TestBackup_Job2(t *testing.T) {
 						RestartPolicy: corev1.RestartPolicyNever,
 						NodeSelector:  nodeselector,
 						Tolerations:   tolerations,
+						InitContainers: []corev1.Container{
+							common.GetInitContainer(
+								"backup",
+								internalSecretName,
+								dbSecrets,
+								[]string{"root"},
+								runAsUser,
+								image,
+							),
+						},
 						Containers: []corev1.Container{{
 							Name:  jobName,
-							Image: testImage,
+							Image: image,
 							Command: []string{
 								"/bin/bash",
 								"-c",
 								command,
 							},
 							VolumeMounts: []corev1.VolumeMount{{
-								Name:      internalSecretName,
+								Name:      dbSecrets,
 								MountPath: certPath,
 							}, {
 								Name:      secretKey,
@@ -144,15 +173,21 @@ func TestBackup_Job2(t *testing.T) {
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
 									SecretName:  rootSecretName,
-									DefaultMode: helpers.PointerInt32(defaultMode),
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: secretKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: secretName,
+									SecretName:  secretName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
+							},
+						}, {
+							Name: dbSecrets,
+							VolumeSource: corev1.VolumeSource{
+								EmptyDir: &corev1.EmptyDirVolumeSource{},
 							},
 						}},
 					},
@@ -160,5 +195,5 @@ func TestBackup_Job2(t *testing.T) {
 			},
 		}
 
-	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, testImage))
+	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, image, runAsUser))
 }

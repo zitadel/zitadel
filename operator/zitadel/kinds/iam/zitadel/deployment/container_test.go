@@ -1,7 +1,6 @@
 package deployment
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/caos/zitadel/operator/common"
@@ -134,7 +133,7 @@ func TestDeployment_GetContainer(t *testing.T) {
 			RunAsUser: helpers.PointerInt64(RunAsUser),
 		},
 		Name:            containerName,
-		Image:           fmt.Sprintf("ghcr.io/%s:%s", common.ZITADELImage, version),
+		Image:           common.ZITADELImage.Reference("", version),
 		ImagePullPolicy: corev1.PullIfNotPresent,
 		Ports: []corev1.ContainerPort{
 			{Name: "grpc", ContainerPort: 50001},

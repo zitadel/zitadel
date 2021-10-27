@@ -29,6 +29,7 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	image := "testImage"
+	runAsUser := int64(100)
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	dbURL := "testDB"
@@ -60,6 +61,7 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 				dbPort,
 			),
 			image,
+			runAsUser,
 		),
 	)
 
@@ -83,6 +85,7 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		dbPort,
 		features,
 		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -108,6 +111,7 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
 	image := "testImage2"
+	runAsUser := int64(100)
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
@@ -137,6 +141,7 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 				dbPort,
 			),
 			image,
+			runAsUser,
 		),
 	)
 
@@ -160,6 +165,7 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		dbPort,
 		features,
 		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -185,6 +191,7 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
 	image := "testImage"
+	runAsUser := int64(100)
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	jobName := GetJobName(backupName)
@@ -215,6 +222,7 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 				dbPort,
 			),
 			image,
+			runAsUser,
 		),
 	)
 
@@ -237,6 +245,7 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		dbPort,
 		features,
 		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -262,6 +271,7 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
 	image := "testImage2"
+	runAsUser := int64(100)
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	jobName := GetJobName(backupName)
@@ -292,6 +302,7 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 				dbPort,
 			),
 			image,
+			runAsUser,
 		),
 	)
 
@@ -314,6 +325,7 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		dbPort,
 		features,
 		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)

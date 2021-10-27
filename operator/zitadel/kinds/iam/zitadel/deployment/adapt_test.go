@@ -1,6 +1,7 @@
 package deployment
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"testing"
 
 	"github.com/caos/orbos/pkg/labels/mocklabels"
@@ -83,14 +84,13 @@ func TestDeployment_Adapt(t *testing.T) {
 					Tolerations:  nil,
 					Affinity:     nil,
 					InitContainers: []corev1.Container{
-						GetInitContainer(
+						common.GetInitContainer(
 							"zitadel",
 							rootSecret,
 							dbSecrets,
 							users,
-							RunAsUser,
-							customImageRegistry,
-							imageVersion,
+							common.ZITADELImage.RunAsUser(),
+							common.ZITADELCockroachImage.Reference(customImageRegistry, imageVersion),
 						),
 					},
 					Containers: []corev1.Container{

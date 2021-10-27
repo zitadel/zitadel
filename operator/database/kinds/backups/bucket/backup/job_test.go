@@ -1,6 +1,7 @@
 package backup
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"testing"
 
 	"github.com/caos/zitadel/operator/helpers"
@@ -18,6 +19,7 @@ func TestBackup_JobSpec1(t *testing.T) {
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	image := "testImage"
+	runAsUser := int64(100)
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -25,6 +27,16 @@ func TestBackup_JobSpec1(t *testing.T) {
 				RestartPolicy: corev1.RestartPolicyNever,
 				NodeSelector:  nodeselector,
 				Tolerations:   tolerations,
+				InitContainers: []corev1.Container{
+					common.GetInitContainer(
+						"backup",
+						internalSecretName,
+						dbSecrets,
+						[]string{"root"},
+						runAsUser,
+						image,
+					),
+				},
 				Containers: []corev1.Container{{
 					Name:  backupName,
 					Image: image,
@@ -34,7 +46,7 @@ func TestBackup_JobSpec1(t *testing.T) {
 						command,
 					},
 					VolumeMounts: []corev1.VolumeMount{{
-						Name:      internalSecretName,
+						Name:      dbSecrets,
 						MountPath: certPath,
 					}, {
 						Name:      secretKey,
@@ -48,22 +60,28 @@ func TestBackup_JobSpec1(t *testing.T) {
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName:  rootSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: secretKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretName,
+							SecretName:  secretName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
+					},
+				}, {
+					Name: dbSecrets,
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				}},
 			},
 		},
 	}
 
-	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image))
+	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image, runAsUser))
 }
 
 func TestBackup_JobSpec2(t *testing.T) {
@@ -75,6 +93,7 @@ func TestBackup_JobSpec2(t *testing.T) {
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	image := "testImage2"
+	runAsUser := int64(100)
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -82,6 +101,16 @@ func TestBackup_JobSpec2(t *testing.T) {
 				RestartPolicy: corev1.RestartPolicyNever,
 				NodeSelector:  nodeselector,
 				Tolerations:   tolerations,
+				InitContainers: []corev1.Container{
+					common.GetInitContainer(
+						"backup",
+						internalSecretName,
+						dbSecrets,
+						[]string{"root"},
+						runAsUser,
+						image,
+					),
+				},
 				Containers: []corev1.Container{{
 					Name:  backupName,
 					Image: image,
@@ -91,7 +120,7 @@ func TestBackup_JobSpec2(t *testing.T) {
 						command,
 					},
 					VolumeMounts: []corev1.VolumeMount{{
-						Name:      internalSecretName,
+						Name:      dbSecrets,
 						MountPath: certPath,
 					}, {
 						Name:      secretKey,
@@ -105,20 +134,26 @@ func TestBackup_JobSpec2(t *testing.T) {
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName:  rootSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: secretKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretName,
+							SecretName:  secretName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
+					},
+				}, {
+					Name: dbSecrets,
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
 					},
 				}},
 			},
 		},
 	}
 
-	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image))
+	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image, runAsUser))
 }

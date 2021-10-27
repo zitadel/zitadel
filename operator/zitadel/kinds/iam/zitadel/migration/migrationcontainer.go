@@ -17,9 +17,8 @@ func getMigrationContainer(
 	users []string,
 	customImageRegistry string,
 	dbCerts string,
-	runAsUser int64,
 ) corev1.Container {
-
+	runAsUser := common.FlywayImage.RunAsUser()
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),

@@ -22,6 +22,8 @@ func TestBackup_JobSpec1(t *testing.T) {
 	secretAccessKeyKey := "testSAKK"
 	sessionTokenName := "testSTN"
 	sessionTokenKey := "testSTK"
+	image := common.ZITADELCockroachImage.Reference("", version)
+	runAsUser := int64(100)
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -29,16 +31,26 @@ func TestBackup_JobSpec1(t *testing.T) {
 				RestartPolicy: corev1.RestartPolicyNever,
 				NodeSelector:  nodeselector,
 				Tolerations:   tolerations,
+				InitContainers: []corev1.Container{
+					common.GetInitContainer(
+						"backup",
+						internalSecretName,
+						dbSecrets,
+						[]string{"root"},
+						runAsUser,
+						image,
+					),
+				},
 				Containers: []corev1.Container{{
 					Name:  backupName,
-					Image: common.ZITADELCockroachImage.Reference("", version),
+					Image: image,
 					Command: []string{
 						"/bin/bash",
 						"-c",
 						command,
 					},
 					VolumeMounts: []corev1.VolumeMount{{
-						Name:      internalSecretName,
+						Name:      dbSecrets,
 						MountPath: certPath,
 					}, {
 						Name:      accessKeyIDKey,
@@ -60,31 +72,40 @@ func TestBackup_JobSpec1(t *testing.T) {
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName:  rootSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: accessKeyIDKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: accessKeyIDName,
+							SecretName:  accessKeyIDName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: secretAccessKeyKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretAccessKeyName,
+							SecretName:  secretAccessKeyName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: sessionTokenKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: sessionTokenName,
+							SecretName:  sessionTokenName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
-				}},
+				}, {
+					Name: dbSecrets,
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+				},
 			},
 		},
 	}
@@ -99,8 +120,10 @@ func TestBackup_JobSpec1(t *testing.T) {
 		sessionTokenName,
 		sessionTokenKey,
 		backupName,
-		common.ZITADELCockroachImage.Reference("", version),
-		command))
+		command,
+		image,
+		runAsUser,
+	))
 }
 
 func TestBackup_JobSpec2(t *testing.T) {
@@ -116,6 +139,8 @@ func TestBackup_JobSpec2(t *testing.T) {
 	secretAccessKeyKey := "testSAKK2"
 	sessionTokenName := "testSTN2"
 	sessionTokenKey := "testSTK2"
+	image := common.ZITADELCockroachImage.Reference("", version)
+	runAsUser := int64(100)
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -123,16 +148,26 @@ func TestBackup_JobSpec2(t *testing.T) {
 				RestartPolicy: corev1.RestartPolicyNever,
 				NodeSelector:  nodeselector,
 				Tolerations:   tolerations,
+				InitContainers: []corev1.Container{
+					common.GetInitContainer(
+						"backup",
+						internalSecretName,
+						dbSecrets,
+						[]string{"root"},
+						runAsUser,
+						image,
+					),
+				},
 				Containers: []corev1.Container{{
 					Name:  backupName,
-					Image: common.ZITADELCockroachImage.Reference("", version),
+					Image: image,
 					Command: []string{
 						"/bin/bash",
 						"-c",
 						command,
 					},
 					VolumeMounts: []corev1.VolumeMount{{
-						Name:      internalSecretName,
+						Name:      dbSecrets,
 						MountPath: certPath,
 					}, {
 						Name:      accessKeyIDKey,
@@ -154,31 +189,40 @@ func TestBackup_JobSpec2(t *testing.T) {
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName:  rootSecretName,
-							DefaultMode: helpers.PointerInt32(defaultMode),
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: accessKeyIDKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: accessKeyIDName,
+							SecretName:  accessKeyIDName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: secretAccessKeyKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretAccessKeyName,
+							SecretName:  secretAccessKeyName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
 				}, {
 					Name: sessionTokenKey,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: sessionTokenName,
+							SecretName:  sessionTokenName,
+							DefaultMode: helpers.PointerInt32(0444),
 						},
 					},
-				}},
+				}, {
+					Name: dbSecrets,
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+				},
 			},
 		},
 	}
@@ -193,7 +237,8 @@ func TestBackup_JobSpec2(t *testing.T) {
 		sessionTokenName,
 		sessionTokenKey,
 		backupName,
-		common.ZITADELCockroachImage.Reference("", version),
 		command,
+		image,
+		runAsUser,
 	))
 }

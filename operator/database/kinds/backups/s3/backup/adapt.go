@@ -14,18 +14,18 @@ import (
 )
 
 const (
-	defaultMode         int32 = 256
-	certPath                  = "/cockroach/cockroach-certs"
-	accessKeyIDPath           = "/secrets/accessaccountkey"
-	secretAccessKeyPath       = "/secrets/secretaccesskey"
-	sessionTokenPath          = "/secrets/sessiontoken"
-	backupNameEnv             = "BACKUP_NAME"
-	cronJobNamePrefix         = "backup-"
-	internalSecretName        = "client-certs"
-	rootSecretName            = "cockroachdb.client.root"
-	timeout                   = 15 * time.Minute
-	Normal                    = "backup"
-	Instant                   = "instantbackup"
+	certPath            = "/cockroach/cockroach-certs"
+	accessKeyIDPath     = "/secrets/accessaccountkey"
+	secretAccessKeyPath = "/secrets/secretaccesskey"
+	sessionTokenPath    = "/secrets/sessiontoken"
+	backupNameEnv       = "BACKUP_NAME"
+	cronJobNamePrefix   = "backup-"
+	internalSecretName  = "client-certs"
+	rootSecretName      = "cockroachdb.client.root"
+	dbSecrets           = "db-secrets"
+	timeout             = 15 * time.Minute
+	Normal              = "backup"
+	Instant             = "instantbackup"
 )
 
 func AdaptFunc(
@@ -51,6 +51,7 @@ func AdaptFunc(
 	dbPort int32,
 	features []string,
 	image string,
+	runAsUser int64,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -81,8 +82,9 @@ func AdaptFunc(
 		sessionTokenName,
 		sessionTokenKey,
 		backupName,
-		image,
 		command,
+		image,
+		runAsUser,
 	)
 
 	destroyers := []operator.DestroyFunc{}

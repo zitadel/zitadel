@@ -14,7 +14,6 @@ import (
 
 const (
 	Instant             = "restore"
-	defaultMode         = int32(256)
 	certPath            = "/cockroach/cockroach-certs"
 	accessKeyIDPath     = "/secrets/accessaccountkey"
 	secretAccessKeyPath = "/secrets/secretaccesskey"
@@ -23,6 +22,7 @@ const (
 	jobSuffix           = "-restore"
 	internalSecretName  = "client-certs"
 	rootSecretName      = "cockroachdb.client.root"
+	dbSecrets           = "db-secrets"
 	timeout             = 15 * time.Minute
 )
 
@@ -47,6 +47,7 @@ func AdaptFunc(
 	dbURL string,
 	dbPort int32,
 	image string,
+	runAsUser int64,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -79,8 +80,9 @@ func AdaptFunc(
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
-		image,
 		command,
+		image,
+		runAsUser,
 	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)

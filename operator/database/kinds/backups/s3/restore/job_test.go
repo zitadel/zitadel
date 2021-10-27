@@ -2,6 +2,7 @@ package restore
 
 import (
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
 	batchv1 "k8s.io/api/batch/v1"
@@ -34,6 +35,7 @@ func TestBackup_Job1(t *testing.T) {
 		"caos.ch/kind":                 "testKind"}
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testOpVersion"), "testKind", "testVersion"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
+	runAsUser := int64(100)
 
 	equals :=
 		&batchv1.Job{
@@ -48,6 +50,16 @@ func TestBackup_Job1(t *testing.T) {
 						RestartPolicy: corev1.RestartPolicyNever,
 						NodeSelector:  nodeselector,
 						Tolerations:   tolerations,
+						InitContainers: []corev1.Container{
+							common.GetInitContainer(
+								"backup",
+								internalSecretName,
+								dbSecrets,
+								[]string{"root"},
+								runAsUser,
+								image,
+							),
+						},
 						Containers: []corev1.Container{{
 							Name:  jobName,
 							Image: image,
@@ -57,7 +69,7 @@ func TestBackup_Job1(t *testing.T) {
 								command,
 							},
 							VolumeMounts: []corev1.VolumeMount{{
-								Name:      internalSecretName,
+								Name:      dbSecrets,
 								MountPath: certPath,
 							}, {
 								Name:      accessKeyIDKey,
@@ -79,29 +91,37 @@ func TestBackup_Job1(t *testing.T) {
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
 									SecretName:  rootSecretName,
-									DefaultMode: helpers.PointerInt32(defaultMode),
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: accessKeyIDKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: accessKeyIDName,
+									SecretName:  accessKeyIDName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: secretAccessKeyKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: secretAccessKeyName,
+									SecretName:  secretAccessKeyName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: sessionTokenKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: sessionTokenName,
+									SecretName:  sessionTokenName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
+							},
+						}, {
+							Name: dbSecrets,
+							VolumeSource: corev1.VolumeSource{
+								EmptyDir: &corev1.EmptyDirVolumeSource{},
 							},
 						}},
 					},
@@ -120,8 +140,9 @@ func TestBackup_Job1(t *testing.T) {
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
-		image,
 		command,
+		image,
+		runAsUser,
 	))
 }
 
@@ -149,7 +170,7 @@ func TestBackup_Job2(t *testing.T) {
 		"caos.ch/kind":                 "testKind2"}
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testOpVersion2"), "testKind2", "testVersion2"), "testComponent2")
 	nameLabels := labels.MustForName(componentLabels, jobName)
-
+	runAsUser := int64(100)
 	equals :=
 		&batchv1.Job{
 			ObjectMeta: metav1.ObjectMeta{
@@ -163,6 +184,16 @@ func TestBackup_Job2(t *testing.T) {
 						RestartPolicy: corev1.RestartPolicyNever,
 						NodeSelector:  nodeselector,
 						Tolerations:   tolerations,
+						InitContainers: []corev1.Container{
+							common.GetInitContainer(
+								"backup",
+								internalSecretName,
+								dbSecrets,
+								[]string{"root"},
+								runAsUser,
+								image,
+							),
+						},
 						Containers: []corev1.Container{{
 							Name:  jobName,
 							Image: image,
@@ -172,7 +203,7 @@ func TestBackup_Job2(t *testing.T) {
 								command,
 							},
 							VolumeMounts: []corev1.VolumeMount{{
-								Name:      internalSecretName,
+								Name:      dbSecrets,
 								MountPath: certPath,
 							}, {
 								Name:      accessKeyIDKey,
@@ -194,29 +225,37 @@ func TestBackup_Job2(t *testing.T) {
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
 									SecretName:  rootSecretName,
-									DefaultMode: helpers.PointerInt32(defaultMode),
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: accessKeyIDKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: accessKeyIDName,
+									SecretName:  accessKeyIDName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: secretAccessKeyKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: secretAccessKeyName,
+									SecretName:  secretAccessKeyName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
 							},
 						}, {
 							Name: sessionTokenKey,
 							VolumeSource: corev1.VolumeSource{
 								Secret: &corev1.SecretVolumeSource{
-									SecretName: sessionTokenName,
+									SecretName:  sessionTokenName,
+									DefaultMode: helpers.PointerInt32(0444),
 								},
+							},
+						}, {
+							Name: dbSecrets,
+							VolumeSource: corev1.VolumeSource{
+								EmptyDir: &corev1.EmptyDirVolumeSource{},
 							},
 						}},
 					},
@@ -235,6 +274,8 @@ func TestBackup_Job2(t *testing.T) {
 		secretAccessKeyKey,
 		sessionTokenName,
 		sessionTokenKey,
+		command,
 		image,
-		command))
+		runAsUser,
+	))
 }

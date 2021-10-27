@@ -7,6 +7,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/job"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	batchv1 "k8s.io/api/batch/v1"
@@ -134,21 +135,20 @@ func jobDef(
 	customImageRegistry string,
 ) *batchv1.Job {
 	initContainers := []corev1.Container{
-		deployment.GetInitContainer(
+		common.GetInitContainer(
 			"zitadel",
 			rootSecret,
 			dbSecrets,
 			users,
-			deployment.RunAsUser,
-			customImageRegistry,
-			*version,
+			common.ZITADELImage.RunAsUser(),
+			common.ZITADELCockroachImage.Reference(customImageRegistry, *version),
 		)}
-
+	runAsUser := common.ZITADELImage.RunAsUser()
 	containers := []corev1.Container{
 		deployment.GetContainer(
 			containerName,
 			*version,
-			deployment.RunAsUser,
+			runAsUser,
 			deployment.GetResourcesFromDefault(resources),
 			cmName,
 			certPath,
@@ -181,7 +181,7 @@ func jobDef(
 				Spec: corev1.PodSpec{
 					SecurityContext: &corev1.PodSecurityContext{
 						RunAsNonRoot: helpers.PointerBool(true),
-						FSGroup:      helpers.PointerInt64(deployment.RunAsUser),
+						FSGroup:      helpers.PointerInt64(runAsUser),
 					},
 					NodeSelector:   nodeselector,
 					Tolerations:    tolerations,

@@ -14,13 +14,13 @@ import (
 
 const (
 	Instant            = "restore"
-	defaultMode        = int32(256)
 	certPath           = "/cockroach/cockroach-certs"
 	secretPath         = "/secrets/sa.json"
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
+	dbSecrets          = "db-secrets"
 	timeout            = 45 * time.Minute
 	saJsonBase64Env    = "SAJSON"
 )
@@ -40,6 +40,7 @@ func AdaptFunc(
 	dbURL string,
 	dbPort int32,
 	image string,
+	runAsUser int64,
 ) (
 	queryFunc operator.QueryFunc,
 	destroyFunc operator.DestroyFunc,
@@ -66,6 +67,7 @@ func AdaptFunc(
 		secretKey,
 		command,
 		image,
+		runAsUser,
 	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)

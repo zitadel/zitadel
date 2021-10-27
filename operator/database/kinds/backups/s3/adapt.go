@@ -83,6 +83,7 @@ func AdaptFunc(
 		}
 
 		image := common.ZITADELCockroachImage.Reference(customImageRegistry, version)
+		runAsUser := common.ZITADELCockroachImage.RunAsUser()
 
 		_, destroyB, err := backup.AdaptFunc(
 			internalMonitor,
@@ -107,6 +108,7 @@ func AdaptFunc(
 			dbPort,
 			features,
 			image,
+			runAsUser,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -133,6 +135,7 @@ func AdaptFunc(
 			dbURL,
 			dbPort,
 			image,
+			runAsUser,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -214,6 +217,7 @@ func AdaptFunc(
 					dbPort,
 					features,
 					image,
+					runAsUser,
 				)
 				if err != nil {
 					return nil, err
@@ -240,6 +244,7 @@ func AdaptFunc(
 					dbURL,
 					dbPort,
 					image,
+					runAsUser,
 				)
 				if err != nil {
 					return nil, err

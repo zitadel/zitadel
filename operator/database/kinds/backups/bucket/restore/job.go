@@ -2,6 +2,7 @@ package restore
 
 import (
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -17,6 +18,7 @@ func getJob(
 	secretKey string,
 	command string,
 	image string,
+	runAsUser int64,
 ) *batchv1.Job {
 	return &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
@@ -30,6 +32,16 @@ func getJob(
 					NodeSelector:  nodeselector,
 					Tolerations:   tolerations,
 					RestartPolicy: corev1.RestartPolicyNever,
+					InitContainers: []corev1.Container{
+						common.GetInitContainer(
+							"backup",
+							internalSecretName,
+							dbSecrets,
+							[]string{"root"},
+							runAsUser,
+							image,
+						),
+					},
 					Containers: []corev1.Container{{
 						Name:  nameLabels.Name(),
 						Image: image,
@@ -39,7 +51,7 @@ func getJob(
 							command,
 						},
 						VolumeMounts: []corev1.VolumeMount{{
-							Name:      internalSecretName,
+							Name:      dbSecrets,
 							MountPath: certPath,
 						}, {
 							Name:      secretKey,
@@ -53,15 +65,21 @@ func getJob(
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
 								SecretName:  rootSecretName,
-								DefaultMode: helpers.PointerInt32(defaultMode),
+								DefaultMode: helpers.PointerInt32(0444),
 							},
 						},
 					}, {
 						Name: secretKey,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName: secretName,
+								SecretName:  secretName,
+								DefaultMode: helpers.PointerInt32(0444),
 							},
+						},
+					}, {
+						Name: dbSecrets,
+						VolumeSource: corev1.VolumeSource{
+							EmptyDir: &corev1.EmptyDirVolumeSource{},
 						},
 					}},
 				},

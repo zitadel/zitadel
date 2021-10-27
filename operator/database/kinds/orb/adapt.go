@@ -77,8 +77,8 @@ func AdaptFunc(
 		databaseCurrent := &tree.Tree{}
 
 		operatorLabels := mustDatabaseOperator(binaryVersion)
-		version := ""
-		if binaryVersion != nil {
+		version := desiredKind.Spec.Version
+		if version == "" && binaryVersion != nil {
 			version = *binaryVersion
 		}
 

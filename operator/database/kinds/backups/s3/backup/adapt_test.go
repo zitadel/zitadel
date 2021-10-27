@@ -28,7 +28,8 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
-	version := "testVersion"
+	image := "testImage"
+	runAsUser := int64(100)
 	accessKeyIDName := "testAKIN"
 	accessKeyIDKey := "testAKIK"
 	secretAccessKeyName := "testSAKN"
@@ -60,7 +61,6 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 			sessionTokenName,
 			sessionTokenKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -74,6 +74,8 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
+			runAsUser,
 		),
 	)
 
@@ -102,7 +104,8 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -127,7 +130,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
-	version := "testVersion2"
+	image := "testImage2"
+	runAsUser := int64(100)
 	accessKeyIDName := "testAKIN2"
 	accessKeyIDKey := "testAKIK2"
 	secretAccessKeyName := "testSAKN2"
@@ -157,7 +161,6 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 			sessionTokenName,
 			sessionTokenKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -171,6 +174,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
+			runAsUser,
 		),
 	)
 
@@ -199,7 +204,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -224,7 +230,8 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey", Operator: "testOp"}}
 	backupName := "testName"
-	version := "testVersion"
+	image := "testImage"
+	runAsUser := int64(100)
 	accessKeyIDName := "testAKIN"
 	accessKeyIDKey := "testAKIK"
 	secretAccessKeyName := "testSAKN"
@@ -255,7 +262,6 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 			sessionTokenName,
 			sessionTokenKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -269,6 +275,8 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
+			runAsUser,
 		),
 	)
 
@@ -296,7 +304,8 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -321,7 +330,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 	tolerations := []corev1.Toleration{
 		{Key: "testKey2", Operator: "testOp2"}}
 	backupName := "testName2"
-	version := "testVersion2"
+	image := "testImage2"
+	runAsUser := int64(100)
 	accessKeyIDName := "testAKIN2"
 	accessKeyIDKey := "testAKIK2"
 	secretAccessKeyName := "testSAKN2"
@@ -352,7 +362,6 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 			sessionTokenName,
 			sessionTokenKey,
 			backupName,
-			version,
 			getBackupCommand(
 				timestamp,
 				bucketName,
@@ -366,6 +375,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 				dbURL,
 				dbPort,
 			),
+			image,
+			runAsUser,
 		),
 	)
 
@@ -393,7 +404,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		dbURL,
 		dbPort,
 		features,
-		version,
+		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)

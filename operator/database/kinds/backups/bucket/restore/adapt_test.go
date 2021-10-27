@@ -26,6 +26,7 @@ func TestBackup_Adapt1(t *testing.T) {
 	backupName := "testName2"
 	bucketName := "testBucket2"
 	image := "testImage2"
+	runAsUser := int64(100)
 	secretKey := "testKey"
 	secretName := "testSecretName"
 	dbURL := "testDB"
@@ -55,6 +56,7 @@ func TestBackup_Adapt1(t *testing.T) {
 			dbPort,
 		),
 		image,
+		runAsUser,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -75,6 +77,7 @@ func TestBackup_Adapt1(t *testing.T) {
 		dbURL,
 		dbPort,
 		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)
@@ -96,6 +99,7 @@ func TestBackup_Adapt2(t *testing.T) {
 	backupName := "testName2"
 	bucketName := "testBucket2"
 	image := "testImage2"
+	runAsUser := int64(100)
 	secretKey := "testKey2"
 	secretName := "testSecretName2"
 	dbURL := "testDB"
@@ -125,6 +129,7 @@ func TestBackup_Adapt2(t *testing.T) {
 			dbPort,
 		),
 		image,
+		runAsUser,
 	)
 
 	client.EXPECT().ApplyJob(jobDef).Times(1).Return(nil)
@@ -145,6 +150,7 @@ func TestBackup_Adapt2(t *testing.T) {
 		dbURL,
 		dbPort,
 		image,
+		runAsUser,
 	)
 
 	assert.NoError(t, err)

@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"testing"
 
 	"github.com/caos/orbos/mntr"
@@ -61,14 +62,13 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	}
 
 	initContainers := []corev1.Container{
-		deployment.GetInitContainer(
+		common.GetInitContainer(
 			"zitadel",
 			rootSecret,
 			dbSecrets,
 			users,
-			deployment.RunAsUser,
-			"",
-			version,
+			common.ZITADELImage.RunAsUser(),
+			common.ZITADELCockroachImage.Reference("", version),
 		),
 	}
 	containers := []corev1.Container{deployment.GetContainer(

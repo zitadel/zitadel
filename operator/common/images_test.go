@@ -9,7 +9,7 @@ import (
 
 func TestDockerHubReference(t *testing.T) {
 
-	imgs := []dockerhubImage{CockroachImage, PostgresImage, FlywayImage, AlpineImage}
+	imgs := []dockerhubImage{CockroachImage, FlywayImage}
 
 	type args struct {
 		customImageRegistry string
@@ -41,7 +41,7 @@ func TestDockerHubReference(t *testing.T) {
 			for i := range imgs {
 				got := imgs[i].Reference(tt.args.customImageRegistry)
 				if err := tt.test(got); err != nil {
-					t.Error(fmt.Errorf("DockerHubReference(%s): %w", imgs[i], err))
+					t.Error(fmt.Errorf("DockerHubReference(%s): %w", imgs[i].image, err))
 				}
 			}
 		})
@@ -83,7 +83,7 @@ func TestZITADELReference(t *testing.T) {
 			for i := range imgs {
 				got := imgs[i].Reference(tt.args.customImageRegistry, dummyVersion)
 				if err := tt.test(got); err != nil {
-					t.Error(fmt.Errorf("ZITADELReference(%s): %w", imgs[i], err))
+					t.Error(fmt.Errorf("ZITADELReference(%s): %w", imgs[i].image, err))
 				}
 			}
 		})

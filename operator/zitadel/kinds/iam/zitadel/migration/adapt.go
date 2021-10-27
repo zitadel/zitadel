@@ -40,8 +40,6 @@ const (
 	rootSecretName     = "cockroachdb.client.root"
 	dbCertsCockroach   = "dbcertscockroach"
 	dbCertsFlyway      = "dbcertsflyway"
-	runAsUserFlyway    = int64(101)
-	runAsUserCockroach = int64(1000)
 )
 
 func AdaptFunc(
@@ -121,9 +119,7 @@ func AdaptFunc(
 								customImageRegistry,
 								version,
 								dbCertsCockroach,
-								runAsUserCockroach,
 								dbCertsFlyway,
-								runAsUserFlyway,
 							),
 							Containers: []corev1.Container{
 								getMigrationContainer(
@@ -134,7 +130,6 @@ func AdaptFunc(
 									users,
 									customImageRegistry,
 									dbCertsFlyway,
-									runAsUserFlyway,
 								),
 							},
 							RestartPolicy:                 "Never",
