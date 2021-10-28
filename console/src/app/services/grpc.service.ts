@@ -27,11 +27,13 @@ export class GrpcService {
     private authenticationService: AuthenticationService,
     private storageService: StorageService,
     private dialog: MatDialog,
-  ) { }
+  ) {}
 
   public async loadAppEnvironment(): Promise<any> {
-    return this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
+    return this.http
+      .get('./assets/environment.json')
+      .toPromise()
+      .then((data: any) => {
         if (data && data.authServiceUrl && data.mgmtServiceUrl && data.issuer) {
           const interceptors = {
             unaryInterceptors: [
@@ -62,7 +64,7 @@ export class GrpcService {
           );
 
           const authConfig: AuthConfig = {
-            scope: 'openid profile email',
+            scope: 'openid profile email urn:zitadel:iam:org:project:id:70669147545070419:aud',
             responseType: 'code',
             oidc: true,
             clientId: data.clientid,
@@ -74,7 +76,8 @@ export class GrpcService {
           this.authenticationService.initConfig(authConfig);
         }
         return Promise.resolve(data);
-      }).catch(() => {
+      })
+      .catch(() => {
         console.error('Failed to load environment from assets');
       });
   }

@@ -339,6 +339,9 @@
       "EMAIL": "E-mail",
       "PHONE": "Phonenumber",
       "USERNAME": "User Name",
+      "CHANGEUSERNAME":"modify",
+      "CHANGEUSERNAME_TITLE":"Change username",
+      "CHANGEUSERNAME_DESC":"Enter the new name in the field below.",
       "FIRSTNAME": "First Name",
       "LASTNAME": "Last Name",
       "NICKNAME": "Nickname",
@@ -473,6 +476,7 @@
     "TOAST": {
       "CREATED": "User created successfully.",
       "SAVED": "Profile saved successfully.",
+      "USERNAMECHANGED":"Username changed.",
       "EMAILSAVED": "E-mail saved successfully.",
       "INITEMAILSENT": "Initializing mail sent.",
       "PHONESAVED": "Phone saved successfully.",
