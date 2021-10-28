@@ -50,6 +50,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
 	NewMailTemplateProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["mail_templates"]))
 	NewMessageTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["message_texts"]))
+	NewCustomTextProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["custom_texts"]))
 
 	return nil
 }

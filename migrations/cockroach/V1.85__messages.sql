@@ -32,3 +32,19 @@ CREATE TABLE zitadel.projections.message_texts (
 
    PRIMARY KEY (aggregate_id, type, language)
 );
+
+CREATE TABLE zitadel.projections.custom_texts (
+     aggregate_id TEXT,
+
+     creation_date TIMESTAMPTZ,
+     change_date TIMESTAMPTZ,
+     sequence BIGINT,
+     is_default BOOLEAN,
+
+     template TEXT,
+     language TEXT,
+     key TEXT,
+     text TEXT,
+
+     PRIMARY KEY (aggregate_id, template, key, language)
+);
