@@ -63,7 +63,7 @@ const (
 func (p *IDPUserLinkProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanExternalIDPAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-v2qC3", "seq", e.Sequence(), "expectedType", user.HumanExternalIDPAddedType).Error("wrong event type")
+		logging.LogWithFields("HANDL-v2qC3", "seq", event.Sequence(), "expectedType", user.HumanExternalIDPAddedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DpmXq", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(e,
@@ -83,7 +83,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.EventReader) (*hand
 func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanExternalIDPRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zX5m9", "seq", e.Sequence(), "expectedType", user.HumanExternalIDPRemovedType).Error("wrong event type")
+		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", user.HumanExternalIDPRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(e,
@@ -98,7 +98,7 @@ func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.EventReader) (*ha
 func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanExternalIDPCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-I0s2H", "seq", e.Sequence(), "expectedType", user.HumanExternalIDPCascadeRemovedType).Error("wrong event type")
+		logging.LogWithFields("HANDL-I0s2H", "seq", event.Sequence(), "expectedType", user.HumanExternalIDPCascadeRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jQpv9", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(e,
