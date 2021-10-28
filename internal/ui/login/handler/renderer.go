@@ -443,6 +443,9 @@ func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
 			privateLabelingOrgID = authReq.UserOrgID
 		}
 	}
+	if authReq.RequestedOrgID != "" {
+		privateLabelingOrgID = authReq.RequestedOrgID
+	}
 	return privateLabelingOrgID
 }
 

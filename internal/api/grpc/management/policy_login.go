@@ -107,7 +107,7 @@ func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.Remo
 }
 
 func (s *Server) ListLoginPolicySecondFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicySecondFactorsRequest) (*mgmt_pb.ListLoginPolicySecondFactorsResponse, error) {
-	result, err := s.query.SecondFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
+	result, err := s.query.SecondFactorsByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (s *Server) RemoveSecondFactorFromLoginPolicy(ctx context.Context, req *mgm
 }
 
 func (s *Server) ListLoginPolicyMultiFactors(ctx context.Context, req *mgmt_pb.ListLoginPolicyMultiFactorsRequest) (*mgmt_pb.ListLoginPolicyMultiFactorsResponse, error) {
-	res, err := s.query.MultiFactorsByID(ctx, authz.GetCtxData(ctx).OrgID)
+	res, err := s.query.MultiFactorsByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
