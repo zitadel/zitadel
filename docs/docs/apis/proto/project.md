@@ -9,6 +9,20 @@ title: zitadel/project.proto
 ## Messages
 
 
+### AllProjectGrantQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.project_name_query |  GrantProjectNameQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.role_key_query |  GrantRoleKeyQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.project_id_query |  ProjectIDQuery | - |  |
+| [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.granted_org_id_query |  GrantedOrgIDQuery | - |  |
+
+
+
+
 ### GrantProjectNameQuery
 
 
@@ -29,6 +43,17 @@ title: zitadel/project.proto
 | ----- | ---- | ----------- | ----------- |
 | role_key |  string | - | string.max_len: 200<br />  |
 | method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### GrantedOrgIDQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| granted_org_id |  string | - | string.max_len: 200<br />  |
 
 
 
@@ -79,6 +104,17 @@ title: zitadel/project.proto
 | ----- | ---- | ----------- | ----------- |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.project_name_query |  GrantProjectNameQuery | - |  |
 | [**oneof**](https://developers.google.com/protocol-buffers/docs/proto3#oneof) query.role_key_query |  GrantRoleKeyQuery | - |  |
+
+
+
+
+### ProjectIDQuery
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| project_id |  string | - | string.max_len: 200<br />  |
 
 
 

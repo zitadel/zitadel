@@ -1437,6 +1437,19 @@ service ManagementService {
         };
     }
 
+    // Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
+        option (google.api.http) = {
+            post: "/projectgrants/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
+        };
+    }
+
     // Add a new project grant (ProjectGrant = Grant another organisation for my project)
     // Project Grant will be listed in granted project of the other organisation
     rpc AddProjectGrant(AddProjectGrantRequest) returns (AddProjectGrantResponse) {
@@ -4023,6 +4036,18 @@ message ListProjectGrantsRequest {
 }
 
 message ListProjectGrantsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.project.v1.GrantedProject result = 2;
+}
+
+message ListAllProjectGrantsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.project.v1.AllProjectGrantQuery queries = 2;
+}
+
+message ListAllProjectGrantsResponse {
     zitadel.v1.ListDetails details = 1;
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
