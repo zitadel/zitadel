@@ -25,7 +25,7 @@ func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {
 	authReq, err := l.getAuthRequest(r)
 	if err != nil {
-		return nil, err
+		return authReq, err
 	}
 	err = l.parser.Parse(r, data)
 	return authReq, err
