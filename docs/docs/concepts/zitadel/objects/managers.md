@@ -18,8 +18,11 @@ In the right part of the console you can finde **MANAGERS** in the details part.
 |---|---|
 | IAM_OWNER  | Manage the IAM, manage all organizations with their content  |
 | IAM_OWNER_VIEWER  | View the IAM and view all organizations with their content |
+| IAM_ORG_MANAGER  | Manage all organizations including their policies, projects and users |
+| IAM_USER_MANAGER  | Manage all users and their authorizations over all organizations |
 | ORG_OWNER  | Manage everything within an organization  |
 | ORG_OWNER_VIEWER  | View everything within an organization  |
+| ORG_USER_MANAGER  | Manage users and their authorizations within an organization |
 | ORG_USER_PERMISSION_EDITOR  | Manage user grants and view everything needed for this  |
 | ORG_PROJECT_PERMISSION_EDITOR  | Grant Projects to other organizations and view everything needed for this  |
 | ORG_PROJECT_CREATOR  | This role is used for users in the global organization. They are allowed to create projects and manage them.  |
