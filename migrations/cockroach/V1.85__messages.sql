@@ -17,10 +17,10 @@ CREATE TABLE zitadel.projections.message_texts (
 
    creation_date TIMESTAMPTZ,
    change_date TIMESTAMPTZ,
-   mail_text_state SMALLINT,
+   state SMALLINT,
    sequence BIGINT,
 
-   mail_text_type TEXT,
+   type TEXT,
    language TEXT,
    title TEXT,
    pre_header TEXT,
@@ -28,6 +28,7 @@ CREATE TABLE zitadel.projections.message_texts (
    greeting TEXT,
    text TEXT,
    button_text TEXT,
+   footer_text TEXT,
 
-   PRIMARY KEY (aggregate_id, mail_text_type, language)
+   PRIMARY KEY (aggregate_id, type, language)
 );
