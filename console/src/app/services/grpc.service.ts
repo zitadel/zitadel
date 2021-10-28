@@ -64,7 +64,7 @@ export class GrpcService {
           );
 
           const authConfig: AuthConfig = {
-            scope: 'openid profile email urn:zitadel:iam:org:project:id:70669147545070419:aud',
+            scope: 'openid profile email',
             responseType: 'code',
             oidc: true,
             clientId: data.clientid,

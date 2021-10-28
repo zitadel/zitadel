@@ -74,7 +74,7 @@ const stateHandlerFn = (stateHandler: StatehandlerService) => {
 };
 
 const authConfig: AuthConfig = {
-  scope: 'openid profile email urn:zitadel:iam:org:project:id:70669147545070419:aud', // offline_access
+  scope: 'openid profile email', // offline_access
   responseType: 'code',
   oidc: true,
 };
