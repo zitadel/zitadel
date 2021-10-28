@@ -14,7 +14,7 @@ export class HasRoleDirective {
         if (isAllowed && !this.hasView) {
           this.viewContainerRef.clear();
           this.viewContainerRef.createEmbeddedView(this.templateRef);
-        } else if (this.hasView) {
+        } else {
           this.viewContainerRef.clear();
           this.hasView = false;
         }

@@ -11,11 +11,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { DurationToSecondsPipeModule } from 'src/app/pipes/duration-to-seconds-pipe/duration-to-seconds-pipe.module';
+import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
@@ -54,6 +56,8 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     MatSelectModule,
     WarnDialogModule,
     DragDropModule,
+    InfoSectionModule,
+    HasFeaturePipeModule,
   ]
 })
 export class ActionsModule { }
