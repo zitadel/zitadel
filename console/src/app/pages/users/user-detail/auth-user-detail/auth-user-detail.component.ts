@@ -72,7 +72,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     });
 
     dialogRefPhone.afterClosed().subscribe(resp => {
-      if (resp) {
+      if (resp && resp !== this.user.userName) {
         this.userService.updateMyUserName(resp).then(() => {
             this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
             this.refreshUser();
