@@ -224,6 +224,8 @@ InternalAuthZ:
           - "user.grant.write"
           - "user.grant.delete"
           - "user.membership.read"
+          - "project.read"
+          - "project.role.read"
     - Role: 'ORG_OWNER_VIEWER'
       Permissions:
         - "org.read"
