@@ -46,7 +46,7 @@ func (p *CustomTextProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  org.CustomTextSetEventType,
-					Reduce: p.reduceAdded,
+					Reduce: p.reduceSet,
 				},
 				{
 					Event:  org.CustomTextRemovedEventType,
@@ -63,7 +63,7 @@ func (p *CustomTextProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  iam.CustomTextSetEventType,
-					Reduce: p.reduceAdded,
+					Reduce: p.reduceSet,
 				},
 				{
 					Event:  iam.CustomTextRemovedEventType,
@@ -78,62 +78,72 @@ func (p *CustomTextProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *CustomTextProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	var templateEvent policy.CustomTextSetEvent
+func (p *CustomTextProjection) reduceSet(event eventstore.EventReader) (*handler.Statement, error) {
+	var customTextEvent policy.CustomTextSetEvent
 	var isDefault bool
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
-		templateEvent = e.CustomTextSetEvent
+		customTextEvent = e.CustomTextSetEvent
 		isDefault = false
 	case *iam.CustomTextSetEvent:
-		templateEvent = e.CustomTextSetEvent
+		customTextEvent = e.CustomTextSetEvent
 		isDefault = true
 	default:
 		logging.LogWithFields("PROJE-g0Jfs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KKfw4", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
-		&templateEvent,
+		&customTextEvent,
 		[]handler.Column{
-			handler.NewCol(CustomTextAggregateIDCol, templateEvent.Aggregate().ID),
-			handler.NewCol(CustomTextCreationDateCol, templateEvent.CreationDate()),
-			handler.NewCol(CustomTextChangeDateCol, templateEvent.CreationDate()),
-			handler.NewCol(CustomTextSequenceCol, templateEvent.Sequence()),
+			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
+			handler.NewCol(CustomTextCreationDateCol, customTextEvent.CreationDate()),
+			handler.NewCol(CustomTextChangeDateCol, customTextEvent.CreationDate()),
+			handler.NewCol(CustomTextSequenceCol, customTextEvent.Sequence()),
 			handler.NewCol(CustomTextIsDefaultCol, isDefault),
-			handler.NewCol(CustomTextTemplateCol, templateEvent.Template),
-			handler.NewCol(CustomTextLanguageCol, templateEvent.Language.String()),
-			handler.NewCol(CustomTextKeyCol, templateEvent.Key),
-			handler.NewCol(CustomTextTextCol, templateEvent.Text),
+			handler.NewCol(CustomTextTemplateCol, customTextEvent.Template),
+			handler.NewCol(CustomTextLanguageCol, customTextEvent.Language.String()),
+			handler.NewCol(CustomTextKeyCol, customTextEvent.Key),
+			handler.NewCol(CustomTextTextCol, customTextEvent.Text),
 		}), nil
 }
 
 func (p *CustomTextProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	policyEvent, ok := event.(*org.CustomTextRemovedEvent)
-	if !ok {
-		logging.LogWithFields("PROJE-wm00r", "seq", event.Sequence(), "expectedType", org.CustomTextRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-sJ0gs", "reduce.wrong.event.type")
+	var customTextEvent policy.CustomTextRemovedEvent
+	switch e := event.(type) {
+	case *org.CustomTextRemovedEvent:
+		customTextEvent = e.CustomTextRemovedEvent
+	case *iam.CustomTextRemovedEvent:
+		customTextEvent = e.CustomTextRemovedEvent
+	default:
+		logging.LogWithFields("PROJE-2Nigw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-n9wJg", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
-		policyEvent,
+		&customTextEvent,
 		[]handler.Condition{
-			handler.NewCond(CustomTextAggregateIDCol, policyEvent.Aggregate().ID),
-			handler.NewCond(CustomTextTemplateCol, policyEvent.Template),
-			handler.NewCond(CustomTextKeyCol, policyEvent.Key),
-			handler.NewCond(CustomTextLanguageCol, policyEvent.Language),
+			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
+			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
+			handler.NewCond(CustomTextKeyCol, customTextEvent.Key),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
 		}), nil
 }
 
 func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	policyEvent, ok := event.(*org.CustomTextRemovedEvent)
-	if !ok {
-		logging.LogWithFields("PROJE-2j0gs", "seq", event.Sequence(), "expectedType", org.CustomTextRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-0gmeG", "reduce.wrong.event.type")
+	var customTextEvent policy.CustomTextTemplateRemovedEvent
+	switch e := event.(type) {
+	case *org.CustomTextTemplateRemovedEvent:
+		customTextEvent = e.CustomTextTemplateRemovedEvent
+	case *iam.CustomTextTemplateRemovedEvent:
+		customTextEvent = e.CustomTextTemplateRemovedEvent
+	default:
+		logging.LogWithFields("PROJE-J9wfg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, iam.CustomTextTemplateRemovedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-29iPf", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
-		policyEvent,
+		&customTextEvent,
 		[]handler.Condition{
-			handler.NewCond(CustomTextAggregateIDCol, policyEvent.Aggregate().ID),
-			handler.NewCond(CustomTextTemplateCol, policyEvent.Template),
-			handler.NewCond(CustomTextLanguageCol, policyEvent.Language),
+			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
+			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
 		}), nil
 }
