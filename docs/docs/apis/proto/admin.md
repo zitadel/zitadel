@@ -1433,7 +1433,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy |  |
 
 
 
