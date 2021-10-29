@@ -1,6 +1,7 @@
 package backup
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -20,7 +21,6 @@ const (
 	backupPath               = "/cockroach"
 	backupNameEnv            = "BACKUP_NAME"
 	saJsonBase64Env          = "SAJSON"
-	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
 	rootSecretName           = "cockroachdb.client.root"
 	timeout                  = 45 * time.Minute
@@ -36,7 +36,6 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	bucketName string,
 	cron string,
-	secretName string,
 	secretKey string,
 	timestamp string,
 	nodeselector map[string]string,
@@ -50,7 +49,7 @@ func AdaptFunc(
 	destroyFunc operator.DestroyFunc,
 	err error,
 ) {
-
+	jobName := core.GetBackupJobName(backupName)
 	command := getBackupCommand(
 		timestamp,
 		bucketName,
@@ -64,7 +63,7 @@ func AdaptFunc(
 	jobSpecDef := getJobSpecDef(
 		nodeselector,
 		tolerations,
-		secretName,
+		core.GetSecretName(backupName),
 		secretKey,
 		backupName,
 		command,
@@ -76,7 +75,7 @@ func AdaptFunc(
 
 	cronJobDef := getCronJob(
 		namespace,
-		labels.MustForName(componentLabels, GetJobName(backupName)),
+		labels.MustForName(componentLabels, jobName),
 		cron,
 		jobSpecDef,
 	)
@@ -93,7 +92,7 @@ func AdaptFunc(
 
 	jobDef := getJob(
 		namespace,
-		labels.MustForName(componentLabels, cronJobNamePrefix+backupName),
+		labels.MustForName(componentLabels, jobName),
 		jobSpecDef,
 	)
 
@@ -133,8 +132,4 @@ func AdaptFunc(
 		},
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
 		nil
-}
-
-func GetJobName(backupName string) string {
-	return cronJobNamePrefix + backupName
 }

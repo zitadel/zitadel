@@ -11,18 +11,16 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3/restore"
 	corev1 "k8s.io/api/core/v1"
 )
 
 const (
-	accessKeyIDName     = "backup-accessaccountkey"
-	accessKeyIDKey      = "accessaccountkey"
-	secretAccessKeyName = "backup-secretaccesskey"
-	secretAccessKeyKey  = "secretaccesskey"
-	sessionTokenName    = "backup-sessiontoken"
-	sessionTokenKey     = "sessiontoken"
+	accessKeyIDKey     = "accessaccountkey"
+	secretAccessKeyKey = "secretaccesskey"
+	sessionTokenKey    = "sessiontoken"
 )
 
 func AdaptFunc(
@@ -67,17 +65,7 @@ func AdaptFunc(
 			internalMonitor.Verbose()
 		}
 
-		destroySAKI, err := secret.AdaptFuncToDestroy(namespace, accessKeyIDName)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
-		destroySSAK, err := secret.AdaptFuncToDestroy(namespace, secretAccessKeyName)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
-		destroySSTK, err := secret.AdaptFuncToDestroy(namespace, sessionTokenName)
+		destroySecret, err := secret.AdaptFuncToDestroy(namespace, core.GetSecretName(name))
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
@@ -92,11 +80,8 @@ func AdaptFunc(
 			checkDBReady,
 			desiredKind.Spec.Bucket,
 			desiredKind.Spec.Cron,
-			accessKeyIDName,
 			accessKeyIDKey,
-			secretAccessKeyName,
 			secretAccessKeyKey,
-			sessionTokenName,
 			sessionTokenKey,
 			desiredKind.Spec.Region,
 			desiredKind.Spec.Endpoint,
@@ -119,11 +104,8 @@ func AdaptFunc(
 			componentLabels,
 			desiredKind.Spec.Bucket,
 			timestamp,
-			accessKeyIDName,
 			accessKeyIDKey,
-			secretAccessKeyName,
 			secretAccessKeyKey,
-			sessionTokenName,
 			sessionTokenKey,
 			desiredKind.Spec.Region,
 			desiredKind.Spec.Endpoint,
@@ -143,9 +125,7 @@ func AdaptFunc(
 			switch feature {
 			case backup.Normal, backup.Instant:
 				destroyers = append(destroyers,
-					operator.ResourceDestroyToZitadelDestroy(destroySSAK),
-					operator.ResourceDestroyToZitadelDestroy(destroySAKI),
-					operator.ResourceDestroyToZitadelDestroy(destroySSTK),
+					operator.ResourceDestroyToZitadelDestroy(destroySecret),
 					destroyB,
 				)
 			case restore.Instant:
@@ -161,32 +141,35 @@ func AdaptFunc(
 					return nil, err
 				}
 
+				secrets := map[string]string{}
 				valueAKI, err := read.GetSecretValue(k8sClient, desiredKind.Spec.AccessKeyID, desiredKind.Spec.ExistingAccessKeyID)
 				if err != nil {
 					return nil, err
 				}
-
-				querySAKI, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, accessKeyIDName), map[string]string{accessKeyIDKey: valueAKI})
-				if err != nil {
-					return nil, err
+				if valueAKI != "" {
+					secrets[accessKeyIDKey] = valueAKI
 				}
 
 				valueSAK, err := read.GetSecretValue(k8sClient, desiredKind.Spec.SecretAccessKey, desiredKind.Spec.ExistingSecretAccessKey)
 				if err != nil {
 					return nil, err
 				}
-
-				querySSAK, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretAccessKeyName), map[string]string{secretAccessKeyKey: valueSAK})
-				if err != nil {
-					return nil, err
+				if valueAKI != "" {
+					secrets[secretAccessKeyKey] = valueSAK
 				}
 
 				valueST, err := read.GetSecretValue(k8sClient, desiredKind.Spec.SessionToken, desiredKind.Spec.ExistingSessionToken)
 				if err != nil {
 					return nil, err
 				}
+				if valueAKI != "" {
+					secrets[sessionTokenKey] = valueST
+				}
 
-				querySST, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, sessionTokenName), map[string]string{sessionTokenKey: valueST})
+				querySecret, err := secret.AdaptFuncToEnsure(namespace,
+					labels.MustForName(componentLabels, core.GetSecretName(name)),
+					secrets,
+				)
 				if err != nil {
 					return nil, err
 				}
@@ -199,11 +182,8 @@ func AdaptFunc(
 					checkDBReady,
 					desiredKind.Spec.Bucket,
 					desiredKind.Spec.Cron,
-					accessKeyIDName,
 					accessKeyIDKey,
-					secretAccessKeyName,
 					secretAccessKeyKey,
-					sessionTokenName,
 					sessionTokenKey,
 					desiredKind.Spec.Region,
 					desiredKind.Spec.Endpoint,
@@ -226,11 +206,8 @@ func AdaptFunc(
 					componentLabels,
 					desiredKind.Spec.Bucket,
 					timestamp,
-					accessKeyIDName,
 					accessKeyIDKey,
-					secretAccessKeyName,
 					secretAccessKeyKey,
-					sessionTokenName,
 					sessionTokenKey,
 					desiredKind.Spec.Region,
 					desiredKind.Spec.Endpoint,
@@ -251,16 +228,12 @@ func AdaptFunc(
 					switch feature {
 					case backup.Normal:
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(querySAKI),
-							operator.ResourceQueryToZitadelQuery(querySSAK),
-							operator.ResourceQueryToZitadelQuery(querySST),
+							operator.ResourceQueryToZitadelQuery(querySecret),
 							queryB,
 						)
 					case backup.Instant:
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(querySAKI),
-							operator.ResourceQueryToZitadelQuery(querySSAK),
-							operator.ResourceQueryToZitadelQuery(querySST),
+							operator.ResourceQueryToZitadelQuery(querySecret),
 							queryB,
 						)
 						cleanupQueries = append(cleanupQueries,
@@ -268,9 +241,7 @@ func AdaptFunc(
 						)
 					case restore.Instant:
 						queriers = append(queriers,
-							operator.ResourceQueryToZitadelQuery(querySAKI),
-							operator.ResourceQueryToZitadelQuery(querySSAK),
-							operator.ResourceQueryToZitadelQuery(querySST),
+							operator.ResourceQueryToZitadelQuery(querySecret),
 							queryR,
 						)
 						cleanupQueries = append(cleanupQueries,

@@ -2,6 +2,8 @@ package restore
 
 import (
 	"github.com/caos/zitadel/operator/common"
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
+	"path/filepath"
 	"testing"
 
 	"github.com/caos/orbos/mntr"
@@ -27,17 +29,15 @@ func TestBackup_Adapt1(t *testing.T) {
 	backupName := "testName2"
 	bucketName := "testBucket2"
 	version := "testVersion"
-	accessKeyIDName := "testAKIN"
+	secretName := core.GetSecretName(backupName)
 	accessKeyIDKey := "testAKIK"
-	secretAccessKeyName := "testSAKN"
 	secretAccessKeyKey := "testSAKK"
-	sessionTokenName := "testSTN"
 	sessionTokenKey := "testSTK"
 	region := "region"
 	endpoint := "endpoint"
 	dbURL := "testDB"
 	dbPort := int32(80)
-	jobName := GetJobName(backupName)
+	jobName := core.GetRestoreJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "testVersion"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -50,21 +50,16 @@ func TestBackup_Adapt1(t *testing.T) {
 		nameLabels,
 		nodeselector,
 		tolerations,
-		accessKeyIDName,
-		accessKeyIDKey,
-		secretAccessKeyName,
-		secretAccessKeyKey,
-		sessionTokenName,
-		sessionTokenKey,
+		secretName,
 		common.BackupImage.Reference("", version),
 		getCommand(
 			timestamp,
 			bucketName,
 			backupName,
 			certPath,
-			accessKeyIDPath,
-			secretAccessKeyPath,
-			sessionTokenPath,
+			filepath.Join(secretsPath, accessKeyIDKey),
+			filepath.Join(secretsPath, secretAccessKeyKey),
+			filepath.Join(secretsPath, sessionTokenKey),
 			region,
 			endpoint,
 			dbURL,
@@ -82,11 +77,8 @@ func TestBackup_Adapt1(t *testing.T) {
 		componentLabels,
 		bucketName,
 		timestamp,
-		accessKeyIDName,
 		accessKeyIDKey,
-		secretAccessKeyName,
 		secretAccessKeyKey,
-		sessionTokenName,
 		sessionTokenKey,
 		region,
 		endpoint,
@@ -117,17 +109,15 @@ func TestBackup_Adapt2(t *testing.T) {
 	backupName := "testName2"
 	bucketName := "testBucket2"
 	version := "testVersion2"
-	accessKeyIDName := "testAKIN2"
+	secretName := core.GetSecretName(backupName)
 	accessKeyIDKey := "testAKIK2"
-	secretAccessKeyName := "testSAKN2"
 	secretAccessKeyKey := "testSAKK2"
-	sessionTokenName := "testSTN2"
 	sessionTokenKey := "testSTK2"
 	region := "region2"
 	endpoint := "endpoint2"
 	dbURL := "testDB"
 	dbPort := int32(80)
-	jobName := GetJobName(backupName)
+	jobName := core.GetRestoreJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent2")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -140,21 +130,16 @@ func TestBackup_Adapt2(t *testing.T) {
 		nameLabels,
 		nodeselector,
 		tolerations,
-		accessKeyIDName,
-		accessKeyIDKey,
-		secretAccessKeyName,
-		secretAccessKeyKey,
-		sessionTokenName,
-		sessionTokenKey,
+		secretName,
 		common.BackupImage.Reference("", version),
 		getCommand(
 			timestamp,
 			bucketName,
 			backupName,
 			certPath,
-			accessKeyIDPath,
-			secretAccessKeyPath,
-			sessionTokenPath,
+			filepath.Join(secretsPath, accessKeyIDKey),
+			filepath.Join(secretsPath, secretAccessKeyKey),
+			filepath.Join(secretsPath, sessionTokenKey),
 			region,
 			endpoint,
 			dbURL,
@@ -172,11 +157,8 @@ func TestBackup_Adapt2(t *testing.T) {
 		componentLabels,
 		bucketName,
 		timestamp,
-		accessKeyIDName,
 		accessKeyIDKey,
-		secretAccessKeyName,
 		secretAccessKeyKey,
-		sessionTokenName,
 		sessionTokenKey,
 		region,
 		endpoint,

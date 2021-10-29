@@ -1,6 +1,8 @@
 package restore
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
+	"path/filepath"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -13,17 +15,14 @@ import (
 )
 
 const (
-	Instant             = "restore"
-	defaultMode         = int32(256)
-	certPath            = "/cockroach/cockroach-certs"
-	accessKeyIDPath     = "/secrets/accessaccountkey"
-	secretAccessKeyPath = "/secrets/secretaccesskey"
-	sessionTokenPath    = "/secrets/sessiontoken"
-	jobPrefix           = "backup-"
-	jobSuffix           = "-restore"
-	internalSecretName  = "client-certs"
-	rootSecretName      = "cockroachdb.client.root"
-	timeout             = 15 * time.Minute
+	Instant                 = "restore"
+	defaultMode             = int32(256)
+	certPath                = "/cockroach/cockroach-certs"
+	secretsPath             = "/secrets"
+	internalSecretsName     = "secrets"
+	internalCertsSecretName = "client-certs"
+	rootSecretName          = "cockroachdb.client.root"
+	timeout                 = 15 * time.Minute
 )
 
 func AdaptFunc(
@@ -33,11 +32,8 @@ func AdaptFunc(
 	componentLabels *labels.Component,
 	bucketName string,
 	timestamp string,
-	accessKeyIDName string,
 	accessKeyIDKey string,
-	secretAccessKeyName string,
 	secretAccessKeyKey string,
-	sessionTokenName string,
 	sessionTokenKey string,
 	region string,
 	endpoint string,
@@ -53,15 +49,15 @@ func AdaptFunc(
 	err error,
 ) {
 
-	jobName := jobPrefix + backupName + jobSuffix
+	jobName := core.GetRestoreJobName(backupName)
 	command := getCommand(
 		timestamp,
 		bucketName,
 		backupName,
 		certPath,
-		accessKeyIDPath,
-		secretAccessKeyPath,
-		sessionTokenPath,
+		filepath.Join(secretsPath, accessKeyIDKey),
+		filepath.Join(secretsPath, secretAccessKeyKey),
+		filepath.Join(secretsPath, sessionTokenKey),
 		region,
 		endpoint,
 		dbURL,
@@ -70,15 +66,10 @@ func AdaptFunc(
 
 	jobdef := getJob(
 		namespace,
-		labels.MustForName(componentLabels, GetJobName(backupName)),
+		labels.MustForName(componentLabels, jobName),
 		nodeselector,
 		tolerations,
-		accessKeyIDName,
-		accessKeyIDKey,
-		secretAccessKeyName,
-		secretAccessKeyKey,
-		sessionTokenName,
-		sessionTokenKey,
+		core.GetSecretName(backupName),
 		image,
 		command,
 	)
@@ -108,8 +99,4 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
 
 		nil
-}
-
-func GetJobName(backupName string) string {
-	return jobPrefix + backupName + jobSuffix
 }

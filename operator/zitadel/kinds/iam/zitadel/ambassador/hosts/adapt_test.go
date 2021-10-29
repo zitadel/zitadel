@@ -54,7 +54,7 @@ func TestHosts_AdaptFunc(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(4).MaxTimes(4).Return(&apixv1beta1.CustomResourceDefinition{}, false, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -215,7 +215,7 @@ func TestHosts_AdaptFunc2(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(4).MaxTimes(4).Return(&apixv1beta1.CustomResourceDefinition{}, false, nil)
 
 	group := "getambassador.io"
 	version := "v2"

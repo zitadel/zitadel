@@ -1,6 +1,8 @@
 package backup
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
+	"path/filepath"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -14,18 +16,17 @@ import (
 )
 
 const (
-	defaultMode         int32 = 256
-	certPath                  = "/cockroach/cockroach-certs"
-	accessKeyIDPath           = "/secrets/accessaccountkey"
-	secretAccessKeyPath       = "/secrets/secretaccesskey"
-	sessionTokenPath          = "/secrets/sessiontoken"
-	backupNameEnv             = "BACKUP_NAME"
-	cronJobNamePrefix         = "backup-"
-	internalSecretName        = "client-certs"
-	rootSecretName            = "cockroachdb.client.root"
-	timeout                   = 15 * time.Minute
-	Normal                    = "backup"
-	Instant                   = "instantbackup"
+	defaultMode             int32 = 256
+	certPath                      = "/cockroach/cockroach-certs"
+	secretsPath                   = "/secrets"
+	internalSecretName            = "secrets"
+	backupNameEnv                 = "BACKUP_NAME"
+	cronJobNamePrefix             = "backup-"
+	internalCertsSecretName       = "client-certs"
+	rootSecretName                = "cockroachdb.client.root"
+	timeout                       = 15 * time.Minute
+	Normal                        = "backup"
+	Instant                       = "instantbackup"
 )
 
 func AdaptFunc(
@@ -36,11 +37,8 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	bucketName string,
 	cron string,
-	accessKeyIDName string,
 	accessKeyIDKey string,
-	secretAccessKeyName string,
 	secretAccessKeyKey string,
-	sessionTokenName string,
 	sessionTokenKey string,
 	region string,
 	endpoint string,
@@ -62,9 +60,9 @@ func AdaptFunc(
 		bucketName,
 		backupName,
 		certPath,
-		accessKeyIDPath,
-		secretAccessKeyPath,
-		sessionTokenPath,
+		filepath.Join(secretsPath, accessKeyIDKey),
+		filepath.Join(secretsPath, secretAccessKeyKey),
+		filepath.Join(secretsPath, sessionTokenKey),
 		region,
 		endpoint,
 		dbURL,
@@ -74,12 +72,7 @@ func AdaptFunc(
 	jobSpecDef := getJobSpecDef(
 		nodeselector,
 		tolerations,
-		accessKeyIDName,
-		accessKeyIDKey,
-		secretAccessKeyName,
-		secretAccessKeyKey,
-		sessionTokenName,
-		sessionTokenKey,
+		core.GetSecretName(backupName),
 		backupName,
 		image,
 		command,
@@ -90,7 +83,7 @@ func AdaptFunc(
 
 	cronJobDef := getCronJob(
 		namespace,
-		labels.MustForName(componentLabels, GetJobName(backupName)),
+		labels.MustForName(componentLabels, core.GetBackupJobName(backupName)),
 		cron,
 		jobSpecDef,
 	)
@@ -147,8 +140,4 @@ func AdaptFunc(
 		},
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
 		nil
-}
-
-func GetJobName(backupName string) string {
-	return cronJobNamePrefix + backupName
 }

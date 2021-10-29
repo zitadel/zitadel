@@ -5,6 +5,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 )
 
 func GetCleanupFunc(
@@ -14,11 +15,11 @@ func GetCleanupFunc(
 ) operator.EnsureFunc {
 	return func(k8sClient kubernetes.ClientInt) error {
 		monitor.Info("waiting for restore to be completed")
-		if err := k8sClient.WaitUntilJobCompleted(namespace, GetJobName(backupName), timeout); err != nil {
+		if err := k8sClient.WaitUntilJobCompleted(namespace, core.GetRestoreJobName(backupName), timeout); err != nil {
 			return fmt.Errorf("error while waiting for restore to be completed: %s", err.Error())
 		}
 		monitor.Info("restore is completed, cleanup")
-		if err := k8sClient.DeleteJob(namespace, GetJobName(backupName)); err != nil {
+		if err := k8sClient.DeleteJob(namespace, core.GetRestoreJobName(backupName)); err != nil {
 			return fmt.Errorf("error while trying to cleanup restore: %s", err.Error())
 		}
 		monitor.Info("restore cleanup is completed")

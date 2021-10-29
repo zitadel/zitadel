@@ -3,6 +3,8 @@ package database
 import (
 	"context"
 	"fmt"
+	"github.com/caos/zitadel/operator/api/core"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -41,23 +43,42 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, err
 	}
 
-	query, _, _, _, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
-	if err != nil {
-		internalMonitor.Error(err)
-		return res, err
-	}
+	if desired != nil {
+		query, _, _, _, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
+		if err != nil {
+			internalMonitor.Error(err)
+			return res, err
+		}
 
-	ensure, err := query(r.ClientInt, map[string]interface{}{})
-	if err != nil {
-		internalMonitor.Error(err)
-		return res, err
-	}
+		ensure, err := query(r.ClientInt, map[string]interface{}{})
+		if err != nil {
+			internalMonitor.Error(err)
+			return res, err
+		}
 
-	if err := ensure(r.ClientInt); err != nil {
-		internalMonitor.Error(err)
-		return res, err
-	}
+		if err := ensure(r.ClientInt); err != nil {
+			internalMonitor.Error(err)
+			return res, err
+		}
+	} else {
+		unstruct := &unstructured.Unstructured{}
+		desired, err := core.UnmarshalUnstructuredSpec(unstruct)
+		if err != nil {
+			internalMonitor.Error(err)
+			return res, err
+		}
 
+		_, destroy, _, _, _, _, err := orbdb.AdaptFunc("", &r.Version, false, "database")(internalMonitor, desired, &tree.Tree{})
+		if err != nil {
+			internalMonitor.Error(err)
+			return res, err
+		}
+
+		if err := destroy(r.ClientInt); err != nil {
+			internalMonitor.Error(err)
+			return res, err
+		}
+	}
 	return res, nil
 }
 

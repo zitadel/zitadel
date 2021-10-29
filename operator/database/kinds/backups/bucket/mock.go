@@ -2,8 +2,7 @@ package bucket
 
 import (
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
+	coreBackup "github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/golang/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
@@ -28,7 +27,7 @@ func SetInstantBackup(
 ) {
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      secretName,
+			Name:      coreBackup.GetSecretName(backupName),
 			Namespace: namespace,
 			Labels:    labels,
 		},
@@ -37,20 +36,21 @@ func SetInstantBackup(
 	}).MinTimes(1).MaxTimes(1).Return(nil)
 
 	k8sClient.EXPECT().ApplyJob(gomock.Any()).Times(1).Return(nil)
-	k8sClient.EXPECT().GetJob(namespace, backup.GetJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, backup.GetJobName(backupName)))
-	k8sClient.EXPECT().WaitUntilJobCompleted(namespace, backup.GetJobName(backupName), gomock.Any()).Times(1).Return(nil)
-	k8sClient.EXPECT().DeleteJob(namespace, backup.GetJobName(backupName)).Times(1).Return(nil)
+	k8sClient.EXPECT().GetJob(namespace, coreBackup.GetBackupJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, coreBackup.GetBackupJobName(backupName)))
+	k8sClient.EXPECT().WaitUntilJobCompleted(namespace, coreBackup.GetBackupJobName(backupName), gomock.Any()).Times(1).Return(nil)
+	k8sClient.EXPECT().DeleteJob(namespace, coreBackup.GetBackupJobName(backupName)).Times(1).Return(nil)
 }
 
 func SetBackup(
 	k8sClient *kubernetesmock.MockClientInt,
 	namespace string,
+	backupName string,
 	labels map[string]string,
 	saJson string,
 ) {
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      secretName,
+			Name:      coreBackup.GetSecretName(backupName),
 			Namespace: namespace,
 			Labels:    labels,
 		},
@@ -69,7 +69,7 @@ func SetRestore(
 ) {
 	k8sClient.EXPECT().ApplySecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      secretName,
+			Name:      coreBackup.GetSecretName(backupName),
 			Namespace: namespace,
 			Labels:    labels,
 		},
@@ -78,7 +78,7 @@ func SetRestore(
 	}).MinTimes(1).MaxTimes(1).Return(nil)
 
 	k8sClient.EXPECT().ApplyJob(gomock.Any()).Times(1).Return(nil)
-	k8sClient.EXPECT().GetJob(namespace, restore.GetJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, restore.GetJobName(backupName)))
-	k8sClient.EXPECT().WaitUntilJobCompleted(namespace, restore.GetJobName(backupName), gomock.Any()).Times(1).Return(nil)
-	k8sClient.EXPECT().DeleteJob(namespace, restore.GetJobName(backupName)).Times(1).Return(nil)
+	k8sClient.EXPECT().GetJob(namespace, coreBackup.GetRestoreJobName(backupName)).Times(1).Return(nil, macherrs.NewNotFound(schema.GroupResource{"batch", "jobs"}, coreBackup.GetRestoreJobName(backupName)))
+	k8sClient.EXPECT().WaitUntilJobCompleted(namespace, coreBackup.GetRestoreJobName(backupName), gomock.Any()).Times(1).Return(nil)
+	k8sClient.EXPECT().DeleteJob(namespace, coreBackup.GetRestoreJobName(backupName)).Times(1).Return(nil)
 }

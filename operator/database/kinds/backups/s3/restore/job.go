@@ -13,12 +13,7 @@ func getJob(
 	nameLabels *labels.Name,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	accessKeyIDName string,
-	accessKeyIDKey string,
-	secretAccessKeyName string,
-	secretAccessKeyKey string,
-	sessionTokenName string,
-	sessionTokenKey string,
+	secretName string,
 	image string,
 	command string,
 
@@ -44,25 +39,16 @@ func getJob(
 							command,
 						},
 						VolumeMounts: []corev1.VolumeMount{{
-							Name:      internalSecretName,
+							Name:      internalCertsSecretName,
 							MountPath: certPath,
 						}, {
-							Name:      accessKeyIDKey,
-							SubPath:   accessKeyIDKey,
-							MountPath: accessKeyIDPath,
-						}, {
-							Name:      secretAccessKeyKey,
-							SubPath:   secretAccessKeyKey,
-							MountPath: secretAccessKeyPath,
-						}, {
-							Name:      sessionTokenKey,
-							SubPath:   sessionTokenKey,
-							MountPath: sessionTokenPath,
+							Name:      internalSecretsName,
+							MountPath: secretsPath,
 						}},
 						ImagePullPolicy: corev1.PullIfNotPresent,
 					}},
 					Volumes: []corev1.Volume{{
-						Name: internalSecretName,
+						Name: internalCertsSecretName,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
 								SecretName:  rootSecretName,
@@ -70,24 +56,10 @@ func getJob(
 							},
 						},
 					}, {
-						Name: accessKeyIDKey,
+						Name: internalSecretsName,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName: accessKeyIDName,
-							},
-						},
-					}, {
-						Name: secretAccessKeyKey,
-						VolumeSource: corev1.VolumeSource{
-							Secret: &corev1.SecretVolumeSource{
-								SecretName: secretAccessKeyName,
-							},
-						},
-					}, {
-						Name: sessionTokenKey,
-						VolumeSource: corev1.VolumeSource{
-							Secret: &corev1.SecretVolumeSource{
-								SecretName: sessionTokenName,
+								SecretName: secretName,
 							},
 						},
 					}},

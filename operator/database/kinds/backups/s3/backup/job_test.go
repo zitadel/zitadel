@@ -16,12 +16,7 @@ func TestBackup_JobSpec1(t *testing.T) {
 	backupName := "testName"
 	version := "testVersion"
 	command := "test"
-	accessKeyIDName := "testAKIN"
-	accessKeyIDKey := "testAKIK"
-	secretAccessKeyName := "testSAKN"
-	secretAccessKeyKey := "testSAKK"
-	sessionTokenName := "testSTN"
-	sessionTokenKey := "testSTK"
+	secretName := "testSecret"
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -38,25 +33,16 @@ func TestBackup_JobSpec1(t *testing.T) {
 						command,
 					},
 					VolumeMounts: []corev1.VolumeMount{{
-						Name:      internalSecretName,
+						Name:      internalCertsSecretName,
 						MountPath: certPath,
 					}, {
-						Name:      accessKeyIDKey,
-						SubPath:   accessKeyIDKey,
-						MountPath: accessKeyIDPath,
-					}, {
-						Name:      secretAccessKeyKey,
-						SubPath:   secretAccessKeyKey,
-						MountPath: secretAccessKeyPath,
-					}, {
-						Name:      sessionTokenKey,
-						SubPath:   sessionTokenKey,
-						MountPath: sessionTokenPath,
+						Name:      internalSecretName,
+						MountPath: secretsPath,
 					}},
 					ImagePullPolicy: corev1.PullIfNotPresent,
 				}},
 				Volumes: []corev1.Volume{{
-					Name: internalSecretName,
+					Name: internalCertsSecretName,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName:  rootSecretName,
@@ -64,24 +50,10 @@ func TestBackup_JobSpec1(t *testing.T) {
 						},
 					},
 				}, {
-					Name: accessKeyIDKey,
+					Name: internalSecretName,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: accessKeyIDName,
-						},
-					},
-				}, {
-					Name: secretAccessKeyKey,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretAccessKeyName,
-						},
-					},
-				}, {
-					Name: sessionTokenKey,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: sessionTokenName,
+							SecretName: secretName,
 						},
 					},
 				}},
@@ -92,12 +64,7 @@ func TestBackup_JobSpec1(t *testing.T) {
 	assert.Equal(t, equals, getJobSpecDef(
 		nodeselector,
 		tolerations,
-		accessKeyIDName,
-		accessKeyIDKey,
-		secretAccessKeyName,
-		secretAccessKeyKey,
-		sessionTokenName,
-		sessionTokenKey,
+		secretName,
 		backupName,
 		common.BackupImage.Reference("", version),
 		command))
@@ -110,12 +77,7 @@ func TestBackup_JobSpec2(t *testing.T) {
 	backupName := "testName2"
 	version := "testVersion2"
 	command := "test2"
-	accessKeyIDName := "testAKIN2"
-	accessKeyIDKey := "testAKIK2"
-	secretAccessKeyName := "testSAKN2"
-	secretAccessKeyKey := "testSAKK2"
-	sessionTokenName := "testSTN2"
-	sessionTokenKey := "testSTK2"
+	secretName := "testSecret"
 
 	equals := batchv1.JobSpec{
 		Template: corev1.PodTemplateSpec{
@@ -132,25 +94,16 @@ func TestBackup_JobSpec2(t *testing.T) {
 						command,
 					},
 					VolumeMounts: []corev1.VolumeMount{{
-						Name:      internalSecretName,
+						Name:      internalCertsSecretName,
 						MountPath: certPath,
 					}, {
-						Name:      accessKeyIDKey,
-						SubPath:   accessKeyIDKey,
-						MountPath: accessKeyIDPath,
-					}, {
-						Name:      secretAccessKeyKey,
-						SubPath:   secretAccessKeyKey,
-						MountPath: secretAccessKeyPath,
-					}, {
-						Name:      sessionTokenKey,
-						SubPath:   sessionTokenKey,
-						MountPath: sessionTokenPath,
+						Name:      internalSecretName,
+						MountPath: secretsPath,
 					}},
 					ImagePullPolicy: corev1.PullIfNotPresent,
 				}},
 				Volumes: []corev1.Volume{{
-					Name: internalSecretName,
+					Name: internalCertsSecretName,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
 							SecretName:  rootSecretName,
@@ -158,24 +111,10 @@ func TestBackup_JobSpec2(t *testing.T) {
 						},
 					},
 				}, {
-					Name: accessKeyIDKey,
+					Name: internalSecretName,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName: accessKeyIDName,
-						},
-					},
-				}, {
-					Name: secretAccessKeyKey,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: secretAccessKeyName,
-						},
-					},
-				}, {
-					Name: sessionTokenKey,
-					VolumeSource: corev1.VolumeSource{
-						Secret: &corev1.SecretVolumeSource{
-							SecretName: sessionTokenName,
+							SecretName: secretName,
 						},
 					},
 				}},
@@ -186,12 +125,7 @@ func TestBackup_JobSpec2(t *testing.T) {
 	assert.Equal(t, equals, getJobSpecDef(
 		nodeselector,
 		tolerations,
-		accessKeyIDName,
-		accessKeyIDKey,
-		secretAccessKeyName,
-		secretAccessKeyKey,
-		sessionTokenName,
-		sessionTokenKey,
+		secretName,
 		backupName,
 		common.BackupImage.Reference("", version),
 		command,

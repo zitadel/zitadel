@@ -2,6 +2,7 @@ package managed
 
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/kubernetes/resources/cronjob"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/pdb"
+	secretK8s "github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
@@ -18,6 +20,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
+	coreBackup "github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
@@ -34,7 +37,6 @@ const (
 	cockroachPort      = int32(26257)
 	cockroachHTTPPort  = int32(8080)
 	Clean              = "clean"
-	DBReady            = "dbready"
 )
 
 func Adapter(
@@ -281,4 +283,56 @@ func Adapter(
 			migrate,
 			nil
 	}
+}
+
+func cleanup(
+	monitor mntr.Monitor,
+	backupDefs map[string]*tree.Tree,
+	k8sClient kubernetes.ClientInt,
+	namespace string,
+	joblabels map[string]string,
+) (
+	operator.DestroyFunc,
+	error,
+) {
+	names := make([]string, 0)
+	for name := range backupDefs {
+		names = append(names, name)
+	}
+
+	list, err := k8sClient.ListCronJobs(namespace, joblabels)
+	if err != nil {
+		return nil, err
+	}
+
+	destroyers := make([]operator.DestroyFunc, 0)
+	for _, cj := range list.Items {
+		backupName := coreBackup.TrimBackupJobName(cj.Name)
+		found := false
+		for _, name := range names {
+			if name == backupName {
+				found = true
+			}
+		}
+		if found {
+			continue
+		}
+
+		destroyCJ, err := cronjob.AdaptFuncToDestroy(namespace, cj.Name)
+		if err != nil {
+			return nil, err
+		}
+
+		destroySecret, err := secretK8s.AdaptFuncToDestroy(namespace, coreBackup.GetSecretName(backupName))
+		if err != nil {
+			return nil, err
+		}
+
+		destroyers = append(destroyers,
+			operator.ResourceDestroyToZitadelDestroy(destroyCJ),
+			operator.ResourceDestroyToZitadelDestroy(destroySecret),
+		)
+	}
+
+	return operator.DestroyersToDestroyFunc(monitor, destroyers), nil
 }

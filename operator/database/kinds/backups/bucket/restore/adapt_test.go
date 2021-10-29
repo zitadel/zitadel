@@ -1,6 +1,7 @@
 package restore
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"testing"
 
 	"github.com/caos/orbos/mntr"
@@ -27,10 +28,10 @@ func TestBackup_Adapt1(t *testing.T) {
 	bucketName := "testBucket2"
 	image := "testImage2"
 	secretKey := "testKey"
-	secretName := "testSecretName"
+	secretName := core.GetSecretName(backupName)
 	dbURL := "testDB"
 	dbPort := int32(80)
-	jobName := GetJobName(backupName)
+	jobName := core.GetRestoreJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "testVersion"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -70,7 +71,6 @@ func TestBackup_Adapt1(t *testing.T) {
 		nodeselector,
 		tolerations,
 		checkDBReady,
-		secretName,
 		secretKey,
 		dbURL,
 		dbPort,
@@ -97,10 +97,10 @@ func TestBackup_Adapt2(t *testing.T) {
 	bucketName := "testBucket2"
 	image := "testImage2"
 	secretKey := "testKey2"
-	secretName := "testSecretName2"
+	secretName := core.GetSecretName(backupName)
 	dbURL := "testDB"
 	dbPort := int32(80)
-	jobName := GetJobName(backupName)
+	jobName := core.GetRestoreJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent2")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -140,7 +140,6 @@ func TestBackup_Adapt2(t *testing.T) {
 		nodeselector,
 		tolerations,
 		checkDBReady,
-		secretName,
 		secretKey,
 		dbURL,
 		dbPort,

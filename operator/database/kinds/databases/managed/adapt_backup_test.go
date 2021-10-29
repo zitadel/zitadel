@@ -1,6 +1,7 @@
 package managed
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"testing"
 	"time"
 
@@ -50,17 +51,7 @@ func getTreeWithDBAndBackup(t *testing.T, masterkey string, saJson string, backu
 
 func TestManaged_AdaptBucketBackup(t *testing.T) {
 	monitor := mntr.Monitor{}
-	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
 
-	labels := map[string]string{
-		"app.kubernetes.io/component":  "backup",
-		"app.kubernetes.io/managed-by": "testOp",
-		"app.kubernetes.io/name":       "backup-serviceaccountjson",
-		"app.kubernetes.io/part-of":    "testProd",
-		"app.kubernetes.io/version":    "testVersion",
-		"caos.ch/apiversion":           "v0",
-		"caos.ch/kind":                 "BucketBackup",
-	}
 	namespace := "testNs"
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
@@ -70,11 +61,21 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 	saJson := "testSA"
 	masterkey := "testMk"
 	version := "test"
+	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
+	labels := map[string]string{
+		"app.kubernetes.io/component":  "backup",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       core.GetSecretName(backupName),
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
 	features := []string{backup.Normal}
-	bucket.SetBackup(k8sClient, namespace, labels, saJson)
+	bucket.SetBackup(k8sClient, namespace, backupName, labels, saJson)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
 	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features, "")(monitor, desired, &tree.Tree{})
@@ -91,16 +92,7 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 
 func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 	monitor := mntr.Monitor{}
-	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
-	labels := map[string]string{
-		"app.kubernetes.io/component":  "backup",
-		"app.kubernetes.io/managed-by": "testOp",
-		"app.kubernetes.io/name":       "backup-serviceaccountjson",
-		"app.kubernetes.io/part-of":    "testProd",
-		"app.kubernetes.io/version":    "testVersion",
-		"caos.ch/apiversion":           "v0",
-		"caos.ch/kind":                 "BucketBackup",
-	}
+
 	namespace := "testNs"
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
@@ -110,6 +102,16 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 	saJson := "testSA"
 	backupName := "testBucket"
 	version := "test"
+	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
+	labels := map[string]string{
+		"app.kubernetes.io/component":  "backup",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       core.GetSecretName(backupName),
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
 
 	features := []string{backup.Instant}
 	bucket.SetInstantBackup(k8sClient, namespace, backupName, labels, saJson)
@@ -131,16 +133,7 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 
 func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	monitor := mntr.Monitor{}
-	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
-	labels := map[string]string{
-		"app.kubernetes.io/component":  "backup",
-		"app.kubernetes.io/managed-by": "testOp",
-		"app.kubernetes.io/name":       "backup-serviceaccountjson",
-		"app.kubernetes.io/part-of":    "testProd",
-		"app.kubernetes.io/version":    "testVersion",
-		"caos.ch/apiversion":           "v0",
-		"caos.ch/kind":                 "BucketBackup",
-	}
+
 	namespace := "testNs"
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
@@ -150,6 +143,16 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	saJson := "testSA"
 	backupName := "testBucket"
+	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd", "testOp", "testVersion"), "testKind", "v0"), "database")
+	labels := map[string]string{
+		"app.kubernetes.io/component":  "backup",
+		"app.kubernetes.io/managed-by": "testOp",
+		"app.kubernetes.io/name":       core.GetSecretName(backupName),
+		"app.kubernetes.io/part-of":    "testProd",
+		"app.kubernetes.io/version":    "testVersion",
+		"caos.ch/apiversion":           "v0",
+		"caos.ch/kind":                 "BucketBackup",
+	}
 
 	features := []string{restore.Instant}
 	bucket.SetRestore(k8sClient, namespace, backupName, labels, saJson)

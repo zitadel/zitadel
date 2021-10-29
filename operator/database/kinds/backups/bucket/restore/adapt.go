@@ -1,6 +1,7 @@
 package restore
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -17,8 +18,6 @@ const (
 	defaultMode        = int32(256)
 	certPath           = "/cockroach/cockroach-certs"
 	secretPath         = "/secrets/sa.json"
-	jobPrefix          = "backup-"
-	jobSuffix          = "-restore"
 	internalSecretName = "client-certs"
 	rootSecretName     = "cockroachdb.client.root"
 	timeout            = 45 * time.Minute
@@ -35,7 +34,6 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	checkDBReady operator.EnsureFunc,
-	secretName string,
 	secretKey string,
 	dbURL string,
 	dbPort int32,
@@ -46,7 +44,7 @@ func AdaptFunc(
 	err error,
 ) {
 
-	jobName := jobPrefix + backupName + jobSuffix
+	jobName := core.GetRestoreJobName(backupName)
 	command := getCommand(
 		timestamp,
 		bucketName,
@@ -59,10 +57,10 @@ func AdaptFunc(
 
 	jobdef := getJob(
 		namespace,
-		labels.MustForName(componentLabels, GetJobName(backupName)),
+		labels.MustForName(componentLabels, jobName),
 		nodeselector,
 		tolerations,
-		secretName,
+		core.GetSecretName(backupName),
 		secretKey,
 		command,
 		image,
@@ -93,8 +91,4 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
 
 		nil
-}
-
-func GetJobName(backupName string) string {
-	return jobPrefix + backupName + jobSuffix
 }

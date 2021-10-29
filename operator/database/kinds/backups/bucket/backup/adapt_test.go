@@ -1,6 +1,7 @@
 package backup
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/core"
 	"testing"
 
 	"github.com/caos/orbos/mntr"
@@ -30,10 +31,10 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 	backupName := "testName"
 	image := "testImage"
 	secretKey := "testKey"
-	secretName := "testSecretName"
+	secretName := core.GetSecretName(backupName)
 	dbURL := "testDB"
 	dbPort := int32(80)
-	jobName := GetJobName(backupName)
+	jobName := core.GetBackupJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -74,7 +75,6 @@ func TestBackup_AdaptInstantBackup1(t *testing.T) {
 		checkDBReady,
 		bucketName,
 		cron,
-		secretName,
 		secretKey,
 		timestamp,
 		nodeselector,
@@ -109,8 +109,8 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 	backupName := "testName2"
 	image := "testImage2"
 	secretKey := "testKey2"
-	secretName := "testSecretName2"
-	jobName := GetJobName(backupName)
+	secretName := core.GetSecretName(backupName)
+	jobName := core.GetBackupJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -151,7 +151,6 @@ func TestBackup_AdaptInstantBackup2(t *testing.T) {
 		checkDBReady,
 		bucketName,
 		cron,
-		secretName,
 		secretKey,
 		timestamp,
 		nodeselector,
@@ -186,8 +185,8 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 	backupName := "testName"
 	image := "testImage"
 	secretKey := "testKey"
-	secretName := "testSecretName"
-	jobName := GetJobName(backupName)
+	secretName := core.GetSecretName(backupName)
+	jobName := core.GetBackupJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -228,7 +227,6 @@ func TestBackup_AdaptBackup1(t *testing.T) {
 		checkDBReady,
 		bucketName,
 		cron,
-		secretName,
 		secretKey,
 		timestamp,
 		nodeselector,
@@ -263,8 +261,8 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 	backupName := "testName2"
 	image := "testImage2"
 	secretKey := "testKey2"
-	secretName := "testSecretName2"
-	jobName := GetJobName(backupName)
+	secretName := core.GetSecretName(backupName)
+	jobName := core.GetBackupJobName(backupName)
 	componentLabels := labels.MustForComponent(labels.MustForAPI(labels.MustForOperator("testProd2", "testOp2", "testVersion2"), "testKind2", "testVersion2"), "testComponent")
 	nameLabels := labels.MustForName(componentLabels, jobName)
 
@@ -305,7 +303,6 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 		checkDBReady,
 		bucketName,
 		cron,
-		secretName,
 		secretKey,
 		timestamp,
 		nodeselector,
