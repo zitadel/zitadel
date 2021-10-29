@@ -91,7 +91,7 @@ var (
 		name:  projection.IDPStylingTypeCol,
 		table: idpTable,
 	}
-	IDPOwnerCol = Column{
+	IDPOwnerTypeCol = Column{
 		name:  projection.IDPOwnerTypeCol,
 		table: idpTable,
 	}
@@ -203,6 +203,8 @@ func (q *Queries) SearchIDPs(ctx context.Context, resourceOwner string, queries 
 		sq.Or{
 			sq.Eq{
 				IDPResourceOwnerCol.identifier(): resourceOwner,
+			},
+			sq.Eq{
 				IDPResourceOwnerCol.identifier(): q.iamID,
 			},
 		},
@@ -235,14 +237,7 @@ func NewIDPIDSearchQuery(id string) (SearchQuery, error) {
 }
 
 func NewIDPOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQuery, error) {
-	switch ownerType {
-	case domain.IdentityProviderTypeOrg:
-		return NewBoolQuery(LoginPolicyColumnIsDefault, false)
-	case domain.IdentityProviderTypeSystem:
-		return NewBoolQuery(LoginPolicyColumnIsDefault, true)
-	default:
-		return nil, errors.ThrowUnimplemented(nil, "QUERY-8yZAI", "Errors.Query.InvalidRequest")
-	}
+	return NewNumberQuery(IDPOwnerTypeCol, ownerType, NumberEquals)
 }
 
 func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -267,7 +262,7 @@ func prepareIDPByIDQuery() (sq.SelectBuilder, func(*sql.Row) (*IDP, error)) {
 			IDPStateCol.identifier(),
 			IDPNameCol.identifier(),
 			IDPStylingTypeCol.identifier(),
-			IDPOwnerCol.identifier(),
+			IDPOwnerTypeCol.identifier(),
 			IDPAutoRegisterCol.identifier(),
 			OIDCIDPColIDPID.identifier(),
 			OIDCIDPColClientID.identifier(),
@@ -375,7 +370,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 			IDPStateCol.identifier(),
 			IDPNameCol.identifier(),
 			IDPStylingTypeCol.identifier(),
-			IDPOwnerCol.identifier(),
+			IDPOwnerTypeCol.identifier(),
 			IDPAutoRegisterCol.identifier(),
 			OIDCIDPColIDPID.identifier(),
 			OIDCIDPColClientID.identifier(),
