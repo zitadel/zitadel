@@ -71,6 +71,9 @@ func (wm *UserAccessTokenWriteModel) Reduce() error {
 			wm.Expiration = e.Expiration
 			wm.PreferredLanguage = e.PreferredLanguage
 			wm.UserState = domain.UserStateActive
+			if e.Expiration.Before(time.Now()) {
+				wm.UserState = domain.UserStateDeleted
+			}
 		case *user.UserTokenRemovedEvent,
 			*user.HumanSignedOutEvent,
 			*user.UserLockedEvent,

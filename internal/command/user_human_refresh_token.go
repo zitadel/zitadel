@@ -45,6 +45,9 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	refreshIdleExpiration time.Duration,
 	authTime time.Time,
 ) (accessToken *domain.Token, newRefreshToken string, err error) {
+	if userID == "" || agentID == "" || clientID == "" {
+		return nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-adg4r", "Errors.IDMissing")
+	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
 	refreshTokenID, err := c.idGenerator.Next()
 	if err != nil {
