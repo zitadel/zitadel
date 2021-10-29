@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-enum InfoSectionType {
+export enum InfoSectionType {
   INFO = 'INFO',
   SUCCESS = 'SUCCESS',
   WARN = 'WARN',
@@ -14,5 +14,5 @@ enum InfoSectionType {
 export class InfoSectionComponent {
 
   @Input() type: InfoSectionType = InfoSectionType.INFO;
-  @Input() featureLink: string = '';
+  @Input() featureLink: string | string[] = '';
 }

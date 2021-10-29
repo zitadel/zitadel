@@ -1,22 +1,22 @@
-<div class="card" appOutsideClick (clickOutside)="closeCard($event)">
-  <app-avatar
+<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+  <cnsl-avatar
     *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
     class="avatar" [forColor]="user.preferredLoginName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
-    [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
+    [name]="(user.human && user.human.profile && user.human.profile.displayName) ? user.human.profile.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
     [size]="80">
-  </app-avatar>
+  </cnsl-avatar>
 
   <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
-  <span class="u-email">{{user?.preferredLoginName}}</span>
+  <span class="u-email" *ngIf="user.preferredLoginName">{{user.preferredLoginName}}</span>
   <span class="iamuser" *ngIf="iamuser">IAM USER</span>
 
   <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
   <div class="l-accounts">
     <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
     <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">
-      <app-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''"
+      <cnsl-avatar *ngIf="session && session.displayName" class="small-avatar" [avatarUrl]="session.avatarUrl || ''"
         [forColor]="session.loginName" [size]="32">
-      </app-avatar>
+      </cnsl-avatar>
 
       <div class="col">
         <span class="user-title">{{session.displayName ? session.displayName : session.userName}} </span>

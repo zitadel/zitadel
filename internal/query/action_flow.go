@@ -51,12 +51,10 @@ type Flow struct {
 }
 
 func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (*Flow, error) {
-	query, scan := q.prepareFlowQuery()
+	query, scan := q.prepareFlowQuery(flowType)
 	stmt, args, err := query.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
 		}).ToSql()
 	if err != nil {
@@ -74,14 +72,11 @@ func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType d
 	stmt, scan := q.prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			FlowsTriggersColumnFlowType.identifier(): flowType,
-		},
-		sq.Eq{
-			FlowsTriggersColumnTriggerType.identifier(): triggerType,
-		},
-		sq.Eq{
+			FlowsTriggersColumnFlowType.identifier():      flowType,
+			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
-		}).ToSql()
+		},
+	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
 	}
@@ -177,7 +172,7 @@ func (q *Queries) prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows
 		}
 }
 
-func (q *Queries) prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+func (q *Queries) prepareFlowQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -195,6 +190,7 @@ func (q *Queries) prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, 
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Flow, error) {
 			flow := &Flow{
+				Type:           flowType,
 				TriggerActions: make(map[domain.TriggerType][]*Action),
 			}
 			for rows.Next() {

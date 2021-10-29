@@ -1,7 +1,7 @@
-<app-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
+<cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
     [timestamp]="keyResult?.details?.viewTimestamp" [selection]="selection">
     <div actions>
-        <a [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false" color="primary"
+        <a [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) === false" color="primary"
             mat-raised-button (click)="openAddKey()">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
@@ -50,7 +50,7 @@
             <ng-container matColumnDef="actions" stickyEnd>
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let key">
-                    <button [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) == false"
+                    <button [disabled]="([('user.write:' + userId), 'user.write'] | hasRole | async) === false"
                         mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}"
                         (click)="deleteKey(key)">
                         <i class="las la-trash"></i>
@@ -67,4 +67,4 @@
         <cnsl-paginator #paginator class="paginator" [timestamp]="keyResult?.details?.viewTimestamp" [length]="keyResult?.details?.totalResult || 0" [pageSize]="10"
             [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
     </div>
-</app-refresh-table>
+</cnsl-refresh-table>

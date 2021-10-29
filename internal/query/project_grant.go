@@ -156,7 +156,7 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 		SearchRequest: SearchRequest{},
 		Queries:       make([]SearchQuery, 2),
 	}
-	searchQuery.Queries[0], err = NewProjectGrantProjectIDSearchQuery(TextEquals, projectID)
+	searchQuery.Queries[0], err = NewProjectGrantProjectIDSearchQuery(projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ func (q *Queries) SearchProjectGrantsByProjectIDAndRoleKey(ctx context.Context, 
 	return q.SearchProjectGrants(ctx, searchQuery)
 }
 
-func NewProjectGrantProjectIDSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectGrantColumnProjectID, value, method)
+func NewProjectGrantProjectIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantColumnProjectID, value, TextEquals)
 }
 
 func NewProjectGrantIDsSearchQuery(values []string) (SearchQuery, error) {
@@ -194,32 +194,32 @@ func NewProjectGrantGrantedOrgIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(ProjectGrantColumnGrantedOrgID, value, TextEquals)
 }
 
-func (r *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
+func (q *ProjectGrantSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	query, err := NewProjectGrantResourceOwnerSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
-	r.Queries = append(r.Queries, query)
+	q.Queries = append(q.Queries, query)
 	return nil
 }
 
-func (r *ProjectGrantSearchQueries) AppendGrantedOrgQuery(orgID string) error {
+func (q *ProjectGrantSearchQueries) AppendGrantedOrgQuery(orgID string) error {
 	query, err := NewProjectGrantGrantedOrgIDSearchQuery(orgID)
 	if err != nil {
 		return err
 	}
-	r.Queries = append(r.Queries, query)
+	q.Queries = append(q.Queries, query)
 	return nil
 }
 
-func (r ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
+func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string) error {
 	if !authz.HasGlobalPermission(permissions) {
 		ids := authz.GetAllPermissionCtxIDs(permissions)
 		query, err := NewProjectGrantIDsSearchQuery(ids)
 		if err != nil {
 			return err
 		}
-		r.Queries = append(r.Queries, query)
+		q.Queries = append(q.Queries, query)
 	}
 	return nil
 }

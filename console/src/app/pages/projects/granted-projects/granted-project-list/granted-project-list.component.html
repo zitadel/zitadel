@@ -1,6 +1,6 @@
-<app-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
+<cnsl-granted-project-grid *ngIf="grid" [loading]="loading$ | async" (changedView)="grid = false"
     [items]="grantedProjectList">
-</app-granted-project-grid>
+</cnsl-granted-project-grid>
 
 <div *ngIf="!grid" class="view-toggle">
     <button class="icon-button" (click)="grid = true" mat-icon-button
@@ -10,7 +10,7 @@
 </div>
 
 <div *ngIf="!grid && grantedProjectList">
-    <app-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
+    <cnsl-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
         [selection]="selection" [loading]="loading$ | async">
 
         <div class="table-wrapper">
@@ -70,12 +70,12 @@
                     [routerLink]="['/granted-projects', row.projectId, 'grant', row.grantId]"></tr>
 
             </table>
-            <div *ngIf="(loading$ | async) == false && !dataSource?.data?.length" class="no-content-row">
+            <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
                 <i class="las la-exclamation"></i>
                 <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
             </div>
             <cnsl-paginator class="paginator" #paginator [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="10"
                 [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
         </div>
-    </app-refresh-table>
+    </cnsl-refresh-table>
 </div>

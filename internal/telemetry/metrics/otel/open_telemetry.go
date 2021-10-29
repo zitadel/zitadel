@@ -29,7 +29,7 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	exporter, err := prometheus.New(
 		prometheus.Config{},
 		controller.New(
-			processor.New(
+			processor.NewFactory(
 				selector.NewWithHistogramDistribution(),
 				export.CumulativeExportKindSelector(),
 				processor.WithMemory(true),

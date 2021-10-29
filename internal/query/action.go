@@ -114,9 +114,7 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*
 	stmt, scan := prepareActionQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			ActionColumnID.identifier(): id,
-		},
-		sq.Eq{
+			ActionColumnID.identifier():            id,
 			ActionColumnResourceOwner.identifier(): orgID,
 		}).ToSql()
 	if err != nil {

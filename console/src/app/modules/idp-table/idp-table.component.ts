@@ -17,7 +17,7 @@ import { PolicyComponentServiceType } from '../policies/policy-component-types.e
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
-  selector: 'app-idp-table',
+  selector: 'cnsl-idp-table',
   templateUrl: './idp-table.component.html',
   styleUrls: ['./idp-table.component.scss'],
 })

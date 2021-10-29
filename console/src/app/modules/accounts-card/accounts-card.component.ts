@@ -6,15 +6,15 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
-  selector: 'app-accounts-card',
+  selector: 'cnsl-accounts-card',
   templateUrl: './accounts-card.component.html',
   styleUrls: ['./accounts-card.component.scss'],
 })
 export class AccountsCardComponent implements OnInit {
   @Input() public user!: User.AsObject;
-  @Input() public iamuser: boolean = false;
+  @Input() public iamuser: boolean | null = false;
 
-  @Output() public close: EventEmitter<void> = new EventEmitter();
+  @Output() public closedCard: EventEmitter<void> = new EventEmitter();
   public sessions: Session.AsObject[] = [];
   public loadingUsers: boolean = false;
   constructor(public authService: AuthenticationService, private router: Router, private userService: GrpcAuthService) {
@@ -37,12 +37,12 @@ export class AccountsCardComponent implements OnInit {
 
   public editUserProfile(): void {
     this.router.navigate(['users/me']);
-    this.close.emit();
+    this.closedCard.emit();
   }
 
   public closeCard(element: HTMLElement): void {
     if (!element.classList.contains('dontcloseonclick')) {
-      this.close.emit();
+      this.closedCard.emit();
     }
   }
 
@@ -69,6 +69,6 @@ export class AccountsCardComponent implements OnInit {
 
   public logout(): void {
     this.authService.signout();
-    this.close.emit();
+    this.closedCard.emit();
   }
 }

@@ -1,4 +1,4 @@
-<app-card class="metadata-details" title="{{ 'USER.METADATA.TITLE' | translate }}">
+<cnsl-card class="metadata-details" title="{{ 'USER.METADATA.TITLE' | translate }}">
   <div card-actions class="actions">
     <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
     <button mat-raised-button color="primary" class="edit" (click)="editMetadata()">{{'ACTIONS.EDIT' | translate}}</button>
@@ -18,4 +18,4 @@
   <ng-template #emptyList>
     <p class="empty-desc">{{'USER.METADATA.EMPTY' | translate}}</p>
   </ng-template>
-</app-card>
+</cnsl-card>

@@ -6,16 +6,15 @@
   <div class="people">
     <div class="img-list" [@cardAnimation]="totalResult">
       <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-
       <ng-container *ngIf="totalResult < 10; else compact">
         <ng-container *ngFor="let member of membersSubject | async; index as i">
           <div @animate (click)="emitShowDetail()" class="avatar-circle"
             matTooltip="{{ member.displayName }} | {{member.rolesList?.join(' ')}}" [ngStyle]="{'z-index': 100 - i}">
-            <app-avatar *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
-              class="avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''" [forColor]="member?.userName"
-              [forColor]="member?.preferredLoginName"
+            <cnsl-avatar *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
+              class="avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''"
+              [forColor]="member.preferredLoginName ?? 'A'"
               [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)" [size]="32">
-            </app-avatar>
+            </cnsl-avatar>
             <ng-template #cog>
               <div class="sa-icon">
                 <i class="las la-user-cog"></i>

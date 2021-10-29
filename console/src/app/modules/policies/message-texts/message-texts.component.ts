@@ -40,6 +40,7 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { InfoSectionType } from '../../info-section/info-section.component';
 import { GridPolicy, MESSAGE_TEXTS_POLICY } from '../../policy-grid/policies';
 import { WarnDialogComponent } from '../../warn-dialog/warn-dialog.component';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
@@ -267,7 +268,7 @@ const REQUESTMAP = {
   },
 };
 @Component({
-  selector: 'app-message-texts',
+  selector: 'cnsl-message-texts',
   templateUrl: './message-texts.component.html',
   styleUrls: ['./message-texts.component.scss'],
 })
@@ -285,6 +286,7 @@ export class MessageTextsComponent implements OnDestroy {
 
   public updateRequest!: SetCustomInitMessageTextRequest | SetDefaultInitMessageTextRequest;
 
+  public InfoSectionType: any = InfoSectionType;
   public chips: {
     [messagetype: string]: Array<{ key: string; value: string; }>;
   } = {
@@ -446,6 +448,8 @@ export class MessageTextsComponent implements OnDestroy {
           return this.stripDetails((this.service as ManagementService).getCustomDomainClaimedMessageText(req));
         case MESSAGETYPES.PASSWORDLESS:
           return this.stripDetails((this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(req));
+        default:
+          return undefined;
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       switch (type) {
@@ -461,7 +465,11 @@ export class MessageTextsComponent implements OnDestroy {
           return this.stripDetails((this.service as AdminService).getCustomDomainClaimedMessageText(req));
         case MESSAGETYPES.PASSWORDLESS:
           return this.stripDetails((this.service as AdminService).getCustomPasswordlessRegistrationMessageText(req));
+        default:
+          return undefined;
       }
+    } else {
+      return undefined;
     }
   }
 
@@ -548,36 +556,36 @@ export class MessageTextsComponent implements OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(resp => {
-      if (resp) {
-        if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          const handler = (prom: Promise<any>): Promise<any> => {
-            return prom.then(() => {
-              setTimeout(() => {
-                this.loadData(this.currentType);
-              }, 1000);
-            }).catch(error => {
-              this.toast.showError(error);
-            });
-          };
+      if (resp && this.serviceType === PolicyComponentServiceType.MGMT) {
+        const handler = (prom: Promise<any>): Promise<any> => {
+          return prom.then(() => {
+            setTimeout(() => {
+              this.loadData(this.currentType);
+            }, 1000);
+          }).catch(error => {
+            this.toast.showError(error);
+          });
+        };
 
-          switch (this.currentType) {
-            case MESSAGETYPES.INIT:
-              return handler((this.service as ManagementService).resetCustomInitMessageTextToDefault(this.locale));
-            case MESSAGETYPES.VERIFYPHONE:
-              return handler((this.service as ManagementService).resetCustomVerifyPhoneMessageTextToDefault(this.locale));
-            case MESSAGETYPES.VERIFYEMAIL:
-              return handler((this.service as ManagementService).resetCustomVerifyEmailMessageTextToDefault(this.locale));
-            case MESSAGETYPES.PASSWORDRESET:
-              return handler((this.service as ManagementService).resetCustomPasswordResetMessageTextToDefault(this.locale));
-            case MESSAGETYPES.DOMAINCLAIMED:
-              return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(this.locale));
-            case MESSAGETYPES.DOMAINCLAIMED:
-              return handler((this.service as ManagementService)
-                .resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale));
-
-          }
-
+        switch (this.currentType) {
+          case MESSAGETYPES.INIT:
+            return handler((this.service as ManagementService).resetCustomInitMessageTextToDefault(this.locale));
+          case MESSAGETYPES.VERIFYPHONE:
+            return handler((this.service as ManagementService).resetCustomVerifyPhoneMessageTextToDefault(this.locale));
+          case MESSAGETYPES.VERIFYEMAIL:
+            return handler((this.service as ManagementService).resetCustomVerifyEmailMessageTextToDefault(this.locale));
+          case MESSAGETYPES.PASSWORDRESET:
+            return handler((this.service as ManagementService).resetCustomPasswordResetMessageTextToDefault(this.locale));
+          case MESSAGETYPES.DOMAINCLAIMED:
+            return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(this.locale));
+          case MESSAGETYPES.DOMAINCLAIMED:
+            return handler((this.service as ManagementService)
+              .resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale));
+          default:
+            return Promise.reject();
         }
+      } else {
+        return Promise.reject();
       }
     });
   }

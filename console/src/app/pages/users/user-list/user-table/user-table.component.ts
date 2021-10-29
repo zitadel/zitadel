@@ -35,7 +35,7 @@ enum UserListSearchKey {
 }
 
 @Component({
-  selector: 'app-user-table',
+  selector: 'cnsl-user-table',
   templateUrl: './user-table.component.html',
   styleUrls: ['./user-table.component.scss'],
   animations: [

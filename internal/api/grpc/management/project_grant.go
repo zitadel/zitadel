@@ -27,16 +27,37 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 		return nil, err
 	}
 	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
-	domains, err := s.query.SearchProjectGrants(ctx, queries)
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantsResponse{
-		Result: proj_grpc.GrantedProjectViewsToPb(domains.ProjectGrants),
+		Result: proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
 		Details: object_grpc.ToListDetails(
-			domains.Count,
-			domains.Sequence,
-			domains.Timestamp,
+			grants.Count,
+			grants.Sequence,
+			grants.Timestamp,
+		),
+	}, nil
+}
+
+func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllProjectGrantsRequest) (*mgmt_pb.ListAllProjectGrantsResponse, error) {
+	queries, err := listAllProjectGrantsRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	grants, err := s.query.SearchProjectGrants(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListAllProjectGrantsResponse{
+		Result: proj_grpc.GrantedProjectViewsToPb(grants.ProjectGrants),
+		Details: object_grpc.ToListDetails(
+			grants.Count,
+			grants.Sequence,
+			grants.Timestamp,
 		),
 	}, nil
 }
@@ -57,11 +78,11 @@ func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGra
 }
 
 func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProjectGrantRequest) (*mgmt_pb.UpdateProjectGrantResponse, error) {
-	userGrants, err := s.usergrant.UserGrantsByProjectAndGrantID(ctx, req.ProjectId, req.GrantId)
+	grants, err := s.usergrant.UserGrantsByProjectAndGrantID(ctx, req.ProjectId, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(userGrants)...)
+	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
 	if err != nil {
 		return nil, err
 	}
