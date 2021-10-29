@@ -1,0 +1,146 @@
+---
+title: Introduction
+---
+
+import {ApiCard} from '../../src/components/apicard';
+import Column from '../../src/components/column';
+
+## APIs
+
+ZITADEL provides four API's for different use cases. Three API's are built with GRPC and then generate a REST service.
+Each service's proto definition is located in the source control on GitHub.
+As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file.
+We annotate the corresponding REST methods on each possible call as well as the AuthN and AuthZ requirements.
+The last API (assets) is only a REST API because we use multipart form data.
+
+<ApiCard title="Authentication" type="AUTH">
+<Column>
+<div>
+
+## Authentication
+The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.
+
+</div>
+<div>
+
+### GRPC
+Endpoint:
+[https://api.zitadel.ch/auth/v1/](https://api.zitadel.ch/auth/v1/)
+
+### REST
+Endpoint:
+[https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
+Definition:
+
+
+</div>
+</Column>
+</ApiCard>
+
+<ApiCard title="Management" type="MGMT">
+<Column>
+
+<div>
+
+## Management
+
+The management API is as the name states the interface where systems can mutate IAM objects like, organizations, projects, clients, users and so on if they have the necessary access rights.
+To identify the current organization you can send a header `x-zitadel-orgid` or if no header is set, the organization of the authenticated user is set.
+
+</div>
+<div>
+
+### GRPC
+Endpoint:
+[https://api.zitadel.ch/management/v1/](https://api.zitadel.ch/management/v1/)
+
+### REST
+Endpoint:
+[https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
+Definition:
+
+
+</div>
+</Column>
+</ApiCard>
+
+<ApiCard title="Administration" type="ADMIN">
+<Column>
+<div>
+
+## Administration
+
+This API is intended to configure and manage the IAM itself.
+
+</div>
+<div>
+
+### GRPC
+Endpoint:
+[https://api.zitadel.ch/admin/v1/](https://api.zitadel.ch/admin/v1/)
+
+### REST
+Endpoint:
+[https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
+Definition:
+
+
+</div>
+</Column>
+</ApiCard>
+
+<ApiCard title="Assets" type="ASSET">
+<Column>
+<div>
+
+## Assets
+
+The Assets API allows you to up- and download all kinds of assets. This can be files such as logos, fonts or user avatar.
+
+</div>
+<div>
+
+### REST
+Endpoint:
+https://api.zitadel.ch/assets/v1/](https://api.zitadel.ch/assets/v1/
+Definition:
+
+
+</div>
+</Column>
+</ApiCard>
+
+## Example 
+
+See below for an example with the call **GetMyUser**.
+
+```Go
+  //User
+  rpc GetMyUser(google.protobuf.Empty) returns (UserView) {
+    option (google.api.http) = {
+      get: "/users/me"
+    };
+
+    option (caos.zitadel.utils.v1.auth_option) = {
+      permission: "authenticated"
+    };
+  }
+```
+
+As you can see the `GetMyUser` function is also available as a REST service under the path `/users/me`.
+
+In the table below you can see the URI of those calls.
+
+| Service | URI                                                                                                                                            |
+|:--------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| REST    | [https://api.zitadel.ch/auth/v1/users/me](https://api.zitadel.ch/auth/v1/users/me)                                                             |
+| GRPC    | [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser) |
+
+## Domains
+
+| Domain Name | Example               | Description                                                                                                                          |
+| :---------- | :-------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](openidoauth/endpoints#openid-connect-10-discovery)                                                  |
+| api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain.                                        |
+| login       | `accounts.zitadel.ch` | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
+| console     | `console.zitadel.ch`  | With the console.* domain we serve the assets for the management gui                                                                 |
