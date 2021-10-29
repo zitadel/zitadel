@@ -56,7 +56,48 @@ func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.Search
 		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
 	}
 }
+func listAllProjectGrantsRequestToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := AllProjectGrantQueriesToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
 
+func AllProjectGrantQueriesToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (_ []query.SearchQuery, err error) {
+	queries := make([]query.SearchQuery, 0, len(req.Queries))
+	for _, query := range req.Queries {
+		q, err := AllProjectGrantQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, q)
+	}
+	return queries, nil
+}
+
+func AllProjectGrantQueryToModel(apiQuery *proj_pb.AllProjectGrantQuery) (query.SearchQuery, error) {
+	switch q := apiQuery.Query.(type) {
+	case *proj_pb.AllProjectGrantQuery_ProjectNameQuery:
+		return query.NewProjectGrantProjectNameSearchQuery(object.TextMethodToQuery(q.ProjectNameQuery.Method), q.ProjectNameQuery.Name)
+	case *proj_pb.AllProjectGrantQuery_RoleKeyQuery:
+		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyQuery.RoleKey)
+	case *proj_pb.AllProjectGrantQuery_ProjectIdQuery:
+		return query.NewProjectGrantProjectIDSearchQuery(q.ProjectIdQuery.ProjectId)
+	case *proj_pb.AllProjectGrantQuery_GrantedOrgIdQuery:
+		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.GrantedOrgIdQuery.GrantedOrgId)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+	}
+}
 func AddProjectGrantRequestToDomain(req *mgmt_pb.AddProjectGrantRequest) *domain.ProjectGrant {
 	return &domain.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{

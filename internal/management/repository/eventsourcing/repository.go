@@ -73,6 +73,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 			NotificationDir:                     statikNotificationFS,
 			LoginTranslationFileContents:        make(map[string][]byte),
 			NotificationTranslationFileContents: make(map[string][]byte),
+			Query:                               queries,
 		},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI},
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},

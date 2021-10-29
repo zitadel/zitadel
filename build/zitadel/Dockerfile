@@ -19,7 +19,7 @@ FROM ${BUILDARCH}-base AS base
 ARG PROTOC_VERSION=3.18.0
 ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
 ARG GATEWAY_VERSION=2.6.0
-ARG VALIDATOR_VERSION=0.6.1
+ARG VALIDATOR_VERSION=0.6.2
 ARG GRPC_WEB_VERSION=1.2.1
 # no arm specific version available and x86 works fine at the moment:
 ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
@@ -67,9 +67,9 @@ RUN apt install openssl tzdata tar
 
 # cockroach binary used to backup database
 RUN mkdir /usr/local/lib/cockroach
-RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v21.1.7.linux-amd64.tgz \
-    | tar  xvz && cp -i cockroach-v21.1.7.linux-amd64/cockroach /usr/local/bin/
-RUN rm -r cockroach-v21.1.7.linux-amd64
+RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v21.1.11.linux-amd64.tgz \
+    | tar  xvz && cp -i cockroach-v21.1.11.linux-amd64/cockroach /usr/local/bin/
+RUN rm -r cockroach-v21.1.11.linux-amd64
 
 #######################
 ## generates static files
