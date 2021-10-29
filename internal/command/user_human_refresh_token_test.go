@@ -54,35 +54,35 @@ func TestCommands_AddAccessAndRefreshToken(t *testing.T) {
 		args   args
 		res    res
 	}{
-		//{
-		//	name: "missing ID, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(t),
-		//	},
-		//	args: args{},
-		//	res: res{
-		//		err: caos_errs.IsErrorInvalidArgument,
-		//	},
-		//},
-		//{
-		//	name: "add refresh token, user inactive, error",
-		//	fields: fields{
-		//		eventstore: eventstoreExpect(t,
-		//			expectFilter(),
-		//		),
-		//		idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "refreshTokenID1"),
-		//	},
-		//	args: args{
-		//		ctx:      context.Background(),
-		//		orgID:    "orgID",
-		//		agentID:  "agentID",
-		//		userID:   "userID",
-		//		clientID: "clientID",
-		//	},
-		//	res: res{
-		//		err: caos_errs.IsNotFound,
-		//	},
-		//},
+		{
+			name: "missing ID, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t),
+			},
+			args: args{},
+			res: res{
+				err: caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			name: "add refresh token, user inactive, error",
+			fields: fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(),
+				),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "refreshTokenID1"),
+			},
+			args: args{
+				ctx:      context.Background(),
+				orgID:    "orgID",
+				agentID:  "agentID",
+				userID:   "userID",
+				clientID: "clientID",
+			},
+			res: res{
+				err: caos_errs.IsNotFound,
+			},
+		},
 		{
 			name: "renew refresh token, invalid token, error",
 			fields: fields{
