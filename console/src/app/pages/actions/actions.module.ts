@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -28,12 +29,7 @@ import { AddActionDialogComponent } from './add-action-dialog/add-action-dialog.
 import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.component';
 
 @NgModule({
-  declarations: [
-    ActionsComponent,
-    ActionTableComponent,
-    AddActionDialogComponent,
-    AddFlowDialogComponent,
-  ],
+  declarations: [ActionsComponent, ActionTableComponent, AddActionDialogComponent, AddFlowDialogComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -49,6 +45,7 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     DurationToSecondsPipeModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
+    HasRoleModule,
     MatTooltipModule,
     MatCheckboxModule,
     InputModule,
@@ -58,6 +55,6 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     DragDropModule,
     InfoSectionModule,
     HasFeaturePipeModule,
-  ]
+  ],
 })
-export class ActionsModule { }
+export class ActionsModule {}
