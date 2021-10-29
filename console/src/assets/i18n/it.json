@@ -759,7 +759,7 @@
       "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura gli Identity Provider",
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
-      "ADVANCED":"Impostazioni avanzate",
+      "ADVANCED": "Impostazioni avanzate",
       "SAVED": "Salvato con successo!"
     },
     "PRIVACY_POLICY": {
@@ -824,7 +824,7 @@
         "passwordlessRegistrationDoneText": "Registrazione autenticazione passwordless finita",
         "passwordlessRegistrationText": "Registrazione autenticazione passwordless",
         "passwordlessText": "Autenticazione passwordless",
-        "externalRegistrationUserOverviewText":"Registrazione utente esterno"
+        "externalRegistrationUserOverviewText": "Registrazione utente esterno"
       }
     },
     "MESSAGE_TEXTS": {
@@ -1042,8 +1042,13 @@
         "MEMBERTITLE": "Manager",
         "MEMBERDESC": "Questi sono i manager dell'org grant. Aggiungi qui gli utenti che devono ottenere l'accesso per modificare i dati del progetto.",
         "PROJECTNAME": "Nome del progetto",
-        "GRANTEDORG":"Organizzazione concessa",
+        "GRANTEDORG": "Organizzazione concessa",
         "RESOURCEOWNER": "Resource owner"
+      },
+      "STATE": "Stato",
+      "STATES": {
+        "1": "Attivo",
+        "2": "Inattivo"
       },
       "SHOWDETAIL": "Mostra dettagli",
       "USER": "Utente",
@@ -1137,7 +1142,7 @@
     "LIST": {
       "TITLE": "Identity Providers",
       "DESCRIPTION": "Definisci ulteriori Identity Provider, che possono essere utilizzati per l'autenticazione nelle tue organizzazioni.",
-      "ACTIVETITLE":"Identity Providers"
+      "ACTIVETITLE": "Identity Providers"
     },
     "CREATE": {
       "TITLE": "Nuovo IDP",
@@ -1146,8 +1151,8 @@
     "DETAIL": {
       "TITLE": "Identity Provider",
       "DESCRIPTION": "Configurazione generale del tuo fornitore di identit\u00e0.",
-      "DATECREATED":"Creato",
-      "DATECHANGED":"Cambiato"
+      "DATECREATED": "Creato",
+      "DATECHANGED": "Cambiato"
     },
     "OWNERTYPES": {
       "0": "sconosciuto",
@@ -1171,11 +1176,11 @@
       "0": "No Styling",
       "1": "Google"
     },
-    "ADD":"Aggiungi Identity Provider",
+    "ADD": "Aggiungi Identity Provider",
     "AUTOREGISTER": "Registrazione automatica",
     "AUTOREGISTER_DESC": "Se \u00e8 selezionato e non esiste ancora un account, ne verr\u00e0 creato uno.",
     "TYPE": "Tipo",
-    "OWNER":"Owner",
+    "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Nome",
     "CONFIG": "Configurazione",
@@ -1186,7 +1191,7 @@
     "CLIENTSECRET": "Client Secret",
     "IDPDISPLAYNAMMAPPING": "Mapping del nome di visualizzazione IDP",
     "USERNAMEMAPPING": "Mapping del nome utente",
-    "DATES":"Date",
+    "DATES": "Date",
     "CREATIONDATE": "Creato",
     "CHANGEDATE": "Ultima modifica",
     "DEACTIVATE": "Disattiva",
@@ -1197,15 +1202,15 @@
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "OIDC": {
-      "TITLE":"OpenId Connect IDP",
-      "DESCRIPTION":"Inserisci i dati per il OIDC Identity Provider."
+      "TITLE": "OpenId Connect IDP",
+      "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
     },
     "JWT": {
-      "TITLE":"JWT IDP",
-      "DESCRIPTION":"Inserisci i dati per il JWT Identity Provider.",
-      "HEADERNAME":"Header Name",
-      "JWTENDPOINT":"JWT Endpoint",
-      "JWTKEYSENDPOINT":"JWT Keys Endpoint"
+      "TITLE": "JWT IDP",
+      "DESCRIPTION": "Inserisci i dati per il JWT Identity Provider.",
+      "HEADERNAME": "Header Name",
+      "JWTENDPOINT": "JWT Endpoint",
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
     },
     "TOAST": {
       "SAVED": "Salvato con successo.",
