@@ -36,7 +36,7 @@ func (s *Server) RevokeMyRefreshToken(ctx context.Context, req *auth.RevokeMyRef
 	}, nil
 }
 
-func (s *Server) RevokeAllMyRefreshTokens(ctx context.Context, req *auth.RevokeAllMyRefreshTokensRequest) (*auth.RevokeAllMyRefreshTokensResponse, error) {
+func (s *Server) RevokeAllMyRefreshTokens(ctx context.Context, _ *auth.RevokeAllMyRefreshTokensRequest) (*auth.RevokeAllMyRefreshTokensResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	res, err := s.repo.SearchMyRefreshTokens(ctx, ctxData.UserID, ListMyRefreshTokensRequestToModel(nil))
 	if err != nil {
