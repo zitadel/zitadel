@@ -33,7 +33,7 @@
     "cors": "^2.8.5",
     "file-saver": "^2.0.5",
     "google-proto-files": "^2.4.0",
-    "google-protobuf": "^3.18.0",
+    "google-protobuf": "^3.19.1",
     "grpc-web": "^1.2.1",
     "libphonenumber-js": "^1.9.34",
     "moment": "^2.29.1",
