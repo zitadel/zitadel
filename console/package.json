@@ -48,7 +48,7 @@
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
-    "@angular-eslint/builder": "12.5.0",
+    "@angular-eslint/builder": "12.6.1",
     "@angular-eslint/eslint-plugin": "12.5.0",
     "@angular-eslint/eslint-plugin-template": "12.5.0",
     "@angular-eslint/schematics": "12.5.0",
