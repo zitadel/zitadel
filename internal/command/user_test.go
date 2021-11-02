@@ -1078,7 +1078,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"idpConfigID",
 								"displayName",
@@ -1107,7 +1107,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("idpConfigID", "externalUserID")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("idpConfigID", "externalUserID")),
 					),
 				),
 			},

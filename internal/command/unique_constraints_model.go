@@ -131,7 +131,7 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
 		case *user.UserRemovedEvent:
 			rm.removeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.UniqueUsername)
-			rm.listRemoveUniqueConstraint(e.Aggregate().ID, user.UniqueExternalIDPType)
+			rm.listRemoveUniqueConstraint(e.Aggregate().ID, user.UniqueUserIDPLinkType)
 		case *user.UsernameChangedEvent:
 			policy, err := rm.commandProvider.getOrgIAMPolicy(rm.ctx, e.Aggregate().ResourceOwner)
 			if err != nil {
@@ -146,12 +146,12 @@ func (rm *UniqueConstraintReadModel) Reduce() error {
 				continue
 			}
 			rm.changeUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, user.NewAddUsernameUniqueConstraint(e.UserName, e.Aggregate().ResourceOwner, policy.UserLoginMustBeDomain))
-		case *user.HumanExternalIDPAddedEvent:
-			rm.addUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID))
-		case *user.HumanExternalIDPRemovedEvent:
-			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
-		case *user.HumanExternalIDPCascadeRemovedEvent:
-			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueExternalIDPType)
+		case *user.UserIDPLinkAddedEvent:
+			rm.addUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.NewAddUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID))
+		case *user.UserIDPLinkRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueUserIDPLinkType)
+		case *user.UserIDPLinkCascadeRemovedEvent:
+			rm.removeUniqueConstraint(e.Aggregate().ID, e.IDPConfigID+e.ExternalUserID, user.UniqueUserIDPLinkType)
 		case *usergrant.UserGrantAddedEvent:
 			rm.addUniqueConstraint(e.Aggregate().ID, e.Aggregate().ID, usergrant.NewAddUserGrantUniqueConstraint(e.Aggregate().ResourceOwner, e.UserID, e.ProjectID, e.ProjectGrantID))
 		case *usergrant.UserGrantRemovedEvent:
@@ -224,9 +224,9 @@ func (rm *UniqueConstraintReadModel) Query() *eventstore.SearchQueryBuilder {
 			user.UserUserNameChangedType,
 			user.UserDomainClaimedType,
 			user.UserRemovedType,
-			user.HumanExternalIDPAddedType,
-			user.HumanExternalIDPRemovedType,
-			user.HumanExternalIDPCascadeRemovedType,
+			user.UserIDPLinkAddedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
 			usergrant.UserGrantAddedType,
 			usergrant.UserGrantRemovedType,
 			usergrant.UserGrantCascadeRemovedType,

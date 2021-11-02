@@ -17,7 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
+func TestCommandSide_BulkAddUserIDPLinks(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -25,7 +25,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 		ctx           context.Context
 		userID        string
 		resourceOwner string
-		externalIDPs  []*domain.ExternalIDP
+		links         []*domain.UserIDPLink
 	}
 	type res struct {
 		err func(error) bool
@@ -46,7 +46,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 			args: args{
 				ctx:    context.Background(),
 				userID: "",
-				externalIDPs: []*domain.ExternalIDP{
+				links: []*domain.UserIDPLink{
 					{
 						IDPConfigID:    "config1",
 						ExternalUserID: "externaluser1",
@@ -85,7 +85,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				externalIDPs: []*domain.ExternalIDP{
+				links: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user2",
@@ -110,7 +110,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				externalIDPs: []*domain.ExternalIDP{
+				links: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -137,7 +137,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				externalIDPs: []*domain.ExternalIDP{
+				links: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -171,7 +171,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanExternalIDPAddedEvent(context.Background(),
+								user.NewUserIDPLinkAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"config1",
 									"name",
@@ -179,7 +179,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(user.NewAddExternalIDPUniqueConstraint("config1", "externaluser1")),
+						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("config1", "externaluser1")),
 					),
 				),
 			},
@@ -187,7 +187,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				externalIDPs: []*domain.ExternalIDP{
+				links: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -221,7 +221,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanExternalIDPAddedEvent(context.Background(),
+								user.NewUserIDPLinkAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"config1",
 									"name",
@@ -229,7 +229,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(user.NewAddExternalIDPUniqueConstraint("config1", "externaluser1")),
+						uniqueConstraintsFromEventConstraint(user.NewAddUserIDPLinkUniqueConstraint("config1", "externaluser1")),
 					),
 				),
 			},
@@ -237,7 +237,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 				ctx:           context.Background(),
 				userID:        "user1",
 				resourceOwner: "org1",
-				externalIDPs: []*domain.ExternalIDP{
+				links: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -256,7 +256,7 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.BulkAddedHumanExternalIDP(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.externalIDPs)
+			err := r.BulkAddedUserIDPLinks(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.links)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -267,13 +267,13 @@ func TestCommandSide_BulkAddExternalIDPs(t *testing.T) {
 	}
 }
 
-func TestCommandSide_RemoveExternalIDP(t *testing.T) {
+func TestCommandSide_RemoveUserIDPLink(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx         context.Context
-		externalIDP *domain.ExternalIDP
+		ctx  context.Context
+		link *domain.UserIDPLink
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -294,7 +294,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				externalIDP: &domain.ExternalIDP{
+				link: &domain.UserIDPLink{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
@@ -315,7 +315,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				externalIDP: &domain.ExternalIDP{
+				link: &domain.UserIDPLink{
 					IDPConfigID:    "config1",
 					ExternalUserID: "externaluser1",
 				},
@@ -331,7 +331,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"config1",
 								"name",
@@ -351,7 +351,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				externalIDP: &domain.ExternalIDP{
+				link: &domain.UserIDPLink{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
@@ -373,7 +373,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				externalIDP: &domain.ExternalIDP{
+				link: &domain.UserIDPLink{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
@@ -392,7 +392,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"config1",
 								"name",
@@ -403,20 +403,20 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanExternalIDPRemovedEvent(context.Background(),
+								user.NewUserIDPLinkRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"config1",
 									"externaluser1",
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("config1", "externaluser1")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("config1", "externaluser1")),
 					),
 				),
 			},
 			args: args{
 				ctx: context.Background(),
-				externalIDP: &domain.ExternalIDP{
+				link: &domain.UserIDPLink{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "user1",
 					},
@@ -436,7 +436,7 @@ func TestCommandSide_RemoveExternalIDP(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveHumanExternalIDP(tt.args.ctx, tt.args.externalIDP)
+			got, err := r.RemoveUserIDPLink(tt.args.ctx, tt.args.link)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -492,7 +492,7 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"config1",
 								"name",
@@ -543,7 +543,7 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewHumanExternalIDPCheckSucceededEvent(context.Background(),
+								user.NewUserIDPCheckSucceededEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									&user.AuthRequestInfo{
 										ID:                  "request1",
@@ -574,7 +574,7 @@ func TestCommandSide_ExternalLoginCheck(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.HumanExternalLoginChecked(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.authRequest)
+			err := r.UserIDPLoginChecked(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.authRequest)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

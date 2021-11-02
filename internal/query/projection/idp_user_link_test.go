@@ -24,14 +24,14 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			name: "reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.HumanExternalIDPAddedType),
+					repository.EventType(user.UserIDPLinkAddedType),
 					user.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
     "userId": "external-user-id",
     "displayName": "gigi@caos.ch" 
 }`),
-				), user.HumanExternalIDPAddedEventMapper),
+				), user.UserIDPLinkAddedEventMapper),
 			},
 			reduce: (&IDPUserLinkProjection{}).reduceAdded,
 			want: wantReduce{
@@ -62,13 +62,13 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			name: "reduceRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.HumanExternalIDPRemovedType),
+					repository.EventType(user.UserIDPLinkRemovedType),
 					user.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
     "userId": "external-user-id"
 }`),
-				), user.HumanExternalIDPRemovedEventMapper),
+				), user.UserIDPLinkRemovedEventMapper),
 			},
 			reduce: (&IDPUserLinkProjection{}).reduceRemoved,
 			want: wantReduce{
@@ -94,13 +94,13 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			name: "reduceCascadeRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.HumanExternalIDPCascadeRemovedType),
+					repository.EventType(user.UserIDPLinkCascadeRemovedType),
 					user.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
     "userId": "external-user-id"
 }`),
-				), user.HumanExternalIDPCascadeRemovedEventMapper),
+				), user.UserIDPLinkCascadeRemovedEventMapper),
 			},
 			reduce: (&IDPUserLinkProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
