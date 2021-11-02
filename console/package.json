@@ -51,7 +51,7 @@
     "@angular-eslint/builder": "12.5.0",
     "@angular-eslint/eslint-plugin": "12.5.0",
     "@angular-eslint/eslint-plugin-template": "12.5.0",
-    "@angular-eslint/schematics": "12.5.0",
+    "@angular-eslint/schematics": "12.6.1",
     "@angular-eslint/template-parser": "12.5.0",
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
