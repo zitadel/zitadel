@@ -9,7 +9,7 @@ jobs:
   e2e-testing:
     name: E2E-testing with an ORBOS cluster
     runs-on: ubuntu-18.04
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    #if: ${{ github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
