@@ -58,6 +58,32 @@ export class AuthUserDetailComponent implements OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  public changeUsername(): void {
+    const dialogRefPhone = this.dialog.open(EditDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.CHANGE',
+        cancelKey: 'ACTIONS.CANCEL',
+        labelKey: 'ACTIONS.NEWVALUE',
+        titleKey: 'USER.PROFILE.CHANGEUSERNAME_TITLE',
+        descriptionKey: 'USER.PROFILE.CHANGEUSERNAME_DESC',
+        value: this.user.userName,
+      },
+      width: '400px',
+    });
+
+    dialogRefPhone.afterClosed().subscribe(resp => {
+      if (resp && resp !== this.user.userName) {
+        this.userService.updateMyUserName(resp).then(() => {
+            this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
+            this.refreshUser();
+          })
+          .catch(error => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
   public saveProfile(profileData: Profile.AsObject): void {
     if (this.user.human) {
       this.user.human.profile = profileData;

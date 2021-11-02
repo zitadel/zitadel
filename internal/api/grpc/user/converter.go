@@ -233,10 +233,10 @@ func WebAuthNTokenToWebAuthNKeyPb(token *domain.WebAuthNToken) *user_pb.WebAuthN
 	}
 }
 
-func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*domain.ExternalIDP {
-	idps := make([]*domain.ExternalIDP, len(externalIDPs))
+func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*domain.UserIDPLink {
+	idps := make([]*domain.UserIDPLink, len(externalIDPs))
 	for i, idp := range externalIDPs {
-		idps[i] = &domain.ExternalIDP{
+		idps[i] = &domain.UserIDPLink{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -10,31 +11,31 @@ import (
 )
 
 const (
-	UniqueExternalIDPType    = "external_idps"
-	externalIDPEventPrefix   = humanEventPrefix + "externalidp."
-	externalLoginEventPrefix = humanEventPrefix + "externallogin."
+	UniqueUserIDPLinkType  = "external_idps"
+	UserIDPLinkEventPrefix = humanEventPrefix + "externalidp."
+	idpLoginEventPrefix    = humanEventPrefix + "externallogin."
 
-	HumanExternalIDPAddedType          = externalIDPEventPrefix + "added"
-	HumanExternalIDPRemovedType        = externalIDPEventPrefix + "removed"
-	HumanExternalIDPCascadeRemovedType = externalIDPEventPrefix + "cascade.removed"
+	UserIDPLinkAddedType          = UserIDPLinkEventPrefix + "added"
+	UserIDPLinkRemovedType        = UserIDPLinkEventPrefix + "removed"
+	UserIDPLinkCascadeRemovedType = UserIDPLinkEventPrefix + "cascade.removed"
 
-	HumanExternalLoginCheckSucceededType = externalLoginEventPrefix + "check.succeeded"
+	UserIDPLoginCheckSucceededType = idpLoginEventPrefix + "check.succeeded"
 )
 
-func NewAddExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
+func NewAddUserIDPLinkUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
-		UniqueExternalIDPType,
+		UniqueUserIDPLinkType,
 		idpConfigID+externalUserID,
 		"Errors.User.ExternalIDP.AlreadyExists")
 }
 
-func NewRemoveExternalIDPUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
+func NewRemoveUserIDPLinkUniqueConstraint(idpConfigID, externalUserID string) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
-		UniqueExternalIDPType,
+		UniqueUserIDPLinkType,
 		idpConfigID+externalUserID)
 }
 
-type HumanExternalIDPAddedEvent struct {
+type UserIDPLinkAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID    string `json:"idpConfigId,omitempty"`
@@ -42,26 +43,26 @@ type HumanExternalIDPAddedEvent struct {
 	DisplayName    string `json:"displayName,omitempty"`
 }
 
-func (e *HumanExternalIDPAddedEvent) Data() interface{} {
+func (e *UserIDPLinkAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanExternalIDPAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewAddExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
+func (e *UserIDPLinkAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewAddUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPAddedEvent(
+func NewUserIDPLinkAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
 	displayName,
 	externalUserID string,
-) *HumanExternalIDPAddedEvent {
-	return &HumanExternalIDPAddedEvent{
+) *UserIDPLinkAddedEvent {
+	return &UserIDPLinkAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			HumanExternalIDPAddedType,
+			UserIDPLinkAddedType,
 		),
 		IDPConfigID:    idpConfigID,
 		DisplayName:    displayName,
@@ -69,8 +70,8 @@ func NewHumanExternalIDPAddedEvent(
 	}
 }
 
-func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPAddedEvent{
+func UserIDPLinkAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &UserIDPLinkAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -82,40 +83,40 @@ func HumanExternalIDPAddedEventMapper(event *repository.Event) (eventstore.Event
 	return e, nil
 }
 
-type HumanExternalIDPRemovedEvent struct {
+type UserIDPLinkRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID    string `json:"idpConfigId"`
 	ExternalUserID string `json:"userId,omitempty"`
 }
 
-func (e *HumanExternalIDPRemovedEvent) Data() interface{} {
+func (e *UserIDPLinkRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanExternalIDPRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
+func (e *UserIDPLinkRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPRemovedEvent(
+func NewUserIDPLinkRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
 	externalUserID string,
-) *HumanExternalIDPRemovedEvent {
-	return &HumanExternalIDPRemovedEvent{
+) *UserIDPLinkRemovedEvent {
+	return &UserIDPLinkRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			HumanExternalIDPRemovedType,
+			UserIDPLinkRemovedType,
 		),
 		IDPConfigID:    idpConfigID,
 		ExternalUserID: externalUserID,
 	}
 }
 
-func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPRemovedEvent{
+func UserIDPLinkRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &UserIDPLinkRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
@@ -127,86 +128,86 @@ func HumanExternalIDPRemovedEventMapper(event *repository.Event) (eventstore.Eve
 	return e, nil
 }
 
-type HumanExternalIDPCascadeRemovedEvent struct {
+type UserIDPLinkCascadeRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	IDPConfigID    string `json:"idpConfigId"`
 	ExternalUserID string `json:"userId,omitempty"`
 }
 
-func (e *HumanExternalIDPCascadeRemovedEvent) Data() interface{} {
+func (e *UserIDPLinkCascadeRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanExternalIDPCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveExternalIDPUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
+func (e *UserIDPLinkCascadeRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return []*eventstore.EventUniqueConstraint{NewRemoveUserIDPLinkUniqueConstraint(e.IDPConfigID, e.ExternalUserID)}
 }
 
-func NewHumanExternalIDPCascadeRemovedEvent(
+func NewUserIDPLinkCascadeRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	idpConfigID,
 	externalUserID string,
-) *HumanExternalIDPCascadeRemovedEvent {
-	return &HumanExternalIDPCascadeRemovedEvent{
+) *UserIDPLinkCascadeRemovedEvent {
+	return &UserIDPLinkCascadeRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			HumanExternalIDPCascadeRemovedType,
+			UserIDPLinkCascadeRemovedType,
 		),
 		IDPConfigID:    idpConfigID,
 		ExternalUserID: externalUserID,
 	}
 }
 
-func HumanExternalIDPCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPCascadeRemovedEvent{
+func UserIDPLinkCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &UserIDPLinkCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-2M0sd", "unable to unmarshal user external idp cascade removed")
+		return nil, errors.ThrowInternal(err, "USER-dKGqO", "unable to unmarshal user external idp cascade removed")
 	}
 
 	return e, nil
 }
 
-type HumanExternalIDPCheckSucceededEvent struct {
+type UserIDPCheckSucceededEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	*AuthRequestInfo
 }
 
-func (e *HumanExternalIDPCheckSucceededEvent) Data() interface{} {
+func (e *UserIDPCheckSucceededEvent) Data() interface{} {
 	return e
 }
 
-func (e *HumanExternalIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *UserIDPCheckSucceededEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewHumanExternalIDPCheckSucceededEvent(
+func NewUserIDPCheckSucceededEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	info *AuthRequestInfo) *HumanExternalIDPCheckSucceededEvent {
-	return &HumanExternalIDPCheckSucceededEvent{
+	info *AuthRequestInfo) *UserIDPCheckSucceededEvent {
+	return &UserIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			HumanExternalLoginCheckSucceededType,
+			UserIDPLoginCheckSucceededType,
 		),
 		AuthRequestInfo: info,
 	}
 }
 
-func HumanExternalIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	e := &HumanExternalIDPCheckSucceededEvent{
+func UserIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+	e := &UserIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-2M0sd", "unable to unmarshal user external idp check succeeded")
+		return nil, errors.ThrowInternal(err, "USER-oikSS", "unable to unmarshal user external idp check succeeded")
 	}
 
 	return e, nil

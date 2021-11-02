@@ -164,7 +164,7 @@ type UserRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	userName          string
-	externalIDPs      []*domain.ExternalIDP
+	externalIDPs      []*domain.UserIDPLink
 	loginMustBeDomain bool
 }
 
@@ -178,7 +178,7 @@ func (e *UserRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 		events = append(events, NewRemoveUsernameUniqueConstraint(e.userName, e.Aggregate().ResourceOwner, e.loginMustBeDomain))
 	}
 	for _, idp := range e.externalIDPs {
-		events = append(events, NewRemoveExternalIDPUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
+		events = append(events, NewRemoveUserIDPLinkUniqueConstraint(idp.IDPConfigID, idp.ExternalUserID))
 	}
 	return events
 }
@@ -187,7 +187,7 @@ func NewUserRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userName string,
-	externalIDPs []*domain.ExternalIDP,
+	externalIDPs []*domain.UserIDPLink,
 	userLoginMustBeDomain bool,
 ) *UserRemovedEvent {
 	return &UserRemovedEvent{
