@@ -6,18 +6,18 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-type HumanExternalIDPWriteModel struct {
+type UserIDPLinkWriteModel struct {
 	eventstore.WriteModel
 
 	IDPConfigID    string
 	ExternalUserID string
 	DisplayName    string
 
-	State domain.ExternalIDPState
+	State domain.UserIDPLinkState
 }
 
-func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resourceOwner string) *HumanExternalIDPWriteModel {
-	return &HumanExternalIDPWriteModel{
+func NewUserIDPLinkWriteModel(userID, idpConfigID, externalUserID, resourceOwner string) *UserIDPLinkWriteModel {
+	return &UserIDPLinkWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
@@ -27,20 +27,20 @@ func NewHumanExternalIDPWriteModel(userID, idpConfigID, externalUserID, resource
 	}
 }
 
-func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *user.HumanExternalIDPAddedEvent:
+		case *user.UserIDPLinkAddedEvent:
 			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.HumanExternalIDPRemovedEvent:
+		case *user.UserIDPLinkRemovedEvent:
 			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.HumanExternalIDPCascadeRemovedEvent:
+		case *user.UserIDPLinkCascadeRemovedEvent:
 			if e.IDPConfigID != wm.IDPConfigID && e.ExternalUserID != wm.ExternalUserID {
 				continue
 			}
@@ -51,34 +51,34 @@ func (wm *HumanExternalIDPWriteModel) AppendEvents(events ...eventstore.EventRea
 	}
 }
 
-func (wm *HumanExternalIDPWriteModel) Reduce() error {
+func (wm *UserIDPLinkWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanExternalIDPAddedEvent:
+		case *user.UserIDPLinkAddedEvent:
 			wm.IDPConfigID = e.IDPConfigID
 			wm.DisplayName = e.DisplayName
 			wm.ExternalUserID = e.ExternalUserID
-			wm.State = domain.ExternalIDPStateActive
-		case *user.HumanExternalIDPRemovedEvent:
-			wm.State = domain.ExternalIDPStateRemoved
-		case *user.HumanExternalIDPCascadeRemovedEvent:
-			wm.State = domain.ExternalIDPStateRemoved
+			wm.State = domain.UserIDPLinkStateActive
+		case *user.UserIDPLinkRemovedEvent:
+			wm.State = domain.UserIDPLinkStateRemoved
+		case *user.UserIDPLinkCascadeRemovedEvent:
+			wm.State = domain.UserIDPLinkStateRemoved
 		case *user.UserRemovedEvent:
-			wm.State = domain.ExternalIDPStateRemoved
+			wm.State = domain.UserIDPLinkStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *HumanExternalIDPWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *UserIDPLinkWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
-		EventTypes(user.HumanExternalIDPAddedType,
-			user.HumanExternalIDPRemovedType,
-			user.HumanExternalIDPCascadeRemovedType,
+		EventTypes(user.UserIDPLinkAddedType,
+			user.UserIDPLinkRemovedType,
+			user.UserIDPLinkCascadeRemovedType,
 			user.UserRemovedType).
 		Builder()
 }
