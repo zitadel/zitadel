@@ -426,7 +426,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 		idpID                 string
 		orgID                 string
 		cascadeRemoveProvider bool
-		cascadeExternalIDPs   []*domain.ExternalIDP
+		cascadeExternalIDPs   []*domain.UserIDPLink
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -531,7 +531,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&org.NewAggregate("user1", "org1").Aggregate,
 								"idp1",
 								"name",
@@ -550,14 +550,14 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"idp1",
 							),
-							user.NewHumanExternalIDPCascadeRemovedEvent(context.Background(),
+							user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"idp1",
 								"id1",
 							),
 						),
 						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "org1")),
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("idp1", "id1")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("idp1", "id1")),
 					),
 				),
 			},
@@ -566,7 +566,7 @@ func TestCommands_RemoveIDPConfig(t *testing.T) {
 				"idp1",
 				"org1",
 				true,
-				[]*domain.ExternalIDP{
+				[]*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
