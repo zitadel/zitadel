@@ -457,7 +457,7 @@ func (repo *AuthRequestRepo) getAuthRequestNextSteps(ctx context.Context, id, us
 	}
 	steps, err := repo.nextSteps(ctx, request, checkLoggedIn)
 	if err != nil {
-		return nil, err
+		return request, err
 	}
 	request.PossibleSteps = steps
 	return request, nil

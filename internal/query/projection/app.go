@@ -19,8 +19,8 @@ type AppProjection struct {
 
 const (
 	AppProjectionTable = "zitadel.projections.apps"
-	AppAPISuffix       = "api_configs"
-	AppOIDCSuffix      = "oidc_configs"
+	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
+	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 )
 
 func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *AppProjection {
@@ -95,28 +95,30 @@ const (
 	AppColumnState         = "state"
 	AppColumnSequence      = "sequence"
 
-	APIConfigColumnAppID        = "app_id"
-	APIConfigColumnClientID     = "client_id"
-	APIConfigColumnClientSecret = "client_secret"
-	APIConfigColumnAuthMethod   = "auth_method"
+	appAPITableSuffix              = "api_configs"
+	AppAPIConfigColumnAppID        = "app_id"
+	AppAPIConfigColumnClientID     = "client_id"
+	AppAPIConfigColumnClientSecret = "client_secret"
+	AppAPIConfigColumnAuthMethod   = "auth_method"
 
-	OIDCConfigColumnAppID                    = "app_id"
-	OIDCConfigColumnVersion                  = "version"
-	OIDCConfigColumnClientID                 = "client_id"
-	OIDCConfigColumnClientSecret             = "client_secret"
-	OIDCConfigColumnRedirectUris             = "redirect_uris"
-	OIDCConfigColumnResponseTypes            = "response_types"
-	OIDCConfigColumnGrantTypes               = "grant_types"
-	OIDCConfigColumnApplicationType          = "application_type"
-	OIDCConfigColumnAuthMethodType           = "auth_method_type"
-	OIDCConfigColumnPostLogoutRedirectUris   = "post_logout_redirect_uris"
-	OIDCConfigColumnDevMode                  = "is_dev_mode"
-	OIDCConfigColumnAccessTokenType          = "access_token_type"
-	OIDCConfigColumnAccessTokenRoleAssertion = "access_token_role_assertion"
-	OIDCConfigColumnIDTokenRoleAssertion     = "id_token_role_assertion"
-	OIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
-	OIDCConfigColumnClockSkew                = "clock_skew"
-	OIDCConfigColumnAdditionalOrigins        = "additional_origins"
+	appOIDCTableSuffix                          = "oidc_configs"
+	AppOIDCConfigColumnAppID                    = "app_id"
+	AppOIDCConfigColumnVersion                  = "version"
+	AppOIDCConfigColumnClientID                 = "client_id"
+	AppOIDCConfigColumnClientSecret             = "client_secret"
+	AppOIDCConfigColumnRedirectUris             = "redirect_uris"
+	AppOIDCConfigColumnResponseTypes            = "response_types"
+	AppOIDCConfigColumnGrantTypes               = "grant_types"
+	AppOIDCConfigColumnApplicationType          = "application_type"
+	AppOIDCConfigColumnAuthMethodType           = "auth_method_type"
+	AppOIDCConfigColumnPostLogoutRedirectUris   = "post_logout_redirect_uris"
+	AppOIDCConfigColumnDevMode                  = "is_dev_mode"
+	AppOIDCConfigColumnAccessTokenType          = "access_token_type"
+	AppOIDCConfigColumnAccessTokenRoleAssertion = "access_token_role_assertion"
+	AppOIDCConfigColumnIDTokenRoleAssertion     = "id_token_role_assertion"
+	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
+	AppOIDCConfigColumnClockSkew                = "clock_skew"
+	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
 )
 
 func (p *AppProjection) reduceAppAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -221,12 +223,12 @@ func (p *AppProjection) reduceAPIConfigAdded(event eventstore.EventReader) (*han
 		e,
 		crdb.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(APIConfigColumnAppID, e.AppID),
-				handler.NewCol(APIConfigColumnClientID, e.ClientID),
-				handler.NewCol(APIConfigColumnClientSecret, e.ClientSecret),
-				handler.NewCol(APIConfigColumnAuthMethod, e.AuthMethodType),
+				handler.NewCol(AppAPIConfigColumnAppID, e.AppID),
+				handler.NewCol(AppAPIConfigColumnClientID, e.ClientID),
+				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
 			},
-			crdb.WithTableSuffix(AppAPISuffix),
+			crdb.WithTableSuffix(appAPITableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
@@ -248,10 +250,10 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.EventReader) (*h
 	}
 	cols := make([]handler.Column, 0, 2)
 	if e.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(APIConfigColumnClientSecret, e.ClientSecret))
+		cols = append(cols, handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret))
 	}
 	if e.AuthMethodType != nil {
-		cols = append(cols, handler.NewCol(APIConfigColumnAuthMethod, *e.AuthMethodType))
+		cols = append(cols, handler.NewCol(AppAPIConfigColumnAuthMethod, *e.AuthMethodType))
 	}
 	if len(cols) == 0 {
 		return crdb.NewNoOpStatement(e), nil
@@ -261,9 +263,9 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.EventReader) (*h
 		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
-				handler.NewCond(APIConfigColumnAppID, e.AppID),
+				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
 			},
-			crdb.WithTableSuffix(AppAPISuffix),
+			crdb.WithTableSuffix(appAPITableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
@@ -287,12 +289,12 @@ func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.EventReade
 		e,
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(APIConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
 			},
 			[]handler.Condition{
-				handler.NewCond(APIConfigColumnAppID, e.AppID),
+				handler.NewCond(AppAPIConfigColumnAppID, e.AppID),
 			},
-			crdb.WithTableSuffix(AppAPISuffix),
+			crdb.WithTableSuffix(appAPITableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
@@ -316,25 +318,25 @@ func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*ha
 		e,
 		crdb.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(OIDCConfigColumnAppID, e.AppID),
-				handler.NewCol(OIDCConfigColumnVersion, e.Version),
-				handler.NewCol(OIDCConfigColumnClientID, e.ClientID),
-				handler.NewCol(OIDCConfigColumnClientSecret, e.ClientSecret),
-				handler.NewCol(OIDCConfigColumnRedirectUris, pq.StringArray(e.RedirectUris)),
-				handler.NewCol(OIDCConfigColumnResponseTypes, pq.Array(e.ResponseTypes)),
-				handler.NewCol(OIDCConfigColumnGrantTypes, pq.Array(e.GrantTypes)),
-				handler.NewCol(OIDCConfigColumnApplicationType, e.ApplicationType),
-				handler.NewCol(OIDCConfigColumnAuthMethodType, e.AuthMethodType),
-				handler.NewCol(OIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(e.PostLogoutRedirectUris)),
-				handler.NewCol(OIDCConfigColumnDevMode, e.DevMode),
-				handler.NewCol(OIDCConfigColumnAccessTokenType, e.AccessTokenType),
-				handler.NewCol(OIDCConfigColumnAccessTokenRoleAssertion, e.AccessTokenRoleAssertion),
-				handler.NewCol(OIDCConfigColumnIDTokenRoleAssertion, e.IDTokenRoleAssertion),
-				handler.NewCol(OIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
-				handler.NewCol(OIDCConfigColumnClockSkew, e.ClockSkew),
-				handler.NewCol(OIDCConfigColumnAdditionalOrigins, pq.StringArray(e.AdditionalOrigins)),
+				handler.NewCol(AppOIDCConfigColumnAppID, e.AppID),
+				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
+				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppOIDCConfigColumnRedirectUris, pq.StringArray(e.RedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnResponseTypes, pq.Array(e.ResponseTypes)),
+				handler.NewCol(AppOIDCConfigColumnGrantTypes, pq.Array(e.GrantTypes)),
+				handler.NewCol(AppOIDCConfigColumnApplicationType, e.ApplicationType),
+				handler.NewCol(AppOIDCConfigColumnAuthMethodType, e.AuthMethodType),
+				handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(e.PostLogoutRedirectUris)),
+				handler.NewCol(AppOIDCConfigColumnDevMode, e.DevMode),
+				handler.NewCol(AppOIDCConfigColumnAccessTokenType, e.AccessTokenType),
+				handler.NewCol(AppOIDCConfigColumnAccessTokenRoleAssertion, e.AccessTokenRoleAssertion),
+				handler.NewCol(AppOIDCConfigColumnIDTokenRoleAssertion, e.IDTokenRoleAssertion),
+				handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, e.IDTokenUserinfoAssertion),
+				handler.NewCol(AppOIDCConfigColumnClockSkew, e.ClockSkew),
+				handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, pq.StringArray(e.AdditionalOrigins)),
 			},
-			crdb.WithTableSuffix(AppOIDCSuffix),
+			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
@@ -357,46 +359,46 @@ func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 
 	cols := make([]handler.Column, 0, 15)
 	if e.Version != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnVersion, *e.Version))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnVersion, *e.Version))
 	}
 	if e.RedirectUris != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnRedirectUris, pq.StringArray(*e.RedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnRedirectUris, pq.StringArray(*e.RedirectUris)))
 	}
 	if e.ResponseTypes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnResponseTypes, pq.Array(*e.ResponseTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnResponseTypes, pq.Array(*e.ResponseTypes)))
 	}
 	if e.GrantTypes != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnGrantTypes, pq.Array(*e.GrantTypes)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnGrantTypes, pq.Array(*e.GrantTypes)))
 	}
 	if e.ApplicationType != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnApplicationType, *e.ApplicationType))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnApplicationType, *e.ApplicationType))
 	}
 	if e.AuthMethodType != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnAuthMethodType, *e.AuthMethodType))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAuthMethodType, *e.AuthMethodType))
 	}
 	if e.PostLogoutRedirectUris != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(*e.PostLogoutRedirectUris)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnPostLogoutRedirectUris, pq.StringArray(*e.PostLogoutRedirectUris)))
 	}
 	if e.DevMode != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnDevMode, *e.DevMode))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnDevMode, *e.DevMode))
 	}
 	if e.AccessTokenType != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnAccessTokenType, *e.AccessTokenType))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAccessTokenType, *e.AccessTokenType))
 	}
 	if e.AccessTokenRoleAssertion != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnAccessTokenRoleAssertion, *e.AccessTokenRoleAssertion))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAccessTokenRoleAssertion, *e.AccessTokenRoleAssertion))
 	}
 	if e.IDTokenRoleAssertion != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnIDTokenRoleAssertion, *e.IDTokenRoleAssertion))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnIDTokenRoleAssertion, *e.IDTokenRoleAssertion))
 	}
 	if e.IDTokenUserinfoAssertion != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnIDTokenUserinfoAssertion, *e.IDTokenUserinfoAssertion))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnIDTokenUserinfoAssertion, *e.IDTokenUserinfoAssertion))
 	}
 	if e.ClockSkew != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnClockSkew, *e.ClockSkew))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnClockSkew, *e.ClockSkew))
 	}
 	if e.AdditionalOrigins != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigColumnAdditionalOrigins, pq.StringArray(*e.AdditionalOrigins)))
+		cols = append(cols, handler.NewCol(AppOIDCConfigColumnAdditionalOrigins, pq.StringArray(*e.AdditionalOrigins)))
 	}
 
 	if len(cols) == 0 {
@@ -408,9 +410,9 @@ func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 		crdb.AddUpdateStatement(
 			cols,
 			[]handler.Condition{
-				handler.NewCond(OIDCConfigColumnAppID, e.AppID),
+				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
 			},
-			crdb.WithTableSuffix(AppOIDCSuffix),
+			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
@@ -434,12 +436,12 @@ func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.EventRead
 		e,
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(OIDCConfigColumnClientSecret, e.ClientSecret),
+				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),
 			},
 			[]handler.Condition{
-				handler.NewCond(OIDCConfigColumnAppID, e.AppID),
+				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
 			},
-			crdb.WithTableSuffix(AppOIDCSuffix),
+			crdb.WithTableSuffix(appOIDCTableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
