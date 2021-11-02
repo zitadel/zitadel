@@ -9,11 +9,11 @@ import (
 )
 
 func (s *Server) GetFeatures(ctx context.Context, req *mgmt_pb.GetFeaturesRequest) (*mgmt_pb.GetFeaturesResponse, error) {
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeatureByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetFeaturesResponse{
-		Features: features_grpc.FeaturesFromModel(features),
+		Features: features_grpc.ModelFeatureToPb(features),
 	}, nil
 }

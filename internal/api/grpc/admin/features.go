@@ -10,12 +10,12 @@ import (
 )
 
 func (s *Server) GetDefaultFeatures(ctx context.Context, _ *admin_pb.GetDefaultFeaturesRequest) (*admin_pb.GetDefaultFeaturesResponse, error) {
-	features, err := s.features.GetDefaultFeatures(ctx)
+	features, err := s.query.DefaultFeature(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.GetDefaultFeaturesResponse{
-		Features: features_grpc.FeaturesFromModel(features),
+		Features: features_grpc.ModelFeatureToPb(features),
 	}, nil
 }
 
@@ -30,12 +30,12 @@ func (s *Server) SetDefaultFeatures(ctx context.Context, req *admin_pb.SetDefaul
 }
 
 func (s *Server) GetOrgFeatures(ctx context.Context, req *admin_pb.GetOrgFeaturesRequest) (*admin_pb.GetOrgFeaturesResponse, error) {
-	features, err := s.features.GetOrgFeatures(ctx, req.OrgId)
+	features, err := s.query.FeatureByOrgID(ctx, req.OrgId)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.GetOrgFeaturesResponse{
-		Features: features_grpc.FeaturesFromModel(features),
+		Features: features_grpc.ModelFeatureToPb(features),
 	}, nil
 }
 

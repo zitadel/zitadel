@@ -125,7 +125,7 @@ var (
 	}
 )
 
-func (q *Queries) FeatureByID(ctx context.Context, orgID string) (*Feature, error) {
+func (q *Queries) FeatureByOrgID(ctx context.Context, orgID string) (*Feature, error) {
 	query, scan := prepareFeatureQuery()
 	stmt, args, err := query.Where(
 		sq.Or{
@@ -227,4 +227,57 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			}
 			return p, nil
 		}
+}
+
+func (f *Feature) FeatureList() []string {
+	list := make([]string, 0)
+	if f.LoginPolicyFactors {
+		list = append(list, domain.FeatureLoginPolicyFactors)
+	}
+	if f.LoginPolicyIDP {
+		list = append(list, domain.FeatureLoginPolicyIDP)
+	}
+	if f.LoginPolicyPasswordless {
+		list = append(list, domain.FeatureLoginPolicyPasswordless)
+	}
+	if f.LoginPolicyRegistration {
+		list = append(list, domain.FeatureLoginPolicyRegistration)
+	}
+	if f.LoginPolicyUsernameLogin {
+		list = append(list, domain.FeatureLoginPolicyUsernameLogin)
+	}
+	if f.LoginPolicyPasswordReset {
+		list = append(list, domain.FeatureLoginPolicyPasswordReset)
+	}
+	if f.PasswordComplexityPolicy {
+		list = append(list, domain.FeaturePasswordComplexityPolicy)
+	}
+	if f.LabelPolicyPrivateLabel {
+		list = append(list, domain.FeatureLabelPolicyPrivateLabel)
+	}
+	if f.LabelPolicyWatermark {
+		list = append(list, domain.FeatureLabelPolicyWatermark)
+	}
+	if f.CustomDomain {
+		list = append(list, domain.FeatureCustomDomain)
+	}
+	if f.PrivacyPolicy {
+		list = append(list, domain.FeaturePrivacyPolicy)
+	}
+	if f.MetadataUser {
+		list = append(list, domain.FeatureMetadataUser)
+	}
+	if f.CustomTextMessage {
+		list = append(list, domain.FeatureCustomTextMessage)
+	}
+	if f.CustomTextLogin {
+		list = append(list, domain.FeatureCustomTextLogin)
+	}
+	if f.LockoutPolicy {
+		list = append(list, domain.FeatureLockoutPolicy)
+	}
+	if f.Actions {
+		list = append(list, domain.FeatureActions)
+	}
+	return list
 }

@@ -72,6 +72,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, qu
 			Eventstore:           es,
 			IAMID:                systemDefaults.IamID,
 			View:                 view,
+			Query:                queries,
 		},
 	}, nil
 }

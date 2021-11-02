@@ -16,6 +16,5 @@ type Repository interface {
 	UserGrantRepository
 	OrgRepository
 	IAMRepository
-	FeaturesRepository
 	RefreshTokenRepository
 }
