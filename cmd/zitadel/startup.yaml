@@ -316,6 +316,9 @@ API:
       Introspection:
         Path: 'introspect'
         URL: '$ZITADEL_OAUTH/introspect'
+      Revocation:
+        Path: 'revoke2'
+        URL: '$ZITADEL_OAUTH/revoke2'
       EndSession:
         Path: 'endsession'
         URL: '$ZITADEL_AUTHORIZE/endsession'
