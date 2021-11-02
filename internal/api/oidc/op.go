@@ -76,6 +76,8 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	}
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
 	config.OPConfig.CodeMethodS256 = true
+	config.OPConfig.AuthMethodPost = true
+	config.OPConfig.AuthMethodPrivateKeyJWT = true
 	config.OPConfig.GrantTypeRefreshToken = true
 	supportedLanguages, err := getSupportedLanguages()
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
