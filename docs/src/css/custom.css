@@ -60,6 +60,11 @@
   --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
 }
 
+.apicard-right {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .padding-top--md {
   padding-top: 3rem !important;
 }
