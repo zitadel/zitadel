@@ -4,7 +4,6 @@ on:
   push:
     branches-ignore:
       - master
-  workflow_dispatch:
 
 jobs:
   e2e-testing:
