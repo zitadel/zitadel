@@ -130,7 +130,6 @@ module.exports = {
     ],
     apis: [
         'apis/introduction',
-        // 'apis/domains',
         {
             type: 'category',
             label: 'API Definition',

@@ -54,6 +54,10 @@
   --card-background: #fafafa;
   --list-background: #f7fafc;
   --ifm-spacing-horizontal: 1.5rem;
+  --apiauthbackground: linear-gradient(40deg, #a9d9ca 30%, #b4d5cb);
+  --apimgmtbackground: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
+  --apiadminbackground: linear-gradient(40deg, #c192c790, #c192c790);
+  --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
 }
 
 .padding-top--md {
@@ -198,6 +202,10 @@ h2 {
   --ifm-color-warning-contrast-foreground: #ffc1c1;
   --card-background: #454a66;
   --list-background: #3c405850;
+  --apiauthbackground: linear-gradient(40deg, #506e6e90 30%, #506e6e90);
+  --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
+  --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
+  --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
 }
 
 .menu li li a {

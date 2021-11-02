@@ -11,19 +11,19 @@
 }
 
 .apiauth {
-  background: linear-gradient(40deg, #a9d9ca 30%, #b4d5cb);
+  background: var(--apiauthbackground);
 }
 
 .apimgmt {
-  background: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
+  background: var(--apimgmtbackground);
 }
 
 .apiadmin {
-  background: linear-gradient(40deg, #e4eaf1, #eef2f9);
+  background: var(--apiadminbackground);
 }
 
 .apiasset {
-  background: linear-gradient(40deg, #e4eaf1, #eef2f9);
+  background: var(--apiassetbackground);
 }
 
 .apicard:hover {
