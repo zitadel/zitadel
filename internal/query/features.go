@@ -160,6 +160,26 @@ func (q *Queries) DefaultFeature(ctx context.Context) (*Feature, error) {
 }
 
 func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) {
+	tierName := sql.NullString{}
+	tierDescription := sql.NullString{}
+	stateDescription := sql.NullString{}
+	auditLogRetention := sql.NullInt64{}
+	loginPolicyFactors := sql.NullBool{}
+	loginPolicyIDP := sql.NullBool{}
+	loginPolicyPasswordless := sql.NullBool{}
+	loginPolicyRegistration := sql.NullBool{}
+	loginPolicyUsernameLogin := sql.NullBool{}
+	loginPolicyPasswordReset := sql.NullBool{}
+	passwordComplexityPolicy := sql.NullBool{}
+	labelPolicyPrivateLabel := sql.NullBool{}
+	labelPolicyWatermark := sql.NullBool{}
+	customDomain := sql.NullBool{}
+	privacyPolicy := sql.NullBool{}
+	metadataUser := sql.NullBool{}
+	customTextMessage := sql.NullBool{}
+	customTextLogin := sql.NullBool{}
+	lockoutPolicy := sql.NullBool{}
+	actions := sql.NullBool{}
 	return sq.Select(
 			FeatureColumnAggregateID.identifier(),
 			FeatureColumnCreationDate.identifier(),
@@ -187,7 +207,7 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			FeatureCustomTextLogin.identifier(),
 			FeatureLockoutPolicy.identifier(),
 			FeatureActions.identifier(),
-		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(feautureTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Feature, error) {
 			p := new(Feature)
 			err := row.Scan(
@@ -196,28 +216,27 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 				&p.ChangeDate,
 				&p.Sequence,
 				&p.IsDefault,
-				&p.TierName,
-				&p.TierDescription,
+				&tierName,
+				&tierDescription,
 				&p.State,
-				&p.StateDescription,
-				&p.AuditLogRetention,
-				&p.LoginPolicyFactors,
-				&p.LoginPolicyIDP,
-				&p.LoginPolicyPasswordless,
-				&p.LoginPolicyRegistration,
-				&p.LoginPolicyRegistration,
-				&p.LoginPolicyUsernameLogin,
-				&p.LoginPolicyPasswordReset,
-				&p.PasswordComplexityPolicy,
-				&p.LabelPolicyPrivateLabel,
-				&p.LabelPolicyWatermark,
-				&p.CustomDomain,
-				&p.PrivacyPolicy,
-				&p.MetadataUser,
-				&p.CustomTextMessage,
-				&p.CustomTextLogin,
-				&p.LockoutPolicy,
-				&p.Actions,
+				&stateDescription,
+				&auditLogRetention,
+				&loginPolicyFactors,
+				&loginPolicyIDP,
+				&loginPolicyPasswordless,
+				&loginPolicyRegistration,
+				&loginPolicyUsernameLogin,
+				&loginPolicyPasswordReset,
+				&passwordComplexityPolicy,
+				&labelPolicyPrivateLabel,
+				&labelPolicyWatermark,
+				&customDomain,
+				&privacyPolicy,
+				&metadataUser,
+				&customTextMessage,
+				&customTextLogin,
+				&lockoutPolicy,
+				&actions,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -225,6 +244,26 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-3o9gd", "Errors.Internal")
 			}
+			p.TierName = tierName.String
+			p.TierDescription = tierDescription.String
+			p.StateDescription = stateDescription.String
+			p.AuditLogRetention = time.Duration(auditLogRetention.Int64)
+			p.LoginPolicyFactors = loginPolicyFactors.Bool
+			p.LoginPolicyIDP = loginPolicyIDP.Bool
+			p.LoginPolicyPasswordless = loginPolicyPasswordless.Bool
+			p.LoginPolicyRegistration = loginPolicyRegistration.Bool
+			p.LoginPolicyUsernameLogin = loginPolicyUsernameLogin.Bool
+			p.LoginPolicyPasswordReset = loginPolicyPasswordReset.Bool
+			p.PasswordComplexityPolicy = passwordComplexityPolicy.Bool
+			p.LabelPolicyPrivateLabel = labelPolicyPrivateLabel.Bool
+			p.LabelPolicyWatermark = labelPolicyWatermark.Bool
+			p.CustomDomain = customDomain.Bool
+			p.PrivacyPolicy = privacyPolicy.Bool
+			p.MetadataUser = metadataUser.Bool
+			p.CustomTextMessage = customTextMessage.Bool
+			p.CustomTextLogin = customTextLogin.Bool
+			p.LockoutPolicy = lockoutPolicy.Bool
+			p.Actions = actions.Bool
 			return p, nil
 		}
 }
