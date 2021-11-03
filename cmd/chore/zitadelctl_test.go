@@ -54,6 +54,7 @@ var _ = Describe("zitadelctl", func() {
 		k8sClient                                                                                      kubernetes.ClientInt
 		gitClient                                                                                      *git.Client
 		kubectl                                                                                        k8s_test.KubectlCmd
+		zitadelctlBuildGitops                                                                          helpers_test.ZitadelctlGitopsCmd
 		zitadelctlGitops                                                                               helpers_test.ZitadelctlGitopsCmd
 		orbctlGitops                                                                                   helpers_test.OrbctlGitopsCmd
 		GetLogsOfPod                                                                                   helpers_test.GetLogsOfPod
@@ -118,6 +119,7 @@ var _ = Describe("zitadelctl", func() {
 		data := gitClient.Read("networking.yml")
 		orbctlVersion = orbctl.GetVersion(data)
 		zitadelctlGitops = helpers_test.ZitadelctlGitopsFunc(orbconfigPath, tag)
+		zitadelctlBuildGitops = helpers_test.ZitadelctlBuildGitopsFunc(orbconfigPath, tag)
 		orbctlGitops = helpers_test.OrbctlGitopsFunc(orbconfigPath, orbctlVersion)
 
 		Expect(tag).ToNot(BeEmpty(), fmt.Sprintf("environment variable %s is required", envPrefix+tagEnv))
@@ -164,7 +166,7 @@ var _ = Describe("zitadelctl", func() {
 		When("the zitadelctl is downloaded from github releases", func() {
 			It("contains the tag read from environment variable", func() {
 
-				session, err := gexec.Start(zitadelctlGitops("--version"), GinkgoWriter, GinkgoWriter)
+				session, err := gexec.Start(zitadelctlBuildGitops("--version"), GinkgoWriter, GinkgoWriter)
 				Expect(err).ToNot(HaveOccurred())
 				Eventually(session, 1*time.Minute, 1*time.Second).Should(gexec.Exit(0))
 				Eventually(string(session.Out.Contents()), 1*time.Minute, 1*time.Second).Should(ContainSubstring(regexp.QuoteMeta(fmt.Sprintf("zitadelctl version %s", tag))))

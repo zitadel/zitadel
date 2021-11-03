@@ -24,6 +24,16 @@ func PrefixedEnv(env string) string {
 
 type ZitadelctlGitopsCmd func(args ...string) *exec.Cmd
 
+func ZitadelctlBuildGitopsFunc(orbconfig string, tag string) ZitadelctlGitopsCmd {
+	cmdFunc, error := zitadelctl.Command(false, false, false, tag)
+	Expect(error).ToNot(HaveOccurred())
+	return func(args ...string) *exec.Cmd {
+		cmd := cmdFunc(context.Background())
+		cmd.Args = append(cmd.Args, append([]string{"--disable-analytics", "--gitops", "--orbconfig", orbconfig}, args...)...)
+		return cmd
+	}
+}
+
 func ZitadelctlGitopsFunc(orbconfig string, tag string) ZitadelctlGitopsCmd {
 	cmdFunc, error := zitadelctl.Command(false, true, false, tag)
 	Expect(error).ToNot(HaveOccurred())
@@ -78,7 +88,7 @@ func AwaitReadyNodesFunc(kubectl k8s_test.KubectlCmd) AwaitReadyNodes {
 			}
 			return readyNodes
 		}
-		Eventually(getReadyNodes(), timeout).Should(Equal(count))
+		Eventually(getReadyNodes(), timeout, 5*time.Second).Should(Equal(count))
 	}
 }
 
