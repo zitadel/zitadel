@@ -1532,6 +1532,109 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 			},
 		},
 		{
+			name: "login policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "login policy registration not allowed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewPasswordComplexityPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								1,
+								false,
+								false,
+								false,
+								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:   context.Background(),
+				orgID: "org1",
+				human: &domain.Human{
+					Username: "username",
+					Profile: &domain.Profile{
+						FirstName: "firstname",
+					},
+					Password: &domain.Password{
+						SecretString: "password",
+					},
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "user invalid, invalid argument error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1553,6 +1656,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
 							),
 						),
 					),
@@ -1597,6 +1713,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
 							),
 						),
 					),
@@ -1658,6 +1787,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
 							),
 						),
 					),
@@ -1780,6 +1922,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1867,6 +2022,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 							),
 						),
 					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1945,6 +2113,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
 							),
 						),
 					),
@@ -2048,6 +2229,19 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 								false,
 								false,
 								false,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								true,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
 							),
 						),
 					),
