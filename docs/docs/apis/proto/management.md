@@ -6700,7 +6700,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| email |  string | - | string.email: true<br />  |
+| email |  string | - | string.email: true<br /> string.ignore_empty: true<br />  |
 
 
 

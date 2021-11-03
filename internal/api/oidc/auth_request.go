@@ -116,6 +116,9 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
+		if errors.IsErrorInvalidArgument(err) {
+			err = oidc.ErrInvalidGrant().WithParent(err)
+		}
 		return "", "", time.Time{}, err
 	}
 	return resp.TokenID, token, resp.Expiration, nil
@@ -160,6 +163,35 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
 	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
 	return err
+}
+
+func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) *oidc.Error {
+	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	if err == nil {
+		if refreshToken.ClientID != clientID {
+			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+		}
+		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
+		if errors.IsNotFound(err) {
+			return nil
+		}
+		return oidc.ErrServerError().WithParent(err)
+	}
+	accessToken, err := o.repo.TokenByID(ctx, userID, token)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil
+		}
+		return oidc.ErrServerError().WithParent(err)
+	}
+	if accessToken.ApplicationID != clientID {
+		return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+	}
+	_, err = o.command.RevokeAccessToken(ctx, userID, accessToken.ResourceOwner, accessToken.ID)
+	if err == nil || errors.IsNotFound(err) {
+		return nil
+	}
+	return oidc.ErrServerError().WithParent(err)
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {

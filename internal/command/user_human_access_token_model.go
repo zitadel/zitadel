@@ -9,19 +9,22 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-type HumanRefreshTokenWriteModel struct {
+type UserAccessTokenWriteModel struct {
 	eventstore.WriteModel
 
-	TokenID      string
-	RefreshToken string
+	TokenID           string
+	ApplicationID     string
+	UserAgentID       string
+	Audience          []string
+	Scopes            []string
+	Expiration        time.Time
+	PreferredLanguage string
 
-	UserState      domain.UserState
-	IdleExpiration time.Time
-	Expiration     time.Time
+	UserState domain.UserState
 }
 
-func NewHumanRefreshTokenWriteModel(userID, resourceOwner, tokenID string) *HumanRefreshTokenWriteModel {
-	return &HumanRefreshTokenWriteModel{
+func NewUserAccessTokenWriteModel(userID, resourceOwner, tokenID string) *UserAccessTokenWriteModel {
+	return &UserAccessTokenWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
@@ -30,44 +33,48 @@ func NewHumanRefreshTokenWriteModel(userID, resourceOwner, tokenID string) *Huma
 	}
 }
 
-func (wm *HumanRefreshTokenWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserAccessTokenWriteModel) AppendEvents(events ...eventstore.EventReader) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *user.HumanRefreshTokenAddedEvent:
+		case *user.UserTokenAddedEvent:
 			if wm.TokenID != e.TokenID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.HumanRefreshTokenRenewedEvent:
+		case *user.UserTokenRemovedEvent:
 			if wm.TokenID != e.TokenID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.HumanRefreshTokenRemovedEvent:
-			if wm.TokenID != e.TokenID {
+		case *user.HumanSignedOutEvent:
+			if wm.UserAgentID != e.UserAgentID {
 				continue
 			}
+			wm.WriteModel.AppendEvents(e)
+		case *user.UserLockedEvent,
+			*user.UserDeactivatedEvent,
+			*user.UserRemovedEvent:
 			wm.WriteModel.AppendEvents(e)
 		}
 	}
 }
 
-func (wm *HumanRefreshTokenWriteModel) Reduce() error {
+func (wm *UserAccessTokenWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.HumanRefreshTokenAddedEvent:
+		case *user.UserTokenAddedEvent:
 			wm.TokenID = e.TokenID
-			wm.RefreshToken = e.TokenID
-			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
-			wm.Expiration = e.CreationDate().Add(e.Expiration)
+			wm.ApplicationID = e.ApplicationID
+			wm.UserAgentID = e.UserAgentID
+			wm.Audience = e.Audience
+			wm.Scopes = e.Scopes
+			wm.Expiration = e.Expiration
+			wm.PreferredLanguage = e.PreferredLanguage
 			wm.UserState = domain.UserStateActive
-		case *user.HumanRefreshTokenRenewedEvent:
-			if wm.UserState == domain.UserStateActive {
-				wm.RefreshToken = e.RefreshToken
+			if e.Expiration.Before(time.Now()) {
+				wm.UserState = domain.UserStateDeleted
 			}
-			wm.RefreshToken = e.RefreshToken
-			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
-		case *user.HumanRefreshTokenRemovedEvent,
+		case *user.UserTokenRemovedEvent,
 			*user.HumanSignedOutEvent,
 			*user.UserLockedEvent,
 			*user.UserDeactivatedEvent,
@@ -78,15 +85,14 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *UserAccessTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 	query := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			user.HumanRefreshTokenAddedType,
-			user.HumanRefreshTokenRenewedType,
-			user.HumanRefreshTokenRemovedType,
+			user.UserTokenAddedType,
+			user.UserTokenRemovedType,
 			user.HumanSignedOutType,
 			user.UserLockedType,
 			user.UserDeactivatedType,

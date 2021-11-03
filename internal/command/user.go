@@ -223,7 +223,7 @@ func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, u
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, audience, scopes, lifetime)
+	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, lifetime)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +234,23 @@ func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, u
 	return accessToken, nil
 }
 
-func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
+func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*domain.ObjectDetails, error) {
+	removeEvent, accessTokenWriteModel, err := c.removeAccessToken(ctx, userID, orgID, tokenID)
+	if err != nil {
+		return nil, err
+	}
+	events, err := c.eventstore.PushEvents(ctx, removeEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(accessTokenWriteModel, events...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&accessTokenWriteModel.WriteModel), nil
+}
+
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
 		return nil, nil, err
@@ -257,7 +273,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	}
 
 	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, audience, scopes, expiration),
+	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, expiration),
 		&domain.Token{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID: userWriteModel.AggregateID,
@@ -265,11 +281,28 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 			TokenID:           tokenID,
 			UserAgentID:       agentID,
 			ApplicationID:     clientID,
+			RefreshTokenID:    refreshTokenID,
 			Audience:          audience,
 			Scopes:            scopes,
 			Expiration:        expiration,
 			PreferredLanguage: preferredLanguage,
 		}, nil
+}
+
+func (c *Commands) removeAccessToken(ctx context.Context, userID, orgID, tokenID string) (*user.UserTokenRemovedEvent, *UserAccessTokenWriteModel, error) {
+	if userID == "" || orgID == "" || tokenID == "" {
+		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dng42", "Errors.IDMissing")
+	}
+	refreshTokenWriteModel := NewUserAccessTokenWriteModel(userID, orgID, tokenID)
+	err := c.eventstore.FilterToQueryReducer(ctx, refreshTokenWriteModel)
+	if err != nil {
+		return nil, nil, err
+	}
+	if refreshTokenWriteModel.UserState != domain.UserStateActive {
+		return nil, nil, caos_errs.ThrowNotFound(nil, "COMMAND-BF4hd", "Errors.User.AccessToken.NotFound")
+	}
+	userAgg := UserAggregateFromWriteModel(&refreshTokenWriteModel.WriteModel)
+	return user.NewUserTokenRemovedEvent(ctx, userAgg, tokenID), refreshTokenWriteModel, nil
 }
 
 func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events []eventstore.EventPusher, _ *UserWriteModel, err error) {
