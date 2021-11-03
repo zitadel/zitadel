@@ -287,9 +287,7 @@ Errors:
       NotExisting: Impostazioni di complessità della password predefinite non esistenti
       AlreadyExists: Impostazioni di complessità della password predefinite già esistenti
       Empty: Le impostazioni di complessità della password predefinite non sono state trovate
-      NotChanged: >-
-        Le impostazioni di complessità della password predefinite non sono state
-        cambiate
+      NotChanged: Le impostazioni di complessità della password predefinite non sono state cambiate
     PasswordAgePolicy:
       NotFound: Le impostazioni di validità della password predefinite non trovate
       NotExisting: Le impostazioni di validità della password predefinite non esistono
@@ -319,9 +317,7 @@ Errors:
         PrimaryColorDark: Il colore primario (modo scuro) non è un valore di colore HEX valido
         BackgroundColorDark: Il colore di sfondo (modo scuro) non è un valore di colore HEX valido
         WarnColorDark: Warn color (dark mode) non è un valore di colore HEX valido
-        FontColorDark: >-
-          Il colore del carattere (modalità scura) non è un valore di colore HEX
-          valido
+        FontColorDark: Il colore del carattere (modalità scura) non è un valore di colore HEX valido
   UserGrant:
     AlreadyExists: User Grant già esistente
     NotFound: User Grant non trovato
@@ -348,9 +344,7 @@ Errors:
   Login:
     LoginPolicy:
       MFA:
-        ForceAndNotConfigured: >-
-          Multifactor è configurato come richiesto, ma nessun provider
-          è configurato. Contatta il tuo amministratore di sistema.
+        ForceAndNotConfigured: Multifactor è configurato come richiesto, ma nessun provider è configurato. Contatta il tuo amministratore di sistema.
   Step:
     Started:
       AlreadyExists: Il passo iniziato già esistente
@@ -511,9 +505,7 @@ EventTypes:
             sent: Codice di inizializzazione inviato
             requested: Richiesta del codice di inizializzazione
             check:
-              succeeded: >-
-                Codice di inizializzazione controllato con
-                successo
+              succeeded: Codice di inizializzazione controllato con successo
               failed: Controllo del codice di inizializzazione fallito
       signed:
         out: L'utente è uscito
@@ -819,41 +811,26 @@ EventTypes:
 Application:
   OIDC:
     V1:
-      NotCompliant: >-
-        La tua configurazione non è conforme e differisce dallo standard OIDC
-        1.0.
+      NotCompliant: La tua configurazione non è conforme e differisce dallo standard OIDC 1.0.
       NoRedirectUris: Deve essere registrato almeno un URI di reindirizzamento.
-      NotAllCombinationsAreAllowed: >-
-        La configurazione è conforme, ma non tutte le combinazioni possibili
-        sono permesse.
+      NotAllCombinationsAreAllowed: La configurazione è conforme, ma non tutte le combinazioni possibili sono permesse.
       Code:
         RedirectUris:
-          HttpOnlyForWeb: >-
-            Grant Type Implicit consente reindirizzamenti http solo per AppType Web
-          CustomOnlyForNative: >-
-            Grant Type permette solo URI di reindirizzamento
-            personalizzati per AppType native (ad esempio appname:// )
+          HttpOnlyForWeb: Grant Type Implicit consente reindirizzamenti http solo per AppType Web
+          CustomOnlyForNative: Grant Type permette solo URI di reindirizzamento personalizzati per AppType native (ad esempio appname:// )
       Implicit:
         RedirectUris:
-          CustomNotAllowed: >-
-            Grant Type non permette URI di
-            reindirizzamento personalizzati
+          CustomNotAllowed: Grant Type non permette URI di reindirizzamento personalizzati
           HttpNotAllowed: Grant Type implicito non permette URI di reindirizzamento http
-          HttpLocalhostOnlyForNative: >-
-            http://localhost redirect uri è consentito solo per le applicazioni
-            native.
+          HttpLocalhostOnlyForNative: http://localhost redirect uri è consentito solo per le applicazioni native.
       Native:
         AuthMethodType:
           NotNone: Le applicazioni native dovrebbero avere authmethodtype none.
         RedirectUris:
-          MustBeHttpLocalhost: >-
-            Gli URI di reindirizzamento devono iniziare con il proprio
-            protocollo, http://127.0.0.1, http://[::1] o http://localhost.
+          MustBeHttpLocalhost: Gli URI di reindirizzamento devono iniziare con il proprio protocollo, http://127.0.0.1, http://[::1] o http://localhost.
       UserAgent:
         AuthMethodType:
           NotNone: L'app agente utente dovrebbe avere authmethodtype none.
       GrantType:
         Refresh:
-          NoAuthCode: >-
-            Refresh Token consentito solo in combinazione con Authorization
-            Code.
+          NoAuthCode: Refresh Token consentito solo in combinazione con Authorization Code.

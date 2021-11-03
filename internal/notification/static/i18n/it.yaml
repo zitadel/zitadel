@@ -3,57 +3,40 @@ InitCode:
   PreHeader: Inizializzare l'utente
   Subject: Inizializzare l'utente
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
-  Text: >-
-    Questo utente è stato creato in ZITADEL. Usa il nome utente
-    {{.PreferredLoginName}} per accedere. Per favore, clicca il pulsante per finire il processo di inizializzazione. (Codice {{.Codice}}) Se
-    non hai richiesto questa mail, per favore ignorala.
+  Text: Questo utente è stato creato in ZITADEL. Usa il nome utente {{.PreferredLoginName}} per accedere. Per favore, clicca il pulsante per finire il processo di inizializzazione. (Codice {{.Codice}}) Se non hai richiesto questa mail, per favore ignorala.
   ButtonText: Termina
 PasswordReset:
   Title: ZITADEL - Ripristina la password
   PreHeader: Ripristina la password
   Subject: Ripristina la password
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
-  Text: >-
-    Abbiamo ricevuto una richiesta di reimpostazione della password. Per favore
-    clicca il pulsante per resettare la tua password. (Codice
-    {{.Codice}}) Se non hai richiesto questa mail, ignorala.
+  Text: Abbiamo ricevuto una richiesta di reimpostazione della password. Per favore clicca il pulsante per resettare la tua password. (Codice {{.Codice}}) Se non hai richiesto questa mail, ignorala.
   ButtonText: Ripristina
 VerifyEmail:
   Title: ZITADEL - Verifica l'e-mail
   PreHeader: Verifica l'e-mail
   Subject: Verifica l'e-mail
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
-  Text: >-
-    È stata aggiunta una nuova email. Per favore fai clic sul pulsante per
-    verificare la tua mail. (Codice {{.Codice}}) Se non hai aggiunto una nuova
-    email, ignora questa email.
+  Text: È stata aggiunta una nuova email. Per favore fai clic sul pulsante per verificare la tua mail. (Codice {{.Codice}}) Se non hai aggiunto una nuova email, ignora questa email.
   ButtonText: Verifica
 VerifyPhone:
   Title: ZITADEL - Verifica il telefono
   PreHeader: Verifica il telefono
   Subject: Verifica il telefono
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
-  Text: >-
-    È stato aggiunto un nuovo numero di telefono. Usa il seguente codice per
-    verificarlo {{.Code}}
+  Text: È stato aggiunto un nuovo numero di telefono. Usa il seguente codice per verificarlo {{.Code}}
   ButtonText: Verifica
 DomainClaimed:
   Title: ZITADEL - Il dominio è stato rivendicato
   PreHeader: Cambiare email / nome utente
   Subject: Il dominio è stato rivendicato
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
-  Text: >-
-    Il dominio {{.Domain}} è stato rivendicato da un'organizzazione. Il tuo
-    attuale utente {{.Username}} non fa parte di questa organizzazione. Perciò
-    dovrai cambiare la tua email quando farai il login. Abbiamo creato un nome
-    utente temporaneo ({{.TempUsername}}) per questo login.
+  Text: Il dominio {{.Domain}} è stato rivendicato da un'organizzazione. Il tuo attuale utente {{.Username}} non fa parte di questa organizzazione. Perciò dovrai cambiare la tua email quando farai il login. Abbiamo creato un nome utente temporaneo ({{.TempUsername}}) per questo login.
   ButtonText: Accedi
 PasswordlessRegistration:
   Title: ZITADEL - Aggiungere autenticazione passwordless
   PreHeader: Aggiungi l'autenticazione passwordless
   Subject: Aggiungi l'autenticazione passwordless
   Greeting: 'Ciao {{.FirstName}} {{.LastName}},'
-  Text: >-
-    Abbiamo ricevuto una richiesta per aggiungere l'autenticazione passwordless. Usa il pulsante qui sotto per aggiungere il tuo token o
-    dispositivo per il login senza password.
+  Text: Abbiamo ricevuto una richiesta per aggiungere l'autenticazione passwordless. Usa il pulsante qui sotto per aggiungere il tuo token o dispositivo per il login senza password.
   ButtonText: Attiva passwordless
