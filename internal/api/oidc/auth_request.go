@@ -172,7 +172,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
 		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
-		if errors.IsNotFound(err) {
+		if err == nil || errors.IsNotFound(err) {
 			return nil
 		}
 		return oidc.ErrServerError().WithParent(err)
