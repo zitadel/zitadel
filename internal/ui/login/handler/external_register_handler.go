@@ -130,7 +130,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.ExternalIDP) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := iam.GlobalOrgID
 	memberRoles := []string{domain.RoleOrgProjectCreator}
 
@@ -146,7 +146,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, idp *domain.ExternalIDP, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -216,7 +216,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP) {
+func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink) {
 	username := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -264,7 +264,7 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPol
 		displayName = tokens.IDTokenClaims.GetEmail()
 	}
 
-	externalIDP := &domain.ExternalIDP{
+	externalIDP := &domain.UserIDPLink{
 		IDPConfigID:    idpConfig.IDPConfigID,
 		ExternalUserID: tokens.IDTokenClaims.GetSubject(),
 		DisplayName:    displayName,
@@ -304,8 +304,8 @@ func (l *Login) mapExternalRegisterDataToUser(r *http.Request, data *externalReg
 	return human, nil
 }
 
-func (l *Login) getExternalIDP(data *externalRegisterFormData) (*domain.ExternalIDP, error) {
-	return &domain.ExternalIDP{
+func (l *Login) getExternalIDP(data *externalRegisterFormData) (*domain.UserIDPLink, error) {
+	return &domain.UserIDPLink{
 		IDPConfigID:    data.ExternalIDPConfigID,
 		ExternalUserID: data.ExternalIDPExtUserID,
 		DisplayName:    data.ExternalIDPDisplayName,

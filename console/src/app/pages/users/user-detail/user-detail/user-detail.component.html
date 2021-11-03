@@ -48,7 +48,7 @@
       <cnsl-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
         <cnsl-detail-form [preferredLoginName]="user.preferredLoginName" [disabled]="(canWrite$ | async) === false"
           [genders]="genders" [languages]="languages" [username]="user.userName" [user]="user.human"
-          (submitData)="saveProfile($event)">
+          (submitData)="saveProfile($event)" (changeUsernameClicked)="changeUsername()">
         </cnsl-detail-form>
       </cnsl-card>
 

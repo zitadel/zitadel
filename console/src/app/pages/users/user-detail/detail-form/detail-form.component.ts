@@ -21,7 +21,8 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Input() public languages: string[] = ['de', 'en'];
   @Output() public submitData: EventEmitter<Profile.AsObject> = new EventEmitter<Profile.AsObject>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
-
+  @Output() public changeUsernameClicked: EventEmitter<void> = new EventEmitter();
+  
   public profileForm!: FormGroup;
 
   private sub: Subscription = new Subscription();
@@ -71,6 +72,10 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   public submitForm(): void {
     this.submitData.emit(this.profileForm.value);
+  }
+
+  public changeUsername(): void {
+    this.changeUsernameClicked.emit();
   }
 
   public openUploadDialog(): void {

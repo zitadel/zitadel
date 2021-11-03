@@ -153,7 +153,7 @@ func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string)
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	existingIDP, err := c.orgIDPConfigWriteModelByID(ctx, idpID, orgID)
 	if err != nil {
 		return nil, err
@@ -173,7 +173,7 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfigWriteModel, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.ExternalIDP) ([]eventstore.EventPusher, error) {
+func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfigWriteModel, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.UserIDPLink) ([]eventstore.EventPusher, error) {
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
 	}

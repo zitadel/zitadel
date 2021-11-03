@@ -1078,7 +1078,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"idpConfigID",
 								"displayName",
@@ -1107,7 +1107,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 							),
 						},
 						uniqueConstraintsFromEventConstraint(user.NewRemoveUsernameUniqueConstraint("username", "org1", true)),
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("idpConfigID", "externalUserID")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("idpConfigID", "externalUserID")),
 					),
 				),
 			},
@@ -1322,6 +1322,136 @@ func TestCommandSide_AddUserToken(t *testing.T) {
 				idGenerator: tt.fields.idGenerator,
 			}
 			got, err := r.AddUserToken(tt.args.ctx, tt.args.orgID, tt.args.agentID, tt.args.clientID, tt.args.userID, tt.args.audience, tt.args.scopes, tt.args.lifetime)
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
+			}
+			if tt.res.err == nil {
+				assert.Equal(t, tt.res.want, got)
+			}
+		})
+	}
+}
+
+func TestCommands_RevokeAccessToken(t *testing.T) {
+	type fields struct {
+		eventstore *eventstore.Eventstore
+	}
+	type args struct {
+		ctx     context.Context
+		userID  string
+		orgID   string
+		tokenID string
+	}
+	type res struct {
+		want *domain.ObjectDetails
+		err  func(error) bool
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		res    res
+	}{
+		{
+			"id missing error",
+			fields{
+				eventstoreExpect(t),
+			},
+			args{
+				context.Background(),
+				"userID",
+				"orgID",
+				"",
+			},
+			res{
+				nil,
+				caos_errs.IsErrorInvalidArgument,
+			},
+		},
+		{
+			"not active error",
+			fields{
+				eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserTokenAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"tokenID",
+								"clientID",
+								"agentID",
+								"de",
+								"refreshTokenID",
+								[]string{"clientID"},
+								[]string{"openid"},
+								time.Now(),
+							),
+						),
+					),
+				),
+			},
+			args{
+				context.Background(),
+				"userID",
+				"orgID",
+				"tokenID",
+			},
+			res{
+				nil,
+				caos_errs.IsNotFound,
+			},
+		},
+		{
+			"active ok",
+			fields{
+				eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewUserTokenAddedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"tokenID",
+								"clientID",
+								"agentID",
+								"de",
+								"refreshTokenID",
+								[]string{"clientID"},
+								[]string{"openid"},
+								time.Now().Add(5*time.Hour),
+							),
+						),
+					),
+					expectPush(
+						eventPusherToEvents(
+							user.NewUserTokenRemovedEvent(context.Background(),
+								&user.NewAggregate("userID", "orgID").Aggregate,
+								"tokenID",
+							),
+						),
+					),
+				),
+			},
+			args{
+				context.Background(),
+				"userID",
+				"orgID",
+				"tokenID",
+			},
+			res{
+				&domain.ObjectDetails{
+					ResourceOwner: "orgID",
+				},
+				nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Commands{
+				eventstore: tt.fields.eventstore,
+			}
+			got, err := c.RevokeAccessToken(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.tokenID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

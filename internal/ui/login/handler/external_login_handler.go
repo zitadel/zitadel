@@ -348,7 +348,7 @@ func (l *Login) mapTokenToLoginUser(tokens *oidc.Tokens, idpConfig *iam_model.ID
 	}
 	return externalUser
 }
-func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.OrgIAMPolicy, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.ExternalIDP, []*domain.Metadata) {
+func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.OrgIAMPolicy, linkingUser *domain.ExternalUser, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink, []*domain.Metadata) {
 	username := linkingUser.PreferredUsername
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:
@@ -398,7 +398,7 @@ func (l *Login) mapExternalUserToLoginUser(orgIamPolicy *query.OrgIAMPolicy, lin
 		displayName = linkingUser.Email
 	}
 
-	externalIDP := &domain.ExternalIDP{
+	externalIDP := &domain.UserIDPLink{
 		IDPConfigID:    idpConfig.IDPConfigID,
 		ExternalUserID: linkingUser.ExternalUserID,
 		DisplayName:    displayName,
