@@ -3,7 +3,10 @@ package query
 import (
 	"context"
 	"database/sql"
+	"net/http"
+	"sync"
 
+	"github.com/caos/logging"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -15,12 +18,21 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
 )
 
 type Queries struct {
 	iamID      string
 	eventstore *eventstore.Eventstore
 	client     *sql.DB
+
+	DefaultLanguage                     language.Tag
+	LoginDir                            http.FileSystem
+	NotificationDir                     http.FileSystem
+	mutex                               sync.Mutex
+	LoginTranslationFileContents        map[string][]byte
+	NotificationTranslationFileContents map[string][]byte
 }
 
 type Config struct {
@@ -33,10 +45,21 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		return nil, err
 	}
 
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
+
+	statikNotificationFS, err := fs.NewWithNamespace("notification")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
+
 	repo = &Queries{
-		iamID:      defaults.IamID,
-		eventstore: es,
-		client:     sqlClient,
+		iamID:                               defaults.IamID,
+		eventstore:                          es,
+		client:                              sqlClient,
+		DefaultLanguage:                     defaults.DefaultLanguage,
+		LoginDir:                            statikLoginFS,
+		NotificationDir:                     statikNotificationFS,
+		LoginTranslationFileContents:        make(map[string][]byte),
+		NotificationTranslationFileContents: make(map[string][]byte),
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)
