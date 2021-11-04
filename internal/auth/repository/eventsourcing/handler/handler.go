@@ -58,7 +58,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			systemDefaults),
-		newProjectRole(handler{view, bulkLimit, configs.cycleDuration("ProjectRole"), errorCount, es}),
 		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
 		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
