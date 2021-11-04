@@ -36,23 +36,23 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 
-	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})); err != nil {
+	desired, err := zitadel.ReadCrd(r.ClientInt)
+	if err != nil {
 		return res, err
 	}
 
-	return res, nil
+	if desired != nil {
+		return res, Takeoff(internalMonitor, r.ClientInt, desired, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"}))
+	}
+	return res, Destroy(r.Monitor, r.ClientInt, r.Version)
 }
 
 func Takeoff(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
+	desired *tree.Tree,
 	adaptFunc operator.AdaptFunc,
 ) error {
-	desired, err := zitadel.ReadCrd(k8sClient)
-	if err != nil {
-		return err
-	}
-
 	query, _, _, _, _, _, err := adaptFunc(monitor, desired, &tree.Tree{})
 	if err != nil {
 		return err

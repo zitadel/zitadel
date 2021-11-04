@@ -14,6 +14,10 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+const (
+	Component = "backup"
+)
+
 func Adapt(
 	monitor mntr.Monitor,
 	desiredTree *tree.Tree,
@@ -50,7 +54,7 @@ func Adapt(
 					"BucketBackup",
 					desiredTree.Common.Version(),
 				),
-				"backup"),
+				Component),
 			checkDBReady,
 			timestamp,
 			nodeselector,
@@ -71,7 +75,7 @@ func Adapt(
 					"S3Backup",
 					desiredTree.Common.Version(),
 				),
-				"backup"),
+				Component),
 			checkDBReady,
 			timestamp,
 			nodeselector,

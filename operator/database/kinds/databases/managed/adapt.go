@@ -82,9 +82,16 @@ func Adapter(
 		}
 		desired.Parsed = desiredKind
 
-		storageCapacity, err := resource.ParseQuantity(desiredKind.Spec.StorageCapacity)
+		storageCapacity, err := resource.ParseQuantity("5G")
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("parsing storage capacity format failed: %w", err))
+		}
+		if desiredKind.Spec.StorageCapacity != "" {
+			storageCapacityT, err := resource.ParseQuantity(desiredKind.Spec.StorageCapacity)
+			if err != nil {
+				return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("parsing storage capacity format failed: %w", err))
+			}
+			storageCapacity = storageCapacityT
 		}
 
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
@@ -249,6 +256,11 @@ func Adapter(
 				}
 			}
 		}
+		backupLabels := map[string]string{
+			"app.kubernetes.io/component":  backups.Component,
+			"app.kubernetes.io/managed-by": "database.caos.ch",
+			"app.kubernetes.io/part-of":    "ZITADEL",
+		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
@@ -266,10 +278,43 @@ func Adapter(
 					internalMonitor.Info("set current state of managed database")
 				}
 
+				backupDefs := map[string]*tree.Tree{}
+				if desiredKind.Spec.Backups != nil {
+					backupDefs = desiredKind.Spec.Backups
+				}
+				cleanupDestroy, err := cleanup(
+					monitor,
+					backupDefs,
+					k8sClient,
+					namespace,
+					backupLabels,
+				)
+				if err != nil {
+					return nil, err
+				}
+				queriers = append(queriers, func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+					return func(k8sClient kubernetes.ClientInt) error {
+						return cleanupDestroy(k8sClient)
+					}, nil
+				})
+
 				ensure, err := operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)
 				return ensure, err
 			},
-			operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
+			func(k8sClient kubernetes.ClientInt) error {
+				cleanupDestroy, err := cleanup(
+					monitor,
+					map[string]*tree.Tree{},
+					k8sClient,
+					namespace,
+					backupLabels,
+				)
+				if err != nil {
+					return err
+				}
+				destroyers = append(destroyers, cleanupDestroy)
+				return operator.DestroyersToDestroyFunc(internalMonitor, destroyers)(k8sClient)
+			},
 			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
 				for i := range configurers {
 					if err := configurers[i](k8sClient, queried, gitops); err != nil {

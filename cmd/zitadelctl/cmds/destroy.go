@@ -89,7 +89,7 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 				return err
 			}
 		} else {
-			if err := crtlcrd.Destroy(monitor, k8sClient, version, "zitadel", "database"); err != nil {
+			if err := crtlcrd.Destroy(monitor, k8sClient, version, crtlcrd.Zitadel, crtlcrd.Database); err != nil {
 				return err
 			}
 		}

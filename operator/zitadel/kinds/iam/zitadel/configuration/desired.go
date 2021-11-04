@@ -23,13 +23,20 @@ type Configuration struct {
 }
 
 func (c *Configuration) Validate() (err error) {
+	if c == nil {
+		return nil
+	}
+
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("validating configuration failed: %w", err)
 		}
 	}()
 
-	return c.DNS.validate()
+	if c.DNS != nil {
+		return c.DNS.validate()
+	}
+	return nil
 }
 
 type AssetStorage struct {

@@ -25,7 +25,7 @@ func DestroyOperator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 		return err
 	}
 
-	return zitadel.Destroy(monitor, gitClient, orbz.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"zitadel", "iam"}), k8sClient)
+	return zitadel.Destroy(monitor, gitClient, orbz.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "iam"}), k8sClient)
 }
 
 func DestroyDatabase(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.Client, version *string, gitops bool) error {
