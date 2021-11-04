@@ -1,6 +1,7 @@
 package managed
 
 import (
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	"testing"
 	"time"
 
@@ -103,6 +104,7 @@ func TestManaged_Adapt1(t *testing.T) {
 		Items: []corev1.Secret{},
 	}
 
+	k8sClient.EXPECT().ListCronJobs(namespace, getBackupLabels()).Return(&batchv1beta1.CronJobList{}, nil)
 	k8sClient.EXPECT().ApplyService(gomock.Any()).Times(3)
 	k8sClient.EXPECT().ApplyServiceAccount(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplyRole(gomock.Any()).MinTimes(1).MaxTimes(1)
@@ -212,6 +214,7 @@ func TestManaged_Adapt2(t *testing.T) {
 		Items: []corev1.Secret{},
 	}
 
+	k8sClient.EXPECT().ListCronJobs(namespace, getBackupLabels()).Return(&batchv1beta1.CronJobList{}, nil)
 	k8sClient.EXPECT().ApplyService(gomock.Any()).Times(3)
 	k8sClient.EXPECT().ApplyServiceAccount(gomock.Any()).MinTimes(1).MaxTimes(1)
 	k8sClient.EXPECT().ApplyRole(gomock.Any()).MinTimes(1).MaxTimes(1)

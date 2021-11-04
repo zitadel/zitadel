@@ -2,6 +2,7 @@ package managed
 
 import (
 	"github.com/caos/zitadel/operator/database/kinds/backups/core"
+	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	"testing"
 	"time"
 
@@ -76,6 +77,7 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 
 	features := []string{backup.Normal}
 	bucket.SetBackup(k8sClient, namespace, backupName, labels, saJson)
+	k8sClient.EXPECT().ListCronJobs(namespace, getBackupLabels()).Return(&batchv1beta1.CronJobList{}, nil)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
 	query, _, _, _, _, _, err := Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features, "")(monitor, desired, &tree.Tree{})
@@ -115,6 +117,7 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 
 	features := []string{backup.Instant}
 	bucket.SetInstantBackup(k8sClient, namespace, backupName, labels, saJson)
+	k8sClient.EXPECT().ListCronJobs(namespace, getBackupLabels()).Return(&batchv1beta1.CronJobList{}, nil)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
@@ -157,6 +160,7 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	features := []string{restore.Instant}
 	bucket.SetRestore(k8sClient, namespace, backupName, labels, saJson)
 	//SetClean(k8sClient, namespace, 1)
+	k8sClient.EXPECT().ListCronJobs(namespace, getBackupLabels()).Return(&batchv1beta1.CronJobList{}, nil)
 	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second).Times(1)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)

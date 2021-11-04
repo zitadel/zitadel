@@ -256,11 +256,6 @@ func Adapter(
 				}
 			}
 		}
-		backupLabels := map[string]string{
-			"app.kubernetes.io/component":  backups.Component,
-			"app.kubernetes.io/managed-by": "database.caos.ch",
-			"app.kubernetes.io/part-of":    "ZITADEL",
-		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
@@ -287,7 +282,7 @@ func Adapter(
 					backupDefs,
 					k8sClient,
 					namespace,
-					backupLabels,
+					getBackupLabels(),
 				)
 				if err != nil {
 					return nil, err
@@ -307,7 +302,7 @@ func Adapter(
 					map[string]*tree.Tree{},
 					k8sClient,
 					namespace,
-					backupLabels,
+					getBackupLabels(),
 				)
 				if err != nil {
 					return err
@@ -380,4 +375,12 @@ func cleanup(
 	}
 
 	return operator.DestroyersToDestroyFunc(monitor, destroyers), nil
+}
+
+func getBackupLabels() map[string]string {
+	return map[string]string{
+		"app.kubernetes.io/component":  backups.Component,
+		"app.kubernetes.io/managed-by": "database.caos.ch",
+		"app.kubernetes.io/part-of":    "ZITADEL",
+	}
 }
