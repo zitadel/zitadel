@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/query"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -17,7 +18,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -48,11 +49,13 @@ type Notification struct {
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
 	apiDomain      string
+	queries        *query.Queries
 }
 
 func newNotification(
 	handler handler,
 	command *command.Commands,
+	query *query.Queries,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
 	statikDir http.FileSystem,
@@ -65,6 +68,7 @@ func newNotification(
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
 		apiDomain:      apiDomain,
+		queries:        query,
 	}
 
 	h.subscribe()
@@ -76,7 +80,7 @@ func (k *Notification) subscribe() {
 	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
 	go func() {
 		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+			queryv1.ReduceEvent(k, event)
 		}
 	}()
 }
@@ -424,21 +428,20 @@ func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPoli
 }
 
 // Read organization specific template
-func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
+func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate, error) {
 	// read from Org
-	template, err := n.view.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID, mailTemplateTableOrg)
+	template, err := n.queries.MailTemplateByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if errors.IsNotFound(err) {
 		// read from default
-		template, err = n.view.MailTemplateByAggregateID(n.systemDefaults.IamID, mailTemplateTableDef)
+		template, err = n.queries.DefaultMailTemplate(ctx)
 		if err != nil {
 			return nil, err
 		}
-		template.Default = true
 	}
 	if err != nil {
 		return nil, err
 	}
-	return iam_es_model.MailTemplateViewToModel(template), err
+	return template, err
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {

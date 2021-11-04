@@ -183,14 +183,6 @@ func (repo *IAMRepository) GetDefaultPreviewLabelPolicy(ctx context.Context) (*i
 	return iam_es_model.LabelPolicyViewToModel(policy), err
 }
 
-func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
-	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.MailTemplateViewToModel(template), err
-}
-
 func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
 	err := request.EnsureLimit(repo.SearchLimit)
 	if err != nil {

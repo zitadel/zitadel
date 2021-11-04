@@ -26,9 +26,6 @@ type OrgRepository interface {
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 
-	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-
 	GetDefaultMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
 	GetMessageText(ctx context.Context, orgID, textType, lang string) (*domain.CustomMessageText, error)
 

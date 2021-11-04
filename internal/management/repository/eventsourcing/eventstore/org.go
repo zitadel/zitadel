@@ -270,30 +270,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 	return result, nil
 }
 
-func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
-	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	template.Default = true
-	return iam_view_model.MailTemplateViewToModel(template), err
-}
-
-func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
-	template, err := repo.View.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		template, err = repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
-		template.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.MailTemplateViewToModel(template), err
-}
-
 func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()

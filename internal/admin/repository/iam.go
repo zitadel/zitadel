@@ -28,8 +28,6 @@ type IAMRepository interface {
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetDefaultPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 
-	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-
 	GetDefaultMessageText(ctx context.Context, textType, language string) (*domain.CustomMessageText, error)
 	GetCustomMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
 	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
