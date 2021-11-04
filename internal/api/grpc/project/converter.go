@@ -191,20 +191,3 @@ func RoleViewToPb(role *query.ProjectRole) *proj_pb.Role {
 		),
 	}
 }
-
-func RolesToPb(roles []*proj_model.ProjectRoleView) []*proj_pb.Role {
-	r := make([]*proj_pb.Role, len(roles))
-	for i, role := range roles {
-		r[i] = RoleToPb(role)
-	}
-	return r
-}
-
-func RoleToPb(role *proj_model.ProjectRoleView) *proj_pb.Role {
-	return &proj_pb.Role{
-		Key:         role.Key,
-		Details:     object.ToViewDetailsPb(role.Sequence, role.CreationDate, role.ChangeDate, role.ResourceOwner),
-		DisplayName: role.DisplayName,
-		Group:       role.Group,
-	}
-}
