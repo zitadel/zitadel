@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
@@ -42,12 +43,16 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if client.State != domain.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
-	projectRoles, err := o.repo.ProjectRolesByProjectID(client.ProjectID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(client.ProjectID)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
+	}
+	projectRoles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
-	allowedScopes := make([]string, len(projectRoles))
-	for i, role := range projectRoles {
+	allowedScopes := make([]string, len(projectRoles.ProjectRoles))
+	for i, role := range projectRoles.ProjectRoles {
 		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)

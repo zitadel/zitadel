@@ -64,4 +64,4 @@ kubectl apply --filename ./boom.yml
 watch "kubectl --namespace caos-system get pods"
 ```
 
-Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/domains) now.
+Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/introduction#domains) now.

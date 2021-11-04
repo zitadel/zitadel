@@ -120,6 +120,9 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
+		if errors.IsErrorInvalidArgument(err) {
+			err = oidc.ErrInvalidGrant().WithParent(err)
+		}
 		return "", "", time.Time{}, err
 	}
 	return resp.TokenID, token, resp.Expiration, nil
@@ -166,6 +169,35 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	return err
 }
 
+func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID string) *oidc.Error {
+	refreshToken, err := o.repo.RefreshTokenByID(ctx, token)
+	if err == nil {
+		if refreshToken.ClientID != clientID {
+			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+		}
+		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
+		if err == nil || errors.IsNotFound(err) {
+			return nil
+		}
+		return oidc.ErrServerError().WithParent(err)
+	}
+	accessToken, err := o.repo.TokenByID(ctx, userID, token)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil
+		}
+		return oidc.ErrServerError().WithParent(err)
+	}
+	if accessToken.ApplicationID != clientID {
+		return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
+	}
+	_, err = o.command.RevokeAccessToken(ctx, userID, accessToken.ResourceOwner, accessToken.ID)
+	if err == nil || errors.IsNotFound(err) {
+		return nil
+	}
+	return oidc.ErrServerError().WithParent(err)
+}
+
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
 	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
 }
@@ -185,11 +217,15 @@ func (o *OPStorage) assertProjectRoleScopes(project *query.Project, scopes []str
 			return scopes, nil
 		}
 	}
-	roles, err := o.repo.ProjectRolesByProjectID(project.ID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+	}
+	roles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
-	for _, role := range roles {
+	for _, role := range roles.ProjectRoles {
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil

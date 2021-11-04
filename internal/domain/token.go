@@ -1,9 +1,10 @@
 package domain
 
 import (
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"strings"
 	"time"
+
+	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 type Token struct {
@@ -12,6 +13,7 @@ type Token struct {
 	TokenID           string
 	ApplicationID     string
 	UserAgentID       string
+	RefreshTokenID    string
 	Audience          []string
 	Expiration        time.Time
 	Scopes            []string

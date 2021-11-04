@@ -57,6 +57,8 @@ func (key TokenSearchKey) ToColumnName() string {
 		return TokenKeyUserAgentID
 	case model.TokenSearchKeyUserID:
 		return TokenKeyUserID
+	case model.TokenSearchKeyRefreshTokenID:
+		return TokenKeyRefreshTokenID
 	case model.TokenSearchKeyApplicationID:
 		return TokenKeyApplicationID
 	case model.TokenSearchKeyExpiration:

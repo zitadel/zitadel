@@ -142,6 +142,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
 	}
+	if request.UserID == "" && request.LoginHint == "" && domain.IsPrompt(request.Prompt, domain.PromptNone) {
+		err = repo.tryUsingOnlyUserSession(request)
+		logging.LogWithFields("EVENT-SDf3g", "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("unable to select only user session")
+	}
 
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
 	if err != nil {
@@ -570,6 +574,22 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.OrgTranslations = orgLoginTranslations
+	return nil
+}
+
+func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest) error {
+	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+	if err != nil {
+		return err
+	}
+	if len(userSessions) == 1 {
+		user := userSessions[0]
+		username := user.UserName
+		if request.RequestedOrgID == "" {
+			username = user.LoginName
+		}
+		request.SetUserInfo(user.UserID, username, user.LoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
+	}
 	return nil
 }
 
