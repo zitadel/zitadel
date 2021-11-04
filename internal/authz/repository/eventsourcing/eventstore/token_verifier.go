@@ -106,7 +106,7 @@ func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context
 	if err != nil {
 		return "", nil, err
 	}
-	return app.ProjectID, app.OriginAllowList, nil
+	return app.ProjectID, app.OIDCConfig.AllowedOrigins, nil
 }
 
 func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
@@ -251,7 +251,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	if err != nil {
 		return "", err
 	}
-	return app.OIDCClientID, nil
+	return app.OIDCConfig.ClientID, nil
 }
 
 func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {

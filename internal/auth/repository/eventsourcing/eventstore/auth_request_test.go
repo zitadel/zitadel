@@ -212,8 +212,8 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
-	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck}, nil
+func (m *mockUserGrants) ProjectByAppID(ctx context.Context, s string) (*query.Project, error) {
+	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
 func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*grant_view_model.UserGrantView, error) {
@@ -229,8 +229,8 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m *mockProject) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
-	return &proj_view_model.ApplicationView{HasProjectCheck: m.projectCheck}, nil
+func (m *mockProject) ProjectByAppID(ctx context.Context, s string) (*query.Project, error) {
+	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
 func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID string) (*proj_view_model.OrgProjectMapping, error) {

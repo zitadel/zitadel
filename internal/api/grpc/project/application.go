@@ -7,11 +7,12 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	app_pb "github.com/caos/zitadel/pkg/grpc/app"
 	message_pb "github.com/caos/zitadel/pkg/grpc/message"
 )
 
-func AppsToPb(apps []*proj_model.ApplicationView) []*app_pb.App {
+func AppsToPb(apps []*query.App) []*app_pb.App {
 	a := make([]*app_pb.App, len(apps))
 	for i, app := range apps {
 		a[i] = AppToPb(app)
@@ -19,7 +20,7 @@ func AppsToPb(apps []*proj_model.ApplicationView) []*app_pb.App {
 	return a
 }
 
-func AppToPb(app *proj_model.ApplicationView) *app_pb.App {
+func AppToPb(app *query.App) *app_pb.App {
 	return &app_pb.App{
 		Id:      app.ID,
 		Details: object_grpc.ToViewDetailsPb(app.Sequence, app.CreationDate, app.ChangeDate, app.ResourceOwner),
@@ -29,68 +30,68 @@ func AppToPb(app *proj_model.ApplicationView) *app_pb.App {
 	}
 }
 
-func AppConfigToPb(app *proj_model.ApplicationView) app_pb.AppConfig {
-	if app.IsOIDC {
-		return AppOIDCConfigToPb(app)
+func AppConfigToPb(app *query.App) app_pb.AppConfig {
+	if app.OIDCConfig != nil {
+		return AppOIDCConfigToPb(app.OIDCConfig)
 	}
-	return AppAPIConfigToPb(app)
+	return AppAPIConfigToPb(app.APIConfig)
 }
 
-func AppOIDCConfigToPb(app *proj_model.ApplicationView) *app_pb.App_OidcConfig {
+func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 	return &app_pb.App_OidcConfig{
 		OidcConfig: &app_pb.OIDCConfig{
-			RedirectUris:             app.OIDCRedirectUris,
-			ResponseTypes:            OIDCResponseTypesFromModel(app.OIDCResponseTypes),
-			GrantTypes:               OIDCGrantTypesFromModel(app.OIDCGrantTypes),
-			AppType:                  OIDCApplicationTypeToPb(domain.OIDCApplicationType(app.OIDCApplicationType)),
-			ClientId:                 app.OIDCClientID,
-			AuthMethodType:           OIDCAuthMethodTypeToPb(domain.OIDCAuthMethodType(app.OIDCAuthMethodType)),
-			PostLogoutRedirectUris:   app.OIDCPostLogoutRedirectUris,
-			Version:                  OIDCVersionToPb(domain.OIDCVersion(app.OIDCVersion)),
+			RedirectUris:             app.RedirectURIs,
+			ResponseTypes:            OIDCResponseTypesFromModel(app.ResponseTypes),
+			GrantTypes:               OIDCGrantTypesFromModel(app.GrantTypes),
+			AppType:                  OIDCApplicationTypeToPb(app.AppType),
+			ClientId:                 app.ClientID,
+			AuthMethodType:           OIDCAuthMethodTypeToPb(app.AuthMethodType),
+			PostLogoutRedirectUris:   app.PostLogoutRedirectURIs,
+			Version:                  OIDCVersionToPb(domain.OIDCVersion(app.Version)),
 			NoneCompliant:            app.NoneCompliant,
 			ComplianceProblems:       ComplianceProblemsToLocalizedMessages(app.ComplianceProblems),
-			DevMode:                  app.DevMode,
-			AccessTokenType:          oidcTokenTypeToPb(domain.OIDCTokenType(app.AccessTokenType)),
-			AccessTokenRoleAssertion: app.AccessTokenRoleAssertion,
-			IdTokenRoleAssertion:     app.IDTokenRoleAssertion,
-			IdTokenUserinfoAssertion: app.IDTokenUserinfoAssertion,
+			DevMode:                  app.IsDevMode,
+			AccessTokenType:          oidcTokenTypeToPb(app.AccessTokenType),
+			AccessTokenRoleAssertion: app.AssertAccessTokenRole,
+			IdTokenRoleAssertion:     app.AssertIDTokenRole,
+			IdTokenUserinfoAssertion: app.AssertIDTokenUserinfo,
 			ClockSkew:                durationpb.New(app.ClockSkew),
 			AdditionalOrigins:        app.AdditionalOrigins,
-			AllowedOrigins:           app.OriginAllowList,
+			AllowedOrigins:           app.AllowedOrigins,
 		},
 	}
 }
 
-func AppAPIConfigToPb(app *proj_model.ApplicationView) app_pb.AppConfig {
+func AppAPIConfigToPb(app *query.APIApp) app_pb.AppConfig {
 	return &app_pb.App_ApiConfig{
 		ApiConfig: &app_pb.APIConfig{
-			ClientId:       app.OIDCClientID,
+			ClientId:       app.ClientID,
 			ClientSecret:   "", //TODO: remove from proto
-			AuthMethodType: APIAuthMethodeTypeToPb(domain.APIAuthMethodType(app.OIDCAuthMethodType)),
+			AuthMethodType: APIAuthMethodeTypeToPb(app.AuthMethodType),
 		},
 	}
 }
 
-func AppStateToPb(state proj_model.AppState) app_pb.AppState {
+func AppStateToPb(state domain.AppState) app_pb.AppState {
 	switch state {
-	case proj_model.AppStateActive:
+	case domain.AppStateActive:
 		return app_pb.AppState_APP_STATE_ACTIVE
-	case proj_model.AppStateInactive:
+	case domain.AppStateInactive:
 		return app_pb.AppState_APP_STATE_INACTIVE
 	default:
 		return app_pb.AppState_APP_STATE_UNSPECIFIED
 	}
 }
 
-func OIDCResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []app_pb.OIDCResponseType {
+func OIDCResponseTypesFromModel(responseTypes []domain.OIDCResponseType) []app_pb.OIDCResponseType {
 	oidcResponseTypes := make([]app_pb.OIDCResponseType, len(responseTypes))
 	for i, responseType := range responseTypes {
 		switch responseType {
-		case proj_model.OIDCResponseTypeCode:
+		case domain.OIDCResponseTypeCode:
 			oidcResponseTypes[i] = app_pb.OIDCResponseType_OIDC_RESPONSE_TYPE_CODE
-		case proj_model.OIDCResponseTypeIDToken:
+		case domain.OIDCResponseTypeIDToken:
 			oidcResponseTypes[i] = app_pb.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN
-		case proj_model.OIDCResponseTypeIDTokenToken:
+		case domain.OIDCResponseTypeIDTokenToken:
 			oidcResponseTypes[i] = app_pb.OIDCResponseType_OIDC_RESPONSE_TYPE_ID_TOKEN_TOKEN
 		}
 	}
@@ -98,7 +99,7 @@ func OIDCResponseTypesFromModel(responseTypes []proj_model.OIDCResponseType) []a
 }
 
 func OIDCResponseTypesToDomain(responseTypes []app_pb.OIDCResponseType) []domain.OIDCResponseType {
-	if responseTypes == nil || len(responseTypes) == 0 {
+	if len(responseTypes) == 0 {
 		return []domain.OIDCResponseType{domain.OIDCResponseTypeCode}
 	}
 	oidcResponseTypes := make([]domain.OIDCResponseType, len(responseTypes))
@@ -115,15 +116,15 @@ func OIDCResponseTypesToDomain(responseTypes []app_pb.OIDCResponseType) []domain
 	return oidcResponseTypes
 }
 
-func OIDCGrantTypesFromModel(grantTypes []proj_model.OIDCGrantType) []app_pb.OIDCGrantType {
+func OIDCGrantTypesFromModel(grantTypes []domain.OIDCGrantType) []app_pb.OIDCGrantType {
 	oidcGrantTypes := make([]app_pb.OIDCGrantType, len(grantTypes))
 	for i, grantType := range grantTypes {
 		switch grantType {
-		case proj_model.OIDCGrantTypeAuthorizationCode:
+		case domain.OIDCGrantTypeAuthorizationCode:
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_AUTHORIZATION_CODE
-		case proj_model.OIDCGrantTypeImplicit:
+		case domain.OIDCGrantTypeImplicit:
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_IMPLICIT
-		case proj_model.OIDCGrantTypeRefreshToken:
+		case domain.OIDCGrantTypeRefreshToken:
 			oidcGrantTypes[i] = app_pb.OIDCGrantType_OIDC_GRANT_TYPE_REFRESH_TOKEN
 		}
 	}
@@ -272,8 +273,8 @@ func APIAuthMethodTypeToDomain(authType app_pb.APIAuthMethodType) domain.APIAuth
 	}
 }
 
-func AppQueriesToModel(queries []*app_pb.AppQuery) (_ []*proj_model.ApplicationSearchQuery, err error) {
-	q := make([]*proj_model.ApplicationSearchQuery, len(queries))
+func AppQueriesToModel(queries []*app_pb.AppQuery) (q []query.SearchQuery, err error) {
+	q = make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
 		q[i], err = AppQueryToModel(query)
 		if err != nil {
@@ -283,10 +284,10 @@ func AppQueriesToModel(queries []*app_pb.AppQuery) (_ []*proj_model.ApplicationS
 	return q, nil
 }
 
-func AppQueryToModel(query *app_pb.AppQuery) (*proj_model.ApplicationSearchQuery, error) {
-	switch q := query.Query.(type) {
+func AppQueryToModel(appQuery *app_pb.AppQuery) (query.SearchQuery, error) {
+	switch q := appQuery.Query.(type) {
 	case *app_pb.AppQuery_NameQuery:
-		return AppQueryNameToModel(q.NameQuery), nil
+		return query.NewAppNameSearchQuery(object_grpc.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "APP-Add46", "List.Query.Invalid")
 	}

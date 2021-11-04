@@ -12,11 +12,10 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/auth_request/model"
 	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
@@ -36,11 +35,11 @@ const (
 func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Client, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	client, err := o.repo.ApplicationByClientID(ctx, id)
+	client, err := o.query.AppByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	if client.State != proj_model.AppStateActive {
+	if client.State != domain.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
 	projectRoles, err := o.repo.ProjectRolesByProjectID(client.ProjectID)
@@ -120,11 +119,11 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
-		app, err := o.repo.ApplicationByClientID(ctx, token.ApplicationID)
+		app, err := o.query.AppByID(ctx, token.ApplicationID)
 		if err != nil {
 			return err
 		}
-		if origin != "" && !http.IsOriginAllowed(app.OriginAllowList, origin) {
+		if origin != "" && !http.IsOriginAllowed(app.OIDCConfig.AllowedOrigins, origin) {
 			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
@@ -197,8 +196,8 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 			if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 				roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
 			}
-			if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-				userInfo.AppendClaims(model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+			if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+				userInfo.AppendClaims(authreq_model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
 			}
 		}
 	}
@@ -220,12 +219,12 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	app, err := o.repo.ApplicationByClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromAppID(ctx, clientID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
 	for _, aud := range token.Audience {
-		if aud == clientID || aud == app.ProjectID {
+		if aud == clientID || aud == projectID {
 			err := o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
 			if err != nil {
 				return err
@@ -261,8 +260,8 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 		}
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			roles = append(roles, strings.TrimPrefix(scope, ScopeProjectRolePrefix))
-		} else if strings.HasPrefix(scope, model.OrgDomainPrimaryScope) {
-			claims = appendClaim(claims, model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, model.OrgDomainPrimaryScope))
+		} else if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
+			claims = appendClaim(claims, authreq_model.OrgDomainPrimaryClaim, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
 		}
 	}
 	if len(roles) == 0 || clientID == "" {
@@ -279,11 +278,11 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	app, err := o.repo.ApplicationByClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromAppID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(app.ProjectID, userID)
+	grants, err := o.repo.UserGrantsByProjectAndUserID(projectID, userID)
 	if err != nil {
 		return nil, err
 	}

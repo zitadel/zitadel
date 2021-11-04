@@ -48,6 +48,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 	eventstore.IAMRepository
 	eventstore.FeaturesRepo
+	eventstore.ProjectRepo
 }
 
 func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
@@ -69,7 +70,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator, assetsAPI)
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm, queries, idGenerator, assetsAPI)
 	if err != nil {
 		return nil, err
 	}
@@ -93,6 +94,14 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		SystemDefaults:  systemDefaults,
 		PrefixAvatarURL: assetsAPI,
 	}
+	//TODO: remove as soon as possible
+	queryView := struct {
+		*query.Queries
+		*auth_view.View
+	}{
+		queries,
+		view,
+	}
 	return &EsRepository{
 		spool,
 		es,
@@ -111,8 +120,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IDPProviderViewProvider:    view,
 			LockoutPolicyViewProvider:  queries,
 			LoginPolicyViewProvider:    queries,
-			UserGrantProvider:          view,
-			ProjectProvider:            view,
+			Query:                      queries,
+			UserGrantProvider:          queryView,
+			ProjectProvider:            queryView,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
@@ -143,7 +153,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,
-			View:     view,
+			Query:    queries,
 		},
 
 		eventstore.UserSessionRepo{
@@ -172,6 +182,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		eventstore.FeaturesRepo{
 			Eventstore: es,
 			View:       view,
+		},
+		eventstore.ProjectRepo{
+			View: view,
 		},
 	}, nil
 }

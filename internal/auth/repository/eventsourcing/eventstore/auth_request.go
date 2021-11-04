@@ -29,6 +29,7 @@ import (
 
 type AuthRequestRepo struct {
 	Command      *command.Commands
+	Query        *query.Queries
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 	Eventstore   v1.Eventstore
@@ -96,12 +97,12 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
+	ProjectByAppID(context.Context, string) (*query.Project, error)
 	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
 }
 
 type projectProvider interface {
-	ApplicationByClientID(context.Context, string) (*project_view_model.ApplicationView, error)
+	ProjectByAppID(context.Context, string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
 }
 
@@ -117,18 +118,23 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	app, err := repo.View.ApplicationByClientID(ctx, request.ApplicationID)
+	//DISCUSS: the 3 following calls refer to the query side but we are on the command side
+	project, err := repo.ProjectProvider.ProjectByAppID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := repo.View.AppIDsFromProjectID(ctx, app.ProjectID)
+	projectIDQuery, err := query.NewAppProjectIDSearchQuery(project.ID)
+	if err != nil {
+		return nil, err
+	}
+	appIDs, err := repo.Query.SearchAppIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
 	request.Audience = appIDs
-	request.AppendAudIfNotExisting(app.ProjectID)
-	request.ApplicationResourceOwner = app.ResourceOwner
-	request.PrivateLabelingSetting = app.PrivateLabelingSetting
+	request.AppendAudIfNotExisting(project.ID)
+	request.ApplicationResourceOwner = project.ResourceOwner
+	request.PrivateLabelingSetting = project.PrivateLabelingSetting
 	if err := setOrgID(repo.OrgViewProvider, request); err != nil {
 		return nil, err
 	}
@@ -1127,20 +1133,20 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 }
 
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
-	var app *project_view_model.ApplicationView
+	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		app, err = userGrantProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		project, err = userGrantProvider.ProjectByAppID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
 	default:
 		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
-	if !app.ProjectRoleCheck {
+	if !project.ProjectRoleCheck {
 		return false, nil
 	}
-	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(app.ProjectID, user.ID)
+	grants, err := userGrantProvider.UserGrantsByProjectAndUserID(project.ID, user.ID)
 	if err != nil {
 		return false, err
 	}
@@ -1148,20 +1154,20 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 }
 
 func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
-	var app *project_view_model.ApplicationView
+	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		app, err = projectProvider.ApplicationByClientID(ctx, request.ApplicationID)
+		project, err = projectProvider.ProjectByAppID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
 	default:
 		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
-	if !app.HasProjectCheck {
+	if !project.HasProjectCheck {
 		return false, nil
 	}
-	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, app.ProjectID)
+	_, err = projectProvider.OrgProjectMappingByIDs(request.UserOrgID, project.ID)
 	if errors.IsNotFound(err) {
 		return true, nil
 	}

@@ -10,7 +10,7 @@ type ProjectRepo struct {
 	View *view.View
 }
 
-func (a *ApplicationRepo) ProjectRolesByProjectID(projectID string) ([]*model.ProjectRoleView, error) {
+func (a *ProjectRepo) ProjectRolesByProjectID(projectID string) ([]*model.ProjectRoleView, error) {
 	roles, err := a.View.ProjectRolesByProjectID(projectID)
 	if err != nil {
 		return nil, err
