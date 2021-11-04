@@ -48,7 +48,6 @@ type EsRepository struct {
 	eventstore.OrgRepository
 	eventstore.IAMRepository
 	eventstore.FeaturesRepo
-	eventstore.ProjectRepo
 }
 
 func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
@@ -182,9 +181,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		eventstore.FeaturesRepo{
 			Eventstore: es,
 			View:       view,
-		},
-		eventstore.ProjectRepo{
-			View: view,
 		},
 	}, nil
 }
