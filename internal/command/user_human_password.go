@@ -211,7 +211,6 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
 	}
-	loginPolicy.AllowUsernamePassword = false
 	if !loginPolicy.AllowUsernamePassword {
 		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
 	}
