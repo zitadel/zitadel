@@ -5,9 +5,11 @@ import (
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
+	"github.com/caos/zitadel/operator/api/core"
 	"github.com/caos/zitadel/operator/api/database"
 	coredb "github.com/caos/zitadel/operator/database/kinds/databases/core"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 func CrdGetConnectionInfo(
@@ -17,6 +19,30 @@ func CrdGetConnectionInfo(
 	desired, err := database.ReadCrd(k8sClient)
 	if err != nil {
 		return "", "", err
+	}
+
+	if desired == nil {
+		unstruct := &unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "caos.ch/v1",
+				"kind":       "Database",
+				"spec": map[string]interface{}{
+					"kind":    "databases.caos.ch/Orb",
+					"version": "v0",
+					"spec":    map[string]interface{}{},
+					"database": map[string]interface{}{
+						"kind":    "databases.caos.ch/CockroachDB",
+						"version": "v0",
+					},
+				},
+			},
+		}
+
+		desiredT, err := core.UnmarshalUnstructuredSpec(unstruct)
+		if err != nil {
+			return "", "", err
+		}
+		desired = desiredT
 	}
 
 	return getConnectionInfo(monitor, k8sClient, desired, false)

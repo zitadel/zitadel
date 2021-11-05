@@ -176,6 +176,12 @@ github.com/caos/orbos v1.5.14-0.20211104124428-d2ccd04ef8c5 h1:beUiK+B6Rnk3L0bnY
 github.com/caos/orbos v1.5.14-0.20211104124428-d2ccd04ef8c5/go.mod h1:rCFhwdWo7dS0viJftFdBNjoT9U0fHS3UFsbsAmpKwlI=
 github.com/caos/orbos v1.5.14-0.20211104130647-1f200f995dde h1:k8OdX7tiGIb9X2TLX4eoNktYUyO8pvGEG1tk/ToypJs=
 github.com/caos/orbos v1.5.14-0.20211104130647-1f200f995dde/go.mod h1:rCFhwdWo7dS0viJftFdBNjoT9U0fHS3UFsbsAmpKwlI=
+github.com/caos/orbos v1.5.14-0.20211105132211-f07ddd8cc6ac h1:J/TeUy1I0iAilzQO4RW9gEUwnQ2tq14reNBQk3WSoF8=
+github.com/caos/orbos v1.5.14-0.20211105132211-f07ddd8cc6ac/go.mod h1:rCFhwdWo7dS0viJftFdBNjoT9U0fHS3UFsbsAmpKwlI=
+github.com/caos/orbos v1.5.14-0.20211105132756-5eb4d03fbb00 h1:Mo0JpfI9tmq05kWxbexiwePgNvSNTkfoZ53kIpqVXqE=
+github.com/caos/orbos v1.5.14-0.20211105132756-5eb4d03fbb00/go.mod h1:rCFhwdWo7dS0viJftFdBNjoT9U0fHS3UFsbsAmpKwlI=
+github.com/caos/orbos v1.5.14-0.20211105133355-c3d718cf3a4d h1:dYeasHYJYpFi9NFoTX/KsJ0tnJp++9kPs1GVWNQmaio=
+github.com/caos/orbos v1.5.14-0.20211105133355-c3d718cf3a4d/go.mod h1:rCFhwdWo7dS0viJftFdBNjoT9U0fHS3UFsbsAmpKwlI=
 github.com/cenkalti/backoff v2.1.1+incompatible h1:tKJnvO2kl0zmb/jA5UKAt4VoEVw1qxKWjE/Bpp46npY=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff/v4 v4.1.1 h1:G2HAfAmvm/GcKan2oOQpBXOd2tT2G57ZnZGWa1PxPBQ=
