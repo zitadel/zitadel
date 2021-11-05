@@ -25,7 +25,7 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	projectID, err := o.query.ProjectIDFromAppID(ctx, req.ClientID)
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, req.ClientID)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}

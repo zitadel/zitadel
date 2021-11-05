@@ -97,12 +97,12 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByAppID(context.Context, string) (*query.Project, error)
+	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
 	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
 }
 
 type projectProvider interface {
-	ProjectByAppID(context.Context, string) (*query.Project, error)
+	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
 }
 
@@ -119,7 +119,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	}
 	request.ID = reqID
 	//DISCUSS: the 3 following calls refer to the query side but we are on the command side
-	project, err := repo.ProjectProvider.ProjectByAppID(ctx, request.ApplicationID)
+	project, err := repo.ProjectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -1156,7 +1156,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		project, err = userGrantProvider.ProjectByAppID(ctx, request.ApplicationID)
+		project, err = userGrantProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
@@ -1177,7 +1177,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		project, err = projectProvider.ProjectByAppID(ctx, request.ApplicationID)
+		project, err = projectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}

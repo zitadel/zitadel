@@ -238,10 +238,10 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 	return scan(row)
 }
 
-func (q *Queries) ProjectIDFromAppID(ctx context.Context, appID string) (string, error) {
-	stmt, scan := prepareAppProjectIDQuery()
+func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
+	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppColumnID.identifier(): appID},
+		sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
 	).ToSql()
 	if err != nil {
 		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
@@ -251,10 +251,10 @@ func (q *Queries) ProjectIDFromAppID(ctx context.Context, appID string) (string,
 	return scan(row)
 }
 
-func (q *Queries) ProjectByAppID(ctx context.Context, appID string) (*Project, error) {
+func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (*Project, error) {
 	stmt, scan := prepareProjectByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppColumnID.identifier(): appID},
+		sq.Eq{AppOIDCConfigColumnClientID.identifier(): id},
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
@@ -331,10 +331,12 @@ func prepareSingleAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 			AppColumnState.identifier(),
 			AppColumnSequence.identifier(),
 
+			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
 			AppAPIConfigColumnClientSecret.identifier(),
 			AppAPIConfigColumnAuthMethod.identifier(),
 
+			AppOIDCConfigColumnAppID.identifier(),
 			AppOIDCConfigColumnVersion.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
 			AppOIDCConfigColumnClientSecret.identifier(),
@@ -410,10 +412,12 @@ func prepareSingleAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 		}
 }
 
-func prepareAppProjectIDQuery() (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
+func prepareProjectIDByAppQuery() (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
 	return sq.Select(
 			AppColumnProjectID.identifier(),
 		).From(appsTable.identifier()).
+			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
 			err = row.Scan(
 				&projectID,
@@ -442,9 +446,11 @@ func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, err
 			ProjectColumnProjectRoleAssertion.identifier(),
 			ProjectColumnProjectRoleCheck.identifier(),
 			ProjectColumnHasProjectCheck.identifier(),
-			ProjectColumnPrivateLabelingSetting.identifier()).
-			From(projectsTable.identifier()).
+			ProjectColumnPrivateLabelingSetting.identifier(),
+		).From(projectsTable.identifier()).
 			Join(join(AppColumnProjectID, ProjectColumnID)).
+			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Project, error) {
 			p := new(Project)
@@ -483,10 +489,12 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppColumnSequence.identifier(),
 			countColumn.identifier(),
 
+			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
 			AppAPIConfigColumnClientSecret.identifier(),
 			AppAPIConfigColumnAuthMethod.identifier(),
 
+			AppOIDCConfigColumnAppID.identifier(),
 			AppOIDCConfigColumnVersion.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
 			AppOIDCConfigColumnClientSecret.identifier(),
@@ -611,8 +619,8 @@ type sqlOIDCConfig struct {
 	iDTokenUserinfoAssertion sql.NullBool
 	clockSkew                sql.NullInt64
 	additionalOrigins        pq.StringArray
-	responseTypes            oidcResponseTypes
-	grantTypes               oidcGrantTypes
+	responseTypes            pq.Int32Array
+	grantTypes               pq.Int32Array
 }
 
 func (c sqlOIDCConfig) set(app *App) {
@@ -634,8 +642,8 @@ func (c sqlOIDCConfig) set(app *App) {
 		AssertIDTokenUserinfo:  c.iDTokenUserinfoAssertion.Bool,
 		ClockSkew:              time.Duration(c.clockSkew.Int64),
 		AdditionalOrigins:      c.additionalOrigins,
-		ResponseTypes:          c.responseTypes.toDomain(),
-		GrantTypes:             c.grantTypes.toDomain(),
+		ResponseTypes:          oidcResponseTypesToDomain(c.responseTypes),
+		GrantTypes:             oidcGrantTypesToDomain(c.grantTypes),
 	}
 }
 
@@ -657,9 +665,7 @@ func (c sqlAPIConfig) set(app *App) {
 	}
 }
 
-type oidcResponseTypes pq.Int32Array
-
-func (t oidcResponseTypes) toDomain() []domain.OIDCResponseType {
+func oidcResponseTypesToDomain(t pq.Int32Array) []domain.OIDCResponseType {
 	types := make([]domain.OIDCResponseType, len(t))
 	for i, typ := range t {
 		types[i] = domain.OIDCResponseType(typ)
@@ -667,9 +673,7 @@ func (t oidcResponseTypes) toDomain() []domain.OIDCResponseType {
 	return types
 }
 
-type oidcGrantTypes pq.Int32Array
-
-func (t oidcGrantTypes) toDomain() []domain.OIDCGrantType {
+func oidcGrantTypesToDomain(t pq.Int32Array) []domain.OIDCGrantType {
 	types := make([]domain.OIDCGrantType, len(t))
 	for i, typ := range t {
 		types[i] = domain.OIDCGrantType(typ)
