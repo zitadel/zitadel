@@ -57,6 +57,7 @@
 
         <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
           <span>{{'ACTIONS.NEW' | translate}}</span>
+          <span *ngIf="selection && selection.length">&nbsp;({{selection.length}})</span>
           <mat-icon>add</mat-icon>
         </button>
       </div>

@@ -34,7 +34,6 @@ export class ActionsComponent {
   private loadFlow() {
     this.mgmtService.getFlow(this.flowType).then((flowResponse) => {
       if (flowResponse.flow) this.flow = flowResponse.flow;
-      console.log(this.flow);
     });
   }
 
@@ -64,7 +63,6 @@ export class ActionsComponent {
   }
 
   public openAddTrigger(): void {
-    console.log(this.selection);
     const dialogRef = this.dialog.open(AddFlowDialogComponent, {
       data: {
         flowType: this.flowType,
@@ -94,7 +92,7 @@ export class ActionsComponent {
   }
 
   saveFlow(index: number) {
-    console.log(this.flow.triggerActionsList[index].actionsList);
+    console.log(this.flow.triggerActionsList[index].actionsList.map((action) => action.id));
     this.mgmtService
       .setTriggerActions(
         this.flow.triggerActionsList[index].actionsList.map((action) => action.id),
@@ -102,7 +100,7 @@ export class ActionsComponent {
         this.flow.triggerActionsList[index].triggerType,
       )
       .then((updateResponse) => {
-        console.log(updateResponse);
+        this.toast.showInfo('FLOWS.TOAST.ACTIONSSET', true);
       })
       .catch((error) => {
         this.toast.showError(error);
