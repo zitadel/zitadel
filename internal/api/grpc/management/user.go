@@ -493,6 +493,19 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
+func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.AddPasswordlessRegistrationRequest) (*mgmt_pb.AddPasswordlessRegistrationResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddPasswordlessRegistrationResponse{
+		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+		Expiration: durationpb.New(initCode.Expiration),
+	}, nil
+}
+
 func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
