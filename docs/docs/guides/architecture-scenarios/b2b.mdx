@@ -1,0 +1,62 @@
+---
+title: B2B
+---
+
+## Business to Business
+
+B2B describes the situation where an organization interacts with another organization.
+You could have a simple case where an organization only shares one of its projects with another organization or have a more complex case where an organization is offering a portal application to all its partners with included administration.
+
+In ZITADEL an organization represents a business customer who typically has its own branding and has different access settings like an additional federated login for its users.
+
+<!-- This guide describes an application  -->
+## Sample scenario
+
+Octagon is a fictitious company which tries to solve multiple tasks in the tourism field with the help of technology.
+Their portfolio includes several applications some of which are web-based, some of which are used by IoT devices which gather inforamtion about various things.
+
+### Portal Application
+
+Octagon has a portal application where its employees can access their account and list all applications they are allowed to use.
+Employees work for a department organization within Octagon or for Octagon itself. 
+Some have enhanced features because they are supervisors of a team. Those can onboard new employees and manage there roles and features.
+Target groups of the application can be split into:
+- **Employes:** using the application as a starting point for their work.
+- **Administrators:** using the application as a starting point for their work with the addition to manage users of their department.
+
+### Planning considerations
+
+- **Login and Access:** Should a user be allowed to login with his social account? Does the application have a default login page or does each organization use its own branding? Is the user allowed to login passwordless or does he need a second factor to validate his identity?
+- **Organizations:** Does a user have access in multiple organizations? Is a user required to use a different federated login for those organizations?
+- **Roles** Does the application need users to have specific roles assigned within their organizations? Which roles are needed to enable certan features of the application?
+
+### Login
+
+You can decide whether a organization is preselected for the login or if the user is redirected to the default login screen. You can send the user to a specific organization by defining the organization in a custom scope.
+Settings to the branding or the login options of the organization can be made from the organization section in [Console](https://console.zitadel.ch/org). 
+The behaviour of the login branding can be set in your projects detail page. You can choose the branding of the selected organization, the user resource owner, or the projects resource owner.
+
+### Organizations
+
+ZITADELs users of course can be members of multiple organizations.
+A user can be isolated to an organization, or be shared across multiple organizations. Anyways, a user should be able to use the same identity to switch between organizations.
+If this feature is not desired, a seperate user for each organization should be created.
+
+Adding a user to a different organization can be as easy as adding a new user authorization (user grant). A user grant combines a user with an organization, a project and 0 to N roles.
+
+In our sample scenario, we assume to have the following users:
+
+- **Dimitri:** A team leader who is directly employed by Hexagon, an Octagon business customer. Dimitri uses his Microsoft Account in combination with his one time password to access the portal. Hexagon requires its users to secure their accounts with additional factor.
+- **Michael** A trainee of Hexagon only using the portal to access his workspace apps. Michael uses his Google Account in combination with is his laptops fingerprint.
+
+After having determined the constellation of the organizations and its users, all the necessary data (Portal project with roles and app, users, login requirements, identity providers, branding) should be set up in [Console](https://console.zitadel.ch/org). 
+
+### Roles
+
+To allow an other organization to use a project, a project grant has to be created. Upon creation, roles for a grant can be limited to a subset of the total projectroles.
+
+In our scenario, Hexagon is limited to use `writer` and `viewer` role. The `admin` role is reserved for the Octagon organization itself.
+
+If you made a dashboard where some users create grants for other users, the Management API to do such operations should be triggered with the personal access token of the users itself, not with the token of a service user, to create a meaningful audit log. 
+
+> Note: If having such users, ZITADEL manager roles must be assigned to those users.

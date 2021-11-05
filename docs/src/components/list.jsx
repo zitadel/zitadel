@@ -58,11 +58,13 @@ export const ICONTYPE = {
   </div>,
 };
 
-export function ListElement({ link, iconClasses, type, title, description}) {
+export function ListElement({ link, iconClasses,roundClasses, label, type, title, description}) {
   return (
     <a className={styles.listelement} href={link}>
       {type ? type : 
-        iconClasses && <div><i className={`${styles.icon} ${iconClasses}`}></i></div>
+        iconClasses && <div className={roundClasses}>
+          { label ? <span className={styles.listlabel}>{label}</span>: <i className={`${iconClasses}`}></i> }
+        </div>
       }
       <div>
         <h3>{title}</h3>

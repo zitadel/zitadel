@@ -1,0 +1,33 @@
+---
+title: B2C
+---
+
+## Business to Customer
+
+B2C describes one of the simplest use cases in ZITADEL where we have an organization offering an application to customers like a Point of Sales website, having its customers as users in its organization.
+
+The journey starts by creating an organization which is ZITADELS vessel for projects, roles, applications and users.
+Depending on your Software Development Life Cycle (SDLC) you will have to create multiple organizations.
+
+| Environment | Organization Name     | Description                                                                                                                          |
+| :---------- | :-------------------- | ----------------------- |
+| Development | **acme-dev**          | The development environment and organization |
+| Testing     | **acme-test**         | An environment for testing and production preview |
+| Production  | **acme-prod**         | The production environment and organization |
+
+
+### Custom domain
+
+Right after org creation you'll be greeted which the domain section of your organization. ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch` on creation, but you can set your own by saving a verification file on the specified location.  
+
+### User Authentication
+
+The process of verifying a users identity is called User Authentication and is required in order for your users to access applications.
+User Authentication can be performed in multiple ways, starting with the most basic one: Username Password. 
+ZITADEL allows you to configure Multifactor Authentication in order to enhance security for your users. All methods including Identity Providers and Passwordless Authentication are starting from FREE Tier.
+To setup your personal login policy, go to your organizations detail in [Console](https://console.zitadel.ch/org).
+
+### Hosted Login
+
+### Projects and applications
+

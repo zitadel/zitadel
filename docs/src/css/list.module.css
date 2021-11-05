@@ -31,6 +31,10 @@
   padding: .5rem 1rem .5rem .5rem;
 }
 
+.listlabel {
+  color: white;
+}
+
 .listWrapper {
   display: flex;
   flex-direction: column;
