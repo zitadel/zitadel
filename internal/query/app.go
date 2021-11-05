@@ -2,11 +2,16 @@ package query
 
 import (
 	"context"
+	"database/sql"
+	errs "errors"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/lib/pq"
 )
 
 type Apps struct {
@@ -60,6 +65,14 @@ type APIApp struct {
 type AppSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func (q *AppSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.ToQuery(query)
+	}
+	return query
 }
 
 var (
@@ -197,31 +210,106 @@ var (
 )
 
 func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID string) (*App, error) {
-	return nil, nil
+	stmt, scan := prepareSingleAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			AppColumnID.identifier():        appID,
+			AppColumnProjectID.identifier(): projectID,
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-AFDgg", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
 }
 
 func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
-	return nil, nil
+	stmt, scan := prepareSingleAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{AppColumnID.identifier(): appID},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-immt9", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
 }
 
 func (q *Queries) ProjectIDFromAppID(ctx context.Context, appID string) (string, error) {
-	return "", nil
+	stmt, scan := prepareAppProjectIDQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{AppColumnID.identifier(): appID},
+	).ToSql()
+	if err != nil {
+		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
 }
 
 func (q *Queries) ProjectByAppID(ctx context.Context, appID string) (*Project, error) {
-	return nil, nil
+	stmt, scan := prepareProjectByAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{AppColumnID.identifier(): appID},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-XhJi4", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
 }
 
 func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App, error) {
-	return nil, nil
+	stmt, scan := prepareSingleAppQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			AppOIDCConfigColumnClientID.identifier(): clientID,
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
 }
 
 func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*Apps, error) {
-	return nil, nil
+	query, scan := prepareAppsQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+	}
+	apps, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	apps.LatestSequence, err = q.latestSequence(ctx, appsTable)
+	return apps, err
 }
 
 func (q *Queries) SearchAppIDs(ctx context.Context, queries *AppSearchQueries) ([]string, error) {
-	return nil, nil
+	query, scan := prepareAppIDsQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-aJnZL", "Errors.Internal")
+	}
+	return scan(rows)
 }
 
 func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
@@ -230,4 +318,361 @@ func NewAppNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 
 func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
+}
+
+func prepareSingleAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+	return sq.Select(
+			AppColumnID.identifier(),
+			AppColumnName.identifier(),
+			AppColumnProjectID.identifier(),
+			AppColumnCreationDate.identifier(),
+			AppColumnChangeDate.identifier(),
+			AppColumnResourceOwner.identifier(),
+			AppColumnState.identifier(),
+			AppColumnSequence.identifier(),
+
+			AppAPIConfigColumnClientID.identifier(),
+			AppAPIConfigColumnClientSecret.identifier(),
+			AppAPIConfigColumnAuthMethod.identifier(),
+
+			AppOIDCConfigColumnVersion.identifier(),
+			AppOIDCConfigColumnClientID.identifier(),
+			AppOIDCConfigColumnClientSecret.identifier(),
+			AppOIDCConfigColumnRedirectUris.identifier(),
+			AppOIDCConfigColumnResponseTypes.identifier(),
+			AppOIDCConfigColumnGrantTypes.identifier(),
+			AppOIDCConfigColumnApplicationType.identifier(),
+			AppOIDCConfigColumnAuthMethodType.identifier(),
+			AppOIDCConfigColumnPostLogoutRedirectUris.identifier(),
+			AppOIDCConfigColumnDevMode.identifier(),
+			AppOIDCConfigColumnAccessTokenType.identifier(),
+			AppOIDCConfigColumnAccessTokenRoleAssertion.identifier(),
+			AppOIDCConfigColumnIDTokenRoleAssertion.identifier(),
+			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
+			AppOIDCConfigColumnClockSkew.identifier(),
+			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+		).From(appsTable.identifier()).
+			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*App, error) {
+			app := new(App)
+
+			var (
+				apiConfig  = sqlAPIConfig{}
+				oidcConfig = sqlOIDCConfig{}
+			)
+
+			err := row.Scan(
+				&app.ID,
+				&app.Name,
+				&app.ProjectID,
+				&app.CreationDate,
+				&app.ChangeDate,
+				&app.ResourceOwner,
+				&app.State,
+				&app.Sequence,
+
+				&apiConfig.appID,
+				&apiConfig.clientID,
+				&apiConfig.clientSecret,
+				&apiConfig.authMethod,
+
+				&oidcConfig.appID,
+				&oidcConfig.version,
+				&oidcConfig.clientID,
+				&oidcConfig.clientSecret,
+				&oidcConfig.redirectUris,
+				&oidcConfig.responseTypes,
+				&oidcConfig.grantTypes,
+				&oidcConfig.applicationType,
+				&oidcConfig.authMethodType,
+				&oidcConfig.postLogoutRedirectUris,
+				&oidcConfig.devMode,
+				&oidcConfig.accessTokenType,
+				&oidcConfig.accessTokenRoleAssertion,
+				&oidcConfig.iDTokenRoleAssertion,
+				&oidcConfig.iDTokenUserinfoAssertion,
+				&oidcConfig.clockSkew,
+				&oidcConfig.additionalOrigins,
+			)
+
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+			}
+
+			apiConfig.set(app)
+			oidcConfig.set(app)
+
+			return app, nil
+		}
+}
+
+func prepareAppProjectIDQuery() (sq.SelectBuilder, func(*sql.Row) (projectID string, err error)) {
+	return sq.Select(
+			AppColumnProjectID.identifier(),
+		).From(appsTable.identifier()).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (projectID string, err error) {
+			err = row.Scan(
+				&projectID,
+			)
+
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return "", errors.ThrowNotFound(err, "QUERY-aKcc2", "Errors.Project.NotExisting")
+				}
+				return "", errors.ThrowInternal(err, "QUERY-3A5TG", "Errors.Internal")
+			}
+
+			return projectID, nil
+		}
+}
+
+func prepareProjectByAppQuery() (sq.SelectBuilder, func(*sql.Row) (*Project, error)) {
+	return sq.Select(
+			ProjectColumnID.identifier(),
+			ProjectColumnCreationDate.identifier(),
+			ProjectColumnChangeDate.identifier(),
+			ProjectColumnResourceOwner.identifier(),
+			ProjectColumnState.identifier(),
+			ProjectColumnSequence.identifier(),
+			ProjectColumnName.identifier(),
+			ProjectColumnProjectRoleAssertion.identifier(),
+			ProjectColumnProjectRoleCheck.identifier(),
+			ProjectColumnHasProjectCheck.identifier(),
+			ProjectColumnPrivateLabelingSetting.identifier()).
+			From(projectsTable.identifier()).
+			Join(join(AppColumnProjectID, ProjectColumnID)).
+			PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Project, error) {
+			p := new(Project)
+			err := row.Scan(
+				&p.ID,
+				&p.CreationDate,
+				&p.ChangeDate,
+				&p.ResourceOwner,
+				&p.State,
+				&p.Sequence,
+				&p.Name,
+				&p.ProjectRoleAssertion,
+				&p.ProjectRoleCheck,
+				&p.HasProjectCheck,
+				&p.PrivateLabelingSetting,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-fk2fs", "Errors.Project.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-dj2FF", "Errors.Internal")
+			}
+			return p, nil
+		}
+}
+
+func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
+	return sq.Select(
+			AppColumnID.identifier(),
+			AppColumnName.identifier(),
+			AppColumnProjectID.identifier(),
+			AppColumnCreationDate.identifier(),
+			AppColumnChangeDate.identifier(),
+			AppColumnResourceOwner.identifier(),
+			AppColumnState.identifier(),
+			AppColumnSequence.identifier(),
+			countColumn.identifier(),
+
+			AppAPIConfigColumnClientID.identifier(),
+			AppAPIConfigColumnClientSecret.identifier(),
+			AppAPIConfigColumnAuthMethod.identifier(),
+
+			AppOIDCConfigColumnVersion.identifier(),
+			AppOIDCConfigColumnClientID.identifier(),
+			AppOIDCConfigColumnClientSecret.identifier(),
+			AppOIDCConfigColumnRedirectUris.identifier(),
+			AppOIDCConfigColumnResponseTypes.identifier(),
+			AppOIDCConfigColumnGrantTypes.identifier(),
+			AppOIDCConfigColumnApplicationType.identifier(),
+			AppOIDCConfigColumnAuthMethodType.identifier(),
+			AppOIDCConfigColumnPostLogoutRedirectUris.identifier(),
+			AppOIDCConfigColumnDevMode.identifier(),
+			AppOIDCConfigColumnAccessTokenType.identifier(),
+			AppOIDCConfigColumnAccessTokenRoleAssertion.identifier(),
+			AppOIDCConfigColumnIDTokenRoleAssertion.identifier(),
+			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
+			AppOIDCConfigColumnClockSkew.identifier(),
+			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+		).From(appsTable.identifier()).
+			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
+			apps := new(Apps)
+
+			for row.Next() {
+				app := new(App)
+				var (
+					apiConfig  = sqlAPIConfig{}
+					oidcConfig = sqlOIDCConfig{}
+				)
+
+				err := row.Scan(
+					&app.ID,
+					&app.Name,
+					&app.ProjectID,
+					&app.CreationDate,
+					&app.ChangeDate,
+					&app.ResourceOwner,
+					&app.State,
+					&app.Sequence,
+					&apps.Count,
+
+					&apiConfig.appID,
+					&apiConfig.clientID,
+					&apiConfig.clientSecret,
+					&apiConfig.authMethod,
+
+					&oidcConfig.appID,
+					&oidcConfig.version,
+					&oidcConfig.clientID,
+					&oidcConfig.clientSecret,
+					&oidcConfig.redirectUris,
+					&oidcConfig.responseTypes,
+					&oidcConfig.grantTypes,
+					&oidcConfig.applicationType,
+					&oidcConfig.authMethodType,
+					&oidcConfig.postLogoutRedirectUris,
+					&oidcConfig.devMode,
+					&oidcConfig.accessTokenType,
+					&oidcConfig.accessTokenRoleAssertion,
+					&oidcConfig.iDTokenRoleAssertion,
+					&oidcConfig.iDTokenUserinfoAssertion,
+					&oidcConfig.clockSkew,
+					&oidcConfig.additionalOrigins,
+				)
+
+				if err != nil {
+					if errs.Is(err, sql.ErrNoRows) {
+						return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
+					}
+					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+				}
+
+				apiConfig.set(app)
+				oidcConfig.set(app)
+			}
+
+			return apps, nil
+		}
+}
+
+func prepareAppIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
+	return sq.Select(
+			AppColumnID.identifier(),
+		).From(appsTable.identifier()).
+			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
+			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
+			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) ([]string, error) {
+			ids := []string{}
+
+			for row.Next() {
+				var id string
+				err := row.Scan(
+					&id,
+				)
+
+				if err != nil {
+					if errs.Is(err, sql.ErrNoRows) {
+						return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
+					}
+					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
+				}
+
+				ids = append(ids, id)
+			}
+
+			return ids, nil
+		}
+}
+
+type sqlOIDCConfig struct {
+	appID                    sql.NullString
+	version                  sql.NullInt32
+	clientID                 sql.NullString
+	clientSecret             crypto.CryptoValue
+	redirectUris             pq.StringArray
+	applicationType          sql.NullInt16
+	authMethodType           sql.NullInt16
+	postLogoutRedirectUris   pq.StringArray
+	devMode                  sql.NullBool
+	accessTokenType          sql.NullInt16
+	accessTokenRoleAssertion sql.NullBool
+	iDTokenRoleAssertion     sql.NullBool
+	iDTokenUserinfoAssertion sql.NullBool
+	clockSkew                sql.NullInt64
+	additionalOrigins        pq.StringArray
+	responseTypes            oidcResponseTypes
+	grantTypes               oidcGrantTypes
+}
+
+func (c sqlOIDCConfig) set(app *App) {
+	if !c.appID.Valid {
+		return
+	}
+	app.OIDCConfig = &OIDCApp{
+		Version:                domain.OIDCVersion(c.version.Int32),
+		ClientID:               c.clientID.String,
+		ClientSecret:           &c.clientSecret,
+		RedirectURIs:           c.redirectUris,
+		AppType:                domain.OIDCApplicationType(c.applicationType.Int16),
+		AuthMethodType:         domain.OIDCAuthMethodType(c.authMethodType.Int16),
+		PostLogoutRedirectURIs: c.postLogoutRedirectUris,
+		IsDevMode:              c.devMode.Bool,
+		AccessTokenType:        domain.OIDCTokenType(c.accessTokenType.Int16),
+		AssertAccessTokenRole:  c.accessTokenRoleAssertion.Bool,
+		AssertIDTokenRole:      c.iDTokenRoleAssertion.Bool,
+		AssertIDTokenUserinfo:  c.iDTokenUserinfoAssertion.Bool,
+		ClockSkew:              time.Duration(c.clockSkew.Int64),
+		AdditionalOrigins:      c.additionalOrigins,
+		ResponseTypes:          c.responseTypes.toDomain(),
+		GrantTypes:             c.grantTypes.toDomain(),
+	}
+}
+
+type sqlAPIConfig struct {
+	appID        sql.NullString
+	clientID     sql.NullString
+	clientSecret crypto.CryptoValue
+	authMethod   sql.NullInt16
+}
+
+func (c sqlAPIConfig) set(app *App) {
+	if !c.appID.Valid {
+		return
+	}
+	app.APIConfig = &APIApp{
+		ClientID:       c.clientID.String,
+		ClientSecret:   &c.clientSecret,
+		AuthMethodType: domain.APIAuthMethodType(c.authMethod.Int16),
+	}
+}
+
+type oidcResponseTypes pq.Int32Array
+
+func (t oidcResponseTypes) toDomain() []domain.OIDCResponseType {
+	types := make([]domain.OIDCResponseType, len(t))
+	for i, typ := range t {
+		types[i] = domain.OIDCResponseType(typ)
+	}
+	return types
+}
+
+type oidcGrantTypes pq.Int32Array
+
+func (t oidcGrantTypes) toDomain() []domain.OIDCGrantType {
+	types := make([]domain.OIDCGrantType, len(t))
+	for i, typ := range t {
+		types[i] = domain.OIDCGrantType(typ)
+	}
+	return types
 }
