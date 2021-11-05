@@ -8,10 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-// func (v *View) ApplicationByID(projectID, appID string) (*query.App, error) {
-// 	return v.Query.AppByProjectAndAppID(context.TODO(), projectID, appID)
-// }
-
 func (v *View) ApplicationByOIDCClientID(clientID string) (*query.App, error) {
 	return v.Query.AppByOIDCClientID(context.TODO(), clientID)
 }
@@ -30,10 +26,11 @@ func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, a
 	}
 
 	queries := &query.AppSearchQueries{
-		Queries: make([]query.SearchQuery, 0, 2),
+		Queries: []query.SearchQuery{
+			nameQuery,
+			projectQuery,
+		},
 	}
-
-	queries.Queries = append(queries.Queries, nameQuery, projectQuery)
 
 	apps, err := v.Query.SearchApps(ctx, queries)
 	if err != nil {

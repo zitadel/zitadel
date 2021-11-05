@@ -17,7 +17,7 @@ func (a *ApplicationRepo) AuthorizeClientIDSecret(ctx context.Context, clientID,
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	app, err := a.Query.AppByID(ctx, clientID)
+	app, err := a.Query.AppByOIDCClientID(ctx, clientID)
 	if err != nil {
 		return err
 	}
