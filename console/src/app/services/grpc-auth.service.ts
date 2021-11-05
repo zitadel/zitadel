@@ -68,6 +68,8 @@ import {
   UpdateMyPasswordResponse,
   UpdateMyProfileRequest,
   UpdateMyProfileResponse,
+  UpdateMyUserNameRequest,
+  UpdateMyUserNameResponse,
   VerifyMyAuthFactorOTPRequest,
   VerifyMyAuthFactorOTPResponse,
   VerifyMyAuthFactorU2FRequest,
@@ -414,6 +416,12 @@ export class GrpcAuthService {
 
   public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {
     return this.grpcService.auth.removeMyPhone(new RemoveMyPhoneRequest(), null).then((resp) => resp.toObject());
+  }
+
+  public updateMyUserName(username: string): Promise<UpdateMyUserNameResponse.AsObject> {
+    const req = new UpdateMyUserNameRequest();
+    req.setUserName(username);
+    return this.grpcService.auth.updateMyUserName(req, null).then(resp => resp.toObject());
   }
 
   public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse.AsObject> {

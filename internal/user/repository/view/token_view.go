@@ -67,6 +67,11 @@ func DeleteUserTokens(db *gorm.DB, table, userID string) error {
 	return delete(db)
 }
 
+func DeleteTokensFromRefreshToken(db *gorm.DB, table, refreshTokenID string) error {
+	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyRefreshTokenID), refreshTokenID)
+	return delete(db)
+}
+
 func DeleteApplicationTokens(db *gorm.DB, table string, appIDs []string) error {
 	delete := repository.PrepareDeleteByKey(table, usr_model.TokenSearchKey(model.TokenSearchKeyApplicationID), pq.StringArray(appIDs))
 	return delete(db)

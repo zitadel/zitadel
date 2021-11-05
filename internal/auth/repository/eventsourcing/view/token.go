@@ -68,6 +68,14 @@ func (v *View) DeleteApplicationTokens(event *models.Event, ids ...string) error
 	return v.ProcessedTokenSequence(event)
 }
 
+func (v *View) DeleteTokensFromRefreshToken(refreshTokenID string, event *models.Event) error {
+	err := usr_view.DeleteTokensFromRefreshToken(v.Db, tokenTable, refreshTokenID)
+	if err != nil && !errors.IsNotFound(err) {
+		return err
+	}
+	return v.ProcessedTokenSequence(event)
+}
+
 func (v *View) GetLatestTokenSequence() (*repository.CurrentSequence, error) {
 	return v.latestSequence(tokenTable)
 }

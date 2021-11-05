@@ -24,7 +24,7 @@ func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinked
 }
 
 func (s *Server) RemoveMyLinkedIDP(ctx context.Context, req *auth_pb.RemoveMyLinkedIDPRequest) (*auth_pb.RemoveMyLinkedIDPResponse, error) {
-	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveMyLinkedIDPRequestToDomain(ctx, req))
+	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveMyLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}

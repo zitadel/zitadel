@@ -598,7 +598,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	}, nil
 }
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
-	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
+	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}

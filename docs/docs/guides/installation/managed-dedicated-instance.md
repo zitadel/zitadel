@@ -56,7 +56,7 @@ import TabItem from '@theme/TabItem';
   </TabItem>
 </Tabs>
 
-- We need you to point [four DNS subdomains](/docs/apis/domains) to the CAOS-generated IP address.
+- We need you to point [four DNS subdomains](/docs/apis/introduction#domains) to the CAOS-generated IP address.
 - For being able to send SMS, we need a Twilio sender name, SID and an auth token.
 - ZITADEL also needs to connect to an email relay of your choice. We need the SMTP host, user and app key as well as the ZITADEL emails sender address and name.
 

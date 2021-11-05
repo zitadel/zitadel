@@ -1,0 +1,73 @@
+.apicard {
+  border-radius: .5rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  background: var(--card-background);
+  padding: 1rem;
+  text-decoration: none;
+  transition: all .2 ease-in-out;
+  margin: 1rem 0;
+}
+
+.apiauth {
+  background: var(--apiauthbackground);
+}
+
+.apimgmt {
+  background: var(--apimgmtbackground);
+}
+
+.apiadmin {
+  background: var(--apiadminbackground);
+}
+
+.apiasset {
+  background: var(--apiassetbackground);
+}
+
+.apicard:hover {
+  text-decoration: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* .apicard h2 {
+  color: white;
+}
+
+.apicard a {
+  color: #bfc1cc;
+} */
+
+.apicard h3, h4, h5 {
+  /* color: white; */
+  margin: 0.5rem 0 0 0;
+}
+
+.apicard p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.fillspace {
+  flex: 1;
+}
+
+.bottom {
+  display: flex;
+  align-items: center;
+}
+
+.bottomicon {
+  width: 24px;
+  margin-right: .5rem;
+  color: var(--ifm-font-color-base);
+}
+
+.bottomspan {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+  text-transform: uppercase;
+  margin: 0;
+}

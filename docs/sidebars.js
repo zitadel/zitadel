@@ -130,47 +130,42 @@ module.exports = {
     ],
     apis: [
         'apis/introduction',
-        'apis/domains',
         {
             type: 'category',
-            label: 'Rate Limits',
+            label: 'API Definition',
             collapsed: true,
             items: [
-                'legal/rate-limit-policy',
-                'apis/ratelimits/accounts',
-                'apis/ratelimits/api',
-            ],
-        },
-        'apis/apis',
-        {
-            type: 'category',
-            label: 'Proto API Definition',
-            collapsed: true,
-            items: [
-                'apis/proto/auth',
-                'apis/proto/management',
-                'apis/proto/admin',
-                'apis/proto/org',
-                'apis/proto/user',
-                'apis/proto/app',
-                'apis/proto/policy',
-                'apis/proto/auth_n_key',
-                'apis/proto/change',
-                'apis/proto/idp',
-                'apis/proto/member',
-                'apis/proto/metadata',
-                'apis/proto/message',
-                'apis/proto/text',
-                'apis/proto/object',
-                'apis/proto/options',
-            ],
-        },
-        {
-            type: 'category',
-            label: 'Assets API Definition',
-            collapsed: false,
-            items: [
-                'apis/assets/assets',
+              {
+                type: 'category',
+                label: 'Proto',
+                collapsed: true,
+                items: [
+                  'apis/proto/auth',
+                  'apis/proto/management',
+                  'apis/proto/admin',
+                  'apis/proto/org',
+                  'apis/proto/user',
+                  'apis/proto/app',
+                  'apis/proto/policy',
+                  'apis/proto/auth_n_key',
+                  'apis/proto/change',
+                  'apis/proto/idp',
+                  'apis/proto/member',
+                  'apis/proto/metadata',
+                  'apis/proto/message',
+                  'apis/proto/text',
+                  'apis/proto/object',
+                  'apis/proto/options'
+                ],
+              },
+              {
+                type: 'category',
+                label: 'Assets API',
+                collapsed: true,
+                items: [
+                    'apis/assets/assets',
+                ],
+              },
             ],
         },
         {
@@ -184,6 +179,16 @@ module.exports = {
                 'apis/openidoauth/authn-methods',
                 'apis/openidoauth/grant-types'
             ],
+        },
+        {
+          type: 'category',
+          label: 'Rate Limits',
+          collapsed: true,
+          items: [
+              'legal/rate-limit-policy',
+              'apis/ratelimits/accounts',
+              'apis/ratelimits/api',
+          ],
         },
     ],
     concepts: [

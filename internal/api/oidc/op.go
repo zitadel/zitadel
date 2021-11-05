@@ -44,6 +44,7 @@ type EndpointConfig struct {
 	Token         *Endpoint
 	Introspection *Endpoint
 	Userinfo      *Endpoint
+	Revocation    *Endpoint
 	EndSession    *Endpoint
 	Keys          *Endpoint
 }
@@ -76,6 +77,8 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	}
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
 	config.OPConfig.CodeMethodS256 = true
+	config.OPConfig.AuthMethodPost = true
+	config.OPConfig.AuthMethodPrivateKeyJWT = true
 	config.OPConfig.GrantTypeRefreshToken = true
 	supportedLanguages, err := getSupportedLanguages()
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
@@ -96,6 +99,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),
 		op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(config.Endpoints.Introspection.Path, config.Endpoints.Introspection.URL)),
 		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),
+		op.WithCustomRevocationEndpoint(op.NewEndpointWithURL(config.Endpoints.Revocation.Path, config.Endpoints.Revocation.URL)),
 		op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(config.Endpoints.EndSession.Path, config.Endpoints.EndSession.URL)),
 		op.WithCustomKeysEndpoint(op.NewEndpointWithURL(config.Endpoints.Keys.Path, config.Endpoints.Keys.URL)),
 	)

@@ -110,6 +110,6 @@ You have successfully integrated ZITADEL in your React Application!
 
 ### Whats next?
 
-Now you can proceed implementing our APIs to include Authorization. You can find our API Docs [here](../../apis/apis)
+Now you can proceed implementing our APIs to include Authorization. You can find our API Docs [here](../../apis/introduction)
 
 For more information about creating a React application we refer to [React](https://reactjs.org/docs/getting-started.html) and for more information about the used oauth/oidc library consider reading their docs at [oidc-react](https://www.npmjs.com/package/oidc-react).

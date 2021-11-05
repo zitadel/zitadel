@@ -1425,7 +1425,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 		ctx            context.Context
 		orgID          string
 		human          *domain.Human
-		externalIDP    *domain.ExternalIDP
+		link           *domain.UserIDPLink
 		orgMemberRoles []string
 	}
 	type res struct {
@@ -2134,7 +2134,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 				phoneVerificationCode: tt.fields.secretGenerator,
 				userPasswordAlg:       tt.fields.userPasswordAlg,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.externalIDP, tt.args.orgMemberRoles)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
