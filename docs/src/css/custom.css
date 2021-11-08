@@ -58,6 +58,7 @@
   --apimgmtbackground: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
   --apiadminbackground: linear-gradient(40deg, #c192c790, #c192c790);
   --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
+  --overlaycolor: #6c90b420;
 }
 
 .apicard-right {
@@ -211,6 +212,7 @@ h2 {
   --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
   --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
   --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
+  --overlaycolor: #ffffff15;
 }
 
 .menu li li a {
@@ -308,4 +310,43 @@ main .container img {
 
 .docs-link img {
   margin: 40px;
+}
+
+.b2borg,
+.b2bproject,
+.b2bapp,
+.b2buser {
+  border-radius: 1rem;
+  background: var(--overlaycolor);
+  padding: 1rem;
+}
+
+.b2buser {
+  margin-top: 1rem;
+}
+
+.b2borg span,
+.b2bproject span,
+.b2bapp span,
+.b2buser span {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.flexrowbetween {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+
+.arrowright {
+  height: 2rem;
+  width: auto;
+  align-self: center;
+  min-width: 2rem;
+}
+
+.b2bprojectrole {
+  margin: 1rem 0 0 1rem !important;
 }

@@ -4,21 +4,48 @@ title: B2C
 
 ## Business to Customer
 
-B2C describes one of the simplest use cases in ZITADEL where we have an organization offering an application to customers like a Point of Sales website, having its customers as users in its organization.
+Users in general come from different domains. You may have customers, employees, or even customers from other parties (B2B). 
+This groups of users usually don't share the same intentions and use applications differently.
+When planning your applications, investing time in reserching your apps architecture is vital for later feature upgrades and enhancements as those changes come in with heftier pricepoints if you have to make bigger changes.
 
-The journey starts by creating an organization which is ZITADELS vessel for projects, roles, applications and users.
-Depending on your Software Development Life Cycle (SDLC) you will have to create multiple organizations.
+This guide introduces you to the grouping and structuring of ZITADEL projects which forms the base for all projects. This can be used as a quickstart to the [B2B scenario](./b2b), which is merely focused on planning considerations if you are having projects with multiple organizations (Multitenancy).
 
-| Environment | Organization Name     | Description                                                                                                                          |
+The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL, as it is, its vessel for projects, roles, applications and users.
+Creation can be done from [ZITADEL Console](https://console.zitadel.ch/org/create). You can choose your current account for the organization owner or create a new one.
+
+Depending on your Software Development Life Cycle (SDLC) you will have to create multiple organizations to keep your data from different environments seperate.
+
+| Environment | Organization Name     | Description             |
 | :---------- | :-------------------- | ----------------------- |
 | Development | **acme-dev**          | The development environment and organization |
 | Testing     | **acme-test**         | An environment for testing and production preview |
 | Production  | **acme-prod**         | The production environment and organization |
 
-
 ### Custom domain
 
-Right after org creation you'll be greeted which the domain section of your organization. ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch` on creation, but you can set your own by saving a verification file on the specified location.  
+Right after org creation you'll be greeted which the domain section of your organization. ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch`, but you can set your own by saving a verification file on the specified location.  
+We recommend that you create your domains early as they create a sense of confidence and trust for your application.
+
+### Data Provisioning
+
+Independent to the fact if you are migrating an existing dataset of users into ZITADEL or if your starting a project from scratch, you should define how users get signed up into your application.
+ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Providers. On signup, ZITADEL imports user information to the own profile.
+ZITADEL gives you a basic storage of the user and manages phone and email addresses, but also gives you the option to store your own application data such as preferences or external identifiers to the metadata of a user.
+
+If you are migrating an existing project and you already have an external identity store you can consider bulkimporting your user datasets.
+Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info. If the users email is not verified or no password is set, a initialization mail will be send. 
+
+:::info
+Requests to the management API are rate limited. Read our [Ratelimit Policy](../../legal/rate-limit-policy) for more info.
+:::
+
+<!-- If you are migrating an existing project and you already have an external identity store you can consider following options:
+
+- ZITADEL as Identity store
+- use an external Identity store
+- migrate users from your existing data store to ZITADEL
+- Federated Login -->
+
 
 ### User Authentication
 
@@ -28,6 +55,15 @@ ZITADEL allows you to configure Multifactor Authentication in order to enhance s
 To setup your personal login policy, go to your organizations detail in [Console](https://console.zitadel.ch/org).
 
 ### Hosted Login
+
+OIDC (OpenID Connect) opens the doors for a central authentication page. Especially if you have more than one application, you may want a central and familiar authentication experience. With SSO (Single Sign On), ZITADEL provides a seamless experience across all your apps.
+If you decide to add a second factor to optimize your users account security, this can be easily configured in [Console](https://console.zitadel.ch/org) and is automatically added to the login. Users will be notified about setting up a second factor or be forced to if you wish so. 
+
+### Branding
+
+Branding and customization is a very important part of your application. With ZITADEL you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consitent design thoughout your applications.
+In addition to visual modifications, you can edit notification texts for your users. ZITADEL gives you handlebar similar templating for common variables. Of course you can define texts for any language.
+We'd appreciate if you could contribute to our repo with translations of your language. Read on how to contribute [here](../../guides/customization/texts).
 
 ### Projects and applications
 
