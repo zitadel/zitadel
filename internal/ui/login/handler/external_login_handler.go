@@ -89,7 +89,11 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 }
 
 func (l *Login) handleOIDCAuthorize(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) {
-	provider := l.getRPConfig(w, r, authReq, idpConfig, callbackEndpoint)
+	provider, err := l.getRPConfig(idpConfig, callbackEndpoint)
+	if err != nil {
+		l.renderLogin(w, r, authReq, err)
+		return
+	}
 	http.Redirect(w, r, rp.AuthURL(authReq.ID, provider, rp.WithPrompt(oidc.PromptSelectAccount)), http.StatusFound)
 }
 
@@ -135,7 +139,11 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	if idpConfig.IsOIDC {
-		provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalLoginCallback)
+		provider, err := l.getRPConfig(idpConfig, EndpointExternalLoginCallback)
+		if err != nil {
+			l.renderLogin(w, r, authReq, err)
+			return
+		}
 		tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 		if err != nil {
 			l.renderLogin(w, r, authReq, err)
@@ -148,23 +156,20 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 	return
 }
 
-func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, callbackEndpoint string) rp.RelyingParty {
+func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
 	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
 	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return nil
+		return nil, err
 	}
 	if idpConfig.OIDCIssuer != "" {
 		provider, err := rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 		if err != nil {
-			l.renderError(w, r, authReq, err)
-			return nil
+			return nil, err
 		}
-		return provider
+		return provider, nil
 	}
 	if idpConfig.OAuthAuthorizationEndpoint == "" || idpConfig.OAuthTokenEndpoint == "" {
-		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig"))
-		return nil
+		return nil, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig")
 	}
 	oauth2Config := &oauth2.Config{
 		ClientID:     idpConfig.OIDCClientID,
@@ -178,10 +183,9 @@ func (l *Login) getRPConfig(w http.ResponseWriter, r *http.Request, authReq *dom
 	}
 	provider, err := rp.NewRelyingPartyOAuth(oauth2Config, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	if err != nil {
-		l.renderError(w, r, authReq, err)
-		return nil
+		return nil, err
 	}
-	return provider
+	return provider, nil
 }
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
