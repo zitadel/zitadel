@@ -14,7 +14,7 @@
     "@angular/cdk": "~12.2.8",
     "@angular/common": "~12.2.8",
     "@angular/compiler": "~12.2.8",
-    "@angular/core": "~12.2.8",
+    "@angular/core": "~13.0.0",
     "@angular/forms": "~12.2.8",
     "@angular/material": "^12.2.8",
     "@angular/material-moment-adapter": "^12.2.8",
