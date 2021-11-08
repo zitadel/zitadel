@@ -63,7 +63,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.25.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.26.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.25.0
 	go.opentelemetry.io/otel v1.1.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.1.0
@@ -80,7 +80,7 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.7
 	google.golang.org/api v0.59.0
-	google.golang.org/genproto v0.0.0-20211027162914-98a5263abeca
+	google.golang.org/genproto v0.0.0-20211027162914-98a5263abeca // indirect
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
