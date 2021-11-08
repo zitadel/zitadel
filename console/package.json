@@ -56,7 +56,7 @@
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
     "eslint": "^7.26.0",
-    "@angular-devkit/build-angular": "~12.2.8",
+    "@angular-devkit/build-angular": "~13.0.1",
     "@angular/cli": "~12.2.8",
     "@angular/compiler-cli": "~12.2.8",
     "@angular/language-service": "~12.2.8",
