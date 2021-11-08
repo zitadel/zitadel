@@ -17,9 +17,9 @@ import (
 
 //assertPrepare checks if the prepare func executes the correct sql query and returns the correct object
 //prepareFunc must be of type
-// func() (sq.SelectBuilder, func(*sql.Rows) (<Ptr to object>, error))
+// func() (sq.SelectBuilder, func(*sql.Rows) (*struct, error))
 // or
-// func() (sq.SelectBuilder, func(*sql.Row) (<Ptr to object>, error))
+// func() (sq.SelectBuilder, func(*sql.Row) (*struct, error))
 //expectedObject represents the return value of scan
 //sqlExpectation represents the query executed on the database
 func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExpectation sqlExpectation, isErr checkErr) bool {
@@ -54,17 +54,7 @@ func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExp
 	}
 
 	if !reflect.DeepEqual(object, expectedObject) {
-		expectedMarshalled, _ := json.Marshal(expectedObject)
-		objectMarshalled, _ := json.Marshal(object)
-		_, diff := jsondiff.Compare(
-			expectedMarshalled,
-			objectMarshalled,
-			&jsondiff.Options{
-				SkipMatches:      true,
-				Indent:           "  ",
-				ChangedSeparator: " is expected, got ",
-			})
-		t.Errorf("unexpected object: want %T, got %T, difference:\n%s", expectedObject, object, diff)
+		prettyPrintDiff(t, expectedObject, object)
 		return false
 	}
 
@@ -131,13 +121,19 @@ func execScan(client *sql.DB, builder sq.SelectBuilder, scan interface{}, errChe
 		return fmt.Errorf("unexpeted error from sql builder: %w", err), false
 	}
 
+	//resultSet represents *sql.Row or *sql.Rows,
+	// depending on whats assignable to the scan function
 	var resultSet interface{}
 
+	//execute sql stmt
+	// if scan(*sql.Rows)...
 	if scanType.In(0).AssignableTo(rowsType) {
 		resultSet, err = client.Query(stmt, args...)
 		if err != nil {
 			return errCheck(err)
 		}
+
+		// if scan(*sql.Row)...
 	} else if scanType.In(0).AssignableTo(rowType) {
 		row := client.QueryRow(stmt, args...)
 		if row.Err() != nil {
@@ -309,4 +305,20 @@ func TestValidatePrepare(t *testing.T) {
 			}
 		})
 	}
+}
+
+func prettyPrintDiff(t *testing.T, expected, gotten interface{}) {
+	t.Helper()
+
+	expectedMarshalled, _ := json.Marshal(expected)
+	objectMarshalled, _ := json.Marshal(gotten)
+	_, diff := jsondiff.Compare(
+		expectedMarshalled,
+		objectMarshalled,
+		&jsondiff.Options{
+			SkipMatches:      true,
+			Indent:           "  ",
+			ChangedSeparator: " is expected, got ",
+		})
+	t.Errorf("unexpected object: want %T, got %T, difference:\n%s", expected, gotten, diff)
 }
