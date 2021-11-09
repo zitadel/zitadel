@@ -30,28 +30,36 @@ var (
 		name: projection.OrgIAMPolicyTable,
 	}
 	OrgIAMColID = Column{
-		name: projection.OrgIAMPolicyIDCol,
+		name:  projection.OrgIAMPolicyIDCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColSequence = Column{
-		name: projection.OrgIAMPolicySequenceCol,
+		name:  projection.OrgIAMPolicySequenceCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColCreationDate = Column{
-		name: projection.OrgIAMPolicyCreationDateCol,
+		name:  projection.OrgIAMPolicyCreationDateCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColChangeDate = Column{
-		name: projection.OrgIAMPolicyChangeDateCol,
+		name:  projection.OrgIAMPolicyChangeDateCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColResourceOwner = Column{
-		name: projection.OrgIAMPolicyResourceOwnerCol,
+		name:  projection.OrgIAMPolicyResourceOwnerCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColUserLoginMustBeDomain = Column{
-		name: projection.OrgIAMPolicyUserLoginMustBeDomainCol,
+		name:  projection.OrgIAMPolicyUserLoginMustBeDomainCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColIsDefault = Column{
-		name: projection.OrgIAMPolicyIsDefaultCol,
+		name:  projection.OrgIAMPolicyIsDefaultCol,
+		table: orgDomainsTable,
 	}
 	OrgIAMColState = Column{
-		name: projection.OrgIAMPolicyStateCol,
+		name:  projection.OrgIAMPolicyStateCol,
+		table: orgDomainsTable,
 	}
 )
 
