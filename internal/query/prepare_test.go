@@ -79,7 +79,9 @@ func mockQuery(stmt string, cols []string, row []driver.Value) func(m sqlmock.Sq
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 		q := m.ExpectQuery(stmt)
 		result := sqlmock.NewRows(cols)
-		result.AddRow(row...)
+		if len(row) > 0 {
+			result.AddRow(row...)
+		}
 		q.WillReturnRows(result)
 		return m
 	}
