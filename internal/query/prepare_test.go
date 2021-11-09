@@ -9,10 +9,15 @@ import (
 	"log"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/nsf/jsondiff"
+)
+
+var (
+	testNow = time.Now()
 )
 
 //assertPrepare checks if the prepare func executes the correct sql query and returns the correct object

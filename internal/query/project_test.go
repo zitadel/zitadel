@@ -7,17 +7,12 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 )
 
-var (
-	now = time.Now()
-)
-
-func Test_prepareProjectsQuery(t *testing.T) {
+func Test_ProjectPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -87,8 +82,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 					[][]driver.Value{
 						{
 							"id",
-							now,
-							now,
+							testNow,
+							testNow,
 							"ro",
 							domain.ProjectStateActive,
 							uint64(20211108),
@@ -108,8 +103,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 				Projects: []*Project{
 					{
 						ID:                     "id",
-						CreationDate:           now,
-						ChangeDate:             now,
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
 						ResourceOwner:          "ro",
 						State:                  domain.ProjectStateActive,
 						Sequence:               20211108,
@@ -157,8 +152,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 					[][]driver.Value{
 						{
 							"id-1",
-							now,
-							now,
+							testNow,
+							testNow,
 							"ro",
 							domain.ProjectStateActive,
 							uint64(20211108),
@@ -170,8 +165,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 						},
 						{
 							"id-2",
-							now,
-							now,
+							testNow,
+							testNow,
 							"ro",
 							domain.ProjectStateActive,
 							uint64(20211108),
@@ -191,8 +186,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 				Projects: []*Project{
 					{
 						ID:                     "id-1",
-						CreationDate:           now,
-						ChangeDate:             now,
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
 						ResourceOwner:          "ro",
 						State:                  domain.ProjectStateActive,
 						Sequence:               20211108,
@@ -204,8 +199,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 					},
 					{
 						ID:                     "id-2",
-						CreationDate:           now,
-						ChangeDate:             now,
+						CreationDate:           testNow,
+						ChangeDate:             testNow,
 						ResourceOwner:          "ro",
 						State:                  domain.ProjectStateActive,
 						Sequence:               20211108,
@@ -308,8 +303,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 					},
 					[]driver.Value{
 						"id",
-						now,
-						now,
+						testNow,
+						testNow,
 						"ro",
 						domain.ProjectStateActive,
 						uint64(20211108),
@@ -323,8 +318,8 @@ func Test_prepareProjectsQuery(t *testing.T) {
 			},
 			object: &Project{
 				ID:                     "id",
-				CreationDate:           now,
-				ChangeDate:             now,
+				CreationDate:           testNow,
+				ChangeDate:             testNow,
 				ResourceOwner:          "ro",
 				State:                  domain.ProjectStateActive,
 				Sequence:               20211108,
