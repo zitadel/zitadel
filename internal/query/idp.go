@@ -424,6 +424,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&idp.StylingType,
 					&idp.OwnerType,
 					&idp.AutoRegister,
+					// oidc config
 					&oidcIDPID,
 					&oidcClientID,
 					oidcClientSecret,
@@ -433,6 +434,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&oidcUsernameMapping,
 					&oidcAuthorizationEndpoint,
 					&oidcTokenEndpoint,
+					// jwt config
 					&jwtIDPID,
 					&jwtIssuer,
 					&jwtKeysEndpoint,
