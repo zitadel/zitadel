@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
-func Test_DomainDomainPrepares(t *testing.T) {
+func Test_OrgDomainPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
