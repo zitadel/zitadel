@@ -80,9 +80,9 @@ func mockQuery(stmt string, cols []string, row []driver.Value) func(m sqlmock.Sq
 	}
 }
 
-func mockQueries(stmt string, cols []string, rows [][]driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
+func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		q := m.ExpectQuery(stmt)
+		q := m.ExpectQuery(stmt).WithArgs(args...)
 		result := sqlmock.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
@@ -95,9 +95,9 @@ func mockQueries(stmt string, cols []string, rows [][]driver.Value) func(m sqlmo
 	}
 }
 
-func mockQueryErr(stmt string, err error) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
+func mockQueryErr(stmt string, err error, args ...driver.Value) func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
 	return func(m sqlmock.Sqlmock) sqlmock.Sqlmock {
-		q := m.ExpectQuery(stmt)
+		q := m.ExpectQuery(stmt).WithArgs(args...)
 		q.WillReturnError(err)
 		return m
 	}
