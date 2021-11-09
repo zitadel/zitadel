@@ -153,7 +153,6 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "RP-asff2", "Errors.ExternalIDP.IDPTypeNotImplemented"))
-	return
 }
 
 func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
@@ -162,11 +161,7 @@ func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint
 		return nil, err
 	}
 	if idpConfig.OIDCIssuer != "" {
-		provider, err := rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
-		if err != nil {
-			return nil, err
-		}
-		return provider, nil
+		return rp.NewRelyingPartyOIDC(idpConfig.OIDCIssuer, idpConfig.OIDCClientID, oidcClientSecret, l.baseURL+callbackEndpoint, idpConfig.OIDCScopes, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 	}
 	if idpConfig.OAuthAuthorizationEndpoint == "" || idpConfig.OAuthTokenEndpoint == "" {
 		return nil, caos_errors.ThrowPreconditionFailed(nil, "RP-4n0fs", "Errors.IdentityProvider.InvalidConfig")
@@ -181,11 +176,7 @@ func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint
 		RedirectURL: l.baseURL + callbackEndpoint,
 		Scopes:      idpConfig.OIDCScopes,
 	}
-	provider, err := rp.NewRelyingPartyOAuth(oauth2Config, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
-	if err != nil {
-		return nil, err
-	}
-	return provider, nil
+	return rp.NewRelyingPartyOAuth(oauth2Config, rp.WithVerifierOpts(rp.WithIssuedAtOffset(3*time.Second)))
 }
 
 func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
