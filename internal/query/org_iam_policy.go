@@ -31,35 +31,35 @@ var (
 	}
 	OrgIAMColID = Column{
 		name:  projection.OrgIAMPolicyIDCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColSequence = Column{
 		name:  projection.OrgIAMPolicySequenceCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColCreationDate = Column{
 		name:  projection.OrgIAMPolicyCreationDateCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColChangeDate = Column{
 		name:  projection.OrgIAMPolicyChangeDateCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColResourceOwner = Column{
 		name:  projection.OrgIAMPolicyResourceOwnerCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColUserLoginMustBeDomain = Column{
 		name:  projection.OrgIAMPolicyUserLoginMustBeDomainCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColIsDefault = Column{
 		name:  projection.OrgIAMPolicyIsDefaultCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 	OrgIAMColState = Column{
 		name:  projection.OrgIAMPolicyStateCol,
-		table: orgDomainsTable,
+		table: orgIAMTable,
 	}
 )
 
