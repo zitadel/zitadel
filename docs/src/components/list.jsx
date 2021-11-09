@@ -6,6 +6,12 @@ export const ICONTYPE = {
   START: <div className="rounded rounded-start">
     <i className={`las la-play-circle`}></i>
   </div>,
+  TASKS: <div className="rounded rounded-start">
+  <i className={`las la-tasks`}></i>
+</div>,
+  ARCHITECTURE: <div className="rounded rounded-architecture">
+  <i className={`las la-sitemap`}></i>
+</div>,
   LOGIN: <div className="rounded rounded-login">
     <i className={`las la-sign-in-alt`}></i>
   </div>,
@@ -20,6 +26,15 @@ export const ICONTYPE = {
   </div>,
   SERVICE: <div className="rounded rounded-service">
   <i className={`las la-concierge-bell`}></i>
+  </div>,
+  STORAGE: <div className="rounded rounded-storage">
+  <i className={`las la-database`}></i>
+  </div>,
+  FOLDER: <div className="rounded rounded-storage">
+  <i className={`las la-folder`}></i>
+  </div>,
+  FILE: <div className="rounded rounded-storage">
+  <i className={`las la-file-alt`}></i>
   </div>,
   SYSTEM: <div className="rounded rounded-system">
     <i className={`las la-server`}></i>

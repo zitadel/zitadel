@@ -1,5 +1,5 @@
 ---
-title: Structure
+title: Overview
 ---
 
 This overview shows the general structure of ZITADEL.

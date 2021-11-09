@@ -266,12 +266,18 @@ main .container img {
 .rounded-privatelabel,
 .rounded-phone,
 .rounded-email,
+.rounded-storage,
 .rounded-service {
   background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
 }
 
+.rounded-split {
+  background: linear-gradient(40deg, #3b82f6, #4f46e5);
+}
+
 .rounded-texts,
-.rounded-help {
+.rounded-help,
+.rounded-architecture {
   background: linear-gradient(40deg, #dc2626 30%, #db2777);
 }
 

@@ -203,35 +203,23 @@ module.exports = {
     ],
     concepts: [
         'concepts/introduction',
+        'concepts/principles',
+        'concepts/eventstore',
+        'concepts/architecture',
         {
+          
             type: 'category',
-            label: 'ZITADEL',
+            label: 'Structure',
             collapsed: true,
             items: [
-                'concepts/zitadel/architecture',
-                {
-                    type: 'category',
-                    label: "Object Overview",
-                    collapsed: false,
-                    items: [
-                        'concepts/zitadel/objects/overview',
-                        'concepts/zitadel/objects/organizations',
-                        'concepts/zitadel/objects/policies',
-                        'concepts/zitadel/objects/projects',
-                        'concepts/zitadel/objects/applications',
-                        'concepts/zitadel/objects/granted_projects',
-                        'concepts/zitadel/objects/users',
-                        'concepts/zitadel/objects/managers',
-                    ],
-                },
-            ],
-        }, {
-            type: 'category',
-            label: 'General',
-            collapsed: true,
-            items: [
-                'concepts/general/principles',
-                'concepts/general/eventstore',
+              'concepts/structure/overview',
+              'concepts/structure/organizations',
+              'concepts/structure/policies',
+              'concepts/structure/projects',
+              'concepts/structure/applications',
+              'concepts/structure/granted_projects',
+              'concepts/structure/users',
+              'concepts/structure/managers',
             ],
         },
         {

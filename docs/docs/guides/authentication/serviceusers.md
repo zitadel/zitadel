@@ -29,7 +29,7 @@ title: Service Users
 </table>
 
 
-import UserDescription from '../../concepts/zitadel/objects/_user_description.mdx';
+import UserDescription from '../../concepts/structure/_user_description.mdx';
 
 <UserDescription name="UserDescription" />
 
