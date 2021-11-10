@@ -6,6 +6,8 @@ import ThemedImage from '@theme/ThemedImage';
 import clsx from 'clsx';
 import React from 'react';
 
+import Column from '../components/column';
+import { HomeListWrapper, ICONTYPE, ListElement, ListWrapper } from '../components/list';
 import styles from './styles.module.css';
 
 const features = [
@@ -19,6 +21,22 @@ const features = [
         Read our guides on how to manage your data and role associations in ZITADEL and on what we recommend.
       </>
     ),
+    content: <ListWrapper>
+    <Column>
+    <div>
+    <ListElement link="docs/concepts/structure/overview" type={ICONTYPE.START} title="Get started" description="" />
+    <ListElement link="docs/guides/authentication/login-users" type={ICONTYPE.LOGIN} title="Authentication" description="" />
+    <ListElement link="docs/guides/authorization/oauth-recommended-flows" type={ICONTYPE.TASKS} title="Authorzation" description="" />
+    <ListElement link="docs/guides/customization/branding" type={ICONTYPE.FILE} title="Projects" description="" />
+    </div>
+    <div>
+    <ListElement link="docs/concepts/structure/overview" type={ICONTYPE.FILE} title="Applications" description="" />
+    <ListElement link="docs/concepts/structure/overview" type={ICONTYPE.FILE} title="Granted Projects" description="" />
+    <ListElement link="docs/concepts/structure/overview" type={ICONTYPE.FILE} title="Users" description="" />
+    <ListElement link="docs/concepts/structure/overview" type={ICONTYPE.FILE} title="Managers" description="" />
+    </div>
+    </Column>
+  </ListWrapper>
   },
   {
     title: 'Quickstarts',
@@ -55,27 +73,32 @@ const features = [
   },
 ];
 
-function Feature({darkImageUrl, lightImageUrl, title, description, link}) {
+function Feature({darkImageUrl, lightImageUrl, title, description, link, content}) {
   const darkImgUrl = useBaseUrl(darkImageUrl);
   const lightImgUrl = useBaseUrl(lightImageUrl);
+
+  const themedImage =  <ThemedImage
+  className={styles.featureImage}
+  alt={title}
+  sources={{
+    light: lightImgUrl,
+    dark: darkImgUrl,
+  }}
+/>;
   return (
-        <div className={clsx('col col--4 docs-link', styles.feature)}>
-          <Link to={useBaseUrl(link)}>
+        <div className={clsx('col col--6 docs-link', styles.feature)}>
           {darkImgUrl && lightImgUrl && (
-              <div className="text--center">
-                <ThemedImage
-                    className={styles.featureImage}
-                    alt={title}
-                    sources={{
-                      light: lightImgUrl,
-                      dark: darkImgUrl,
-                    }}
-                />
+              <div className="">
+                <HomeListWrapper image={themedImage}>
+                <Link to={useBaseUrl(link)}>
+                  <h3 className="">{title}</h3>
+                </Link>
+                <p className="">{description}</p>
+
+                {content}
+                </HomeListWrapper>
               </div>
           )}
-          <h3 className="text--center">{title}</h3>
-          <p className="text--center">{description}</p>
-          </Link>
         </div>
   );
 }

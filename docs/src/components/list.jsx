@@ -92,8 +92,19 @@ export function ListElement({ link, iconClasses,roundClasses, label, type, title
 export function ListWrapper({children, title, columns}) {
   return (
     <div className={styles.listWrapper}>
-      <span className={styles.listWrapperTitle}>{title}</span>
+      {title && <span className={styles.listWrapperTitle}>{title}</span>}
       {children}
+    </div>
+  )
+}
+
+export function HomeListWrapper({children, image}) {
+  return (
+    <div className={styles.homerow}>
+      {image}
+      <div className={styles.homecontent}>
+        {children}
+      </div>
     </div>
   )
 }

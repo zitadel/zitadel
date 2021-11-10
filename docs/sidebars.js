@@ -86,7 +86,7 @@ module.exports = {
         {
             type: 'category',
             label: 'Installation',
-            collapsed: false,
+            collapsed: true,
             items: [
                 {
                     type: 'category',
@@ -122,7 +122,7 @@ module.exports = {
         {
             type: 'category',
             label: 'Trainings',
-            collapsed: false,
+            collapsed: true,
             items: [
                 'guides/trainings/introduction',
                 {
