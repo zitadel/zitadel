@@ -304,6 +304,10 @@ main .container img {
   padding: 0 var(--ifm-pre-padding);
 }
 
+.hero__title {
+  color: white;
+}
+
 .get-started {
   border: 2px solid var(--get-started);
   background-color: var(--get-started);
@@ -313,6 +317,10 @@ main .container img {
 .get-started:hover {
   background-color: var(--get-started-bg-hover);
   color: var(--ifm-hero-text-color);
+}
+
+.docs-link {
+  margin-bottom: 2rem;
 }
 
 .docs-link a {
@@ -365,4 +373,12 @@ main .container img {
 
 .b2bprojectrole {
   margin: 1rem 0 0 1rem !important;
+}
+
+.footer__link-item {
+  font-size: 14px;
+}
+
+.footer__link-item svg {
+  margin-left: .5rem;
 }

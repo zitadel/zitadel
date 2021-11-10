@@ -2,7 +2,7 @@
 title: Eventstore
 ---
 
-ZITADEL is built on the [event sourcing pattern](../zitadel/architecture.md), where changes are stored as events in an eventstore.
+ZITADEL is built on the [event sourcing pattern](./architecture), where changes are stored as events in an eventstore.
 
 ## What is an eventstore?
 

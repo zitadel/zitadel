@@ -2,6 +2,8 @@
 title: B2C
 ---
 
+import Column from '../../../src/components/column';
+
 ## Business to Customer
 
 Users in general come from different domains. You may have customers, employees, or even customers from other parties (B2B). 
@@ -25,6 +27,7 @@ Depending on your Software Development Life Cycle (SDLC) you will have to create
 
 Right after org creation you'll be greeted which the domain section of your organization. ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch`, but you can set your own by saving a verification file on the specified location.  
 We recommend that you create your domains early as they create a sense of confidence and trust for your application.
+You can read more about how ZITADEL handles usernames [here](../basics/organizations#how-zitadel-handles-usernames).
 
 ### Data Provisioning
 
@@ -38,14 +41,6 @@ Read our [Management API definitions](../../apis/proto/management#importhumanuse
 :::info
 Requests to the management API are rate limited. Read our [Ratelimit Policy](../../legal/rate-limit-policy) for more info.
 :::
-
-<!-- If you are migrating an existing project and you already have an external identity store you can consider following options:
-
-- ZITADEL as Identity store
-- use an external Identity store
-- migrate users from your existing data store to ZITADEL
-- Federated Login -->
-
 
 ### User Authentication
 
@@ -76,14 +71,33 @@ With SSO, ZITADEL provides a seamless experience across all your apps.
 
 ### Branding
 
+<Column>
+<div>
+
 Branding and customization is a very important part of your application. 
 With ZITADEL you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consitent design thoughout your applications.
 In addition to visual modifications, you can edit notification texts for your users. 
 ZITADEL gives you handlebar similar templating for variables. Of course you can define texts for any language.
 We'd appreciate if you could contribute to our repo with translations of your language. Read on how to contribute [here](../../guides/customization/texts).
 
+> Note that your console design changes to your design too
+
+</div>
+<img src="/img/guides/branding.jpeg" alt="branding in console"/>
+</Column>
+
 ### Projects and applications
 
 As our Hosted Login is a seperate authentication screen, you have to determine how you are directing your users from your applications.
 ZITADELs Applications live under ZITADELs Projects. You may add multiple Applications for your different apps (Native, Web, User Agent, or API). When setting up you applications consider reading our guide about [Authentication Flows](../authentication/login-users).
 
+## Access Control
+
+By having authenticated a user you need to ensure users and services have access to your application and APIs. This process is called Access Control and comprises User Authentication, Authorization and Policy Enforcement.
+Take the following considerations:
+
+- Does your application call your own APIs?
+- Does your application need to call third-party APIs?
+- Do **you** offer an API for third-party applications?
+
+The data required to check if a user has access to a certain API is stored within a user grant. This information typically is stored within roles or custom claims and can be accessed with an `access` or OIDC `id` token.
