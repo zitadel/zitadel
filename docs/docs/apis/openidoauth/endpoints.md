@@ -407,6 +407,79 @@ Check the [Claims](claims) page if a specific claims might be returned and for d
 
 If the token is invalid or expired, an HTTP 401 will be returned.
 
+## revocation_endpoint
+
+[https://api.zitadel.ch/oauth/v2/revoke](https://api.zitadel.ch/oauth/v2/revoke)
+
+This endpoint enables clients to revoke an `acccess_token` or `refresh_token` they have been granted.
+
+:::important
+If you revoke an `access_token` only that specific token will be revoked. If you revoke a `refresh_token`,
+the corresponding `access_token` will be revoked as well.
+:::
+
+
+| Parameter | Description                      |
+| --------- | -------------------------------- |
+| token     | An access token or refresh token |
+
+Depending on your authorization method you will have to provide additional parameters or headers:
+
+<Tabs
+    groupId="token-auth-methods"
+    defaultValue="client_secret_basic"
+    values={[
+        {label: 'client_secret_basic', value: 'client_secret_basic'},
+        {label: 'client_secret_post', value: 'client_secret_post'},
+        {label: 'none (PKCE)', value: 'none'},
+        {label: 'private_key_jwt', value: 'private_key_jwt'},
+    ]}
+>
+<TabItem value="client_secret_basic">
+
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+
+</TabItem>
+<TabItem value="client_secret_post">
+
+Send your `client_id` and `client_secret` as parameters in the body:
+
+| Parameter     | Description                      |
+| ------------- | -------------------------------- |
+| client_id     | client_id of the application     |
+| client_secret | client_secret of the application |
+
+</TabItem>
+<TabItem value="none">
+
+Send your `client_id` as parameters in the body:
+
+| Parameter | Description                  |
+| --------- | ---------------------------- |
+| client_id | client_id of the application |
+
+</TabItem>
+<TabItem value="private_key_jwt">
+
+Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
+
+| Parameter             | Description                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
+| client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
+
+```BASH
+curl --request POST \
+  --url https://api.zitadel.ch/oauth/v2/revoke \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
+  --data client_assertion=eyJhbGciOiJSUzI1Ni... \
+  --data token=VjVxyCZmRmWYqd3_F5db9Pb9mHR5fqzhn...
+```
+
+</TabItem>
+</Tabs>
+
 ## end_session_endpoint
 
 [https://accounts.zitadel.ch/oauth/v2/endsession](https://accounts.zitadel.ch/oauth/v2/endsession)
