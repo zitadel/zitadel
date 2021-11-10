@@ -64,7 +64,7 @@ require (
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.26.1
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.25.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.26.1
 	go.opentelemetry.io/otel v1.1.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.1.0
 	go.opentelemetry.io/otel/exporters/prometheus v0.24.0
