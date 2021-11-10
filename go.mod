@@ -15,10 +15,10 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.7.0
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
-	github.com/aws/aws-sdk-go-v2 v1.10.0
+	github.com/aws/aws-sdk-go-v2 v1.11.0
 	github.com/aws/aws-sdk-go-v2/config v1.9.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.5.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.17.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.18.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v1.0.0
