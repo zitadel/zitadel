@@ -45,7 +45,7 @@ require (
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
 	github.com/kevinburke/rest v0.0.0-20210506044642-5611499aa33c // indirect
 	github.com/kevinburke/twilio-go v0.0.0-20210327194925-1623146bcf73
-	github.com/lib/pq v1.10.3
+	github.com/lib/pq v1.10.4
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mattn/go-colorable v0.1.11 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
