@@ -137,6 +137,8 @@
     "CHANGE": "Change",
     "REACTIVATE": "Reactivate",
     "DEACTIVATE": "Deactivate",
+    "REACTIVATESELECTION": "Reactivate Selection",
+    "DEACTIVATESELECTION": "Deactivate Selection",
     "REFRESH": "Refresh",
     "LOGIN": "Login",
     "EDIT": "Edit",

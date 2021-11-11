@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -22,35 +23,30 @@ import { UserListRoutingModule } from './user-list-routing.module';
 import { UserListComponent } from './user-list.component';
 import { UserTableComponent } from './user-table/user-table.component';
 
-
 @NgModule({
-    declarations: [
-        UserListComponent,
-        UserTableComponent,
-    ],
-    imports: [
-        AvatarModule,
-        UserListRoutingModule,
-        CommonModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogModule,
-        HasRoleModule,
-        CardModule,
-        MatTableModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
-        MatTooltipModule,
-        HasRolePipeModule,
-        TranslateModule,
-        SharedModule,
-        RefreshTableModule,
-        InputModule,
-        PaginatorModule,
-    ],
-    exports: [
-        UserListComponent,
-    ],
+  declarations: [UserListComponent, UserTableComponent],
+  imports: [
+    AvatarModule,
+    UserListRoutingModule,
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatMenuModule,
+    HasRoleModule,
+    CardModule,
+    MatTableModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    HasRolePipeModule,
+    TranslateModule,
+    SharedModule,
+    RefreshTableModule,
+    InputModule,
+    PaginatorModule,
+  ],
+  exports: [UserListComponent],
 })
-export class UserListModule { }
+export class UserListModule {}
