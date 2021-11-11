@@ -91,7 +91,7 @@ We'd appreciate if you could contribute to our repo with translations of your la
 As our Hosted Login is a seperate authentication screen, you have to determine how you are directing your users from your applications.
 ZITADELs Applications live under ZITADELs Projects. You may add multiple Applications for your different apps (Native, Web, User Agent, or API). When setting up you applications consider reading our guide about [Authentication Flows](../authentication/login-users).
 
-## Access Control
+### Access Control
 
 By having authenticated a user you need to ensure users and services have access to your application and APIs. This process is called Access Control and comprises User Authentication, Authorization and Policy Enforcement.
 Take the following considerations:
@@ -101,3 +101,15 @@ Take the following considerations:
 - Do **you** offer an API for third-party applications?
 
 The data required to check if a user has access to a certain API is stored within a user grant. This information typically is stored within roles or custom claims and can be accessed with an `access` or OIDC `id` token.
+
+...
+
+### Attack prevention?
+
+...
+
+## Learn more
+
+- [Creating an organization](../basics/organizations#exercise---create-a-new-organization)
+- [Organization Branding](../customization/branding)
+- [Authorization](../authorization/oauth-recommended-flows)
