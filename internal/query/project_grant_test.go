@@ -44,7 +44,8 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` COUNT(*) OVER () `+
 						` FROM zitadel.projections.project_grants `+
 						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					nil,
 					nil,
 				),
@@ -68,10 +69,11 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` o.name,`+
 						` zitadel.projections.project_grants.granted_role_keys,`+
 						` r.name,`+
-						` COUNT(*) OVER () `+
-						` FROM zitadel.projections.project_grants `+
-						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` COUNT(*) OVER ()`+
+						` FROM zitadel.projections.project_grants`+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id`+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -128,6 +130,237 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareProjectGrantsQuery no project",
+			prepare: prepareProjectGrantsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(` SELECT zitadel.projections.project_grants.project_id,`+
+						` zitadel.projections.project_grants.grant_id,`+
+						` zitadel.projections.project_grants.creation_date,`+
+						` zitadel.projections.project_grants.change_date,`+
+						` zitadel.projections.project_grants.resource_owner,`+
+						` zitadel.projections.project_grants.state,`+
+						` zitadel.projections.project_grants.sequence,`+
+						` zitadel.projections.projects.name,`+
+						` zitadel.projections.project_grants.granted_org_id,`+
+						` o.name,`+
+						` zitadel.projections.project_grants.granted_role_keys,`+
+						` r.name,`+
+						` COUNT(*) OVER () `+
+						` FROM zitadel.projections.project_grants `+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+					[]string{
+						"project_id",
+						"grant_id",
+						"creation_date",
+						"change_date",
+						"resource_owner",
+						"state",
+						"sequence",
+						"name",
+						"granted_org_id",
+						"name",
+						"granted_role_keys",
+						"name",
+						"count",
+					},
+					[][]driver.Value{
+						{
+							"project-id",
+							"grant-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.ProjectGrantStateActive,
+							20211111,
+							nil,
+							"org-id",
+							"org-name",
+							pq.StringArray{"role-key"},
+							"ro-name",
+						},
+					},
+				),
+			},
+			object: &ProjectGrants{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				ProjectGrants: []*ProjectGrant{
+					{
+						ProjectID:         "project-id",
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						ResourceOwner:     "ro",
+						Sequence:          20211111,
+						GrantID:           "grant-id",
+						State:             domain.ProjectGrantStateActive,
+						ProjectName:       "",
+						GrantedOrgID:      "org-id",
+						OrgName:           "org-name",
+						GrantedRoleKeys:   pq.StringArray{"role-key"},
+						ResourceOwnerName: "ro-name",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareProjectGrantsQuery no org",
+			prepare: prepareProjectGrantsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(` SELECT zitadel.projections.project_grants.project_id,`+
+						` zitadel.projections.project_grants.grant_id,`+
+						` zitadel.projections.project_grants.creation_date,`+
+						` zitadel.projections.project_grants.change_date,`+
+						` zitadel.projections.project_grants.resource_owner,`+
+						` zitadel.projections.project_grants.state,`+
+						` zitadel.projections.project_grants.sequence,`+
+						` zitadel.projections.projects.name,`+
+						` zitadel.projections.project_grants.granted_org_id,`+
+						` o.name,`+
+						` zitadel.projections.project_grants.granted_role_keys,`+
+						` r.name,`+
+						` COUNT(*) OVER () `+
+						` FROM zitadel.projections.project_grants `+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+					[]string{
+						"project_id",
+						"grant_id",
+						"creation_date",
+						"change_date",
+						"resource_owner",
+						"state",
+						"sequence",
+						"name",
+						"granted_org_id",
+						"name",
+						"granted_role_keys",
+						"name",
+						"count",
+					},
+					[][]driver.Value{
+						{
+							"project-id",
+							"grant-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.ProjectGrantStateActive,
+							20211111,
+							"project-name",
+							"org-id",
+							nil,
+							pq.StringArray{"role-key"},
+							"ro-name",
+						},
+					},
+				),
+			},
+			object: &ProjectGrants{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				ProjectGrants: []*ProjectGrant{
+					{
+						ProjectID:         "project-id",
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						ResourceOwner:     "ro",
+						Sequence:          20211111,
+						GrantID:           "grant-id",
+						State:             domain.ProjectGrantStateActive,
+						ProjectName:       "project-name",
+						GrantedOrgID:      "org-id",
+						OrgName:           "",
+						GrantedRoleKeys:   pq.StringArray{"role-key"},
+						ResourceOwnerName: "ro-name",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareProjectGrantsQuery no resource owner",
+			prepare: prepareProjectGrantsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(` SELECT zitadel.projections.project_grants.project_id,`+
+						` zitadel.projections.project_grants.grant_id,`+
+						` zitadel.projections.project_grants.creation_date,`+
+						` zitadel.projections.project_grants.change_date,`+
+						` zitadel.projections.project_grants.resource_owner,`+
+						` zitadel.projections.project_grants.state,`+
+						` zitadel.projections.project_grants.sequence,`+
+						` zitadel.projections.projects.name,`+
+						` zitadel.projections.project_grants.granted_org_id,`+
+						` o.name,`+
+						` zitadel.projections.project_grants.granted_role_keys,`+
+						` r.name,`+
+						` COUNT(*) OVER () `+
+						` FROM zitadel.projections.project_grants `+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+					[]string{
+						"project_id",
+						"grant_id",
+						"creation_date",
+						"change_date",
+						"resource_owner",
+						"state",
+						"sequence",
+						"name",
+						"granted_org_id",
+						"name",
+						"granted_role_keys",
+						"name",
+						"count",
+					},
+					[][]driver.Value{
+						{
+							"project-id",
+							"grant-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.ProjectGrantStateActive,
+							20211111,
+							"project-name",
+							"org-id",
+							"org-name",
+							pq.StringArray{"role-key"},
+							nil,
+						},
+					},
+				),
+			},
+			object: &ProjectGrants{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				ProjectGrants: []*ProjectGrant{
+					{
+						ProjectID:         "project-id",
+						CreationDate:      testNow,
+						ChangeDate:        testNow,
+						ResourceOwner:     "ro",
+						Sequence:          20211111,
+						GrantID:           "grant-id",
+						State:             domain.ProjectGrantStateActive,
+						ProjectName:       "project-name",
+						GrantedOrgID:      "org-id",
+						OrgName:           "org-name",
+						GrantedRoleKeys:   pq.StringArray{"role-key"},
+						ResourceOwnerName: "",
+					},
+				},
+			},
+		},
+		{
 			name:    "prepareProjectGrantsQuery multiple result",
 			prepare: prepareProjectGrantsQuery,
 			want: want{
@@ -147,7 +380,8 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` COUNT(*) OVER () `+
 						` FROM zitadel.projections.project_grants `+
 						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -251,7 +485,8 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` COUNT(*) OVER () `+
 						` FROM zitadel.projections.project_grants `+
 						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -282,7 +517,8 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` r.name`+
 						` FROM zitadel.projections.project_grants `+
 						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					nil,
 					nil,
 				),
@@ -314,7 +550,8 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` r.name`+
 						` FROM zitadel.projections.project_grants `+
 						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					[]string{
 						"project_id",
 						"grant_id",
@@ -361,6 +598,204 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 			},
 		},
 		{
+			name:    "prepareProjectGrantQuery no org",
+			prepare: prepareProjectGrantQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(` SELECT zitadel.projections.project_grants.project_id,`+
+						` zitadel.projections.project_grants.grant_id,`+
+						` zitadel.projections.project_grants.creation_date,`+
+						` zitadel.projections.project_grants.change_date,`+
+						` zitadel.projections.project_grants.resource_owner,`+
+						` zitadel.projections.project_grants.state,`+
+						` zitadel.projections.project_grants.sequence,`+
+						` zitadel.projections.projects.name,`+
+						` zitadel.projections.project_grants.granted_org_id,`+
+						` o.name,`+
+						` zitadel.projections.project_grants.granted_role_keys,`+
+						` r.name`+
+						` FROM zitadel.projections.project_grants `+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+					[]string{
+						"project_id",
+						"grant_id",
+						"creation_date",
+						"change_date",
+						"resource_owner",
+						"state",
+						"sequence",
+						"name",
+						"granted_org_id",
+						"name",
+						"granted_role_keys",
+						"name",
+					},
+					[]driver.Value{
+						"project-id",
+						"grant-id",
+						testNow,
+						testNow,
+						"ro",
+						domain.ProjectGrantStateActive,
+						20211111,
+						"project-name",
+						"org-id",
+						nil,
+						pq.StringArray{"role-key"},
+						"ro-name",
+					},
+				),
+			},
+			object: &ProjectGrant{
+				ProjectID:         "project-id",
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				ResourceOwner:     "ro",
+				Sequence:          20211111,
+				GrantID:           "grant-id",
+				State:             domain.ProjectGrantStateActive,
+				ProjectName:       "project-name",
+				GrantedOrgID:      "org-id",
+				OrgName:           "",
+				GrantedRoleKeys:   pq.StringArray{"role-key"},
+				ResourceOwnerName: "ro-name",
+			},
+		},
+		{
+			name:    "prepareProjectGrantQuery no resource owner",
+			prepare: prepareProjectGrantQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(` SELECT zitadel.projections.project_grants.project_id,`+
+						` zitadel.projections.project_grants.grant_id,`+
+						` zitadel.projections.project_grants.creation_date,`+
+						` zitadel.projections.project_grants.change_date,`+
+						` zitadel.projections.project_grants.resource_owner,`+
+						` zitadel.projections.project_grants.state,`+
+						` zitadel.projections.project_grants.sequence,`+
+						` zitadel.projections.projects.name,`+
+						` zitadel.projections.project_grants.granted_org_id,`+
+						` o.name,`+
+						` zitadel.projections.project_grants.granted_role_keys,`+
+						` r.name`+
+						` FROM zitadel.projections.project_grants `+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+					[]string{
+						"project_id",
+						"grant_id",
+						"creation_date",
+						"change_date",
+						"resource_owner",
+						"state",
+						"sequence",
+						"name",
+						"granted_org_id",
+						"name",
+						"granted_role_keys",
+						"name",
+					},
+					[]driver.Value{
+						"project-id",
+						"grant-id",
+						testNow,
+						testNow,
+						"ro",
+						domain.ProjectGrantStateActive,
+						20211111,
+						"project-name",
+						"org-id",
+						"org-name",
+						pq.StringArray{"role-key"},
+						nil,
+					},
+				),
+			},
+			object: &ProjectGrant{
+				ProjectID:         "project-id",
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				ResourceOwner:     "ro",
+				Sequence:          20211111,
+				GrantID:           "grant-id",
+				State:             domain.ProjectGrantStateActive,
+				ProjectName:       "project-name",
+				GrantedOrgID:      "org-id",
+				OrgName:           "org-name",
+				GrantedRoleKeys:   pq.StringArray{"role-key"},
+				ResourceOwnerName: "",
+			},
+		},
+		{
+			name:    "prepareProjectGrantQuery no project",
+			prepare: prepareProjectGrantQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					regexp.QuoteMeta(` SELECT zitadel.projections.project_grants.project_id,`+
+						` zitadel.projections.project_grants.grant_id,`+
+						` zitadel.projections.project_grants.creation_date,`+
+						` zitadel.projections.project_grants.change_date,`+
+						` zitadel.projections.project_grants.resource_owner,`+
+						` zitadel.projections.project_grants.state,`+
+						` zitadel.projections.project_grants.sequence,`+
+						` zitadel.projections.projects.name,`+
+						` zitadel.projections.project_grants.granted_org_id,`+
+						` o.name,`+
+						` zitadel.projections.project_grants.granted_role_keys,`+
+						` r.name`+
+						` FROM zitadel.projections.project_grants `+
+						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+					[]string{
+						"project_id",
+						"grant_id",
+						"creation_date",
+						"change_date",
+						"resource_owner",
+						"state",
+						"sequence",
+						"name",
+						"granted_org_id",
+						"name",
+						"granted_role_keys",
+						"name",
+					},
+					[]driver.Value{
+						"project-id",
+						"grant-id",
+						testNow,
+						testNow,
+						"ro",
+						domain.ProjectGrantStateActive,
+						20211111,
+						nil,
+						"org-id",
+						"org-name",
+						pq.StringArray{"role-key"},
+						"ro-name",
+					},
+				),
+			},
+			object: &ProjectGrant{
+				ProjectID:         "project-id",
+				CreationDate:      testNow,
+				ChangeDate:        testNow,
+				ResourceOwner:     "ro",
+				Sequence:          20211111,
+				GrantID:           "grant-id",
+				State:             domain.ProjectGrantStateActive,
+				ProjectName:       "",
+				GrantedOrgID:      "org-id",
+				OrgName:           "org-name",
+				GrantedRoleKeys:   pq.StringArray{"role-key"},
+				ResourceOwnerName: "ro-name",
+			},
+		},
+		{
 			name:    "prepareProjectGrantQuery sql err",
 			prepare: prepareProjectGrantQuery,
 			want: want{
@@ -379,7 +814,8 @@ func Test_ProjectGrantPrepares(t *testing.T) {
 						` r.name`+
 						` FROM zitadel.projections.project_grants `+
 						` LEFT JOIN zitadel.projections.projects ON zitadel.projections.project_grants.project_id = zitadel.projections.projects.id `+
-						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
+						` LEFT JOIN zitadel.projections.orgs as r ON zitadel.projections.project_grants.resource_owner = r.id`+
+						` LEFT JOIN zitadel.projections.orgs as o ON zitadel.projections.project_grants.granted_org_id = o.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
