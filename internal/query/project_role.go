@@ -96,7 +96,7 @@ func (q *Queries) ExistsProjectRole(ctx context.Context, projectID, key string) 
 }
 
 func (q *Queries) SearchProjectRoles(ctx context.Context, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
-	query, scan := q.prepareProjectRolesQuery()
+	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -123,7 +123,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	if err != nil {
 		return nil, err
 	}
-	query, scan := q.prepareProjectRolesQuery()
+	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -237,7 +237,7 @@ func prepareProjectRoleQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectRole, 
 		}
 }
 
-func (q *Queries) prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
+func prepareProjectRolesQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectRoles, error)) {
 	return sq.Select(
 			ProjectRoleColumnProjectID.identifier(),
 			ProjectRoleColumnCreationDate.identifier(),
