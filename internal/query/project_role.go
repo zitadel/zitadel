@@ -141,8 +141,8 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	return projects, err
 }
 
-func NewProjectRoleProjectIDSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectRoleColumnProjectID, value, method)
+func NewProjectRoleProjectIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectRoleColumnProjectID, value, TextEquals)
 }
 
 func NewProjectRoleResourceOwnerSearchQuery(value string) (SearchQuery, error) {
@@ -170,7 +170,7 @@ func NewProjectRoleGroupSearchQuery(method TextComparison, value string) (Search
 }
 
 func (r *ProjectRoleSearchQueries) AppendProjectIDQuery(projectID string) error {
-	query, err := NewProjectRoleProjectIDSearchQuery(TextEquals, projectID)
+	query, err := NewProjectRoleProjectIDSearchQuery(projectID)
 	if err != nil {
 		return err
 	}

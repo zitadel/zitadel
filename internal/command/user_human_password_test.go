@@ -1126,10 +1126,72 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			},
 		},
 		{
+			name: "login policy not found, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(),
+					expectFilter(),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			name: "login policy login password not allowed, precondition error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								false,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx:           context.Background(),
+				userID:        "user1",
+				resourceOwner: "org1",
+				password:      "password",
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
 			name: "user not existing, precondition error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectFilter(),
 				),
 			},
@@ -1148,6 +1210,19 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1182,6 +1257,19 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1250,6 +1338,19 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),
@@ -1325,6 +1426,19 @@ func TestCommandSide_CheckPassword(t *testing.T) {
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
+					expectFilter(
+						eventFromEventPusher(
+							org.NewLoginPolicyAddedEvent(context.Background(),
+								&org.NewAggregate("org1", "org1").Aggregate,
+								true,
+								false,
+								false,
+								false,
+								false,
+								domain.PasswordlessTypeNotAllowed,
+							),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							user.NewHumanAddedEvent(context.Background(),

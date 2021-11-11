@@ -14,6 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
@@ -172,7 +173,7 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 			return oidc.ErrInvalidClient().WithDescription("token was not issued for this client")
 		}
 		_, err = o.command.RevokeRefreshToken(ctx, refreshToken.UserID, refreshToken.ResourceOwner, refreshToken.ID)
-		if errors.IsNotFound(err) {
+		if err == nil || errors.IsNotFound(err) {
 			return nil
 		}
 		return oidc.ErrServerError().WithParent(err)
@@ -213,11 +214,15 @@ func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, sco
 			return scopes, nil
 		}
 	}
-	roles, err := o.repo.ProjectRolesByProjectID(app.ProjectID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(app.ProjectID)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+	}
+	roles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
-	for _, role := range roles {
+	for _, role := range roles.ProjectRoles {
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil

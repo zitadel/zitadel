@@ -154,6 +154,8 @@ Errors:
       AlreadyExists: Login Policy existiert bereits
       IdpProviderAlreadyExisting: Idp Provider existiert bereits
       IdpProviderNotExisting: Idp Provider existiert nicht
+      RegistrationNotAllowed: Registrierung ist nicht erlaubt
+      UsernamePasswordNotAllowed: Login mit Username / Passwort nicht erlaubt
       MFA:
         AlreadyExists: Multifaktor existiert bereits
         NotExisting: Multifaktor existiert nicht
