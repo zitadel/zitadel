@@ -21,13 +21,16 @@ export class IamComponent {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public totalMemberResult: number = 0;
-  public membersSubject: BehaviorSubject<Member.AsObject[]>
-    = new BehaviorSubject<Member.AsObject[]>([]);
+  public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
 
   public features!: Features.AsObject;
 
-  constructor(public adminService: AdminService, private dialog: MatDialog, private toast: ToastService,
-    private router: Router) {
+  constructor(
+    public adminService: AdminService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+    private router: Router,
+  ) {
     this.loadMembers();
     this.loadFeatures();
     this.adminService.getDefaultFeatures();
@@ -35,20 +38,22 @@ export class IamComponent {
 
   public loadMembers(): void {
     this.loadingSubject.next(true);
-    from(this.adminService.listIAMMembers(100, 0)).pipe(
-      map(resp => {
-        if (resp.details?.totalResult) {
-          this.totalMemberResult = resp.details.totalResult;
-        } else {
-          this.totalMemberResult = 0;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+    from(this.adminService.listIAMMembers(100, 0))
+      .pipe(
+        map((resp) => {
+          if (resp.details?.totalResult) {
+            this.totalMemberResult = resp.details.totalResult;
+          } else {
+            this.totalMemberResult = 0;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
 
   public openAddMember(): void {
@@ -59,22 +64,26 @@ export class IamComponent {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const users: User.AsObject[] = resp.users;
         const roles: string[] = resp.roles;
 
         if (users && users.length && roles && roles.length) {
-          Promise.all(users.map(user => {
-            return this.adminService.addIAMMember(user.id, roles);
-          })).then(() => {
-            this.toast.showInfo('IAM.TOAST.MEMBERADDED');
-            setTimeout(() => {
-              this.loadMembers();
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          Promise.all(
+            users.map((user) => {
+              return this.adminService.addIAMMember(user.id, roles);
+            }),
+          )
+            .then(() => {
+              this.toast.showInfo('IAM.TOAST.MEMBERADDED');
+              setTimeout(() => {
+                this.loadMembers();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });
@@ -86,7 +95,7 @@ export class IamComponent {
 
   public loadFeatures(): void {
     this.loadingSubject.next(true);
-    this.adminService.getDefaultFeatures().then(resp => {
+    this.adminService.getDefaultFeatures().then((resp) => {
       if (resp.features) {
         this.features = resp.features;
       }

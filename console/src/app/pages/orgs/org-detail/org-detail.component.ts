@@ -8,6 +8,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { RememberedTabComponent } from 'src/app/modules/meta-layout/remembered-tab/remembered-tab.component';
 import { PolicyComponentServiceType } from 'src/app/modules/policies/policy-component-types.enum';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Features } from 'src/app/proto/generated/zitadel/features_pb';
@@ -20,13 +21,12 @@ import { ToastService } from 'src/app/services/toast.service';
 import { AddDomainDialogComponent } from './add-domain-dialog/add-domain-dialog.component';
 import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
 
-
 @Component({
   selector: 'cnsl-org-detail',
   templateUrl: './org-detail.component.html',
   styleUrls: ['./org-detail.component.scss'],
 })
-export class OrgDetailComponent implements OnInit {
+export class OrgDetailComponent extends RememberedTabComponent implements OnInit {
   public org!: Org.AsObject;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
 
@@ -40,8 +40,7 @@ export class OrgDetailComponent implements OnInit {
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public totalMemberResult: number = 0;
-  public membersSubject: BehaviorSubject<Member.AsObject[]>
-    = new BehaviorSubject<Member.AsObject[]>([]);
+  public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
   public features!: Features.AsObject;
   public InfoSectionType: any = InfoSectionType;
 
@@ -51,54 +50,68 @@ export class OrgDetailComponent implements OnInit {
     public mgmtService: ManagementService,
     private toast: ToastService,
     private router: Router,
-  ) { }
+  ) {
+    super();
+  }
 
   public ngOnInit(): void {
     this.getData();
   }
 
   private async getData(): Promise<void> {
-    this.mgmtService.getMyOrg().then((resp) => {
-      if (resp.org) {
-        this.org = resp.org;
-      }
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .getMyOrg()
+      .then((resp) => {
+        if (resp.org) {
+          this.org = resp.org;
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
     this.loadMembers();
     this.loadDomains();
     this.loadFeatures();
   }
 
   public loadDomains(): void {
-    this.mgmtService.listOrgDomains().then(result => {
+    this.mgmtService.listOrgDomains().then((result) => {
       this.domains = result.resultList;
-      this.primaryDomain = this.domains.find(domain => domain.isPrimary)?.domainName ?? '';
+      this.primaryDomain = this.domains.find((domain) => domain.isPrimary)?.domainName ?? '';
     });
   }
 
   public setPrimary(domain: Domain.AsObject): void {
-    this.mgmtService.setPrimaryOrgDomain(domain.domainName).then(() => {
-      this.toast.showInfo('ORG.TOAST.SETPRIMARY', true);
-      this.loadDomains();
-    }).catch((error) => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .setPrimaryOrgDomain(domain.domainName)
+      .then(() => {
+        this.toast.showInfo('ORG.TOAST.SETPRIMARY', true);
+        this.loadDomains();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public changeState(event: MatButtonToggleChange | any): void {
     if (event.value === OrgState.ORG_STATE_ACTIVE) {
-      this.mgmtService.reactivateOrg().then(() => {
-        this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
-      }).catch((error) => {
-        this.toast.showError(error);
-      });
+      this.mgmtService
+        .reactivateOrg()
+        .then(() => {
+          this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     } else if (event.value === OrgState.ORG_STATE_INACTIVE) {
-      this.mgmtService.deactivateOrg().then(() => {
-        this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
-      }).catch((error) => {
-        this.toast.showError(error);
-      });
+      this.mgmtService
+        .deactivateOrg()
+        .then(() => {
+          this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
@@ -108,17 +121,20 @@ export class OrgDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.mgmtService.addOrgDomain(resp).then(() => {
-          this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
+        this.mgmtService
+          .addOrgDomain(resp)
+          .then(() => {
+            this.toast.showInfo('ORG.TOAST.DOMAINADDED', true);
 
-          setTimeout(() => {
-            this.loadDomains();
-          }, 1000);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+            setTimeout(() => {
+              this.loadDomains();
+            }, 1000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
@@ -134,17 +150,20 @@ export class OrgDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.mgmtService.removeOrgDomain(domain).then(() => {
-          this.toast.showInfo('ORG.TOAST.DOMAINREMOVED', true);
-          const index = this.domains.findIndex(d => d.domainName === domain);
-          if (index > -1) {
-            this.domains.splice(index, 1);
-          }
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.mgmtService
+          .removeOrgDomain(domain)
+          .then(() => {
+            this.toast.showInfo('ORG.TOAST.DOMAINREMOVED', true);
+            const index = this.domains.findIndex((d) => d.domainName === domain);
+            if (index > -1) {
+              this.domains.splice(index, 1);
+            }
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
@@ -157,22 +176,26 @@ export class OrgDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const users: User.AsObject[] = resp.users;
         const roles: string[] = resp.roles;
 
         if (users && users.length && roles && roles.length) {
-          Promise.all(users.map(user => {
-            return this.mgmtService.addOrgMember(user.id, roles);
-          })).then(() => {
-            this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
-            setTimeout(() => {
-              this.loadMembers();
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          Promise.all(
+            users.map((user) => {
+              return this.mgmtService.addOrgMember(user.id, roles);
+            }),
+          )
+            .then(() => {
+              this.toast.showInfo('ORG.TOAST.MEMBERADDED', true);
+              setTimeout(() => {
+                this.loadMembers();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });
@@ -199,26 +222,28 @@ export class OrgDetailComponent implements OnInit {
 
   public loadMembers(): void {
     this.loadingSubject.next(true);
-    from(this.mgmtService.listOrgMembers(100, 0)).pipe(
-      map(resp => {
-        if (resp.details?.totalResult) {
-          this.totalMemberResult = resp.details?.totalResult;
-        } else {
-          this.totalMemberResult = 0;
-        }
+    from(this.mgmtService.listOrgMembers(100, 0))
+      .pipe(
+        map((resp) => {
+          if (resp.details?.totalResult) {
+            this.totalMemberResult = resp.details?.totalResult;
+          } else {
+            this.totalMemberResult = 0;
+          }
 
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
 
   public loadFeatures(): void {
     this.loadingSubject.next(true);
-    this.mgmtService.getFeatures().then(resp => {
+    this.mgmtService.getFeatures().then((resp) => {
       if (resp.features) {
         this.features = resp.features;
       }

@@ -2,7 +2,8 @@
   <p>{{error}}</p>
 </div>
 
-<cnsl-meta-layout *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
+<cnsl-meta-layout (siteChanged)="setTab($event)" [changedTab$]="selectedMetaTab$"
+  *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
   <div class="max-width-container">
     <div class="head">
       <a (click)="navigateBack()" mat-icon-button>
@@ -123,7 +124,8 @@
       </div>
     </div>
 
-    <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
+    <mat-tab-group [selectedIndex]="metaTab === MetaTab.ACTIVITY ? 1 : 0" (selectedIndexChange)="selectTab($event)"
+      mat-stretch-tabs class="tab-group" [disablePagination]="true">
       <mat-tab label="Details">
         <div class="side-padding">
           <ng-template cnslHasRole [hasRole]="['user.membership.read']">

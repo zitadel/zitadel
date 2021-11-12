@@ -6,6 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { RememberedTabComponent } from 'src/app/modules/meta-layout/remembered-tab/remembered-tab.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -22,7 +23,7 @@ import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dia
   templateUrl: './user-detail.component.html',
   styleUrls: ['./user-detail.component.scss'],
 })
-export class UserDetailComponent implements OnInit {
+export class UserDetailComponent extends RememberedTabComponent implements OnInit {
   public user!: User.AsObject;
   public metadata: Metadata.AsObject[] = [];
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
@@ -49,7 +50,9 @@ export class UserDetailComponent implements OnInit {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
-  ) {}
+  ) {
+    super();
+  }
 
   refreshUser(): void {
     this.refreshChanges$.emit();
