@@ -126,7 +126,7 @@
     "CONTINUE": "Continua",
     "BACK": "Indietro",
     "CLOSE": "chiudi",
-    "CLEAR": "Chiaro",
+    "CLEAR": "Resetta",
     "CANCEL": "cancella",
     "INFO": "Info",
     "OK": "OK",
@@ -522,10 +522,10 @@
     }
   },
   "FLOWS": {
-    "TITLE": "Azioni e processi",
+    "TITLE": "Azioni e Processi",
     "DESCRIPTION": "Esegui processi su certi eventi.",
     "ACTIONSTITLE": "Azioni",
-    "FLOWSTITLE": "processi",
+    "FLOWSTITLE": "Processi",
     "ID": "ID",
     "NAME": "Nome",
     "STATE": "Stato",
