@@ -54,7 +54,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
-	github.com/nsf/jsondiff v0.0.0-20210926074059-1e845ec5d249 // indirect
+	github.com/nsf/jsondiff v0.0.0-20210926074059-1e845ec5d249
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.3.0
 	github.com/rakyll/statik v0.1.7
@@ -81,7 +81,7 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.7
 	google.golang.org/api v0.60.0
-	google.golang.org/genproto v0.0.0-20211027162914-98a5263abeca // indirect
+	google.golang.org/genproto v0.0.0-20211027162914-98a5263abeca
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
