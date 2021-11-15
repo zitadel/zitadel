@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -159,19 +160,20 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	switch event.Type {
 	case proj_es_model.ProjectChanged:
+		proj := new(proj_es_model.Project)
+		err := proj.SetData(event)
+		if err != nil {
+			return err
+		}
+		if proj.Name == "" {
+			return u.view.ProcessedUserGrantSequence(event)
+		}
 		grants, err := u.view.UserGrantsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
-		if len(grants) == 0 {
-			return u.view.ProcessedUserGrantSequence(event)
-		}
-		project, err := u.getProjectByID(context.Background(), event.AggregateID)
-		if err != nil {
-			return err
-		}
 		for _, grant := range grants {
-			u.fillProjectData(grant, project)
+			grant.ProjectName = proj.Name
 		}
 		return u.view.PutUserGrants(grants, event)
 	default:
