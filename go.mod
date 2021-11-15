@@ -23,7 +23,7 @@ require (
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v1.0.0
 	github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2
-	github.com/cockroachdb/cockroach-go/v2 v2.2.1
+	github.com/cockroachdb/cockroach-go/v2 v2.2.3
 	github.com/dop251/goja v0.0.0-20211022113120-dc8c55024d06
 	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
