@@ -754,7 +754,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins."
+      "BTN":"Datei auswählen",
+      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
+      "ACTIVATEPREVIEW":"Preview aktivieren"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
@@ -1300,6 +1302,7 @@
         }
       },
       "NEXTSTEPS": {
+        "TITLE": "Nächste Schritte",
         "0": {
           "TITLE": "Rollen festlegen",
           "DESC": "Erfassen Sie Rollen für ihr Projekt"
@@ -1388,7 +1391,7 @@
       "TOKENTYPE": "Auth Token Typ",
       "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
-      "UNSECUREREDIRECT": "Ich hoffe, Du weisst, was Du tust.",
+      "UNSECUREREDIRECT": "Wir hoffen, Du weisst, was Du tust.",
       "OVERVIEWSECTION": "Übersicht",
       "OVERVIEWTITLE": "Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
       "ACCESSTOKENROLEASSERTION": "Benutzerrollen dem Access Token hinzufügen",
@@ -1480,6 +1483,7 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
+    "it": "Italienisch",
     "en": "Englisch"
   },
   "MEMBER": {
