@@ -25,5 +25,21 @@ You will see the default texts in the input field and you can overwrite them by 
 ![Message Texts](/img/console_login_texts.png)
 
 ## Reset to default
+
 If you don't like your customization anymore click the "reset policy" button.
 All your settings will be removed and the default settings of the system will trigger.
+
+## Internationalization
+
+ZITADELs support for languages will be extended with time. 
+If you need support for a specific language we highly recommend you to write translation files for the missing language.
+
+ZITADEL loads translations from three files:
+
+ - [Console translations](https://github.com/caos/zitadel/tree/main/console/src/assets/i18n)
+ - [Login interface texts](https://github.com/caos/zitadel/tree/main/internal/ui/login/static/i18n)
+ - [Email Notifcation texts](https://github.com/caos/zitadel/tree/main/internal/notification/static/i18n)
+ - [Common translations](https://github.com/caos/zitadel/tree/main/internal/static/i18n) for success or error toasts
+
+ Make sure you set the locale as the name. Later on, language header will determine which file gets displayed.
+

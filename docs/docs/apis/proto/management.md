@@ -529,6 +529,20 @@ Returns all configured passwordless authenticators
     POST: /users/{user_id}/passwordless/_search
 
 
+### AddPasswordlessRegistration
+
+> **rpc** AddPasswordlessRegistration([AddPasswordlessRegistrationRequest](#addpasswordlessregistrationrequest))
+[AddPasswordlessRegistrationResponse](#addpasswordlessregistrationresponse)
+
+Adds a new passwordless authenticator link to the user and returns it directly
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/{user_id}/passwordless/_link
+
+
 ### SendPasswordlessRegistration
 
 > **rpc** SendPasswordlessRegistration([SendPasswordlessRegistrationRequest](#sendpasswordlessregistrationrequest))
@@ -3369,6 +3383,30 @@ This is an empty request
 
 
 
+### AddPasswordlessRegistrationRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddPasswordlessRegistrationResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
+
+
+
+
 ### AddProjectGrantMemberRequest
 
 
@@ -5043,7 +5081,8 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | link |  string | - |  |
-| lifetime |  google.protobuf.Duration | - |  |
+| lifetime |  google.protobuf.Duration | deprecated: use expiration instead |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 

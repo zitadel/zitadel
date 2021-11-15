@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -165,9 +166,13 @@ func (m *UserMembership) fillOrgDisplayName(member *usr_es_model.UserMembershipV
 }
 
 func (m *UserMembership) updateOrgDisplayName(event *es_models.Event) error {
-	org, err := m.getOrgByID(context.Background(), event.AggregateID)
+	org := new(org_es_model.Org)
+	err := org.SetData(event)
 	if err != nil {
 		return err
+	}
+	if org.Name == "" {
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 
 	memberships, err := m.view.UserMembershipsByAggregateID(event.AggregateID)
@@ -231,9 +236,13 @@ func (m *UserMembership) fillProjectDisplayName(member *usr_es_model.UserMembers
 }
 
 func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error {
-	project, err := m.getProjectByID(context.Background(), event.AggregateID)
+	proj := new(proj_es_model.Project)
+	err := proj.SetData(event)
 	if err != nil {
 		return err
+	}
+	if proj.Name == "" {
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 
 	memberships, err := m.view.UserMembershipsByAggregateID(event.AggregateID)
@@ -241,7 +250,7 @@ func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error 
 		return err
 	}
 	for _, membership := range memberships {
-		membership.DisplayName = project.Name
+		membership.DisplayName = proj.Name
 	}
 	return m.view.BulkPutUserMemberships(memberships, event)
 }

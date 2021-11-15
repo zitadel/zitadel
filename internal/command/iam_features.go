@@ -45,6 +45,7 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.LoginPolicyPasswordless,
 		features.LoginPolicyRegistration,
 		features.LoginPolicyUsernameLogin,
+		features.LoginPolicyPasswordReset,
 		features.PasswordComplexityPolicy,
 		features.LabelPolicyPrivateLabel,
 		features.LabelPolicyWatermark,

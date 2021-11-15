@@ -22,6 +22,8 @@ import {
   GetMyProfileResponse,
   GetMyUserRequest,
   GetMyUserResponse,
+  GetSupportedLanguagesRequest,
+  GetSupportedLanguagesResponse,
   ListMyAuthFactorsRequest,
   ListMyAuthFactorsResponse,
   ListMyLinkedIDPsRequest,
@@ -414,6 +416,11 @@ export class GrpcAuthService {
     return this.grpcService.auth.resendMyEmailVerification(req, null).then((resp) => resp.toObject());
   }
 
+  public getSupportedLanguages(): Promise<GetSupportedLanguagesResponse.AsObject> {
+    const req = new GetSupportedLanguagesRequest();
+    return this.grpcService.auth.getSupportedLanguages(req, null).then((resp) => resp.toObject());
+  }
+
   public removeMyPhone(): Promise<RemoveMyPhoneResponse.AsObject> {
     return this.grpcService.auth.removeMyPhone(new RemoveMyPhoneRequest(), null).then((resp) => resp.toObject());
   }
@@ -421,7 +428,7 @@ export class GrpcAuthService {
   public updateMyUserName(username: string): Promise<UpdateMyUserNameResponse.AsObject> {
     const req = new UpdateMyUserNameRequest();
     req.setUserName(username);
-    return this.grpcService.auth.updateMyUserName(req, null).then(resp => resp.toObject());
+    return this.grpcService.auth.updateMyUserName(req, null).then((resp) => resp.toObject());
   }
 
   public listMyZitadelPermissions(): Promise<ListMyZitadelPermissionsResponse.AsObject> {

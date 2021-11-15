@@ -35,7 +35,7 @@
     "SECURITYANDPRIVACY_DESC": "Manage Your Information and Security Settings",
     "SECURITYANDPRIVACY_BUTTON": "Personalise Information and Security",
     "CHANGE_PWD": "Change Password",
-    "PROTECTION": "Organisational Policies",
+    "PROTECTION": "Organizational Policies",
     "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
     "PROTECTION_BUTTON": "Explore",
     "PROJECTS": "Create and Manage Your Applications and Projects",
@@ -303,8 +303,8 @@
     "EXTERNALIDP": {
       "TITLE": "External Identity Providers",
       "DESC": "",
-      "IDPCONFIGID": "Idp Config ID",
-      "IDPNAME": "Idp Name",
+      "IDPCONFIGID": "IDP Config ID",
+      "IDPNAME": "IDP Name",
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
       "DIALOG": {
@@ -333,7 +333,7 @@
       "STATE2": "Inactive",
       "STATE3": "Deleted",
       "STATE4": "Locked",
-      "STATE5": "Supend",
+      "STATE5": "Suspended",
       "STATE6": "Initial"
     },
     "PROFILE": {
@@ -358,7 +358,7 @@
         "CURRENT": "Current Picture",
         "PREVIEW": "Preview",
         "DELETESUCCESS": "Deleted successfully!",
-        "CROPPERERROR": "An error while uploading your file failed. Try a different format and size if necessary."
+        "CROPPERERROR": "An error while uploading your file occurred. Try a different format and size if necessary."
       }
     },
     "MACHINE": {
@@ -646,7 +646,7 @@
         "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
         "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new Token",
+        "REQUESTNEWTOKEN": "Request new token",
         "TYPES": {
           "1": "HTTP",
           "2": "DNS"
@@ -710,7 +710,7 @@
       "POSTAL_CODE": "Postal Code",
       "COUNTRY": "Country",
       "TITLE": "Zitadel Tier",
-      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to stripe.com.",
       "QUESTIONS": "For questions regarding payments contact our support ",
       "BTN": "Change Tier"
     },
@@ -769,7 +769,7 @@
       "BTN": "Select File",
       "ACTIVATEPREVIEW": "Apply configuration",
       "DARK": "Dark Mode",
-      "LIGHT": "Lighg Mode",
+      "LIGHT": "Light Mode",
       "CHANGEVIEW": "Change View",
       "ACTIVATED": "Policy changes are now LIVE",
       "THEME": "Theme",
@@ -1536,6 +1536,7 @@
   },
   "LANGUAGES": {
     "de": "German",
+    "it": "Italian",
     "en": "English"
   },
   "MEMBER": {

@@ -129,6 +129,13 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
 	}
+	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	if err != nil {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-Dfg3g", "Errors.Org.LoginPolicy.NotFound")
+	}
+	if !loginPolicy.AllowRegister {
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-SAbr3", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
+	}
 	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, link, orgIAMPolicy, pwPolicy)
 	if err != nil {
 		return nil, err

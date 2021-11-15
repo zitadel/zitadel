@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/Masterminds/squirrel"
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -89,13 +88,13 @@ func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType d
 }
 
 func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) ([]domain.FlowType, error) {
-	stmt, args, err := squirrel.StatementBuilder.
+	stmt, args, err := sq.StatementBuilder.
 		Select(FlowsTriggersColumnFlowType.identifier()).
 		From(flowsTriggersTable.identifier()).
 		Where(sq.Eq{
 			FlowsTriggersColumnActionID.identifier(): actionID,
 		}).
-		PlaceholderFormat(squirrel.Dollar).
+		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Dh311", "Errors.Query.InvalidRequest")
