@@ -411,10 +411,10 @@ If the token is invalid or expired, an HTTP 401 will be returned.
 
 [https://api.zitadel.ch/oauth/v2/revoke](https://api.zitadel.ch/oauth/v2/revoke)
 
-This endpoint enables clients to revoke an `acccess_token` or `refresh_token` they have been granted.
+This endpoint enables clients to revoke an `access_token` or `refresh_token` they have been granted.
 
 :::important
-If you revoke an `access_token` only that specific token will be revoked. If you revoke a `refresh_token`,
+If you revoke an `access_token` only the specific token will be revoked. When revoking a `refresh_token`,
 the corresponding `access_token` will be revoked as well.
 :::
 
@@ -437,7 +437,7 @@ Depending on your authorization method you will have to provide additional param
 >
 <TabItem value="client_secret_basic">
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to build it correctly.
+Send your `client_id` and `client_secret` as Basic Auth Header. Check [Client Secret Basic Auth Method](authn-methods#client-secret-basic) on how to construct a request correctly.
 
 </TabItem>
 <TabItem value="client_secret_post">
@@ -461,11 +461,11 @@ Send your `client_id` as parameters in the body:
 </TabItem>
 <TabItem value="private_key_jwt">
 
-Send a `client_assertion` as JWT for us to validate the signature against the registered public key.
+Send a `client_assertion` as JWT for ZITADEL to verify the signature against the registered public key.
 
 | Parameter             | Description                                                                                                 |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
-| client_assertion      | JWT built and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
+| client_assertion      | JWT created and signed according to [Using JWTs for Client Authentication](authn-methods#client-secret-basic) |
 | client_assertion_type | must be `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`                                            |
 
 ```BASH
