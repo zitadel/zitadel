@@ -91,6 +91,7 @@
     "SHOWORGS": "Mostra tutte le organizzazioni",
     "GRANTSECTION": "Sezione di autorizzazione",
     "GRANTS": "Autorizzazioni",
+    "ACTIONS": "Azioni",
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
     "TOOLTIP": {
@@ -102,7 +103,8 @@
       "GRANTEDPROJECTS": "Mostra i progetti a cui la tua organizzazione ha accesso",
       "HUMANUSERS": "Mostra tutti gli utenti umani registrati nella tua organizzazione",
       "MACHINEUSERS": "Mostra tutti gli utenti di servizio della tua organizzazione",
-      "AUTHZ": "Mostra le autorizzazioni disponibili per gli utenti della tua organizzazione"
+      "AUTHZ": "Mostra le autorizzazioni disponibili per gli utenti della tua organizzazione",
+      "ACTIONS": "Esegui processi su certi eventi."
     }
   },
   "ACTIONS": {
@@ -519,6 +521,55 @@
       }
     }
   },
+  "FLOWS": {
+    "TITLE": "Azioni e processi",
+    "DESCRIPTION": "Esegui processi su certi eventi.",
+    "ACTIONSTITLE": "Azioni",
+    "FLOWSTITLE": "processi",
+    "ID": "ID",
+    "NAME": "Nome",
+    "STATE": "Stato",
+    "STATES": {
+      "0": "Nessun stato",
+      "1": "inattivo",
+      "2": "attivo"
+    },
+    "TYPES": {
+      "0": "Non specifico",
+      "1": "Autenticazione esterna"
+    },
+    "TRIGGERTYPES": {
+      "1": "Post autenticazione",
+      "2": "Pre creazione",
+      "3": "Post creazione"
+    },
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timeout in secondi",
+    "ALLOWEDTOFAIL": "Può fallire",
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Tipo processo",
+    "TRIGGERTYPE": "Tipo trigger",
+    "ACTIONS": "Azioni",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Crea azione"
+      },
+      "UPDATE": {
+        "TITLE": "Modifica azione"
+      },
+      "DELETEACTION": {
+        "TITLE": "Elimina azione?",
+        "DESCRIPTION": ""
+      },
+      "CLEAR": {
+        "TITLE": "Flow zurücksetzen?",
+        "DESCRIPTION": "Stai per cancellare un'azione. Questa azione non può essere annullata. Vuoi continuare?"
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "Azioni salvate!"
+    }
+  },
   "IAM": {
     "POLICIES": {
       "TITLE": "Impostazioni IAM e impostazioni di accesso",
@@ -669,7 +720,8 @@
       "LABELPOLICY": "Privatelabelling",
       "DOMAIN": "Dominio dell'organizzazione",
       "TEXTSANDLINKS": "Testi e link",
-      "METADATA": "Metadati"
+      "METADATA": "Metadati",
+      "FLOWS": "Azioni e processi"
     },
     "DATA": {
       "AUDITLOGRETENTION": "Ritenzione Audit Log",
@@ -687,7 +739,8 @@
       "CUSTOMTEXTLOGIN": "Testi dell'interfaccia login",
       "CUSTOMTEXTMESSAGE": "Testi email personalizzati",
       "PRIVACYPOLICY": "Link personalizzati all'informativa sulla privacy e ai TOS",
-      "METADATAUSER": "Metadati utente"
+      "METADATAUSER": "Metadati utente",
+      "FLOWS": "Azioni e processi"
     },
     "TIERSTATES": {
       "0": "Attivo",
