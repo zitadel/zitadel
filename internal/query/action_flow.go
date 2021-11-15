@@ -39,18 +39,17 @@ var (
 )
 
 type Flow struct {
-	ID            string
-	CreationDate  time.Time
-	ChangeDate    time.Time
-	ResourceOwner string
-	Sequence      uint64
+	CreationDate  time.Time //TODO: add in projection
+	ChangeDate    time.Time //TODO: add in projection
+	ResourceOwner string    //TODO: add in projection
+	Sequence      uint64    //TODO: add in projection
 	Type          domain.FlowType
 
 	TriggerActions map[domain.TriggerType][]*Action
 }
 
 func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID string) (*Flow, error) {
-	query, scan := q.prepareFlowsQuery(flowType)
+	query, scan := prepareFlowQuery()
 	stmt, args, err := query.Where(
 		sq.Eq{
 			FlowsTriggersColumnFlowType.identifier():      flowType,
@@ -68,7 +67,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 }
 
 func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) ([]*Action, error) {
-	stmt, scan := q.prepareTriggerActionsQuery()
+	stmt, scan := prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
 			FlowsTriggersColumnFlowType.identifier():      flowType,
@@ -123,7 +122,7 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (
 	return flowTypes, nil
 }
 
-func (q *Queries) prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
+func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -171,7 +170,7 @@ func (q *Queries) prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows
 		}
 }
 
-func (q *Queries) prepareFlowsQuery(flowType domain.FlowType) (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
+func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 	return sq.Select(
 			ActionColumnID.identifier(),
 			ActionColumnCreationDate.identifier(),
@@ -183,19 +182,20 @@ func (q *Queries) prepareFlowsQuery(flowType domain.FlowType) (sq.SelectBuilder,
 			ActionColumnScript.identifier(),
 			FlowsTriggersColumnTriggerType.identifier(),
 			FlowsTriggersColumnTriggerSequence.identifier(),
+			FlowsTriggersColumnFlowType.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Flow, error) {
 			flow := &Flow{
-				Type:           flowType,
 				TriggerActions: make(map[domain.TriggerType][]*Action),
 			}
 			for rows.Next() {
 				action := new(Action)
 				var triggerType domain.TriggerType
 				var triggerSequence int
+				var flowType domain.FlowType
 				err := rows.Scan(
 					&action.ID,
 					&action.CreationDate,
@@ -207,10 +207,12 @@ func (q *Queries) prepareFlowsQuery(flowType domain.FlowType) (sq.SelectBuilder,
 					&action.Script,
 					&triggerType,
 					&triggerSequence,
+					&flowType,
 				)
 				if err != nil {
 					return nil, err
 				}
+				flow.Type = flowType
 				flow.TriggerActions[triggerType] = append(flow.TriggerActions[triggerType], action)
 			}
 
