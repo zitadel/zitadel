@@ -580,7 +580,6 @@ service ManagementService {
     rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
         option (google.api.http) = {
             post: "/users/{user_id}/passwordless/_link"
-            body: "*"
         };
         option (zitadel.v1.auth_option) = {
             permission: "user.credential.write"
@@ -3001,7 +3000,9 @@ message ImportHumanUserRequest {
 message ImportHumanUserResponse {
     message PasswordlessRegistration {
         string link = 1;
+        //deprecated: use expiration instead
         google.protobuf.Duration lifetime = 2;
+        google.protobuf.Duration expiration = 3;
     }
 
     string user_id = 1;

@@ -383,7 +383,7 @@ export class MessageTextsComponent implements OnDestroy {
     };
 
   public locale: string = 'en';
-  public LOCALES: string[] = ['en'];
+  public LOCALES: string[] = ['en', 'de', 'it'];
   private sub: Subscription = new Subscription();
   public currentPolicy: GridPolicy = MESSAGE_TEXTS_POLICY;
 
