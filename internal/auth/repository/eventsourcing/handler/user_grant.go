@@ -177,27 +177,37 @@ func (u *UserGrant) processUser(event *es_models.Event) (err error) {
 func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	switch event.Type {
 	case proj_es_model.ProjectChanged:
+		proj := new(proj_es_model.Project)
+		err := proj.SetData(event)
+		if err != nil {
+			return err
+		}
+		if proj.Name == "" {
+			return u.view.ProcessedUserGrantSequence(event)
+		}
 		grants, err := u.view.UserGrantsByProjectID(event.AggregateID)
 		if err != nil {
 			return err
 		}
-		project, err := u.getProjectByID(context.Background(), event.AggregateID)
-		if err != nil {
-			return err
-		}
 		for _, grant := range grants {
-			u.fillProjectData(grant, project)
+			grant.ProjectName = proj.Name
 		}
 		return u.view.PutUserGrants(grants, event)
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged,
 		proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		member := new(proj_es_model.ProjectMember)
-		member.SetData(event)
+		err := member.SetData(event)
+		if err != nil {
+			return err
+		}
 		return u.processMember(event, "PROJECT", event.AggregateID, member.UserID, member.Roles)
 	case proj_es_model.ProjectGrantMemberAdded, proj_es_model.ProjectGrantMemberChanged,
 		proj_es_model.ProjectGrantMemberRemoved, proj_es_model.ProjectGrantMemberCascadeRemoved:
 		member := new(proj_es_model.ProjectGrantMember)
-		member.SetData(event)
+		err := member.SetData(event)
+		if err != nil {
+			return err
+		}
 		return u.processMember(event, "PROJECT_GRANT", member.GrantID, member.UserID, member.Roles)
 	default:
 		return u.view.ProcessedUserGrantSequence(event)

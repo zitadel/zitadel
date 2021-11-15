@@ -184,8 +184,9 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	}
 	if code != nil {
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
-			Lifetime: durationpb.New(code.Expiration),
+			Link:       code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Lifetime:   durationpb.New(code.Expiration),
+			Expiration: durationpb.New(code.Expiration),
 		}
 	}
 	return resp, nil

@@ -18,7 +18,7 @@ Errors:
       SetPublicFailed: Bucket konnte nicht auf public gesetzt werden
     Object:
       PutFailed: Objekt konnte nicht erstellt werden
-      GetFaieled: Objekt konnte nicht gelesen werden
+      GetFailed: Objekt konnte nicht gelesen werden
       PresignedTokenFailed: Signiertes Token konnte nicht erstellt werden
       ListFailed: Objektliste konnte nicht gelesen werden
       RemoveFailed: Objekt konnte nicht gelöscht werden
@@ -190,7 +190,7 @@ Errors:
       NotExisting: Org IAM Policy existiert nicht
       AlreadyExists: Org IAM Policy existiert bereits
   Project:
-    ProjectIDMissing: Project Id fehlt
+    ProjectIDMissing: Project ID fehlt
     AlreadyExists: Project existiert bereits auf der Organisation
     OrgNotExisting: Organisation existiert nicht
     UserNotExisting: User existiert nicht
@@ -242,7 +242,7 @@ Errors:
     MemberInvalid: Member ist ungültig
     MemberAlreadyExisting: Member existiert bereits
     MemberNotExisting: Member existiert nicht
-    IDMissing: Id fehlt
+    IDMissing: ID fehlt
     GlobalOrgMissing: Globale Organisation fehlt
     GlobalOrgAlreadySet: Globale Organisation wurde bereits gesetzt
     IAMProjectIDMissing: IAM Project ID fehlt
@@ -266,7 +266,7 @@ Errors:
       IDP:
         AlreadyExists: Identitäts Provider existiert bereits
         NotExisting: Identitäts Provider existiert nicht
-        Invalid: Idp Provider ist ungültig
+        Invalid: IDP ist ungültig
       IDPConfig:
         AlreadyExists: Identitäts Provider Konfiguration existiert bereits
         NotInactive: Identitäts Provider Konfiguration nicht inaktive
@@ -325,7 +325,7 @@ Errors:
     NotFound: Benutzer Berechtigung konnte nicht gefunden werden
     Invalid: Benutzer Berechtigung ist ungültig
     NotChanged: Benutzer Berechtigung wurde nicht verändert
-    IDMissing: Id fehlt
+    IDMissing: ID fehlt
     NotActive: Benutzer Berechtigung ist nicht aktiv
     NotInactive: Benutzer Berechtigung ist nicht deaktiviert
     NoPermissionForProject: Benutzer hat keine Rechte auf diesem Projekt
