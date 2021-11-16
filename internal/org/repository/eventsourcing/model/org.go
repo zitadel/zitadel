@@ -87,12 +87,12 @@ func (o *Org) AppendEvents(events ...*es_models.Event) error {
 func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	switch event.Type {
 	case OrgAdded:
-		err = o.setData(event)
+		err = o.SetData(event)
 		if err != nil {
 			return err
 		}
 	case OrgChanged:
-		err = o.setData(event)
+		err = o.SetData(event)
 		if err != nil {
 			return err
 		}
@@ -210,7 +210,7 @@ func (o *Org) AppendEvent(event *es_models.Event) (err error) {
 	return nil
 }
 
-func (o *Org) setData(event *es_models.Event) error {
+func (o *Org) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, o)
 	if err != nil {
 		return errors.ThrowInternal(err, "EVENT-BpbQZ", "unable to unmarshal event")
