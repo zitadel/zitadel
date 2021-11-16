@@ -22,7 +22,7 @@ func (wm *CustomLoginTextsReadModel) Reduce() error {
 			wm.CustomLoginTexts[e.Template+e.Language.String()] = &CustomText{Language: e.Language, Template: e.Template}
 		case *policy.CustomTextTemplateRemovedEvent:
 			if _, ok := wm.CustomLoginTexts[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomLoginTexts, e.Template)
+				delete(wm.CustomLoginTexts, e.Template+e.Language.String())
 			}
 		}
 	}
