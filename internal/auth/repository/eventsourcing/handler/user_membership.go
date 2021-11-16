@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
@@ -245,9 +245,13 @@ func (m *UserMembership) fillProjectDisplayName(member *usr_es_model.UserMembers
 }
 
 func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error {
-	project, err := m.getProjectByID(context.Background(), event.AggregateID)
+	proj := new(proj_es_model.Project)
+	err := proj.SetData(event)
 	if err != nil {
 		return err
+	}
+	if proj.Name == "" {
+		return m.view.ProcessedUserMembershipSequence(event)
 	}
 
 	memberships, err := m.view.UserMembershipsByAggregateID(event.AggregateID)
@@ -255,7 +259,7 @@ func (m *UserMembership) updateProjectDisplayName(event *es_models.Event) error 
 		return err
 	}
 	for _, membership := range memberships {
-		membership.DisplayName = project.Name
+		membership.DisplayName = proj.Name
 	}
 	return m.view.BulkPutUserMemberships(memberships, event)
 }

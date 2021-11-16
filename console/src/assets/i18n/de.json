@@ -91,6 +91,7 @@
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTSECTION": "Berechtigungssektion",
     "GRANTS": "Berechtigungen",
+    "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
     "TOOLTIP": {
@@ -102,7 +103,8 @@
       "GRANTEDPROJECTS": "Verwalte die berechtigten Projekte von anderen Organisationen",
       "HUMANUSERS": "Verwalte die Menschlichen Benutzer deiner Organisation",
       "MACHINEUSERS": "Verwalte die  Service Benutzer deiner Organisation",
-      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer"
+      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer",
+      "ACTIONS": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden."
     }
   },
   "ACTIONS": {
@@ -521,6 +523,55 @@
       }
     }
   },
+  "FLOWS": {
+    "TITLE": "Aktionen und Abläufe",
+    "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
+    "ACTIONSTITLE": "Aktionen",
+    "FLOWSTITLE": "Abläufe",
+    "ID": "ID",
+    "NAME": "Name",
+    "STATE": "State",
+    "STATES": {
+      "0": "Kein Status",
+      "1": "inaktiv",
+      "2": "aktiv"
+    },
+    "TYPES": {
+      "0": "Unspezifisch",
+      "1": "Externe Authentifizierung"
+    },
+    "TRIGGERTYPES": {
+      "1": "Post Authentication",
+      "2": "Pre Creation",
+      "3": "Post Creation"
+    },
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timout in Sekunden",
+    "ALLOWEDTOFAIL": "Allowed To Fail",
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Flow Typ",
+    "TRIGGERTYPE": "Trigger Typ",
+    "ACTIONS": "Aktionen",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Aktion erstellen"
+      },
+      "UPDATE": {
+        "TITLE": "Aktion bearbeiten"
+      },
+      "DELETEACTION": {
+        "TITLE": "Aktion löschen?",
+        "DESCRIPTION": "Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?"
+      },
+      "CLEAR": {
+        "TITLE": "Flow zurücksetzen?",
+        "DESCRIPTION": "Sie sind im Begriff den Flow mitsamt seinen Triggern und Aktionen zurückzusetzen. Diese Änderung kann nicht wiederhergestellt werden."
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "Aktionen gesetzt"
+    }
+  },
   "IAM": {
     "POLICIES": {
       "TITLE": "IAM Administration",
@@ -671,7 +722,8 @@
       "LABELPOLICY": "Privatelabelling",
       "DOMAIN": "Organisations Domänen",
       "TEXTSANDLINKS": "Texte und Links",
-      "METADATA": "Metadata"
+      "METADATA": "Metadata",
+      "FLOWS": "Aktionen und Abläufe"
     },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
@@ -689,7 +741,8 @@
       "CUSTOMTEXTLOGIN": "Benutzerdefinierte Logininterface Texte",
       "CUSTOMTEXTMESSAGE": "Benutzerdefinierte Benachrichtigungstexte",
       "PRIVACYPOLICY": "Benutzerdefinierte Datenschutzrichtlinie und AGB",
-      "METADATAUSER": "User Metadata"
+      "METADATAUSER": "User Metadata",
+      "FLOWS": "Aktionen und Abläufe"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -756,7 +809,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins."
+      "BTN": "Datei auswählen",
+      "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
+      "ACTIVATEPREVIEW": "Preview aktivieren"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
@@ -1302,6 +1357,7 @@
         }
       },
       "NEXTSTEPS": {
+        "TITLE": "Nächste Schritte",
         "0": {
           "TITLE": "Rollen festlegen",
           "DESC": "Erfassen Sie Rollen für ihr Projekt"
@@ -1390,7 +1446,7 @@
       "TOKENTYPE": "Auth Token Typ",
       "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
-      "UNSECUREREDIRECT": "Ich hoffe, Du weisst, was Du tust.",
+      "UNSECUREREDIRECT": "Wir hoffen, Du weisst, was Du tust.",
       "OVERVIEWSECTION": "Übersicht",
       "OVERVIEWTITLE": "Deine Konfiguration ist bereit. Du kannst sie hier nochmals prüfen.",
       "ACCESSTOKENROLEASSERTION": "Benutzerrollen dem Access Token hinzufügen",
@@ -1482,6 +1538,7 @@
   },
   "LANGUAGES": {
     "de": "Deutsch",
+    "it": "Italienisch",
     "en": "Englisch"
   },
   "MEMBER": {

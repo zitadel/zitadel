@@ -155,6 +155,16 @@ export class AppComponent implements OnDestroy {
 
     this.matIconRegistry.addSvgIcon('mdi_api', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'));
 
+    this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_right_bottom',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-right-bottom.svg'),
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_decision',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
+    );
+
     this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
       const { org } = route;
       if (org) {
@@ -324,9 +334,9 @@ export class AppComponent implements OnDestroy {
       if (userprofile) {
         // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/en|de|it/) ? cropped : 'en';
 
-        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de/)
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it/)
           ? userprofile.human.profile?.preferredLanguage
           : fallbackLang;
         this.translate.use(lang);

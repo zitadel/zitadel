@@ -35,7 +35,7 @@
     "SECURITYANDPRIVACY_DESC": "Manage Your Information and Security Settings",
     "SECURITYANDPRIVACY_BUTTON": "Personalise Information and Security",
     "CHANGE_PWD": "Change Password",
-    "PROTECTION": "Organisational Policies",
+    "PROTECTION": "Organizational Policies",
     "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
     "PROTECTION_BUTTON": "Explore",
     "PROJECTS": "Create and Manage Your Applications and Projects",
@@ -91,6 +91,7 @@
     "SHOWORGS": "Show All Organisations",
     "GRANTSECTION": "Authorization Section",
     "GRANTS": "Authorizations",
+    "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "TOOLTIP": {
@@ -102,7 +103,8 @@
       "GRANTEDPROJECTS": "Show projects your organisation was granted access",
       "HUMANUSERS": "Show all registered human users on your organisation",
       "MACHINEUSERS": "Show service users of your organisation",
-      "AUTHZ": "Show authorizations available to your organisation users"
+      "AUTHZ": "Show authorizations available to your organisation users",
+      "ACTIONS": "Define scripts to execute on a certain event."
     }
   },
   "ACTIONS": {
@@ -303,8 +305,8 @@
     "EXTERNALIDP": {
       "TITLE": "External Identity Providers",
       "DESC": "",
-      "IDPCONFIGID": "Idp Config ID",
-      "IDPNAME": "Idp Name",
+      "IDPCONFIGID": "IDP Config ID",
+      "IDPNAME": "IDP Name",
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
       "DIALOG": {
@@ -333,7 +335,7 @@
       "STATE2": "Inactive",
       "STATE3": "Deleted",
       "STATE4": "Locked",
-      "STATE5": "Supend",
+      "STATE5": "Suspended",
       "STATE6": "Initial"
     },
     "PROFILE": {
@@ -358,7 +360,7 @@
         "CURRENT": "Current Picture",
         "PREVIEW": "Preview",
         "DELETESUCCESS": "Deleted successfully!",
-        "CROPPERERROR": "An error while uploading your file failed. Try a different format and size if necessary."
+        "CROPPERERROR": "An error while uploading your file occurred. Try a different format and size if necessary."
       }
     },
     "MACHINE": {
@@ -521,6 +523,55 @@
       }
     }
   },
+  "FLOWS": {
+    "TITLE": "Actions and Flows",
+    "DESCRIPTION": "Define scripts to execute on a certain event.",
+    "ACTIONSTITLE": "Actions",
+    "FLOWSTITLE": "Flows",
+    "ID": "ID",
+    "NAME": "Name",
+    "STATE": "State",
+    "STATES": {
+      "0": "no status",
+      "1": "inactive",
+      "2": "active"
+    },
+    "TYPES": {
+      "0": "Unspecified Type",
+      "1": "External Authentication"
+    },
+    "TRIGGERTYPES": {
+      "1": "Post Authentication",
+      "2": "Pre Creation",
+      "3": "Post Creation"
+    },
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timout in seconds",
+    "ALLOWEDTOFAIL": "Allowed To Fail",
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Flow Type",
+    "TRIGGERTYPE": "Trigger Type",
+    "ACTIONS": "Actions",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Create an Action"
+      },
+      "UPDATE": {
+        "TITLE": "Update Action"
+      },
+      "DELETEACTION": {
+        "TITLE": "Delete Action?",
+        "DESCRIPTION": "You are about to delete an action. This cannot be reverted. Are you sure?"
+      },
+      "CLEAR": {
+        "TITLE": "Clear flow?",
+        "DESCRIPTION": "You are about to reset the flow along with its triggers and actions. This change cannot be restored. Are you sure?"
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "Actions set"
+    }
+  },
   "IAM": {
     "POLICIES": {
       "TITLE": "IAM Policies and Access Settings",
@@ -597,7 +648,7 @@
         "VERIFICATION_VALIDATION_ONGOING": "A verification token has already been requested. Click on the button to trigger a verification check.",
         "VERIFICATION_VALIDATION_ONGOING_TYPE": "Type of the token:",
         "VERIFICATION_SUCCESSFUL": "Domain successfully verified!",
-        "REQUESTNEWTOKEN": "Request new Token",
+        "REQUESTNEWTOKEN": "Request new token",
         "TYPES": {
           "1": "HTTP",
           "2": "DNS"
@@ -661,7 +712,7 @@
       "POSTAL_CODE": "Postal Code",
       "COUNTRY": "Country",
       "TITLE": "Zitadel Tier",
-      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to Stripe.com.",
+      "DESCRIPTION": "Zitadel works with Stripe to simplify invoicing. The following link redirects to stripe.com.",
       "QUESTIONS": "For questions regarding payments contact our support ",
       "BTN": "Change Tier"
     },
@@ -671,7 +722,8 @@
       "LABELPOLICY": "Privatelabelling",
       "DOMAIN": "Organization Domain",
       "TEXTSANDLINKS": "Texts and Links",
-      "METADATA": "Metadata"
+      "METADATA": "Metadata",
+      "FLOWS": "Actions and Flows"
     },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
@@ -689,7 +741,8 @@
       "CUSTOMTEXTLOGIN": "Custom login interface texts",
       "CUSTOMTEXTMESSAGE": "Custom notification mail texts",
       "PRIVACYPOLICY": "Custom Privacy Policy and TOS Links",
-      "METADATAUSER": "User Metadata"
+      "METADATAUSER": "User Metadata",
+      "FLOWS": "Actions and Flows"
     },
     "TIERSTATES": {
       "0": "Active",
@@ -718,7 +771,7 @@
       "BTN": "Select File",
       "ACTIVATEPREVIEW": "Apply configuration",
       "DARK": "Dark Mode",
-      "LIGHT": "Lighg Mode",
+      "LIGHT": "Light Mode",
       "CHANGEVIEW": "Change View",
       "ACTIVATED": "Policy changes are now LIVE",
       "THEME": "Theme",
@@ -1485,6 +1538,7 @@
   },
   "LANGUAGES": {
     "de": "German",
+    "it": "Italian",
     "en": "English"
   },
   "MEMBER": {

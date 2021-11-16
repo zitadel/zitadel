@@ -44,43 +44,56 @@ var (
 		name: projection.LoginPolicyTable,
 	}
 	LoginPolicyColumnOrgID = Column{
-		name: projection.LoginPolicyIDCol,
+		name:  projection.LoginPolicyIDCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnCreationDate = Column{
-		name: projection.LoginPolicyCreationDateCol,
+		name:  projection.LoginPolicyCreationDateCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnChangeDate = Column{
-		name: projection.LoginPolicyChangeDateCol,
+		name:  projection.LoginPolicyChangeDateCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnSequence = Column{
-		name: projection.LoginPolicySequenceCol,
+		name:  projection.LoginPolicySequenceCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnAllowRegister = Column{
-		name: projection.LoginPolicyAllowRegisterCol,
+		name:  projection.LoginPolicyAllowRegisterCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnAllowUsernamePassword = Column{
-		name: projection.LoginPolicyAllowUsernamePasswordCol,
+		name:  projection.LoginPolicyAllowUsernamePasswordCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnAllowExternalIDPs = Column{
-		name: projection.LoginPolicyAllowExternalIDPsCol,
+		name:  projection.LoginPolicyAllowExternalIDPsCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnForceMFA = Column{
-		name: projection.LoginPolicyForceMFACol,
+		name:  projection.LoginPolicyForceMFACol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnSecondFactors = Column{
-		name: projection.LoginPolicy2FAsCol,
+		name:  projection.LoginPolicy2FAsCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnMultiFactors = Column{
-		name: projection.LoginPolicyMFAsCol,
+		name:  projection.LoginPolicyMFAsCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnPasswordlessType = Column{
-		name: projection.LoginPolicyPasswordlessTypeCol,
+		name:  projection.LoginPolicyPasswordlessTypeCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnIsDefault = Column{
-		name: projection.LoginPolicyIsDefaultCol,
+		name:  projection.LoginPolicyIsDefaultCol,
+		table: loginPolicyTable,
 	}
 	LoginPolicyColumnHidePasswordReset = Column{
-		name: projection.LoginPolicyHidePWResetCol,
+		name:  projection.LoginPolicyHidePWResetCol,
+		table: loginPolicyTable,
 	}
 )
 

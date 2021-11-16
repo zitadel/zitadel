@@ -87,6 +87,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			if e.CustomDomain != nil {
 				wm.CustomDomain = *e.CustomDomain
 			}
+			if e.PrivacyPolicy != nil {
+				wm.PrivacyPolicy = *e.PrivacyPolicy
+			}
 			if e.MetadataUser != nil {
 				wm.MetadataUser = *e.MetadataUser
 			}
