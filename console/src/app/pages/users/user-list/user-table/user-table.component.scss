@@ -7,12 +7,12 @@
 
     td,
     th {
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
+      padding-left: .5rem;
+      padding-right: .5rem;
 
       &:first-child {
         padding-left: 0;
-        padding-right: 0.5rem;
+        padding-right: .5rem;
       }
 
       &:last-child {
@@ -65,7 +65,7 @@
 .sa-icon {
   display: block;
   width: 32px;
-  margin: 0 0.5rem;
+  margin: 0 .5rem;
 
   i {
     margin: auto;
@@ -79,8 +79,8 @@
   margin-right: 1rem;
 
   .icon {
-    margin-left: 0.5rem;
-    margin-right: -0.5rem;
+    margin-left: .5rem;
+    margin-right: -.5rem;
   }
 }
 

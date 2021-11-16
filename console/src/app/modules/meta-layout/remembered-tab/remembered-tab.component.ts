@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { MetaTab } from '../meta-layout.component';
@@ -8,14 +8,12 @@ import { MetaTab } from '../meta-layout.component';
   templateUrl: './remembered-tab.component.html',
   styleUrls: ['./remembered-tab.component.scss'],
 })
-export class RememberedTabComponent implements OnInit {
+export class RememberedTabComponent {
   public MetaTab: any = MetaTab;
   public metaTab!: MetaTab;
   public selectedMetaTab$: BehaviorSubject<MetaTab> = new BehaviorSubject<MetaTab>(MetaTab.DETAIL);
 
   constructor() {}
-
-  ngOnInit(): void {}
 
   public setTab(site: MetaTab): void {
     this.metaTab = site;
