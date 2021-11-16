@@ -1,0 +1,27 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.desc {
+  color: var(--grey);
+  font-size: .9rem;
+}
+
+.script {
+  min-height: 200px;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+}

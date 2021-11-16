@@ -63,6 +63,7 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	loginPolicyPasswordless,
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
+	loginPolicyPasswordReset,
 	passwordComplexityPolicy,
 	labelPolicyPrivateLabel,
 	labelPolicyWatermark,
@@ -106,6 +107,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.LoginPolicyUsernameLogin != loginPolicyUsernameLogin {
 		changes = append(changes, features.ChangeLoginPolicyUsernameLogin(loginPolicyUsernameLogin))
+	}
+	if wm.LoginPolicyPasswordReset != loginPolicyPasswordReset {
+		changes = append(changes, features.ChangeLoginPolicyPasswordReset(loginPolicyPasswordReset))
 	}
 	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
 		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))

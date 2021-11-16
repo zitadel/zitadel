@@ -107,7 +107,7 @@ export class LoginTextsComponent implements OnDestroy {
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
 
   public KeyNamesArray: string[] = KeyNamesArray;
-  public LOCALES: string[] = ['en'];
+  public LOCALES: string[] = ['en', 'de', 'it'];
 
   private sub: Subscription = new Subscription();
 
