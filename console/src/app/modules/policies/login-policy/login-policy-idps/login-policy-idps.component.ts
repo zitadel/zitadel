@@ -23,30 +23,24 @@ export class LoginPolicyIdpsComponent implements OnInit {
 
   public IDPStylingType: any = IDPStylingType;
 
-  constructor(
-    private toast: ToastService,
-    private dialog: MatDialog,
-  ) { }
+  constructor(private toast: ToastService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.getIdps().then(resp => {
+    this.getIdps().then((resp) => {
       this.idps = resp;
-      console.log(this.idps);
     });
   }
 
   private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        return (this.service as ManagementService).listLoginPolicyIDPs()
-          .then((resp) => {
-            return resp.resultList;
-          });
+        return (this.service as ManagementService).listLoginPolicyIDPs().then((resp) => {
+          return resp.resultList;
+        });
       case PolicyComponentServiceType.ADMIN:
-        return (this.service as AdminService).listLoginPolicyIDPs()
-          .then((providers) => {
-            return providers.resultList;
-          });
+        return (this.service as AdminService).listLoginPolicyIDPs().then((providers) => {
+          return providers.resultList;
+        });
     }
   }
 
@@ -67,16 +61,20 @@ export class LoginPolicyIdpsComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp && resp.idp && resp.type) {
-        this.addIdp(resp.idp, resp.type).then(() => {
-          this.loading = true;
-          setTimeout(() => {
-            this.getIdps();
-          }, 1000);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.addIdp(resp.idp, resp.type)
+          .then(() => {
+            this.loading = true;
+            setTimeout(() => {
+              this.getIdps().then((resp) => {
+                this.idps = resp;
+              });
+            }, 1000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
@@ -84,24 +82,28 @@ export class LoginPolicyIdpsComponent implements OnInit {
   public removeIdp(idp: IDPLoginPolicyLink.AsObject): void {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
-        (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
-          const index = this.idps.findIndex(temp => temp === idp);
-          if (index > -1) {
-            this.idps.splice(index, 1);
-          }
-        }, error => {
-          this.toast.showError(error);
-        });
+        (this.service as ManagementService).removeIDPFromLoginPolicy(idp.idpId).then(
+          () => {
+            this.getIdps().then((resp) => {
+              this.idps = resp;
+            });
+          },
+          (error) => {
+            this.toast.showError(error);
+          },
+        );
         break;
       case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpId).then(() => {
-          const index = this.idps.findIndex(temp => temp === idp);
-          if (index > -1) {
-            this.idps.splice(index, 1);
-          }
-        }, error => {
-          this.toast.showError(error);
-        });
+        (this.service as AdminService).removeIDPFromLoginPolicy(idp.idpId).then(
+          () => {
+            this.getIdps().then((resp) => {
+              this.idps = resp;
+            });
+          },
+          (error) => {
+            this.toast.showError(error);
+          },
+        );
         break;
     }
   }

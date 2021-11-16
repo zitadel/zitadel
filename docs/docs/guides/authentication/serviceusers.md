@@ -98,20 +98,18 @@ Payload
     "iss": "100507859606888466",
     "sub": "100507859606888466",
     "aud": "https://issuer.zitadel.ch",
-    "iat": [Current UTC timestamp, e.g. 1605179982],
-    "exp": [UTC timestamp, max. 1 hour from iat, e.g. 1605183582]
+    "iat": [Current UTC timestamp, e.g. 1605179982, max. 1 hour ago],
+    "exp": [UTC timestamp, e.g. 1605183582]
 }
 ```
 
 * `iss` represents the requesting party, i.e. the owner of the private key. In this case the value of `userId` from the downloaded JSON.
 * `sub` represents the application. Set the value also to the value of `userId`
 * `aud` must be ZITADEL's issuing domain
-* `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now
-* `exp` is the unix timestamp of expiry of this assertion. Must be less than 1 hour from `iat`
+* `iat` is a unix timestamp of the creation signing time of the JWT, e.g. now and must not be older than 1 hour ago
+* `exp` is the unix timestamp of expiry of this assertion
 
 Please refer to [JWT_with_Private_Key](../../apis/openidoauth/authn-methods#jwt-with-private-key) in the documentation for further information.
-
-> **Information:** The `exp` claim is currently not validated, but will be with a future release. Make sure that `exp` is less than 1 hour starting from `iat`.
 
 If you use Go, you might want to use the [provided tool](https://github.com/caos/zitadel-tools) to generate a JWT from the downloaded json. There are many [libraries](https://jwt.io/#libraries-io) to generate and sign JWT.
 

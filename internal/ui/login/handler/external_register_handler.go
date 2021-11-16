@@ -97,7 +97,11 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	provider := l.getRPConfig(w, r, authReq, idpConfig, EndpointExternalRegisterCallback)
+	provider, err := l.getRPConfig(idpConfig, EndpointExternalRegisterCallback)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
 	tokens, err := rp.CodeExchange(r.Context(), data.Code, provider)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
