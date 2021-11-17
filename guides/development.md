@@ -14,6 +14,14 @@ You can use the default vars provided in [this .env-file](../build/local/local.e
 
 This part is relevant if you start the backend or console without docker compose.
 
+### Internationalization (i18n)
+
+```bash
+docker build -t python-i18n -f ./build/i18n/Dockerfile . --build-arg DEEPL_AUTH_KEY=
+
+DOCKER_BUILDKIT=1 docker build -t python-i18n -f ./build/i18n/Dockerfile . --build-arg DEEPL_AUTH_KEY=[yourdeeplkey] --target output-copy -o .
+```
+
 ### Console
 
 This command generates the grpc stub for console into the folder console/src/app/proto/generated for local development.
