@@ -1,7 +1,7 @@
 CREATE TABLE test.projections.org_members (
     org_id STRING NOT NULL
     , user_id STRING NOT NULL
-    , roles STRING[],
+    , roles STRING[]
 
     , creation_date TIMESTAMPTZ NOT NULL
     , change_date TIMESTAMPTZ NOT NULL
@@ -28,6 +28,7 @@ CREATE TABLE test.projections.project_members (
     project_id STRING NOT NULL
     , user_id STRING NOT NULL
     , roles STRING[]
+    , grant_id STRING
 
     , creation_date TIMESTAMPTZ NOT NULL
     , change_date TIMESTAMPTZ NOT NULL
