@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"sync"
 
-	label "go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/metric/prometheus"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/prometheus"
 	"go.opentelemetry.io/otel/metric"
-	export "go.opentelemetry.io/otel/sdk/export/metric"
+	"go.opentelemetry.io/otel/sdk/export/metric/aggregation"
 	controller "go.opentelemetry.io/otel/sdk/metric/controller/basic"
 	processor "go.opentelemetry.io/otel/sdk/metric/processor/basic"
 	selector "go.opentelemetry.io/otel/sdk/metric/selector/simple"
@@ -29,9 +29,9 @@ func NewMetrics(meterName string) (metrics.Metrics, error) {
 	exporter, err := prometheus.New(
 		prometheus.Config{},
 		controller.New(
-			processor.New(
+			processor.NewFactory(
 				selector.NewWithHistogramDistribution(),
-				export.CumulativeExportKindSelector(),
+				aggregation.CumulativeTemporalitySelector(),
 				processor.WithMemory(true),
 			),
 		),
@@ -62,7 +62,7 @@ func (m *Metrics) RegisterCounter(name, description string) error {
 	return nil
 }
 
-func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels map[string]interface{}) error {
+func (m *Metrics) AddCount(ctx context.Context, name string, value int64, labels map[string]attribute.Value) error {
 	counter, exists := m.Counters.Load(name)
 	if !exists {
 		return caos_errs.ThrowNotFound(nil, "METER-4u8fs", "Errors.Metrics.Counter.NotFound")
@@ -75,7 +75,7 @@ func (m *Metrics) RegisterUpDownSumObserver(name, description string, callbackFu
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
-	sumObserver := metric.Must(m.Meter).NewInt64UpDownSumObserver(
+	sumObserver := metric.Must(m.Meter).NewInt64UpDownCounterObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)
@@ -86,20 +86,23 @@ func (m *Metrics) RegisterValueObserver(name, description string, callbackFunc m
 	if _, exists := m.UpDownSumObserver.Load(name); exists {
 		return nil
 	}
-	sumObserver := metric.Must(m.Meter).NewInt64ValueObserver(
+	sumObserver := metric.Must(m.Meter).NewInt64GaugeObserver(
 		name, callbackFunc, metric.WithDescription(description))
 
 	m.UpDownSumObserver.Store(name, sumObserver)
 	return nil
 }
 
-func MapToKeyValue(labels map[string]interface{}) []label.KeyValue {
+func MapToKeyValue(labels map[string]attribute.Value) []attribute.KeyValue {
 	if labels == nil {
 		return nil
 	}
-	keyValues := make([]label.KeyValue, 0, len(labels))
+	keyValues := make([]attribute.KeyValue, 0, len(labels))
 	for key, value := range labels {
-		keyValues = append(keyValues, label.Any(key, value))
+		keyValues = append(keyValues, attribute.KeyValue{
+			Key:   attribute.Key(key),
+			Value: value,
+		})
 	}
 	return keyValues
 }

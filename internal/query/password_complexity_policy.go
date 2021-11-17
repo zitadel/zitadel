@@ -29,7 +29,7 @@ type PasswordComplexityPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) MyPasswordComplexityPolicy(ctx context.Context, orgID string) (*PasswordComplexityPolicy, error) {
+func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID string) (*PasswordComplexityPolicy, error) {
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -43,7 +43,7 @@ func (q *Queries) MyPasswordComplexityPolicy(ctx context.Context, orgID string) 
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-lDnrk", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-lDnrk", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -58,7 +58,7 @@ func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context) (*Passwor
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-h4Uyr", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-h4Uyr", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -70,40 +70,52 @@ var (
 		name: projection.PasswordComplexityTable,
 	}
 	PasswordComplexityColID = Column{
-		name: projection.ComplexityPolicyIDCol,
+		name:  projection.ComplexityPolicyIDCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColSequence = Column{
-		name: projection.ComplexityPolicySequenceCol,
+		name:  projection.ComplexityPolicySequenceCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColCreationDate = Column{
-		name: projection.ComplexityPolicyCreationDateCol,
+		name:  projection.ComplexityPolicyCreationDateCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColChangeDate = Column{
-		name: projection.ComplexityPolicyChangeDateCol,
+		name:  projection.ComplexityPolicyChangeDateCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColResourceOwner = Column{
-		name: projection.ComplexityPolicyResourceOwnerCol,
+		name:  projection.ComplexityPolicyResourceOwnerCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColMinLength = Column{
-		name: projection.ComplexityPolicyMinLengthCol,
+		name:  projection.ComplexityPolicyMinLengthCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasLowercase = Column{
-		name: projection.ComplexityPolicyHasLowercaseCol,
+		name:  projection.ComplexityPolicyHasLowercaseCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasUpperCase = Column{
-		name: projection.ComplexityPolicyHasUppercaseCol,
+		name:  projection.ComplexityPolicyHasUppercaseCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasNumber = Column{
-		name: projection.ComplexityPolicyHasNumberCol,
+		name:  projection.ComplexityPolicyHasNumberCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasSymbol = Column{
-		name: projection.ComplexityPolicyHasSymbolCol,
+		name:  projection.ComplexityPolicyHasSymbolCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColIsDefault = Column{
-		name: projection.ComplexityPolicyIsDefaultCol,
+		name:  projection.ComplexityPolicyIsDefaultCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColState = Column{
-		name: projection.ComplexityPolicyStateCol,
+		name:  projection.ComplexityPolicyStateCol,
+		table: passwordComplexityTable,
 	}
 )
 
@@ -141,9 +153,9 @@ func preparePasswordComplexityPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "errors.policy.password.complexity.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexity.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}

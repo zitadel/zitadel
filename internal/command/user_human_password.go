@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -204,6 +205,14 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	}
 	if password == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-3n8fs", "Errors.User.Password.Empty")
+	}
+
+	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
+	if err != nil {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Edf3g", "Errors.Org.LoginPolicy.NotFound")
+	}
+	if !loginPolicy.AllowUsernamePassword {
+		return caos_errs.ThrowPreconditionFailed(err, "COMMAND-Dft32", "Errors.Org.LoginPolicy.UsernamePasswordNotAllowed")
 	}
 
 	existingPassword, err := c.passwordWriteModel(ctx, userID, orgID)

@@ -4,7 +4,7 @@ import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules
 import { GridPolicy, POLICIES } from './policies';
 
 @Component({
-  selector: 'app-policy-grid',
+  selector: 'cnsl-policy-grid',
   templateUrl: './policy-grid.component.html',
   styleUrls: ['./policy-grid.component.scss'],
 })

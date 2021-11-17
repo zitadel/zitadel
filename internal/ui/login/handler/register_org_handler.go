@@ -109,7 +109,7 @@ func (l *Login) renderRegisterOrg(w http.ResponseWriter, r *http.Request, authRe
 	orgPolicy, _ := l.getDefaultOrgIamPolicy(r)
 	if orgPolicy != nil {
 		data.UserLoginMustBeDomain = orgPolicy.UserLoginMustBeDomain
-		data.IamDomain = l.iamDomain //TODO: what does this field??
+		data.IamDomain = l.iamDomain
 	}
 
 	translator := l.getTranslator(authRequest)

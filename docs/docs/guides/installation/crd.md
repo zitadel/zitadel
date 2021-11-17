@@ -21,7 +21,14 @@ zitadelctl takeoff
 kubectl apply --filename ./database.yml,./zitadel.yml
 
 # Write the encryption keys
-wget https://raw.githubusercontent.com/caos/zitadel/main/site/docs/start/templates/example_keys && zitadelctl writesecret zitadel.keys.existing --file ./example_keys
+cat EOF << zitadelctl writesecret zitadel.keys.existing --stdin
+otpverificationkey_1: $(openssl rand -base64 22)
+cookiekey_1: $(openssl rand -base64 22)
+domainverificationkey_1: $(openssl rand -base64 22)
+idpconfigverificationkey_1: $(openssl rand -base64 22)
+oidckey_1: $(openssl rand -base64 22)
+userverificationkey_1: $(openssl rand -base64 22)
+EOF
 
 # Write the Twiilio sender ID and auth token so that ZITADEL is able to send your users SMS.
 TWILIO_SID=<My Twilio Sender ID>
@@ -57,4 +64,4 @@ kubectl apply --filename ./boom.yml
 watch "kubectl --namespace caos-system get pods"
 ```
 
-Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/domains) now.
+Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/introduction#domains) now.

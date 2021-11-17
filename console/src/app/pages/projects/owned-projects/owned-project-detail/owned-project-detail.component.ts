@@ -24,7 +24,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { NameDialogComponent } from '../../../../modules/name-dialog/name-dialog.component';
 
 @Component({
-  selector: 'app-owned-project-detail',
+  selector: 'cnsl-owned-project-detail',
   templateUrl: './owned-project-detail.component.html',
   styleUrls: ['./owned-project-detail.component.scss'],
 

@@ -1,4 +1,4 @@
-<app-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
+<cnsl-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
     [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
 
     <ng-container actions *ngIf="selection.hasValue()">
@@ -21,9 +21,9 @@
                 <td class="selection" mat-cell *matCellDef="let row">
                     <mat-checkbox [disabled]="!canWrite" color="primary" (click)="$event.stopPropagation()"
                         (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                        <app-avatar *ngIf="row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
+                        <cnsl-avatar *ngIf="row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
                             [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [avatarUrl]="row.avatarUrl|| ''" [forColor]="row?.preferredLoginName" [size]="32">
-                        </app-avatar>
+                        </cnsl-avatar>
                         <ng-template #cog>
                             <div class="sa-icon">
                                 <i class="las la-user-cog"></i>
@@ -94,4 +94,4 @@
     <cnsl-paginator *ngIf="dataSource" class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [pageSize]="INITIALPAGESIZE"
         [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
     </cnsl-paginator>
-</app-refresh-table>
+</cnsl-refresh-table>

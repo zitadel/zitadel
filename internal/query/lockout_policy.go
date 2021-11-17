@@ -26,7 +26,49 @@ type LockoutPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) MyLockoutPolicy(ctx context.Context, orgID string) (*LockoutPolicy, error) {
+var (
+	lockoutTable = table{
+		name: projection.LockoutPolicyTable,
+	}
+	LockoutColID = Column{
+		name:  projection.LockoutPolicyIDCol,
+		table: lockoutTable,
+	}
+	LockoutColSequence = Column{
+		name:  projection.LockoutPolicySequenceCol,
+		table: lockoutTable,
+	}
+	LockoutColCreationDate = Column{
+		name:  projection.LockoutPolicyCreationDateCol,
+		table: lockoutTable,
+	}
+	LockoutColChangeDate = Column{
+		name:  projection.LockoutPolicyChangeDateCol,
+		table: lockoutTable,
+	}
+	LockoutColResourceOwner = Column{
+		name:  projection.LockoutPolicyResourceOwnerCol,
+		table: lockoutTable,
+	}
+	LockoutColShowFailures = Column{
+		name:  projection.LockoutPolicyShowLockOutFailuresCol,
+		table: lockoutTable,
+	}
+	LockoutColMaxPasswordAttempts = Column{
+		name:  projection.LockoutPolicyMaxPasswordAttemptsCol,
+		table: lockoutTable,
+	}
+	LockoutColIsDefault = Column{
+		name:  projection.LockoutPolicyIsDefaultCol,
+		table: lockoutTable,
+	}
+	LockoutColState = Column{
+		name:  projection.LockoutPolicyStateCol,
+		table: lockoutTable,
+	}
+)
+
+func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*LockoutPolicy, error) {
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -40,7 +82,7 @@ func (q *Queries) MyLockoutPolicy(ctx context.Context, orgID string) (*LockoutPo
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -55,45 +97,12 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, err
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	lockoutTable = table{
-		name: projection.LockoutPolicyTable,
-	}
-	LockoutColID = Column{
-		name: projection.LockoutPolicyIDCol,
-	}
-	LockoutColSequence = Column{
-		name: projection.LockoutPolicySequenceCol,
-	}
-	LockoutColCreationDate = Column{
-		name: projection.LockoutPolicyCreationDateCol,
-	}
-	LockoutColChangeDate = Column{
-		name: projection.LockoutPolicyChangeDateCol,
-	}
-	LockoutColResourceOwner = Column{
-		name: projection.LockoutPolicyResourceOwnerCol,
-	}
-	LockoutColShowFailures = Column{
-		name: projection.LockoutPolicyShowLockOutFailuresCol,
-	}
-	LockoutColMaxPasswordAttempts = Column{
-		name: projection.LockoutPolicyMaxPasswordAttemptsCol,
-	}
-	LockoutColIsDefault = Column{
-		name: projection.LockoutPolicyIsDefaultCol,
-	}
-	LockoutColState = Column{
-		name: projection.LockoutPolicyStateCol,
-	}
-)
 
 func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPolicy, error)) {
 	return sq.Select(
@@ -123,9 +132,9 @@ func prepareLockoutPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LockoutPoli
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "errors.policy.password.complexity.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.PasswordComplexityPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}

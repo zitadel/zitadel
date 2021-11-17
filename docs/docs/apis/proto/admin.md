@@ -1433,7 +1433,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy |  |
 
 
 
@@ -2563,6 +2563,7 @@ This is an empty request
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
+| actions |  bool | - |  |
 
 
 
@@ -2752,6 +2753,7 @@ This is an empty request
 | custom_text_message |  bool | - |  |
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
+| actions |  bool | - |  |
 
 
 

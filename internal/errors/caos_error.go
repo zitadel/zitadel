@@ -58,6 +58,10 @@ func (err *CaosError) Is(target error) bool {
 }
 
 func (err *CaosError) As(target interface{}) bool {
+	_, ok := target.(**CaosError)
+	if !ok {
+		return false
+	}
 	reflect.Indirect(reflect.ValueOf(target)).Set(reflect.ValueOf(err))
 	return true
 }

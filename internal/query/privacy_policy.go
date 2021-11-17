@@ -26,7 +26,49 @@ type PrivacyPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) MyPrivacyPolicy(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
+var (
+	privacyTable = table{
+		name: projection.PrivacyPolicyTable,
+	}
+	PrivacyColID = Column{
+		name:  projection.PrivacyPolicyIDCol,
+		table: privacyTable,
+	}
+	PrivacyColSequence = Column{
+		name:  projection.PrivacyPolicySequenceCol,
+		table: privacyTable,
+	}
+	PrivacyColCreationDate = Column{
+		name:  projection.PrivacyPolicyCreationDateCol,
+		table: privacyTable,
+	}
+	PrivacyColChangeDate = Column{
+		name:  projection.PrivacyPolicyChangeDateCol,
+		table: privacyTable,
+	}
+	PrivacyColResourceOwner = Column{
+		name:  projection.PrivacyPolicyResourceOwnerCol,
+		table: privacyTable,
+	}
+	PrivacyColPrivacyLink = Column{
+		name:  projection.PrivacyPolicyPrivacyLinkCol,
+		table: privacyTable,
+	}
+	PrivacyColTOSLink = Column{
+		name:  projection.PrivacyPolicyTOSLinkCol,
+		table: privacyTable,
+	}
+	PrivacyColIsDefault = Column{
+		name:  projection.PrivacyPolicyIsDefaultCol,
+		table: privacyTable,
+	}
+	PrivacyColState = Column{
+		name:  projection.PrivacyPolicyStateCol,
+		table: privacyTable,
+	}
+)
+
+func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -40,7 +82,7 @@ func (q *Queries) MyPrivacyPolicy(ctx context.Context, orgID string) (*PrivacyPo
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-UXuPI", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-UXuPI", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -55,45 +97,12 @@ func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, err
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-LkFZ7", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-LkFZ7", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	privacyTable = table{
-		name: projection.PrivacyPolicyTable,
-	}
-	PrivacyColID = Column{
-		name: projection.PrivacyPolicyIDCol,
-	}
-	PrivacyColSequence = Column{
-		name: projection.PrivacyPolicySequenceCol,
-	}
-	PrivacyColCreationDate = Column{
-		name: projection.PrivacyPolicyCreationDateCol,
-	}
-	PrivacyColChangeDate = Column{
-		name: projection.PrivacyPolicyChangeDateCol,
-	}
-	PrivacyColResourceOwner = Column{
-		name: projection.PrivacyPolicyResourceOwnerCol,
-	}
-	PrivacyColPrivacyLink = Column{
-		name: projection.PrivacyPolicyPrivacyLinkCol,
-	}
-	PrivacyColTOSLink = Column{
-		name: projection.PrivacyPolicyTOSLinkCol,
-	}
-	PrivacyColIsDefault = Column{
-		name: projection.PrivacyPolicyIsDefaultCol,
-	}
-	PrivacyColState = Column{
-		name: projection.PrivacyPolicyStateCol,
-	}
-)
 
 func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPolicy, error)) {
 	return sq.Select(
@@ -123,9 +132,9 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-vNMHL", "errors.policy.privacy.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-vNMHL", "Errors.PrivacyPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-csrdo", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-csrdo", "Errors.Internal")
 			}
 			return policy, nil
 		}

@@ -10,44 +10,37 @@ import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
+
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
-import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
-
 @Component({
-  selector: 'app-root',
+  selector: 'cnsl-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  animations: [
-    toolbarAnimation,
-    ...navAnimations,
-    accountCard,
-    routeAnimations,
-    adminLineAnimation,
-  ],
+  animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
 })
 export class AppComponent implements OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
   @ViewChild('input', { static: false }) input!: ElementRef;
-  public isHandset$: Observable<boolean> = this.breakpointObserver
-    .observe('(max-width: 599px)')
-    .pipe(map(result => {
+  public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
+    map((result) => {
       return result.matches;
-    }));
+    }),
+  );
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
   public showAccount: boolean = false;
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
-  public user!: User.AsObject;
+  // public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
@@ -78,9 +71,18 @@ export class AppComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
   ) {
-    console.log('%cWait!', 'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px');
-    console.log('%cInserting something here could give attackers access to your zitadel account.', 'color: red; font-size: 18px');
-    console.log('%cIf you don\'t know exactly what you\'re doing, close the window and stay on the safe side', 'font-size: 16px');
+    console.log(
+      '%cWait!',
+      'text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black; color: #5469D4; font-size: 50px',
+    );
+    console.log(
+      '%cInserting something here could give attackers access to your zitadel account.',
+      'color: red; font-size: 18px',
+    );
+    console.log(
+      "%cIf you don't know exactly what you're doing, close the window and stay on the safe side",
+      'font-size: 16px',
+    );
     console.log('%cIf you know exactly what you are doing, you should work for us', 'font-size: 16px');
     this.setLanguage();
 
@@ -109,10 +111,7 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lightbulb-off-outline.svg'),
     );
 
-    this.matIconRegistry.addSvgIcon(
-      'mdi_radar',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/radar.svg'),
-    );
+    this.matIconRegistry.addSvgIcon('mdi_radar', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/radar.svg'));
 
     this.matIconRegistry.addSvgIcon(
       'mdi_lock_question',
@@ -129,20 +128,14 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/lock-reset.svg'),
     );
 
-    this.matIconRegistry.addSvgIcon(
-      'mdi_broom',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/broom.svg'),
-    );
+    this.matIconRegistry.addSvgIcon('mdi_broom', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/broom.svg'));
 
     this.matIconRegistry.addSvgIcon(
       'mdi_pin_outline',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin-outline.svg'),
     );
 
-    this.matIconRegistry.addSvgIcon(
-      'mdi_pin',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'),
-    );
+    this.matIconRegistry.addSvgIcon('mdi_pin', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/pin.svg'));
 
     this.matIconRegistry.addSvgIcon(
       'mdi_format-letter-case-lower',
@@ -159,44 +152,50 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/counter.svg'),
     );
 
-    this.matIconRegistry.addSvgIcon(
-      'mdi_symbol',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'),
-    );
+    this.matIconRegistry.addSvgIcon('mdi_openid', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/openid.svg'));
+
+    this.matIconRegistry.addSvgIcon('mdi_jwt', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/jwt.svg'));
+
+    this.matIconRegistry.addSvgIcon('mdi_symbol', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/symbol.svg'));
 
     this.matIconRegistry.addSvgIcon(
       'mdi_numeric',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/numeric.svg'),
     );
 
+    this.matIconRegistry.addSvgIcon('mdi_api', this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'));
+
     this.matIconRegistry.addSvgIcon(
-      'mdi_api',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/api.svg'),
+      'mdi_arrow_right_bottom',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-right-bottom.svg'),
     );
 
-    this.activatedRoute.queryParams
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(route => {
-        const { org } = route;
-        if (org) {
-          this.authService.getActiveOrg(org).then(queriedOrg => {
-            this.org = queriedOrg;
-          });
-        }
-      });
+    this.matIconRegistry.addSvgIcon(
+      'mdi_arrow_decision',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
+    );
+
+    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
+      const { org } = route;
+      if (org) {
+        this.authService.getActiveOrg(org).then((queriedOrg) => {
+          this.org = queriedOrg;
+        });
+      }
+    });
 
     this.loadPrivateLabelling();
 
     this.getProjectCount();
 
-    this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe(org => {
+    this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
       this.org = org;
       this.getProjectCount();
     });
 
     this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
       if (authenticated) {
-        this.authService.getActiveOrg().then(org => {
+        this.authService.getActiveOrg().then((org) => {
           this.org = org;
         });
       }
@@ -209,17 +208,15 @@ export class AppComponent implements OnDestroy {
     }
 
     this.isDarkTheme = this.themeService.isDarkTheme;
-    this.isDarkTheme.subscribe(dark => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
+    this.isDarkTheme.subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
 
     this.translate.onLangChange.subscribe((language: LangChangeEvent) => {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
 
-    this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe(value => {
-      this.loadOrgs(
-        value.trim().toLowerCase(),
-      );
+    this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+      this.loadOrgs(value.trim().toLowerCase());
     });
 
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
@@ -260,7 +257,7 @@ export class AppComponent implements OnDestroy {
 
     setDefaultColors();
 
-    this.mgmtService.getLabelPolicy().then(labelpolicy => {
+    this.mgmtService.getLabelPolicy().then((labelpolicy) => {
       if (labelpolicy.policy) {
         this.labelpolicy = labelpolicy.policy;
 
@@ -286,8 +283,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public loadPolicies(): void {
-    this.mgmtService.getPrivacyPolicy().then(privacypolicy => {
-
+    this.mgmtService.getPrivacyPolicy().then((privacypolicy) => {
       if (privacypolicy.policy) {
         this.privacyPolicy = privacypolicy.policy;
       }
@@ -306,7 +302,7 @@ export class AppComponent implements OnDestroy {
 
     this.orgLoading$.next(true);
     this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
-      map(resp => {
+      map((resp) => {
         return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
       }),
       catchError(() => of([])),
@@ -337,16 +333,15 @@ export class AppComponent implements OnDestroy {
     this.translate.addLangs(['en', 'de']);
     this.translate.setDefaultLang('en');
 
-    this.authService.user.subscribe(userprofile => {
+    this.authService.user.subscribe((userprofile) => {
       if (userprofile) {
-        this.user = userprofile;
+        // this.user = userprofile;
         const cropped = navigator.language.split('-')[0] ?? 'en';
-        const fallbackLang = cropped.match(/en|de/) ? cropped : 'en';
+        const fallbackLang = cropped.match(/en|de|it/) ? cropped : 'en';
 
-        const lang =
-          userprofile?.human?.profile?.preferredLanguage.match(/en|de/) ?
-            userprofile.human.profile?.preferredLanguage :
-            fallbackLang;
+        const lang = userprofile?.human?.profile?.preferredLanguage.match(/en|de|it/)
+          ? userprofile.human.profile?.preferredLanguage
+          : fallbackLang;
         this.translate.use(lang);
         this.language = lang;
         this.document.documentElement.lang = lang;
@@ -378,4 +373,3 @@ export class AppComponent implements OnDestroy {
     }, 0);
   }
 }
-

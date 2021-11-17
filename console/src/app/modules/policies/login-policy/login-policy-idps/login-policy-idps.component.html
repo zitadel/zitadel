@@ -1,0 +1,18 @@
+<div class="idps">
+  <div class="idp mat-elevation-z1" *ngFor="let idp of idps">
+    <img src="../../../assets/images/google.png" *ngIf="idp.idpName.toLowerCase() === 'google'" alt="google" />
+    <div>
+      <span class="name">{{idp.idpName}}</span>
+      <span class="meta-info">{{ 'IDP.TYPES.'+idp.idpType | translate }}</span>
+      <!-- <span class="meta-info">{{ 'IDP.ID' | translate }}: {{idp.idpId}}</span> -->
+    </div>
+    <span class="fill-space"></span>
+    <button color="warn" *ngIf="!disabled" mat-icon-button (click)="removeIdp(idp)" class="rm">
+      <mat-icon matTooltip="{{'ACTIONS.REMOVE' | translate}}">remove_circle</mat-icon>
+    </button>
+  </div>
+  <button mat-raised-button color="primary" [disabled]="disabled" class="new-idp" (click)="openDialog()">
+    <span>{{'IDP.ADD' | translate}}</span>
+    <mat-icon class="icon">add</mat-icon>
+  </button>
+</div>

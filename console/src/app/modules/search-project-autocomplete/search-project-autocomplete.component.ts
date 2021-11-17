@@ -17,7 +17,7 @@ export enum ProjectAutocompleteType {
 }
 
 @Component({
-  selector: 'app-search-project-autocomplete',
+  selector: 'cnsl-search-project-autocomplete',
   templateUrl: './search-project-autocomplete.component.html',
   styleUrls: ['./search-project-autocomplete.component.scss'],
 })
@@ -95,9 +95,9 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
     this.unsubscribed$.next();
   }
 
-  public displayFn(project?: any): string | undefined {
+  public displayFn(project?: any): string {
     return (project && project.projectName) ? `${project.projectName}` :
-      (project && project.name) ? `${project.name}` : undefined;
+      (project && project.name) ? `${project.name}` : '';
   }
 
   public add(event: MatChipInputEvent): void {
@@ -111,6 +111,8 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
             return project.projectName === value;
           } else if (project?.name) {
             return project.name === value;
+          } else {
+            return false;
           }
         });
         if (index > -1) {

@@ -26,7 +26,49 @@ type PasswordAgePolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) MyPasswordAgePolicy(ctx context.Context, orgID string) (*PasswordAgePolicy, error) {
+var (
+	passwordAgeTable = table{
+		name: projection.PasswordAgeTable,
+	}
+	PasswordAgeColID = Column{
+		name:  projection.AgePolicyIDCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColSequence = Column{
+		name:  projection.AgePolicySequenceCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColCreationDate = Column{
+		name:  projection.AgePolicyCreationDateCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColChangeDate = Column{
+		name:  projection.AgePolicyChangeDateCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColResourceOwner = Column{
+		name:  projection.AgePolicyResourceOwnerCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColWarnDays = Column{
+		name:  projection.AgePolicyExpireWarnDaysCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColMaxAge = Column{
+		name:  projection.AgePolicyMaxAgeDaysCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColIsDefault = Column{
+		name:  projection.AgePolicyIsDefaultCol,
+		table: passwordAgeTable,
+	}
+	PasswordAgeColState = Column{
+		name:  projection.AgePolicyStateCol,
+		table: passwordAgeTable,
+	}
+)
+
+func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*PasswordAgePolicy, error) {
 	stmt, scan := preparePasswordAgePolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -40,7 +82,7 @@ func (q *Queries) MyPasswordAgePolicy(ctx context.Context, orgID string) (*Passw
 		OrderBy(PasswordAgeColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-SKR6X", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -55,45 +97,12 @@ func (q *Queries) DefaultPasswordAgePolicy(ctx context.Context) (*PasswordAgePol
 		OrderBy(PasswordAgeColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-mN0Ci", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	passwordAgeTable = table{
-		name: projection.PasswordAgeTable,
-	}
-	PasswordAgeColID = Column{
-		name: projection.AgePolicyIDCol,
-	}
-	PasswordAgeColSequence = Column{
-		name: projection.AgePolicySequenceCol,
-	}
-	PasswordAgeColCreationDate = Column{
-		name: projection.AgePolicyCreationDateCol,
-	}
-	PasswordAgeColChangeDate = Column{
-		name: projection.AgePolicyChangeDateCol,
-	}
-	PasswordAgeColResourceOwner = Column{
-		name: projection.AgePolicyResourceOwnerCol,
-	}
-	PasswordAgeColWarnDays = Column{
-		name: projection.AgePolicyExpireWarnDaysCol,
-	}
-	PasswordAgeColMaxAge = Column{
-		name: projection.AgePolicyMaxAgeDaysCol,
-	}
-	PasswordAgeColIsDefault = Column{
-		name: projection.AgePolicyIsDefaultCol,
-	}
-	PasswordAgeColState = Column{
-		name: projection.AgePolicyStateCol,
-	}
-)
 
 func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PasswordAgePolicy, error)) {
 	return sq.Select(
@@ -123,9 +132,9 @@ func preparePasswordAgePolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*Passwor
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "errors.policy.password.complexity.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-63mtI", "Errors.Org.PasswordComplexity.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-uulCZ", "Errors.Internal")
 			}
 			return policy, nil
 		}

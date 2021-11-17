@@ -25,7 +25,45 @@ type OrgIAMPolicy struct {
 	IsDefault bool
 }
 
-func (q *Queries) MyOrgIAMPolicy(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
+var (
+	orgIAMTable = table{
+		name: projection.OrgIAMPolicyTable,
+	}
+	OrgIAMColID = Column{
+		name:  projection.OrgIAMPolicyIDCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColSequence = Column{
+		name:  projection.OrgIAMPolicySequenceCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColCreationDate = Column{
+		name:  projection.OrgIAMPolicyCreationDateCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColChangeDate = Column{
+		name:  projection.OrgIAMPolicyChangeDateCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColResourceOwner = Column{
+		name:  projection.OrgIAMPolicyResourceOwnerCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColUserLoginMustBeDomain = Column{
+		name:  projection.OrgIAMPolicyUserLoginMustBeDomainCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColIsDefault = Column{
+		name:  projection.OrgIAMPolicyIsDefaultCol,
+		table: orgIAMTable,
+	}
+	OrgIAMColState = Column{
+		name:  projection.OrgIAMPolicyStateCol,
+		table: orgIAMTable,
+	}
+)
+
+func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
@@ -39,7 +77,7 @@ func (q *Queries) MyOrgIAMPolicy(ctx context.Context, orgID string) (*OrgIAMPoli
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-D3CqT", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -54,42 +92,12 @@ func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-pM7lP", "unable to create sql stmt")
+		return nil, errors.ThrowInternal(err, "QUERY-pM7lP", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
 }
-
-var (
-	orgIAMTable = table{
-		name: projection.OrgIAMPolicyTable,
-	}
-	OrgIAMColID = Column{
-		name: projection.OrgIAMPolicyIDCol,
-	}
-	OrgIAMColSequence = Column{
-		name: projection.OrgIAMPolicySequenceCol,
-	}
-	OrgIAMColCreationDate = Column{
-		name: projection.OrgIAMPolicyCreationDateCol,
-	}
-	OrgIAMColChangeDate = Column{
-		name: projection.OrgIAMPolicyChangeDateCol,
-	}
-	OrgIAMColResourceOwner = Column{
-		name: projection.OrgIAMPolicyResourceOwnerCol,
-	}
-	OrgIAMColUserLoginMustBeDomain = Column{
-		name: projection.OrgIAMPolicyUserLoginMustBeDomainCol,
-	}
-	OrgIAMColIsDefault = Column{
-		name: projection.OrgIAMPolicyIsDefaultCol,
-	}
-	OrgIAMColState = Column{
-		name: projection.OrgIAMPolicyStateCol,
-	}
-)
 
 func prepareOrgIAMPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgIAMPolicy, error)) {
 	return sq.Select(
@@ -117,9 +125,9 @@ func prepareOrgIAMPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*OrgIAMPolicy
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-K0Jr5", "errors.policy.org_iam.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-K0Jr5", "Errors.OrgIAMPolicy.NotFound")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-rIy6j", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-rIy6j", "Errors.Internal")
 			}
 			return policy, nil
 		}

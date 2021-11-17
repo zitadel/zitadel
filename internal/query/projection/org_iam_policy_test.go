@@ -38,7 +38,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgIAMPolicyTable,
+				projection:       OrgIAMPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -74,7 +74,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgIAMPolicyTable,
+				projection:       OrgIAMPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -104,7 +104,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgIAMPolicyTable,
+				projection:       OrgIAMPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -133,7 +133,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgIAMPolicyTable,
+				projection:       OrgIAMPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
@@ -169,7 +169,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
-				projectionName:   OrgIAMPolicyTable,
+				projection:       OrgIAMPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{

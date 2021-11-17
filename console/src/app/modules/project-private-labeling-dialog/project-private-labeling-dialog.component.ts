@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PrivateLabelingSetting } from 'src/app/proto/generated/zitadel/project_pb';
 
 @Component({
-  selector: 'app-project-private-labeling-dialog',
+  selector: 'cnsl-project-private-labeling-dialog',
   templateUrl: './project-private-labeling-dialog.component.html',
   styleUrls: ['./project-private-labeling-dialog.component.scss'],
 })

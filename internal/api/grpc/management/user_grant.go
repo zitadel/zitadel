@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
@@ -37,7 +38,11 @@ func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantR
 }
 
 func (s *Server) AddUserGrant(ctx context.Context, req *mgmt_pb.AddUserGrantRequest) (*mgmt_pb.AddUserGrantResponse, error) {
-	grant, err := s.command.AddUserGrant(ctx, AddUserGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	grant := AddUserGrantRequestToDomain(req)
+	if err := checkExplicitProjectPermission(ctx, grant.ProjectGrantID, grant.ProjectID); err != nil {
+		return nil, err
+	}
+	grant, err := s.command.AddUserGrant(ctx, grant, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}

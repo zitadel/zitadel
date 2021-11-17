@@ -2,10 +2,10 @@ package idpconfig
 
 import (
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -232,7 +232,7 @@ type IDPConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	ConfigID string `json:"idpConfigId"`
-	Name     string
+	name     string
 }
 
 func NewIDPConfigRemovedEvent(
@@ -244,7 +244,7 @@ func NewIDPConfigRemovedEvent(
 	return &IDPConfigRemovedEvent{
 		BaseEvent: *base,
 		ConfigID:  configID,
-		Name:      name,
+		name:      name,
 	}
 }
 
@@ -253,7 +253,7 @@ func (e *IDPConfigRemovedEvent) Data() interface{} {
 }
 
 func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
+	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
 }
 
 func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {

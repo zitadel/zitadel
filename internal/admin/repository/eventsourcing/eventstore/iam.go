@@ -17,6 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/i18n"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -32,6 +33,7 @@ import (
 )
 
 type IAMRepository struct {
+	Query                               *query.Queries
 	Eventstore                          v1.Eventstore
 	SearchLimit                         uint64
 	View                                *admin_view.View
@@ -116,23 +118,6 @@ func (repo *IAMRepository) ExternalIDPsByIDPConfigID(ctx context.Context, idpCon
 	return model.ExternalIDPViewsToModel(externalIDPs), nil
 }
 
-func (repo *IAMRepository) ExternalIDPsByIDPConfigIDFromDefaultPolicy(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
-	policies, err := repo.View.AllDefaultLoginPolicies()
-	if err != nil {
-		return nil, err
-	}
-	resourceOwners := make([]string, len(policies))
-	for i, policy := range policies {
-		resourceOwners[i] = policy.AggregateID
-	}
-
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwners(idpConfigID, resourceOwners)
-	if err != nil {
-		return nil, err
-	}
-	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
 func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
 	err := request.EnsureLimit(repo.SearchLimit)
 	if err != nil {
@@ -155,32 +140,6 @@ func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *IAMRepository) GetDefaultLoginPolicy(ctx context.Context) (*iam_model.LoginPolicyView, error) {
-	policy, viewErr := repo.View.LoginPolicyByAggregateID(repo.SystemDefaults.IamID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if caos_errs.IsNotFound(viewErr) {
-		policy = new(iam_es_model.LoginPolicyView)
-	}
-
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-cmO9s", "Errors.IAM.LoginPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-2Mi8s").WithError(esErr).Debug("error retrieving new events")
-		return iam_es_model.LoginPolicyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_es_model.LoginPolicyViewToModel(policy), nil
-		}
-	}
-	return iam_es_model.LoginPolicyViewToModel(policy), nil
 }
 
 func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
@@ -206,28 +165,6 @@ func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, reques
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *IAMRepository) SearchDefaultSecondFactors(ctx context.Context) (*iam_model.SecondFactorsSearchResponse, error) {
-	policy, err := repo.GetDefaultLoginPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.SecondFactorsSearchResponse{
-		TotalResult: uint64(len(policy.SecondFactors)),
-		Result:      policy.SecondFactors,
-	}, nil
-}
-
-func (repo *IAMRepository) SearchDefaultMultiFactors(ctx context.Context) (*iam_model.MultiFactorsSearchResponse, error) {
-	policy, err := repo.GetDefaultLoginPolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &iam_model.MultiFactorsSearchResponse{
-		TotalResult: uint64(len(policy.MultiFactors)),
-		Result:      policy.MultiFactors,
-	}, nil
 }
 
 func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
@@ -257,7 +194,6 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	}
 	if err == nil {
 		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = result.Timestamp
 	}
 	return result, nil
 }

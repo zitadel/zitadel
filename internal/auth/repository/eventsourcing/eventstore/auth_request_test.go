@@ -15,8 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	proj_view_model "github.com/caos/zitadel/internal/project/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
@@ -144,10 +142,10 @@ type mockViewUser struct {
 }
 
 type mockLoginPolicy struct {
-	policy *iam_view_model.LoginPolicyView
+	policy *query.LoginPolicy
 }
 
-func (m *mockLoginPolicy) LoginPolicyByAggregateID(id string) (*iam_view_model.LoginPolicyView, error) {
+func (m *mockLoginPolicy) LoginPolicyByID(ctx context.Context, id string) (*query.LoginPolicy, error) {
 	return m.policy, nil
 }
 
@@ -155,7 +153,7 @@ type mockLockoutPolicy struct {
 	policy *query.LockoutPolicy
 }
 
-func (m *mockLockoutPolicy) MyLockoutPolicy(context.Context, string) (*query.LockoutPolicy, error) {
+func (m *mockLockoutPolicy) LockoutPolicyByOrg(context.Context, string) (*query.LockoutPolicy, error) {
 	return m.policy, nil
 }
 
@@ -712,7 +710,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userGrantProvider: &mockUserGrants{},
 				projectProvider:   &mockProject{},
 				loginPolicyProvider: &mockLoginPolicy{
-					policy: &iam_view_model.LoginPolicyView{},
+					policy: &query.LoginPolicy{},
 				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
@@ -1309,7 +1307,6 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		userSession *user_model.UserSessionView
 		request     *domain.AuthRequest
 		user        *user_model.UserView
-		policy      *iam_model.LoginPolicyView
 	}
 	tests := []struct {
 		name        string

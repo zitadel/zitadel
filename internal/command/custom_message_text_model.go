@@ -159,7 +159,7 @@ func (wm *CustomMessageTemplatesReadModel) Reduce() error {
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
 			if _, ok := wm.CustomMessageTemplate[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomMessageTemplate, e.Template)
+				delete(wm.CustomMessageTemplate, e.Template+e.Language.String())
 			}
 		}
 	}

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 @Component({
-  selector: 'app-home',
+  selector: 'cnsl-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })

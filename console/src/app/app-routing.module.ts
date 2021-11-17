@@ -26,7 +26,7 @@ const routes: Routes = [
             .then(m => m.GrantedProjectsModule),
         canActivate: [AuthGuard, RoleGuard],
         data: {
-            roles: ['project.read'],
+            roles: ['project.grant.read'],
         },
     },
     {
@@ -74,6 +74,14 @@ const routes: Routes = [
             roles: ['org.read'],
         },
     },
+    {
+      path: 'actions',
+      loadChildren: () => import('./pages/actions/actions.module').then(m => m.ActionsModule),
+      canActivate: [AuthGuard, RoleGuard],
+      data: {
+          roles: ['org.read'],
+      },
+  },
     {
         path: 'grants',
         loadChildren: () => import('./pages/grants/grants.module').then(m => m.GrantsModule),

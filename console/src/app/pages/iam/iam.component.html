@@ -1,4 +1,4 @@
-<app-meta-layout>
+<cnsl-meta-layout>
     <div class="enlarged-container">
         <h1 class="h1">{{'IAM.POLICIES.TITLE' | translate}}</h1>
         <p class="sub">{{'IAM.POLICIES.DESCRIPTION' | translate}} </p>
@@ -7,14 +7,14 @@
         <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
         <cnsl-zitadel-tier [features]="features" [iam]="true"></cnsl-zitadel-tier>
 
-        <app-policy-grid [type]="PolicyComponentServiceType.ADMIN"></app-policy-grid>
+        <cnsl-policy-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>
     </div>
 
     <div metainfo>
-        <app-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
+        <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
             [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
             description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
             (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
-        </app-contributors>
+        </cnsl-contributors>
     </div>
-</app-meta-layout>
+</cnsl-meta-layout>

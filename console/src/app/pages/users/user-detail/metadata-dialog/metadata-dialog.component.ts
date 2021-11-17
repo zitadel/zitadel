@@ -7,7 +7,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 
 @Component({
-  selector: 'app-metadata-dialog',
+  selector: 'cnsl-metadata-dialog',
   templateUrl: './metadata-dialog.component.html',
   styleUrls: ['./metadata-dialog.component.scss'],
 })

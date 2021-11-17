@@ -62,6 +62,17 @@ func (c *Commands) orgLoginPolicyWriteModelByID(ctx context.Context, orgID strin
 	return policyWriteModel, nil
 }
 
+func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain.LoginPolicy, error) {
+	policy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if policy.State == domain.PolicyStateActive {
+		return writeModelToLoginPolicy(&policy.LoginPolicyWriteModel), nil
+	}
+	return c.getDefaultLoginPolicy(ctx)
+}
+
 func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")
@@ -164,7 +175,14 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-9nf88", "Errors.Org.LoginPolicy.IDP.")
 	}
-	var err error
+	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-Ffgw2", "Errors.Org.LoginPolicy.NotFound")
+	}
+
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
@@ -194,15 +212,23 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-66m9s", "Errors.Org.LoginPolicy.IDP.Invalid")
 	}
+	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-GVDfe", "Errors.Org.LoginPolicy.NotFound")
+	}
+
 	idpModel := NewOrgIdentityProviderWriteModel(resourceOwner, idpProvider.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +250,7 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	return writeModelToObjectDetails(&idpModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.EventPusher {
+func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.EventPusher {
 	var events []eventstore.EventPusher
 	if cascade {
 		events = append(events, org.NewIdentityProviderCascadeRemovedEvent(ctx, orgAgg, idpConfigID))
@@ -233,7 +259,7 @@ func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg 
 	}
 
 	for _, idp := range cascadeExternalIDPs {
-		event, _, err := c.removeHumanExternalIDP(ctx, idp, true)
+		event, _, err := c.removeUserIDPLink(ctx, idp, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-n8RRf", "userid", idp.AggregateID, "idpconfigid", idp.IDPConfigID).WithError(err).Warn("could not cascade remove external idp")
 			continue

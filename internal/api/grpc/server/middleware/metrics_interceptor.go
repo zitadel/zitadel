@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
@@ -54,8 +55,8 @@ func RegisterMetrics(ctx context.Context, req interface{}, info *grpc.UnaryServe
 }
 
 func RegisterGrpcRequestCounter(ctx context.Context, info *grpc.UnaryServerInfo) {
-	var labels = map[string]interface{}{
-		GrpcMethod: info.FullMethod,
+	var labels = map[string]attribute.Value{
+		GrpcMethod: attribute.StringValue(info.FullMethod),
 	}
 	metrics.RegisterCounter(GrpcRequestCounter, GrpcRequestCounterDescription)
 	metrics.AddCount(ctx, GrpcRequestCounter, 1, labels)
@@ -68,9 +69,9 @@ func RegisterGrpcTotalRequestCounter(ctx context.Context) {
 
 func RegisterGrpcRequestCodeCounter(ctx context.Context, info *grpc.UnaryServerInfo, err error) {
 	statusCode := status.Code(err)
-	var labels = map[string]interface{}{
-		GrpcMethod: info.FullMethod,
-		ReturnCode: runtime.HTTPStatusFromCode(statusCode),
+	var labels = map[string]attribute.Value{
+		GrpcMethod: attribute.StringValue(info.FullMethod),
+		ReturnCode: attribute.IntValue(runtime.HTTPStatusFromCode(statusCode)),
 	}
 	metrics.RegisterCounter(GrpcStatusCodeCounter, GrpcStatusCodeCounterDescription)
 	metrics.AddCount(ctx, GrpcStatusCodeCounter, 1, labels)

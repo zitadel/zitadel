@@ -30,6 +30,7 @@ import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { HasFeatureModule } from './directives/has-feature/has-feature.module';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
@@ -80,10 +81,7 @@ const authConfig: AuthConfig = {
 };
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    SignedoutComponent,
-  ],
+  declarations: [AppComponent, SignedoutComponent],
   imports: [
     AppRoutingModule,
     CommonModule,
@@ -91,7 +89,12 @@ const authConfig: AuthConfig = {
     OverlayModule,
     OAuthModule.forRoot({
       resourceServer: {
-        allowedUrls: ['https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService', 'https://test.api.zitadel.caos.ch/oauth/v2/userinfo', 'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/', 'https://preview.api.zitadel.caos.ch'],
+        allowedUrls: [
+          'https://test.api.zitadel.caos.ch/caos.zitadel.auth.api.v1.AuthService',
+          'https://test.api.zitadel.caos.ch/oauth/v2/userinfo',
+          'https://test.api.zitadel.caos.ch/caos.zitadel.management.api.v1.ManagementService/',
+          'https://preview.api.zitadel.caos.ch',
+        ],
         sendAccessToken: true,
       },
     }),
@@ -116,6 +119,7 @@ const authConfig: AuthConfig = {
     InputModule,
     HasRolePipeModule,
     HasFeaturePipeModule,
+    HasFeatureModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatToolbarModule,
@@ -185,7 +189,6 @@ const authConfig: AuthConfig = {
   ],
   bootstrap: [AppComponent],
 })
-
 export class AppModule {
-  constructor() { }
+  constructor() {}
 }

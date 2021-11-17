@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -88,7 +89,16 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-9nf88", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
-	_, err := c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
+	existingPolicy := NewIAMLoginPolicyWriteModel()
+	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
+	}
+
+	_, err = c.getIAMIDPConfigByID(ctx, idpProvider.IDPConfigID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "IAM-m8fsd", "Errors.IDPConfig.NotExisting")
 	}
@@ -113,12 +123,21 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-66m9s", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
+	existingPolicy := NewIAMLoginPolicyWriteModel()
+	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
+	if err != nil {
+		return nil, err
+	}
+	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-Dfg4t", "Errors.IAM.LoginPolicy.NotFound")
+	}
+
 	idpModel := NewIAMIdentityProviderWriteModel(idpProvider.IDPConfigID)
-	err := c.eventstore.FilterToQueryReducer(ctx, idpModel)
+	err = c.eventstore.FilterToQueryReducer(ctx, idpModel)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +158,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	return writeModelToObjectDetails(&idpModel.IdentityProviderWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.EventPusher {
+func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.EventPusher {
 	var events []eventstore.EventPusher
 	if cascade {
 		events = append(events, iam_repo.NewIdentityProviderCascadeRemovedEvent(ctx, iamAgg, idpProvider.IDPConfigID))
@@ -148,7 +167,7 @@ func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	}
 
 	for _, idp := range cascadeExternalIDPs {
-		userEvent, _, err := c.removeHumanExternalIDP(ctx, idp, true)
+		userEvent, _, err := c.removeUserIDPLink(ctx, idp, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-4nfsf", "userid", idp.AggregateID, "idp-id", idp.IDPConfigID).WithError(err).Warn("could not cascade remove externalidp in remove provider from policy")
 			continue

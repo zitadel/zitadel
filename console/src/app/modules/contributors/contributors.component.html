@@ -1,45 +1,42 @@
 <div class="groups">
-    <span class="co-header">{{ title }}</span>
-    <span class="sub-header">{{ description }} {{'MEMBER.DOCSINFO' | translate}} <a
-            href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">ZITADEL Managers</a>.
-    </span>
-    <div class="people">
-        <div class="img-list" [@cardAnimation]="totalResult">
-            <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
-
-            <ng-container *ngIf="totalResult < 10; else compact">
-                <ng-container *ngFor="let member of membersSubject | async; index as i">
-                    <div @animate (click)="emitShowDetail()" class="avatar-circle"
-                        matTooltip="{{ member.displayName }} | {{member.rolesList?.join(' ')}}"
-                        [ngStyle]="{'z-index': 100 - i}">
-                        <app-avatar
-                            *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
-                            class="avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''" [forColor]="member?.userName"[forColor]="member?.preferredLoginName"
-                            [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
-                            [size]="32">
-                        </app-avatar>
-                        <ng-template #cog>
-                            <div class="sa-icon">
-                                <i class="las la-user-cog"></i>
-                            </div>
-                        </ng-template>
-                    </div>
-                </ng-container>
-            </ng-container>
-            <ng-template #compact>
-                <div (click)="emitShowDetail()" class="avatar-circle" matTooltip="Click to show detail">
-                    <span>{{totalResult}}</span>
-                </div>
+  <span class="co-header">{{ title }}</span>
+  <span class="sub-header">{{ description }} {{'MEMBER.DOCSINFO' | translate}} <a
+      href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">ZITADEL Managers</a>.
+  </span>
+  <div class="people">
+    <div class="img-list" [@cardAnimation]="totalResult">
+      <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
+      <ng-container *ngIf="totalResult < 10; else compact">
+        <ng-container *ngFor="let member of membersSubject | async; index as i">
+          <div @animate (click)="emitShowDetail()" class="avatar-circle"
+            matTooltip="{{ member.displayName }} | {{member.rolesList?.join(' ')}}" [ngStyle]="{'z-index': 100 - i}">
+            <cnsl-avatar *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
+              class="avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''"
+              [forColor]="member.preferredLoginName ?? 'A'"
+              [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)" [size]="32">
+            </cnsl-avatar>
+            <ng-template #cog>
+              <div class="sa-icon">
+                <i class="las la-user-cog"></i>
+              </div>
             </ng-template>
-            <button class="add-img" (click)="emitAddMember()" [disabled]="disabled" mat-icon-button
-                matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="Edit contributors">
-                <mat-icon>add</mat-icon>
-            </button>
-            <span class="fill-space"></span>
-            <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-img" (click)="emitRefresh()"
-                [disabled]="disabled" mat-icon-button aria-label="refresh contributors">
-                <mat-icon class="icon">refresh</mat-icon>
-            </button>
+          </div>
+        </ng-container>
+      </ng-container>
+      <ng-template #compact>
+        <div (click)="emitShowDetail()" class="avatar-circle" matTooltip="Click to show detail">
+          <span>{{totalResult}}</span>
         </div>
+      </ng-template>
+      <button class="add-img" (click)="emitAddMember()" [disabled]="disabled" mat-icon-button
+        matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="Edit contributors">
+        <mat-icon>add</mat-icon>
+      </button>
+      <span class="fill-space"></span>
+      <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-img" (click)="emitRefresh()" mat-icon-button
+        aria-label="refresh contributors">
+        <mat-icon class="icon">refresh</mat-icon>
+      </button>
     </div>
+  </div>
 </div>

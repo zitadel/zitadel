@@ -43,7 +43,7 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 const sqlPlaceholder = "?"
 
 type SearchQuery interface {
-	ToQuery(sq.SelectBuilder) sq.SelectBuilder
+	toQuery(sq.SelectBuilder) sq.SelectBuilder
 }
 
 type TextQuery struct {
@@ -72,7 +72,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 	}, nil
 }
 
-func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	where, args := q.comp()
 	return query.Where(where, args...)
 }
@@ -169,7 +169,7 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 	}, nil
 }
 
-func (q *NumberQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *NumberQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	where, args := q.comp()
 	return query.Where(where, args...)
 }
@@ -220,6 +220,77 @@ func NumberComparisonFromMethod(m domain.SearchMethod) NumberComparison {
 	}
 }
 
+type ListQuery struct {
+	Column  Column
+	List    []interface{}
+	Compare ListComparison
+}
+
+func NewListQuery(column Column, value []interface{}, compare ListComparison) (*ListQuery, error) {
+	if compare < 0 || compare >= listCompareMax {
+		return nil, ErrInvalidCompare
+	}
+	if column.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &ListQuery{
+		Column:  column,
+		List:    value,
+		Compare: compare,
+	}, nil
+}
+
+func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	where, args := q.comp()
+	return query.Where(where, args...)
+}
+
+func (s *ListQuery) comp() (interface{}, []interface{}) {
+	switch s.Compare {
+	case ListIn:
+		return sq.Eq{s.Column.identifier(): s.List}, nil
+	}
+	return nil, nil
+}
+
+type ListComparison int
+
+const (
+	ListIn ListComparison = iota
+
+	listCompareMax
+)
+
+func ListComparisonFromMethod(m domain.SearchMethod) ListComparison {
+	switch m {
+	case domain.SearchMethodEquals:
+		return ListIn
+	default:
+		return listCompareMax
+	}
+}
+
+type BoolQuery struct {
+	Column Column
+	Value  bool
+}
+
+func NewBoolQuery(c Column, value bool) (*BoolQuery, error) {
+	return &BoolQuery{
+		Column: c,
+		Value:  value,
+	}, nil
+}
+
+func (q *BoolQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	where, args := q.comp()
+	return query.Where(where, args...)
+}
+
+func (s *BoolQuery) comp() (comparison interface{}, args []interface{}) {
+	return sq.Eq{s.Column.identifier(): s.Value}, nil
+}
+
 var (
 	//countColumn represents the default counter for search responses
 	countColumn = Column{
@@ -258,10 +329,13 @@ type Column struct {
 }
 
 func (c Column) identifier() string {
-	if c.table.alias == "" {
-		return c.name
+	if c.table.alias != "" {
+		return c.table.alias + "." + c.name
 	}
-	return c.table.alias + "." + c.name
+	if c.table.name != "" {
+		return c.table.name + "." + c.name
+	}
+	return c.name
 }
 
 func (c Column) setTable(t table) Column {

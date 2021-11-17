@@ -76,7 +76,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.EventReader) (*hand
 		policyEvent = e.PasswordAgePolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-stxcL", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-stxcL", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-CJqF0", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -102,7 +102,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.EventReader) (*ha
 	case *iam.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-EZ53p", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventType}).Error("was not an  event")
+		logging.LogWithFields("PROJE-EZ53p", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-i7FZt", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{
@@ -126,7 +126,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.EventReader) (*ha
 func (p *PasswordAgeProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-iwqfN", "seq", event.Sequence(), "expectedType", org.PasswordAgePolicyRemovedEventType).Error("was not an  event")
+		logging.LogWithFields("PROJE-iwqfN", "seq", event.Sequence(), "expectedType", org.PasswordAgePolicyRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-EtHWB", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
