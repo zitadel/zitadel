@@ -124,7 +124,7 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
 	if token.ApplicationID != "" {
-		app, err := o.query.AppByID(ctx, token.ApplicationID)
+		app, err := o.query.AppByOIDCClientID(ctx, token.ApplicationID)
 		if err != nil {
 			return err
 		}

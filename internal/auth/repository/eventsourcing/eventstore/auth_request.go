@@ -118,7 +118,6 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	//DISCUSS: the 3 following calls refer to the query side but we are on the command side
 	project, err := repo.ProjectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
