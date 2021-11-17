@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -41,24 +40,15 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  user.HumanAddedType,
-					Reduce: p.reduceHumanAdded,
+					Reduce: p.reduceUserCreated,
 				},
 				{
 					Event:  user.HumanRegisteredType,
-					Reduce: p.reduceHumanRegistered,
+					Reduce: p.reduceUserCreated,
 				},
-				{
-					Event:  user.HumanEmailChangedType,
-					Reduce: p.reduceEmailChanged,
-				},
-				// {
-				// 	Event: user.HumanEmailVerifiedType,
-				// 	// Reduce: p.reduceEmailVerified,
-				// 	// email is changed as soon as the email changed
-				// },
 				{
 					Event:  user.MachineAddedEventType,
-					Reduce: p.reduceMachineAdded,
+					Reduce: p.reduceUserCreated,
 				},
 				{
 					Event:  user.UserRemovedType,
@@ -91,10 +81,6 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.OrgIAMPolicyRemovedEventType,
 					Reduce: p.reduceOrgIAMPolicyRemoved,
-				},
-				{
-					Event:  org.OrgDomainAddedEventType,
-					Reduce: p.reduceDomainAdded,
 				},
 				{
 					Event:  org.OrgDomainPrimarySetEventType,
@@ -132,14 +118,11 @@ const (
 	loginNameDomainSuffix = "domains"
 
 	LoginNameUserIDCol            = "id"
-	LoginNameUserTypeCol          = "type"
 	LoginNameUserUserNameCol      = "name"
-	LoginNameUserEmailCol         = "email"
 	LoginNameUserResourceOwnerCol = "resource_owner"
 
 	LoginNameDomainNameCol          = "name"
 	LoginNameDomainIsPrimaryCol     = "is_primary"
-	LoginNameDomainIsVerifiedCol    = "is_verified"
 	LoginNameDomainResourceOwnerCol = "resource_owner"
 
 	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
@@ -147,79 +130,27 @@ const (
 	LoginNamePoliciesResourceOwnerCol = "resource_owner"
 )
 
-func (p *LoginNameProjection) reduceHumanAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanAddedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", user.HumanAddedType).Error("wrong event type")
+func (p *LoginNameProjection) reduceUserCreated(event eventstore.EventReader) (*handler.Statement, error) {
+	var userName string
+
+	switch e := event.(type) {
+	case *user.HumanAddedEvent:
+		userName = e.UserName
+	case *user.HumanRegisteredEvent:
+		userName = e.UserName
+	case *user.MachineAddedEvent:
+		userName = e.UserName
+	default:
+		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanAddedType, user.HumanRegisteredType, user.MachineAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ayo69", "reduce.wrong.event.type")
 	}
 
 	return crdb.NewCreateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(LoginNameUserIDCol, e.Aggregate().ID),
-			handler.NewCol(LoginNameUserTypeCol, domain.UserTypeHuman),
-			handler.NewCol(LoginNameUserUserNameCol, e.UserName),
-			handler.NewCol(LoginNameUserEmailCol, e.EmailAddress),
-			handler.NewCol(LoginNameUserResourceOwnerCol, e.Aggregate().ResourceOwner),
-		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
-	), nil
-}
-
-func (p *LoginNameProjection) reduceHumanRegistered(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanRegisteredEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", user.HumanRegisteredType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-psrvi", "reduce.wrong.event.type")
-	}
-
-	return crdb.NewCreateStatement(
-		event,
-		[]handler.Column{
-			handler.NewCol(LoginNameUserIDCol, e.Aggregate().ID),
-			handler.NewCol(LoginNameUserTypeCol, domain.UserTypeHuman),
-			handler.NewCol(LoginNameUserUserNameCol, e.UserName),
-			handler.NewCol(LoginNameUserEmailCol, e.EmailAddress),
-			handler.NewCol(LoginNameUserResourceOwnerCol, e.Aggregate().ResourceOwner),
-		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
-	), nil
-}
-
-func (p *LoginNameProjection) reduceEmailChanged(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*user.HumanEmailChangedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", user.HumanEmailChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-kAeEo", "reduce.wrong.event.type")
-	}
-
-	return crdb.NewUpdateStatement(
-		event,
-		[]handler.Column{
-			handler.NewCol(LoginNameUserEmailCol, e.EmailAddress),
-		},
-		[]handler.Condition{
-			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
-		},
-		crdb.WithTableSuffix(loginNameUserSuffix),
-	), nil
-}
-
-func (p *LoginNameProjection) reduceMachineAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*user.MachineAddedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", user.MachineAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-65IL8", "reduce.wrong.event.type")
-	}
-
-	return crdb.NewCreateStatement(
-		event,
-		[]handler.Column{
-			handler.NewCol(LoginNameUserIDCol, e.Aggregate().ID),
-			handler.NewCol(LoginNameUserTypeCol, domain.UserTypeMachine),
-			handler.NewCol(LoginNameUserUserNameCol, e.UserName),
-			handler.NewCol(LoginNameUserResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(LoginNameUserIDCol, event.Aggregate().ID),
+			handler.NewCol(LoginNameUserUserNameCol, userName),
+			handler.NewCol(LoginNameUserResourceOwnerCol, event.Aggregate().ResourceOwner),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -353,11 +284,11 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyRemoved(event eventstore.EventRe
 	), nil
 }
 
-func (p *LoginNameProjection) reduceDomainAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*org.DomainAddedEvent)
+func (p *LoginNameProjection) reduceDomainVerified(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", org.OrgDomainAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-JKUlP", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", org.OrgDomainVerifiedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-weGAh", "reduce.wrong.event.type")
 	}
 
 	return crdb.NewCreateStatement(
@@ -385,6 +316,7 @@ func (p *LoginNameProjection) reducePrimaryDomainSet(event eventstore.EventReade
 			},
 			[]handler.Condition{
 				handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
+				handler.NewCond(LoginNameDomainIsPrimaryCol, true),
 			},
 			crdb.WithTableSuffix(loginNameUserSuffix),
 		),
@@ -410,26 +342,6 @@ func (p *LoginNameProjection) reduceDomainRemoved(event eventstore.EventReader) 
 
 	return crdb.NewDeleteStatement(
 		event,
-		[]handler.Condition{
-			handler.NewCond(LoginNameDomainNameCol, e.Domain),
-			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
-		},
-		crdb.WithTableSuffix(loginNameDomainSuffix),
-	), nil
-}
-
-func (p *LoginNameProjection) reduceDomainVerified(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*org.DomainVerifiedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", org.OrgDomainVerifiedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-weGAh", "reduce.wrong.event.type")
-	}
-
-	return crdb.NewUpdateStatement(
-		event,
-		[]handler.Column{
-			handler.NewCol(LoginNameDomainIsVerifiedCol, true),
-		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameDomainNameCol, e.Domain),
 			handler.NewCond(LoginNameDomainResourceOwnerCol, e.Aggregate().ID),
