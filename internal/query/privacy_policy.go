@@ -31,31 +31,40 @@ var (
 		name: projection.PrivacyPolicyTable,
 	}
 	PrivacyColID = Column{
-		name: projection.PrivacyPolicyIDCol,
+		name:  projection.PrivacyPolicyIDCol,
+		table: privacyTable,
 	}
 	PrivacyColSequence = Column{
-		name: projection.PrivacyPolicySequenceCol,
+		name:  projection.PrivacyPolicySequenceCol,
+		table: privacyTable,
 	}
 	PrivacyColCreationDate = Column{
-		name: projection.PrivacyPolicyCreationDateCol,
+		name:  projection.PrivacyPolicyCreationDateCol,
+		table: privacyTable,
 	}
 	PrivacyColChangeDate = Column{
-		name: projection.PrivacyPolicyChangeDateCol,
+		name:  projection.PrivacyPolicyChangeDateCol,
+		table: privacyTable,
 	}
 	PrivacyColResourceOwner = Column{
-		name: projection.PrivacyPolicyResourceOwnerCol,
+		name:  projection.PrivacyPolicyResourceOwnerCol,
+		table: privacyTable,
 	}
 	PrivacyColPrivacyLink = Column{
-		name: projection.PrivacyPolicyPrivacyLinkCol,
+		name:  projection.PrivacyPolicyPrivacyLinkCol,
+		table: privacyTable,
 	}
 	PrivacyColTOSLink = Column{
-		name: projection.PrivacyPolicyTOSLinkCol,
+		name:  projection.PrivacyPolicyTOSLinkCol,
+		table: privacyTable,
 	}
 	PrivacyColIsDefault = Column{
-		name: projection.PrivacyPolicyIsDefaultCol,
+		name:  projection.PrivacyPolicyIsDefaultCol,
+		table: privacyTable,
 	}
 	PrivacyColState = Column{
-		name: projection.PrivacyPolicyStateCol,
+		name:  projection.PrivacyPolicyStateCol,
+		table: privacyTable,
 	}
 )
 

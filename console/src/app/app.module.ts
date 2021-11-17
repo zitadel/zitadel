@@ -30,6 +30,7 @@ import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { HasFeatureModule } from './directives/has-feature/has-feature.module';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
@@ -118,6 +119,7 @@ const authConfig: AuthConfig = {
     InputModule,
     HasRolePipeModule,
     HasFeaturePipeModule,
+    HasFeatureModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatToolbarModule,

@@ -19,9 +19,13 @@ func ProjectViewsToPb(projects []*query.Project) []*proj_pb.Project {
 
 func ProjectViewToPb(project *query.Project) *proj_pb.Project {
 	return &proj_pb.Project{
-		Id:    project.ID,
-		State: projectStateToPb(project.State),
-		Name:  project.Name,
+		Id:                     project.ID,
+		State:                  projectStateToPb(project.State),
+		Name:                   project.Name,
+		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
+		HasProjectCheck:        project.HasProjectCheck,
+		ProjectRoleAssertion:   project.ProjectRoleAssertion,
+		ProjectRoleCheck:       project.ProjectRoleCheck,
 		Details: object.ToViewDetailsPb(
 			project.Sequence,
 			project.CreationDate,
