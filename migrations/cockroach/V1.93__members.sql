@@ -1,4 +1,4 @@
-CREATE TABLE test.projections.org_members (
+CREATE TABLE zitadel.projections.org_members (
     org_id STRING NOT NULL
     , user_id STRING NOT NULL
     , roles STRING[]
@@ -11,7 +11,7 @@ CREATE TABLE test.projections.org_members (
     , PRIMARY KEY (org_id, user_id)
 );
 
-CREATE TABLE test.projections.iam_members (
+CREATE TABLE zitadel.projections.iam_members (
     iam_id STRING NOT NULL
     , user_id STRING NOT NULL
     , roles STRING[]
@@ -24,7 +24,7 @@ CREATE TABLE test.projections.iam_members (
     , PRIMARY KEY (iam_id, user_id)
 );
 
-CREATE TABLE test.projections.project_members (
+CREATE TABLE zitadel.projections.project_members (
     project_id STRING NOT NULL
     , user_id STRING NOT NULL
     , roles STRING[]
