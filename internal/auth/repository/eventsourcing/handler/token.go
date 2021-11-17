@@ -7,7 +7,7 @@ import (
 	"github.com/caos/logging"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
@@ -15,6 +15,7 @@ import (
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	project_es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -111,6 +112,18 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		user_es_model.UserDeactivated,
 		user_es_model.UserRemoved:
 		return t.view.DeleteUserTokens(event.AggregateID, event)
+	case es_models.EventType(user_repo.UserTokenRemovedType):
+		id, err := tokenIDFromRemovedEvent(event)
+		if err != nil {
+			return err
+		}
+		return t.view.DeleteToken(id, event)
+	case es_models.EventType(user_repo.HumanRefreshTokenRemovedType):
+		id, err := refreshTokenIDFromRemovedEvent(event)
+		if err != nil {
+			return err
+		}
+		return t.view.DeleteTokensFromRefreshToken(id, event)
 	case project_es_model.ApplicationDeactivated,
 		project_es_model.ApplicationRemoved:
 		application, err := applicationFromSession(event)
@@ -155,6 +168,24 @@ func applicationFromSession(event *es_models.Event) (*project_es_model.Applicati
 		return nil, caos_errs.ThrowInternal(nil, "MODEL-Hrw1q", "could not unmarshal data")
 	}
 	return application, nil
+}
+
+func tokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
+	removed := make(map[string]interface{})
+	if err := json.Unmarshal(event.Data, &removed); err != nil {
+		logging.Log("EVEN-Sdff3").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(nil, "MODEL-Sff32", "could not unmarshal data")
+	}
+	return removed["tokenId"].(string), nil
+}
+
+func refreshTokenIDFromRemovedEvent(event *es_models.Event) (string, error) {
+	removed := make(map[string]interface{})
+	if err := json.Unmarshal(event.Data, &removed); err != nil {
+		logging.Log("EVEN-Ff23g").WithError(err).Error("could not unmarshal event data")
+		return "", caos_errs.ThrowInternal(nil, "MODEL-Dfb3w", "could not unmarshal data")
+	}
+	return removed["tokenId"].(string), nil
 }
 
 func (t *Token) OnSuccess() error {

@@ -67,7 +67,11 @@ func (wm *HumanRefreshTokenWriteModel) Reduce() error {
 			}
 			wm.RefreshToken = e.RefreshToken
 			wm.IdleExpiration = e.CreationDate().Add(e.IdleExpiration)
-		case *user.HumanRefreshTokenRemovedEvent:
+		case *user.HumanRefreshTokenRemovedEvent,
+			*user.HumanSignedOutEvent,
+			*user.UserLockedEvent,
+			*user.UserDeactivatedEvent,
+			*user.UserRemovedEvent:
 			wm.UserState = domain.UserStateDeleted
 		}
 	}
@@ -83,6 +87,9 @@ func (wm *HumanRefreshTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 			user.HumanRefreshTokenAddedType,
 			user.HumanRefreshTokenRenewedType,
 			user.HumanRefreshTokenRemovedType,
+			user.HumanSignedOutType,
+			user.UserLockedType,
+			user.UserDeactivatedType,
 			user.UserRemovedType).
 		Builder()
 

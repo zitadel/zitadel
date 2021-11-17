@@ -8,6 +8,7 @@ import (
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
+	user_repo "github.com/caos/zitadel/internal/repository/user"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 
@@ -15,12 +16,13 @@ import (
 )
 
 const (
-	TokenKeyTokenID       = "id"
-	TokenKeyUserID        = "user_id"
-	TokenKeyApplicationID = "application_id"
-	TokenKeyUserAgentID   = "user_agent_id"
-	TokenKeyExpiration    = "expiration"
-	TokenKeyResourceOwner = "resource_owner"
+	TokenKeyTokenID        = "id"
+	TokenKeyUserID         = "user_id"
+	TokenKeyRefreshTokenID = "refresh_token_id"
+	TokenKeyApplicationID  = "application_id"
+	TokenKeyUserAgentID    = "user_agent_id"
+	TokenKeyExpiration     = "expiration"
+	TokenKeyResourceOwner  = "resource_owner"
 )
 
 type TokenView struct {
@@ -36,24 +38,8 @@ type TokenView struct {
 	Expiration        time.Time      `json:"expiration" gorm:"column:expiration"`
 	Sequence          uint64         `json:"-" gorm:"column:sequence"`
 	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
+	RefreshTokenID    string         `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
 	Deactivated       bool           `json:"-" gorm:"-"`
-}
-
-func TokenViewFromModel(token *usr_model.TokenView) *TokenView {
-	return &TokenView{
-		ID:                token.ID,
-		CreationDate:      token.CreationDate,
-		ChangeDate:        token.ChangeDate,
-		ResourceOwner:     token.ResourceOwner,
-		UserID:            token.UserID,
-		ApplicationID:     token.ApplicationID,
-		UserAgentID:       token.UserAgentID,
-		Audience:          token.Audience,
-		Scopes:            token.Scopes,
-		Expiration:        token.Expiration,
-		Sequence:          token.Sequence,
-		PreferredLanguage: token.PreferredLanguage,
-	}
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {
@@ -70,6 +56,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 		Expiration:        token.Expiration,
 		Sequence:          token.Sequence,
 		PreferredLanguage: token.PreferredLanguage,
+		RefreshTokenID:    token.RefreshTokenID,
 	}
 }
 
@@ -79,6 +66,10 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 	case usr_es_model.UserTokenAdded:
 		view.setRootData(event)
 		err = view.setData(event)
+	case es_models.EventType(user_repo.UserTokenRemovedType):
+		return t.appendTokenRemoved(event)
+	case es_models.EventType(user_repo.HumanRefreshTokenRemovedType):
+		return t.appendRefreshTokenRemoved(event)
 	case usr_es_model.SignedOut,
 		usr_es_model.HumanSignedOut:
 		id, err := agentIDFromSession(event)
@@ -102,6 +93,9 @@ func (t *TokenView) AppendEventIfMyToken(event *es_models.Event) (err error) {
 		return nil
 	default:
 		return nil
+	}
+	if err != nil {
+		return err
 	}
 	if view.ID == t.ID {
 		return t.AppendEvent(event)
@@ -144,4 +138,35 @@ func agentIDFromSession(event *es_models.Event) (string, error) {
 		return "", caos_errs.ThrowInternal(nil, "MODEL-GBf32", "could not unmarshal data")
 	}
 	return session["userAgentID"].(string), nil
+}
+
+func (t *TokenView) appendTokenRemoved(event *es_models.Event) error {
+	token, err := eventToMap(event)
+	if err != nil {
+		return err
+	}
+	if token["tokenId"] == t.ID {
+		t.Deactivated = true
+	}
+	return nil
+}
+
+func (t *TokenView) appendRefreshTokenRemoved(event *es_models.Event) error {
+	refreshToken, err := eventToMap(event)
+	if err != nil {
+		return err
+	}
+	if refreshToken["tokenId"] == t.RefreshTokenID {
+		t.Deactivated = true
+	}
+	return nil
+}
+
+func eventToMap(event *es_models.Event) (map[string]interface{}, error) {
+	m := make(map[string]interface{})
+	if err := json.Unmarshal(event.Data, &m); err != nil {
+		logging.Log("EVEN-Dbffe").WithError(err).Error("could not unmarshal event data")
+		return nil, caos_errs.ThrowInternal(nil, "MODEL-SDAfw", "could not unmarshal data")
+	}
+	return m, nil
 }

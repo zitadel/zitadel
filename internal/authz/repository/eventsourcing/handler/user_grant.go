@@ -2,11 +2,12 @@ package handler
 
 import (
 	"context"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	"strings"
+
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"strings"
 
 	"github.com/caos/logging"
 
@@ -109,13 +110,19 @@ func (u *UserGrant) processProject(event *es_models.Event) (err error) {
 	case proj_es_model.ProjectMemberAdded, proj_es_model.ProjectMemberChanged,
 		proj_es_model.ProjectMemberRemoved, proj_es_model.ProjectMemberCascadeRemoved:
 		member := new(proj_es_model.ProjectMember)
-		member.SetData(event)
+		err := member.SetData(event)
+		if err != nil {
+			return err
+		}
 		return u.processMember(event, "PROJECT", event.AggregateID, member.UserID, member.Roles)
 	case proj_es_model.ProjectGrantMemberAdded, proj_es_model.ProjectGrantMemberChanged,
 		proj_es_model.ProjectGrantMemberRemoved,
 		proj_es_model.ProjectGrantMemberCascadeRemoved:
 		member := new(proj_es_model.ProjectGrantMember)
-		member.SetData(event)
+		err := member.SetData(event)
+		if err != nil {
+			return err
+		}
 		return u.processMember(event, "PROJECT_GRANT", member.GrantID, member.UserID, member.Roles)
 	default:
 		return u.view.ProcessedUserGrantSequence(event)
@@ -127,7 +134,10 @@ func (u *UserGrant) processOrg(event *es_models.Event) (err error) {
 	case org_es_model.OrgMemberAdded, org_es_model.OrgMemberChanged,
 		org_es_model.OrgMemberRemoved, org_es_model.OrgMemberCascadeRemoved:
 		member := new(org_es_model.OrgMember)
-		member.SetData(event)
+		err := member.SetData(event)
+		if err != nil {
+			return err
+		}
 		return u.processMember(event, "ORG", "", member.UserID, member.Roles)
 	default:
 		return u.view.ProcessedUserGrantSequence(event)

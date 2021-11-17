@@ -123,7 +123,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	return writeModelToIDPProvider(&idpModel.IdentityProviderWriteModel), nil
 }
 
-func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, idpProvider *domain.IDPProvider, cascadeExternalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	if !idpProvider.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-66m9s", "Errors.IAM.LoginPolicy.IDP.Invalid")
 	}
@@ -158,7 +158,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	return writeModelToObjectDetails(&idpModel.IdentityProviderWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.ExternalIDP) []eventstore.EventPusher {
+func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.EventPusher {
 	var events []eventstore.EventPusher
 	if cascade {
 		events = append(events, iam_repo.NewIdentityProviderCascadeRemovedEvent(ctx, iamAgg, idpProvider.IDPConfigID))
@@ -167,7 +167,7 @@ func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	}
 
 	for _, idp := range cascadeExternalIDPs {
-		userEvent, _, err := c.removeHumanExternalIDP(ctx, idp, true)
+		userEvent, _, err := c.removeUserIDPLink(ctx, idp, true)
 		if err != nil {
 			logging.LogWithFields("COMMAND-4nfsf", "userid", idp.AggregateID, "idp-id", idp.IDPConfigID).WithError(err).Warn("could not cascade remove externalidp in remove provider from policy")
 			continue

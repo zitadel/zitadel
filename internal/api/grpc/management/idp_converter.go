@@ -148,10 +148,10 @@ func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityPro
 	}
 }
 
-func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.ExternalIDP {
-	externalIDPs := make([]*domain.ExternalIDP, len(idps))
+func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.UserIDPLink {
+	externalIDPs := make([]*domain.UserIDPLink, len(idps))
 	for i, idp := range idps {
-		externalIDPs[i] = &domain.ExternalIDP{
+		externalIDPs[i] = &domain.UserIDPLink{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,

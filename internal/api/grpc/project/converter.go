@@ -19,9 +19,13 @@ func ProjectViewsToPb(projects []*query.Project) []*proj_pb.Project {
 
 func ProjectViewToPb(project *query.Project) *proj_pb.Project {
 	return &proj_pb.Project{
-		Id:    project.ID,
-		State: projectStateToPb(project.State),
-		Name:  project.Name,
+		Id:                     project.ID,
+		State:                  projectStateToPb(project.State),
+		Name:                   project.Name,
+		PrivateLabelingSetting: privateLabelingSettingToPb(project.PrivateLabelingSetting),
+		HasProjectCheck:        project.HasProjectCheck,
+		ProjectRoleAssertion:   project.ProjectRoleAssertion,
+		ProjectRoleCheck:       project.ProjectRoleCheck,
 		Details: object.ToViewDetailsPb(
 			project.Sequence,
 			project.CreationDate,
@@ -189,22 +193,5 @@ func RoleViewToPb(role *query.ProjectRole) *proj_pb.Role {
 			role.ChangeDate,
 			role.ResourceOwner,
 		),
-	}
-}
-
-func RolesToPb(roles []*proj_model.ProjectRoleView) []*proj_pb.Role {
-	r := make([]*proj_pb.Role, len(roles))
-	for i, role := range roles {
-		r[i] = RoleToPb(role)
-	}
-	return r
-}
-
-func RoleToPb(role *proj_model.ProjectRoleView) *proj_pb.Role {
-	return &proj_pb.Role{
-		Key:         role.Key,
-		Details:     object.ToViewDetailsPb(role.Sequence, role.CreationDate, role.ChangeDate, role.ResourceOwner),
-		DisplayName: role.DisplayName,
-		Group:       role.Group,
 	}
 }

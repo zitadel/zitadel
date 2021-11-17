@@ -87,7 +87,7 @@ type userEventProvider interface {
 }
 
 type userCommandProvider interface {
-	BulkAddedHumanExternalIDP(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.ExternalIDP) error
+	BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.UserIDPLink) error
 }
 
 type orgViewProvider interface {
@@ -135,6 +135,10 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if request.LoginHint != "" {
 		err = repo.checkLoginName(ctx, request, request.LoginHint)
 		logging.LogWithFields("EVENT-aG311", "login name", request.LoginHint, "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("login hint invalid")
+	}
+	if request.UserID == "" && request.LoginHint == "" && domain.IsPrompt(request.Prompt, domain.PromptNone) {
+		err = repo.tryUsingOnlyUserSession(request)
+		logging.LogWithFields("EVENT-SDf3g", "id", request.ID, "applicationID", request.ApplicationID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Debug("unable to select only user session")
 	}
 
 	err = repo.AuthRequests.SaveAuthRequest(ctx, request)
@@ -238,7 +242,7 @@ func (repo *AuthRequestRepo) CheckExternalUserLogin(ctx context.Context, authReq
 		return err
 	}
 
-	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
+	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -404,7 +408,7 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 	if err != nil {
 		return err
 	}
-	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
+	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -422,7 +426,7 @@ func (repo *AuthRequestRepo) ResetLinkingUsers(ctx context.Context, authReqID, u
 	return repo.AuthRequests.UpdateAuthRequest(ctx, request)
 }
 
-func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.ExternalIDP, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) (err error) {
+func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, registerUser *domain.Human, externalIDP *domain.UserIDPLink, orgMemberRoles []string, authReqID, userAgentID, resourceOwner string, metadatas []*domain.Metadata, info *domain.BrowserInfo) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	request, err := repo.getAuthRequest(ctx, authReqID, userAgentID)
@@ -437,7 +441,7 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	request.UserOrgID = human.ResourceOwner
 	request.SelectedIDPConfigID = externalIDP.IDPConfigID
 	request.LinkingUsers = nil
-	err = repo.Command.HumanExternalLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
+	err = repo.Command.UserIDPLoginChecked(ctx, request.UserOrgID, request.UserID, request.WithCurrentInfo(info))
 	if err != nil {
 		return err
 	}
@@ -564,6 +568,22 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.OrgTranslations = orgLoginTranslations
+	return nil
+}
+
+func (repo *AuthRequestRepo) tryUsingOnlyUserSession(request *domain.AuthRequest) error {
+	userSessions, err := userSessionsByUserAgentID(repo.UserSessionViewProvider, request.AgentID)
+	if err != nil {
+		return err
+	}
+	if len(userSessions) == 1 {
+		user := userSessions[0]
+		username := user.UserName
+		if request.RequestedOrgID == "" {
+			username = user.LoginName
+		}
+		request.SetUserInfo(user.UserID, username, user.LoginName, user.DisplayName, user.AvatarKey, user.ResourceOwner)
+	}
 	return nil
 }
 
@@ -1093,9 +1113,9 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 }
 
 func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {
-	externalIDPs := make([]*domain.ExternalIDP, len(request.LinkingUsers))
+	externalIDPs := make([]*domain.UserIDPLink, len(request.LinkingUsers))
 	for i, linkingUser := range request.LinkingUsers {
-		externalIDP := &domain.ExternalIDP{
+		externalIDP := &domain.UserIDPLink{
 			ObjectRoot:     es_models.ObjectRoot{AggregateID: request.UserID},
 			IDPConfigID:    linkingUser.IDPConfigID,
 			ExternalUserID: linkingUser.ExternalUserID,
@@ -1107,7 +1127,7 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 		UserID: "LOGIN",
 		OrgID:  request.UserOrgID,
 	}
-	return userCommandProvider.BulkAddedHumanExternalIDP(authz.SetCtxData(ctx, data), request.UserID, request.UserOrgID, externalIDPs)
+	return userCommandProvider.BulkAddedUserIDPLinks(authz.SetCtxData(ctx, data), request.UserID, request.UserOrgID, externalIDPs)
 }
 
 func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, idpProviders []*domain.IDPProvider) bool {
