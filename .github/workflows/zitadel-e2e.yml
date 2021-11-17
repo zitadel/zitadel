@@ -3,7 +3,7 @@ name: "E2E testing"
 on:
   push:
     branches-ignore:
-      - master
+      - main
 
 jobs:
   e2e-testing:
