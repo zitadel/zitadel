@@ -35,19 +35,19 @@ func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  iam.MemberAddedEventType,
-					Reduce: p.reduceOrgAdded,
+					Reduce: p.reduceAdded,
 				},
 				{
 					Event:  iam.MemberChangedEventType,
-					Reduce: p.reduceOrgChanged,
+					Reduce: p.reduceChanged,
 				},
 				{
 					Event:  iam.MemberCascadeRemovedEventType,
-					Reduce: p.reduceIAMMemberCascadeRemoved,
+					Reduce: p.reduceCascadeRemoved,
 				},
 				{
 					Event:  iam.MemberRemovedEventType,
-					Reduce: p.reduceIAMMemberRemoved,
+					Reduce: p.reduceRemoved,
 				},
 			},
 		},
@@ -57,71 +57,41 @@ func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
 type IAMMemberColumn string
 
 const (
-	IAMMemberOrgIDCol  = "iam_id"
-	IAMMemberUserIDCol = "user_id"
-	IAMMemberRolesCol  = "roles"
+	IAMMemberIAMIDCol = "iam_id"
 )
 
-func (p *IAMMemberProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IAMMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-GG4Tq", "seq", event.Sequence(), "expectedType", iam.MemberAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-8cz08", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-c8SBb", "seq", event.Sequence(), "expectedType", iam.MemberAddedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pGNCu", "reduce.wrong.event.type")
 	}
-	return crdb.NewCreateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(IAMMemberOrgIDCol, e.Aggregate().ResourceOwner),
-			handler.NewCol(IAMMemberUserIDCol, e.UserID),
-			handler.NewCol(IAMMemberRolesCol, e.Roles),
-		},
-	), nil
+	return reduceMemberAdded(e.MemberAddedEvent, IAMMemberIAMIDCol)
 }
 
-func (p *IAMMemberProjection) reduceOrgChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IAMMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-cssba", "seq", event.Sequence(), "expected", iam.MemberChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-oDv1T", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-QsjwO", "seq", event.Sequence(), "expected", iam.MemberChangedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-5WQcZ", "reduce.wrong.event.type")
 	}
-	return crdb.NewUpdateStatement(
-		e,
-		[]handler.Column{
-			handler.NewCol(IAMMemberRolesCol, e.Roles),
-		},
-		[]handler.Condition{
-			handler.NewCond(IAMMemberOrgIDCol, e.Aggregate().ResourceOwner),
-			handler.NewCond(IAMMemberUserIDCol, e.UserID),
-		},
-	), nil
+	return reduceMemberChanged(e.MemberChangedEvent, IAMMemberIAMIDCol)
 }
 
-func (p *IAMMemberProjection) reduceIAMMemberCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-QEvzT", "seq", event.Sequence(), "expected", iam.MemberCascadeRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sWq0V", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-mOncs", "seq", event.Sequence(), "expected", iam.MemberCascadeRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dmdf2", "reduce.wrong.event.type")
 	}
-	return crdb.NewDeleteStatement(
-		e,
-		[]handler.Condition{
-			handler.NewCond(IAMMemberOrgIDCol, e.Aggregate().ResourceOwner),
-			handler.NewCond(IAMMemberUserIDCol, e.UserID),
-		},
-	), nil
+	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, IAMMemberIAMIDCol)
 }
 
-func (p *IAMMemberProjection) reduceIAMMemberRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IAMMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-QPcBD", "seq", event.Sequence(), "expected", iam.MemberRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-rIE9Z", "reduce.wrong.event.type")
+		logging.LogWithFields("HANDL-lW1Zv", "seq", event.Sequence(), "expected", iam.MemberRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-exVqy", "reduce.wrong.event.type")
 	}
-	return crdb.NewDeleteStatement(
-		e,
-		[]handler.Condition{
-			handler.NewCond(IAMMemberOrgIDCol, e.Aggregate().ResourceOwner),
-			handler.NewCond(IAMMemberUserIDCol, e.UserID),
-		},
-	), nil
+	return reduceMemberRemoved(e.MemberRemovedEvent, IAMMemberIAMIDCol)
 }
