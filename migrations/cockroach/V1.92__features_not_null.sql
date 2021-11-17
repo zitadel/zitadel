@@ -1,5 +1,8 @@
 alter table zitadel.projections.features
+    drop column creation_date,
     alter column is_default set default false,
+    alter column state set default 0,
+    alter column audit_log_retention set default 0,
     alter column login_policy_factors set default false,
     alter column login_policy_idp set default false,
     alter column login_policy_passwordless set default false,
