@@ -14,9 +14,10 @@ RUN echo DEEPL_AUTH_KEY=${DEEPL_AUTH_KEY} > .env
 RUN pip install -r requirements.txt
 
 RUN mkdir -p i18n
+RUN mkdir -p output
 COPY /console/src/assets/i18n ./i18n
 
-CMD [ "python", "main.py", "./i18n/en.json", "--locale", "ES", "--output", "es.json" ]
+RUN python main.py ./i18n/en.json --local ES --output ../output/es.json
 
 FROM scratch as output
-COPY --from=output-copy /json-deepl-translate/i18n .
+COPY --from=output-copy /json-deepl-translate/output /console/src/assets/i18n
