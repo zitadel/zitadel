@@ -66,7 +66,7 @@ func (p *OrgMemberProjection) reduceAdded(event eventstore.EventReader) (*handle
 		logging.LogWithFields("HANDL-BoKBr", "seq", event.Sequence(), "expectedType", org.MemberAddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, OrgMemberOrgIDCol)
+	return reduceMemberAdded(e.MemberAddedEvent, withCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
 func (p *OrgMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
@@ -75,7 +75,7 @@ func (p *OrgMemberProjection) reduceChanged(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-bfqNl", "seq", event.Sequence(), "expected", org.MemberChangedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Bg8oM", "reduce.wrong.event.type")
 	}
-	return reduceMemberChanged(e.MemberChangedEvent, OrgMemberOrgIDCol)
+	return reduceMemberChanged(e.MemberChangedEvent, withCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
 func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
@@ -84,7 +84,7 @@ func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.EventReader)
 		logging.LogWithFields("HANDL-zgb6w", "seq", event.Sequence(), "expected", org.MemberCascadeRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-4twP2", "reduce.wrong.event.type")
 	}
-	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, OrgMemberOrgIDCol)
+	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
 func (p *OrgMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
@@ -93,5 +93,5 @@ func (p *OrgMemberProjection) reduceRemoved(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-KPyxE", "seq", event.Sequence(), "expected", org.MemberRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-avatH", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(e.MemberRemovedEvent, OrgMemberOrgIDCol)
+	return reduceMemberRemoved(e.MemberRemovedEvent, withCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }

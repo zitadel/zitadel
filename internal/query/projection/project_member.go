@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
@@ -38,6 +39,10 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAdded,
 				},
 				{
+					Event:  project.GrantMemberAddedType,
+					Reduce: p.reduceAdded,
+				},
+				{
 					Event:  project.MemberChangedType,
 					Reduce: p.reduceChanged,
 				},
@@ -58,40 +63,69 @@ type ProjectMemberColumn string
 
 const (
 	ProjectMemberProjectIDCol = "project_id"
+	ProjectMemberGrantIDCol   = "grant_id"
 )
 
 func (p *ProjectMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*project.MemberAddedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-CEmLi", "seq", event.Sequence(), "expectedType", project.MemberAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-u92W1", "reduce.wrong.event.type")
+	switch e := event.(type) {
+	case *project.MemberAddedEvent:
+		return reduceMemberAdded(e.MemberAddedEvent, withCol(ProjectMemberProjectIDCol, e.Aggregate().ID))
+	case *project.GrantMemberAddedEvent:
+		return reduceMemberAdded(
+			*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
+			withCol(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withCol(ProjectMemberGrantIDCol, e.GrantID),
+		)
+	default:
+		logging.LogWithFields("HANDL-tPdUI", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberAddedType, project.GrantMemberAddedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-rddM1", "reduce.wrong.event.type")
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, ProjectMemberProjectIDCol)
 }
 
 func (p *ProjectMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*project.MemberChangedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-2mexJ", "seq", event.Sequence(), "expected", project.MemberChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fl6sR", "reduce.wrong.event.type")
+	switch e := event.(type) {
+	case *project.MemberChangedEvent:
+		return reduceMemberChanged(e.MemberChangedEvent, withCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
+	case *project.GrantMemberChangedEvent:
+		return reduceMemberChanged(
+			*member.NewMemberChangedEvent(&e.BaseEvent, e.UserID, e.Roles...),
+			withCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withCond(ProjectMemberGrantIDCol, e.GrantID),
+		)
+	default:
+		logging.LogWithFields("HANDL-LxWSn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberChangedType, project.GrantMemberChangedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-FM8L7", "reduce.wrong.event.type")
 	}
-	return reduceMemberChanged(e.MemberChangedEvent, ProjectMemberProjectIDCol)
 }
 
 func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*project.MemberCascadeRemovedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-Madqe", "seq", event.Sequence(), "expected", project.MemberCascadeRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-byUCI", "reduce.wrong.event.type")
+	switch e := event.(type) {
+	case *project.MemberCascadeRemovedEvent:
+		return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
+	case *project.GrantMemberCascadeRemovedEvent:
+		return reduceMemberCascadeRemoved(
+			*member.NewCascadeRemovedEvent(&e.BaseEvent, e.UserID),
+			withCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withCond(ProjectMemberGrantIDCol, e.GrantID),
+		)
+	default:
+		logging.LogWithFields("HANDL-6gFXG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberCascadeRemovedType, project.GrantMemberCascadeRemovedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-lwmfd", "reduce.wrong.event.type")
 	}
-	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, ProjectMemberProjectIDCol)
 }
 
 func (p *ProjectMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	e, ok := event.(*project.MemberRemovedEvent)
-	if !ok {
-		logging.LogWithFields("HANDL-MBL7R", "seq", event.Sequence(), "expected", project.MemberRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-lnEzp", "reduce.wrong.event.type")
+	switch e := event.(type) {
+	case *project.MemberRemovedEvent:
+		return reduceMemberRemoved(e.MemberRemovedEvent, withCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
+	case *project.GrantMemberRemovedEvent:
+		return reduceMemberRemoved(
+			*member.NewRemovedEvent(&e.BaseEvent, e.UserID),
+			withCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withCond(ProjectMemberGrantIDCol, e.GrantID),
+		)
+	default:
+		logging.LogWithFields("HANDL-ryUlI", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberRemovedType, project.GrantMemberRemovedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-vU5sx", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(e.MemberRemovedEvent, ProjectMemberProjectIDCol)
 }

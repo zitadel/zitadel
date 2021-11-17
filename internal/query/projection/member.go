@@ -16,52 +16,83 @@ const (
 	MemberResourceOwner = "resource_owner"
 )
 
-func reduceMemberAdded(e member.MemberAddedEvent, aggregateIDCol string) (*handler.Statement, error) {
-	return crdb.NewCreateStatement(
-		&e,
-		[]handler.Column{
-			handler.NewCol(aggregateIDCol, e.Aggregate().ID),
+type reduceMemberConfig struct {
+	cols  []handler.Column
+	conds []handler.Condition
+}
+
+type reduceMemberOpt func(reduceMemberConfig) reduceMemberConfig
+
+func withCol(col string, value interface{}) reduceMemberOpt {
+	return func(opt reduceMemberConfig) reduceMemberConfig {
+		opt.cols = append(opt.cols, handler.NewCol(col, value))
+		return opt
+	}
+}
+
+func withCond(cond string, value interface{}) reduceMemberOpt {
+	return func(opt reduceMemberConfig) reduceMemberConfig {
+		opt.conds = append(opt.conds, handler.NewCond(cond, value))
+		return opt
+	}
+}
+
+func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
+	config := reduceMemberConfig{
+		cols: []handler.Column{
 			handler.NewCol(MemberUserIDCol, e.UserID),
 			handler.NewCol(MemberRolesCol, e.Roles),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
-		},
-	), nil
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
+	}
+
+	return crdb.NewCreateStatement(&e, config.cols), nil
 }
 
-func reduceMemberChanged(e member.MemberChangedEvent, aggregateIDCol string) (*handler.Statement, error) {
-	return crdb.NewUpdateStatement(
-		&e,
-		[]handler.Column{
+func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
+	config := reduceMemberConfig{
+		cols: []handler.Column{
 			handler.NewCol(MemberRolesCol, e.Roles),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},
-		[]handler.Condition{
-			handler.NewCond(aggregateIDCol, e.Aggregate().ID),
+		conds: []handler.Condition{
 			handler.NewCond(MemberUserIDCol, e.UserID),
-		},
-	), nil
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
+	}
+
+	return crdb.NewUpdateStatement(&e, config.cols, config.conds), nil
 }
 
-func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, aggregateIDCol string) (*handler.Statement, error) {
-	return crdb.NewDeleteStatement(
-		&e,
-		[]handler.Condition{
-			handler.NewCond(aggregateIDCol, e.Aggregate().ID),
+func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
+	config := reduceMemberConfig{
+		conds: []handler.Condition{
 			handler.NewCond(MemberUserIDCol, e.UserID),
-		},
-	), nil
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
+	}
+	return crdb.NewDeleteStatement(&e, config.conds), nil
 }
 
-func reduceMemberRemoved(e member.MemberRemovedEvent, aggregateIDCol string) (*handler.Statement, error) {
-	return crdb.NewDeleteStatement(
-		&e,
-		[]handler.Condition{
-			handler.NewCond(aggregateIDCol, e.Aggregate().ID),
+func reduceMemberRemoved(e member.MemberRemovedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
+	config := reduceMemberConfig{
+		conds: []handler.Condition{
 			handler.NewCond(MemberUserIDCol, e.UserID),
-		},
-	), nil
+		}}
+
+	for _, opt := range opts {
+		config = opt(config)
+	}
+	return crdb.NewDeleteStatement(&e, config.conds), nil
 }

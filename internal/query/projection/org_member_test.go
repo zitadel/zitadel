@@ -41,15 +41,15 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.org_members (org_id, user_id, roles, creation_date, change_date, sequence, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.org_members (user_id, roles, creation_date, change_date, sequence, resource_owner, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								"user-id",
 								[]string{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"agg-id",
 							},
 						},
 					},
@@ -77,13 +77,13 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.org_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (org_id = $4) AND (user_id = $5)",
+							expectedStmt: "UPDATE zitadel.projections.org_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (org_id = $5)",
 							expectedArgs: []interface{}{
 								[]string{"role", "changed"},
 								anyArg{},
 								uint64(15),
-								"agg-id",
 								"user-id",
+								"agg-id",
 							},
 						},
 					},
@@ -110,10 +110,10 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.org_members WHERE (org_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.org_members WHERE (user_id = $1) AND (org_id = $2)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								"user-id",
+								"agg-id",
 							},
 						},
 					},
@@ -140,10 +140,10 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.org_members WHERE (org_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.org_members WHERE (user_id = $1) AND (org_id = $2)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								"user-id",
+								"agg-id",
 							},
 						},
 					},

@@ -41,15 +41,15 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.project_members (project_id, user_id, roles, creation_date, change_date, sequence, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.project_members (user_id, roles, creation_date, change_date, sequence, resource_owner, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								"user-id",
 								[]string{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"agg-id",
 							},
 						},
 					},
@@ -77,13 +77,13 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.project_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (project_id = $4) AND (user_id = $5)",
+							expectedStmt: "UPDATE zitadel.projections.project_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								[]string{"role", "changed"},
 								anyArg{},
 								uint64(15),
-								"agg-id",
 								"user-id",
+								"agg-id",
 							},
 						},
 					},
@@ -110,10 +110,10 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (project_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								"user-id",
+								"agg-id",
 							},
 						},
 					},
@@ -140,10 +140,148 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (project_id = $1) AND (user_id = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
-								"agg-id",
 								"user-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.GrantMemberAddedType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantMemberAddedType),
+					project.AggregateType,
+					[]byte(`{
+					"userId": "user-id",
+					"roles": ["role"],
+					"grantId": "grant-id"
+				}`),
+				), project.GrantMemberAddedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceAdded,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.project_members (user_id, roles, creation_date, change_date, sequence, resource_owner, project_id, grant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedArgs: []interface{}{
+								"user-id",
+								[]string{"role"},
+								anyArg{},
+								anyArg{},
+								uint64(15),
+								"ro-id",
+								"agg-id",
+								"grant-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.GrantMemberChangedType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantMemberChangedType),
+					project.AggregateType,
+					[]byte(`{
+					"userId": "user-id",
+					"roles": ["role", "changed"],
+					"grantId": "grant-id"
+				}`),
+				), project.GrantMemberChangedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceChanged,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.project_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5) AND (grant_id = $6)",
+							expectedArgs: []interface{}{
+								[]string{"role", "changed"},
+								anyArg{},
+								uint64(15),
+								"user-id",
+								"agg-id",
+								"grant-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.GrantMemberCascadeRemovedType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantMemberCascadeRemovedType),
+					project.AggregateType,
+					[]byte(`{
+					"userId": "user-id",
+					"grantId": "grant-id"
+				}`),
+				), project.GrantMemberCascadeRemovedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceCascadeRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
+							expectedArgs: []interface{}{
+								"user-id",
+								"agg-id",
+								"grant-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.GrantMemberRemovedType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantMemberRemovedType),
+					project.AggregateType,
+					[]byte(`{
+					"userId": "user-id",
+					"grantId": "grant-id"
+				}`),
+				), project.GrantMemberRemovedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
+							expectedArgs: []interface{}{
+								"user-id",
+								"agg-id",
+								"grant-id",
 							},
 						},
 					},
