@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -14,7 +15,6 @@ import (
 
 type Feature struct {
 	AggregateID              string
-	CreationDate             time.Time
 	ChangeDate               time.Time
 	Sequence                 uint64
 	IsDefault                bool
@@ -46,82 +46,104 @@ var (
 		name: projection.FeatureTable,
 	}
 	FeatureColumnAggregateID = Column{
-		name: projection.FeatureAggregateIDCol,
-	}
-	FeatureColumnCreationDate = Column{
-		name: projection.FeatureCreationDateCol,
+		name:  projection.FeatureAggregateIDCol,
+		table: feautureTable,
 	}
 	FeatureColumnChangeDate = Column{
-		name: projection.FeatureChangeDateCol,
+		name:  projection.FeatureChangeDateCol,
+		table: feautureTable,
 	}
 	FeatureColumnSequence = Column{
-		name: projection.FeatureSequenceCol,
+		name:  projection.FeatureSequenceCol,
+		table: feautureTable,
 	}
 	FeatureColumnIsDefault = Column{
-		name: projection.FeatureIsDefaultCol,
+		name:  projection.FeatureIsDefaultCol,
+		table: feautureTable,
 	}
 	FeatureTierName = Column{
-		name: projection.FeatureTierNameCol,
+		name:  projection.FeatureTierNameCol,
+		table: feautureTable,
 	}
 	FeatureTierDescription = Column{
-		name: projection.FeatureTierDescriptionCol,
+		name:  projection.FeatureTierDescriptionCol,
+		table: feautureTable,
 	}
 	FeatureState = Column{
-		name: projection.FeatureStateCol,
+		name:  projection.FeatureStateCol,
+		table: feautureTable,
 	}
 	FeatureStateDescription = Column{
-		name: projection.FeatureStateDescriptionCol,
+		name:  projection.FeatureStateDescriptionCol,
+		table: feautureTable,
 	}
 	FeatureAuditLogRetention = Column{
-		name: projection.FeatureAuditLogRetentionCol,
+		name:  projection.FeatureAuditLogRetentionCol,
+		table: feautureTable,
 	}
 	FeatureLoginPolicyFactors = Column{
-		name: projection.FeatureLoginPolicyFactorsCol,
+		name:  projection.FeatureLoginPolicyFactorsCol,
+		table: feautureTable,
 	}
 	FeatureLoginPolicyIDP = Column{
-		name: projection.FeatureLoginPolicyIDPCol,
+		name:  projection.FeatureLoginPolicyIDPCol,
+		table: feautureTable,
 	}
 	FeatureLoginPolicyPasswordless = Column{
-		name: projection.FeatureLoginPolicyPasswordlessCol,
+		name:  projection.FeatureLoginPolicyPasswordlessCol,
+		table: feautureTable,
 	}
 	FeatureLoginPolicyRegistration = Column{
-		name: projection.FeatureLoginPolicyRegistrationCol,
+		name:  projection.FeatureLoginPolicyRegistrationCol,
+		table: feautureTable,
 	}
 	FeatureLoginPolicyUsernameLogin = Column{
-		name: projection.FeatureLoginPolicyUsernameLoginCol,
+		name:  projection.FeatureLoginPolicyUsernameLoginCol,
+		table: feautureTable,
 	}
 	FeatureLoginPolicyPasswordReset = Column{
-		name: projection.FeatureLoginPolicyPasswordResetCol,
+		name:  projection.FeatureLoginPolicyPasswordResetCol,
+		table: feautureTable,
 	}
 	FeaturePasswordComplexityPolicy = Column{
-		name: projection.FeaturePasswordComplexityPolicyCol,
+		name:  projection.FeaturePasswordComplexityPolicyCol,
+		table: feautureTable,
 	}
 	FeatureLabelPolicyPrivateLabel = Column{
-		name: projection.FeatureLabelPolicyPrivateLabelCol,
+		name:  projection.FeatureLabelPolicyPrivateLabelCol,
+		table: feautureTable,
 	}
 	FeatureLabelPolicyWatermark = Column{
-		name: projection.FeatureLabelPolicyWatermarkCol,
+		name:  projection.FeatureLabelPolicyWatermarkCol,
+		table: feautureTable,
 	}
 	FeatureCustomDomain = Column{
-		name: projection.FeatureCustomDomainCol,
+		name:  projection.FeatureCustomDomainCol,
+		table: feautureTable,
 	}
 	FeaturePrivacyPolicy = Column{
-		name: projection.FeaturePrivacyPolicyCol,
+		name:  projection.FeaturePrivacyPolicyCol,
+		table: feautureTable,
 	}
 	FeatureMetadataUser = Column{
-		name: projection.FeatureMetadataUserCol,
+		name:  projection.FeatureMetadataUserCol,
+		table: feautureTable,
 	}
 	FeatureCustomTextMessage = Column{
-		name: projection.FeatureCustomTextMessageCol,
+		name:  projection.FeatureCustomTextMessageCol,
+		table: feautureTable,
 	}
 	FeatureCustomTextLogin = Column{
-		name: projection.FeatureCustomTextLoginCol,
+		name:  projection.FeatureCustomTextLoginCol,
+		table: feautureTable,
 	}
 	FeatureLockoutPolicy = Column{
-		name: projection.FeatureLockoutPolicyCol,
+		name:  projection.FeatureLockoutPolicyCol,
+		table: feautureTable,
 	}
 	FeatureActions = Column{
-		name: projection.FeatureActionsCol,
+		name:  projection.FeatureActionsCol,
+		table: feautureTable,
 	}
 )
 
@@ -163,26 +185,8 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 	tierName := sql.NullString{}
 	tierDescription := sql.NullString{}
 	stateDescription := sql.NullString{}
-	auditLogRetention := sql.NullInt64{}
-	loginPolicyFactors := sql.NullBool{}
-	loginPolicyIDP := sql.NullBool{}
-	loginPolicyPasswordless := sql.NullBool{}
-	loginPolicyRegistration := sql.NullBool{}
-	loginPolicyUsernameLogin := sql.NullBool{}
-	loginPolicyPasswordReset := sql.NullBool{}
-	passwordComplexityPolicy := sql.NullBool{}
-	labelPolicyPrivateLabel := sql.NullBool{}
-	labelPolicyWatermark := sql.NullBool{}
-	customDomain := sql.NullBool{}
-	privacyPolicy := sql.NullBool{}
-	metadataUser := sql.NullBool{}
-	customTextMessage := sql.NullBool{}
-	customTextLogin := sql.NullBool{}
-	lockoutPolicy := sql.NullBool{}
-	actions := sql.NullBool{}
 	return sq.Select(
 			FeatureColumnAggregateID.identifier(),
-			FeatureColumnCreationDate.identifier(),
 			FeatureColumnChangeDate.identifier(),
 			FeatureColumnSequence.identifier(),
 			FeatureColumnIsDefault.identifier(),
@@ -212,7 +216,6 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			p := new(Feature)
 			err := row.Scan(
 				&p.AggregateID,
-				&p.CreationDate,
 				&p.ChangeDate,
 				&p.Sequence,
 				&p.IsDefault,
@@ -220,23 +223,23 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 				&tierDescription,
 				&p.State,
 				&stateDescription,
-				&auditLogRetention,
-				&loginPolicyFactors,
-				&loginPolicyIDP,
-				&loginPolicyPasswordless,
-				&loginPolicyRegistration,
-				&loginPolicyUsernameLogin,
-				&loginPolicyPasswordReset,
-				&passwordComplexityPolicy,
-				&labelPolicyPrivateLabel,
-				&labelPolicyWatermark,
-				&customDomain,
-				&privacyPolicy,
-				&metadataUser,
-				&customTextMessage,
-				&customTextLogin,
-				&lockoutPolicy,
-				&actions,
+				&p.AuditLogRetention,
+				&p.LoginPolicyFactors,
+				&p.LoginPolicyIDP,
+				&p.LoginPolicyPasswordless,
+				&p.LoginPolicyRegistration,
+				&p.LoginPolicyUsernameLogin,
+				&p.LoginPolicyPasswordReset,
+				&p.PasswordComplexityPolicy,
+				&p.LabelPolicyPrivateLabel,
+				&p.LabelPolicyWatermark,
+				&p.CustomDomain,
+				&p.PrivacyPolicy,
+				&p.MetadataUser,
+				&p.CustomTextMessage,
+				&p.CustomTextLogin,
+				&p.LockoutPolicy,
+				&p.Actions,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -247,23 +250,6 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			p.TierName = tierName.String
 			p.TierDescription = tierDescription.String
 			p.StateDescription = stateDescription.String
-			p.AuditLogRetention = time.Duration(auditLogRetention.Int64)
-			p.LoginPolicyFactors = loginPolicyFactors.Bool
-			p.LoginPolicyIDP = loginPolicyIDP.Bool
-			p.LoginPolicyPasswordless = loginPolicyPasswordless.Bool
-			p.LoginPolicyRegistration = loginPolicyRegistration.Bool
-			p.LoginPolicyUsernameLogin = loginPolicyUsernameLogin.Bool
-			p.LoginPolicyPasswordReset = loginPolicyPasswordReset.Bool
-			p.PasswordComplexityPolicy = passwordComplexityPolicy.Bool
-			p.LabelPolicyPrivateLabel = labelPolicyPrivateLabel.Bool
-			p.LabelPolicyWatermark = labelPolicyWatermark.Bool
-			p.CustomDomain = customDomain.Bool
-			p.PrivacyPolicy = privacyPolicy.Bool
-			p.MetadataUser = metadataUser.Bool
-			p.CustomTextMessage = customTextMessage.Bool
-			p.CustomTextLogin = customTextLogin.Bool
-			p.LockoutPolicy = lockoutPolicy.Bool
-			p.Actions = actions.Bool
 			return p, nil
 		}
 }

@@ -1,11 +1,11 @@
 package features
 
 import (
-	"github.com/caos/zitadel/internal/query"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	features_pb "github.com/caos/zitadel/pkg/grpc/features"
 )
 
@@ -32,9 +32,8 @@ func ModelFeatureToPb(features *query.Feature) *features_pb.Features {
 		MetadataUser:             features.MetadataUser,
 		LockoutPolicy:            features.LockoutPolicy,
 		Actions:                  features.Actions,
-		Details: object_grpc.ToViewDetailsPb(
+		Details: object_grpc.ChangeToDetailsPb(
 			features.Sequence,
-			features.CreationDate,
 			features.ChangeDate,
 			features.AggregateID,
 		),
