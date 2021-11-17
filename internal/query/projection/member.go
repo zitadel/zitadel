@@ -20,7 +20,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, aggregateIDCol string) (*handl
 	return crdb.NewCreateStatement(
 		&e,
 		[]handler.Column{
-			handler.NewCol(aggregateIDCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(aggregateIDCol, e.Aggregate().ID),
 			handler.NewCol(MemberUserIDCol, e.UserID),
 			handler.NewCol(MemberRolesCol, e.Roles),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
@@ -38,10 +38,9 @@ func reduceMemberChanged(e member.MemberChangedEvent, aggregateIDCol string) (*h
 			handler.NewCol(MemberRolesCol, e.Roles),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
-			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
 		},
 		[]handler.Condition{
-			handler.NewCond(aggregateIDCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(aggregateIDCol, e.Aggregate().ID),
 			handler.NewCond(MemberUserIDCol, e.UserID),
 		},
 	), nil
@@ -51,7 +50,7 @@ func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, aggregateIDC
 	return crdb.NewDeleteStatement(
 		&e,
 		[]handler.Condition{
-			handler.NewCond(aggregateIDCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(aggregateIDCol, e.Aggregate().ID),
 			handler.NewCond(MemberUserIDCol, e.UserID),
 		},
 	), nil
@@ -61,7 +60,7 @@ func reduceMemberRemoved(e member.MemberRemovedEvent, aggregateIDCol string) (*h
 	return crdb.NewDeleteStatement(
 		&e,
 		[]handler.Condition{
-			handler.NewCond(aggregateIDCol, e.Aggregate().ResourceOwner),
+			handler.NewCond(aggregateIDCol, e.Aggregate().ID),
 			handler.NewCond(MemberUserIDCol, e.UserID),
 		},
 	), nil
