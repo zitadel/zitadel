@@ -1,34 +1,32 @@
 CREATE TABLE test.projections.login_names_users (
-    id STRING NOT NULL,
-    type SMALLINT NOT NULL,
-    user_name STRING NOT NULL,
-    email STRING,
-    is_domain_claimed BOOLEAN NOT NULL DEFAULT false,
-    resource_owner STRING NOT NULL,
+    id STRING NOT NULL
+    , type SMALLINT NOT NULL
+    , user_name STRING NOT NULL
+    , email STRING
+    , resource_owner STRING NOT NULL
 
-    PRIMARY KEY (id),
-    INDEX idx_ro (resource_owner)
+    , PRIMARY KEY (id)
+    , INDEX idx_ro (resource_owner)
 );
 
 CREATE TABLE test.projections.login_names_domains (
-    name STRING NOT NULL,
-    is_primary BOOLEAN NOT NULL DEFAULT false,
-    is_verified BOOLEAN NOT NULL DEFAULT false,
-    resource_owner STRING NOT NULL,
-
-    PRIMARY KEY (resource_owner, name)
+    name STRING NOT NULL
+    , is_primary BOOLEAN NOT NULL DEFAULT false
+    , is_verified BOOLEAN NOT NULL DEFAULT false
+    , resource_owner STRING NOT NULL
+    
+    , PRIMARY KEY (resource_owner, name)
+    , INDEX idx_verified_ro (is_verified, resource_owner)
 );
 
 CREATE TABLE test.projections.login_names_policies (
-    must_be_domain BOOLEAN NOT NULL,
-    is_default BOOLEAN NOT NULL,
-    resource_owner STRING NOT NULL,
-
-    PRIMARY KEY (resource_owner)
+    must_be_domain BOOLEAN NOT NULL
+    , is_default BOOLEAN NOT NULL
+    , resource_owner STRING NOT NULL
+    
+    , PRIMARY KEY (resource_owner)
 );
 
-
--- drop VIEW test.projections.login_names;
 CREATE VIEW test.projections.login_names
 AS SELECT
     user_id
@@ -44,12 +42,12 @@ AS SELECT
     , IFNULL(is_primary, true) AS is_primary -- is_default is null no additional verified domain and policy with must_be_domain=false
 FROM (
 SELECT
-    p.user_id
-    , p.type
-    , p.user_name
-    , p.email
-    , p.resource_owner
-    , p.must_be_domain
+    policy_users.user_id
+    , policy_users.type
+    , policy_users.user_name
+    , policy_users.email
+    , policy_users.resource_owner
+    , policy_users.must_be_domain
     , domains.name AS domain
     , domains.is_primary 
 FROM (
@@ -62,8 +60,8 @@ FROM (
         , IFNULL(policy_custom.must_be_domain, policy_default.must_be_domain) must_be_domain
     FROM test.projections.login_names_users users
     LEFT JOIN test.projections.login_names_policies policy_custom on policy_custom.resource_owner = users.resource_owner
-    LEFT JOIN test.projections.login_names_policies policy_default on policy_default.is_default = true) p
-LEFT JOIN test.projections.login_names_domains domains ON p.must_be_domain AND domains.is_verified AND p.resource_owner = domains.resource_owner
+    LEFT JOIN test.projections.login_names_policies policy_default on policy_default.is_default = true) policy_users
+LEFT JOIN test.projections.login_names_domains domains ON policy_users.must_be_domain AND domains.is_verified AND policy_users.resource_owner = domains.resource_owner
 );
 
 -- --------------------------------------------------------
@@ -88,11 +86,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -125,11 +122,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -164,11 +160,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -203,11 +198,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -254,11 +248,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -294,11 +287,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -335,11 +327,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -376,11 +367,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -429,11 +419,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -469,11 +458,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -510,11 +498,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -551,11 +538,10 @@ INSERT INTO test.projections.login_names_users (
     , type
     , user_name
     , email
-    , is_domain_claimed
     , resource_owner
 ) VALUES 
-    ('h', 1, 'human', 'human@caos.ch', false, 'org')
-    , ('m', 2, 'machine', NULL, false, 'org')
+    ('h', 1, 'human', 'human@caos.ch', 'org')
+    , ('m', 2, 'machine', NULL, 'org')
 ;
 
 INSERT INTO test.projections.login_names_domains (
@@ -581,15 +567,3 @@ INSERT INTO test.projections.login_names_policies (
 -- 2 login names per user
 SELECT * FROM test.projections.login_names WHERE user_id IN ('h', 'm');
 ROLLBACK;
-
--- --------------------------------------------------------
--- --------------------------------------------------------
--- --------------------------------------------------------
--- --------------------------------------------------------
--- --------------------------------------------------------
--- domain claimed: correct implementation is impossible atm
--- --------------------------------------------------------
--- --------------------------------------------------------
--- --------------------------------------------------------
--- --------------------------------------------------------
--- --------------------------------------------------------

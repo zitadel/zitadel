@@ -69,7 +69,9 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceUserNameChanged,
 				},
 				{
-					// DISCUSS: IMP it's not possible to impekent this reducer correctly
+					// changes the username of the user
+					// this event occures in orgs
+					// where policy.must_be_domain=false
 					Event:  user.UserDomainClaimedType,
 					Reduce: p.reduceUserDomainClaimed,
 				},
@@ -129,12 +131,11 @@ const (
 	loginNamePolicySuffix = "policies"
 	loginNameDomainSuffix = "domains"
 
-	LoginNameUserIDCol              = "id"
-	LoginNameUserTypeCol            = "type"
-	LoginNameUserUserNameCol        = "name"
-	LoginNameUserEmailCol           = "email"
-	LoginNameUserIsDomainClaimedCol = "is_domain_claimed"
-	LoginNameUserResourceOwnerCol   = "resource_owner"
+	LoginNameUserIDCol            = "id"
+	LoginNameUserTypeCol          = "type"
+	LoginNameUserUserNameCol      = "name"
+	LoginNameUserEmailCol         = "email"
+	LoginNameUserResourceOwnerCol = "resource_owner"
 
 	LoginNameDomainNameCol          = "name"
 	LoginNameDomainIsPrimaryCol     = "is_primary"
@@ -197,7 +198,6 @@ func (p *LoginNameProjection) reduceEmailChanged(event eventstore.EventReader) (
 		event,
 		[]handler.Column{
 			handler.NewCol(LoginNameUserEmailCol, e.EmailAddress),
-			handler.NewCol(LoginNameUserIsDomainClaimedCol, false),
 		},
 		[]handler.Condition{
 			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
@@ -261,23 +261,22 @@ func (p *LoginNameProjection) reduceUserNameChanged(event eventstore.EventReader
 }
 
 func (p *LoginNameProjection) reduceUserDomainClaimed(event eventstore.EventReader) (*handler.Statement, error) {
-	logging.Log("PROJE-Fv8SW").Panic("unable to implement correctly")
-	return nil, nil
-	// e, ok := event.(*user.DomainClaimedEvent)
-	// if !ok {
-	// 	logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", user.UserDomainClaimedType).Error("wrong event type")
-	// 	return nil, errors.ThrowInvalidArgument(nil, "HANDL-AQMBY", "reduce.wrong.event.type")
-	// }
+	e, ok := event.(*user.DomainClaimedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", user.UserDomainClaimedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AQMBY", "reduce.wrong.event.type")
+	}
 
-	// return crdb.NewUpdateStatement(
-	// 	event,
-	// 	[]handler.Column{
-	// 		handler.NewCol(LoginNameUserEmailCol, e.UserName),
-	// 		handler.NewCol(LoginNameUserIsDomainClaimedCol, true),
-	// 	},
-	// 	[]handler.Condition{},
-	// 	crdb.WithTableSuffix(loginNameUserSuffix),
-	// ), nil
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(LoginNameUserUserNameCol, e.UserName),
+		},
+		[]handler.Condition{
+			handler.NewCond(LoginNameUserIDCol, e.Aggregate().ID),
+		},
+		crdb.WithTableSuffix(loginNameUserSuffix),
+	), nil
 }
 
 func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.EventReader) (*handler.Statement, error) {
