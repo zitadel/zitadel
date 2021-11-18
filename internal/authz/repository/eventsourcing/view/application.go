@@ -36,7 +36,7 @@ func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, a
 	if err != nil {
 		return nil, err
 	}
-	if len(apps.Apps) != 0 {
+	if len(apps.Apps) != 1 {
 		return nil, errors.ThrowNotFound(nil, "VIEW-svLQq", "app not found")
 	}
 
