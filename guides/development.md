@@ -16,14 +16,14 @@ This part is relevant if you start the backend or console without docker compose
 
 ### Internationalization (i18n)
 
-This command translates all relevant files for internationalization. You have to provide a Deepl Authentication Key and your target language (de for german, en for english, ...)
+This command translates all relevant files for internationalization. You have to provide a Deepl Authentication Key and your target language (de for german, en for english, ...).
 
 ```bash
 DOCKER_BUILDKIT=1 docker build \
 -t python-i18n \
 -f ./build/i18n/Dockerfile . \
 --build-arg DEEPL_AUTH_KEY=[your_deepl_key] \
---build-arg LANGUAGE=[target_language]
+--build-arg LANGUAGE=[target_language] \
 --target login-output -o .
 ```
 

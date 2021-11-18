@@ -10,6 +10,7 @@ RUN git clone https://github.com/Saigesp/json-deepl-translate.git
 WORKDIR /json-deepl-translate
 RUN echo DEEPL_AUTH_KEY=${DEEPL_AUTH_KEY} > .env
 RUN pip install -r requirements.txt
+RUN pip install PyYAML
 
 #######################
 ## console translations
@@ -21,7 +22,7 @@ COPY /console/src/assets/i18n ./i18n
 
 RUN python main.py ./i18n/en.json --local ${LANGUAGE} --output ../output/${LANGUAGE}.json
 
-FROM scratch as output
+FROM scratch as console-output
 COPY --from=python-base /json-deepl-translate/output /console/src/assets/i18n
 
 #######################
@@ -29,7 +30,6 @@ COPY --from=python-base /json-deepl-translate/output /console/src/assets/i18n
 #######################
 
 FROM python-base as notification
-RUN pip install PyYAML
 RUN rm -rf i18n output output-yaml
 RUN mkdir -p i18n output output-yaml
 COPY /internal/notification/static/i18n ./i18n
@@ -44,7 +44,6 @@ COPY --from=notification /json-deepl-translate/output-yaml /internal/notificatio
 #######################
 
 FROM python-base as internal
-RUN pip install PyYAML
 RUN rm -rf i18n output output-yaml
 RUN mkdir -p i18n output output-yaml
 COPY /internal/static/i18n ./i18n
@@ -59,7 +58,6 @@ COPY --from=internal /json-deepl-translate/output-yaml /internal/static/i18n
 #######################
 
 FROM python-base as login
-RUN pip install PyYAML
 RUN rm -rf i18n output output-yaml
 RUN mkdir -p i18n output output-yaml
 COPY /internal/ui/login/static/i18n ./i18n
