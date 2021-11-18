@@ -42,108 +42,108 @@ type Feature struct {
 }
 
 var (
-	feautureTable = table{
+	featureTable = table{
 		name: projection.FeatureTable,
 	}
 	FeatureColumnAggregateID = Column{
 		name:  projection.FeatureAggregateIDCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureColumnChangeDate = Column{
 		name:  projection.FeatureChangeDateCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureColumnSequence = Column{
 		name:  projection.FeatureSequenceCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureColumnIsDefault = Column{
 		name:  projection.FeatureIsDefaultCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureTierName = Column{
 		name:  projection.FeatureTierNameCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureTierDescription = Column{
 		name:  projection.FeatureTierDescriptionCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureState = Column{
 		name:  projection.FeatureStateCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureStateDescription = Column{
 		name:  projection.FeatureStateDescriptionCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureAuditLogRetention = Column{
 		name:  projection.FeatureAuditLogRetentionCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLoginPolicyFactors = Column{
 		name:  projection.FeatureLoginPolicyFactorsCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLoginPolicyIDP = Column{
 		name:  projection.FeatureLoginPolicyIDPCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLoginPolicyPasswordless = Column{
 		name:  projection.FeatureLoginPolicyPasswordlessCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLoginPolicyRegistration = Column{
 		name:  projection.FeatureLoginPolicyRegistrationCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLoginPolicyUsernameLogin = Column{
 		name:  projection.FeatureLoginPolicyUsernameLoginCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLoginPolicyPasswordReset = Column{
 		name:  projection.FeatureLoginPolicyPasswordResetCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeaturePasswordComplexityPolicy = Column{
 		name:  projection.FeaturePasswordComplexityPolicyCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLabelPolicyPrivateLabel = Column{
 		name:  projection.FeatureLabelPolicyPrivateLabelCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLabelPolicyWatermark = Column{
 		name:  projection.FeatureLabelPolicyWatermarkCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureCustomDomain = Column{
 		name:  projection.FeatureCustomDomainCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeaturePrivacyPolicy = Column{
 		name:  projection.FeaturePrivacyPolicyCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureMetadataUser = Column{
 		name:  projection.FeatureMetadataUserCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureCustomTextMessage = Column{
 		name:  projection.FeatureCustomTextMessageCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureCustomTextLogin = Column{
 		name:  projection.FeatureCustomTextLoginCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureLockoutPolicy = Column{
 		name:  projection.FeatureLockoutPolicyCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 	FeatureActions = Column{
 		name:  projection.FeatureActionsCol,
-		table: feautureTable,
+		table: featureTable,
 	}
 )
 
@@ -172,7 +172,7 @@ func (q *Queries) DefaultFeature(ctx context.Context) (*Feature, error) {
 	query, scan := prepareFeatureQuery()
 	stmt, args, err := query.Where(sq.Eq{
 		FeatureColumnAggregateID.identifier(): domain.IAMID,
-	}).OrderBy(FeatureColumnIsDefault.identifier()).ToSql()
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-1Ndlg", "Errors.Query.SQLStatement")
 	}
@@ -182,9 +182,6 @@ func (q *Queries) DefaultFeature(ctx context.Context) (*Feature, error) {
 }
 
 func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) {
-	tierName := sql.NullString{}
-	tierDescription := sql.NullString{}
-	stateDescription := sql.NullString{}
 	return sq.Select(
 			FeatureColumnAggregateID.identifier(),
 			FeatureColumnChangeDate.identifier(),
@@ -211,9 +208,12 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			FeatureCustomTextLogin.identifier(),
 			FeatureLockoutPolicy.identifier(),
 			FeatureActions.identifier(),
-		).From(feautureTable.identifier()).PlaceholderFormat(sq.Dollar),
+		).From(featureTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Feature, error) {
 			p := new(Feature)
+			tierName := sql.NullString{}
+			tierDescription := sql.NullString{}
+			stateDescription := sql.NullString{}
 			err := row.Scan(
 				&p.AggregateID,
 				&p.ChangeDate,
@@ -254,7 +254,7 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 		}
 }
 
-func (f *Feature) FeatureList() []string {
+func (f *Feature) EnabledFeatureTypes() []string {
 	list := make([]string, 0)
 	if f.LoginPolicyFactors {
 		list = append(list, domain.FeatureLoginPolicyFactors)

@@ -13,6 +13,6 @@ func (s *Server) ListMyZitadelFeatures(ctx context.Context, _ *auth_pb.ListMyZit
 		return nil, err
 	}
 	return &auth_pb.ListMyZitadelFeaturesResponse{
-		Result: features.FeatureList(),
+		Result: features.EnabledFeatureTypes(),
 	}, nil
 }
