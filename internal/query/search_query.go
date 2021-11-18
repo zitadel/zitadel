@@ -43,7 +43,7 @@ func (req *SearchRequest) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 const sqlPlaceholder = "?"
 
 type SearchQuery interface {
-	ToQuery(sq.SelectBuilder) sq.SelectBuilder
+	toQuery(sq.SelectBuilder) sq.SelectBuilder
 }
 
 type TextQuery struct {
@@ -72,7 +72,7 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 	}, nil
 }
 
-func (q *TextQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	where, args := q.comp()
 	return query.Where(where, args...)
 }
@@ -169,7 +169,7 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 	}, nil
 }
 
-func (q *NumberQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *NumberQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	where, args := q.comp()
 	return query.Where(where, args...)
 }
@@ -240,7 +240,7 @@ func NewListQuery(column Column, value []interface{}, compare ListComparison) (*
 	}, nil
 }
 
-func (q *ListQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	where, args := q.comp()
 	return query.Where(where, args...)
 }
@@ -282,7 +282,7 @@ func NewBoolQuery(c Column, value bool) (*BoolQuery, error) {
 	}, nil
 }
 
-func (q *BoolQuery) ToQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *BoolQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	where, args := q.comp()
 	return query.Where(where, args...)
 }

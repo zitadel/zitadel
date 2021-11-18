@@ -91,6 +91,7 @@
     "SHOWORGS": "Alle Organisationen anzeigen",
     "GRANTSECTION": "Berechtigungssektion",
     "GRANTS": "Berechtigungen",
+    "ACTIONS": "Aktionen",
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
     "TOOLTIP": {
@@ -102,20 +103,21 @@
       "GRANTEDPROJECTS": "Verwalte die berechtigten Projekte von anderen Organisationen",
       "HUMANUSERS": "Verwalte die Menschlichen Benutzer deiner Organisation",
       "MACHINEUSERS": "Verwalte die  Service Benutzer deiner Organisation",
-      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer"
+      "AUTHZ": "Verwalte die Berechtigungen deiner Organisationsbenutzer",
+      "ACTIONS": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden."
     }
   },
   "ACTIONS": {
-    "ACTIONS":"Aktionen",
-    "RENAME":"Umbenennen",
-    "SET":"Übernehmen",
-    "COPY":"In die Zwischenablage kopieren",
-    "COPIED":"In die Zwischenablage kopiert.",
-    "RESETDEFAULT":"Auf Standard zurücksetzen",
-    "RESETTO":"Zurücksetzen auf: ",
-    "RESETCURRENT":"Auf aktuellen Wert zurücksetzen",
-    "SHOW":"Aufklappen",
-    "HIDE":"Zuklappen",
+    "ACTIONS": "Aktionen",
+    "RENAME": "Umbenennen",
+    "SET": "Übernehmen",
+    "COPY": "In die Zwischenablage kopieren",
+    "COPIED": "In die Zwischenablage kopiert.",
+    "RESETDEFAULT": "Auf Standard zurücksetzen",
+    "RESETTO": "Zurücksetzen auf: ",
+    "RESETCURRENT": "Auf aktuellen Wert zurücksetzen",
+    "SHOW": "Aufklappen",
+    "HIDE": "Zuklappen",
     "SAVE": "Speichern",
     "SAVENOW": "Speichern",
     "NEW": "Neu",
@@ -144,9 +146,9 @@
     "CONFIGURE": "Konfigurieren",
     "SEND": "Senden",
     "NEWVALUE": "Neuer Wert",
-    "RESTORE":"Wiederherstellen",
-    "CONTINUEWITHOUTSAVE":"Ohne speichern fortfahren",
-    "GOTOFEATURES":"Zu den Features"
+    "RESTORE": "Wiederherstellen",
+    "CONTINUEWITHOUTSAVE": "Ohne speichern fortfahren",
+    "GOTOFEATURES": "Zu den Features"
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -177,14 +179,14 @@
       "REACTIVATE": "Reaktivieren",
       "DEACTIVATE": "Deaktivieren",
       "FILTER": "Filter",
-      "STATE":"Status",
+      "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
-      "LOCKEDDESCRIPTION":"Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
+      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
     },
     "DETAILS": {
-      "DATECREATED":"Erstellt",
-      "DATECHANGED":"Geändert"
+      "DATECREATED": "Erstellt",
+      "DATECHANGED": "Geändert"
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
@@ -211,7 +213,7 @@
       "EMPTY": "Keine Einträge"
     },
     "PASSWORDLESS": {
-      "SEND":"Registrierungslink senden",
+      "SEND": "Registrierungslink senden",
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
@@ -239,28 +241,28 @@
       "DIALOG": {
         "DELETE_TITLE": "Passwordless entfernen",
         "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
-        "ADD_TITLE":"Passwortlose Authentifizierung",
-        "ADD_DESCRIPTION":"Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwordlosen Authentifizierungsmethode.",
-        "SEND_DESCRIPTION":"Senden Sie sich einen Registrierungslink an Ihre email adresse.",
-        "SEND":"Registrierungslink senden",
-        "SENT":"Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup forzufahren.",
-        "QRCODE_DESCRIPTION":"QR-Code zum scannen mit einem anderen Gerät generieren.",
-        "QRCODE":"QR-Code generieren",
-        "QRCODE_SCAN":"Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät forzufahren.",
-        "NEW_DESCRIPTION":"Verwenden Sie dieses Gerät um Passwordless aufzusetzen.",
-        "NEW":"Hinzufügen"
+        "ADD_TITLE": "Passwortlose Authentifizierung",
+        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwordlosen Authentifizierungsmethode.",
+        "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre email adresse.",
+        "SEND": "Registrierungslink senden",
+        "SENT": "Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup forzufahren.",
+        "QRCODE_DESCRIPTION": "QR-Code zum scannen mit einem anderen Gerät generieren.",
+        "QRCODE": "QR-Code generieren",
+        "QRCODE_SCAN": "Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät forzufahren.",
+        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um Passwordless aufzusetzen.",
+        "NEW": "Hinzufügen"
       }
     },
     "METADATA": {
-      "TITLE":"Metadata",
-      "DESCRIPTION":"",
-      "KEY":"Schlüssel",
-      "VALUE":"Wert",
-      "ADD":"Neues Element",
-      "SAVE":"Speichern",
-      "EMPTY":"Keine Metadaten",
-      "SETSUCCESS":"Element erfolgreich gespeichert",
-      "REMOVESUCCESS":"Element erfolgreich gelöscht"
+      "TITLE": "Metadata",
+      "DESCRIPTION": "",
+      "KEY": "Schlüssel",
+      "VALUE": "Wert",
+      "ADD": "Neues Element",
+      "SAVE": "Speichern",
+      "EMPTY": "Keine Metadaten",
+      "SETSUCCESS": "Element erfolgreich gespeichert",
+      "REMOVESUCCESS": "Element erfolgreich gelöscht"
     },
     "MFA": {
       "TABLETYPE": "Typ",
@@ -339,9 +341,9 @@
       "EMAIL": "E-Mail",
       "PHONE": "Telefonnummer",
       "USERNAME": "Benutzername",
-      "CHANGEUSERNAME":"bearbeiten",
-      "CHANGEUSERNAME_TITLE":"Benutzername ändern",
-      "CHANGEUSERNAME_DESC":"Geben Sie ihren neuen Namen an.",
+      "CHANGEUSERNAME": "bearbeiten",
+      "CHANGEUSERNAME_TITLE": "Benutzername ändern",
+      "CHANGEUSERNAME_DESC": "Geben Sie ihren neuen Namen an.",
       "FIRSTNAME": "Vorname",
       "LASTNAME": "Nachname",
       "NICKNAME": "Spitzname",
@@ -350,13 +352,13 @@
       "GENDER": "Geschlecht",
       "PASSWORD": "Passwort",
       "AVATAR": {
-        "UPLOADTITLE":"Profilfoto uploaden",
-        "UPLOADBTN":"Datei auswählen",
-        "UPLOAD":"Hochladen",
-        "CURRENT":"Aktuelles Bild",
-        "PREVIEW":"Vorschau",
-        "DELETESUCCESS":"Erfolgreich gelöscht!",
-        "CROPPERERROR":"Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
+        "UPLOADTITLE": "Profilfoto uploaden",
+        "UPLOADBTN": "Datei auswählen",
+        "UPLOAD": "Hochladen",
+        "CURRENT": "Aktuelles Bild",
+        "PREVIEW": "Vorschau",
+        "DELETESUCCESS": "Erfolgreich gelöscht!",
+        "CROPPERERROR": "Ein Fehler beim hochladen Ihrer Datei ist fehlgeschlagen. Versuchen Sie es mit ggf mit einem anderen Format und Grösse."
       }
     },
     "MACHINE": {
@@ -476,7 +478,7 @@
     "TOAST": {
       "CREATED": "Benutzer erfolgreich erstellt.",
       "SAVED": "Profil gespeichert.",
-      "USERNAMECHANGED":"Username geändert.",
+      "USERNAMECHANGED": "Username geändert.",
       "EMAILSAVED": "E-Mail gespeichert.",
       "INITEMAILSENT": "Initialisierung Email gesendet.",
       "PHONESAVED": "Telefonnummer gespeichert.",
@@ -498,14 +500,14 @@
       "KEYADDED": "Schlüssel hinzugefügt!",
       "MACHINEADDED": "Service User erstellt!",
       "DELETED": "Benutzer erfolgreich gelöscht!",
-      "UNLOCKED":"Benutzer erfolgreich freigeschaltet!",
-      "PASSWORDLESSREGISTRATIONSENT":"Link via email versendet."
+      "UNLOCKED": "Benutzer erfolgreich freigeschaltet!",
+      "PASSWORDLESSREGISTRATIONSENT": "Link via email versendet."
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager-Rollen",
       "DESCRIPTION": "Dies sind alle Mitgliedschaften des Benutzers. Du kannst die entsprechenden Rechte auch auf der Organisations-, Projekt-, oder IAM-Detailseite aufrufen und modifizieren.",
-      "ORGCONTEXT":"Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
-      "USERCONTEXT":"Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
+      "ORGCONTEXT": "Sie sehen alle Organisationen und Projekte, die mit der aktuell gewählten Organisation in Verbindung stehen.",
+      "USERCONTEXT": "Sie sehen alle Organisationen und Projekte auf denen Sie berechtigt sind inklusive aller zur Auswahl stehenden Organisationen.",
       "CREATIONDATE": "Erstelldatum",
       "CHANGEDATE": "Letzte Änderung",
       "DISPLAYNAME": "Anzeigename",
@@ -517,6 +519,55 @@
         "PROJECT": "Projekt",
         "GRANTEDPROJECT": "Berechtigtes Projekt"
       }
+    }
+  },
+  "FLOWS": {
+    "TITLE": "Aktionen und Abläufe",
+    "DESCRIPTION": "Hinterlege scripts die bei einem bestimmten Event ausgeführt werden.",
+    "ACTIONSTITLE": "Aktionen",
+    "FLOWSTITLE": "Abläufe",
+    "ID": "ID",
+    "NAME": "Name",
+    "STATE": "State",
+    "STATES": {
+      "0": "Kein Status",
+      "1": "inaktiv",
+      "2": "aktiv"
+    },
+    "TYPES": {
+      "0": "Unspezifisch",
+      "1": "Externe Authentifizierung"
+    },
+    "TRIGGERTYPES": {
+      "1": "Post Authentication",
+      "2": "Pre Creation",
+      "3": "Post Creation"
+    },
+    "TIMEOUT": "Timeout",
+    "TIMEOUTINSEC": "Timout in Sekunden",
+    "ALLOWEDTOFAIL": "Allowed To Fail",
+    "SCRIPT": "Script",
+    "FLOWTYPE": "Flow Typ",
+    "TRIGGERTYPE": "Trigger Typ",
+    "ACTIONS": "Aktionen",
+    "DIALOG": {
+      "ADD": {
+        "TITLE": "Aktion erstellen"
+      },
+      "UPDATE": {
+        "TITLE": "Aktion bearbeiten"
+      },
+      "DELETEACTION": {
+        "TITLE": "Aktion löschen?",
+        "DESCRIPTION": "Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?"
+      },
+      "CLEAR": {
+        "TITLE": "Flow zurücksetzen?",
+        "DESCRIPTION": "Sie sind im Begriff den Flow mitsamt seinen Triggern und Aktionen zurückzusetzen. Diese Änderung kann nicht wiederhergestellt werden."
+      }
+    },
+    "TOAST": {
+      "ACTIONSSET": "Aktionen gesetzt"
     }
   },
   "IAM": {
@@ -645,8 +696,8 @@
     "TITLE": "Features",
     "DESCRIPTION": "Hier können Sie Funktionen von ZITADEL auf Basis von Ihrer Preisstufe einsehen.",
     "BTN-EDIT": "Featureset anzeigen",
-    "AVAILABLE":"freigeschaltet",
-    "UNAVAILABLE":"nicht freigeschaltet",
+    "AVAILABLE": "freigeschaltet",
+    "UNAVAILABLE": "nicht freigeschaltet",
     "TIER": {
       "NAME": "Preisstufe Name",
       "DETAILS": "Abrechnungsdetails",
@@ -664,12 +715,13 @@
       "BTN": "Preisstufe ändern"
     },
     "HEADERS": {
-      "LOGINPOLICY":"Login Richtlinie",
-      "PASSWORD":"Passwort",
-      "LABELPOLICY":"Privatelabelling",
-      "DOMAIN":"Organisations Domänen",
-      "TEXTSANDLINKS":"Texte und Links",
-      "METADATA":"Metadata"
+      "LOGINPOLICY": "Login Richtlinie",
+      "PASSWORD": "Passwort",
+      "LABELPOLICY": "Privatelabelling",
+      "DOMAIN": "Organisations Domänen",
+      "TEXTSANDLINKS": "Texte und Links",
+      "METADATA": "Metadata",
+      "FLOWS": "Aktionen und Abläufe"
     },
     "DATA": {
       "AUDITLOGRETENTION": "Audit Log Retention",
@@ -680,14 +732,15 @@
       "LOGINPOLICYFACTORS": "Multifaktoren",
       "LOGINPOLICYPASSWORDLESS": "Passwortlose Authentifizierung",
       "LOGINPOLICYCOMPLEXITYPOLICY": "Passwortkomplexitäts Richtlinie",
-      "LOCKOUTPOLICY":"Passwortsperre",
+      "LOCKOUTPOLICY": "Passwortsperre",
       "LABELPOLICYPRIVATELABEL": "Farben, Logo, Icon und Texterscheinungsbild",
       "LABELPOLICYWATERMARK": "ZITADEL Wasserzeichen entfernen",
       "CUSTOMDOMAIN": "Domänverifikation",
       "CUSTOMTEXTLOGIN": "Benutzerdefinierte Logininterface Texte",
-      "CUSTOMTEXTMESSAGE":"Benutzerdefinierte Benachrichtigungstexte",
-      "PRIVACYPOLICY":"Benutzerdefinierte Datenschutzrichtlinie und AGB",
-      "METADATAUSER":"User Metadata"
+      "CUSTOMTEXTMESSAGE": "Benutzerdefinierte Benachrichtigungstexte",
+      "PRIVACYPOLICY": "Benutzerdefinierte Datenschutzrichtlinie und AGB",
+      "METADATAUSER": "User Metadata",
+      "FLOWS": "Aktionen und Abläufe"
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -710,34 +763,34 @@
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
-      "TITLE":"Private Labeling",
-      "DESCRIPTION":"Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
-      "PREVIEW_DESCRIPTION":"Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
-      "BTN":"Datei auswählen",
-      "ACTIVATEPREVIEW":"Konfiguration übernehmen",
-      "DARK":"Dunkler Modus",
-      "LIGHT":"Heller Modus",
-      "CHANGEVIEW":"Ansicht wechseln",
-      "ACTIVATED":"Richtlinie wurde LIVE geschaltet",
-      "THEME":"Modus",
-      "COLORS":"Farben",
-      "FONT":"Schrift",
-      "ADVANCEDBEHAVIOR":"Erweitertes Verhalten",
-      "DROP":"Bild hier ablegen oder",
-      "RELEASE":"Jetzt loslassen",
-      "DROPFONT":"Fontdatei hier ablegen",
-      "RELEASEFONT":"Jetzt loslassen",
-      "USEOFLOGO":"Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Konsole verwendet wird",
-      "MAXSIZE":"Die maximale Grösse von Uploads ist mit 524kB begrenzt",
-      "EMAILNOSVG":"Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
-      "MAXSIZEEXCEEDED":"Maximale Grösse von 524kB überschritten",
-      "FONTINLOGINONLY":"Die Schriftart wird momentan nur im Login interface angezeigt.",
+      "TITLE": "Private Labeling",
+      "DESCRIPTION": "Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
+      "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
+      "BTN": "Datei auswählen",
+      "ACTIVATEPREVIEW": "Konfiguration übernehmen",
+      "DARK": "Dunkler Modus",
+      "LIGHT": "Heller Modus",
+      "CHANGEVIEW": "Ansicht wechseln",
+      "ACTIVATED": "Richtlinie wurde LIVE geschaltet",
+      "THEME": "Modus",
+      "COLORS": "Farben",
+      "FONT": "Schrift",
+      "ADVANCEDBEHAVIOR": "Erweitertes Verhalten",
+      "DROP": "Bild hier ablegen oder",
+      "RELEASE": "Jetzt loslassen",
+      "DROPFONT": "Fontdatei hier ablegen",
+      "RELEASEFONT": "Jetzt loslassen",
+      "USEOFLOGO": "Ihr Logo wird im Login sowie emails verwendet, während das Icon für kleinere UI-Elemente wie den Organisationswechsel in der Konsole verwendet wird",
+      "MAXSIZE": "Die maximale Grösse von Uploads ist mit 524kB begrenzt",
+      "EMAILNOSVG": "Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
+      "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
+      "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
       "PREVIEW": {
-        "TITLE":"Anmeldung",
-        "SECOND":"mit ZITADEL-Konto anmelden.",
-        "ERROR":"Benutzer konnte nicht gefunden werden!",
-        "PRIMARYBUTTON":"weiter",
-        "SECONDARYBUTTON":"registrieren"
+        "TITLE": "Anmeldung",
+        "SECOND": "mit ZITADEL-Konto anmelden.",
+        "ERROR": "Benutzer konnte nicht gefunden werden!",
+        "PRIMARYBUTTON": "weiter",
+        "SECONDARYBUTTON": "registrieren"
       }
     },
     "PWD_AGE": {
@@ -763,104 +816,104 @@
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
-      "ADVANCED":"Erweitert",
+      "ADVANCED": "Erweitert",
       "SAVED": "Erfolgreich gespeichert."
     },
     "PRIVACY_POLICY": {
       "TITLE": "Datenschutzbestimmungen und AGB",
       "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
-      "TOSLINK":"Link zu den Allgemeinen Geschäftsbedingungen",
-      "POLICYLINK":"Link zur den Datenschutzrichtlinien",
+      "TOSLINK": "Link zu den Allgemeinen Geschäftsbedingungen",
+      "POLICYLINK": "Link zur den Datenschutzrichtlinien",
       "SAVED": "Saved successfully!",
-      "RESET_TITLE":"Standardwerte wiederherstellen",
-      "RESET_DESCRIPTION":"Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
+      "RESET_TITLE": "Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"
     },
     "LOGIN_TEXTS": {
-      "TITLE":"Login Interface Texte",
+      "TITLE": "Login Interface Texte",
       "DESCRIPTION": "Definiere die Texte für das Logininterface. Wenn Texte leer sind, wird der als Platzhalter angezeigte Standardwert verwendet.",
-      "DESCRIPTION_SHORT":"Definiere die Texte für das Logininterface.",
-     "NEWERVERSIONEXISTS":"Neuere Version verfügbar",
-      "CURRENTDATE":"Momentaner Stand",
-      "CHANGEDATE":"Neuer Stand vom",
-      "KEYNAME":"Login Screen / Interface",
-      "RESET_TITLE":"Standardwerte wiederherstellen",
-      "RESET_DESCRIPTION":"Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
-      "UNSAVED_TITLE":"Ohne speichern fortfahren?",
-      "UNSAVED_DESCRIPTION":"Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
-      "LOCALE":"Sprachcode",
+      "DESCRIPTION_SHORT": "Definiere die Texte für das Logininterface.",
+      "NEWERVERSIONEXISTS": "Neuere Version verfügbar",
+      "CURRENTDATE": "Momentaner Stand",
+      "CHANGEDATE": "Neuer Stand vom",
+      "KEYNAME": "Login Screen / Interface",
+      "RESET_TITLE": "Standardwerte wiederherstellen",
+      "RESET_DESCRIPTION": "Sie sind im Begriff alle Standardwerte wiederherzustellen. Alle von Ihnen gesetzen Änderungen werden unwiederruflich gelöscht. Wollen Sie fortfahren?",
+      "UNSAVED_TITLE": "Ohne speichern fortfahren?",
+      "UNSAVED_DESCRIPTION": "Sie haben Änderungen vorgenommen ohne zu speichern. Möchten Sie jetzt speichern?",
+      "LOCALE": "Sprachcode",
       "LOCALES": {
-        "de":"German",
-        "en":"English",
-        "it":"Italian",
-        "fr":"French"
+        "de": "German",
+        "en": "English",
+        "it": "Italian",
+        "fr": "French"
       },
       "KEYS": {
-        "emailVerificationDoneText":"Email Verification erfolgreich",
-        "emailVerificationText":"Email Verification",
-        "externalUserNotFoundText":"Externer Benutzer nicht gefunden",
-        "footerText":"Fusszeile",
-        "initMfaDoneText":"MFA Initialisierung erfolgreich",
-        "initMfaOtpText":"MFA Initialisierung",
-        "initMfaPromptText":"MFA Einrichtungsaufforderung",
-        "initMfaU2fText":"Universeller Zweitfaktor Initialisierung",
-        "initPasswordDoneText":"Passwort Initialisierung erfolgreich",
-        "initPasswordText":"Password Initialisierung",
-        "initializeDoneText":"Benutzereinrichtung erfolgreich",
-        "initializeUserText":"Benutzereinrichtung",
-        "linkingUserDoneText":"Benutzerverlinkung erfolgreich",
-        "loginText":"Anmelden",
-        "logoutText":"Abmelden",
-        "mfaProvidersText":"MFA Provider",
-        "passwordChangeDoneText":"Passwortwechsel erfolgreich",
-        "passwordChangeText":"Passwortwechsel",
-        "passwordResetDoneText":"Passwort zurücksetzen erfolgreich",
-        "passwordText":"Passwort",
-        "registrationOptionText":"Registrierungsoptionen",
-        "registrationOrgText":"Organisation registrieren",
-        "registrationUserText":"Benutzer registrieren",
-        "selectAccountText":"Account wählen",
-        "successLoginText":"Erfolgreiche Anmeldung",
-        "usernameChangeDoneText":"Benutzernamenwechsel erfolgreich",
-        "usernameChangeText":"Benutzernamenwechsel",
-        "verifyMfaOtpText":"OTP Verifikation",
-        "verifyMfaU2fText":"Universeller Zweitfaktor Verifikation",
-        "passwordlessPromptText":"Passwordless Aufforderung",
-        "passwordlessRegistrationDoneText":"Passwordless setzen erfolgreich",
-        "passwordlessRegistrationText":"Passwordless Registrierung",
-        "passwordlessText":"Passwordless",
-        "externalRegistrationUserOverviewText":"Externe Registrierung Benutzer Übersicht"
+        "emailVerificationDoneText": "Email Verification erfolgreich",
+        "emailVerificationText": "Email Verification",
+        "externalUserNotFoundText": "Externer Benutzer nicht gefunden",
+        "footerText": "Fusszeile",
+        "initMfaDoneText": "MFA Initialisierung erfolgreich",
+        "initMfaOtpText": "MFA Initialisierung",
+        "initMfaPromptText": "MFA Einrichtungsaufforderung",
+        "initMfaU2fText": "Universeller Zweitfaktor Initialisierung",
+        "initPasswordDoneText": "Passwort Initialisierung erfolgreich",
+        "initPasswordText": "Password Initialisierung",
+        "initializeDoneText": "Benutzereinrichtung erfolgreich",
+        "initializeUserText": "Benutzereinrichtung",
+        "linkingUserDoneText": "Benutzerverlinkung erfolgreich",
+        "loginText": "Anmelden",
+        "logoutText": "Abmelden",
+        "mfaProvidersText": "MFA Provider",
+        "passwordChangeDoneText": "Passwortwechsel erfolgreich",
+        "passwordChangeText": "Passwortwechsel",
+        "passwordResetDoneText": "Passwort zurücksetzen erfolgreich",
+        "passwordText": "Passwort",
+        "registrationOptionText": "Registrierungsoptionen",
+        "registrationOrgText": "Organisation registrieren",
+        "registrationUserText": "Benutzer registrieren",
+        "selectAccountText": "Account wählen",
+        "successLoginText": "Erfolgreiche Anmeldung",
+        "usernameChangeDoneText": "Benutzernamenwechsel erfolgreich",
+        "usernameChangeText": "Benutzernamenwechsel",
+        "verifyMfaOtpText": "OTP Verifikation",
+        "verifyMfaU2fText": "Universeller Zweitfaktor Verifikation",
+        "passwordlessPromptText": "Passwordless Aufforderung",
+        "passwordlessRegistrationDoneText": "Passwordless setzen erfolgreich",
+        "passwordlessRegistrationText": "Passwordless Registrierung",
+        "passwordlessText": "Passwordless",
+        "externalRegistrationUserOverviewText": "Externe Registrierung Benutzer Übersicht"
       }
     },
     "MESSAGE_TEXTS": {
-      "TITLE":"Email Texte",
+      "TITLE": "Email Texte",
       "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
       "TYPES": {
-        "INIT":"Initialisierung",
-        "VE":"Emailverifikation",
-        "VP":"Telefonnummerverifikation",
-        "PR":"Password Wiederherstellung",
-        "DC":"Domainbeanspruchung",
-        "PL":"Passwordless"
+        "INIT": "Initialisierung",
+        "VE": "Emailverifikation",
+        "VP": "Telefonnummerverifikation",
+        "PR": "Password Wiederherstellung",
+        "DC": "Domainbeanspruchung",
+        "PL": "Passwordless"
       },
       "CHIPS": {
-        "firstname":"Vorname",
-        "lastname":"Nachname",
-        "code":"Code",
-        "preferredLoginName":"Bevorzugter Anmeldename",
-        "displayName":"Anzeigename",
-        "nickName":"Spitzname",
-        "loginnames":"Loginnamen",
-        "domain":"Domain",
-        "lastEmail":"Letzte email",
-        "lastPhone":"Letzte Telefonnummer",
-        "verifiedEmail":"Verifizierte email",
-        "verifiedPhone":"Verifizierte Telefonnummer",
-        "changedate":"Änderungsdatum",
-        "username":"Username",
-        "tempUsername":"Temp. Username"
+        "firstname": "Vorname",
+        "lastname": "Nachname",
+        "code": "Code",
+        "preferredLoginName": "Bevorzugter Anmeldename",
+        "displayName": "Anzeigename",
+        "nickName": "Spitzname",
+        "loginnames": "Loginnamen",
+        "domain": "Domain",
+        "lastEmail": "Letzte email",
+        "lastPhone": "Letzte Telefonnummer",
+        "verifiedEmail": "Verifizierte email",
+        "verifiedPhone": "Verifizierte Telefonnummer",
+        "changedate": "Änderungsdatum",
+        "username": "Username",
+        "tempUsername": "Temp. Username"
       },
       "TOAST": {
-        "UPDATED":"Benutzerdefinierte Texte gespeichert."
+        "UPDATED": "Benutzerdefinierte Texte gespeichert."
       }
     },
     "DEFAULTLABEL": "Die aktuelle Richtlinie entspricht der IAM-Standard Einstellung.",
@@ -888,9 +941,9 @@
       "FORCEMFA_DESC": "Ist die Option gewählt, müssen Benutzer einen zweiten Faktor für den Login verwenden.",
       "HIDEPASSWORDRESET": "Passwort vergessen ausblenden",
       "HIDEPASSWORDRESET_DESC": "Ist die Option gewählt, ist es nicht möglich im Login das Passwort zurück zusetzen via Passwort vergessen Link.",
-      "HIDELOGINNAMESUFFIX":"Loginname Suffix ausblenden",
-      "ERRORMSGPOPUP":"Fehler als Dialog Fenster",
-      "DISABLEWATERMARK":"Wasserzeichen ausblenden"
+      "HIDELOGINNAMESUFFIX": "Loginname Suffix ausblenden",
+      "ERRORMSGPOPUP": "Fehler als Dialog Fenster",
+      "DISABLEWATERMARK": "Wasserzeichen ausblenden"
     },
     "RESET": "Richtlinie zurücksetzen",
     "CREATECUSTOM": "Benutzerdefinierte Richtlinie erstellen",
@@ -899,7 +952,7 @@
       "RESETSUCCESS": "Richtline zurückgesetzt!",
       "UPLOADSUCCESS": "Upload erfolgreich",
       "DELETESUCCESS": "Löschen erfolgreich",
-      "UPLOADFAILED":"Upload fehlgeschlagen!"
+      "UPLOADFAILED": "Upload fehlgeschlagen!"
     }
   },
   "ORG_DETAIL": {
@@ -939,7 +992,7 @@
     "PAGES": {
       "TITLE": "Projekt",
       "DESCRIPTION": "Hier kannst Du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist.",
-      "DELETE":"Projekt löschen",
+      "DELETE": "Projekt löschen",
       "LIST": "Projekte",
       "LISTDESCRIPTION": "Hier findest Du alle Projekte, für die Du Aktionen anzeigen oder ausführen darfst. Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
       "DETAIL": "Details",
@@ -953,22 +1006,22 @@
         "GRANTED": "Berechtigte Projekte"
       },
       "PRIVATELABEL": {
-        "TITLE":"Private Labeling Verhalten",
+        "TITLE": "Private Labeling Verhalten",
         "0": {
-          "TITLE":"Unspezifiziert",
-          "DESC":"Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
+          "TITLE": "Unspezifiziert",
+          "DESC": "Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
         },
         "1": {
-          "TITLE":"Durchsetzung der Richtlinie des Projekteigentümers",
-          "DESC":"Das Privatelabeling der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
+          "TITLE": "Durchsetzung der Richtlinie des Projekteigentümers",
+          "DESC": "Das Privatelabeling der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
         },
         "2": {
-          "TITLE":"Durchsetzung der Richtlinie des Benutzereigentümers",
-          "DESC":"Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
+          "TITLE": "Durchsetzung der Richtlinie des Benutzereigentümers",
+          "DESC": "Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
         },
-        "DIALOG":{
-          "TITLE":"Privatelabeling Verhalten",
-          "DESCRIPTION":"Bestimmen Sie das Verhalten des Projektes im Bezug auf das Privatelabeling."
+        "DIALOG": {
+          "TITLE": "Privatelabeling Verhalten",
+          "DESCRIPTION": "Bestimmen Sie das Verhalten des Projektes im Bezug auf das Privatelabeling."
         }
       },
       "PINNED": "Angepinnt",
@@ -1005,9 +1058,9 @@
     },
     "NAME": "Name",
     "NAMEDIALOG": {
-      "TITLE":"Projekt umbenennen",
-      "DESCRIPTION":"Geben Sie den neuen Namen für Ihr Projekt an!",
-      "NAME":"Projektname"
+      "TITLE": "Projekt umbenennen",
+      "DESCRIPTION": "Geben Sie den neuen Namen für Ihr Projekt an!",
+      "NAME": "Projektname"
     },
     "MEMBER": {
       "TITLE": "Manager",
@@ -1046,7 +1099,7 @@
         "MEMBERTITLE": "Berechtigte Manager der Organisation",
         "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
         "PROJECTNAME": "Projektname",
-        "GRANTEDORG":"Berechtigte Organisation",
+        "GRANTEDORG": "Berechtigte Organisation",
         "RESOURCEOWNER": "Besitzer"
       },
       "STATE": "Status",
@@ -1146,7 +1199,7 @@
     "LIST": {
       "TITLE": "Identitäts Provider",
       "DESCRIPTION": "Definieren Sie hier Ihre zusätzlichen Idps, die sie für die Authentifizierung in Ihren Organisationen verwenden können.",
-      "ACTIVETITLE":"Aktive Identitäts Provider"
+      "ACTIVETITLE": "Aktive Identitäts Provider"
     },
     "CREATE": {
       "TITLE": "Neuer Identitäts Provider",
@@ -1155,8 +1208,8 @@
     "DETAIL": {
       "TITLE": "Identitäts Provider",
       "DESCRIPTION": "Generelle Konfiguration deines Identitäts Providers",
-      "DATECREATED":"Erstellt",
-      "DATECHANGED":"Geändert"
+      "DATECREATED": "Erstellt",
+      "DATECHANGED": "Geändert"
     },
     "OWNERTYPES": {
       "0": "unknown",
@@ -1164,8 +1217,8 @@
       "2": "Organisation"
     },
     "TYPES": {
-        "0": "unknown",
-        "1": "OIDC"
+      "0": "unknown",
+      "1": "OIDC"
     },
     "STATES": {
       "1": "aktiv",
@@ -1180,11 +1233,11 @@
       "0": "kein Styling",
       "1": "Google"
     },
-    "ADD":"Identity Provider hinzufügen",
-    "AUTOREGISTER":"Automatische Registrierung",
-    "AUTOREGISTER_DESC":"Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
+    "ADD": "Identity Provider hinzufügen",
+    "AUTOREGISTER": "Automatische Registrierung",
+    "AUTOREGISTER_DESC": "Wenn aktiviert und noch kein Account vorhanden ist, wird einer für den entsprechenden Benutzer erstellt.",
     "TYPE": "Typ",
-    "OWNER":"Besitzer",
+    "OWNER": "Besitzer",
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Konfiguration",
@@ -1195,7 +1248,7 @@
     "CLIENTSECRET": "Client Secret",
     "IDPDISPLAYNAMMAPPING": "IDP Anzeigename Mapping",
     "USERNAMEMAPPING": "Username Mapping",
-    "DATES":"Datum",
+    "DATES": "Datum",
     "CREATIONDATE": "Erstelldatum",
     "CHANGEDATE": "Letzte Änderung",
     "DEACTIVATE": "Deaktivieren",
@@ -1206,15 +1259,15 @@
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "OIDC": {
-      "TITLE":"OpenId Connect IDP",
-      "DESCRIPTION":"Geben Sie die Daten OIDC Identity Providers ein."
+      "TITLE": "OpenId Connect IDP",
+      "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
     },
     "JWT": {
-      "TITLE":"JWT IDP",
-      "DESCRIPTION":"Geben Sie die Daten JWT Identity Providers ein. ",
-      "HEADERNAME":"Header Name",
-      "JWTENDPOINT":"JWT Endpoint",
-      "JWTKEYSENDPOINT":"JWT Keys Endpoint"
+      "TITLE": "JWT IDP",
+      "DESCRIPTION": "Geben Sie die Daten JWT Identity Providers ein. ",
+      "HEADERNAME": "Header Name",
+      "JWTENDPOINT": "JWT Endpoint",
+      "JWTKEYSENDPOINT": "JWT Keys Endpoint"
     },
     "TOAST": {
       "SAVED": "Erfolgreich gespeichert.",
@@ -1282,11 +1335,11 @@
       "CREATE_OIDC": "OIDC-Anwendung",
       "CREATE_OIDC_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",
       "CREATE_OIDC_DESC_SUB": "Es wird automatisch eine empfohlene Konfiguration generiert.",
-      "STATE":"Status",
-      "DATECREATED":"Erstellt",
-      "DATECHANGED":"Geändert",
-      "URLS":"Urls",
-      "DELETE":"App löschen",
+      "STATE": "Status",
+      "DATECREATED": "Erstellt",
+      "DATECHANGED": "Geändert",
+      "URLS": "Urls",
+      "DELETE": "App löschen",
       "DETAIL": {
         "TITLE": "Detail",
         "STATE": {
@@ -1318,19 +1371,19 @@
       }
     },
     "NAMEDIALOG": {
-      "TITLE":"App umbenennen",
-      "DESCRIPTION":"Geben Sie den neuen Namen für Ihre App an!",
-      "NAME":"Appname"
+      "TITLE": "App umbenennen",
+      "DESCRIPTION": "Geben Sie den neuen Namen für Ihre App an!",
+      "NAME": "Appname"
     },
     "NAME": "Name",
     "TYPE": "Anwendungstyp",
     "AUTHMETHOD": "Authentifizierungsmethode",
     "AUTHMETHODSECTION": "Authentifizierungsmethode",
     "GRANT": "Berechtigungstypen",
-    "ADDITIONALORIGINS":"Zusätzliche Origins",
-    "ADDITIONALORIGINSDESC":"Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusätzen sind, können Sie dies hier tun.",
-    "ORIGINS":"Origins",
-    "NOTANORIGIN":"Der Angegebene Wert ist kein Origin.",
+    "ADDITIONALORIGINS": "Zusätzliche Origins",
+    "ADDITIONALORIGINSDESC": "Wenn sie zusätzliche Origins definieren wollen, die nicht den Redirect URIs gleichzusätzen sind, können Sie dies hier tun.",
+    "ORIGINS": "Origins",
+    "NOTANORIGIN": "Der Angegebene Wert ist kein Origin.",
     "OIDC": {
       "INFO": {
         "ISSUER": "Issuer",
@@ -1353,7 +1406,7 @@
       "TITLE": "OIDC-Konfiguration",
       "CLIENTID": "Client ID",
       "CLIENTSECRET": "Client Secret",
-      "CLIENTSECRET_NOSECRET":"Bei ihrem gewählten Authentication Flow wird kein Secret benötigt und steht daher nicht zur Verfügung.",
+      "CLIENTSECRET_NOSECRET": "Bei ihrem gewählten Authentication Flow wird kein Secret benötigt und steht daher nicht zur Verfügung.",
       "CLIENTSECRET_DESCRIPTION": "Verwahre das Client Secret an einem sicheren Ort, da es nicht mehr angezeigt werden kann, sobald der Dialog geschlossen wird.",
       "REGENERATESECRET": "Client Secret neu generieren",
       "DEVMODE": "Entwicklermodus",
@@ -1375,7 +1428,7 @@
         "1": "ID-Token",
         "2": "Token-ID-Token"
       },
-      "REFRESHTOKEN":"Refresh Token",
+      "REFRESHTOKEN": "Refresh Token",
       "GRANTTYPE": "Berechtigungstypen",
       "GRANT": {
         "0": "Authorisation Code",
@@ -1468,7 +1521,7 @@
       "REACTIVATED": "Anwendung reaktiviert.",
       "DEACTIVATED": "Anwendung deaktiviert.",
       "OIDCUPDATED": "OIDC-Konfiguration geändert.",
-      "APIUPDATED":"API Konfiguration geändert.",
+      "APIUPDATED": "API Konfiguration geändert.",
       "UPDATED": "App geändert.",
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",
       "DELETED": "App gelöscht.",
@@ -1489,7 +1542,7 @@
   "MEMBER": {
     "ADD": "Manager hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
-    "DOCSINFO":"Weitere Informationen finden Sie in unserer Dokumentation",
+    "DOCSINFO": "Weitere Informationen finden Sie in unserer Dokumentation",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organisation",

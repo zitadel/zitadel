@@ -5081,7 +5081,8 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | link |  string | - |  |
-| lifetime |  google.protobuf.Duration | - |  |
+| lifetime |  google.protobuf.Duration | deprecated: use expiration instead |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 

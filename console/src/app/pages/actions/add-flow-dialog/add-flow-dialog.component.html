@@ -1,0 +1,42 @@
+<span class="title" mat-dialog-title>{{'FLOWS.DIALOG.ADD.TITLE' | translate}}</span>
+
+<div mat-dialog-content>
+  <!-- <p class="desc"> {{'FLOWS.DIALOG.ADD.DESCRIPTION' | translate}}</p> -->
+  <form *ngIf="form" [formGroup]="form">
+    <cnsl-form-field class="form-field" appearance="outline">
+      <cnsl-label>{{'FLOWS.FLOWTYPE' | translate}}</cnsl-label>
+      <mat-select formControlName="flowType">
+        <mat-option *ngFor="let type of typesForSelection" [value]="type">
+          {{ 'FLOWS.TYPES.'+type | translate }}
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="form-field" appearance="outline">
+      <cnsl-label>{{'FLOWS.TRIGGERTYPE' | translate}}</cnsl-label>
+      <mat-select formControlName="triggerType" name="triggerType">
+        <mat-option *ngFor="let type of triggerTypesForSelection" [value]="type">
+          {{ 'FLOWS.TRIGGERTYPES.'+type | translate }}
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+
+    <cnsl-form-field class="form-field" appearance="outline">
+      <cnsl-label>{{'FLOWS.ACTIONS' | translate}}</cnsl-label>
+      <mat-select formControlName="actionIdsList" name="actionIdsList" multiple>
+        <mat-option *ngFor="let action of actions" [value]="action.id">
+          {{ action.name }}
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+  </form>
+</div>
+<div mat-dialog-actions class=" action">
+  <button mat-button (click)="closeDialog()">
+    {{'ACTIONS.CANCEL' | translate}}
+  </button>
+
+  <button color="primary" mat-raised-button class="ok-button" [disabled]="false" (click)="closeDialogWithSuccess()">
+    <span>{{'ACTIONS.SAVE' | translate}}</span>
+  </button>
+</div>

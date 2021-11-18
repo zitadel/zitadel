@@ -75,6 +75,14 @@ const routes: Routes = [
         },
     },
     {
+      path: 'actions',
+      loadChildren: () => import('./pages/actions/actions.module').then(m => m.ActionsModule),
+      canActivate: [AuthGuard, RoleGuard],
+      data: {
+          roles: ['org.read'],
+      },
+  },
+    {
         path: 'grants',
         loadChildren: () => import('./pages/grants/grants.module').then(m => m.GrantsModule),
         canActivate: [AuthGuard, RoleGuard],
