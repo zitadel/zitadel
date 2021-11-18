@@ -9,7 +9,7 @@ import (
 	features_pb "github.com/caos/zitadel/pkg/grpc/features"
 )
 
-func ModelFeatureToPb(features *query.Feature) *features_pb.Features {
+func ModelFeaturesToPb(features *query.Features) *features_pb.Features {
 	return &features_pb.Features{
 		IsDefault:                features.IsDefault,
 		Tier:                     FeatureTierToPb(features.TierName, features.TierDescription, features.State, features.StateDescription),

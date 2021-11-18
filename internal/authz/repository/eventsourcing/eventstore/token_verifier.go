@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/authz/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/crypto"
@@ -19,6 +18,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -111,17 +111,14 @@ func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context
 }
 
 func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
-	features, err := repo.Query.FeatureByOrgID(ctx, orgID)
-	if caos_errs.IsNotFound(err) {
-		return repo.checkDefaultFeatures(ctx, requiredFeatures...)
-	}
+	features, err := repo.Query.FeaturesByOrgID(ctx, orgID)
 	if err != nil {
 		return err
 	}
 	return checkFeatures(features, requiredFeatures...)
 }
 
-func checkFeatures(features *query.Feature, requiredFeatures ...string) error {
+func checkFeatures(features *query.Features, requiredFeatures ...string) error {
 	for _, requiredFeature := range requiredFeatures {
 		if strings.HasPrefix(requiredFeature, domain.FeatureLoginPolicy) {
 			if err := checkLoginPolicyFeatures(features, requiredFeature); err != nil {
@@ -188,7 +185,7 @@ func checkFeatures(features *query.Feature, requiredFeatures ...string) error {
 	return nil
 }
 
-func checkLoginPolicyFeatures(features *query.Feature, requiredFeature string) error {
+func checkLoginPolicyFeatures(features *query.Features, requiredFeature string) error {
 	switch requiredFeature {
 	case domain.FeatureLoginPolicyFactors:
 		if !features.LoginPolicyFactors {
@@ -222,7 +219,7 @@ func checkLoginPolicyFeatures(features *query.Feature, requiredFeature string) e
 	return nil
 }
 
-func checkLabelPolicyFeatures(features *query.Feature, requiredFeature string) error {
+func checkLabelPolicyFeatures(features *query.Features, requiredFeature string) error {
 	switch requiredFeature {
 	case domain.FeatureLabelPolicyPrivateLabel:
 		if !features.LabelPolicyPrivateLabel {
@@ -281,7 +278,7 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 }
 
 func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {
-	features, err := repo.Query.DefaultFeature(ctx)
+	features, err := repo.Query.DefaultFeatures(ctx)
 	if err != nil {
 		return err
 	}

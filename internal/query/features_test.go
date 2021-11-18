@@ -25,8 +25,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareFeatureQuery no result",
-			prepare: prepareFeatureQuery,
+			name:    "prepareFeaturesQuery no result",
+			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
@@ -65,11 +65,11 @@ func Test_FeaturesPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*Feature)(nil),
+			object: (*Features)(nil),
 		},
 		{
-			name:    "prepareFeatureQuery found",
-			prepare: prepareFeatureQuery,
+			name:    "prepareFeaturesQuery found",
+			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
@@ -154,7 +154,7 @@ func Test_FeaturesPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &Feature{
+			object: &Features{
 				AggregateID:              "aggregate-id",
 				ChangeDate:               testNow,
 				Sequence:                 20211115,
@@ -183,8 +183,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareFeatureQuery found with empty",
-			prepare: prepareFeatureQuery,
+			name:    "prepareFeaturesQuery found with empty",
+			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
@@ -269,7 +269,7 @@ func Test_FeaturesPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &Feature{
+			object: &Features{
 				AggregateID:              "aggregate-id",
 				ChangeDate:               testNow,
 				Sequence:                 20211115,
@@ -298,8 +298,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareFeatureQuery sql err",
-			prepare: prepareFeatureQuery,
+			name:    "prepareFeaturesQuery sql err",
+			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+

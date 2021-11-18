@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
-type Feature struct {
+type Features struct {
 	AggregateID              string
 	ChangeDate               time.Time
 	Sequence                 uint64
@@ -147,8 +147,8 @@ var (
 	}
 )
 
-func (q *Queries) FeatureByOrgID(ctx context.Context, orgID string) (*Feature, error) {
-	query, scan := prepareFeatureQuery()
+func (q *Queries) FeaturesByOrgID(ctx context.Context, orgID string) (*Features, error) {
+	query, scan := prepareFeaturesQuery()
 	stmt, args, err := query.Where(
 		sq.Or{
 			sq.Eq{
@@ -168,8 +168,8 @@ func (q *Queries) FeatureByOrgID(ctx context.Context, orgID string) (*Feature, e
 	return scan(row)
 }
 
-func (q *Queries) DefaultFeature(ctx context.Context) (*Feature, error) {
-	query, scan := prepareFeatureQuery()
+func (q *Queries) DefaultFeatures(ctx context.Context) (*Features, error) {
+	query, scan := prepareFeaturesQuery()
 	stmt, args, err := query.Where(sq.Eq{
 		FeatureColumnAggregateID.identifier(): domain.IAMID,
 	}).ToSql()
@@ -181,7 +181,7 @@ func (q *Queries) DefaultFeature(ctx context.Context) (*Feature, error) {
 	return scan(row)
 }
 
-func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) {
+func prepareFeaturesQuery() (sq.SelectBuilder, func(*sql.Row) (*Features, error)) {
 	return sq.Select(
 			FeatureColumnAggregateID.identifier(),
 			FeatureColumnChangeDate.identifier(),
@@ -209,8 +209,8 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			FeatureLockoutPolicy.identifier(),
 			FeatureActions.identifier(),
 		).From(featureTable.identifier()).PlaceholderFormat(sq.Dollar),
-		func(row *sql.Row) (*Feature, error) {
-			p := new(Feature)
+		func(row *sql.Row) (*Features, error) {
+			p := new(Features)
 			tierName := sql.NullString{}
 			tierDescription := sql.NullString{}
 			stateDescription := sql.NullString{}
@@ -243,7 +243,7 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-M9fse", "Errors.Feature.NotFound")
+					return nil, errors.ThrowNotFound(err, "QUERY-M9fse", "Errors.Features.NotFound")
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-3o9gd", "Errors.Internal")
 			}
@@ -254,7 +254,7 @@ func prepareFeatureQuery() (sq.SelectBuilder, func(*sql.Row) (*Feature, error)) 
 		}
 }
 
-func (f *Feature) EnabledFeatureTypes() []string {
+func (f *Features) EnabledFeatureTypes() []string {
 	list := make([]string, 0)
 	if f.LoginPolicyFactors {
 		list = append(list, domain.FeatureLoginPolicyFactors)
