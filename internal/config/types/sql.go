@@ -18,6 +18,7 @@ type SQL struct {
 	Port            string
 	User            string
 	Password        string
+	ClusterName     string
 	Database        string
 	Schema          string
 	SSL             *ssl
@@ -27,11 +28,12 @@ type SQL struct {
 }
 
 type SQLBase struct {
-	Host     string
-	Port     string
-	Database string
-	Schema   string
-	SSL      sslBase
+	Host        string
+	Port        string
+	ClusterName string
+	Database    string
+	Schema      string
+	SSL         sslBase
 }
 
 type SQLUser struct {
@@ -68,16 +70,21 @@ func (s *SQL) connectionString() string {
 		"application_name=zitadel",
 		"sslmode=" + s.SSL.Mode,
 	}
+	if s.ClusterName != "" {
+		fields = append(fields, "options=--cluster="+s.ClusterName)
+	}
 	if s.Password != "" {
 		fields = append(fields, "password="+s.Password)
 	}
 
 	if s.SSL.Mode != sslDisabledMode {
-		fields = append(fields, []string{
-			"sslrootcert=" + s.SSL.RootCert,
-			"sslcert=" + s.SSL.Cert,
-			"sslkey=" + s.SSL.Key,
-		}...)
+		fields = append(fields, "sslrootcert="+s.SSL.RootCert)
+		if s.SSL.Cert != "" {
+			fields = append(fields, "sslcert="+s.SSL.Cert)
+		}
+		if s.SSL.Cert != "" {
+			fields = append(fields, "sslkey="+s.SSL.Key)
+		}
 	}
 
 	return strings.Join(fields, " ")
@@ -103,7 +110,7 @@ func (s *SQL) checkSSL() {
 		s.SSL = &ssl{sslBase: sslBase{Mode: sslDisabledMode}}
 		return
 	}
-	if s.SSL.Cert == "" || s.SSL.Key == "" || s.SSL.RootCert == "" {
+	if s.SSL.Cert == "" && s.SSL.Key == "" && s.SSL.RootCert == "" {
 		logging.LogWithFields("TYPES-LFdzP",
 			"cert set", s.SSL.Cert != "",
 			"key set", s.SSL.Key != "",
@@ -114,11 +121,12 @@ func (s *SQL) checkSSL() {
 
 func (u SQLUser) Start(base SQLBase) (*sql.DB, error) {
 	return (&SQL{
-		Host:     base.Host,
-		Port:     base.Port,
-		User:     u.User,
-		Password: u.Password,
-		Database: base.Database,
+		Host:        base.Host,
+		Port:        base.Port,
+		User:        u.User,
+		Password:    u.Password,
+		ClusterName: base.ClusterName,
+		Database:    base.Database,
 		SSL: &ssl{
 			sslBase: sslBase{
 				Mode:     base.SSL.Mode,
