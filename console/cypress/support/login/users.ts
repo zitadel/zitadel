@@ -106,6 +106,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
         validate: () => {
 
             if (force || user === User.LoginPolicyUser || user === User.PasswordComplexityUser) {
+                cy.pause()
                 throw new Error("clear session");
             }
 

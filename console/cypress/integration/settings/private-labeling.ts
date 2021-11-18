@@ -20,8 +20,8 @@ describe("private labeling", ()=> {
                 cy.contains('[data-e2e=policy-card]', 'Private Labeling').contains('button', 'Modify').click({force: true})
             })
                         
-            customize('white')
-            customize('dark')
+            customize('white', user)
+            customize('dark', user)
         })
     })
 })
@@ -65,9 +65,11 @@ function customize(theme: string, user: User) {
             cy.contains('[data-e2e=color]', 'Background Color').find('button').click()
             cy.get('color-editable-input').find('input').clear().type('#ae44dc')
             cy.get('[data-e2e=save-colors-button]').click()
-            login(user, true, null, null, () => {
-                cy.pause()
+            cy.get('[data-e2e=header-user-avatar]').click()
+            cy.contains('Logout All Users').click()
+            login(User.LoginPolicyUser, true, null, () => {
             })
+            cy.pause()
         })
         it('should update the primary color')
         it('should update the warning color')
