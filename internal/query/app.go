@@ -7,7 +7,6 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -40,25 +39,26 @@ type OIDCApp struct {
 	GrantTypes             []domain.OIDCGrantType
 	AppType                domain.OIDCApplicationType
 	ClientID               string
-	ClientSecret           *crypto.CryptoValue
 	AuthMethodType         domain.OIDCAuthMethodType
 	PostLogoutRedirectURIs []string
 	Version                domain.OIDCVersion
 	NoneCompliant          bool
 	ComplianceProblems     []string
 	IsDevMode              bool
-	AccessTokenType        domain.OIDCTokenType
-	AssertAccessTokenRole  bool
-	AssertIDTokenRole      bool
-	AssertIDTokenUserinfo  bool
-	ClockSkew              time.Duration
-	AdditionalOrigins      []string
-	AllowedOrigins         []string
+	// TODO: implement
+	IsCompliant           bool
+	AccessTokenType       domain.OIDCTokenType
+	AssertAccessTokenRole bool
+	AssertIDTokenRole     bool
+	AssertIDTokenUserinfo bool
+	ClockSkew             time.Duration
+	AdditionalOrigins     []string
+	// TODO: implement
+	AllowedOrigins []string
 }
 
 type APIApp struct {
 	ClientID       string
-	ClientSecret   *crypto.CryptoValue
 	AuthMethodType domain.APIAuthMethodType
 }
 
@@ -125,10 +125,6 @@ var (
 		name:  projection.AppAPIConfigColumnClientID,
 		table: appAPIConfigsTable,
 	}
-	AppAPIConfigColumnClientSecret = Column{
-		name:  projection.AppAPIConfigColumnClientSecret,
-		table: appAPIConfigsTable,
-	}
 	AppAPIConfigColumnAuthMethod = Column{
 		name:  projection.AppAPIConfigColumnAuthMethod,
 		table: appAPIConfigsTable,
@@ -149,10 +145,6 @@ var (
 	}
 	AppOIDCConfigColumnClientID = Column{
 		name:  projection.AppOIDCConfigColumnClientID,
-		table: appOIDCConfigsTable,
-	}
-	AppOIDCConfigColumnClientSecret = Column{
-		name:  projection.AppOIDCConfigColumnClientSecret,
 		table: appOIDCConfigsTable,
 	}
 	AppOIDCConfigColumnRedirectUris = Column{
@@ -210,7 +202,7 @@ var (
 )
 
 func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID string) (*App, error) {
-	stmt, scan := prepareSingleAppQuery()
+	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppColumnID.identifier():        appID,
@@ -226,7 +218,7 @@ func (q *Queries) AppByProjectAndAppID(ctx context.Context, projectID, appID str
 }
 
 func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
-	stmt, scan := prepareSingleAppQuery()
+	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{AppColumnID.identifier(): appID},
 	).ToSql()
@@ -265,7 +257,7 @@ func (q *Queries) ProjectByOIDCClientID(ctx context.Context, id string) (*Projec
 }
 
 func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App, error) {
-	stmt, scan := prepareSingleAppQuery()
+	stmt, scan := prepareAppQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
 			AppOIDCConfigColumnClientID.identifier(): clientID,
@@ -320,7 +312,7 @@ func NewAppProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(AppColumnProjectID, id, TextEquals)
 }
 
-func prepareSingleAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
+func prepareAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 	return sq.Select(
 			AppColumnID.identifier(),
 			AppColumnName.identifier(),
@@ -333,13 +325,11 @@ func prepareSingleAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 
 			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
-			AppAPIConfigColumnClientSecret.identifier(),
 			AppAPIConfigColumnAuthMethod.identifier(),
 
 			AppOIDCConfigColumnAppID.identifier(),
 			AppOIDCConfigColumnVersion.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
-			AppOIDCConfigColumnClientSecret.identifier(),
 			AppOIDCConfigColumnRedirectUris.identifier(),
 			AppOIDCConfigColumnResponseTypes.identifier(),
 			AppOIDCConfigColumnGrantTypes.identifier(),
@@ -376,13 +366,11 @@ func prepareSingleAppQuery() (sq.SelectBuilder, func(*sql.Row) (*App, error)) {
 
 				&apiConfig.appID,
 				&apiConfig.clientID,
-				&apiConfig.clientSecret,
 				&apiConfig.authMethod,
 
 				&oidcConfig.appID,
 				&oidcConfig.version,
 				&oidcConfig.clientID,
-				&oidcConfig.clientSecret,
 				&oidcConfig.redirectUris,
 				&oidcConfig.responseTypes,
 				&oidcConfig.grantTypes,
@@ -487,17 +475,14 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppColumnResourceOwner.identifier(),
 			AppColumnState.identifier(),
 			AppColumnSequence.identifier(),
-			countColumn.identifier(),
 
 			AppAPIConfigColumnAppID.identifier(),
 			AppAPIConfigColumnClientID.identifier(),
-			AppAPIConfigColumnClientSecret.identifier(),
 			AppAPIConfigColumnAuthMethod.identifier(),
 
 			AppOIDCConfigColumnAppID.identifier(),
 			AppOIDCConfigColumnVersion.identifier(),
 			AppOIDCConfigColumnClientID.identifier(),
-			AppOIDCConfigColumnClientSecret.identifier(),
 			AppOIDCConfigColumnRedirectUris.identifier(),
 			AppOIDCConfigColumnResponseTypes.identifier(),
 			AppOIDCConfigColumnGrantTypes.identifier(),
@@ -511,11 +496,12 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 			AppOIDCConfigColumnIDTokenUserinfoAssertion.identifier(),
 			AppOIDCConfigColumnClockSkew.identifier(),
 			AppOIDCConfigColumnAdditionalOrigins.identifier(),
+			countColumn.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) (*Apps, error) {
-			apps := new(Apps)
+			apps := &Apps{Apps: []*App{}}
 
 			for row.Next() {
 				app := new(App)
@@ -533,17 +519,14 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&app.ResourceOwner,
 					&app.State,
 					&app.Sequence,
-					&apps.Count,
 
 					&apiConfig.appID,
 					&apiConfig.clientID,
-					&apiConfig.clientSecret,
 					&apiConfig.authMethod,
 
 					&oidcConfig.appID,
 					&oidcConfig.version,
 					&oidcConfig.clientID,
-					&oidcConfig.clientSecret,
 					&oidcConfig.redirectUris,
 					&oidcConfig.responseTypes,
 					&oidcConfig.grantTypes,
@@ -557,17 +540,17 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 					&oidcConfig.iDTokenUserinfoAssertion,
 					&oidcConfig.clockSkew,
 					&oidcConfig.additionalOrigins,
+					&apps.Count,
 				)
 
 				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
-						return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
-					}
 					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
 				}
 
 				apiConfig.set(app)
 				oidcConfig.set(app)
+
+				apps.Apps = append(apps.Apps, app)
 			}
 
 			return apps, nil
@@ -585,14 +568,7 @@ func prepareAppIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) 
 
 			for row.Next() {
 				var id string
-				err := row.Scan(
-					&id,
-				)
-
-				if err != nil {
-					if errs.Is(err, sql.ErrNoRows) {
-						return nil, errors.ThrowNotFound(err, "QUERY-pCP8P", "Errors.App.NotExisting")
-					}
+				if err := row.Scan(&id); err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
 				}
 
@@ -607,7 +583,6 @@ type sqlOIDCConfig struct {
 	appID                    sql.NullString
 	version                  sql.NullInt32
 	clientID                 sql.NullString
-	clientSecret             crypto.CryptoValue
 	redirectUris             pq.StringArray
 	applicationType          sql.NullInt16
 	authMethodType           sql.NullInt16
@@ -630,7 +605,6 @@ func (c sqlOIDCConfig) set(app *App) {
 	app.OIDCConfig = &OIDCApp{
 		Version:                domain.OIDCVersion(c.version.Int32),
 		ClientID:               c.clientID.String,
-		ClientSecret:           &c.clientSecret,
 		RedirectURIs:           c.redirectUris,
 		AppType:                domain.OIDCApplicationType(c.applicationType.Int16),
 		AuthMethodType:         domain.OIDCAuthMethodType(c.authMethodType.Int16),
@@ -648,10 +622,9 @@ func (c sqlOIDCConfig) set(app *App) {
 }
 
 type sqlAPIConfig struct {
-	appID        sql.NullString
-	clientID     sql.NullString
-	clientSecret crypto.CryptoValue
-	authMethod   sql.NullInt16
+	appID      sql.NullString
+	clientID   sql.NullString
+	authMethod sql.NullInt16
 }
 
 func (c sqlAPIConfig) set(app *App) {
@@ -660,7 +633,6 @@ func (c sqlAPIConfig) set(app *App) {
 	}
 	app.APIConfig = &APIApp{
 		ClientID:       c.clientID.String,
-		ClientSecret:   &c.clientSecret,
 		AuthMethodType: domain.APIAuthMethodType(c.authMethod.Int16),
 	}
 }
