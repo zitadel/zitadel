@@ -65,7 +65,7 @@ func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID st
 	return model.TokenViewToModel(token), nil
 }
 
-func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, err error) {
+func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	tokenData, err := base64.RawURLEncoding.DecodeString(tokenString)
@@ -89,10 +89,6 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 
-	projectID, _, err := repo.ProjectIDAndOriginsByClientID(ctx, verifierClientID)
-	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-5M9so", "invalid token")
-	}
 	for _, aud := range token.Audience {
 		if verifierClientID == aud || projectID == aud {
 			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
@@ -239,19 +235,24 @@ func MissingFeatureErr(feature string) error {
 	return caos_errs.ThrowPermissionDeniedf(nil, "AUTH-Dvgsf", "missing feature %v", feature)
 }
 
-func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (_ string, err error) {
+func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName string) (clientID, projectID string, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
 	iam, err := repo.getIAMByID(ctx)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	app, err := repo.View.ApplicationByProjecIDAndAppName(ctx, iam.IAMProjectID, appName)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return app.OIDCConfig.ClientID, nil
+	if app.OIDCConfig != nil {
+		clientID = app.OIDCConfig.ClientID
+	} else if app.APIConfig != nil {
+		clientID = app.APIConfig.ClientID
+	}
+	return clientID, app.ProjectID, nil
 }
 
 func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, sequence uint64) ([]*models.Event, error) {
