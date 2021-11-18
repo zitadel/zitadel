@@ -34,6 +34,8 @@ All your settings will be removed and the default settings of the system will tr
 ZITADELs support for languages will be extended with time. 
 If you need support for a specific language we highly recommend you to write translation files for the missing language.
 
+We have a command to generate translations automatically using [Deepl APIs](https://www.deepl.com/translator). You need to signup and create an API token. The free account should be sufficient to generate all necessary files for ZITADEL. You can get the command [here](https://github.com/caos/zitadel/blob/main/guides/development.md).
+
 ZITADEL loads translations from three files:
 
  - [Console translations](https://github.com/caos/zitadel/tree/main/console/src/assets/i18n)
@@ -41,5 +43,5 @@ ZITADEL loads translations from three files:
  - [Email Notifcation texts](https://github.com/caos/zitadel/tree/main/internal/notification/static/i18n)
  - [Common translations](https://github.com/caos/zitadel/tree/main/internal/static/i18n) for success or error toasts
 
- Make sure you set the locale as the name. Later on, language header will determine which file gets displayed.
+ Make sure you set the correct locale as the name. Later on, language header will determine which file gets displayed.
 
