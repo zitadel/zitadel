@@ -110,7 +110,7 @@ func (s *SQL) checkSSL() {
 		s.SSL = &ssl{sslBase: sslBase{Mode: sslDisabledMode}}
 		return
 	}
-	if s.SSL.Cert == "" && s.SSL.Key == "" && s.SSL.RootCert == "" {
+	if s.SSL.RootCert == "" {
 		logging.LogWithFields("TYPES-LFdzP",
 			"cert set", s.SSL.Cert != "",
 			"key set", s.SSL.Key != "",
