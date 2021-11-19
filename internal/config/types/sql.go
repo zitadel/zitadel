@@ -18,22 +18,28 @@ type SQL struct {
 	Port            string
 	User            string
 	Password        string
-	ClusterName     string
 	Database        string
 	Schema          string
 	SSL             *ssl
 	MaxOpenConns    uint32
 	MaxConnLifetime Duration
 	MaxConnIdleTime Duration
+
+	//Additional options to be appended as options=<Options>
+	//The value will be taken as is. So be sure to separate multiple options by a space
+	Options string
 }
 
 type SQLBase struct {
-	Host        string
-	Port        string
-	ClusterName string
-	Database    string
-	Schema      string
-	SSL         sslBase
+	Host     string
+	Port     string
+	Database string
+	Schema   string
+	SSL      sslBase
+
+	//Additional options to be appended as options=<Options>
+	//The value will be taken as is. So be sure to separate multiple options by a space
+	Options string
 }
 
 type SQLUser struct {
@@ -70,13 +76,13 @@ func (s *SQL) connectionString() string {
 		"application_name=zitadel",
 		"sslmode=" + s.SSL.Mode,
 	}
-	if s.ClusterName != "" {
-		fields = append(fields, "options=--cluster="+s.ClusterName)
+	if s.Options != "" {
+		fields = append(fields, "options="+s.Options)
 	}
 	if s.Password != "" {
 		fields = append(fields, "password="+s.Password)
 	}
-
+	s.checkSSL()
 	if s.SSL.Mode != sslDisabledMode {
 		fields = append(fields, "sslrootcert="+s.SSL.RootCert)
 		if s.SSL.Cert != "" {
@@ -91,7 +97,6 @@ func (s *SQL) connectionString() string {
 }
 
 func (s *SQL) Start() (*sql.DB, error) {
-	s.checkSSL()
 	client, err := sql.Open("postgres", s.connectionString())
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
@@ -121,12 +126,12 @@ func (s *SQL) checkSSL() {
 
 func (u SQLUser) Start(base SQLBase) (*sql.DB, error) {
 	return (&SQL{
-		Host:        base.Host,
-		Port:        base.Port,
-		User:        u.User,
-		Password:    u.Password,
-		ClusterName: base.ClusterName,
-		Database:    base.Database,
+		Host:     base.Host,
+		Port:     base.Port,
+		User:     u.User,
+		Password: u.Password,
+		Database: base.Database,
+		Options:  base.Options,
 		SSL: &ssl{
 			sslBase: sslBase{
 				Mode:     base.SSL.Mode,
