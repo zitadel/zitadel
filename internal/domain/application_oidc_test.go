@@ -2,6 +2,7 @@ package domain
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -597,6 +598,77 @@ func TestCheckRedirectUrisCode(t *testing.T) {
 			}
 			if !reflect.DeepEqual(tt.want.Problems, got.Problems) {
 				t.Errorf("Problems: expected: %v, got %v", tt.want.Problems, got.Problems)
+			}
+		})
+	}
+}
+
+func TestOIDCOriginAllowList(t *testing.T) {
+	type args struct {
+		redirectUris      []string
+		additionalOrigins []string
+	}
+	type want struct {
+		allowed []string
+		err     func(error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "no uris, no origins",
+			args: args{},
+			want: want{
+				allowed: []string{},
+			},
+		},
+		{
+			name: "redirects invalid schema",
+			args: args{
+				redirectUris: []string{"https:// localhost:8080"},
+			},
+			want: want{
+				allowed: nil,
+				err: func(e error) bool {
+					return strings.HasPrefix(e.Error(), "invalid chavalid character")
+				},
+			},
+		},
+		{
+			name: "redirects additional",
+			args: args{
+				redirectUris: []string{"https://localhost:8080"},
+			},
+			want: want{
+				allowed: []string{"https://localhost:8080"},
+			},
+		},
+		{
+			name: "additional origin",
+			args: args{
+				additionalOrigins: []string{"https://localhost:8080"},
+			},
+			want: want{
+				allowed: []string{"https://localhost:8080"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			allowed, err := OIDCOriginAllowList(tt.args.redirectUris, tt.args.additionalOrigins)
+
+			if tt.want.err == nil && err != nil {
+				t.Errorf("unexpected error: %v", err)
+			} else if tt.want.err == nil && err == nil {
+				//ok
+			} else if tt.want.err(err) {
+				t.Errorf("unexpected err got %v", err)
+			}
+
+			if !reflect.DeepEqual(allowed, tt.want.allowed) {
+				t.Errorf("expected list: %v, got: %v", tt.want.allowed, allowed)
 			}
 		})
 	}
