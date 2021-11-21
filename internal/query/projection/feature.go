@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/repository/features"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/caos/zitadel/internal/repository/features"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
 )
@@ -59,7 +59,6 @@ func (p *FeatureProjection) reducers() []handler.AggregateReducer {
 
 const (
 	FeatureAggregateIDCol              = "aggregate_id"
-	FeatureCreationDateCol             = "creation_date"
 	FeatureChangeDateCol               = "change_date"
 	FeatureSequenceCol                 = "sequence"
 	FeatureIsDefaultCol                = "is_default"
@@ -103,7 +102,6 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.EventReader) (*han
 
 	cols := []handler.Column{
 		handler.NewCol(FeatureAggregateIDCol, featureEvent.Aggregate().ID),
-		handler.NewCol(FeatureCreationDateCol, featureEvent.CreationDate()),
 		handler.NewCol(FeatureChangeDateCol, featureEvent.CreationDate()),
 		handler.NewCol(FeatureSequenceCol, featureEvent.Sequence()),
 		handler.NewCol(FeatureIsDefaultCol, isDefault),

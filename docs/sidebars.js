@@ -133,7 +133,7 @@ module.exports = {
         {
             type: 'category',
             label: 'API Definition',
-            collapsed: true,
+            collapsed: false,
             items: [
               {
                 type: 'category',
@@ -171,7 +171,7 @@ module.exports = {
         {
             type: 'category',
             label: 'OpenID Connect & OAuth',
-            collapsed: true,
+            collapsed: false,
             items: [
                 'apis/openidoauth/endpoints',
                 'apis/openidoauth/scopes',
@@ -183,7 +183,7 @@ module.exports = {
         {
           type: 'category',
           label: 'Rate Limits',
-          collapsed: true,
+          collapsed: false,
           items: [
               'legal/rate-limit-policy',
               'apis/ratelimits/accounts',
@@ -196,7 +196,7 @@ module.exports = {
         {
             type: 'category',
             label: 'ZITADEL',
-            collapsed: true,
+            collapsed: false,
             items: [
                 'concepts/zitadel/architecture',
                 {
@@ -218,7 +218,7 @@ module.exports = {
         }, {
             type: 'category',
             label: 'General',
-            collapsed: true,
+            collapsed: false,
             items: [
                 'concepts/general/principles',
                 'concepts/general/eventstore',
@@ -227,7 +227,7 @@ module.exports = {
         {
             type: 'category',
             label: 'Use Cases',
-            collapsed: true,
+            collapsed: false,
             items: [
                 'concepts/usecases/saas'
             ],
