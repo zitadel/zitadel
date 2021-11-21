@@ -134,7 +134,7 @@ func Test_FeaturesPrepares(t *testing.T) {
 						"tier-description",
 						1,
 						"state-description",
-						604800000000000,
+						uint(604800000000000), // 7days in nanoseconds
 						true,
 						true,
 						true,
@@ -249,7 +249,7 @@ func Test_FeaturesPrepares(t *testing.T) {
 						nil,
 						1,
 						nil,
-						604800000000000,
+						uint(604800000000000), // 7days in nanoseconds
 						true,
 						true,
 						true,
