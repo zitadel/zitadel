@@ -28,7 +28,6 @@ type Server struct {
 	user           repository.UserRepository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
-	features       repository.FeaturesRepository
 	authZ          authz.Config
 	systemDefaults systemdefaults.SystemDefaults
 }
@@ -46,7 +45,6 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		user:           repo,
 		usergrant:      repo,
 		iam:            repo,
-		features:       repo,
 		systemDefaults: sd,
 	}
 }
