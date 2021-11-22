@@ -203,8 +203,8 @@ func NewArrayRemoveCol(column string, value interface{}) handler.Column {
 
 //NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
-// if the col of the column is nil the data will be copied from the selected row
-// if the col of the column is not nil the data will be set by the static value
+// if the value of a col is empty the data will be copied from the selected row
+// if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
 func NewCopyStatement(event eventstore.EventReader, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
 	columnNames := make([]string, len(cols))
