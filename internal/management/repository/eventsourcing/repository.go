@@ -31,7 +31,6 @@ type EsRepository struct {
 	eventstore.UserRepo
 	eventstore.UserGrantRepo
 	eventstore.IAMRepository
-	eventstore.FeaturesRepo
 	view *mgmt_view.View
 }
 
@@ -79,7 +78,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},
 		UserGrantRepo: eventstore.UserGrantRepo{conf.SearchLimit, view, assetsAPI},
 		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
-		FeaturesRepo:  eventstore.FeaturesRepo{es, view, conf.SearchLimit, systemDefaults},
 		view:          view,
 	}, nil
 }
