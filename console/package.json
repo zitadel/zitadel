@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@angular-eslint/builder": "12.6.1",
-    "@angular-eslint/eslint-plugin": "12.5.0",
+    "@angular-eslint/eslint-plugin": "13.0.1",
     "@angular-eslint/eslint-plugin-template": "12.5.0",
     "@angular-eslint/schematics": "12.6.1",
     "@angular-eslint/template-parser": "12.5.0",
