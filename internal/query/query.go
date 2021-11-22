@@ -11,6 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/repository/action"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
@@ -43,6 +44,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	org.RegisterEventMappers(repo.eventstore)
 	project.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
+	keypair.RegisterEventMappers(repo.eventstore)
 
 	err = projection.Start(ctx, sqlClient, es, projections)
 	if err != nil {
