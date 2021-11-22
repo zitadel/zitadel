@@ -35,7 +35,7 @@ type OrgDomainSearchQueries struct {
 func (q *OrgDomainSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }

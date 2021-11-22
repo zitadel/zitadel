@@ -59,7 +59,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			systemDefaults),
 		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
-		newFeatures(handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
 		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),

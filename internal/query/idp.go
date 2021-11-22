@@ -247,7 +247,7 @@ func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }

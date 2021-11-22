@@ -30,7 +30,6 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.IAMRepository
 	eventstore.AdministratorRepo
-	eventstore.FeaturesRepo
 	eventstore.UserRepo
 }
 
@@ -73,12 +72,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,
-		},
-		FeaturesRepo: eventstore.FeaturesRepo{
-			Eventstore:     es,
-			View:           view,
-			SearchLimit:    conf.SearchLimit,
-			SystemDefaults: systemDefaults,
 		},
 		UserRepo: eventstore.UserRepo{
 			Eventstore:      es,

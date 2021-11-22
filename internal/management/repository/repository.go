@@ -7,5 +7,4 @@ type Repository interface {
 	UserRepository
 	UserGrantRepository
 	IamRepository
-	FeaturesRepository
 }
