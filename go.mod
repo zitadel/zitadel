@@ -15,10 +15,10 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.7.0
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
-	github.com/aws/aws-sdk-go-v2 v1.11.0
+	github.com/aws/aws-sdk-go-v2 v1.11.1
 	github.com/aws/aws-sdk-go-v2/config v1.10.1
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.19.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.19.1
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v1.0.0
@@ -81,7 +81,7 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.7
 	google.golang.org/api v0.60.0
-	google.golang.org/genproto v0.0.0-20211117155847-120650a500bb
+	google.golang.org/genproto v0.0.0-20211117155847-120650a500bb // indirect
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
