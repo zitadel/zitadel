@@ -39,17 +39,20 @@ type Theme struct {
 	IconURL         string
 }
 
-func (q *Queries) MyActiveLabelPolicy(ctx context.Context, orgID string) (*LabelPolicy, error) {
+func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
 			sq.Eq{
 				LabelPolicyColID.identifier(): orgID,
+			},
+			sq.Eq{
 				LabelPolicyColID.identifier(): q.iamID,
 			},
-		}).
-		Where(sq.Eq{
-			LabelPolicyColState.identifier(): domain.LabelPolicyStateActive,
+		}, sq.And{
+			sq.Eq{
+				LabelPolicyColState.identifier(): domain.LabelPolicyStateActive,
+			},
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -61,17 +64,20 @@ func (q *Queries) MyActiveLabelPolicy(ctx context.Context, orgID string) (*Label
 	return scan(row)
 }
 
-func (q *Queries) MyPreviewLabelPolicy(ctx context.Context, orgID string) (*LabelPolicy, error) {
+func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(
 		sq.Or{
 			sq.Eq{
 				LabelPolicyColID.identifier(): orgID,
+			},
+			sq.Eq{
 				LabelPolicyColID.identifier(): q.iamID,
 			},
-		}).
-		Where(sq.Eq{
-			LabelPolicyColState.identifier(): domain.LabelPolicyStatePreview,
+		}, sq.And{
+			sq.Eq{
+				LabelPolicyColState.identifier(): domain.LabelPolicyStatePreview,
+			},
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()

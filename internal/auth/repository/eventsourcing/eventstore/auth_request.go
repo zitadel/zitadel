@@ -58,7 +58,7 @@ type AuthRequestRepo struct {
 }
 
 type labelPolicyProvider interface {
-	MyActiveLabelPolicy(context.Context, string) (*query.LabelPolicy, error)
+	ActiveLabelPolicyByOrg(context.Context, string) (*query.LabelPolicy, error)
 }
 
 type privacyPolicyProvider interface {
@@ -936,7 +936,7 @@ func (repo *AuthRequestRepo) getLockoutPolicy(ctx context.Context, orgID string)
 }
 
 func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
-	policy, err := repo.LabelPolicyProvider.MyActiveLabelPolicy(ctx, orgID)
+	policy, err := repo.LabelPolicyProvider.ActiveLabelPolicyByOrg(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

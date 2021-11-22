@@ -361,9 +361,9 @@ func getLabelPolicy(ctx context.Context, defaultPolicy, preview bool, queries *q
 		return queries.DefaultActiveLabelPolicy(ctx)
 	}
 	if preview {
-		return queries.MyPreviewLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+		return queries.PreviewLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	}
-	return queries.MyActiveLabelPolicy(ctx, authz.GetCtxData(ctx).OrgID)
+	return queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
 func getLabelPolicyBucketName(ctx context.Context, defaultPolicy, preview bool, queries *query.Queries) string {

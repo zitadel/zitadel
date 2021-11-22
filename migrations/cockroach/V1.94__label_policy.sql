@@ -1,10 +1,10 @@
 CREATE TABLE zitadel.projections.label_policies (
     id STRING NOT NULL, --TODO: pk
-    creation_date TIMESTAMPTZ NULL,
-    change_date TIMESTAMPTZ NULL,
-    sequence INT8 NULL,
-    state INT2 NULL,
-    resource_owner TEXT,
+    creation_date TIMESTAMPTZ NOT NULL,
+    change_date TIMESTAMPTZ NOT NULL,
+    sequence INT8 NOT NULL,
+    state INT2 NOT NULL,
+    resource_owner TEXT NOT NULL,
     
     is_default BOOLEAN,
     hide_login_name_suffix BOOLEAN,
@@ -22,5 +22,7 @@ CREATE TABLE zitadel.projections.label_policies (
 	dark_background_color STRING,
 	dark_font_color STRING,
 	dark_logo_url STRING,
-	dark_icon_url STRING
+	dark_icon_url STRING,
+
+	PRIMARY KEY (id)
 );
