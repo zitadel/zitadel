@@ -15,10 +15,10 @@ import (
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	features_view_model "github.com/caos/zitadel/internal/features/repository/view/model"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -30,6 +30,7 @@ type TokenVerifierRepo struct {
 	IAMID                string
 	Eventstore           v1.Eventstore
 	View                 *view.View
+	Query                *query.Queries
 }
 
 func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
@@ -110,17 +111,14 @@ func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context
 }
 
 func (repo *TokenVerifierRepo) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
-	features, err := repo.View.FeaturesByAggregateID(orgID)
-	if caos_errs.IsNotFound(err) {
-		return repo.checkDefaultFeatures(ctx, requiredFeatures...)
-	}
+	features, err := repo.Query.FeaturesByOrgID(ctx, orgID)
 	if err != nil {
 		return err
 	}
 	return checkFeatures(features, requiredFeatures...)
 }
 
-func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures ...string) error {
+func checkFeatures(features *query.Features, requiredFeatures ...string) error {
 	for _, requiredFeature := range requiredFeatures {
 		if strings.HasPrefix(requiredFeature, domain.FeatureLoginPolicy) {
 			if err := checkLoginPolicyFeatures(features, requiredFeature); err != nil {
@@ -187,7 +185,7 @@ func checkFeatures(features *features_view_model.FeaturesView, requiredFeatures 
 	return nil
 }
 
-func checkLoginPolicyFeatures(features *features_view_model.FeaturesView, requiredFeature string) error {
+func checkLoginPolicyFeatures(features *query.Features, requiredFeature string) error {
 	switch requiredFeature {
 	case domain.FeatureLoginPolicyFactors:
 		if !features.LoginPolicyFactors {
@@ -221,7 +219,7 @@ func checkLoginPolicyFeatures(features *features_view_model.FeaturesView, requir
 	return nil
 }
 
-func checkLabelPolicyFeatures(features *features_view_model.FeaturesView, requiredFeature string) error {
+func checkLabelPolicyFeatures(features *query.Features, requiredFeature string) error {
 	switch requiredFeature {
 	case domain.FeatureLabelPolicyPrivateLabel:
 		if !features.LabelPolicyPrivateLabel {
@@ -280,28 +278,11 @@ func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, err
 }
 
 func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {
-	features, viewErr := repo.View.FeaturesByAggregateID(domain.IAMID)
-	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
-		return viewErr
+	features, err := repo.Query.DefaultFeatures(ctx)
+	if err != nil {
+		return err
 	}
-	if caos_errs.IsNotFound(viewErr) {
-		features = new(features_view_model.FeaturesView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, features.Sequence)
-	if caos_errs.IsNotFound(viewErr) && len(events) == 0 {
-		return checkFeatures(features, requiredFeatures...)
-	}
-	if esErr != nil {
-		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return esErr
-	}
-	featuresCopy := *features
-	for _, event := range events {
-		if err := featuresCopy.AppendEvent(event); err != nil {
-			return checkFeatures(features, requiredFeatures...)
-		}
-	}
-	return checkFeatures(&featuresCopy, requiredFeatures...)
+	return checkFeatures(features, requiredFeatures...)
 }
 
 func (repo *TokenVerifierRepo) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {

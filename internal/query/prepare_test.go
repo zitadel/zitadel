@@ -93,7 +93,9 @@ func mockQueries(stmt string, cols []string, rows [][]driver.Value, args ...driv
 		result := sqlmock.NewRows(cols)
 		count := uint64(len(rows))
 		for _, row := range rows {
-			row = append(row, count)
+			if cols[len(cols)-1] == "count" {
+				row = append(row, count)
+			}
 			result.AddRow(row...)
 		}
 		q.WillReturnRows(result)

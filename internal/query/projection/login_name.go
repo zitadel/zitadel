@@ -20,9 +20,9 @@ type LoginNameProjection struct {
 
 const (
 	LoginNameProjectionTable       = "zitadel.projections.login_names"
-	LoginNameUserProjectionTable   = "zitadel.projections.login_names" + "_" + loginNameUserSuffix
-	LoginNamePolicyProjectionTable = "zitadel.projections.login_names" + "_" + loginNamePolicySuffix
-	LoginNameDomainProjectionTable = "zitadel.projections.login_names" + "_" + loginNameDomainSuffix
+	LoginNameUserProjectionTable   = LoginNameProjectionTable + "_" + loginNameUserSuffix
+	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
+	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
 )
 
 func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginNameProjection {
