@@ -42,14 +42,15 @@ type Theme struct {
 func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{
-				LabelPolicyColID.identifier(): orgID,
+		sq.And{
+			sq.Or{
+				sq.Eq{
+					LabelPolicyColID.identifier(): orgID,
+				},
+				sq.Eq{
+					LabelPolicyColID.identifier(): q.iamID,
+				},
 			},
-			sq.Eq{
-				LabelPolicyColID.identifier(): q.iamID,
-			},
-		}, sq.And{
 			sq.Eq{
 				LabelPolicyColState.identifier(): domain.LabelPolicyStateActive,
 			},
@@ -67,14 +68,15 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*La
 func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
-			sq.Eq{
-				LabelPolicyColID.identifier(): orgID,
+		sq.And{
+			sq.Or{
+				sq.Eq{
+					LabelPolicyColID.identifier(): orgID,
+				},
+				sq.Eq{
+					LabelPolicyColID.identifier(): q.iamID,
+				},
 			},
-			sq.Eq{
-				LabelPolicyColID.identifier(): q.iamID,
-			},
-		}, sq.And{
 			sq.Eq{
 				LabelPolicyColState.identifier(): domain.LabelPolicyStatePreview,
 			},
