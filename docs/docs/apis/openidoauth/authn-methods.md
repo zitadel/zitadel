@@ -46,8 +46,8 @@ JWT
 | Claim | Example                       | Description                                                                                                     |
 |:------|:------------------------------|:----------------------------------------------------------------------------------------------------------------|
 | aud   | `"https://issuer.zitadel.ch"` | String or Array of intended audiences MUST include ZITADEL's issuing domain                                     |
-| exp   | `1605183582`                  | Unix timestamp of the expiry, MUST NOT be longer than 1h                                                        |
-| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT                                                          |
+| exp   | `1605183582`                  | Unix timestamp of the expiry                                                                                    |
+| iat   | `1605179982`                  | Unix timestamp of the creation singing time of the JWT, MUST NOT be older than 1h                               |
 | iss   | `"78366401571920522@acme"`    | String which represents the requesting party (owner of the key), normally the `clientID` from the json key file |
 | sub   | `"78366401571920522@acme"`    | The subject ID of the application, normally the `clientID` from the json key file                               |
 

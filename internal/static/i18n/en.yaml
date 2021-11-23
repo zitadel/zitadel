@@ -17,8 +17,8 @@ Errors:
       RemoveFailed: Bucket not deleted
       SetPublicFailed: Could not set bucket to public
     Object:
-      PutFailed: Objekt not created
-      GetFaieled: Objekt could not be read
+      PutFailed: Object not created
+      GetFailed: Object could not be read
       PresignedTokenFailed: Signed token could not be created
       ListFailed: Objectlist could not be read
       RemoveFailed: Object could not be removed
@@ -74,7 +74,7 @@ Errors:
       Expired: Code is expired
       GeneratorAlgNotSupported: Unsupported generator algorithm
     Password:
-      NotFound: Passoword not found
+      NotFound: Password not found
       Empty: Password is empty
       Invalid: Password is invalid
       NotSet: User has not set a password
@@ -154,6 +154,8 @@ Errors:
       AlreadyExists: Login Policy already exists
       IdpProviderAlreadyExisting: Idp Provider already existing
       IdpProviderNotExisting: Idp Provider not existing
+      RegistrationNotAllowed: Registration is not allowed
+      UsernamePasswordNotAllowed: Login with Username / Password is not allowed
       MFA:
         AlreadyExists: Multifactor already exists
         NotExisting: Multifactor not existing
@@ -214,7 +216,7 @@ Errors:
       NotFound: Application not found
       Invalid: Application invalid
       NotExisting: Application doesn't exist
-      NotActive:: Application is not active
+      NotActive: Application is not active
       NotInactive: Application is not inactive
       OIDCConfigInvalid: OIDC configuration is invalid
       APIConfigInvalid: API configuration is invalid
@@ -283,7 +285,7 @@ Errors:
       AlreadyExists: Default Message Text already exists
       Invalid: Default Message Text is invalid
     PasswordComplexityPolicy:
-      NotFound: Default Private Label Policy not found
+      NotFound: Default Password Complexity Policy not found
       NotExisting: Default Password Complexity Policy not existing
       AlreadyExists: Default Password Complexity Policy already existing
       Empty: Default Password Complexity Policy empty
@@ -686,7 +688,7 @@ EventTypes:
       changed: Project member changed
       removed: Project member removed
       cascade:
-        removeD: Project member cascade removed
+        removed: Project member cascade removed
     role:
       added: Project role added
       changed: Project role changed

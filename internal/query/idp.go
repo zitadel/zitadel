@@ -247,7 +247,7 @@ func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }
@@ -424,6 +424,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&idp.StylingType,
 					&idp.OwnerType,
 					&idp.AutoRegister,
+					// oidc config
 					&oidcIDPID,
 					&oidcClientID,
 					oidcClientSecret,
@@ -433,6 +434,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&oidcUsernameMapping,
 					&oidcAuthorizationEndpoint,
 					&oidcTokenEndpoint,
+					// jwt config
 					&jwtIDPID,
 					&jwtIssuer,
 					&jwtKeysEndpoint,

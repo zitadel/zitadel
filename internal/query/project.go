@@ -155,7 +155,7 @@ func (r *ProjectSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	return nil
 }
 
-func (r ProjectSearchQueries) AppendPermissionQueries(permissions []string) error {
+func (r *ProjectSearchQueries) AppendPermissionQueries(permissions []string) error {
 	if !authz.HasGlobalPermission(permissions) {
 		ids := authz.GetAllPermissionCtxIDs(permissions)
 		query, err := NewProjectIDSearchQuery(ids)
@@ -170,7 +170,7 @@ func (r ProjectSearchQueries) AppendPermissionQueries(permissions []string) erro
 func (q *ProjectSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }

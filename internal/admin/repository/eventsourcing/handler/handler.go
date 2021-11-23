@@ -50,6 +50,10 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			defaults),
 		newFeatures(
 			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
+		newMailTemplate(
+			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
+		newMessageText(
+			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
 		newCustomText(
 			handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 	}
