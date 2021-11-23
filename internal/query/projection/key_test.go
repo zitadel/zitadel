@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -32,7 +34,7 @@ func TestKeyProjection_reduces(t *testing.T) {
 					keypairAddedEventData(time.Now().Add(time.Hour)),
 				), keypair.AddedEventMapper),
 			},
-			reduce: (&KeyProjection{}).reduceKeyPairAdded,
+			reduce: (&KeyProjection{encryptionAlgorithm: crypto.CreateMockEncryptionAlg(gomock.NewController(t))}).reduceKeyPairAdded,
 			want: wantReduce{
 				projection:       KeyProjectionTable,
 				aggregateType:    eventstore.AggregateType("key_pair"),
@@ -41,43 +43,36 @@ func TestKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.keys (id, is_private, creation_date, change_date, resource_owner, sequence, algorithm, use, expiry, key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO zitadel.projections.keys (id, creation_date, change_date, resource_owner, sequence, algorithm, use) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								true,
 								anyArg{},
 								anyArg{},
 								"ro-id",
 								uint64(15),
 								"algorithm",
 								domain.KeyUsageSigning,
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.keys_private (id, expiry, key) VALUES ($1, $2, $3)",
+							expectedArgs: []interface{}{
+								"agg-id",
 								anyArg{},
 								&crypto.CryptoValue{
 									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "alg",
-									KeyID:      "keyID",
+									Algorithm:  "enc",
+									KeyID:      "id",
 									Crypted:    []byte("privateKey"),
 								},
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.keys (id, is_private, creation_date, change_date, resource_owner, sequence, algorithm, use, expiry, key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO zitadel.projections.keys_public (id, expiry, key) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								false,
 								anyArg{},
-								anyArg{},
-								"ro-id",
-								uint64(15),
-								"algorithm",
-								domain.KeyUsageSigning,
-								anyArg{},
-								&crypto.CryptoValue{
-									CryptoType: crypto.TypeEncryption,
-									Algorithm:  "alg",
-									KeyID:      "keyID",
-									Crypted:    []byte("publicKey"),
-								},
+								[]byte("publicKey"),
 							},
 						},
 					},
@@ -119,5 +114,5 @@ func TestKeyProjection_reduces(t *testing.T) {
 }
 
 func keypairAddedEventData(t time.Time) []byte {
-	return []byte(`{"algorithm": "algorithm", "usage": 0, "privateKey": {"key": {"cryptoType": 0, "algorithm": "alg", "keyID": "keyID", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "alg", "keyID": "keyID", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
+	return []byte(`{"algorithm": "algorithm", "usage": 0, "privateKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHJpdmF0ZUtleQ=="}, "expiry": "` + t.Format(time.RFC3339) + `"}, "publicKey": {"key": {"cryptoType": 0, "algorithm": "enc", "keyID": "id", "crypted": "cHVibGljS2V5"}, "expiry": "` + t.Format(time.RFC3339) + `"}}`)
 }

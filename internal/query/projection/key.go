@@ -6,6 +6,8 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -15,16 +17,25 @@ import (
 
 type KeyProjection struct {
 	crdb.StatementHandler
+	encryptionAlgorithm crypto.EncryptionAlgorithm
 }
 
-const KeyProjectionTable = "zitadel.projections.keys"
+const (
+	KeyProjectionTable = "zitadel.projections.keys"
+	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
+	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
+)
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *KeyProjection {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig) (_ *KeyProjection, err error) {
 	p := &KeyProjection{}
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
-	return p
+	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
 }
 
 func (p *KeyProjection) reducers() []handler.AggregateReducer {
@@ -43,15 +54,22 @@ func (p *KeyProjection) reducers() []handler.AggregateReducer {
 
 const (
 	KeyColumnID            = "id"
-	KeyColumnIsPrivate     = "is_private"
 	KeyColumnCreationDate  = "creation_date"
 	KeyColumnChangeDate    = "change_date"
 	KeyColumnResourceOwner = "resource_owner"
 	KeyColumnSequence      = "sequence"
 	KeyColumnAlgorithm     = "algorithm"
 	KeyColumnUse           = "use"
-	KeyColumnExpiry        = "expiry"
-	KeyColumnKey           = "key"
+
+	privateKeyTableSuffix  = "private"
+	KeyPrivateColumnID     = "id"
+	KeyPrivateColumnExpiry = "expiry"
+	KeyPrivateColumnKey    = "key"
+
+	publicKeyTableSuffix  = "public"
+	KeyPublicColumnID     = "id"
+	KeyPublicColumnExpiry = "expiry"
+	KeyPublicColumnKey    = "key"
 )
 
 func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -63,35 +81,39 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
 		return crdb.NewNoOpStatement(e), nil
 	}
+	publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
+	if err != nil {
+		logging.LogWithFields("HANDL-SDfw2", "seq", event.Sequence()).Error("cannot decrypt public key")
+		return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
+	}
 
 	return crdb.NewMultiStatement(e,
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyColumnIsPrivate, true),
 				handler.NewCol(KeyColumnCreationDate, e.CreationDate()),
 				handler.NewCol(KeyColumnChangeDate, e.CreationDate()),
 				handler.NewCol(KeyColumnResourceOwner, e.Aggregate().ResourceOwner),
 				handler.NewCol(KeyColumnSequence, e.Sequence()),
 				handler.NewCol(KeyColumnAlgorithm, e.Algorithm),
 				handler.NewCol(KeyColumnUse, e.Usage),
-				handler.NewCol(KeyColumnExpiry, e.PrivateKey.Expiry),
-				handler.NewCol(KeyColumnKey, e.PrivateKey.Key),
 			},
 		),
 		crdb.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(KeyColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyColumnIsPrivate, false),
-				handler.NewCol(KeyColumnCreationDate, e.CreationDate()),
-				handler.NewCol(KeyColumnChangeDate, e.CreationDate()),
-				handler.NewCol(KeyColumnResourceOwner, e.Aggregate().ResourceOwner),
-				handler.NewCol(KeyColumnSequence, e.Sequence()),
-				handler.NewCol(KeyColumnAlgorithm, e.Algorithm),
-				handler.NewCol(KeyColumnUse, e.Usage),
-				handler.NewCol(KeyColumnExpiry, e.PublicKey.Expiry),
-				handler.NewCol(KeyColumnKey, e.PublicKey.Key),
+				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
+				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
+				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 			},
+			crdb.WithTableSuffix(privateKeyTableSuffix),
+		),
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
+				handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
+				handler.NewCol(KeyPublicColumnKey, publicKey),
+			},
+			crdb.WithTableSuffix(publicKeyTableSuffix),
 		),
 	), nil
 }
