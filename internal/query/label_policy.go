@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -279,7 +278,6 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 				if errs.Is(err, sql.ErrNoRows) {
 					return nil, errors.ThrowNotFound(err, "QUERY-bJEsm", "errors.policy.label.not_found")
 				}
-				fmt.Println(err)
 				return nil, errors.ThrowInternal(err, "QUERY-awLM6", "errors.internal")
 			}
 
