@@ -206,38 +206,6 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
-	repo.mutex.Lock()
-	defer repo.mutex.Unlock()
-	var err error
-	contents, ok := repo.NotificationTranslationFileContents[lang]
-	if !ok {
-		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if caos_errs.IsNotFound(err) {
-			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		repo.NotificationTranslationFileContents[lang] = contents
-	}
-	messageTexts := new(domain.MessageTexts)
-	if err := yaml.Unmarshal(contents, messageTexts); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-3N9fs", "Errors.TranslationFile.ReadError")
-	}
-	return messageTexts.GetMessageTextByType(textType), nil
-}
-
-func (repo *IAMRepository) GetCustomMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, textType, lang)
-	if err != nil {
-		return nil, err
-	}
-	result := iam_es_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts)
-	result.Default = true
-	return result, err
-}
-
 func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
