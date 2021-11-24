@@ -8,6 +8,8 @@ import (
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/query"
 )
 
 const (
@@ -111,9 +113,9 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	}
 	translator := l.getTranslator(authReq)
 	if authReq == nil {
-		policy, err := l.authRepo.GetLabelPolicy(r.Context(), orgID)
-		logging.Log("LOGIN-afgr2").OnError(err).Warn("could not get label policy")
-		data.LabelPolicy = policy
+		policy, err := l.query.ActiveLabelPolicyByOrg(r.Context(), orgID)
+		logging.Log("HANDL-XjWKE").OnError(err).Error("unable to get active label policy")
+		data.LabelPolicy = labelPolicyToDomain(policy)
 
 		translator, err = l.renderer.NewTranslator()
 		if err == nil {
@@ -123,6 +125,36 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 		}
 	}
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplPasswordlessRegistration], data, nil)
+}
+
+func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
+	return &domain.LabelPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:   p.ID,
+			Sequence:      p.Sequence,
+			ResourceOwner: p.ResourceOwner,
+			CreationDate:  p.CreationDate,
+			ChangeDate:    p.ChangeDate,
+		},
+		State:               p.State,
+		Default:             p.IsDefault,
+		PrimaryColor:        p.Light.PrimaryColor,
+		BackgroundColor:     p.Light.BackgroundColor,
+		WarnColor:           p.Light.WarnColor,
+		FontColor:           p.Light.FontColor,
+		LogoURL:             p.Light.LogoURL,
+		IconURL:             p.Light.IconURL,
+		PrimaryColorDark:    p.Dark.PrimaryColor,
+		BackgroundColorDark: p.Dark.BackgroundColor,
+		WarnColorDark:       p.Dark.WarnColor,
+		FontColorDark:       p.Dark.FontColor,
+		LogoDarkURL:         p.Dark.LogoURL,
+		IconDarkURL:         p.Dark.IconURL,
+		Font:                p.FontURL,
+		HideLoginNameSuffix: p.HideLoginNameSuffix,
+		ErrorMsgPopup:       p.ShouldErrorPopup,
+		DisableWatermark:    p.WatermarkDisabled,
+	}
 }
 
 func (l *Login) handlePasswordlessRegistrationCheck(w http.ResponseWriter, r *http.Request) {
