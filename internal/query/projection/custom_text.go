@@ -124,7 +124,7 @@ func (p *CustomTextProjection) reduceRemoved(event eventstore.EventReader) (*han
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextKeyCol, customTextEvent.Key),
-			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
 		}), nil
 }
 
