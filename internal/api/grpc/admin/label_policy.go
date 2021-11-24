@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) GetLabelPolicy(ctx context.Context, req *admin_pb.GetLabelPolicyRequest) (*admin_pb.GetLabelPolicyResponse, error) {
-	policy, err := s.iam.GetDefaultLabelPolicy(ctx)
+	policy, err := s.query.DefaultActiveLabelPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func (s *Server) GetLabelPolicy(ctx context.Context, req *admin_pb.GetLabelPolic
 }
 
 func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *admin_pb.GetPreviewLabelPolicyRequest) (*admin_pb.GetPreviewLabelPolicyResponse, error) {
-	policy, err := s.iam.GetDefaultPreviewLabelPolicy(ctx)
+	policy, err := s.query.DefaultPreviewLabelPolicy(ctx)
 	if err != nil {
 		return nil, err
 	}
