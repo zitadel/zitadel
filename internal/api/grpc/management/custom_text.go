@@ -13,22 +13,22 @@ import (
 )
 
 func (s *Server) GetCustomInitMessageText(ctx context.Context, req *mgmt_pb.GetCustomInitMessageTextRequest) (*mgmt_pb.GetCustomInitMessageTextResponse, error) {
-	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.InitCodeMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomInitMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
 func (s *Server) GetDefaultInitMessageText(ctx context.Context, req *mgmt_pb.GetDefaultInitMessageTextRequest) (*mgmt_pb.GetDefaultInitMessageTextResponse, error) {
-	msg, err := s.org.GetDefaultMessageText(ctx, domain.InitCodeMessageType, req.Language)
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.InitCodeMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultInitMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
@@ -61,22 +61,22 @@ func (s *Server) ResetCustomInitMessageTextToDefault(ctx context.Context, req *m
 }
 
 func (s *Server) GetCustomPasswordResetMessageText(ctx context.Context, req *mgmt_pb.GetCustomPasswordResetMessageTextRequest) (*mgmt_pb.GetCustomPasswordResetMessageTextResponse, error) {
-	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordResetMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomPasswordResetMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
 func (s *Server) GetDefaultPasswordResetMessageText(ctx context.Context, req *mgmt_pb.GetDefaultPasswordResetMessageTextRequest) (*mgmt_pb.GetDefaultPasswordResetMessageTextResponse, error) {
-	msg, err := s.org.GetDefaultMessageText(ctx, domain.PasswordResetMessageType, req.Language)
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.PasswordResetMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultPasswordResetMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
@@ -109,22 +109,22 @@ func (s *Server) ResetCustomPasswordResetMessageTextToDefault(ctx context.Contex
 }
 
 func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *mgmt_pb.GetCustomVerifyEmailMessageTextRequest) (*mgmt_pb.GetCustomVerifyEmailMessageTextResponse, error) {
-	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.VerifyEmailMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomVerifyEmailMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
 func (s *Server) GetDefaultVerifyEmailMessageText(ctx context.Context, req *mgmt_pb.GetDefaultVerifyEmailMessageTextRequest) (*mgmt_pb.GetDefaultVerifyEmailMessageTextResponse, error) {
-	msg, err := s.org.GetDefaultMessageText(ctx, domain.VerifyEmailMessageType, req.Language)
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.VerifyEmailMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultVerifyEmailMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
@@ -157,22 +157,22 @@ func (s *Server) ResetCustomVerifyEmailMessageTextToDefault(ctx context.Context,
 }
 
 func (s *Server) GetCustomVerifyPhoneMessageText(ctx context.Context, req *mgmt_pb.GetCustomVerifyPhoneMessageTextRequest) (*mgmt_pb.GetCustomVerifyPhoneMessageTextResponse, error) {
-	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.VerifyPhoneMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomVerifyPhoneMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
 func (s *Server) GetDefaultVerifyPhoneMessageText(ctx context.Context, req *mgmt_pb.GetDefaultVerifyPhoneMessageTextRequest) (*mgmt_pb.GetDefaultVerifyPhoneMessageTextResponse, error) {
-	msg, err := s.org.GetDefaultMessageText(ctx, domain.VerifyPhoneMessageType, req.Language)
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultVerifyPhoneMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
@@ -205,22 +205,22 @@ func (s *Server) ResetCustomVerifyPhoneMessageTextToDefault(ctx context.Context,
 }
 
 func (s *Server) GetCustomDomainClaimedMessageText(ctx context.Context, req *mgmt_pb.GetCustomDomainClaimedMessageTextRequest) (*mgmt_pb.GetCustomDomainClaimedMessageTextResponse, error) {
-	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.DomainClaimedMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomDomainClaimedMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
 func (s *Server) GetDefaultDomainClaimedMessageText(ctx context.Context, req *mgmt_pb.GetDefaultDomainClaimedMessageTextRequest) (*mgmt_pb.GetDefaultDomainClaimedMessageTextResponse, error) {
-	msg, err := s.org.GetDefaultMessageText(ctx, domain.DomainClaimedMessageType, req.Language)
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.DomainClaimedMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultDomainClaimedMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
@@ -253,22 +253,22 @@ func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Contex
 }
 
 func (s *Server) GetCustomPasswordlessRegistrationMessageText(ctx context.Context, req *mgmt_pb.GetCustomPasswordlessRegistrationMessageTextRequest) (*mgmt_pb.GetCustomPasswordlessRegistrationMessageTextResponse, error) {
-	msg, err := s.org.GetMessageText(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordlessRegistrationMessageType, req.Language)
+	msg, err := s.query.CustomMessageTextByTypeAndLanguage(ctx, authz.GetCtxData(ctx).OrgID, domain.PasswordlessRegistrationMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetCustomPasswordlessRegistrationMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 
 func (s *Server) GetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *mgmt_pb.GetDefaultPasswordlessRegistrationMessageTextRequest) (*mgmt_pb.GetDefaultPasswordlessRegistrationMessageTextResponse, error) {
-	msg, err := s.org.GetDefaultMessageText(ctx, domain.PasswordlessRegistrationMessageType, req.Language)
+	msg, err := s.query.IAMMessageTextByTypeAndLanguage(ctx, domain.PasswordlessRegistrationMessageType, req.Language)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetDefaultPasswordlessRegistrationMessageTextResponse{
-		CustomText: text_grpc.DomainCustomMsgTextToPb(msg),
+		CustomText: text_grpc.ModelCustomMessageTextToPb(msg),
 	}, nil
 }
 

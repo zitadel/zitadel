@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	errs "errors"
 	"fmt"
 	"io/ioutil"
@@ -33,6 +34,8 @@ type MessageText struct {
 	CreationDate time.Time
 	ChangeDate   time.Time
 	State        domain.PolicyState
+
+	IsDefault bool
 
 	Type       string
 	Language   language.Tag
@@ -150,11 +153,11 @@ func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(messageType,
 	return messageTexts.GetMessageTextByType(messageType), nil
 }
 
-func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
+func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			MessageTextColAggregateID.identifier(): q.iamID,
+			MessageTextColAggregateID.identifier(): aggregateID,
 		},
 		sq.Eq{
 			MessageTextColType.identifier(): messageType,
@@ -170,6 +173,55 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 
 	row := q.client.QueryRowContext(ctx, query, args...)
 	return scan(row)
+}
+
+func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
+	q.mutex.Lock()
+	defer q.mutex.Unlock()
+	var err error
+	contents, ok := q.NotificationTranslationFileContents[language]
+	if !ok {
+		contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", language))
+		if errors.IsNotFound(err) {
+			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		q.NotificationTranslationFileContents[language] = contents
+	}
+	notificationTextMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-ekjFF", "Errors.TranslationFile.ReadError")
+	}
+	texts, err := q.CustomTextList(ctx, domain.IAMID, messageType, language)
+	if err != nil {
+		return nil, err
+	}
+	for _, text := range texts.CustomTexts {
+		messageTextMap, ok := notificationTextMap[messageType].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		messageTextMap[text.Key] = text.Text
+	}
+	jsonbody, err := json.Marshal(notificationTextMap)
+
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-3m8fJ", "Errors.TranslationFile.MergeError")
+	}
+	notificationText := new(MessageTexts)
+	if err := json.Unmarshal(jsonbody, &notificationText); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-9MkfD", "Errors.TranslationFile.MergeError")
+	}
+	result := notificationText.GetMessageTextByType(messageType)
+	result.IsDefault = true
+	return result, nil
+}
+
+func (q *Queries) OrgMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
+	//Merged Texts
+	return nil, nil
 }
 
 func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {
