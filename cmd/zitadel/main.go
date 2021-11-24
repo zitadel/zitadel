@@ -189,7 +189,7 @@ func startZitadel(configPaths []string) {
 	}
 
 	verifier := internal_authz.Start(&repo)
-	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store)
+	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store, esQueries)
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
 	if *notificationEnabled {
@@ -214,7 +214,7 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage) {
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore) {
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
@@ -236,7 +236,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, es)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {
