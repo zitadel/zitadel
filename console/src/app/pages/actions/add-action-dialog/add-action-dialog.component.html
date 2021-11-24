@@ -9,10 +9,16 @@
     <input cnslInput [(ngModel)]="name">
   </cnsl-form-field>
 
-  <cnsl-form-field class="form-field" appearance="outline">
+  <!-- <cnsl-form-field class="form-field" appearance="outline">
     <cnsl-label>{{'FLOWS.SCRIPT' | translate}}</cnsl-label>
     <textarea class="script" cnslInput [(ngModel)]="script"></textarea>
-  </cnsl-form-field>
+  </cnsl-form-field> -->
+
+  <ngx-codemirror *ngIf="opened$ | async" [(ngModel)]="script" [options]="{
+    lineNumbers: true,
+    theme: 'material',
+    mode: 'javascript'
+  }"></ngx-codemirror>
 
   <cnsl-form-field class="form-field" appearance="outline">
     <cnsl-label>{{'FLOWS.TIMEOUTINSEC' | translate}}</cnsl-label>
