@@ -24,5 +24,5 @@ CREATE TABLE zitadel.projections.label_policies (
 	dark_logo_url STRING,
 	dark_icon_url STRING,
 
-	PRIMARY KEY (id)
+	PRIMARY KEY (id, state)
 );
