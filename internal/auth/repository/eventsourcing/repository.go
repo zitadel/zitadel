@@ -20,7 +20,6 @@ import (
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
-	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 )
 
@@ -41,7 +40,6 @@ type EsRepository struct {
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
 	eventstore.RefreshTokenRepo
-	eventstore.KeyRepository
 	eventstore.ApplicationRepo
 	eventstore.UserSessionRepo
 	eventstore.UserGrantRepo
@@ -81,9 +79,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
 
-	keyChan := make(chan *key_model.KeyView)
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
-	locker := spooler.NewLocker(sqlClient)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:     conf.SearchLimit,
@@ -129,16 +125,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			Eventstore:   es,
 			SearchLimit:  conf.SearchLimit,
 			KeyAlgorithm: keyAlgorithm,
-		},
-		eventstore.KeyRepository{
-			View:                     view,
-			Commands:                 command,
-			Eventstore:               esV2,
-			SigningKeyRotationCheck:  systemDefaults.KeyConfig.SigningKeyRotationCheck.Duration,
-			SigningKeyGracefulPeriod: systemDefaults.KeyConfig.SigningKeyGracefulPeriod.Duration,
-			KeyAlgorithm:             keyAlgorithm,
-			Locker:                   locker,
-			KeyChan:                  keyChan,
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,

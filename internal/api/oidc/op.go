@@ -17,7 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
-	es_spooler "github.com/caos/zitadel/internal/eventstore/v1/spooler"
+	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
@@ -69,15 +69,14 @@ type OPStorage struct {
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
 	encAlg                            crypto.EncryptionAlgorithm
-	keyChan                           chan interface{}
+	keyChan                           <-chan interface{}
 	currentKey                        query.PrivateKey
-	lockID                            string
 	signingKeyRotationCheck           time.Duration
 	signingKeyGracefulPeriod          time.Duration
-	locker                            es_spooler.Locker
+	locker                            crdb.Locker
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore) op.OpenIDProvider {
+func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) op.OpenIDProvider {
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
 	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, keyConfig.EncryptionConfig.EncryptionKeyID)
@@ -95,7 +94,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
 	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es)
+	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es, projections, keyChan)
 	logging.Log("OIDC-Jdg2k").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create storage")
 	provider, err := op.NewOpenIDProvider(
 		ctx,
@@ -120,8 +119,12 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	return provider
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore) (*OPStorage, error) {
+func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) (*OPStorage, error) {
 	encAlg, err := crypto.NewAESCrypto(keyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+	sqlClient, err := projections.Start()
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +142,8 @@ func newStorage(config StorageConfig, command *command.Commands, query *query.Qu
 		encAlg:                            encAlg,
 		signingKeyGracefulPeriod:          keyConfig.SigningKeyGracefulPeriod.Duration,
 		signingKeyRotationCheck:           keyConfig.SigningKeyRotationCheck.Duration,
-		//locker:                            , //TODO: locker
+		locker:                            crdb.NewLocker(sqlClient, locksTable, signingKey),
+		keyChan:                           keyChan,
 	}, nil
 }
 

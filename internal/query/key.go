@@ -214,7 +214,12 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-WRFG4", "Errors.Internal")
 	}
-	return scan(rows)
+	keys, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	return keys, err
 }
 
 func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, error)) {

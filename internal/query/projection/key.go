@@ -18,6 +18,7 @@ import (
 type KeyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
+	keyChan             chan<- interface{}
 }
 
 const (
@@ -26,11 +27,12 @@ const (
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 )
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig) (_ *KeyProjection, err error) {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
 	p := &KeyProjection{}
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	p.keyChan = keyChan
 	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig.EncryptionConfig)
 	if err != nil {
 		return nil, err
@@ -86,7 +88,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 		logging.LogWithFields("HANDL-SDfw2", "seq", event.Sequence()).Error("cannot decrypt public key")
 		return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
 	}
-
+	p.keyChan <- true
 	return crdb.NewMultiStatement(e,
 		crdb.AddCreateStatement(
 			[]handler.Column{
@@ -102,7 +104,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
+				handler.NewCol(KeyPrivateColumnExpiry, time.Now().Add(20*time.Minute)),
 				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
