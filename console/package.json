@@ -62,7 +62,7 @@
     "@types/node-fetch": "^2.5.12",
     "chokidar-cli": "^3.0.0",
     "codelyzer": "^6.0.0",
-    "cypress": "^9.0.0",
+    "cypress": "^9.1.0",
     "cypress-wait-until": "^1.7.1",
     "form-data": "^4.0.0",
     "jasmine-core": "~3.7.1",

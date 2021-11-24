@@ -111,7 +111,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
             }
 
             cy.visit(`${Cypress.env('consoleUrl')}/users/me`)
-        }        
+        }
     })
 }
 
