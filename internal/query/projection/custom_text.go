@@ -92,7 +92,7 @@ func (p *CustomTextProjection) reduceSet(event eventstore.EventReader) (*handler
 		logging.LogWithFields("PROJE-g0Jfs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KKfw4", "reduce.wrong.event.type")
 	}
-	return crdb.NewCreateStatement(
+	return crdb.NewUpsertStatement(
 		&customTextEvent,
 		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
