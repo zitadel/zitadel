@@ -1,33 +1,37 @@
-name: e2e tmp
+name: End-to-end tests
 on:
-  push:
-    branches-ignore:
-      - master
-env:
-  E2E_ORG_OWNER_PW: ${{ secrets.E2E_ORG_OWNER_PW }}
-  E2E_ORG_OWNER_VIEWER_PW: ${{ secrets.E2E_ORG_OWNER_VIEWER_PW }}
-  E2E_ORG_PROJECT_CREATOR_PW: ${{ secrets.E2E_ORG_PROJECT_CREATOR_PW }}
-  E2E_SERVICEACCOUNT_KEY_BASE64: ${{ secrets.E2E_SERVICEACCOUNT_KEY_BASE64 }}
+  workflow_dispatch:
 jobs:
-  dev-release:
-    name: Dev-Release ORBOS
-    runs-on: ubuntu-18.04
+  cypress-run:
+    runs-on: ubuntu-latest
+    container: cypress/browsers:node14.7.0-chrome84
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-    - name: Install dependencies
-      run: npm ci
-      working-directory: ./console
-    - name: Install dependencies
-      run: npx playwright install --with-deps
-      working-directory: ./console
-    - name: Run tests
-      run: ./playwright.sh ./ci.env
-      working-directory: ./console
-    - uses: actions/upload-artifact@v1
-      if: ${{ always() }}
-      with:
-        name: e2e-test-results
-        path: console/tests/e2e/results
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2.11.7
+        with:
+          project: ./console
+          build: npm run build
+          start: npm start
+          browser: chrome
+          wait-on: "http://localhost:4200"
+          wait-on-timeout: 120
+        env:
+          CYPRESS_consoleUrl: "http://localhost:4200"
+          CYPRESS_apiCallsDomain: "zitadel.dev"
+          CYPRESS_zitadelProjectResourceId: "70669147545070419"
+          CYPRESS_serviceAccountKey: "${{secrets.E2E_SERVICEACCOUNT_KEY}}"
+          CYPRESS_org_owner_password: "${{secrets.E2E_ORG_OWNER_PW}}"
+          CYPRESS_org_owner_viewer_password: "${{secrets.E2E_ORG_OWNER_VIEWER_PW}}"
+          CYPRESS_org_project_creator_password: "${{secrets.E2E_ORG_PROJECT_CREATOR_PW}}"
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: console/cypress/screenshots
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: cypress-videos
+          path: console/cypress/videos
