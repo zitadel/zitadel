@@ -158,12 +158,8 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 	query, args, err := stmt.Where(
 		sq.Eq{
 			MessageTextColAggregateID.identifier(): aggregateID,
-		},
-		sq.Eq{
-			MessageTextColType.identifier(): messageType,
-		},
-		sq.Eq{
-			MessageTextColLanguage.identifier(): language,
+			MessageTextColType.identifier():        messageType,
+			MessageTextColLanguage.identifier():    language,
 		},
 	).
 		Limit(1).ToSql()
