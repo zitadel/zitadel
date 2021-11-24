@@ -106,7 +106,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*hand
 		handler.NewCol(MessageTextSequenceCol, templateEvent.Sequence()),
 		handler.NewCol(MessageTextStateCol, domain.PolicyStateActive),
 		handler.NewCol(MessageTextTypeCol, templateEvent.Template),
-		handler.NewCol(MessageTextLanguageCol, templateEvent.Language),
+		handler.NewCol(MessageTextLanguageCol, templateEvent.Language.String()),
 	}
 	if isTitle(templateEvent.Key) {
 		cols = append(cols, handler.NewCol(MessageTextTitleCol, templateEvent.Text))
