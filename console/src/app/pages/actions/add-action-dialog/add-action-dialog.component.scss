@@ -7,7 +7,7 @@
 
 .desc {
   color: var(--grey);
-  font-size: 0.9rem;
+  font-size: .9rem;
 }
 
 @mixin action-dialog-theme($theme) {
@@ -27,6 +27,6 @@
   }
 
   .ok-button {
-    margin-left: 0.5rem;
+    margin-left: .5rem;
   }
 }
