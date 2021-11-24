@@ -1,5 +1,8 @@
 name: End-to-end tests
 on:
+  push:
+    branches-ignore:
+      - master
   workflow_dispatch:
 jobs:
   cypress-run:
