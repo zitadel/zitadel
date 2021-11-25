@@ -46,7 +46,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	action.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
 
-	err = projection.Start(ctx, sqlClient, es, projections)
+	err = projection.Start(ctx, sqlClient, es, projections, defaults)
 	if err != nil {
 		return nil, err
 	}
