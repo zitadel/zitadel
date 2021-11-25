@@ -8,14 +8,14 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { GridPolicy, IAM_POLICY } from '../../policy-grid/policies';
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
 
 @Component({
-  selector: 'app-org-iam-policy',
+  selector: 'cnsl-org-iam-policy',
   templateUrl: './org-iam-policy.component.html',
   styleUrls: ['./org-iam-policy.component.scss'],
 })
@@ -34,11 +34,11 @@ export class OrgIamPolicyComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
-    private sessionStorage: StorageService,
+    private storage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
   ) {
-    const temporg = this.sessionStorage.getItem('organization') as Org.AsObject;
+    const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     if (temporg) {
       this.org = temporg;
     }
@@ -65,7 +65,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     });
   }
 
-  private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | undefined> {
+  private async getData(): Promise<GetCustomOrgIAMPolicyResponse.AsObject | GetOrgIAMPolicyResponse.AsObject | any> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return this.managementService.getOrgIAMPolicy();
@@ -74,6 +74,8 @@ export class OrgIamPolicyComponent implements OnDestroy {
           return this.adminService.getCustomOrgIAMPolicy(this.org.id);
         }
         break;
+      default:
+        return Promise.reject();
     }
   }
 

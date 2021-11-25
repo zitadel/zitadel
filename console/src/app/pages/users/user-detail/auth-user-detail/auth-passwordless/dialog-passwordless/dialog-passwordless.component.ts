@@ -13,7 +13,7 @@ export enum U2FComponentDestination {
 }
 
 @Component({
-  selector: 'app-dialog-passwordless',
+  selector: 'cnsl-dialog-passwordless',
   templateUrl: './dialog-passwordless.component.html',
   styleUrls: ['./dialog-passwordless.component.scss'],
 })

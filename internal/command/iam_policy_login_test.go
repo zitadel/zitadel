@@ -497,7 +497,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 	type args struct {
 		ctx                 context.Context
 		provider            *domain.IDPProvider
-		cascadeExternalIDPs []*domain.ExternalIDP
+		cascadeExternalIDPs []*domain.UserIDPLink
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -708,7 +708,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
-				cascadeExternalIDPs: []*domain.ExternalIDP{
+				cascadeExternalIDPs: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",
@@ -751,7 +751,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							user.NewHumanExternalIDPAddedEvent(context.Background(),
+							user.NewUserIDPLinkAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"config1", "", "externaluser1"),
 						),
@@ -764,11 +764,11 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 									"config1"),
 							),
 							eventFromEventPusher(
-								user.NewHumanExternalIDPCascadeRemovedEvent(context.Background(),
+								user.NewUserIDPLinkCascadeRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"config1", "externaluser1")),
 						},
-						uniqueConstraintsFromEventConstraint(user.NewRemoveExternalIDPUniqueConstraint("config1", "externaluser1")),
+						uniqueConstraintsFromEventConstraint(user.NewRemoveUserIDPLinkUniqueConstraint("config1", "externaluser1")),
 					),
 				),
 			},
@@ -777,7 +777,7 @@ func TestCommandSide_RemoveIDPProviderDefaultLoginPolicy(t *testing.T) {
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 				},
-				cascadeExternalIDPs: []*domain.ExternalIDP{
+				cascadeExternalIDPs: []*domain.UserIDPLink{
 					{
 						ObjectRoot: models.ObjectRoot{
 							AggregateID: "user1",

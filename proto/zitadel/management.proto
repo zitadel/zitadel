@@ -574,6 +574,18 @@ service ManagementService {
         };
     }
 
+    // Adds a new passwordless authenticator link to the user and returns it directly
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/passwordless/_link"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "user.credential.write"
+        };
+    }
+
     // Adds a new passwordless authenticator link to the user and sends it to the registered email address
     // This link enables the user to register a new device if current passwordless devices are all platform authenticators
     // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
@@ -583,7 +595,7 @@ service ManagementService {
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
+            permission: "user.write"
         };
     }
 
@@ -1434,6 +1446,19 @@ service ManagementService {
         option (zitadel.v1.auth_option) = {
             permission: "project.grant.read"
             check_field_name: "ProjectId"
+        };
+    }
+
+    // Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListAllProjectGrants(ListAllProjectGrantsRequest) returns (ListAllProjectGrantsResponse) {
+        option (google.api.http) = {
+            post: "/projectgrants/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.grant.read"
         };
     }
 
@@ -2975,7 +3000,9 @@ message ImportHumanUserRequest {
 message ImportHumanUserResponse {
     message PasswordlessRegistration {
         string link = 1;
+        //deprecated: use expiration instead
         google.protobuf.Duration lifetime = 2;
+        google.protobuf.Duration expiration = 3;
     }
 
     string user_id = 1;
@@ -3152,7 +3179,7 @@ message UpdateHumanEmailResponse {
 
 message ResendHumanInitializationRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string email = 2 [(validate.rules).string.email = true];
+    string email = 2 [(validate.rules).string = {ignore_empty: true, email: true}];
 }
 
 message ResendHumanInitializationResponse {
@@ -3275,6 +3302,16 @@ message ListHumanPasswordlessRequest {
 
 message ListHumanPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1;
+}
+
+message AddPasswordlessRegistrationRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddPasswordlessRegistrationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
 }
 
 message SendPasswordlessRegistrationRequest {
@@ -4027,6 +4064,18 @@ message ListProjectGrantsResponse {
     repeated zitadel.project.v1.GrantedProject result = 2;
 }
 
+message ListAllProjectGrantsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.project.v1.AllProjectGrantQuery queries = 2;
+}
+
+message ListAllProjectGrantsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.project.v1.GrantedProject result = 2;
+}
+
 message AddProjectGrantRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string granted_org_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -4221,6 +4270,7 @@ message GetLoginPolicyRequest {}
 
 message GetLoginPolicyResponse {
     zitadel.policy.v1.LoginPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LoginPolicy
     bool is_default = 2;
 }
 
@@ -4337,6 +4387,7 @@ message GetPasswordComplexityPolicyRequest {}
 
 message GetPasswordComplexityPolicyResponse {
     zitadel.policy.v1.PasswordComplexityPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy
     bool is_default = 2;
 }
 
@@ -4383,6 +4434,7 @@ message GetPasswordAgePolicyRequest {}
 
 message GetPasswordAgePolicyResponse {
     zitadel.policy.v1.PasswordAgePolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.PasswordAgePolicy
     bool is_default = 2;
 }
 
@@ -4423,6 +4475,7 @@ message GetLockoutPolicyRequest {}
 
 message GetLockoutPolicyResponse {
     zitadel.policy.v1.LockoutPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LockoutPolicy
     bool is_default = 2;
 }
 
@@ -4500,6 +4553,7 @@ message GetLabelPolicyRequest {}
 
 message GetLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy
     bool is_default = 2;
 }
 
@@ -4508,6 +4562,7 @@ message GetPreviewLabelPolicyRequest {}
 
 message GetPreviewLabelPolicyResponse {
     zitadel.policy.v1.LabelPolicy policy = 1;
+    //deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy
     bool is_default = 2;
 }
 

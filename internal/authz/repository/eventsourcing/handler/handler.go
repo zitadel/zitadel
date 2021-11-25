@@ -38,10 +38,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),
 		newApplication(
 			handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
-		newOrg(
-			handler{view, bulkLimit, configs.cycleDuration("Org"), errorCount, es}),
-		newFeatures(
-			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
 	}
 }
 

@@ -1,7 +1,7 @@
 function checkWebauthnSupported(button, func) {
     let support = document.getElementsByClassName("wa-support");
     let noSupport = document.getElementsByClassName("wa-no-support");
-    if (typeof (PublicKeyCredential) === undefined) {
+    if (!window.PublicKeyCredential) {
         for (let item of noSupport) {
             item.classList.remove('hidden');
         }

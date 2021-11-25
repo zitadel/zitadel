@@ -529,6 +529,20 @@ Returns all configured passwordless authenticators
     POST: /users/{user_id}/passwordless/_search
 
 
+### AddPasswordlessRegistration
+
+> **rpc** AddPasswordlessRegistration([AddPasswordlessRegistrationRequest](#addpasswordlessregistrationrequest))
+[AddPasswordlessRegistrationResponse](#addpasswordlessregistrationresponse)
+
+Adds a new passwordless authenticator link to the user and returns it directly
+This link enables the user to register a new device if current passwordless devices are all platform authenticators
+e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+
+
+
+    POST: /users/{user_id}/passwordless/_link
+
+
 ### SendPasswordlessRegistration
 
 > **rpc** SendPasswordlessRegistration([SendPasswordlessRegistrationRequest](#sendpasswordlessregistrationrequest))
@@ -1377,6 +1391,19 @@ Limit should always be set, there is a default limit set by the service
 
 
     POST: /projects/{project_id}/grants/_search
+
+
+### ListAllProjectGrants
+
+> **rpc** ListAllProjectGrants([ListAllProjectGrantsRequest](#listallprojectgrantsrequest))
+[ListAllProjectGrantsResponse](#listallprojectgrantsresponse)
+
+Returns all project grants matching the query, (ProjectGrant = Grant another organisation for my project)
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /projectgrants/_search
 
 
 ### AddProjectGrant
@@ -3356,6 +3383,30 @@ This is an empty request
 
 
 
+### AddPasswordlessRegistrationRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddPasswordlessRegistrationResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| link |  string | - |  |
+| expiration |  google.protobuf.Duration | - |  |
+
+
+
+
 ### AddProjectGrantMemberRequest
 
 
@@ -4545,7 +4596,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy |  |
 
 
 
@@ -4563,7 +4614,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LockoutPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LockoutPolicy |  |
 
 
 
@@ -4581,7 +4632,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LoginPolicy |  |
 
 
 
@@ -4718,7 +4769,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordAgePolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.PasswordAgePolicy |  |
 
 
 
@@ -4736,7 +4787,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PasswordComplexityPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.PasswordComplexityPolicy |  |
 
 
 
@@ -4754,7 +4805,7 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LabelPolicy | - |  |
-| is_default |  bool | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.LabelPolicy |  |
 
 
 
@@ -5030,7 +5081,8 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | link |  string | - |  |
-| lifetime |  google.protobuf.Duration | - |  |
+| lifetime |  google.protobuf.Duration | deprecated: use expiration instead |  |
+| expiration |  google.protobuf.Duration | - |  |
 
 
 
@@ -5080,6 +5132,30 @@ This is an empty response
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.action.v1.ActionFieldName | - |  |
 | result | repeated zitadel.action.v1.Action | - |  |
+
+
+
+
+### ListAllProjectGrantsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.project.v1.AllProjectGrantQuery | criterias the client is looking for |  |
+
+
+
+
+### ListAllProjectGrantsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.project.v1.GrantedProject | - |  |
 
 
 
@@ -6663,7 +6739,7 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| email |  string | - | string.email: true<br />  |
+| email |  string | - | string.email: true<br /> string.ignore_empty: true<br />  |
 
 
 

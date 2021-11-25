@@ -46,15 +46,26 @@
       .head {
         margin-bottom: 2rem;
 
-        h1 {
-          font-size: 1.5rem;
-          margin-top: 10px;
+        .top-view {
+          display: flex;
+          justify-content: space-between;
         }
 
-        .desc {
-          display: block;
-          font-size: .9rem;
-          color: var(--grey);
+        div {
+          h1 {
+            font-size: 1.5rem;
+            margin-top: 10px;
+          }
+
+          .head-desc {
+            display: block;
+            font-size: .9rem;
+            color: var(--grey);
+          }
+        }
+
+        .actions-wrap {
+          padding-top: .5rem;
         }
       }
     }

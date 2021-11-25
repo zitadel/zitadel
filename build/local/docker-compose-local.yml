@@ -6,7 +6,7 @@ services:
     restart: always
     networks:
       - zitadel
-    image: cockroachdb/cockroach:v21.1.0
+    image: cockroachdb/cockroach:v21.1.11
     command: start-single-node --insecure --listen-addr=0.0.0.0
     ports:
       - 8080:8080
@@ -155,7 +155,7 @@ services:
     ports:
       - '50000:8080'
     environment:
-      - BKD_HOST=backend-run
+      - BKD_HOST=host.docker.internal
       - BKD_PORT=50001
 
   frontend-local-run:
@@ -187,7 +187,7 @@ services:
     volumes:
       - ./environment.json:/environment.json
     environment:
-      - HOST=backend-run
+      - HOST=host.docker.internal
       - PORT=50002
 
 networks:

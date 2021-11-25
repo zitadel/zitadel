@@ -1,0 +1,60 @@
+@use '~@angular/material' as mat;
+
+.idp-radio-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin: 0 -.5rem;
+  max-width: 500px;
+}
+
+@mixin idp-type-radio-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $primary-color-light: mat.get-color-from-palette($primary, 300);
+  $primary-color-dark: mat.get-color-from-palette($primary, 700);
+  $primary-color-contrast: mat.get-color-from-palette($primary, default-contrast);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($theme, background);
+  $fg: map-get($theme, foreground);
+  $cardback: map-get($back, card);
+  $text: map-get($fg, text);
+
+  input[type="radio"].idp {
+    appearance: none;
+    opacity: 0;
+    display: none;
+  }
+
+  .cnsl-idp-type-radio-button {
+    margin: .5rem;
+    border-radius: .5rem;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    background-color: $cardback;
+
+    .cnsl-idp-type-radio-header {
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+
+      span {
+        margin: 1rem 0;
+        font-size: 1.1rem;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+    }
+  }
+
+  input.idp:checked + label {
+    border: 4px solid if($is-dark-theme, $primary-color-dark, $primary-color-light) !important;
+    background: $primary-color !important;
+    color: $primary-color-contrast !important;
+  }
+}

@@ -3,22 +3,22 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 
 @Directive({
-  selector: '[appHasFeature]',
+  selector: '[cnslHasFeature]',
 })
 
 export class HasFeatureDirective {
   private hasView: boolean = false;
-  @Input() public set appHasFeature(features: string[] | RegExp[]) {
+  @Input() public set hasFeature(features: string[] | RegExp[]) {
     if (features && features.length > 0) {
       this.authService.canUseFeature(features).subscribe(isAllowed => {
         if (isAllowed && !this.hasView) {
           this.viewContainerRef.clear();
           this.viewContainerRef.createEmbeddedView(this.templateRef);
-        } else if (this.hasView) {
+        } else {
           this.viewContainerRef.clear();
           this.hasView = false;
         }
-      });
+      })
     }
   }
 

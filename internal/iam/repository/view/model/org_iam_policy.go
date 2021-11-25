@@ -2,15 +2,15 @@ package model
 
 import (
 	"encoding/json"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"time"
+
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/iam/model"
 )
 
 const (
@@ -27,28 +27,6 @@ type OrgIAMPolicyView struct {
 	Default               bool `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
-}
-
-func OrgIAMViewFromModel(policy *model.OrgIAMPolicyView) *OrgIAMPolicyView {
-	return &OrgIAMPolicyView{
-		AggregateID:           policy.AggregateID,
-		Sequence:              policy.Sequence,
-		CreationDate:          policy.CreationDate,
-		ChangeDate:            policy.ChangeDate,
-		Default:               policy.Default,
-		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-	}
-}
-
-func OrgIAMViewToModel(policy *OrgIAMPolicyView) *model.OrgIAMPolicyView {
-	return &model.OrgIAMPolicyView{
-		AggregateID:           policy.AggregateID,
-		Sequence:              policy.Sequence,
-		CreationDate:          policy.CreationDate,
-		ChangeDate:            policy.ChangeDate,
-		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
-		Default:               policy.Default,
-	}
 }
 
 func (i *OrgIAMPolicyView) AppendEvent(event *models.Event) (err error) {

@@ -5,7 +5,7 @@
     </div>
 
     <div class="gridcontainer">
-        <ng-template appHasRole [appHasRole]="['iam.write']">
+        <ng-template cnslHasRole [hasRole]="['iam.write']">
             <a matRipple *ngIf="!firstStepsDismissed" class="onboard" [routerLink]="['/firststeps']">
                 <p class="first-steps">{{'ONBOARDING.HEADER' | translate}}</p>
                 <h2>{{'ONBOARDING.TITLE' | translate}}</h2>
@@ -34,8 +34,8 @@
             </button>
         </a>
 
-        <ng-template appHasRole [appHasRole]="['iam.write']">
-            <app-card class="griditem" [nomargin]="true">
+        <ng-template cnslHasRole [hasRole]="['iam.write']">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="icon las la-gem"></i>
@@ -44,11 +44,11 @@
                     <p>{{'HOME.IAM_DESC'| translate}}</p>
                 </div>
 
-                <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
+                <ng-template cnslHasRole [hasRole]="['org.create','iam.write']">
                     <a class="short-link" [routerLink]="[ '/org', 'create']">{{'HOME.IAM_CREATE_ORG' | translate}}<i
                             class="las la-link"></i></a>
                 </ng-template>
-                <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+                <ng-template cnslHasRole [hasRole]="['iam.policy.read']">
                     <a class="short-link" [routerLink]="[ '/iam', 'policy','iam']">{{'HOME.IAM_POLICY_IAM' |
                         translate}}<i class="las la-link"></i></a>
                     <a class="short-link" [routerLink]="[ '/iam', 'policy','complexity']">{{'HOME.IAM_POLICY_COMPLEXITY'
@@ -63,10 +63,10 @@
                 <div class="footer">
                     <a color="primary" mat-stroked-button [routerLink]="['/iam']">{{'HOME.IAM_BUTTON' | translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
 
-        <app-card class="griditem" [nomargin]="true">
+        <cnsl-card class="griditem" [nomargin]="true">
             <div class="top">
                 <h2> <i class="icon las la-user-circle"></i>
                     {{'HOME.SECURITYANDPRIVACY'| translate}}</h2>
@@ -80,17 +80,17 @@
                 <a color="primary" mat-stroked-button [routerLink]="['/users/me']">{{'HOME.SECURITYANDPRIVACY_BUTTON' |
                     translate}}</a>
             </div>
-        </app-card>
+        </cnsl-card>
 
-        <ng-template appHasRole [appHasRole]="['project.read']">
-            <app-card class="griditem" [nomargin]="true">
+        <ng-template cnslHasRole [hasRole]="['project.read']">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="icon las la-layer-group"></i>
                         {{'HOME.PROJECTS'| translate}}
                     </h2>
                     <p>{{'HOME.PROJECTS_DESC'| translate}}</p>
-                    <ng-template appHasRole [appHasRole]="['project.create']">
+                    <ng-template cnslHasRole [hasRole]="['project.create']">
                         <a class="short-link" [routerLink]="[ '/projects', 'create']">{{'HOME.PROJECTS_NEW_LINK' |
                             translate}}<i class="las la-link"></i></a>
                     </ng-template>
@@ -100,20 +100,20 @@
                     <a color="primary" mat-stroked-button [routerLink]="['/projects']">{{'HOME.PROJECTS_BUTTON' |
                         translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['org.read']">
-            <app-card class="griditem" [nomargin]="true">
+        <ng-template cnslHasRole [hasRole]="['org.read']">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2> <i class="icon las la-archway"></i>
                         {{'HOME.PROTECTION'| translate}}</h2>
                     <p>{{'HOME.PROTECTION_DESC'| translate}}</p>
-                    <ng-template appHasRole [appHasRole]="['iam.policy.read']">
+                    <ng-template cnslHasRole [hasRole]="['iam.policy.read']">
                         <a class="short-link" [routerLink]="[ '/org', 'policy','iam']">{{'HOME.ORG_POLICY_IAM' |
                             translate}}<i class="las la-link"></i></a>
                     </ng-template>
-                    <ng-template appHasRole [appHasRole]="['policy.read']">
+                    <ng-template cnslHasRole [hasRole]="['policy.read']">
                         <a class="short-link"
                             [routerLink]="[ '/org', 'policy','complexity']">{{'HOME.ORG_POLICY_COMPLEXITY' |
                             translate}}<i class="las la-link"></i></a>
@@ -128,24 +128,24 @@
                     <a color="primary" mat-stroked-button [routerLink]="['/org']">{{'HOME.PROTECTION_BUTTON' |
                         translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['user.read']">
-            <app-card class="griditem" [nomargin]="true">
+        <ng-template cnslHasRole [hasRole]="['user.read']">
+            <cnsl-card class="griditem" [nomargin]="true">
                 <div class="top">
                     <h2>
                         <i class="las la-users"></i>
                         {{'HOME.USERS'| translate}}
                     </h2>
                     <p>{{'HOME.USERS_DESC'| translate}}</p>
-                    <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+                    <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
                         <a class="short-link" [routerLink]="[ '/users', 'list', 'humans']">{{'HOME.USERS_HUMANS' |
                             translate}}<i class="las la-link"></i></a>
                         <a class="short-link" [routerLink]="[ '/users', 'list', 'machines']">{{'HOME.USERS_MACHINES' |
                             translate}}<i class="las la-link"></i></a>
                     </ng-template>
-                    <ng-template appHasRole [appHasRole]="['user.read']">
+                    <ng-template cnslHasRole [hasRole]="['user.read']">
                         <a class="short-link" [routerLink]="[ '/users', 'create']">{{'HOME.USERS_CREATE' | translate}}<i
                                 class="las la-link"></i></a>
                     </ng-template>
@@ -155,7 +155,7 @@
                     <a color="primary" mat-stroked-button [routerLink]="['/users/list/humans']">{{'HOME.USERS_BUTTON' |
                         translate}}</a>
                 </div>
-            </app-card>
+            </cnsl-card>
         </ng-template>
     </div>
 

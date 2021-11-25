@@ -56,9 +56,9 @@ func SearchUserGrants(db *gorm.DB, table string, req *grant_model.UserGrantSearc
 		}
 	}
 
-	if withGranted {
+	if orgID != "" && withGranted {
 		db = db.Where("resource_owner = ? OR project_owner = ?", orgID, orgID)
-	} else {
+	} else if orgID != "" {
 		db = db.Where("resource_owner = ?", orgID)
 	}
 	query := repository.PrepareSearchQuery(table, model.UserGrantSearchRequest{Limit: req.Limit, Offset: req.Offset, Queries: req.Queries})

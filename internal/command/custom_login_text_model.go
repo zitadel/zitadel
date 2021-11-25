@@ -22,7 +22,7 @@ func (wm *CustomLoginTextsReadModel) Reduce() error {
 			wm.CustomLoginTexts[e.Template+e.Language.String()] = &CustomText{Language: e.Language, Template: e.Template}
 		case *policy.CustomTextTemplateRemovedEvent:
 			if _, ok := wm.CustomLoginTexts[e.Template+e.Language.String()]; ok {
-				delete(wm.CustomLoginTexts, e.Template)
+				delete(wm.CustomLoginTexts, e.Template+e.Language.String())
 			}
 		}
 	}
@@ -182,6 +182,7 @@ type CustomLoginTextReadModel struct {
 
 	PasswordlessRegistrationDoneTitle            string
 	PasswordlessRegistrationDoneDescription      string
+	PasswordlessRegistrationDoneDescriptionClose string
 	PasswordlessRegistrationDoneNextButtonText   string
 	PasswordlessRegistrationDoneCancelButtonText string
 
@@ -1703,6 +1704,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenSetE
 		wm.PasswordlessRegistrationDoneDescription = e.Text
 		return
 	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose {
+		wm.PasswordlessRegistrationDoneDescriptionClose = e.Text
+		return
+	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {
 		wm.PasswordlessRegistrationDoneNextButtonText = e.Text
 		return
@@ -1720,6 +1725,10 @@ func (wm *CustomLoginTextReadModel) handlePasswordlessRegistrationDoneScreenRemo
 	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescription {
 		wm.PasswordlessRegistrationDoneDescription = ""
+		return
+	}
+	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneDescriptionClose {
+		wm.PasswordlessRegistrationDoneDescriptionClose = ""
 		return
 	}
 	if e.Key == domain.LoginKeyPasswordlessRegistrationDoneNextButtonText {

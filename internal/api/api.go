@@ -22,6 +22,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -58,11 +59,20 @@ type admin interface {
 	GetSpoolerDiv(database, viewName string) int64
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
-	api.verifier = authz.Start(authZRepo)
+
+	repo := struct {
+		authz_es.EsRepository
+		query.Queries
+	}{
+		*authZRepo,
+		*q,
+	}
+
+	api.verifier = authz.Start(&repo)
 	api.health = authZRepo
 	api.auth = authRepo
 	api.admin = adminRepo

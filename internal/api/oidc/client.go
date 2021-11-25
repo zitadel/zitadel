@@ -17,6 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
@@ -43,12 +44,16 @@ func (o *OPStorage) GetClientByClientID(ctx context.Context, id string) (_ op.Cl
 	if client.State != proj_model.AppStateActive {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sdaGg", "client is not active")
 	}
-	projectRoles, err := o.repo.ProjectRolesByProjectID(client.ProjectID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(client.ProjectID)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "OIDC-mPxqP", "Errors.Internal")
+	}
+	projectRoles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
-	allowedScopes := make([]string, len(projectRoles))
-	for i, role := range projectRoles {
+	allowedScopes := make([]string, len(projectRoles.ProjectRoles))
+	for i, role := range projectRoles.ProjectRoles {
 		allowedScopes[i] = ScopeProjectRolePrefix + role.Key
 	}
 	return ClientFromBusiness(client, o.defaultLoginURL, o.defaultAccessTokenLifetime, o.defaultIdTokenLifetime, allowedScopes)
@@ -88,7 +93,7 @@ func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string
 		scope := scopes[i]
 		if strings.HasPrefix(scope, authreq_model.OrgDomainPrimaryScope) {
 			var orgID string
-			org, err := o.repo.OrgByPrimaryDomain(strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
+			org, err := o.query.OrgByDomainGlobal(ctx, strings.TrimPrefix(scope, authreq_model.OrgDomainPrimaryScope))
 			if err == nil {
 				orgID = org.ID
 			}
@@ -310,14 +315,18 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	resourceOwner, err := o.repo.OrgByUserID(ctx, userID)
+	user, err := o.repo.UserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwner, err := o.query.OrgByID(ctx, user.ResourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	return map[string]string{
-		ClaimResourceOwner + "id":             resourceOwner.AggregateID,
+		ClaimResourceOwner + "id":             resourceOwner.ID,
 		ClaimResourceOwner + "name":           resourceOwner.Name,
-		ClaimResourceOwner + "primary_domain": resourceOwner.PrimaryDomain,
+		ClaimResourceOwner + "primary_domain": resourceOwner.Domain,
 	}, nil
 }
 

@@ -18,8 +18,8 @@ func ListMyLinkedIDPsRequestToModel(req *auth_pb.ListMyLinkedIDPsRequest) *model
 	}
 }
 
-func RemoveMyLinkedIDPRequestToDomain(ctx context.Context, req *auth_pb.RemoveMyLinkedIDPRequest) *domain.ExternalIDP {
-	return &domain.ExternalIDP{
+func RemoveMyLinkedIDPRequestToDomain(ctx context.Context, req *auth_pb.RemoveMyLinkedIDPRequest) *domain.UserIDPLink {
+	return &domain.UserIDPLink{
 		ObjectRoot:     ctxToObjectRoot(ctx),
 		IDPConfigID:    req.IdpId,
 		ExternalUserID: req.LinkedUserId,

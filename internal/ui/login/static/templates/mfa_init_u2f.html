@@ -18,7 +18,7 @@
 
     <div class="fields">
         <p class="wa-no-support lgn-error hidden">{{t "InitMFAU2F.NotSupported"}}</p>
-        <div class="field">
+        <div class="field wa-support">
             <label class="lgn-label" for="name">{{t "InitMFAU2F.TokenNameLabel"}}</label>
             <input class="lgn-input" type="text" id="name" name="name" autocomplete="off" autofocus>
         </div>
@@ -46,4 +46,3 @@
 <script src="{{ resourceUrl "scripts/webauthn_register.js" }}"></script>
 
 {{template "main-bottom" .}}
- 

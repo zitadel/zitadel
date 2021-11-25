@@ -44,7 +44,7 @@ zitadelctl writesecret zitadel.emailappkey.existing --value $EMAIL_APP_KEY
 watch "kubectl --namespace caos-zitadel get pods"
 ```
 
-ZITADEL needs [gRPC-Web](https://grpc.io/docs/platforms/web/basics/) for client-server communication, which the widely spread [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) doesn't support out-of-the-box but Ambassador does. If you don't have an [Ambassador](https://www.getambassador.io/) running, we recommend you run it with our operator [BOOM](https://github.com/caos/orbos/blob/v4.0.0/docs/boom/boom.md).
+ZITADEL needs [gRPC-Web](https://grpc.io/docs/platforms/web/basics/) for client-server communication, which the widely spread [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) doesn't support out-of-the-box but Ambassador does. If you don't have an [Ambassador Version 1.x](https://www.getambassador.io/docs/edge-stack/1.14/tutorials/getting-started/) running, we recommend you run it with our operator [BOOM](https://github.com/caos/orbos/blob/v4.0.0/docs/boom/boom.md).
 
 Download the template configuration file [boom.yml](./templates/boom.yml). Then adjust the values in boom.yml to match your environment.  
 
@@ -64,4 +64,4 @@ kubectl apply --filename ./boom.yml
 watch "kubectl --namespace caos-system get pods"
 ```
 
-Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/domains) now.
+Congratulations, you can accept traffic at four new ZITADEL [subdomains](/docs/apis/introduction#domains) now.

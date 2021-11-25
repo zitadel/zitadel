@@ -2,76 +2,80 @@ package query
 
 import (
 	"context"
+	"database/sql"
+	errs "errors"
 	"time"
 
-	"github.com/Masterminds/squirrel"
+	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query/projection"
 )
 
-var actionsQuery = squirrel.StatementBuilder.Select("creation_date", "change_date", "resource_owner", "sequence", "id", "action_state", "name", "script", "timeout", "allowed_to_fail").
-	From("zitadel.projections.actions").PlaceholderFormat(squirrel.Dollar)
-
-func (q *Queries) GetAction(ctx context.Context, id string, orgID string) (*Action, error) {
-	idQuery, _ := newActionIDSearchQuery(id)
-	actions, err := q.SearchActions(ctx, &ActionSearchQueries{Queries: []SearchQuery{idQuery}})
-	if err != nil {
-		return nil, err
+var (
+	actionTable = table{
+		name: projection.ActionTable,
 	}
-	if len(actions) != 1 {
-		return nil, errors.ThrowNotFound(nil, "QUERY-dft2g", "Errors.Action.NotFound")
+	ActionColumnID = Column{
+		name:  projection.ActionIDCol,
+		table: actionTable,
 	}
-	return actions[0], err
-}
-
-func (q *Queries) SearchActions(ctx context.Context, query *ActionSearchQueries) ([]*Action, error) {
-	stmt, args, err := query.ToQuery(actionsQuery).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.orgs.invalid.request")
+	ActionColumnCreationDate = Column{
+		name:  projection.ActionCreationDateCol,
+		table: actionTable,
 	}
-
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-M6mYN", "Errors.orgs.internal")
+	ActionColumnChangeDate = Column{
+		name:  projection.ActionChangeDateCol,
+		table: actionTable,
 	}
-
-	actions := []*Action{}
-	for rows.Next() {
-		org := new(Action)
-		rows.Scan(
-			&org.CreationDate,
-			&org.ChangeDate,
-			&org.ResourceOwner,
-			&org.Sequence,
-			&org.ID,
-			&org.State,
-			&org.Name,
-			&org.Script,
-			&org.Timeout,
-			&org.AllowedToFail,
-		)
-		actions = append(actions, org)
+	ActionColumnResourceOwner = Column{
+		name:  projection.ActionResourceOwnerCol,
+		table: actionTable,
 	}
-
-	if err := rows.Err(); err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-pA0Wj", "Errors.actions.internal")
+	ActionColumnSequence = Column{
+		name:  projection.ActionSequenceCol,
+		table: actionTable,
 	}
+	ActionColumnState = Column{
+		name:  projection.ActionStateCol,
+		table: actionTable,
+	}
+	ActionColumnName = Column{
+		name:  projection.ActionNameCol,
+		table: actionTable,
+	}
+	ActionColumnScript = Column{
+		name:  projection.ActionScriptCol,
+		table: actionTable,
+	}
+	ActionColumnTimeout = Column{
+		name:  projection.ActionTimeoutCol,
+		table: actionTable,
+	}
+	ActionColumnAllowedToFail = Column{
+		name:  projection.ActionAllowedToFailCol,
+		table: actionTable,
+	}
+)
 
-	return actions, nil
+type Actions struct {
+	SearchResponse
+	Actions []*Action
 }
 
 type Action struct {
-	ID            string             `col:"id"`
-	CreationDate  time.Time          `col:"creation_date"`
-	ChangeDate    time.Time          `col:"change_date"`
-	ResourceOwner string             `col:"resource_owner"`
-	State         domain.ActionState `col:"action_state"`
-	Sequence      uint64             `col:"sequence"`
+	ID            string
+	CreationDate  time.Time
+	ChangeDate    time.Time
+	ResourceOwner string
+	State         domain.ActionState
+	Sequence      uint64
 
-	Name          string        `col:"name"`
-	Script        string        `col:"script"`
-	Timeout       time.Duration `col:"-"`
-	AllowedToFail bool          `col:"-"`
+	Name          string
+	Script        string
+	Timeout       time.Duration
+	AllowedToFail bool
 }
 
 type ActionSearchQueries struct {
@@ -79,26 +83,144 @@ type ActionSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *ActionSearchQueries) ToQuery(query squirrel.SelectBuilder) squirrel.SelectBuilder {
-	query = q.SearchRequest.ToQuery(query)
+func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }
 
+func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries) (actions *Actions, err error) {
+	query, scan := prepareActionsQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-SDfr52", "Errors.Internal")
+	}
+	actions, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	actions.LatestSequence, err = q.latestSequence(ctx, actionTable)
+	return actions, err
+}
+
+func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*Action, error) {
+	stmt, scan := prepareActionQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			ActionColumnID.identifier():            id,
+			ActionColumnResourceOwner.identifier(): orgID,
+		}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
 func NewActionResourceOwnerQuery(id string) (SearchQuery, error) {
-	return NewTextQuery("resource_owner", id, TextEquals)
+	return NewTextQuery(ActionColumnResourceOwner, id, TextEquals)
 }
 
 func NewActionNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
-	return NewTextQuery("name", value, method)
+	return NewTextQuery(ActionColumnName, value, method)
 }
 
 func NewActionStateSearchQuery(value domain.ActionState) (SearchQuery, error) {
-	return NewIntQuery("state", int(value), IntEquals)
+	return NewNumberQuery(ActionColumnState, int(value), NumberEquals)
 }
 
-func newActionIDSearchQuery(id string) (SearchQuery, error) {
-	return NewTextQuery("id", id, TextEquals)
+func prepareActionsQuery() (sq.SelectBuilder, func(rows *sql.Rows) (*Actions, error)) {
+	return sq.Select(
+			ActionColumnID.identifier(),
+			ActionColumnCreationDate.identifier(),
+			ActionColumnChangeDate.identifier(),
+			ActionColumnResourceOwner.identifier(),
+			ActionColumnSequence.identifier(),
+			ActionColumnState.identifier(),
+			ActionColumnName.identifier(),
+			ActionColumnScript.identifier(),
+			ActionColumnTimeout.identifier(),
+			ActionColumnAllowedToFail.identifier(),
+			countColumn.identifier(),
+		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*Actions, error) {
+			actions := make([]*Action, 0)
+			var count uint64
+			for rows.Next() {
+				action := new(Action)
+				err := rows.Scan(
+					&action.ID,
+					&action.CreationDate,
+					&action.ChangeDate,
+					&action.ResourceOwner,
+					&action.Sequence,
+					&action.State,
+					&action.Name,
+					&action.Script,
+					&action.Timeout,
+					&action.AllowedToFail,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				actions = append(actions, action)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-EGdff", "Errors.Query.CloseRows")
+			}
+
+			return &Actions{
+				Actions: actions,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
+}
+
+func prepareActionQuery() (sq.SelectBuilder, func(row *sql.Row) (*Action, error)) {
+	return sq.Select(
+			ActionColumnID.identifier(),
+			ActionColumnCreationDate.identifier(),
+			ActionColumnChangeDate.identifier(),
+			ActionColumnResourceOwner.identifier(),
+			ActionColumnSequence.identifier(),
+			ActionColumnState.identifier(),
+			ActionColumnName.identifier(),
+			ActionColumnScript.identifier(),
+			ActionColumnTimeout.identifier(),
+			ActionColumnAllowedToFail.identifier(),
+		).From(actionTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(row *sql.Row) (*Action, error) {
+			action := new(Action)
+			err := row.Scan(
+				&action.ID,
+				&action.CreationDate,
+				&action.ChangeDate,
+				&action.ResourceOwner,
+				&action.Sequence,
+				&action.State,
+				&action.Name,
+				&action.Script,
+				&action.Timeout,
+				&action.AllowedToFail,
+			)
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-GEfnb", "Errors.Action.NotFound")
+				}
+				return nil, errors.ThrowInternal(err, "QUERY-Dbnt4", "Errors.Internal")
+			}
+			return action, nil
+		}
 }

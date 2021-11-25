@@ -1,19 +1,21 @@
 package handler
 
 import (
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"net/http"
+
+	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
-func (l *Login) getDefaultOrgIamPolicy(r *http.Request) (*iam_model.OrgIAMPolicyView, error) {
-	return l.authRepo.GetDefaultOrgIAMPolicy(r.Context())
+func (l *Login) getDefaultOrgIamPolicy(r *http.Request) (*query.OrgIAMPolicy, error) {
+	return l.query.DefaultOrgIAMPolicy(r.Context())
 }
 
-func (l *Login) getOrgIamPolicy(r *http.Request, orgID string) (*iam_model.OrgIAMPolicyView, error) {
+func (l *Login) getOrgIamPolicy(r *http.Request, orgID string) (*query.OrgIAMPolicy, error) {
 	if orgID == "" {
-		return l.authRepo.GetDefaultOrgIAMPolicy(r.Context())
+		return l.query.DefaultOrgIAMPolicy(r.Context())
 	}
-	return l.authRepo.GetOrgIAMPolicy(r.Context(), orgID)
+	return l.query.OrgIAMPolicyByOrg(r.Context(), orgID)
 }
 
 func (l *Login) getIDPConfigByID(r *http.Request, idpConfigID string) (*iam_model.IDPConfigView, error) {

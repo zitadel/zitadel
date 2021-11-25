@@ -220,6 +220,10 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 }
 
 func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+	if authReq == nil {
+		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
+		return
+	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 	if err != nil {
@@ -349,7 +353,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
 		}
 	} else {
-		privacyPolicy, err := l.getDefaultPrivacyPolicy(r)
+		privacyPolicy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
 		}
@@ -438,6 +442,9 @@ func (l *Login) getPrivateLabelingID(authReq *domain.AuthRequest) string {
 		if authReq.UserOrgID != "" {
 			privateLabelingOrgID = authReq.UserOrgID
 		}
+	}
+	if authReq.RequestedOrgID != "" {
+		privateLabelingOrgID = authReq.RequestedOrgID
 	}
 	return privateLabelingOrgID
 }

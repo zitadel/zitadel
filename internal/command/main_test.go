@@ -182,10 +182,10 @@ func GetMockSecretGenerator(t *testing.T) crypto.Generator {
 	return generator
 }
 
-func GetMockVerifier(t *testing.T, features ...string) *authz.TokenVerifier {
-	return authz.Start(&testVerifier{
+func GetMockVerifier(t *testing.T, features ...string) *testVerifier {
+	return &testVerifier{
 		features: features,
-	})
+	}
 }
 
 type testVerifier struct {

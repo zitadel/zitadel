@@ -1,12 +1,13 @@
-<ng-container *ngIf="(authService.user | async) || {} as user">
-    <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
-        <cnsl-nav [org]="org" [user]="user" [isDarkTheme]="componentCssClass == 'dark-theme'" [labelpolicy]="labelpolicy" (changedActiveOrg)="changedOrg($event)"></cnsl-nav>
-        <mat-drawer-container class="main-container">
-            <mat-drawer-content class="content">
-                <div class="router" [@routeAnimations]="prepareRoute(outlet)">
-                    <router-outlet #outlet="outlet"></router-outlet>
-                </div>
-            </mat-drawer-content>
-        </mat-drawer-container>
-    </ng-container>
+<ng-container *ngIf="(authService.user | async) || undefined as user">
+  <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
+    <cnsl-nav *ngIf="user" [org]="org" [user]="user" [isDarkTheme]="componentCssClass == 'dark-theme'"
+      [labelpolicy]="labelpolicy" (changedActiveOrg)="changedOrg($event)"></cnsl-nav>
+    <mat-drawer-container class="main-container">
+      <mat-drawer-content class="content">
+        <div class="router" [@routeAnimations]="prepareRoute(outlet)">
+          <router-outlet #outlet="outlet"></router-outlet>
+        </div>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </ng-container>
 </ng-container>

@@ -4,10 +4,10 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { Router } from '@angular/router';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrantedProject, ProjectGrantState } from 'src/app/proto/generated/zitadel/project_pb';
-import { StorageKey, StorageService } from 'src/app/services/storage.service';
+import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 @Component({
-  selector: 'app-granted-project-grid',
+  selector: 'cnsl-granted-project-grid',
   templateUrl: './granted-project-grid.component.html',
   styleUrls: ['./granted-project-grid.component.scss'],
   animations: [
@@ -35,7 +35,7 @@ export class GrantedProjectGridComponent implements OnChanges {
   public notPinned: Array<GrantedProject.AsObject> = [];
   @Output() newClicked: EventEmitter<boolean> = new EventEmitter();
   @Output() changedView: EventEmitter<boolean> = new EventEmitter();
-  @Input() loading: boolean = false;
+  @Input() loading: boolean | null = false;
   public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
 
   public showNewProject: boolean = false;
@@ -70,9 +70,11 @@ export class GrantedProjectGridComponent implements OnChanges {
     this.getPrefixedItem('pinned-granted-projects').then(storageEntry => {
       if (storageEntry) {
         const array: string[] = JSON.parse(storageEntry);
-        const toSelect: GrantedProject.AsObject[] = this.items.filter((item, index) => {
+        const toSelect: GrantedProject.AsObject[] = this.items.filter((item) => {
           if (array.includes(item.projectId)) {
             return true;
+          } else {
+            return false;
           }
         });
         this.selection.select(...toSelect);
@@ -81,12 +83,12 @@ export class GrantedProjectGridComponent implements OnChanges {
   }
 
   private async getPrefixedItem(key: string): Promise<string | null> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
-    return localStorage.getItem(`${org.id}:${key}`);
+    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
+    return localStorage.getItem(`${org?.id}:${key}`);
   }
 
   private async setPrefixedItem(key: string, value: any): Promise<void> {
-    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization) as Org.AsObject;
+    const org = this.storage.getItem<Org.AsObject>(StorageKey.organization, StorageLocation.session) as Org.AsObject;
     return localStorage.setItem(`${org.id}:${key}`, value);
   }
 

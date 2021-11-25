@@ -1,0 +1,34 @@
+---
+title: Overview
+---
+
+import {ListElement, ListWrapper, ICONTYPE} from '../../src/components/list';
+import Column from '../../src/components/column';
+
+With our guides you will learn everything you need to know about specific topics. You get step-by-step instructions for certain tasks and have a knowledge check at the end.
+
+You can either use our cloud-instance [zitadel.ch](https://zitadel.ch) or deploy a dedicated **ZITADEL** instance. To get started, we recommend you to try out our free tier first. Jump directly to the [get started](./basics/get-started) docs.
+
+When you are familiar with the ZITADEL usage, you can choose to stay on [zitadel.ch](./installation/shared-cloud), order your own [dedicated instance](./installation/shared-cloud) which is also availabe on premise, or install ZITADEL easily on your own using [Custom Kubernetes Resources](./installation/crd), [GitOps](./installation/gitops) or [ORBOS](./installation/orbos).
+
+<Column>
+  <ListWrapper title="Get to know ZITADEL">
+    <ListElement link="/docs/guides/basics/get-started" type={ICONTYPE.START} title="Get started" description="Try out zitadel.ch" />
+    <ListElement link="/docs/guides/basics/organizations" type={ICONTYPE.START} title="Organizations" description="Learn how ZITADEL ist organized" />
+    <ListElement link="/docs/guides/basics/projects" type={ICONTYPE.START} title="Projects" description="Understand projects and grants" />
+  </ListWrapper>
+  <ListWrapper title="Authentication">
+    <ListElement link="/docs/guides/authentication/login-users" type={ICONTYPE.LOGIN} title="Login users" description="Authenticate users in ZITADEL" />
+    <ListElement link="/docs/guides/authentication/identity-brokering" type={ICONTYPE.LOGIN} title="Identity Brokering" description="Identity Brokering and Federated Identities" />
+  </ListWrapper>
+  <ListWrapper title="APIs">
+    <ListElement link="/docs/guides/api/access-zitadel-apis" type={ICONTYPE.APIS} title="APIs" description="Authorize Service Users to access ZITADEL APIs" />
+  </ListWrapper>
+  <ListWrapper title="Customization">
+    <ListElement link="/docs/guides/customization/branding" type={ICONTYPE.PRIVATELABELING} title="Private Labeling" description="Customize your organization to your brand" />
+    <ListElement link="/docs/guides/customization/texts" type={ICONTYPE.TEXTS} title="Texts" description="Login interface texts and notification texts" />
+  </ListWrapper>
+  <ListWrapper title="Installation">
+    <ListElement link="/docs/guides/installation/shared-cloud" type={ICONTYPE.SYSTEM} title="Managed" description="Shared ZITADEL Cloud or Dedicated Instance" />
+  </ListWrapper>
+</Column>

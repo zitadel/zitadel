@@ -11,7 +11,6 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
-	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/clean"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -66,11 +65,11 @@ func TestManaged_AdaptBucketBackup(t *testing.T) {
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{}
-	version := "testVersion"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	backupName := "testBucket"
 	saJson := "testSA"
 	masterkey := "testMk"
+	version := "test"
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
@@ -106,11 +105,11 @@ func TestManaged_AdaptBucketInstantBackup(t *testing.T) {
 	timestamp := "testTs"
 	nodeselector := map[string]string{"test": "test"}
 	tolerations := []corev1.Toleration{}
-	version := "testVersion"
 	masterkey := "testMk"
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	saJson := "testSA"
 	backupName := "testBucket"
+	version := "test"
 
 	features := []string{backup.Instant}
 	bucket.SetInstantBackup(k8sClient, namespace, backupName, labels, saJson)
@@ -152,10 +151,10 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 	saJson := "testSA"
 	backupName := "testBucket"
 
-	features := []string{restore.Instant, clean.Instant}
+	features := []string{restore.Instant}
 	bucket.SetRestore(k8sClient, namespace, backupName, labels, saJson)
-	bucket.SetClean(k8sClient, namespace, backupName, labels, saJson)
-	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second).Times(2)
+	//SetClean(k8sClient, namespace, 1)
+	k8sClient.EXPECT().WaitUntilStatefulsetIsReady(namespace, SfsName, true, true, 60*time.Second).Times(1)
 
 	desired := getTreeWithDBAndBackup(t, masterkey, saJson, backupName)
 
