@@ -87,7 +87,8 @@
       </cnsl-card>
     </ng-template>
 
-    <cnsl-passwordless *ngIf="user && user.human" [user]="user"></cnsl-passwordless>
+    <cnsl-passwordless *ngIf="user && user.human" [user]="user" [disabled]="(canWrite$ | async) === false">
+    </cnsl-passwordless>
 
     <cnsl-user-mfa *ngIf="user && user.human" [user]="user"></cnsl-user-mfa>
 
