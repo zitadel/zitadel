@@ -50,9 +50,8 @@ func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.Signing
 			case <-ctx.Done():
 				return
 			case <-o.keyChan:
-				//checkAfter := o.resetTimer(renewTimer, true)
-				logging.Log("OIDC-dK432").Info("requested next signing key check")
-				o.getSigningKey(ctx, renewTimer, keyCh)
+				checkAfter := o.resetTimer(renewTimer, true)
+				logging.Log("OIDC-dK432").Infof("requested next signing key check in %s", checkAfter)
 			case <-renewTimer.C:
 				o.getSigningKey(ctx, renewTimer, keyCh)
 			}

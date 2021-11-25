@@ -104,7 +104,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyPrivateColumnExpiry, time.Now().Add(20*time.Minute)),
+				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
 				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
