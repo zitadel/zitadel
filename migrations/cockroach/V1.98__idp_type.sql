@@ -10,4 +10,4 @@ WITH doa AS (
     LEFT JOIN projections.idps_jwt_config j 
         ON j.idp_id = i.id
 )
-UPDATE zitadel.projections.silvan_idps SET type = doa.type FROM doa WHERE doa.id = zitadel.projections.silvan_idps.id;
+UPDATE zitadel.projections.idps SET type = doa.type FROM doa WHERE doa.id = zitadel.projections.idps.id;
