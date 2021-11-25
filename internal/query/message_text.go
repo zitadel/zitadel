@@ -107,7 +107,6 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 				MessageTextColAggregateID.identifier(): q.iamID,
 			},
 		}).
-		//OrderBy(MessageTextColIsDefault.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-90n3N", "Errors.Query.SQLStatement")

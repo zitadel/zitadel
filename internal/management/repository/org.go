@@ -6,7 +6,6 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 
 	org_model "github.com/caos/zitadel/internal/org/model"
@@ -25,12 +24,6 @@ type OrgRepository interface {
 
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
-
-	GetDefaultMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
-	GetMessageText(ctx context.Context, orgID, textType, lang string) (*domain.CustomMessageText, error)
-
-	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
-	GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error)
 
 	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)

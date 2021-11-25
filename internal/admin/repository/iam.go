@@ -5,7 +5,6 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -27,7 +26,4 @@ type IAMRepository interface {
 
 	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 	GetDefaultPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-
-	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
-	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 }

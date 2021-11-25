@@ -3,6 +3,7 @@ package query
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -140,6 +141,48 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 		return nil, err
 	}
 	return CustomTextsToLoginDomain(domain.IAMID, lang, texts), err
+}
+
+func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	q.mutex.Lock()
+	defer q.mutex.Unlock()
+	contents, ok := q.LoginTranslationFileContents[lang]
+	var err error
+	if !ok {
+		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if errors.IsNotFound(err) {
+			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		q.LoginTranslationFileContents[lang] = contents
+	}
+	loginTextMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
+	}
+	texts, err := q.CustomTextList(ctx, domain.IAMID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	for _, text := range texts.CustomTexts {
+		keys := strings.Split(text.Key, ".")
+		screenTextMap, ok := loginTextMap[keys[0]].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		screenTextMap[keys[1]] = text.Text
+	}
+	jsonbody, err := json.Marshal(loginTextMap)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-0nJ3f", "Errors.TranslationFile.MergeError")
+	}
+	loginText := new(domain.CustomLoginText)
+	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
+	}
+	return loginText, nil
 }
 
 func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {

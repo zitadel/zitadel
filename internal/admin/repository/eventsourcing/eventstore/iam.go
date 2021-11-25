@@ -2,14 +2,10 @@ package eventstore
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 
-	"github.com/ghodss/yaml"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -19,8 +15,6 @@ import (
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
-
-	caos_errs "github.com/caos/zitadel/internal/errors"
 
 	"github.com/caos/logging"
 
@@ -206,55 +200,10 @@ func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_m
 	return result, nil
 }
 
-func (repo *IAMRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	repo.mutex.Lock()
-	defer repo.mutex.Unlock()
-	contents, ok := repo.LoginTranslationFileContents[lang]
-	var err error
-	if !ok {
-		contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if caos_errs.IsNotFound(err) {
-			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		repo.LoginTranslationFileContents[lang] = contents
-	}
-	loginText := new(domain.CustomLoginText)
-	if err := yaml.Unmarshal(contents, loginText); err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-GHR3Q", "Errors.TranslationFile.ReadError")
-	}
-	return loginText, nil
-}
-
-func (repo *IAMRepository) GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
-}
-
 func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
 	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
 	if err != nil {
 		return nil, err
 	}
 	return repo.Eventstore.FilterEvents(ctx, query)
-}
-
-func (repo *IAMRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
-	r, err := dir.Open(filename)
-	if os.IsNotExist(err) {
-		return nil, caos_errs.ThrowNotFound(err, "TEXT-3n9fs", "Errors.TranslationFile.NotFound")
-	}
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-93njw", "Errors.TranslationFile.ReadError")
-	}
-	contents, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, caos_errs.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
-	}
-	return contents, nil
 }

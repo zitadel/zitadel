@@ -48,8 +48,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults),
-		newCustomText(
-			handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 	}
 	if static != nil {
 		handlers = append(handlers, newStyling(
