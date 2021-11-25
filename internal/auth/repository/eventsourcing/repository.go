@@ -99,6 +99,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		eventstore.AuthRequestRepo{
 			PrivacyPolicyProvider:      queries,
 			Command:                    command,
+			Queries:                    queries,
 			OrgViewProvider:            queries,
 			AuthRequests:               authReq,
 			View:                       view,

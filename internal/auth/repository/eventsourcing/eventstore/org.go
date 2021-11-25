@@ -57,15 +57,15 @@ func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*d
 }
 
 func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(domain.IAMID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, domain.IAMID, domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}
-	orgLoginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(orgID, domain.LoginCustomText)
+	orgLoginTexts, err := repo.Query.CustomTextListByTemplate(ctx, orgID, domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}
-	return append(iam_view_model.CustomTextViewsToDomain(loginTexts), iam_view_model.CustomTextViewsToDomain(orgLoginTexts)...), nil
+	return append(query.CustomTextsToDomain(loginTexts), query.CustomTextsToDomain(orgLoginTexts)...), nil
 }
 
 func (p *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {

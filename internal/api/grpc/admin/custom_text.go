@@ -216,7 +216,7 @@ func (s *Server) SetDefaultPasswordlessRegistrationMessageText(ctx context.Conte
 }
 
 func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *admin_pb.GetDefaultLoginTextsRequest) (*admin_pb.GetDefaultLoginTextsResponse, error) {
-	msg, err := s.iam.GetDefaultLoginTexts(ctx, req.Language)
+	msg, err := s.query.GetDefaultLoginTexts(ctx, req.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (s *Server) GetDefaultLoginTexts(ctx context.Context, req *admin_pb.GetDefa
 	}, nil
 }
 func (s *Server) GetCustomLoginTexts(ctx context.Context, req *admin_pb.GetCustomLoginTextsRequest) (*admin_pb.GetCustomLoginTextsResponse, error) {
-	msg, err := s.iam.GetCustomLoginTexts(ctx, req.Language)
+	msg, err := s.query.GetCustomLoginTexts(ctx, domain.IAMID, req.Language)
 	if err != nil {
 		return nil, err
 	}

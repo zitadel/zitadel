@@ -29,6 +29,7 @@ import (
 
 type AuthRequestRepo struct {
 	Command      *command.Commands
+	Queries      *query.Queries
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 	Eventstore   v1.Eventstore
@@ -946,11 +947,11 @@ func (repo *AuthRequestRepo) getLabelPolicy(ctx context.Context, orgID string) (
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(aggregateID, domain.LoginCustomText)
+	loginTexts, err := repo.Queries.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.CustomTextViewsToDomain(loginTexts), err
+	return query.CustomTextsToDomain(loginTexts), err
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
