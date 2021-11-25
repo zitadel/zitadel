@@ -434,7 +434,7 @@ func TestCheckRedirectUrisImplicitAndCode(t *testing.T) {
 				redirectUris: []string{"https://nirvana.com", "cutom://nirvana.com"},
 			},
 			want: &Compliance{
-				NoneCompliant: false, //TODO: imo this should be true
+				NoneCompliant: false,
 				Problems:      []string{"Application.OIDC.V1.NotAllCombinationsAreAllowed"},
 			},
 		},
@@ -558,7 +558,7 @@ func TestCheckRedirectUrisCode(t *testing.T) {
 			name: "only http protocol, app type user agent",
 			args: args{
 				redirectUris: []string{"http://nirvana.com"},
-				appType:      OIDCApplicationTypeUserAgent, //TODO: shouldnt it be type web?
+				appType:      OIDCApplicationTypeUserAgent,
 			},
 			want: &Compliance{
 				NoneCompliant: true,

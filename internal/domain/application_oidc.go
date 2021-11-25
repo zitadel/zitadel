@@ -181,7 +181,10 @@ func GetOIDCCompliance(version OIDCVersion, appType OIDCApplicationType, grantTy
 	case OIDCVersionV1:
 		return GetOIDCV1Compliance(appType, grantTypes, authMethod, redirectUris)
 	}
-	return nil //TODO: shouldn't we add unsuported version problem?
+	return &Compliance{
+		NoneCompliant: true,
+		Problems:      []string{"Application.OIDC.UnsupportedVersion"},
+	}
 }
 
 func GetOIDCV1Compliance(appType OIDCApplicationType, grantTypes []OIDCGrantType, authMethod OIDCAuthMethodType, redirectUris []string) *Compliance {
