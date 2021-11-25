@@ -50,6 +50,9 @@ func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.Signing
 			case <-ctx.Done():
 				return
 			case <-o.keyChan:
+				if !renewTimer.Stop() {
+					<-renewTimer.C
+				}
 				checkAfter := o.resetTimer(renewTimer, true)
 				logging.Log("OIDC-dK432").Infof("requested next signing key check in %s", checkAfter)
 			case <-renewTimer.C:
@@ -79,9 +82,6 @@ func (o *OPStorage) getSigningKey(ctx context.Context, renewTimer *time.Timer, k
 }
 
 func (o *OPStorage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck time.Duration) {
-	//if !timer.Stop() {
-	//	<-timer.C
-	//}
 	nextCheck = o.signingKeyRotationCheck
 	defer func() { timer.Reset(nextCheck) }()
 	if shortRefresh || o.currentKey == nil {
