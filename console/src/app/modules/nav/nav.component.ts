@@ -23,7 +23,6 @@ export class NavComponent {
   @Input() public user!: User.AsObject;
   @Input() public labelpolicy!: LabelPolicy.AsObject;
 
-
   public orgs$: Observable<Org.AsObject[]> = of([]);
   @Input() public org!: Org.AsObject;
   @Output() public changedActiveOrg: EventEmitter<Org.AsObject> = new EventEmitter();
@@ -37,10 +36,8 @@ export class NavComponent {
     public mgmtService: ManagementService,
     private themeService: ThemeService,
   ) {
-    this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe(value => {
-      this.loadOrgs(
-        value.trim().toLowerCase(),
-      );
+    this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+      this.loadOrgs(value.trim().toLowerCase());
     });
 
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
@@ -63,7 +60,7 @@ export class NavComponent {
 
     this.orgLoading$.next(true);
     this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
-      map(resp => {
+      map((resp) => {
         return resp.resultList;
       }),
       catchError(() => of([])),

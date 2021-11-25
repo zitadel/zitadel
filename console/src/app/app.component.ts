@@ -13,7 +13,6 @@ import { map, take, takeUntil } from 'rxjs/operators';
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
 import { Org } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
-import { User } from './proto/generated/zitadel/user_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
@@ -37,7 +36,6 @@ export class AppComponent implements OnDestroy {
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
   public org!: Org.AsObject;
-  public user!: User.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
   public isDarkTheme: Observable<boolean> = of(true);
 
