@@ -5,13 +5,11 @@ on:
       - master
   workflow_dispatch:
 jobs:
-  cypress-run:
-    runs-on: ubuntu-latest
-    container: cypress/browsers:node14.17.0-chrome91-ff89
+  build-console:
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
@@ -31,6 +29,13 @@ jobs:
       - shell: bash
         run: |
           ls -la
+
+  cypress-run:
+    runs-on: ubuntu-18.04
+    container: cypress/browsers:node14.17.0-chrome91-ff89
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Cypress run
         uses: cypress-io/github-action@v2.11.7
