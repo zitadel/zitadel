@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func GetLabelPolicyByAggregateIDAndState(db *gorm.DB, table, aggregateID string, state int32) (*model.LabelPolicyView, error) {
+func GetStylingByAggregateIDAndState(db *gorm.DB, table, aggregateID string, state int32) (*model.LabelPolicyView, error) {
 	policy := new(model.LabelPolicyView)
 	aggregateIDQuery := &model.LabelPolicySearchQuery{Key: iam_model.LabelPolicySearchKeyAggregateID, Value: aggregateID, Method: domain.SearchMethodEquals}
 	stateQuery := &model.LabelPolicySearchQuery{Key: iam_model.LabelPolicySearchKeyState, Value: state, Method: domain.SearchMethodEquals}
@@ -22,12 +22,12 @@ func GetLabelPolicyByAggregateIDAndState(db *gorm.DB, table, aggregateID string,
 	return policy, err
 }
 
-func PutLabelPolicy(db *gorm.DB, table string, policy *model.LabelPolicyView) error {
+func PutStyling(db *gorm.DB, table string, policy *model.LabelPolicyView) error {
 	save := repository.PrepareSave(table)
 	return save(db, policy)
 }
 
-func DeleteLabelPolicy(db *gorm.DB, table, aggregateID string) error {
+func DeleteStyling(db *gorm.DB, table, aggregateID string) error {
 	delete := repository.PrepareDeleteByKey(table, model.LabelPolicySearchKey(iam_model.LabelPolicySearchKeyAggregateID), aggregateID)
 
 	return delete(db)
