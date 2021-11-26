@@ -58,12 +58,12 @@ jobs:
         uses: cypress-io/github-action@v2.11.7
         with:
           working-directory: ./console
-          start: npx http-server .download/zitadel-console --port 4200
+          start: npx angular-http-server --path .download/zitadel-console -p 4200
           browser: chrome
-          wait-on: "http://127.0.0.1:4200"
+          wait-on: "http://localhost:4200"
           wait-on-timeout: 10
         env:
-          CYPRESS_consoleUrl: "http://127.0.0.1:4200"
+          CYPRESS_consoleUrl: "http://localhost:4200"
           CYPRESS_apiCallsDomain: "zitadel.dev"
           CYPRESS_zitadelProjectResourceId: "70669147545070419"
           CYPRESS_serviceAccountKey: "${{secrets.E2E_SERVICEACCOUNT_KEY}}"
