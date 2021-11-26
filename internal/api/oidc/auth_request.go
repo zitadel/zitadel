@@ -13,7 +13,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
-	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
@@ -26,15 +25,20 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	app, err := o.repo.ApplicationByClientID(ctx, req.ClientID)
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, req.ClientID)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
 	}
-	req.Scopes, err = o.assertProjectRoleScopes(app, req.Scopes)
+	project, err := o.query.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
+	}
+	req.Scopes, err = o.assertProjectRoleScopes(project, req.Scopes)
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
+	//TODO: ensure splitting of command and query side durring auth request and login refactoring
 	resp, err := o.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {
 		return nil, err
@@ -205,8 +209,8 @@ func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err e
 	return o.repo.GetKeySet(ctx)
 }
 
-func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, scopes []string) ([]string, error) {
-	if !app.ProjectRoleAssertion {
+func (o *OPStorage) assertProjectRoleScopes(project *query.Project, scopes []string) ([]string, error) {
+	if !project.ProjectRoleAssertion {
 		return scopes, nil
 	}
 	for _, scope := range scopes {
@@ -214,7 +218,7 @@ func (o *OPStorage) assertProjectRoleScopes(app *proj_model.ApplicationView, sco
 			return scopes, nil
 		}
 	}
-	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(app.ProjectID)
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
 	}

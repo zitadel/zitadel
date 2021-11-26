@@ -8,24 +8,25 @@ import (
 	"github.com/caos/oidc/pkg/op"
 
 	authreq_model "github.com/caos/zitadel/internal/auth_request/model"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type Client struct {
-	*model.ApplicationView
+	app                        *query.App
 	defaultLoginURL            string
 	defaultAccessTokenLifetime time.Duration
 	defaultIdTokenLifetime     time.Duration
 	allowedScopes              []string
 }
 
-func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
-	if !app.IsOIDC {
+func ClientFromBusiness(app *query.App, defaultLoginURL string, defaultAccessTokenLifetime, defaultIdTokenLifetime time.Duration, allowedScopes []string) (op.Client, error) {
+	if app.OIDCConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "OIDC-d5bhD", "client is not a proper oidc application")
 	}
 	return &Client{
-			ApplicationView:            app,
+			app:                        app,
 			defaultLoginURL:            defaultLoginURL,
 			defaultAccessTokenLifetime: defaultAccessTokenLifetime,
 			defaultIdTokenLifetime:     defaultIdTokenLifetime,
@@ -34,15 +35,15 @@ func ClientFromBusiness(app *model.ApplicationView, defaultLoginURL string, defa
 }
 
 func (c *Client) ApplicationType() op.ApplicationType {
-	return op.ApplicationType(c.OIDCApplicationType)
+	return op.ApplicationType(c.app.OIDCConfig.AppType)
 }
 
 func (c *Client) AuthMethod() oidc.AuthMethod {
-	return authMethodToOIDC(c.OIDCAuthMethodType)
+	return authMethodToOIDC(c.app.OIDCConfig.AuthMethodType)
 }
 
 func (c *Client) GetID() string {
-	return c.OIDCClientID
+	return c.app.OIDCConfig.ClientID
 }
 
 func (c *Client) LoginURL(id string) string {
@@ -50,28 +51,28 @@ func (c *Client) LoginURL(id string) string {
 }
 
 func (c *Client) RedirectURIs() []string {
-	return c.OIDCRedirectUris
+	return c.app.OIDCConfig.RedirectURIs
 }
 
 func (c *Client) PostLogoutRedirectURIs() []string {
-	return c.OIDCPostLogoutRedirectUris
+	return c.app.OIDCConfig.PostLogoutRedirectURIs
 }
 
 func (c *Client) ResponseTypes() []oidc.ResponseType {
-	return responseTypesToOIDC(c.OIDCResponseTypes)
+	return responseTypesToOIDC(c.app.OIDCConfig.ResponseTypes)
 }
 
 func (c *Client) GrantTypes() []oidc.GrantType {
-	return grantTypesToOIDC(c.OIDCGrantTypes)
+	return grantTypesToOIDC(c.app.OIDCConfig.GrantTypes)
 }
 
 func (c *Client) DevMode() bool {
-	return c.ApplicationView.DevMode
+	return c.app.OIDCConfig.IsDevMode
 }
 
 func (c *Client) RestrictAdditionalIdTokenScopes() func(scopes []string) []string {
 	return func(scopes []string) []string {
-		if c.IDTokenRoleAssertion {
+		if c.app.OIDCConfig.AssertIDTokenRole {
 			return scopes
 		}
 		return removeScopeWithPrefix(scopes, ScopeProjectRolePrefix)
@@ -80,7 +81,7 @@ func (c *Client) RestrictAdditionalIdTokenScopes() func(scopes []string) []strin
 
 func (c *Client) RestrictAdditionalAccessTokenScopes() func(scopes []string) []string {
 	return func(scopes []string) []string {
-		if c.AccessTokenRoleAssertion {
+		if c.app.OIDCConfig.AssertAccessTokenRole {
 			return scopes
 		}
 		return removeScopeWithPrefix(scopes, ScopeProjectRolePrefix)
@@ -96,7 +97,7 @@ func (c *Client) IDTokenLifetime() time.Duration {
 }
 
 func (c *Client) AccessTokenType() op.AccessTokenType {
-	return accessTokenTypeToOIDC(c.ApplicationView.AccessTokenType)
+	return accessTokenTypeToOIDC(c.app.OIDCConfig.AccessTokenType)
 }
 
 func (c *Client) IsScopeAllowed(scope string) bool {
@@ -124,40 +125,40 @@ func (c *Client) IsScopeAllowed(scope string) bool {
 }
 
 func (c *Client) ClockSkew() time.Duration {
-	return c.ApplicationView.ClockSkew
+	return c.app.OIDCConfig.ClockSkew
 }
 
 func (c *Client) IDTokenUserinfoClaimsAssertion() bool {
-	return c.ApplicationView.IDTokenUserinfoAssertion
+	return c.app.OIDCConfig.AssertIDTokenUserinfo
 }
 
-func accessTokenTypeToOIDC(tokenType model.OIDCTokenType) op.AccessTokenType {
+func accessTokenTypeToOIDC(tokenType domain.OIDCTokenType) op.AccessTokenType {
 	switch tokenType {
-	case model.OIDCTokenTypeBearer:
+	case domain.OIDCTokenTypeBearer:
 		return op.AccessTokenTypeBearer
-	case model.OIDCTokenTypeJWT:
+	case domain.OIDCTokenTypeJWT:
 		return op.AccessTokenTypeJWT
 	default:
 		return op.AccessTokenTypeBearer
 	}
 }
 
-func authMethodToOIDC(authType model.OIDCAuthMethodType) oidc.AuthMethod {
+func authMethodToOIDC(authType domain.OIDCAuthMethodType) oidc.AuthMethod {
 	switch authType {
-	case model.OIDCAuthMethodTypeBasic:
+	case domain.OIDCAuthMethodTypeBasic:
 		return oidc.AuthMethodBasic
-	case model.OIDCAuthMethodTypePost:
+	case domain.OIDCAuthMethodTypePost:
 		return oidc.AuthMethodPost
-	case model.OIDCAuthMethodTypeNone:
+	case domain.OIDCAuthMethodTypeNone:
 		return oidc.AuthMethodNone
-	case model.OIDCAuthMethodTypePrivateKeyJWT:
+	case domain.OIDCAuthMethodTypePrivateKeyJWT:
 		return oidc.AuthMethodPrivateKeyJWT
 	default:
 		return oidc.AuthMethodBasic
 	}
 }
 
-func responseTypesToOIDC(responseTypes []model.OIDCResponseType) []oidc.ResponseType {
+func responseTypesToOIDC(responseTypes []domain.OIDCResponseType) []oidc.ResponseType {
 	oidcTypes := make([]oidc.ResponseType, len(responseTypes))
 	for i, t := range responseTypes {
 		oidcTypes[i] = responseTypeToOIDC(t)
@@ -165,20 +166,20 @@ func responseTypesToOIDC(responseTypes []model.OIDCResponseType) []oidc.Response
 	return oidcTypes
 }
 
-func responseTypeToOIDC(responseType model.OIDCResponseType) oidc.ResponseType {
+func responseTypeToOIDC(responseType domain.OIDCResponseType) oidc.ResponseType {
 	switch responseType {
-	case model.OIDCResponseTypeCode:
+	case domain.OIDCResponseTypeCode:
 		return oidc.ResponseTypeCode
-	case model.OIDCResponseTypeIDTokenToken:
+	case domain.OIDCResponseTypeIDTokenToken:
 		return oidc.ResponseTypeIDToken
-	case model.OIDCResponseTypeIDToken:
+	case domain.OIDCResponseTypeIDToken:
 		return oidc.ResponseTypeIDTokenOnly
 	default:
 		return oidc.ResponseTypeCode
 	}
 }
 
-func grantTypesToOIDC(grantTypes []model.OIDCGrantType) []oidc.GrantType {
+func grantTypesToOIDC(grantTypes []domain.OIDCGrantType) []oidc.GrantType {
 	oidcTypes := make([]oidc.GrantType, len(grantTypes))
 	for i, t := range grantTypes {
 		oidcTypes[i] = grantTypeToOIDC(t)
@@ -186,13 +187,13 @@ func grantTypesToOIDC(grantTypes []model.OIDCGrantType) []oidc.GrantType {
 	return oidcTypes
 }
 
-func grantTypeToOIDC(grantType model.OIDCGrantType) oidc.GrantType {
+func grantTypeToOIDC(grantType domain.OIDCGrantType) oidc.GrantType {
 	switch grantType {
-	case model.OIDCGrantTypeAuthorizationCode:
+	case domain.OIDCGrantTypeAuthorizationCode:
 		return oidc.GrantTypeCode
-	case model.OIDCGrantTypeImplicit:
+	case domain.OIDCGrantTypeImplicit:
 		return oidc.GrantTypeImplicit
-	case model.OIDCGrantTypeRefreshToken:
+	case domain.OIDCGrantTypeRefreshToken:
 		return oidc.GrantTypeRefreshToken
 	default:
 		return oidc.GrantTypeCode
