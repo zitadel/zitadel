@@ -8,8 +8,10 @@ jobs:
   build-console:
     runs-on: ubuntu-18.04
     steps:
+
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
@@ -26,13 +28,6 @@ jobs:
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
           outputs: type=local,dest=/tmp/zitadel-console
 
-      - shell: bash
-        run: |
-          echo "$(pwd)"
-          ls -la
-          echo "/tmp/zitadel-console"
-          ls -la /tmp/zitadel-console
-
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel-console-e2e
@@ -43,6 +38,7 @@ jobs:
     runs-on: ubuntu-18.04
     container: cypress/browsers:node14.17.0-chrome91-ff89
     steps:
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -62,8 +58,7 @@ jobs:
         uses: cypress-io/github-action@v2.11.7
         with:
           working-directory: ./console
-          build: npm run build
-          start: npm start
+          start: npx http-server .download/zitadel-console --port 4200
           browser: chrome
           wait-on: "http://localhost:4200"
           wait-on-timeout: 120
@@ -75,11 +70,13 @@ jobs:
           CYPRESS_org_owner_password: "${{secrets.E2E_ORG_OWNER_PW}}"
           CYPRESS_org_owner_viewer_password: "${{secrets.E2E_ORG_OWNER_VIEWER_PW}}"
           CYPRESS_org_project_creator_password: "${{secrets.E2E_ORG_PROJECT_CREATOR_PW}}"
+
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
           name: cypress-screenshots
           path: console/cypress/screenshots
+
       - uses: actions/upload-artifact@v1
         if: always()
         with:
