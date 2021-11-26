@@ -44,7 +44,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newKey(
 			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
 			keyChan),
-		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			systemDefaults.IamID),
