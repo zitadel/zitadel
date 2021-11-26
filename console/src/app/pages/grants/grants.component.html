@@ -1,9 +1,10 @@
 <div class="enlarged-container">
-    <h1>{{ 'GRANTS.TITLE' | translate }}</h1>
-    <p class="desc">{{'GRANTS.DESC' | translate }}</p>
-    <cnsl-user-grants [displayedColumns]="['select', 'user', 'org', 'projectId', 'creationDate','changeDate', 'roleNamesList']"
-        [disableWrite]="((['user.grant.write$'] | hasRole) | async) === false"
-        [disableDelete]="((['user.grant.delete$'] | hasRole) | async) === false"
-        [refreshOnPreviousRoutes]="['/grant-create']">
-    </cnsl-user-grants>
+  <h1>{{ 'GRANTS.TITLE' | translate }}</h1>
+  <p class="desc">{{'GRANTS.DESC' | translate }}</p>
+  <cnsl-user-grants
+    [displayedColumns]="['select', 'user', 'org', 'projectId', 'creationDate','changeDate', 'roleNamesList']"
+    [disableWrite]="((['user.grant.write$'] | hasRole) | async) === false"
+    [disableDelete]="((['user.grant.delete$'] | hasRole) | async) === false"
+    [refreshOnPreviousRoutes]="['/grant-create']">
+  </cnsl-user-grants>
 </div>

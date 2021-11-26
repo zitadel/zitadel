@@ -19,9 +19,7 @@ import { SharedModule } from '../shared/shared.module';
 import { NavComponent } from './nav.component';
 
 @NgModule({
-  declarations: [
-    NavComponent,
-  ],
+  declarations: [NavComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -41,8 +39,6 @@ import { NavComponent } from './nav.component';
     SharedModule,
     OverlayModule,
   ],
-  exports: [
-    NavComponent,
-  ],
+  exports: [NavComponent],
 })
-export class NavModule { }
+export class NavModule {}

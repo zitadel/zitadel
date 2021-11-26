@@ -43,7 +43,7 @@
         <button class="show-all" mat-menu-item [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
           translate}}</button>
 
-        <ng-template appHasRole [appHasRole]="['org.create','iam.write']">
+        <ng-template cnslHasRole [cnslHasRole]="['org.create','iam.write']">
           <button mat-menu-item [routerLink]="[ '/org/create' ]">
             <mat-icon class="avatar">add</mat-icon>
             {{'MENU.NEWORG' | translate}}
@@ -60,8 +60,8 @@
         <cnsl-avatar
           *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
           class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
-          [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName ?? ''"
-          [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
+          [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName || ''"
+          [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName ?? '' : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName) ?? ''"
           [size]="38">
         </cnsl-avatar>
         <cnsl-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount" (close)="showAccount = false"
@@ -85,14 +85,14 @@
       </ng-container> -->
 
       <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
-        <ng-template appHasRole [appHasRole]="['org.read']">
+        <ng-template cnslHasRole [hasRole]="['org.read']">
           <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"
             [routerLink]="[ '/org']">
             <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
           </a>
         </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['project.read(:[0-9]*)?']">
+        <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
           <a @navitem matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
             [routerLinkActive]="['active']" [routerLink]="[ '/projects']">
 
@@ -113,7 +113,7 @@
           </a>
         </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['user.read(:[0-9]*)?']">
+        <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
           <a @navitem matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
             [routerLinkActive]="['active']" [routerLink]="[ '/users/list/humans']"
             [routerLinkActiveOptions]="{ exact: true }">
@@ -126,7 +126,7 @@
           </a>
         </ng-template>
 
-        <ng-template appHasRole [appHasRole]="['user.grant.read(:[0-9]*)?']">
+        <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
           <a @navitem matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item" [routerLinkActive]="['active']"
             [routerLink]="[ '/grants']" [routerLinkActiveOptions]="{ exact: true }">
             <span class="label">{{ 'MENU.GRANTS' | translate }}</span>

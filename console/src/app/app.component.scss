@@ -10,20 +10,21 @@
   .content {
     display: flex;
     flex-direction: column;
-    max-width: 100rem;
-    margin: 0 auto;
     width: 100%;
+    align-items: stretch;
 
     .router {
       height: 100%;
-      overflow-y: auto;
+      width: 100%;
       padding-top: 98px;
+      max-width: 80rem;
+      margin: 0 auto;
     }
   }
 
   .theme-section {
     display: block;
-    padding: 0 .5rem;
+    padding: 0 0.5rem;
     margin-top: 2rem;
     align-self: flex-start;
     border-radius: 1rem;
@@ -33,7 +34,7 @@
       border-radius: 50%;
       height: 30px;
       width: 30px;
-      margin: .5rem;
+      margin: 0.5rem;
       cursor: pointer;
       background: linear-gradient(315deg, #e6e6e6, #fff);
     }
@@ -43,7 +44,7 @@
       border-radius: 50%;
       height: 30px;
       width: 30px;
-      margin: .5rem;
+      margin: 0.5rem;
       cursor: pointer;
       background: linear-gradient(315deg, #000, #000);
     }
@@ -68,7 +69,7 @@
     display: block;
     background-color: #81868a40;
     height: 1px;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
     flex: 1;
     min-width: 10px;
   }
@@ -82,7 +83,7 @@
 
 @mixin textvar($theme) {
   .filter-form {
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
     /* stylelint-disable */
     $foreground: map-get($theme, foreground);
     color: mat.get-color-from-palette($foreground, text) !important;
@@ -92,7 +93,7 @@
     $primary: map-get($theme, primary);
     color: mat.get-color-from-palette($primary, 300) !important;
     border-bottom: 1px solid var(--grey);
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
   /* stylelint-enable */
 }

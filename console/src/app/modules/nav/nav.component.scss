@@ -25,12 +25,12 @@
     left: 0;
     right: 0;
     z-index: 100;
-    max-width: 100rem;
+    max-width: 80rem;
     margin: 0 auto;
     border-bottom: 1px solid map-get($foreground, divider);
     align-items: flex-start;
     background-color: map-get($background, toolbar) !important;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
 
     // &.is-admin {
     //   border-color: mat.get-color-from-palette($warn, 500);
@@ -42,12 +42,12 @@
       max-width: 100rem;
       width: 100%;
       margin: 0 auto;
-      padding: .5rem 2rem;
+      padding: 0.5rem 2rem;
       box-sizing: border-box;
 
       .org-button {
         font-weight: bold;
-        padding-right: .5rem;
+        padding-right: 0.5rem;
       }
 
       .logo {
@@ -64,7 +64,7 @@
       }
 
       .context-menu {
-        border-radius: .5rem;
+        border-radius: 0.5rem;
         background-color: #2d2e30;
       }
 
@@ -107,7 +107,7 @@
           top: 60px;
           right: 0;
           overflow: hidden;
-          border-radius: .5rem;
+          border-radius: 0.5rem;
         }
       }
     }
@@ -118,7 +118,7 @@
 
     .sidenav {
       box-shadow: inset -1px 0 map-get($foreground, divider);
-      transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
     }
 
     .nav-row {
@@ -138,13 +138,13 @@
         align-items: center;
         font-size: 14px;
         line-height: 14px;
-        padding: .4rem 1rem;
+        padding: 0.4rem 1rem;
         color: mat.get-color-from-palette($foreground, text) !important;
-        transition: all .2s ease;
+        transition: all 0.2s ease;
         text-decoration: none;
         border-radius: 50vw;
         font-weight: 500;
-        margin: .25rem 0;
+        margin: 0.25rem 0;
 
         // i {
         //   opacity: .6;
@@ -172,26 +172,26 @@
     .mat-menu-content,
     .mat-menu-panel {
       background-color: $back;
-      border-radius: .5rem;
+      border-radius: 0.5rem;
 
       @include mat.elevation(5);
 
       .active {
         color: $primary-color !important;
-        background-color: rgba($color: $primary-color, $alpha: .1) !important;
+        background-color: rgba($color: $primary-color, $alpha: 0.1) !important;
       }
     }
 
     .root-header {
       background-color: $back !important;
-      transition: all .3s cubic-bezier(.645, .045, .355, 1);
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
       .slash {
         color: if($is-dark-theme, #525454, #d1d5d9);
       }
 
       .org-button {
-        transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+        transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
       }
     }
 
@@ -213,9 +213,9 @@
     // border-top: none;
     color: $warn-color;
     font-size: 13px;
-    padding: .5rem 2rem;
+    padding: 0.5rem 2rem;
     // transform: translateY(75%);
-    transition: all .2s;
+    transition: all 0.2s;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
     position: fixed;
