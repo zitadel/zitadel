@@ -28,14 +28,35 @@ jobs:
 
       - shell: bash
         run: |
+          echo "$(pwd)"
           ls -la
+          echo "/tmp/zitadel-console"
+          ls -la /tmp/zitadel-console
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: zitadel-console-e2e
+          path: /tmp/zitadel-console/
 
   cypress-run:
+    needs: build-console
     runs-on: ubuntu-18.04
     container: cypress/browsers:node14.17.0-chrome91-ff89
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: zitadel-console-e2e
+          path: .download/zitadel-console
+
+      - shell: bash
+        run: |
+          echo "$(pwd)"
+          ls -la
+          echo ".download/zitadel-console"
+          ls -la .download/zitadel-console
 
       - name: Cypress run
         uses: cypress-io/github-action@v2.11.7
