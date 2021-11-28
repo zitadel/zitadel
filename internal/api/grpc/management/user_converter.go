@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
+	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
@@ -234,14 +235,20 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 	}
 }
 
-func ListHumanLinkedIDPsRequestToModel(req *mgmt_pb.ListHumanLinkedIDPsRequest) *user_model.ExternalIDPSearchRequest {
+func ListHumanLinkedIDPsRequestToModel(req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.LinkedIDPsSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &user_model.ExternalIDPSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: []*user_model.ExternalIDPSearchQuery{{Key: user_model.ExternalIDPSearchKeyUserID, Method: domain.SearchMethodEquals, Value: req.UserId}},
+	q, err := query.NewLinkedIDPsUserIDSearchQuery(req.UserId)
+	if err != nil {
+		return nil, err
 	}
+	return &query.LinkedIDPsSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{q},
+	}, nil
 }
 
 func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) (*user_model.UserMembershipSearchRequest, error) {

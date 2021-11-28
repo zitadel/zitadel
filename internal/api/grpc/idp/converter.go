@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
 )
 
@@ -65,7 +64,7 @@ func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb
 	}
 }
 
-func IDPsToUserLinkPb(res []*user_model.ExternalIDPView) []*idp_pb.IDPUserLink {
+func IDPsToUserLinkPb(res []*query.LinkedIDP) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
 		links[i] = ExternalIDPViewToUserLinkPb(link)
@@ -73,13 +72,13 @@ func IDPsToUserLinkPb(res []*user_model.ExternalIDPView) []*idp_pb.IDPUserLink {
 	return links
 }
 
-func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUserLink {
+func ExternalIDPViewToUserLinkPb(link *query.LinkedIDP) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
-		IdpId:            link.IDPConfigID,
+		IdpId:            link.IDPID,
 		IdpName:          link.IDPName,
-		ProvidedUserId:   link.ExternalUserID,
-		ProvidedUserName: link.UserDisplayName,
+		ProvidedUserId:   link.ProvidedUserID,
+		ProvidedUserName: link.ProvidedUsername,
 		//TODO: as soon as saml is implemented we need to switch here
 		//IdpType: IDPTypeToPb(link.Type),
 	}
