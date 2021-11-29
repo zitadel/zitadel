@@ -11,3 +11,5 @@ WITH doa AS (
         ON j.idp_id = i.id
 )
 UPDATE zitadel.projections.idps SET type = doa.type FROM doa WHERE doa.id = zitadel.projections.idps.id;
+
+ALTER TABLE zitadel.projections.idps ALTER COLUMN type SET NOT NULL;
