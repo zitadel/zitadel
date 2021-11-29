@@ -151,8 +151,8 @@ func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName st
 	return model.UserToModel(user, repo.PrefixAvatarURL), nil
 }
 
-func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) (bool, error) {
-	return repo.View.IsUserUnique(userName, email)
+func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email, orgID string) (bool, error) {
+	return repo.View.IsUserUnique(userName, email, orgID)
 }
 
 func (repo *UserRepo) GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error) {
