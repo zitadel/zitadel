@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { OutsideClickModule } from 'src/app/directives/outside-click/outside-click.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AccountsCardModule } from '../accounts-card/accounts-card.module';
@@ -27,6 +28,7 @@ import { HeaderComponent } from './header.component';
     MatButtonModule,
     MatProgressSpinnerModule,
     TranslateModule,
+    OutsideClickModule,
     AvatarModule,
     AccountsCardModule,
     HasRolePipeModule,

@@ -1,0 +1,58 @@
+@mixin footer-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .footer-wrapper {
+    padding: 0.5rem 2rem;
+    background-color: map-get($background, footer) !important;
+    border-top: 1px solid map-get($foreground, divider);
+    padding-bottom: 50px;
+
+    .footer-links {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-gap: 2rem;
+      max-width: 80rem;
+      margin: 0 auto;
+
+      .footer-link-wrapper {
+        display: flex;
+        flex-direction: column;
+
+        .footer-section-title {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          color: var(--grey);
+        }
+
+        a {
+          color: map-get($foreground, base);
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          margin: 0.25rem 0;
+
+          i {
+            margin-left: 0.5rem;
+          }
+
+          &:hover {
+            color: $primary-color;
+          }
+        }
+      }
+    }
+  }
+}

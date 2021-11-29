@@ -239,7 +239,8 @@ $caos-dark-theme-background: (
   infosection: map_get($caos-dark-background, 300),
   warninfosection: #4f566b,
   successinfosection: #4f566b,
-  toolbar: rgba(map_get($caos-dark-background, 400), 0.9),
+  toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
+  footer: map_get($caos-dark-background, 500),
 );
 
 $caos-light-theme-background: (
@@ -261,7 +262,8 @@ $caos-light-theme-background: (
   infosection: #e4e4e4,
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
-  toolbar: rgba(map_get($caos-light-background, 400), 0.9),
+  toolbar: rgba(map_get($caos-light-background, 500), 0.9),
+  footer: map_get($caos-light-background, 400),
 );
 
 $caos-dark-theme-foreground: (

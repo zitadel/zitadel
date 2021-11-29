@@ -59,18 +59,29 @@
         }
       }
 
+      .iam-settings {
+        margin-right: 1rem;
+      }
+
       .icon-container {
         display: flex;
         justify-content: space-between;
         position: relative;
         user-select: none;
+        border: 2px solid #ffffff80;
+        border-radius: 50%;
+        transition: border ease 0.2s;
+
+        &:hover {
+          border-color: #ffffff;
+        }
 
         .docs {
           text-decoration: none;
           font-size: 1.4rem;
         }
 
-        .avatar {
+        .avatar-toggle {
           display: block;
           margin: auto;
           cursor: pointer;
@@ -83,9 +94,11 @@
 
         .a_card {
           position: absolute;
+          z-index: 300;
           top: 60px;
           right: 0;
           overflow: hidden;
+          box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
           border-radius: 0.5rem;
         }
       }

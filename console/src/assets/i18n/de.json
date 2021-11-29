@@ -5,6 +5,27 @@
     "NEXT": "Weiter",
     "COUNT": "Ergebnisse"
   },
+  "FOOTER": {
+    "FEATURES": {
+      "TITLE": "Features",
+      "HOSTEDLOGIN": "Hosted Login",
+      "MFA": "Multifactor Authentication",
+      "PASSWORDLESS": "Passwordless",
+      "AUDITTRAIL": "Audit Trail",
+      "IDENTITYBROKERING": "Identity Brokering",
+      "PLATFORM": "Platform APIs",
+      "MACHINE": "Machine Users"
+    },
+    "USECASES": {
+      "TITLE": "Use Cases"
+    },
+    "ZITADEL": {
+      "TITLE": "ZITADEL"
+    },
+    "LINKS": {
+      "TITLE": "Links"
+    }
+  },
   "ONBOARDING": {
     "HEADER": "Erste Schritte",
     "TITLE": "Lernen Sie unsere ZITADEL Console kennen.",
@@ -807,9 +828,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "BTN":"Datei auswählen",
+      "BTN": "Datei auswählen",
       "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
-      "ACTIVATEPREVIEW":"Preview aktivieren"
+      "ACTIVATEPREVIEW": "Preview aktivieren"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",

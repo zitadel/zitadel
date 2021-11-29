@@ -72,6 +72,7 @@ export class HeaderComponent implements OnInit {
   }
 
   public closeAccountCard(): void {
+    console.log('âsdf');
     if (this.showAccount) {
       this.showAccount = false;
     }

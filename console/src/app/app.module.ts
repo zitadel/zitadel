@@ -3,18 +3,10 @@ import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -30,17 +22,14 @@ import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HasFeatureModule } from './directives/has-feature/has-feature.module';
 import { HasRoleModule } from './directives/has-role/has-role.module';
-import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
+import { FooterModule } from './modules/footer/footer.module';
 import { HeaderModule } from './modules/header/header.module';
-import { InputModule } from './modules/input/input.module';
 import { NavModule } from './modules/nav/nav.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
-import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
@@ -114,21 +103,10 @@ const authConfig: AuthConfig = {
     HasRoleModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatSidenavModule,
-    MatCardModule,
-    OutsideClickModule,
-    InputModule,
+    FooterModule,
     HasRolePipeModule,
-    HasFeaturePipeModule,
-    HasFeatureModule,
-    MatProgressBarModule,
-    MatProgressSpinnerModule,
-    MatToolbarModule,
-    ReactiveFormsModule,
-    MatMenuModule,
     MatSnackBarModule,
     AvatarModule,
     WarnDialogModule,

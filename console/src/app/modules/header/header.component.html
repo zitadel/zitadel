@@ -1,4 +1,4 @@
-<mat-toolbar class="header-wrapper" *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
+<mat-toolbar class="header-wrapper">
   <div class="header-content">
     <ng-container *ngIf="labelpolicy && !labelpolicy?.disableWatermark">
       <a class="title" [routerLink]="['/']">
@@ -55,16 +55,21 @@
       {{'MENU.DOCUMENTATION' | translate}}
     </a>
 
-    <div (clickOutside)="closeAccountCard()" class="icon-container">
+    <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/iam','policies']" class="iam-settings"
+      mat-icon-button>
+      <i class="las la-cog"></i>
+    </a>
+
+    <div cnslOutsideClick (clickOutside)="closeAccountCard()" class="icon-container">
       <cnsl-avatar
         *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-        class="avatar dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
+        class="avatar-toggle dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
         [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName || ''"
         [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName ?? '' : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName) ?? ''"
         [size]="38">
       </cnsl-avatar>
-      <cnsl-accounts-card @accounts class="a_card  mat-elevation-z1" *ngIf="showAccount" (close)="showAccount = false"
-        [user]="user" [iamuser]="iamuser$ | async">
+      <cnsl-accounts-card @accounts class="a_card" *ngIf="showAccount" (close)="showAccount = false" [user]="user"
+        [iamuser]="(['iam.read$','iam.write$'] | hasRole) | async">
       </cnsl-accounts-card>
     </div>
   </div>

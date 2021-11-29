@@ -25,9 +25,12 @@
     position: relative;
 
     .router {
-      max-width: 80rem;
-      margin: 0 auto;
       padding: 0 2rem;
+
+      .outlet {
+        max-width: 80rem;
+        margin: 0 auto;
+      }
     }
 
     .nav {

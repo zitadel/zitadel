@@ -72,11 +72,10 @@
         </ng-template>
       </ng-container>
 
-      <span class="fill-space"></span>
-
-      <ng-container *ngIf="iamuser$ | async">
+      <!-- <span class="fill-space"></span> -->
+      <!-- 
         <a @navitem matTooltip="{{'MENU.TOOLTIP.IAMPOLICIES' | translate}}" class="nav-item"
-          [routerLinkActive]="['active']" [routerLink]="[ '/iam','policies']">
+          [routerLinkActive]="['active']">
           <span class="label">{{'MENU.IAMPOLICIES' | translate}}</span>
         </a>
 
@@ -84,7 +83,7 @@
           [routerLinkActive]="['active']" [routerLink]="[ '/iam', 'eventstore']">
           <span class="label">{{'MENU.IAMEVENTSTORE' | translate}}</span>
         </a>
-      </ng-container>
+      </ng-container> -->
 
       <!-- <div class="toc-line" *ngIf="privacyPolicy">
           <a class="toc" [href]="privacyPolicy.tosLink" alt="Terms and Conditions"

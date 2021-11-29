@@ -5,6 +5,27 @@
     "NEXT": "Next",
     "COUNT": "Total Results"
   },
+  "FOOTER": {
+    "FEATURES": {
+      "TITLE": "Features",
+      "HOSTEDLOGIN": "Hosted Login",
+      "MFA": "Multifactor Authentication",
+      "PASSWORDLESS": "Passwordless",
+      "AUDITTRAIL": "Audit Trail",
+      "IDENTITYBROKERING": "Identity Brokering",
+      "PLATFORM": "Platform APIs",
+      "MACHINE": "Machine Users"
+    },
+    "USECASES": {
+      "TITLE": "Use Cases"
+    },
+    "ZITADEL": {
+      "TITLE": "ZITADEL"
+    },
+    "LINKS": {
+      "TITLE": "Links"
+    }
+  },
   "ONBOARDING": {
     "HEADER": "First Steps",
     "TITLE": "Learn how to use ZITADEL",

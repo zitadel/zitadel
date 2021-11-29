@@ -12,6 +12,7 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/nav/nav.component';
 @import 'src/app/modules/header/header.component';
+@import 'src/app/modules/footer/footer.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
@@ -35,6 +36,7 @@
   @include idp-type-radio-theme($theme);
   @include app-auth-method-radio-theme($theme);
   @include card-theme($theme);
+  @include footer-theme($theme);
   @include table-theme($theme);
   @include detail-layout-theme($theme);
   @include app-card-theme($theme);
