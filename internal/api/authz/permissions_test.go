@@ -15,7 +15,7 @@ type testVerifier struct {
 	memberships []*Membership
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
 	return "userID", "agentID", "clientID", "de", "orgID", nil
 }
 func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*Membership, error) {
@@ -30,8 +30,8 @@ func (v *testVerifier) ExistsOrg(ctx context.Context, orgID string) error {
 	return nil
 }
 
-func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, error) {
-	return "clientID", nil
+func (v *testVerifier) VerifierClientID(ctx context.Context, appName string) (string, string, error) {
+	return "clientID", "projectID", nil
 }
 
 func (v *testVerifier) CheckOrgFeatures(context.Context, string, ...string) error {

@@ -9,25 +9,27 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	key_model "github.com/caos/zitadel/internal/key/model"
-	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*proj_model.ApplicationSearchRequest, error) {
+func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := app_grpc.AppQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	queries = append(queries, &proj_model.ApplicationSearchQuery{
-		Key:    proj_model.AppSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
-	return &proj_model.ApplicationSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
+	projectQuery, err := query.NewAppProjectIDSearchQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, projectQuery)
+	return &query.AppSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

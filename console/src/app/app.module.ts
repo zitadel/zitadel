@@ -31,6 +31,7 @@ import { NavModule } from './modules/nav/nav.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
+import { AdminService } from './services/admin.service';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
@@ -38,6 +39,7 @@ import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
+import { ManagementService } from './services/mgmt.service';
 import { RefreshService } from './services/refresh.service';
 import { SeoService } from './services/seo.service';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
@@ -165,6 +167,8 @@ const authConfig: AuthConfig = {
     GrpcService,
     AuthenticationService,
     GrpcAuthService,
+    ManagementService,
+    AdminService,
     SubscriptionService,
     AssetService,
     { provide: 'windowObject', useValue: window },
