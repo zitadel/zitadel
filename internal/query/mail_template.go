@@ -28,25 +28,32 @@ var (
 		name: projection.MailTemplateTable,
 	}
 	MailTemplateColAggregateID = Column{
-		name: projection.MailTemplateAggregateIDCol,
+		name:  projection.MailTemplateAggregateIDCol,
+		table: mailTemplateTable,
 	}
 	MailTemplateColSequence = Column{
-		name: projection.MailTemplateSequenceCol,
+		name:  projection.MailTemplateSequenceCol,
+		table: mailTemplateTable,
 	}
 	MailTemplateColCreationDate = Column{
-		name: projection.MailTemplateCreationDateCol,
+		name:  projection.MailTemplateCreationDateCol,
+		table: mailTemplateTable,
 	}
 	MailTemplateColChangeDate = Column{
-		name: projection.MailTemplateChangeDateCol,
+		name:  projection.MailTemplateChangeDateCol,
+		table: mailTemplateTable,
 	}
 	MailTemplateColTemplate = Column{
-		name: projection.MailTemplateTemplateCol,
+		name:  projection.MailTemplateTemplateCol,
+		table: mailTemplateTable,
 	}
 	MailTemplateColIsDefault = Column{
-		name: projection.MailTemplateIsDefaultCol,
+		name:  projection.MailTemplateIsDefaultCol,
+		table: mailTemplateTable,
 	}
 	MailTemplateColState = Column{
-		name: projection.MailTemplateStateCol,
+		name:  projection.MailTemplateStateCol,
+		table: mailTemplateTable,
 	}
 )
 

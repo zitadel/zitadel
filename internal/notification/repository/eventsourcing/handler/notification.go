@@ -7,9 +7,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/query"
-	"golang.org/x/text/language"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -24,6 +21,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
+	"github.com/caos/zitadel/internal/query"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -31,14 +29,10 @@ import (
 )
 
 const (
-	notificationTable    = "notification.notifications"
-	NotifyUserID         = "NOTIFICATION"
-	labelPolicyTableOrg  = "management.label_policies"
-	labelPolicyTableDef  = "adminapi.label_policies"
-	mailTemplateTableOrg = "management.mail_templates"
-	mailTemplateTableDef = "adminapi.mail_templates"
-	messageTextTableOrg  = "management.message_texts"
-	messageTextTableDef  = "adminapi.message_texts"
+	notificationTable   = "notification.notifications"
+	NotifyUserID        = "NOTIFICATION"
+	labelPolicyTableOrg = "management.label_policies"
+	labelPolicyTableDef = "adminapi.label_policies"
 )
 
 type Notification struct {
@@ -449,50 +443,25 @@ func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.
 	if err != nil {
 		return nil, err
 	}
-	allCustomTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(domain.IAMID, textType)
+	ctx := context.TODO()
+	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, domain.IAMID, textType)
 	if err != nil {
 		return translator, nil
 	}
-	customTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(orgID, textType)
+	customTexts, err := n.queries.CustomTextListByTemplate(ctx, orgID, textType)
 	if err != nil {
 		return translator, nil
 	}
-	allCustomTexts = append(allCustomTexts, customTexts...)
+	allCustomTexts.CustomTexts = append(allCustomTexts.CustomTexts, customTexts.CustomTexts...)
 
-	for _, text := range allCustomTexts {
+	for _, text := range allCustomTexts.CustomTexts {
 		msg := i18n.Message{
 			ID:   text.Template + "." + text.Key,
 			Text: text.Text,
 		}
-		translator.AddMessages(language.Make(text.Language), msg)
+		translator.AddMessages(text.Language, msg)
 	}
 	return translator, nil
-}
-
-// Read organization specific texts
-func (n *Notification) getMessageText(user *model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
-	langTag := language.Make(lang)
-	if langTag == language.Und {
-		langTag = language.English
-	}
-	langBase, _ := langTag.Base()
-
-	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, langBase.String(), messageTextTableDef)
-	if err != nil {
-		return nil, err
-	}
-	defaultMessageText.Default = true
-
-	// read from Org
-	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, langBase.String(), messageTextTableOrg)
-	if errors.IsNotFound(err) {
-		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	mergedText := mergeMessageTexts(defaultMessageText, orgMessageText)
-	return iam_es_model.MessageTextViewToModel(mergedText), err
 }
 
 func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
@@ -517,29 +486,4 @@ func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
 		return nil, errors.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
 	}
 	return &userCopy, nil
-}
-
-func mergeMessageTexts(defaultText *iam_es_model.MessageTextView, orgText *iam_es_model.MessageTextView) *iam_es_model.MessageTextView {
-	if orgText.Subject == "" {
-		orgText.Subject = defaultText.Subject
-	}
-	if orgText.Title == "" {
-		orgText.Title = defaultText.Title
-	}
-	if orgText.PreHeader == "" {
-		orgText.PreHeader = defaultText.PreHeader
-	}
-	if orgText.Text == "" {
-		orgText.Text = defaultText.Text
-	}
-	if orgText.Greeting == "" {
-		orgText.Greeting = defaultText.Greeting
-	}
-	if orgText.ButtonText == "" {
-		orgText.ButtonText = defaultText.ButtonText
-	}
-	if orgText.FooterText == "" {
-		orgText.FooterText = defaultText.FooterText
-	}
-	return orgText
 }

@@ -53,46 +53,60 @@ var (
 		name: projection.MessageTextTable,
 	}
 	MessageTextColAggregateID = Column{
-		name: projection.MessageTextAggregateIDCol,
+		name:  projection.MessageTextAggregateIDCol,
+		table: messageTextTable,
 	}
 	MessageTextColSequence = Column{
-		name: projection.MessageTextSequenceCol,
+		name:  projection.MessageTextSequenceCol,
+		table: messageTextTable,
 	}
 	MessageTextColCreationDate = Column{
-		name: projection.MessageTextCreationDateCol,
+		name:  projection.MessageTextCreationDateCol,
+		table: messageTextTable,
 	}
 	MessageTextColChangeDate = Column{
-		name: projection.MessageTextChangeDateCol,
+		name:  projection.MessageTextChangeDateCol,
+		table: messageTextTable,
 	}
 	MessageTextColState = Column{
-		name: projection.MessageTextStateCol,
+		name:  projection.MessageTextStateCol,
+		table: messageTextTable,
 	}
 	MessageTextColType = Column{
-		name: projection.MessageTextTypeCol,
+		name:  projection.MessageTextTypeCol,
+		table: messageTextTable,
 	}
 	MessageTextColLanguage = Column{
-		name: projection.MessageTextLanguageCol,
+		name:  projection.MessageTextLanguageCol,
+		table: messageTextTable,
 	}
 	MessageTextColTitle = Column{
-		name: projection.MessageTextTitleCol,
+		name:  projection.MessageTextTitleCol,
+		table: messageTextTable,
 	}
 	MessageTextColPreHeader = Column{
-		name: projection.MessageTextPreHeaderCol,
+		name:  projection.MessageTextPreHeaderCol,
+		table: messageTextTable,
 	}
 	MessageTextColSubject = Column{
-		name: projection.MessageTextSubjectCol,
+		name:  projection.MessageTextSubjectCol,
+		table: messageTextTable,
 	}
 	MessageTextColGreeting = Column{
-		name: projection.MessageTextGreetingCol,
+		name:  projection.MessageTextGreetingCol,
+		table: messageTextTable,
 	}
 	MessageTextColText = Column{
-		name: projection.MessageTextTextCol,
+		name:  projection.MessageTextTextCol,
+		table: messageTextTable,
 	}
 	MessageTextColButtonText = Column{
-		name: projection.MessageTextButtonTextCol,
+		name:  projection.MessageTextButtonTextCol,
+		table: messageTextTable,
 	}
 	MessageTextColFooter = Column{
-		name: projection.MessageTextFooterCol,
+		name:  projection.MessageTextFooterCol,
+		table: messageTextTable,
 	}
 )
 
@@ -107,6 +121,7 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 				MessageTextColAggregateID.identifier(): q.iamID,
 			},
 		}).
+		OrderBy(MessageTextColAggregateID.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-90n3N", "Errors.Query.SQLStatement")
@@ -131,19 +146,9 @@ func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) 
 }
 
 func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(messageType, language string) (*MessageText, error) {
-	q.mutex.Lock()
-	defer q.mutex.Unlock()
-	var err error
-	contents, ok := q.NotificationTranslationFileContents[language]
-	if !ok {
-		contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", language))
-		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		q.NotificationTranslationFileContents[language] = contents
+	contents, err := q.readNotificationTextMessages(language)
+	if err != nil {
+		return nil, err
 	}
 	messageTexts := new(MessageTexts)
 	if err := yaml.Unmarshal(contents, messageTexts); err != nil {
@@ -171,19 +176,9 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 }
 
 func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
-	q.mutex.Lock()
-	defer q.mutex.Unlock()
-	var err error
-	contents, ok := q.NotificationTranslationFileContents[language]
-	if !ok {
-		contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", language))
-		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		q.NotificationTranslationFileContents[language] = contents
+	contents, err := q.readNotificationTextMessages(language)
+	if err != nil {
+		return nil, err
 	}
 	notificationTextMap := make(map[string]interface{})
 	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
@@ -214,9 +209,22 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	return result, nil
 }
 
-func (q *Queries) OrgMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
-	//Merged Texts
-	return nil, nil
+func (q *Queries) readNotificationTextMessages(language string) ([]byte, error) {
+	q.mutex.Lock()
+	defer q.mutex.Unlock()
+	var err error
+	contents, ok := q.NotificationTranslationFileContents[language]
+	if !ok {
+		contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", language))
+		if errors.IsNotFound(err) {
+			contents, err = q.readTranslationFile(q.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		q.NotificationTranslationFileContents[language] = contents
+	}
+	return contents, nil
 }
 
 func prepareMessageTextQuery() (sq.SelectBuilder, func(*sql.Row) (*MessageText, error)) {

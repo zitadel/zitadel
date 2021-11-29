@@ -39,28 +39,36 @@ var (
 		name: projection.CustomTextTable,
 	}
 	CustomTextColAggregateID = Column{
-		name: projection.CustomTextAggregateIDCol,
+		name:  projection.CustomTextAggregateIDCol,
+		table: customTextTable,
 	}
 	CustomTextColSequence = Column{
-		name: projection.CustomTextSequenceCol,
+		name:  projection.CustomTextSequenceCol,
+		table: customTextTable,
 	}
 	CustomTextColCreationDate = Column{
-		name: projection.CustomTextCreationDateCol,
+		name:  projection.CustomTextCreationDateCol,
+		table: customTextTable,
 	}
 	CustomTextColChangeDate = Column{
-		name: projection.CustomTextChangeDateCol,
+		name:  projection.CustomTextChangeDateCol,
+		table: customTextTable,
 	}
 	CustomTextColTemplate = Column{
-		name: projection.CustomTextTemplateCol,
+		name:  projection.CustomTextTemplateCol,
+		table: customTextTable,
 	}
 	CustomTextColLanguage = Column{
-		name: projection.CustomTextLanguageCol,
+		name:  projection.CustomTextLanguageCol,
+		table: customTextTable,
 	}
 	CustomTextColKey = Column{
-		name: projection.CustomTextKeyCol,
+		name:  projection.CustomTextKeyCol,
+		table: customTextTable,
 	}
 	CustomTextColText = Column{
-		name: projection.CustomTextTextCol,
+		name:  projection.CustomTextTextCol,
+		table: customTextTable,
 	}
 )
 
@@ -114,19 +122,9 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 }
 
 func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	q.mutex.Lock()
-	defer q.mutex.Unlock()
-	contents, ok := q.LoginTranslationFileContents[lang]
-	var err error
-	if !ok {
-		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		q.LoginTranslationFileContents[lang] = contents
+	contents, err := q.readLoginTranslationFile(lang)
+	if err != nil {
+		return nil, err
 	}
 	loginText := new(domain.CustomLoginText)
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
@@ -144,19 +142,9 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 }
 
 func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	q.mutex.Lock()
-	defer q.mutex.Unlock()
-	contents, ok := q.LoginTranslationFileContents[lang]
-	var err error
-	if !ok {
-		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		q.LoginTranslationFileContents[lang] = contents
+	contents, err := q.readLoginTranslationFile(lang)
+	if err != nil {
+		return nil, err
 	}
 	loginTextMap := make(map[string]interface{})
 	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
@@ -183,6 +171,24 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.Custo
 		return nil, errors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
 	}
 	return loginText, nil
+}
+
+func (q *Queries) readLoginTranslationFile(lang string) ([]byte, error) {
+	q.mutex.Lock()
+	defer q.mutex.Unlock()
+	contents, ok := q.LoginTranslationFileContents[lang]
+	var err error
+	if !ok {
+		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if errors.IsNotFound(err) {
+			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		q.LoginTranslationFileContents[lang] = contents
+	}
+	return contents, nil
 }
 
 func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {
