@@ -12,7 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
-import { QRCodeModule } from 'angularx-qrcode';
+import { QrCodeModule } from 'ng-qrcode';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/member-create-dialog.module';
@@ -93,7 +93,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     DetailFormMachineModule,
     WarnDialogModule,
     MatDialogModule,
-    QRCodeModule,
+    QrCodeModule,
     MetaLayoutModule,
     MatCheckboxModule,
     HasRolePipeModule,
@@ -124,4 +124,4 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     InfoSectionModule,
   ],
 })
-export class UserDetailModule { }
+export class UserDetailModule {}
