@@ -50,7 +50,7 @@ require (
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mattn/go-colorable v0.1.11 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
-	github.com/minio/minio-go/v7 v7.0.15
+	github.com/minio/minio-go/v7 v7.0.16
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
@@ -81,7 +81,6 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.7
 	google.golang.org/api v0.60.0
-	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
