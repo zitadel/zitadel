@@ -598,16 +598,16 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	queries, err := ListHumanLinkedIDPsRequestToModel(req)
+	queries, err := ListHumanLinkedIDPsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.LinkedIDPsByUser(ctx, queries) // SearchExternalIDPs(ctx, ListHumanLinkedIDPsRequestToModel(req))
+	res, err := s.query.UserIDPLinks(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(res.IDPs),
+		Result: idp_grpc.IDPsToUserLinkPb(res.Links),
 		Details: obj_grpc.ToListDetails(
 			res.Count,
 			res.Sequence,

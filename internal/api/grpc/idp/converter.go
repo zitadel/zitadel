@@ -64,7 +64,7 @@ func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb
 	}
 }
 
-func IDPsToUserLinkPb(res []*query.LinkedIDP) []*idp_pb.IDPUserLink {
+func IDPsToUserLinkPb(res []*query.UserIDPLink) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
 		links[i] = ExternalIDPViewToUserLinkPb(link)
@@ -72,7 +72,7 @@ func IDPsToUserLinkPb(res []*query.LinkedIDP) []*idp_pb.IDPUserLink {
 	return links
 }
 
-func ExternalIDPViewToUserLinkPb(link *query.LinkedIDP) *idp_pb.IDPUserLink {
+func ExternalIDPViewToUserLinkPb(link *query.UserIDPLink) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
 		IdpId:            link.IDPID,

@@ -48,7 +48,7 @@ var (
 	}
 )
 
-type LinkedIDP struct {
+type UserIDPLink struct {
 	IDPID            string
 	UserID           string
 	IDPName          string
@@ -57,17 +57,17 @@ type LinkedIDP struct {
 	IDPType          domain.IDPConfigType
 }
 
-type LinkedIDPs struct {
+type UserIDPLinks struct {
 	SearchResponse
-	IDPs []*LinkedIDP
+	Links []*UserIDPLink
 }
 
-type LinkedIDPsSearchQuery struct {
+type UserIDPLinksSearchQuery struct {
 	SearchRequest
 	Queries []SearchQuery
 }
 
-func (q *LinkedIDPsSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *UserIDPLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
 		query = q.toQuery(query)
@@ -75,8 +75,8 @@ func (q *LinkedIDPsSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 	return query
 }
 
-func (q *Queries) LinkedIDPsByUser(ctx context.Context, queries *LinkedIDPsSearchQuery) (idps *LinkedIDPs, err error) {
-	query, scan := prepareLinkedIDPsQuery()
+func (q *Queries) UserIDPLinks(ctx context.Context, queries *UserIDPLinksSearchQuery) (idps *UserIDPLinks, err error) {
+	query, scan := prepareUserIDPLinksQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
@@ -94,11 +94,15 @@ func (q *Queries) LinkedIDPsByUser(ctx context.Context, queries *LinkedIDPsSearc
 	return idps, err
 }
 
-func NewLinkedIDPsUserIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(OrgColumnDomain, value, TextEquals)
+func NewUserIDPLinksUserIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPUserLinkUserIDCol, value, TextEquals)
 }
 
-func prepareLinkedIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*LinkedIDPs, error)) {
+func NewUserIDPLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPUserLinkResourceOwnerCol, value, TextEquals)
+}
+
+func prepareUserIDPLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserIDPLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
@@ -108,23 +112,34 @@ func prepareLinkedIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*LinkedIDPs, e
 			IDPTypeCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
-			LeftJoin(join(IDPUserLinkIDPIDCol, IDPIDCol)).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*LinkedIDPs, error) {
-			idps := make([]*LinkedIDP, 0)
+			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*UserIDPLinks, error) {
+			idps := make([]*UserIDPLink, 0)
 			var count uint64
 			for rows.Next() {
-				idp := new(LinkedIDP)
+				var (
+					idpName = sql.NullString{}
+					idpType = sql.NullInt16{}
+					idp     = new(UserIDPLink)
+				)
 				err := rows.Scan(
 					&idp.IDPID,
 					&idp.UserID,
-					&idp.IDPName,
+					&idpName,
 					&idp.ProvidedUserID,
 					&idp.ProvidedUsername,
-					&idp.IDPType,
+					&idpType,
 					&count,
 				)
 				if err != nil {
 					return nil, err
+				}
+				idp.IDPName = idpName.String
+				//IDPType 0 is oidc so we have to set unspecified manually
+				if idpType.Valid {
+					idp.IDPType = domain.IDPConfigType(idpType.Int16)
+				} else {
+					idp.IDPType = domain.IDPConfigTypeUnspecified
 				}
 				idps = append(idps, idp)
 			}
@@ -133,8 +148,8 @@ func prepareLinkedIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*LinkedIDPs, e
 				return nil, errors.ThrowInternal(err, "QUERY-nwx6U", "Errors.Query.CloseRows")
 			}
 
-			return &LinkedIDPs{
-				IDPs: idps,
+			return &UserIDPLinks{
+				Links: idps,
 				SearchResponse: SearchResponse{
 					Count: count,
 				},
