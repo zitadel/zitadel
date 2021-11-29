@@ -77,8 +77,16 @@ func (p *UserProjection) reducers() []handler.AggregateReducer {
 			Aggregate: user.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  user.UserV1AddedType,
+					Reduce: p.reduceHumanAdded,
+				},
+				{
 					Event:  user.HumanAddedType,
 					Reduce: p.reduceHumanAdded,
+				},
+				{
+					Event:  user.UserV1RegisteredType,
+					Reduce: p.reduceHumanRegistered,
 				},
 				{
 					Event:  user.HumanRegisteredType,
@@ -113,7 +121,15 @@ func (p *UserProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceHumanProfileChanged,
 				},
 				{
+					Event:  user.UserV1ProfileChangedType,
+					Reduce: p.reduceHumanProfileChanged,
+				},
+				{
 					Event:  user.HumanPhoneChangedType,
+					Reduce: p.reduceHumanPhoneChanged,
+				},
+				{
+					Event:  user.UserV1PhoneChangedType,
 					Reduce: p.reduceHumanPhoneChanged,
 				},
 				{
@@ -121,7 +137,15 @@ func (p *UserProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceHumanPhoneRemoved,
 				},
 				{
+					Event:  user.UserV1PhoneRemovedType,
+					Reduce: p.reduceHumanPhoneRemoved,
+				},
+				{
 					Event:  user.HumanPhoneVerifiedType,
+					Reduce: p.reduceHumanPhoneVerified,
+				},
+				{
+					Event:  user.UserV1PhoneVerifiedType,
 					Reduce: p.reduceHumanPhoneVerified,
 				},
 				{
@@ -129,7 +153,15 @@ func (p *UserProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceHumanEmailChanged,
 				},
 				{
+					Event:  user.UserV1EmailChangedType,
+					Reduce: p.reduceHumanEmailChanged,
+				},
+				{
 					Event:  user.HumanEmailVerifiedType,
+					Reduce: p.reduceHumanEmailVerified,
+				},
+				{
+					Event:  user.UserV1EmailVerifiedType,
 					Reduce: p.reduceHumanEmailVerified,
 				},
 				{

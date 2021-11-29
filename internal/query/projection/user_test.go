@@ -80,6 +80,63 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceUserV1Added",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1AddedType),
+					user.AggregateType,
+					[]byte(`{
+						"username": "user-name",
+						"firstName": "first-name",
+						"lastName": "last-name",
+						"nickName": "nick-name",
+						"displayName": "display-name",
+						"preferredLanguage": "ch-DE",
+						"gender": 1,
+						"email": "email@zitadel.ch",
+						"phone": "+41 00 000 00 00"
+					}`),
+				), user.HumanAddedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanAdded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								domain.UserStateInitial,
+								uint64(15),
+								"user-name",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"first-name",
+								"last-name",
+								&sql.NullString{String: "nick-name", Valid: true},
+								&sql.NullString{String: "display-name", Valid: true},
+								&sql.NullString{String: "ch-DE", Valid: true},
+								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
+								"email@zitadel.ch",
+								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceHumanAdded NULLs",
 			args: args{
 				event: getEvent(testEvent(
@@ -136,6 +193,63 @@ func TestUserProjection_reduces(t *testing.T) {
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanRegisteredType),
+					user.AggregateType,
+					[]byte(`{
+						"username": "user-name",
+						"firstName": "first-name",
+						"lastName": "last-name",
+						"nickName": "nick-name",
+						"displayName": "display-name",
+						"preferredLanguage": "ch-DE",
+						"gender": 1,
+						"email": "email@zitadel.ch",
+						"phone": "+41 00 000 00 00"
+					}`),
+				), user.HumanRegisteredEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanRegistered,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								anyArg{},
+								"ro-id",
+								domain.UserStateInitial,
+								uint64(15),
+								"user-name",
+							},
+						},
+						{
+							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								"first-name",
+								"last-name",
+								&sql.NullString{String: "nick-name", Valid: true},
+								&sql.NullString{String: "display-name", Valid: true},
+								&sql.NullString{String: "ch-DE", Valid: true},
+								&sql.NullInt16{Int16: int16(domain.GenderFemale), Valid: true},
+								"email@zitadel.ch",
+								&sql.NullString{String: "+41 00 000 00 00", Valid: true},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1Registered",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1RegisteredType),
 					user.AggregateType,
 					[]byte(`{
 						"username": "user-name",
@@ -468,10 +582,97 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceUserV1ProfileChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1ProfileChangedType),
+					user.AggregateType,
+					[]byte(`{
+						"firstName": "first-name",
+						"lastName": "last-name",
+						"nickName": "nick-name",
+						"displayName": "display-name",
+						"preferredLanguage": "ch-DE",
+						"gender": 3
+					}`),
+				), user.HumanProfileChangedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanProfileChanged,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
+							expectedArgs: []interface{}{
+								"first-name",
+								"last-name",
+								"nick-name",
+								"display-name",
+								"ch-DE",
+								domain.GenderDiverse,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceHumanPhoneChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanPhoneChangedType),
+					user.AggregateType,
+					[]byte(`{
+						"phone": "+41 00 000 00 00"
+						}`),
+				), user.HumanPhoneChangedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanPhoneChanged,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedArgs: []interface{}{
+								"+41 00 000 00 00",
+								false,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1PhoneChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1PhoneChangedType),
 					user.AggregateType,
 					[]byte(`{
 						"phone": "+41 00 000 00 00"
@@ -544,10 +745,83 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceUserV1PhoneRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1PhoneRemovedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanPhoneRemovedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanPhoneRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedArgs: []interface{}{
+								nil,
+								nil,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceHumanPhoneVerified",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanPhoneVerifiedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanPhoneVerifiedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanPhoneVerified,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
+							expectedArgs: []interface{}{
+								true,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1PhoneVerified",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1PhoneVerifiedType),
 					user.AggregateType,
 					[]byte(`{}`),
 				), user.HumanPhoneVerifiedEventMapper),
@@ -619,10 +893,85 @@ func TestUserProjection_reduces(t *testing.T) {
 			},
 		},
 		{
+			name: "reduceUserV1EmailChanged",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1EmailChangedType),
+					user.AggregateType,
+					[]byte(`{
+						"email": "email@zitadel.ch"
+					}`),
+				), user.HumanEmailChangedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanEmailChanged,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedArgs: []interface{}{
+								"email@zitadel.ch",
+								false,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "reduceHumanEmailVerified",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(user.HumanEmailVerifiedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanEmailVerifiedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanEmailVerified,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedArgs: []interface{}{
+								anyArg{},
+								uint64(15),
+								"agg-id",
+							},
+						},
+						{
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
+							expectedArgs: []interface{}{
+								true,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1EmailVerified",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1EmailVerifiedType),
 					user.AggregateType,
 					[]byte(`{}`),
 				), user.HumanEmailVerifiedEventMapper),
