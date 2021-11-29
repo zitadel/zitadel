@@ -10,6 +10,12 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
 
+interface UserSetting {
+  id: string;
+  i18nKey: string;
+  featureRequired: string[] | false;
+}
+
 @Component({
   selector: 'cnsl-auth-user-detail',
   templateUrl: './auth-user-detail.component.html',
@@ -30,6 +36,16 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
+
+  public settingsList: UserSetting[] = [
+    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
+    { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false },
+    { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false },
+    { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
+    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
+  ];
+  public currentSetting: UserSetting = this.settingsList[0];
 
   constructor(
     public translate: TranslateService,

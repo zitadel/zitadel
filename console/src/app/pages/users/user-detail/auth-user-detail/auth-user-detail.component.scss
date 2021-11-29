@@ -1,37 +1,84 @@
-.header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
+.user-sticky-rel {
+  position: relative;
+}
 
-  .text {
-    flex: 1;
+.user-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  position: relative;
 
-    .h1 {
-      margin: 0;
-    }
+  .user-settings-list {
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    padding: 1rem 2rem 1rem 0;
 
-    .sub {
-      color: var(--grey);
-      max-width: 500px;
-      font-size: 14px;
+    .setting-list-element {
+      border: none;
+      background: none;
+      text-align: left;
+      padding: 0.75rem 0;
+      opacity: 0.6;
+      font-size: 15px;
+      cursor: pointer;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      &.active {
+        font-weight: 600;
+        opacity: 1;
+      }
     }
   }
 
-  .theme {
-    min-width: 250px;
+  .user-settings {
+    grid-column-start: 2;
+    grid-column-end: 5;
+  }
+}
+
+.user-top {
+  // border-bottom: 1px solid $border-color; TODO add divider
+  margin-bottom: 2rem;
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 2rem 0;
+
+    .text {
+      flex: 1;
+
+      .h1 {
+        margin: 0;
+      }
+
+      .sub {
+        color: var(--grey);
+        max-width: 500px;
+        font-size: 14px;
+      }
+    }
+
+    .theme {
+      min-width: 250px;
+    }
   }
 }
 
 .btn-container {
   display: flex;
   justify-content: flex-end;
-  margin: 0 -.5rem;
+  margin: 0 -0.5rem;
 
   button {
-    border-radius: .5rem;
-    margin: 0 .5rem;
+    border-radius: 0.5rem;
+    margin: 0 0.5rem;
   }
 }
 
@@ -39,11 +86,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  margin: -1.5rem -.5rem;
+  margin: -1.5rem -0.5rem;
 
   .app-card {
     flex: 1;
-    margin: .5rem;
+    margin: 0.5rem;
   }
 }
 

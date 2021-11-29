@@ -7,18 +7,17 @@
   $background: map-get($theme, background);
   $card-background-color: mat.get-color-from-palette($background, card);
   $is-dark-theme: map-get($theme, is-dark);
-  $border-color: if($is-dark-theme, rgba(#8795a1, .2), rgba(#8795a1, .2));
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #ffffff, #000000);
   /* stylelint-enable */
 
   .card {
     background-color: $card-background-color;
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
     border: 1px solid $border-color;
     box-sizing: border-box;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     outline: none;
-    height: 100%;
 
     .selection-icon {
       opacity: 0;

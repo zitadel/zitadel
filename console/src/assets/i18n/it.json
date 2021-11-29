@@ -183,6 +183,14 @@
     }
   },
   "USER": {
+    "SETTINGS": {
+      "GENERAL": "Generale",
+      "IDP": "Identity Providers",
+      "MFA": "Autenticazione a più fattori",
+      "PASSWORDLESS": "Passwordless",
+      "USERGRANTS": "Autorizzazioni",
+      "METADATA": "Metadati"
+    },
     "TITLE": "Informazioni personali",
     "DESCRIPTION": "Gestisci le tue informazioni e le impostazioni di sicurezza.",
     "PAGES": {

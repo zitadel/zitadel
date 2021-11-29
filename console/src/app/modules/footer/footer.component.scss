@@ -17,6 +17,7 @@
     background-color: map-get($background, footer) !important;
     border-top: 1px solid map-get($foreground, divider);
     padding-bottom: 50px;
+    margin-top: 50px;
 
     .footer-links {
       display: grid;
