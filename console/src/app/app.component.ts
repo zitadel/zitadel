@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { DOCUMENT } from '@angular/common';
-import { Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { DOCUMENT, ViewportScroller } from '@angular/common';
+import { Component, ElementRef, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -35,6 +35,10 @@ export class AppComponent implements OnDestroy {
   );
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
+  public yoffset: number = 0;
+  @HostListener('window:scroll', ['$event']) onScroll(event: Event): void {
+    this.yoffset = this.viewPortScroller.getScrollPosition()[1];
+  }
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
   public isDarkTheme: Observable<boolean> = of(true);
@@ -48,6 +52,7 @@ export class AppComponent implements OnDestroy {
   public privacyPolicy!: PrivacyPolicy.AsObject;
   constructor(
     @Inject('windowObject') public window: Window,
+    public viewPortScroller: ViewportScroller,
     public translate: TranslateService,
     public authenticationService: AuthenticationService,
     public authService: GrpcAuthService,

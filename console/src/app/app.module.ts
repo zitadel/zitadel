@@ -35,6 +35,7 @@ import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
+import { HeaderModule } from './modules/header/header.module';
 import { InputModule } from './modules/input/input.module';
 import { NavModule } from './modules/nav/nav.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
@@ -87,6 +88,7 @@ const authConfig: AuthConfig = {
     AppRoutingModule,
     CommonModule,
     BrowserModule,
+    HeaderModule,
     OverlayModule,
     OAuthModule.forRoot({
       resourceServer: {

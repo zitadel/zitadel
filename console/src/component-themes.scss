@@ -11,6 +11,7 @@
 @import 'src/app/modules/detail-layout/detail-layout.component';
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/nav/nav.component';
+@import 'src/app/modules/header/header.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
@@ -26,8 +27,10 @@
 @import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
 
 @mixin component-themes($theme) {
+  @include main-theme($theme);
   @include avatar-theme($theme);
   @include nav-theme($theme);
+  @include header-theme($theme);
   @include app-type-radio-theme($theme);
   @include idp-type-radio-theme($theme);
   @include app-auth-method-radio-theme($theme);
@@ -39,7 +42,6 @@
   @include changes-theme($theme);
   @include theme-card($theme);
   @include input-theme($theme);
-  @include textvar($theme);
   @include cnsl-form-field-theme($theme);
   @include cnsl-label-theme($theme);
   @include cnsl-error-theme($theme);

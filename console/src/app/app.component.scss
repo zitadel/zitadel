@@ -1,122 +1,140 @@
 @use '~@angular/material' as mat;
 
-.main-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
+@mixin main-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
 
-  .content {
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+  $base: map-get($foreground, base);
+
+  .main-container {
     display: flex;
     flex-direction: column;
     width: 100%;
-    align-items: stretch;
+    min-height: 100%;
+    // height: 100%;
+    position: relative;
 
     .router {
-      height: 100%;
-      width: 100%;
-      padding-top: 98px;
       max-width: 80rem;
       margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      right: 0;
+      left: 0;
+      background-color: map-get($background, toolbar) !important;
+      backdrop-filter: blur(10px) !important;
+      border-bottom: 1px solid map-get($foreground, divider);
+      z-index: 200;
+
+      &.shadow {
+        box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+      }
+    }
+
+    .theme-section {
+      display: block;
+      padding: 0 0.5rem;
+      margin-top: 2rem;
+      align-self: flex-start;
+      border-radius: 1rem;
+
+      .round-light {
+        display: inline-block;
+        border-radius: 50%;
+        height: 30px;
+        width: 30px;
+        margin: 0.5rem;
+        cursor: pointer;
+        background: linear-gradient(315deg, #e6e6e6, #fff);
+      }
+
+      .round-dark {
+        display: inline-block;
+        border-radius: 50%;
+        height: 30px;
+        width: 30px;
+        margin: 0.5rem;
+        cursor: pointer;
+        background: linear-gradient(315deg, #000, #000);
+      }
     }
   }
 
-  .theme-section {
-    display: block;
-    padding: 0 0.5rem;
-    margin-top: 2rem;
-    align-self: flex-start;
-    border-radius: 1rem;
+  .divider {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 5px 0;
 
-    .round-light {
-      display: inline-block;
-      border-radius: 50%;
-      height: 30px;
-      width: 30px;
-      margin: 0.5rem;
-      cursor: pointer;
-      background: linear-gradient(315deg, #e6e6e6, #fff);
+    span {
+      border: 1px solid #81868a40;
+      padding: 2px 1rem;
+      border-radius: 50vw;
+      color: var(--grey);
+      font-size: 11px;
     }
 
-    .round-dark {
-      display: inline-block;
-      border-radius: 50%;
-      height: 30px;
-      width: 30px;
-      margin: 0.5rem;
-      cursor: pointer;
-      background: linear-gradient(315deg, #000, #000);
+    .line {
+      display: block;
+      background-color: #81868a40;
+      height: 1px;
+      margin: 0.5rem 0;
+      flex: 1;
+      min-width: 10px;
+    }
+
+    .hiddenline {
+      display: block;
+      visibility: hidden;
+      width: 4rem;
     }
   }
-}
 
-.divider {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin: 5px 0;
-
-  span {
-    border: 1px solid #81868a40;
-    padding: 2px 1rem;
-    border-radius: 50vw;
-    color: var(--grey);
-    font-size: 11px;
-  }
-
-  .line {
-    display: block;
-    background-color: #81868a40;
-    height: 1px;
-    margin: 0.5rem 0;
-    flex: 1;
-    min-width: 10px;
-  }
-
-  .hiddenline {
-    display: block;
-    visibility: hidden;
-    width: 4rem;
-  }
-}
-
-@mixin textvar($theme) {
   .filter-form {
     margin: 0 0.5rem;
-    /* stylelint-disable */
-    $foreground: map-get($theme, foreground);
     color: mat.get-color-from-palette($foreground, text) !important;
   }
 
   .show-all {
-    $primary: map-get($theme, primary);
     color: mat.get-color-from-palette($primary, 300) !important;
     border-bottom: 1px solid var(--grey);
     margin-bottom: 0.5rem;
   }
-  /* stylelint-enable */
-}
 
-.menu {
-  position: relative;
+  .menu {
+    position: relative;
 
-  .filter-wrapper {
-    padding: 4px;
+    .filter-wrapper {
+      padding: 4px;
+    }
+
+    .spinner-w {
+      top: 1rem;
+      left: 0;
+      right: 0;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
-  .spinner-w {
-    top: 1rem;
-    left: 0;
-    right: 0;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .org-wrapper {
+    max-height: 350px;
+    overflow-y: auto;
   }
-}
-
-.org-wrapper {
-  max-height: 350px;
-  overflow-y: auto;
 }

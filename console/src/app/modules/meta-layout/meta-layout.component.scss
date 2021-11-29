@@ -7,12 +7,13 @@
     display: relative;
     width: 100%;
     padding-bottom: 2rem;
+    padding-right: 1rem;
   }
 
   .meta {
     flex: 1 0 300px;
     max-width: 300px;
-    padding: 2rem 0 1rem 0;
+    padding: 2rem 0rem 1rem 1rem;
 
     @media only screen and (min-width: 1500px) {
       flex-basis: 400px;

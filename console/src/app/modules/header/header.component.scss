@@ -1,0 +1,94 @@
+@mixin header-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .header-wrapper {
+    padding: 0.5rem 2rem;
+    background-color: map-get($background, toolbar) !important;
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      max-width: 80rem;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+
+      .org-button {
+        font-weight: bold;
+        padding-right: 0.5rem;
+      }
+
+      .logo {
+        max-height: 40px;
+        width: 40px;
+      }
+
+      .title {
+        text-decoration: none;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 400;
+        line-height: 1.2rem;
+      }
+
+      .context-menu {
+        border-radius: 0.5rem;
+        background-color: #2d2e30;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .doc-link {
+        margin-right: 1rem;
+
+        @media only screen and (max-width: 500px) {
+          display: none;
+        }
+      }
+
+      .icon-container {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        user-select: none;
+
+        .docs {
+          text-decoration: none;
+          font-size: 1.4rem;
+        }
+
+        .avatar {
+          display: block;
+          margin: auto;
+          cursor: pointer;
+        }
+
+        .name {
+          font-size: 1rem;
+          font-weight: 400;
+        }
+
+        .a_card {
+          position: absolute;
+          top: 60px;
+          right: 0;
+          overflow: hidden;
+          border-radius: 0.5rem;
+        }
+      }
+    }
+  }
+}

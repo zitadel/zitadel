@@ -19,111 +19,15 @@
     display: flex;
     flex-direction: column;
     height: auto;
-    position: fixed;
-    padding: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
+    padding: 0 2rem;
+    position: relative;
     max-width: 80rem;
     margin: 0 auto;
-    border-bottom: 1px solid map-get($foreground, divider);
     align-items: flex-start;
-    background-color: map-get($background, toolbar) !important;
-    backdrop-filter: blur(10px);
-
-    // &.is-admin {
-    //   border-color: mat.get-color-from-palette($warn, 500);
-    // }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      max-width: 100rem;
-      width: 100%;
-      margin: 0 auto;
-      padding: 0.5rem 2rem;
-      box-sizing: border-box;
-
-      .org-button {
-        font-weight: bold;
-        padding-right: 0.5rem;
-      }
-
-      .logo {
-        max-height: 40px;
-        width: 40px;
-      }
-
-      .title {
-        text-decoration: none;
-        color: white;
-        font-size: 1.2rem;
-        font-weight: 400;
-        line-height: 1.2rem;
-      }
-
-      .context-menu {
-        border-radius: 0.5rem;
-        background-color: #2d2e30;
-      }
-
-      .fill-space {
-        flex: 1;
-      }
-
-      .doc-link {
-        margin-right: 1rem;
-
-        @media only screen and (max-width: 500px) {
-          display: none;
-        }
-      }
-
-      .icon-container {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-        user-select: none;
-
-        .docs {
-          text-decoration: none;
-          font-size: 1.4rem;
-        }
-
-        .avatar {
-          display: block;
-          margin: auto;
-          cursor: pointer;
-        }
-
-        .name {
-          font-size: 1rem;
-          font-weight: 400;
-        }
-
-        .a_card {
-          position: absolute;
-          top: 60px;
-          right: 0;
-          overflow: hidden;
-          border-radius: 0.5rem;
-        }
-      }
-    }
-
-    .meta {
-      box-shadow: inset 1px 0 map-get($foreground, divider);
-    }
-
-    .sidenav {
-      box-shadow: inset -1px 0 map-get($foreground, divider);
-      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
-    }
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
 
     .nav-row {
       align-self: stretch;
-      padding: 0 2rem;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -146,19 +50,9 @@
         font-weight: 500;
         margin: 0.25rem 0;
 
-        // i {
-        //   opacity: .6;
-        // }
-
         &.active {
           background-color: $primary-color;
           color: mat.get-color-from-palette($foreground, toolbar-items) !important;
-
-          // background-color: if($is-dark-theme, rgba($color: $primary-color, $alpha: .1), rgb(84 105 212 / 6%)) !important;
-
-          // i {
-          //   opacity: 1;
-          // }
         }
 
         .c_label {
@@ -209,12 +103,9 @@
   .admin-line {
     display: flex;
     align-items: center;
-    // border: 1px solid $warn-color;
-    // border-top: none;
     color: $warn-color;
     font-size: 13px;
     padding: 0.5rem 2rem;
-    // transform: translateY(75%);
     transition: all 0.2s;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
