@@ -15,6 +15,7 @@
 @import 'src/app/modules/footer/footer.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
+@import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-list/granted-project-grid/granted-project-grid.component';
 @import 'src/app/app.component.scss';
@@ -48,6 +49,7 @@
   @include cnsl-label-theme($theme);
   @include cnsl-error-theme($theme);
   @include link-theme($theme);
+  @include auth-user-detail-theme($theme);
   @include meta-theme($theme);
   @include info-section-theme($theme);
   @include onboarding-theme($theme);

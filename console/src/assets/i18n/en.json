@@ -17,13 +17,25 @@
       "MACHINE": "Machine Users"
     },
     "USECASES": {
-      "TITLE": "Use Cases"
+      "TITLE": "Use Cases",
+      "EASY": "Easy Integration",
+      "SELF": "Self service",
+      "EXISTING": "Existing Identities",
+      "SECURE": "Secure Authentication"
     },
     "ZITADEL": {
-      "TITLE": "ZITADEL"
+      "TITLE": "ZITADEL",
+      "PRICING": "Pricing",
+      "TRUST": "Trust",
+      "OPENSOURCE": "Open Source",
+      "QUICKSTARTS": "Quickstarts",
+      "DISCUSSIONS": "Github Discussions"
     },
     "LINKS": {
-      "TITLE": "Links"
+      "TITLE": "Links",
+      "CONTACT": "Kontakt",
+      "TOS": "Terms of Service",
+      "PP": "Privacy Policy"
     }
   },
   "ONBOARDING": {
@@ -429,6 +441,7 @@
       "MINLENGTHERROR": "The password has to be at least {{value}} characters long.",
       "NOTEQUAL": "The passwords provided do not match."
     },
+    "ID": "ID",
     "EMAIL": "E-mail",
     "PHONE": "Phonenumber",
     "PHONEEMPTY": "No phonenumber defined",

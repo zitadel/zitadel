@@ -24,9 +24,69 @@
       margin: 0 auto;
       box-sizing: border-box;
 
-      .org-button {
-        font-weight: bold;
-        padding-right: 0.5rem;
+      .slash {
+        color: map-get($foreground, divider);
+      }
+
+      .org-context {
+        display: flex;
+        align-items: center;
+
+        .org-link {
+          font-size: 14px;
+          color: map-get($foreground, base);
+          text-decoration: none;
+          padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+          height: 2.5rem;
+          border-radius: 6px;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          transition: all ease 0.1s;
+
+          &:hover {
+            background-color: if($is-dark-theme, #ffffff10, #00000010);
+          }
+        }
+
+        .org-switch-button {
+          font-weight: bold;
+          padding-right: 0.5rem;
+          border: none;
+          color: map-get($foreground, base);
+          border-radius: 6px;
+          position: relative;
+          font-size: 14px;
+          padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+          height: 2.5rem;
+          text-align: left;
+          background-color: transparent;
+          cursor: pointer;
+          transition: all ease 0.2s;
+
+          &:hover {
+            background-color: if($is-dark-theme, #ffffff10, #00000010);
+          }
+
+          .svgsapn {
+            margin-left: 0.75rem;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            padding-right: 0.5rem;
+            pointer-events: none;
+
+            svg {
+              opacity: 0.7;
+              fill: map-get($foreground, base);
+              height: 1.25rem;
+              width: 1.25rem;
+            }
+          }
+        }
       }
 
       .logo {

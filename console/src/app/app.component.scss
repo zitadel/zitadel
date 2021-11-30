@@ -75,6 +75,10 @@
         background: linear-gradient(315deg, #000, #000);
       }
     }
+
+    .fill-space {
+      flex: 1;
+    }
   }
 
   .divider {

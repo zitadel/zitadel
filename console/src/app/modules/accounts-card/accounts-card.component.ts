@@ -14,21 +14,24 @@ export class AccountsCardComponent implements OnInit {
   @Input() public user!: User.AsObject;
   @Input() public iamuser: boolean | null = false;
 
-  @Output() public closedCard: EventEmitter<void> = new EventEmitter();
+  @Output() public close: EventEmitter<void> = new EventEmitter();
   public sessions: Session.AsObject[] = [];
   public loadingUsers: boolean = false;
   constructor(public authService: AuthenticationService, private router: Router, private userService: GrpcAuthService) {
-    this.userService.listMyUserSessions().then(sessions => {
-      this.sessions = sessions.resultList;
-      const index = this.sessions.findIndex(user => user.loginName === this.user.preferredLoginName);
-      if (index > -1) {
-        this.sessions.splice(index, 1);
-      }
+    this.userService
+      .listMyUserSessions()
+      .then((sessions) => {
+        this.sessions = sessions.resultList;
+        const index = this.sessions.findIndex((user) => user.loginName === this.user.preferredLoginName);
+        if (index > -1) {
+          this.sessions.splice(index, 1);
+        }
 
-      this.loadingUsers = false;
-    }).catch(() => {
-      this.loadingUsers = false;
-    });
+        this.loadingUsers = false;
+      })
+      .catch(() => {
+        this.loadingUsers = false;
+      });
   }
 
   public ngOnInit(): void {
@@ -37,12 +40,12 @@ export class AccountsCardComponent implements OnInit {
 
   public editUserProfile(): void {
     this.router.navigate(['users/me']);
-    this.closedCard.emit();
+    this.close.emit();
   }
 
   public closeCard(element: HTMLElement): void {
     if (!element.classList.contains('dontcloseonclick')) {
-      this.closedCard.emit();
+      this.close.emit();
     }
   }
 
@@ -69,6 +72,6 @@ export class AccountsCardComponent implements OnInit {
 
   public logout(): void {
     this.authService.signout();
-    this.closedCard.emit();
+    this.close.emit();
   }
 }

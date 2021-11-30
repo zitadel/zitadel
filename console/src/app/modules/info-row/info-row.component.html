@@ -8,6 +8,11 @@
   </div>
 
   <div class="info">
+    <p class="title">{{ 'USER.ID' | translate }}</p>
+    <p *ngIf="user && user.id" class="desc">{{user.id }}</p>
+  </div>
+
+  <div class="info">
     <p class="title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
     <p *ngIf="user && user.details && user.details.creationDate" class="desc">{{user.details.creationDate |
       timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>

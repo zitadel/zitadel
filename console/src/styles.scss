@@ -240,7 +240,7 @@ $caos-dark-theme-background: (
   warninfosection: #4f566b,
   successinfosection: #4f566b,
   toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
-  footer: map_get($caos-dark-background, 500),
+  footer: #00000020,
 );
 
 $caos-light-theme-background: (

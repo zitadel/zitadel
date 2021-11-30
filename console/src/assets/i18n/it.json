@@ -17,13 +17,25 @@
       "MACHINE": "Machine Users"
     },
     "USECASES": {
-      "TITLE": "Use Cases"
+      "TITLE": "Use Cases",
+      "EASY": "Easy Integration",
+      "SELF": "Self service",
+      "EXISTING": "Existing Identities",
+      "SECURE": "Secure Authentication"
     },
     "ZITADEL": {
-      "TITLE": "ZITADEL"
+      "TITLE": "ZITADEL",
+      "PRICING": "Pricing",
+      "TRUST": "Trust",
+      "OPENSOURCE": "Open Source",
+      "QUICKSTARTS": "Quickstarts",
+      "DISCUSSIONS": "Github Discussions"
     },
     "LINKS": {
-      "TITLE": "Links"
+      "TITLE": "Links",
+      "CONTACT": "Kontakt",
+      "TOS": "Terms of Service",
+      "PP": "Privacy Policy"
     }
   },
   "ONBOARDING": {
@@ -330,7 +342,7 @@
       }
     },
     "EXTERNALIDP": {
-      "TITLE": "IDP esterno",
+      "TITLE": "IDP esterni",
       "DESC": "",
       "IDPCONFIGID": "IDP Config ID",
       "IDPNAME": "Nome Idp",
@@ -429,6 +441,7 @@
       "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
     },
+    "ID": "ID",
     "EMAIL": "E-mail",
     "PHONE": "Numero di telefono",
     "PHONEEMPTY": "Nessun numero di telefono definito",
@@ -1593,7 +1606,7 @@
       "DESCRIPTION": "Definisci le autorizzazioni per il progetto specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
     },
     "USER": {
-      "TITLE": "Autorizzazione",
+      "TITLE": "Autorizzazioni",
       "DESCRIPTION": "Definisci le autorizzazioni per l'utente specificato. Nota che puoi vedere solo le voci dei progetti e degli utenti per i quali hai le autorizzazioni."
     },
     "CREATE": {

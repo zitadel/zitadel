@@ -18,8 +18,11 @@
     border-top: 1px solid map-get($foreground, divider);
     padding-bottom: 50px;
     margin-top: 50px;
+    display: flex;
+    flex-direction: column;
 
     .footer-links {
+      width: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       grid-gap: 2rem;
@@ -44,14 +47,39 @@
           align-items: center;
           font-size: 14px;
           margin: 0.25rem 0;
+          transition: all 0.1s ease;
 
           i {
             margin-left: 0.5rem;
+            visibility: hidden;
           }
 
           &:hover {
             color: $primary-color;
+
+            i {
+              visibility: visible;
+            }
           }
+        }
+      }
+    }
+
+    .swiss-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      width: 100%;
+      max-width: 80rem;
+      margin: 0 auto;
+
+      .swisssvg {
+        width: 14rem;
+        margin: 1rem 0;
+        color: if($is-dark-theme, #ffffff60, #00000060);
+
+        .cross {
+          fill: white;
         }
       }
     }
