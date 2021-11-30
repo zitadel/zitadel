@@ -66,7 +66,7 @@ func (p *IAMMemberProjection) reduceAdded(event eventstore.EventReader) (*handle
 		logging.LogWithFields("HANDL-c8SBb", "seq", event.Sequence(), "expectedType", iam.MemberAddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pGNCu", "reduce.wrong.event.type")
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, withCol(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(IAMMemberIAMIDCol, e.Aggregate().ID))
 }
 
 func (p *IAMMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
@@ -75,7 +75,7 @@ func (p *IAMMemberProjection) reduceChanged(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-QsjwO", "seq", event.Sequence(), "expected", iam.MemberChangedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-5WQcZ", "reduce.wrong.event.type")
 	}
-	return reduceMemberChanged(e.MemberChangedEvent, withCond(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(IAMMemberIAMIDCol, e.Aggregate().ID))
 }
 
 func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
@@ -84,7 +84,7 @@ func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.EventReader)
 		logging.LogWithFields("HANDL-mOncs", "seq", event.Sequence(), "expected", iam.MemberCascadeRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dmdf2", "reduce.wrong.event.type")
 	}
-	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withCond(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(IAMMemberIAMIDCol, e.Aggregate().ID))
 }
 
 func (p *IAMMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
@@ -93,5 +93,5 @@ func (p *IAMMemberProjection) reduceRemoved(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-lW1Zv", "seq", event.Sequence(), "expected", iam.MemberRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-exVqy", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(e.MemberRemovedEvent, withCond(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberRemoved(e.MemberRemovedEvent, withMemberCond(IAMMemberIAMIDCol, e.Aggregate().ID))
 }

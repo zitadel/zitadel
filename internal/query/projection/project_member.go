@@ -69,12 +69,12 @@ const (
 func (p *ProjectMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
 	switch e := event.(type) {
 	case *project.MemberAddedEvent:
-		return reduceMemberAdded(e.MemberAddedEvent, withCol(ProjectMemberProjectIDCol, e.Aggregate().ID))
+		return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(ProjectMemberProjectIDCol, e.Aggregate().ID))
 	case *project.GrantMemberAddedEvent:
 		return reduceMemberAdded(
 			*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
-			withCol(ProjectMemberProjectIDCol, e.Aggregate().ID),
-			withCol(ProjectMemberGrantIDCol, e.GrantID),
+			withMemberCol(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withMemberCol(ProjectMemberGrantIDCol, e.GrantID),
 		)
 	default:
 		logging.LogWithFields("HANDL-tPdUI", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberAddedType, project.GrantMemberAddedType}).Error("wrong event type")
@@ -85,12 +85,12 @@ func (p *ProjectMemberProjection) reduceAdded(event eventstore.EventReader) (*ha
 func (p *ProjectMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
 	switch e := event.(type) {
 	case *project.MemberChangedEvent:
-		return reduceMemberChanged(e.MemberChangedEvent, withCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
+		return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
 	case *project.GrantMemberChangedEvent:
 		return reduceMemberChanged(
 			*member.NewMemberChangedEvent(&e.BaseEvent, e.UserID, e.Roles...),
-			withCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
-			withCond(ProjectMemberGrantIDCol, e.GrantID),
+			withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withMemberCond(ProjectMemberGrantIDCol, e.GrantID),
 		)
 	default:
 		logging.LogWithFields("HANDL-LxWSn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberChangedType, project.GrantMemberChangedType}).Error("wrong event type")
@@ -101,12 +101,12 @@ func (p *ProjectMemberProjection) reduceChanged(event eventstore.EventReader) (*
 func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	switch e := event.(type) {
 	case *project.MemberCascadeRemovedEvent:
-		return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
+		return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
 	case *project.GrantMemberCascadeRemovedEvent:
 		return reduceMemberCascadeRemoved(
 			*member.NewCascadeRemovedEvent(&e.BaseEvent, e.UserID),
-			withCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
-			withCond(ProjectMemberGrantIDCol, e.GrantID),
+			withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withMemberCond(ProjectMemberGrantIDCol, e.GrantID),
 		)
 	default:
 		logging.LogWithFields("HANDL-6gFXG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberCascadeRemovedType, project.GrantMemberCascadeRemovedType}).Error("wrong event type")
@@ -117,12 +117,12 @@ func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.EventRea
 func (p *ProjectMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	switch e := event.(type) {
 	case *project.MemberRemovedEvent:
-		return reduceMemberRemoved(e.MemberRemovedEvent, withCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
+		return reduceMemberRemoved(e.MemberRemovedEvent, withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
 	case *project.GrantMemberRemovedEvent:
 		return reduceMemberRemoved(
 			*member.NewRemovedEvent(&e.BaseEvent, e.UserID),
-			withCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
-			withCond(ProjectMemberGrantIDCol, e.GrantID),
+			withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID),
+			withMemberCond(ProjectMemberGrantIDCol, e.GrantID),
 		)
 	default:
 		logging.LogWithFields("HANDL-ryUlI", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.MemberRemovedType, project.GrantMemberRemovedType}).Error("wrong event type")
