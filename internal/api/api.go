@@ -47,7 +47,7 @@ type API struct {
 type health interface {
 	Health(ctx context.Context) error
 	IamByID(ctx context.Context) (*iam_model.IAM, error)
-	VerifierClientID(ctx context.Context, appName string) (string, error)
+	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
 type auth interface {
@@ -159,7 +159,7 @@ func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *
 }
 
 func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
-	id, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
+	id, _, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
 	if err != nil {
 		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
 		return

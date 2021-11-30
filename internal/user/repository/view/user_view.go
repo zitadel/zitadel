@@ -150,13 +150,13 @@ func GetGlobalUserByLoginName(db *gorm.DB, table, loginName string) (*model.User
 	return user, err
 }
 
-func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
+func IsUserUnique(db *gorm.DB, table, userName, email, orgID string) (bool, error) {
 	user := new(model.UserView)
 
 	emailUnique := email == ""
 	userNameUnique := userName == ""
 	if email != "" {
-		query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyEmail), email)
+		query := repository.PrepareGetByQuery(table, uniqueEmailQuery(userName, orgID)...)
 		err := query(db, user)
 		if err != nil && !caos_errs.IsNotFound(err) {
 			return false, err
@@ -166,7 +166,7 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 		}
 	}
 	if userName != "" {
-		query := repository.PrepareGetByKey(table, model.UserSearchKey(usr_model.UserSearchKeyUserName), userName)
+		query := repository.PrepareGetByQuery(table, uniqueUsernameQuery(userName, orgID)...)
 		err := query(db, user)
 		if err != nil && !caos_errs.IsNotFound(err) {
 			return false, err
@@ -177,6 +177,42 @@ func IsUserUnique(db *gorm.DB, table, userName, email string) (bool, error) {
 	}
 
 	return emailUnique && userNameUnique, nil
+}
+
+func uniqueEmailQuery(email, orgID string) []repository.SearchQuery {
+	queries := []repository.SearchQuery{
+		&model.UserSearchQuery{
+			Key:    usr_model.UserSearchKeyEmail,
+			Method: domain.SearchMethodEquals,
+			Value:  email,
+		},
+	}
+	if orgID == "" {
+		return queries
+	}
+	return append(queries, &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyResourceOwner,
+		Method: domain.SearchMethodEquals,
+		Value:  orgID,
+	})
+
+}
+func uniqueUsernameQuery(userName, orgID string) []repository.SearchQuery {
+	queries := []repository.SearchQuery{
+		&model.UserSearchQuery{
+			Key:    usr_model.UserSearchKeyUserName,
+			Method: domain.SearchMethodEquals,
+			Value:  userName,
+		},
+	}
+	if orgID == "" {
+		return queries
+	}
+	return append(queries, &model.UserSearchQuery{
+		Key:    usr_model.UserSearchKeyResourceOwner,
+		Method: domain.SearchMethodEquals,
+		Value:  orgID,
+	})
 }
 
 func UserMFAs(db *gorm.DB, table, userID string) ([]*usr_model.MultiFactor, error) {

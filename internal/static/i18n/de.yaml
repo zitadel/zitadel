@@ -815,6 +815,7 @@ EventTypes:
     removed: Aktion gelöscht
 Application:
   OIDC:
+    UnsupportedVersion: Deine OIDC Version wird nicht unterstützt
     V1:
       NotCompliant: Deine Konfiguration ist nicht konform und weicht vom OIDC 1.0 Standard ab.
       NoRedirectUris: Es muss mindestens eine Redirect URI erfasst sein.
