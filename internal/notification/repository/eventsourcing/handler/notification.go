@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -406,10 +406,10 @@ func getSetNotifyContextData(orgID string) context.Context {
 // Read organization specific colors
 func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
 	// read from Org
-	policy, err := n.view.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg, int32(domain.LabelPolicyStateActive))
+	policy, err := n.view.StylingByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg, int32(domain.LabelPolicyStateActive))
 	if errors.IsNotFound(err) {
 		// read from default
-		policy, err = n.view.LabelPolicyByAggregateIDAndState(n.systemDefaults.IamID, labelPolicyTableDef, int32(domain.LabelPolicyStateActive))
+		policy, err = n.view.StylingByAggregateIDAndState(n.systemDefaults.IamID, labelPolicyTableDef, int32(domain.LabelPolicyStateActive))
 		if err != nil {
 			return nil, err
 		}

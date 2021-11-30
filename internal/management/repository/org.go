@@ -24,9 +24,4 @@ type OrgRepository interface {
 
 	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
 	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
-
-	GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
-	GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error)
 }

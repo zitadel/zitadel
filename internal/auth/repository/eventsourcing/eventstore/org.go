@@ -7,17 +7,12 @@ import (
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/errors"
 	eventstore "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/iam"
-)
-
-const (
-	orgOwnerRole = "ORG_OWNER"
 )
 
 type OrgRepository struct {
@@ -43,17 +38,6 @@ func (repo *OrgRepository) GetMyPasswordComplexityPolicy(ctx context.Context) (*
 		return nil, err
 	}
 	return iam_view_model.PasswordComplexityViewToModel(policy), err
-}
-
-func (repo *OrgRepository) GetLabelPolicy(ctx context.Context, orgID string) (*domain.LabelPolicy, error) {
-	orgPolicy, err := repo.View.LabelPolicyByAggregateIDAndState(orgID, int32(domain.LabelPolicyStateActive))
-	if errors.IsNotFound(err) {
-		orgPolicy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
-	}
-	if err != nil {
-		return nil, err
-	}
-	return orgPolicy.ToDomain(), nil
 }
 
 func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*domain.CustomText, error) {

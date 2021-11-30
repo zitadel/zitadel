@@ -44,7 +44,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newKey(
 			handler{view, bulkLimit, configs.cycleDuration("Key"), errorCount, es},
 			keyChan),
-		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			systemDefaults.IamID),
@@ -58,7 +57,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			systemDefaults),
-		newLabelPolicy(handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
 		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
