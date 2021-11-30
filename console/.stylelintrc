@@ -1,7 +1,5 @@
 {
-  "plugins": [
-    "stylelint-scss"
-  ],
+  "plugins": ["stylelint-scss"],
   "extends": "stylelint-config-standard",
   "rules": {
     "value-keyword-case": null,
@@ -11,30 +9,20 @@
     "at-rule-empty-line-before": [
       "always",
       {
-        "except": [
-          "blockless-after-same-name-blockless",
-          "first-nested"
-        ],
-        "ignore": [
-          "after-comment"
-        ],
-        "ignoreAtRules": [
-          "else"
-        ]
+        "except": ["blockless-after-same-name-blockless", "first-nested"],
+        "ignore": ["after-comment"],
+        "ignoreAtRules": ["else"]
       }
     ],
     "block-closing-brace-newline-after": [
       "always",
       {
-        "ignoreAtRules": [
-          "if",
-          "else"
-        ]
+        "ignoreAtRules": ["if", "else"]
       }
     ],
     "max-line-length": 125,
     "no-empty-source": null,
-    "number-leading-zero": "never",
+    "number-leading-zero": null,
     "scss/at-rule-no-unknown": null,
     "scss/at-else-if-parentheses-space-before": "always",
     "scss/at-function-parentheses-space-before": "never",
