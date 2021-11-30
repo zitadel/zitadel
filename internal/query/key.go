@@ -83,18 +83,18 @@ type PublicKeys struct {
 	Keys []PublicKey
 }
 
-type publicKey struct {
+type rsaPublicKey struct {
 	key
 	expiry    time.Time
 	publicKey *rsa.PublicKey
 }
 
-func (k *publicKey) Expiry() time.Time {
-	return k.expiry
+func (r *rsaPublicKey) Expiry() time.Time {
+	return r.expiry
 }
 
-func (k *publicKey) Key() interface{} {
-	return k.publicKey
+func (r *rsaPublicKey) Key() interface{} {
+	return r.publicKey
 }
 
 type Keys struct {
@@ -239,7 +239,7 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 		func(rows *sql.Rows) (*PublicKeys, error) {
 			keys := make([]PublicKey, 0)
 			for rows.Next() {
-				k := new(publicKey)
+				k := new(rsaPublicKey)
 				var keyValue []byte
 				err := rows.Scan(
 					&k.id,
