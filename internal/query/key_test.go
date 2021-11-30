@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 )
@@ -38,7 +39,8 @@ func Test_KeyPrepares(t *testing.T) {
 						` zitadel.projections.keys.algorithm,`+
 						` zitadel.projections.keys.use,`+
 						` zitadel.projections.keys_public.expiry,`+
-						` zitadel.projections.keys_public.key`+
+						` zitadel.projections.keys_public.key,`+
+						` COUNT(*) OVER ()`+
 						` FROM zitadel.projections.keys`+
 						` LEFT JOIN zitadel.projections.keys_public ON zitadel.projections.keys.id = zitadel.projections.keys_public.id`),
 					nil,
@@ -66,7 +68,8 @@ func Test_KeyPrepares(t *testing.T) {
 						` zitadel.projections.keys.algorithm,`+
 						` zitadel.projections.keys.use,`+
 						` zitadel.projections.keys_public.expiry,`+
-						` zitadel.projections.keys_public.key`+
+						` zitadel.projections.keys_public.key,`+
+						` COUNT(*) OVER ()`+
 						` FROM zitadel.projections.keys`+
 						` LEFT JOIN zitadel.projections.keys_public ON zitadel.projections.keys.id = zitadel.projections.keys_public.id`),
 					[]string{
@@ -79,6 +82,7 @@ func Test_KeyPrepares(t *testing.T) {
 						"use",
 						"expiry",
 						"key",
+						"count",
 					},
 					[][]driver.Value{
 						{
@@ -97,7 +101,7 @@ func Test_KeyPrepares(t *testing.T) {
 			},
 			object: &PublicKeys{
 				SearchResponse: SearchResponse{
-					Count: 0,
+					Count: 1,
 				},
 				Keys: []PublicKey{
 					&rsaPublicKey{
@@ -132,9 +136,137 @@ func Test_KeyPrepares(t *testing.T) {
 						` zitadel.projections.keys.algorithm,`+
 						` zitadel.projections.keys.use,`+
 						` zitadel.projections.keys_public.expiry,`+
-						` zitadel.projections.keys_public.key`+
+						` zitadel.projections.keys_public.key,`+
+						` COUNT(*) OVER ()`+
 						` FROM zitadel.projections.keys`+
 						` LEFT JOIN zitadel.projections.keys_public ON zitadel.projections.keys.id = zitadel.projections.keys_public.id`),
+					sql.ErrConnDone,
+				),
+				err: func(err error) (error, bool) {
+					if !errors.Is(err, sql.ErrConnDone) {
+						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: nil,
+		},
+		{
+			name:    "preparePrivateKeysQuery no result",
+			prepare: preparePrivateKeysQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
+						` zitadel.projections.keys.creation_date,`+
+						` zitadel.projections.keys.change_date,`+
+						` zitadel.projections.keys.sequence,`+
+						` zitadel.projections.keys.resource_owner,`+
+						` zitadel.projections.keys.algorithm,`+
+						` zitadel.projections.keys.use,`+
+						` zitadel.projections.keys_private.expiry,`+
+						` zitadel.projections.keys_private.key,`+
+						` COUNT(*) OVER ()`+
+						` FROM zitadel.projections.keys`+
+						` LEFT JOIN zitadel.projections.keys_private ON zitadel.projections.keys.id = zitadel.projections.keys_private.id`),
+					nil,
+					nil,
+				),
+				err: func(err error) (error, bool) {
+					if !errs.IsNotFound(err) {
+						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: &PrivateKeys{Keys: []PrivateKey{}},
+		},
+		{
+			name:    "preparePrivateKeysQuery found",
+			prepare: preparePrivateKeysQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
+						` zitadel.projections.keys.creation_date,`+
+						` zitadel.projections.keys.change_date,`+
+						` zitadel.projections.keys.sequence,`+
+						` zitadel.projections.keys.resource_owner,`+
+						` zitadel.projections.keys.algorithm,`+
+						` zitadel.projections.keys.use,`+
+						` zitadel.projections.keys_private.expiry,`+
+						` zitadel.projections.keys_private.key,`+
+						` COUNT(*) OVER ()`+
+						` FROM zitadel.projections.keys`+
+						` LEFT JOIN zitadel.projections.keys_private ON zitadel.projections.keys.id = zitadel.projections.keys_private.id`),
+					[]string{
+						"id",
+						"creation_date",
+						"change_date",
+						"sequence",
+						"resource_owner",
+						"algorithm",
+						"use",
+						"expiry",
+						"key",
+						"count",
+					},
+					[][]driver.Value{
+						{
+							"key-id",
+							testNow,
+							testNow,
+							uint64(20211109),
+							"ro",
+							"RS256",
+							0,
+							testNow,
+							[]byte(`{"Algorithm": "enc", "Crypted": "cHJpdmF0ZUtleQ==", "CryptoType": 0, "KeyID": "id"}`),
+						},
+					},
+				),
+			},
+			object: &PrivateKeys{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Keys: []PrivateKey{
+					&privateKey{
+						key: key{
+							id:            "key-id",
+							creationDate:  testNow,
+							changeDate:    testNow,
+							sequence:      20211109,
+							resourceOwner: "ro",
+							algorithm:     "RS256",
+							use:           domain.KeyUsageSigning,
+						},
+						expiry: testNow,
+						privateKey: &crypto.CryptoValue{
+							CryptoType: crypto.TypeEncryption,
+							Algorithm:  "enc",
+							KeyID:      "id",
+							Crypted:    []byte("privateKey"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "preparePrivateKeysQuery sql err",
+			prepare: preparePrivateKeysQuery,
+			want: want{
+				sqlExpectations: mockQueryErr(
+					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
+						` zitadel.projections.keys.creation_date,`+
+						` zitadel.projections.keys.change_date,`+
+						` zitadel.projections.keys.sequence,`+
+						` zitadel.projections.keys.resource_owner,`+
+						` zitadel.projections.keys.algorithm,`+
+						` zitadel.projections.keys.use,`+
+						` zitadel.projections.keys_private.expiry,`+
+						` zitadel.projections.keys_private.key,`+
+						` COUNT(*) OVER ()`+
+						` FROM zitadel.projections.keys`+
+						` LEFT JOIN zitadel.projections.keys_private ON zitadel.projections.keys.id = zitadel.projections.keys_private.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

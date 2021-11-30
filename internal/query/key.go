@@ -33,6 +33,16 @@ type PublicKey interface {
 	Key() interface{}
 }
 
+type PrivateKeys struct {
+	SearchResponse
+	Keys []PrivateKey
+}
+
+type PublicKeys struct {
+	SearchResponse
+	Keys []PublicKey
+}
+
 type key struct {
 	id            string
 	creationDate  time.Time
@@ -59,11 +69,6 @@ func (k *key) Sequence() uint64 {
 	return k.sequence
 }
 
-type PrivateKeys struct {
-	SearchResponse
-	Keys []PrivateKey
-}
-
 type privateKey struct {
 	key
 	expiry     time.Time
@@ -78,11 +83,6 @@ func (k *privateKey) Key() *crypto.CryptoValue {
 	return k.privateKey
 }
 
-type PublicKeys struct {
-	SearchResponse
-	Keys []PublicKey
-}
-
 type rsaPublicKey struct {
 	key
 	expiry    time.Time
@@ -95,11 +95,6 @@ func (r *rsaPublicKey) Expiry() time.Time {
 
 func (r *rsaPublicKey) Key() interface{} {
 	return r.publicKey
-}
-
-type Keys struct {
-	SearchResponse
-	Keys []Key
 }
 
 var (
@@ -189,7 +184,12 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKey
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Sghn4", "Errors.Internal")
 	}
-	return scan(rows)
+	keys, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
+	return keys, err
 }
 
 func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*PrivateKeys, error) {
@@ -233,11 +233,13 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 			KeyColUse.identifier(),
 			KeyPublicColExpiry.identifier(),
 			KeyPublicColKey.identifier(),
+			countColumn.identifier(),
 		).From(keyTable.identifier()).
 			LeftJoin(join(KeyPublicColID, KeyColID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PublicKeys, error) {
 			keys := make([]PublicKey, 0)
+			var count uint64
 			for rows.Next() {
 				k := new(rsaPublicKey)
 				var keyValue []byte
@@ -251,6 +253,7 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 					&k.use,
 					&k.expiry,
 					&keyValue,
+					&count,
 				)
 				if err != nil {
 					return nil, err
@@ -268,6 +271,9 @@ func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, e
 
 			return &PublicKeys{
 				Keys: keys,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
 			}, nil
 		}
 }
@@ -283,11 +289,13 @@ func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys,
 			KeyColUse.identifier(),
 			KeyPrivateColExpiry.identifier(),
 			KeyPrivateColKey.identifier(),
+			countColumn.identifier(),
 		).From(keyTable.identifier()).
 			LeftJoin(join(KeyPrivateColID, KeyColID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*PrivateKeys, error) {
 			keys := make([]PrivateKey, 0)
+			var count uint64
 			for rows.Next() {
 				k := new(privateKey)
 				err := rows.Scan(
@@ -300,6 +308,7 @@ func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys,
 					&k.use,
 					&k.expiry,
 					&k.privateKey,
+					&count,
 				)
 				if err != nil {
 					return nil, err
@@ -313,6 +322,9 @@ func preparePrivateKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PrivateKeys,
 
 			return &PrivateKeys{
 				Keys: keys,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
 			}, nil
 		}
 }
