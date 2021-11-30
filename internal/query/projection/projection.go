@@ -58,6 +58,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["features"]))
 	NewUserProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["users"]))
 	NewLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
+	NewAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
 
 	return nil
 }
