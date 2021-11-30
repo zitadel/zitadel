@@ -16,6 +16,7 @@ import { MemberCreateDialogModule } from 'src/app/modules/add-member-dialog/memb
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
 import { FeaturesModule } from 'src/app/modules/features/features.module';
+import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
@@ -31,14 +32,16 @@ import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain
 import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
+import { OrgDomainsComponent } from './org-domains/org-domains.component';
 
 @NgModule({
-  declarations: [OrgDetailComponent, DomainVerificationComponent],
+  declarations: [OrgDetailComponent, DomainVerificationComponent, OrgDomainsComponent],
   imports: [
     CommonModule,
     HasRolePipeModule,
     OrgsRoutingModule,
     FormsModule,
+    InfoRowModule,
     HasRoleModule,
     InputModule,
     InfoSectionModule,
@@ -67,4 +70,4 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     ZitadelTierModule,
   ],
 })
-export class OrgsModule { }
+export class OrgsModule {}

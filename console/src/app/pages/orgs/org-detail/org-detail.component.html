@@ -1,88 +1,31 @@
-<cnsl-meta-layout>
-  <div class="max-width-container">
-    <h1 class="h1">{{org?.name}}</h1>
-    <p class="sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
-    <ng-container *ngIf="(['org.write$'] | hasRole) as canwrite$">
-      <cnsl-card title="{{ 'ORG.DOMAINS.TITLE' | translate }}"
-        description="{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}">
-
-        <button class="icon-button" (click)="loadDomains()" card-actions mat-icon-button>
-          <mat-icon class="icon">refresh</mat-icon>
-        </button>
-
-        <div *ngFor="let domain of domains" class="domain">
-          <span *ngIf="(canwrite$ | async) && (['custom_domain'] | hasFeature | async); else noCustom"
-            (click)="verifyDomain(domain)" class="title">{{domain.domainName}}</span>
-
-          <ng-template #noCustom>
-            <span class="title disabled">{{domain.domainName}}</span>
-          </ng-template>
-          <span *ngIf="(canwrite$ | async) === false" class="title disabled">{{domain?.domainName}}</span>
-
-          <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
-          <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
-          <a *ngIf="domain.isVerified && !domain.isPrimary && (canwrite$ | async)" class="primaryset"
-            (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
-
-          <span class="fill-space"></span>
-          <button class="rem-button" [disabled]="(canwrite$ | async) === false" matTooltip="Remove domain" color="warn"
-            mat-icon-button (click)="removeDomain(domain.domainName)"><i class="las la-trash"></i></button>
-        </div>
-        <p class="new-desc">{{'ORG.PAGES.ORGDOMAIN.VERIFICATION' | translate}}</p>
-
-        <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) === false" [featureLink]="['/org/features']"
-          class="info" [type]="InfoSectionType.WARN">
-          <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
-        </cnsl-info-section>
-
-        <button [disabled]="(canwrite$ | async) === false || (['custom_domain'] | hasFeature | async) === false"
-          matTooltip="Add domain" mat-raised-button color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' |
-          translate}}
-        </button>
-      </cnsl-card>
-    </ng-container>
-
-    <ng-container *ngIf="['features.read'] | hasRole | async">
-      <h2>{{'FEATURES.TITLE' | translate}}</h2>
-      <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
-      <cnsl-zitadel-tier [features]="features"></cnsl-zitadel-tier>
-    </ng-container>
-
-    <ng-template cnslHasRole [hasRole]="['policy.read']">
-      <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
-    </ng-template>
-  </div>
-
-  <div class="side" metainfo>
-    <div class="meta-details">
-      <div class="meta-row">
-        <span class="first">{{'RESOURCEID' | translate}}:</span>
-        <span *ngIf="org?.id" class="second">{{ org.id }}</span>
-      </div>
-      <div class="meta-row">
-        <span class="first">{{'ORG.PAGES.PRIMARYDOMAIN' | translate}}</span>
-        <span class="second"><span style="display: block;">{{primaryDomain}}</span></span>
-      </div>
-      <div class="meta-row">
-        <span class="first">{{'ORG.PAGES.STATE' | translate}}</span>
-        <span *ngIf="org && org.state !== undefined" class="state"
-          [ngClass]="{'active': org.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org.state === OrgState.ORG_STATE_INACTIVE}">{{'ORG.STATE.'+org.state
-          |
-          translate}}</span>
-      </div>
+<div class="org-top">
+  <div class="org-top-row">
+    <div>
+      <h1 class="org-title">{{org?.name}}</h1>
+      <p class="org-sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
     </div>
+    <span class="fill-space"></span>
+    <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async" [membersSubject]="membersSubject"
+      title="{{ 'PROJECT.MEMBER.TITLE' | translate }}" description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+      (addClicked)="openAddMember()" (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
+      [disabled]="false">
+    </cnsl-contributors>
+  </div>
+  <cnsl-info-row *ngIf="org" [org]="org"></cnsl-info-row>
+</div>
+<cnsl-meta-layout>
 
-    <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
-      <mat-tab label="Details">
-        <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
-          [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-          description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-          (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
-        </cnsl-contributors>
-      </mat-tab>
-      <mat-tab label="{{ 'CHANGES.ORG.TITLE' | translate }}" class="meta-flex-col">
-        <cnsl-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
-      </mat-tab>
-    </mat-tab-group>
+  <ng-container *ngIf="['features.read'] | hasRole | async">
+    <h2 class="org-subtitle">{{'FEATURES.TITLE' | translate}}</h2>
+    <p class="org-top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+    <cnsl-zitadel-tier [features]="features"></cnsl-zitadel-tier>
+  </ng-container>
+
+  <ng-template cnslHasRole [hasRole]="['policy.read']">
+    <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
+  </ng-template>
+
+  <div metainfo>
+    <cnsl-changes *ngIf="org" [changeType]="ChangeType.ORG" [id]="org.id"></cnsl-changes>
   </div>
 </cnsl-meta-layout>

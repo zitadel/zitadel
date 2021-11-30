@@ -1,25 +1,13 @@
 .groups {
-  padding-top: 1rem;
-
-  .co-header {
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: 400;
-    font-size: 14px;
-    letter-spacing: .05em;
-    text-transform: uppercase;
-  }
-
-  .sub-header {
-    font-size: .8rem;
-    color: var(--grey);
-  }
+  padding: 1rem 0;
 
   .people {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    background: #ffffff20;
+    border-radius: 50vw;
+    padding: 6px 9px;
 
     .owner {
       margin-right: 1rem;
@@ -27,7 +15,6 @@
 
     .img-list {
       width: 100%;
-      margin-top: .5rem;
       margin-left: 1rem;
       display: flex;
       align-items: center;
@@ -61,9 +48,9 @@
         height: 32px;
         width: 32px;
         border-radius: 50%;
-        -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-        -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-        box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+        -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+        -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+        box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -76,7 +63,7 @@
         .sa-icon {
           display: block;
           width: 32px;
-          margin: 0 .5rem;
+          margin: 0 0.5rem;
 
           i {
             margin: auto;

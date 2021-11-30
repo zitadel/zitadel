@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { App, AppState } from 'src/app/proto/generated/zitadel/app_pb';
 import { IDP, IDPState } from 'src/app/proto/generated/zitadel/idp_pb';
+import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
@@ -11,22 +12,26 @@ import { User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 })
 export class InfoRowComponent implements OnInit {
   @Input() public user!: User.AsObject;
+  @Input() public org!: Org.AsObject;
   @Input() public app!: App.AsObject;
   @Input() public idp!: IDP.AsObject;
 
   public UserState: any = UserState;
+  public OrgState: any = OrgState;
   public AppState: any = AppState;
   public IDPState: any = IDPState;
   public copied: string = '';
 
-  public environmentMap: { [key: string]: string; } = {};
+  public environmentMap: { [key: string]: string } = {};
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     if (this.app) {
-      this.http.get('./assets/environment.json')
-        .toPromise().then((env: any) => {
+      this.http
+        .get('./assets/environment.json')
+        .toPromise()
+        .then((env: any) => {
           this.environmentMap = {
             issuer: env.issuer,
             adminServiceUrl: env.adminServiceUrl,
@@ -36,5 +41,4 @@ export class InfoRowComponent implements OnInit {
         });
     }
   }
-
 }

@@ -1,23 +1,10 @@
 <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
   <div class="nav-col" [ngClass]="{'is-admin': (iamuser$ | async)}">
     <div class="nav-row">
-      <!-- <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
-        [routerLink]="['/']">
-        <span class="label">{{ 'MENU.DASHBOARD' | translate }}</span>
-      </a> -->
-
-      <!-- <ng-container *ngIf="authenticationService.authenticationChanged | async">
-          <a @navitem matTooltip="{{'MENU.TOOLTIP.PERSONAL' | translate}}" class="nav-item"
-              [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
-              [routerLink]="['/users/me']">
-              <span class="label">{{ 'MENU.PERSONAL_INFO' | translate }}</span>
-          </a>
-      </ng-container> -->
-
       <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
         <ng-template cnslHasRole [hasRole]="['org.read']">
           <a @navitem matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-            [routerLink]="[ '/org']">
+            [routerLinkActiveOptions]="{ exact: true }" [routerLink]="[ '/org']">
             <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
           </a>
         </ng-template>
@@ -68,6 +55,13 @@
             [routerLinkActive]="['active']" [routerLink]="[ '/actions']" [routerLinkActiveOptions]="{ exact: true }">
             <i class="icon las la-exchange-alt"></i>
             <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
+          </a>
+        </ng-template>
+
+        <ng-template cnslHasRole [hasRole]="['org.read']">
+          <a @navitem class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org/domains']"
+            [routerLinkActiveOptions]="{ exact: true }">
+            <span class="label">{{'MENU.DOMAINS' | translate}}</span>
           </a>
         </ng-template>
       </ng-container>

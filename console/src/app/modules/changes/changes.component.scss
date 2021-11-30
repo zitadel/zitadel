@@ -11,7 +11,7 @@
     font-weight: 400;
     margin-top: 1rem;
     font-size: 14px;
-    letter-spacing: .05em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
@@ -25,22 +25,24 @@
   $foreground: map-get($theme, foreground);
 
   .scroll-container {
-    max-height: 50vh;
+    max-height: 100vh;
     overflow-y: scroll;
     border-bottom: 1px solid map-get($foreground, divider);
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
+    box-sizing: border-box;
 
     .date {
       font-weight: 500;
-      font-size: .8rem;
+      font-size: 0.8rem;
       display: block;
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     .item {
       display: block;
       padding: 10px 0;
-      font-size: .8rem;
+      font-size: 0.8rem;
+      box-sizing: border-box;
 
       .row {
         display: flex;
@@ -54,7 +56,7 @@
           flex: 1;
           display: flex;
           flex-direction: column;
-          margin-top: -.5rem;
+          margin-top: -0.5rem;
 
           .action {
             display: flex;
@@ -74,7 +76,7 @@
             span {
               flex: 1;
               font-weight: 500;
-              font-size: .8rem;
+              font-size: 0.8rem;
               overflow-x: hidden;
             }
 
@@ -91,7 +93,7 @@
               display: none;
               opacity: 0;
               margin-left: 1rem;
-              transform: opacity .2s ease-in-out;
+              transform: opacity 0.2s ease-in-out;
             }
 
             &:hover {
@@ -116,18 +118,18 @@
         /* stylelint-disable */
         $primary: map-get($theme, primary);
         $is-dark-theme: map-get($theme, is-dark);
-        $transparent-color: if($is-dark-theme, rgba(#8795a1, .2), rgba(#8795a1, .2));
+        $transparent-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
         /* stylelint-enable */
 
         &.change-item-back {
-          background-color: rgba($transparent-color, .93);
-          transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+          background-color: rgba($transparent-color, 0.93);
+          transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
       }
 
       .sp-wrapper {
-        padding: .5rem;
+        padding: 0.5rem;
         display: flex;
         justify-content: center;
       }

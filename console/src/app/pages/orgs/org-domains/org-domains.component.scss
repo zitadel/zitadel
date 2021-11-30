@@ -1,0 +1,77 @@
+.domain-top-view {
+  display: flex;
+  align-items: center;
+  padding-top: 2rem;
+
+  h1 {
+    margin: 0;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.desc {
+  color: var(--grey);
+  margin-bottom: 2rem;
+  font-size: 14px;
+}
+
+.domain {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 0.5rem;
+
+  .title {
+    font-size: 16px;
+    margin-right: 1rem;
+
+    &:not(.disabled) {
+      &:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .primaryset {
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .verified,
+  .primary {
+    color: var(--color-main);
+    margin-right: 1rem;
+  }
+
+  .verify-btn {
+    font-size: 13px;
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .rem-button {
+    visibility: hidden;
+  }
+
+  &:hover {
+    .rem-button {
+      visibility: visible;
+      transition: none;
+    }
+  }
+}

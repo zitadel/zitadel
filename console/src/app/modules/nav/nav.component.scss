@@ -50,6 +50,13 @@
         font-weight: 500;
         margin: 0.25rem 0;
 
+        .c_label {
+          .count {
+            display: none;
+            margin-left: 6px;
+          }
+        }
+
         &:hover {
           background: if($is-dark-theme, #ffffff40, #00000010);
         }
@@ -57,11 +64,11 @@
         &.active {
           background-color: $primary-color;
           color: mat.get-color-from-palette($foreground, toolbar-items) !important;
-        }
 
-        .c_label {
-          .count {
-            margin-left: 6px;
+          .c_label {
+            .count {
+              display: inline-block;
+            }
           }
         }
       }

@@ -1,88 +1,56 @@
-.h1 {
-  margin: 0;
+@use '@angular/material' as mat;
+
+@mixin org-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .org-top {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 2rem 2rem 1rem 2rem;
+    background: if($is-dark-theme, #00000020, #ffffff80);
+    // linear-gradient(90deg, #00000000, #00000020 2%, #00000020 98%, #00000000 100%),
+
+    .org-top-row {
+      display: flex;
+      align-items: center;
+      padding-bottom: 1rem;
+
+      .org-title {
+        margin: 0;
+      }
+
+      .org-sub {
+        color: var(--grey);
+        margin: 1rem 0 0 0;
+        font-size: 14px;
+      }
+
+      .org-top-desc {
+        color: var(--grey);
+        font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+    }
+  }
 }
 
-h2 {
+.org-subtitle {
   font-size: 1.2rem;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   margin-top: 2rem;
 }
 
-.top-desc {
-  color: var(--grey);
-  font-size: 14px;
-}
+// .new-desc {
+//   font-size: 14px;
+//   color: var(--grey);
+// }
 
-.sub {
-  color: var(--grey);
-  margin-bottom: 2rem;
-  font-size: 14px;
-}
-
-.icon-button {
-  .icon {
-    font-size: 1.2rem;
-  }
-}
-
-.domain {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-
-  .title {
-    font-size: 16px;
-    margin-right: 1rem;
-
-    &:not(.disabled) {
-      &:hover {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-    }
-  }
-
-  .primaryset {
-    font-size: 13px;
-    cursor: pointer;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .verified,
-  .primary {
-    color: var(--color-main);
-    margin-right: 1rem;
-  }
-
-  .verify-btn {
-    font-size: 13px;
-  }
-
-  .fill-space {
-    flex: 1;
-  }
-
-  .rem-button {
-    visibility: hidden;
-  }
-
-  &:hover {
-    .rem-button {
-      visibility: visible;
-      transition: none;
-    }
-  }
-}
-
-.new-desc {
-  font-size: 14px;
-  color: var(--grey);
-}
-
-.custom-domain-deactivated {
-  margin-bottom: 1rem;
-}
+// .custom-domain-deactivated {
+//   margin-bottom: 1rem;
+// }

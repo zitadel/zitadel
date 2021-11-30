@@ -36,6 +36,44 @@
   </div>
 </div>
 
+<div class="info-row" *ngIf="org">
+  <div class="info">
+    <p class="title">{{ 'ORG.PAGES.STATE' | translate }}</p>
+    <p *ngIf="org && org.state !== undefined" class="state"
+      [ngClass]="{'active': org.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org.state === OrgState.ORG_STATE_INACTIVE}">
+      {{'ORG.STATE.'+org.state
+      | translate}}</p>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'RESOURCEID' | translate }}</p>
+    <p *ngIf="org && org.id" class="desc">{{org.id }}</p>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
+    <p *ngIf="org && org.details && org.details.creationDate" class="desc">{{org.details.creationDate |
+      timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info">
+    <p class="title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
+    <p *ngIf="org && org.details && org.details.changeDate" class="desc">{{org.details.changeDate | timestampToDate
+      | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info width">
+    <p class="title">{{ 'ORG.PAGES.PRIMARYDOMAIN' | translate }}</p>
+    <div class="copy-row" *ngIf="org.primaryDomain">
+      <button [disabled]="copied === org.primaryDomain"
+        [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
+        cnslCopyToClipboard [valueToCopy]="org.primaryDomain" (copiedValue)="copied = $event">
+        {{org.primaryDomain}}
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="info-row" *ngIf="app">
   <div class="info">
     <p class="title">{{ 'APP.PAGES.STATE' | translate }}</p>

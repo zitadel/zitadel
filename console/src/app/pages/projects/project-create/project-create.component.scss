@@ -3,7 +3,7 @@ h1 {
 }
 
 .container {
-  padding: 4rem 4rem 2rem 4rem;
+  padding: 2rem 0 2rem 0;
 
   @media only screen and (max-width: 450px) {
     padding: 4rem 1rem 2rem 1rem;
@@ -28,7 +28,7 @@ h1 {
 }
 
 .margin-right {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .column {
@@ -46,7 +46,7 @@ h1 {
   .slider {
     margin-top: 2rem;
     margin-bottom: 1rem;
-    font-size: .8rem;
+    font-size: 0.8rem;
   }
 
   .access-token {
@@ -57,6 +57,6 @@ h1 {
 .continue-button {
   margin-top: 3rem;
   display: block;
-  padding: .5rem 4rem;
-  border-radius: .5rem;
+  padding: 0.5rem 4rem;
+  border-radius: 0.5rem;
 }

@@ -24,10 +24,18 @@
     .footer-links {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
       grid-gap: 2rem;
       max-width: 80rem;
       margin: 0 auto;
+      grid-template-columns: 1fr;
+
+      @media only screen and (min-width: 699px) {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      @media only screen and (min-width: 1000px) {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
 
       .footer-link-wrapper {
         display: flex;

@@ -112,6 +112,7 @@
     "ORGANIZATION": "Organizzazione",
     "ADMINSECTION": "Amministrazione di ZITADEL",
     "ORGSECTION": "Organizzazione",
+    "DOMAINS": "Domini",
     "PROJECTSSECTION": "Sezione Progetti",
     "PROJECT": "Progetti",
     "GRANTEDPROJECT": "Progetti concessi",
@@ -669,6 +670,7 @@
       "NAME": "Nome",
       "ID": "ID",
       "CREATIONDATE": "Data di creazione",
+      "DATECHANGED": "Cambiato",
       "FILTER": "Filtro",
       "FILTERPLACEHOLDER": "Filtro per il nome",
       "LIST": "Organizzazioni",
@@ -679,7 +681,7 @@
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
       "ORGDOMAIN": {
-        "TITLE": "Verifica della propriet\u00e0 del dominio dell'organizzazione",
+        "TITLE": "Verificazione della propriet\u00e0 del dominio dell'organizzazione",
         "VERIFICATION": "Verifica la propriet\u00e0 del tuo dominio. \u00c8 necessario scaricare un file di verifica e caricarlo all'URL fornito elencato di seguito, o inserire una voce DNS TXT Record per l'URL fornito. Per completare, clicca sul pulsante di verifica.",
         "VERIFICATION_SKIP": "Puoi saltare la verifica per ora e continuare a creare la tua organizzazione, ma per usare la tua organizzazione questo passo deve essere completato!",
         "VERIFICATION_VALIDATION_DESC": "I token sono controllati regolarmente per assicurarsi che tu sia ancora proprietario del dominio.",
@@ -840,7 +842,7 @@
       "DESCRIPTION": "\u00c8 possibile impostare una impostazone per la validità delle password. Questa emette un avviso dopo che il tempo di invecchiamento specifico \u00e8 trascorso."
     },
     "PWD_LOCKOUT": {
-      "TITLE": "Impostazione di blocco",
+      "TITLE": "Impostazioni di blocco",
       "DESCRIPTION": "Imposta un numero massimo di tentativi di password, dopo i quali gli account saranno bloccati."
     },
     "IAM_POLICY": {
@@ -854,7 +856,7 @@
       "ACTIVATEPREVIEW": "Attiva la configurazione"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Impostazione di accesso",
+      "TITLE": "Impostazioni di accesso",
       "DESCRIPTION": "Definisci come gli utenti possono essere autenticati e configura gli Identity Provider",
       "DESCRIPTIONCREATEADMIN": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto.",
       "DESCRIPTIONCREATEMGMT": "Gli utenti possono scegliere tra gli IDP disponibili qui sotto. Nota: puoi usare i provider impostati nel sistema e quelli impostati della tua organizzazione.",
@@ -999,7 +1001,7 @@
   },
   "ORG_DETAIL": {
     "TITLE": "Organizzazione",
-    "DESCRIPTION": "Qui puoi modificare la configurazione della tua organizzazione e gestire i membri.",
+    "DESCRIPTION": "Qui puoi modificare la configurazione della tua organizzazione e gestire le sue membri.",
     "DETAIL": {
       "TITLE": "Dettaglio",
       "NAME": "Nome",
