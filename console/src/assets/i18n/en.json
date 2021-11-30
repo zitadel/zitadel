@@ -1375,6 +1375,7 @@
     "LIST": "Applications",
     "PAGES": {
       "TITLE": "Application",
+      "ID": "ID",
       "DESCRIPTION": "Here you can edit your application data and it's configuration.",
       "CREATE_OIDC": "OIDC Application",
       "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",

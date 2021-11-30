@@ -84,6 +84,11 @@
   </div>
 
   <div class="info">
+    <p class="title">{{ 'APP.PAGES.ID' | translate }}</p>
+    <p *ngIf="app && app.id" class="desc">{{app.id }}</p>
+  </div>
+
+  <div class="info">
     <p class="title">{{ 'APP.PAGES.DATECREATED' | translate }}</p>
     <p *ngIf="app && app.details && app.details.creationDate" class="desc">{{app.details.creationDate | timestampToDate
       | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>

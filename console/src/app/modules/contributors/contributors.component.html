@@ -1,10 +1,6 @@
-<div class="groups">
-  <!-- <span class="co-header">{{ title }}</span>
-  <span class="sub-header">{{ description }} {{'MEMBER.DOCSINFO' | translate}} <a
-      href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">ZITADEL Managers</a>.
-  </span> -->
-  <div class="people" matTooltip="{{ description }} {{'MEMBER.DOCSINFO' | translate}}">
-    <div class="img-list" [@cardAnimation]="totalResult">
+<div class="contributor-groups">
+  <div class="contributor-people" matTooltip="{{ description }} {{'MEMBER.DOCSINFO' | translate}}">
+    <div class="contributor-img-list" [@cardAnimation]="totalResult">
       <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
       <ng-container *ngIf="totalResult < 10; else compact">
         <ng-container *ngFor="let member of membersSubject | async; index as i">

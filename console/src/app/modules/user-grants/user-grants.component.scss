@@ -5,15 +5,16 @@
   .paginator {
     width: 100%;
     background-color: #2d2e30;
+    overflow-x: auto;
 
     td,
     th {
-      padding-left: .5rem;
-      padding-right: .5rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
 
       &:first-child {
         padding-left: 0;
-        padding-right: .5rem;
+        padding-right: 0.5rem;
       }
 
       &:last-child {
@@ -46,11 +47,6 @@
   }
 }
 
-.no-roles {
-  font-size: 13px;
-  color: var(--grey);
-}
-
 .flex-row {
   display: flex;
   flex-direction: row;
@@ -59,7 +55,7 @@
   .role {
     display: flex;
     flex-direction: column;
-    margin: .25rem;
+    margin: 0.25rem;
     font-size: 14px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -72,7 +68,7 @@
   }
 
   button {
-    margin: .5rem 0;
+    margin: 0.5rem 0;
     display: block;
     max-width: 120px;
     box-sizing: border-box;
@@ -102,7 +98,7 @@
 }
 
 .date-block {
-  margin: .5rem 0;
+  margin: 0.5rem 0;
   display: block;
   min-width: 120px;
 

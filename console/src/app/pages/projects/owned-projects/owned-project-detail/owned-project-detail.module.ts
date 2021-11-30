@@ -18,6 +18,7 @@ import { AppCardModule } from 'src/app/modules/app-card/app-card.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { ChangesModule } from 'src/app/modules/changes/changes.module';
 import { ContributorsModule } from 'src/app/modules/contributors/contributors.module';
+import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
@@ -36,12 +37,7 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
 import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
-  declarations: [
-    OwnedProjectDetailComponent,
-    ApplicationGridComponent,
-    ApplicationsComponent,
-    ProjectGrantsComponent,
-  ],
+  declarations: [OwnedProjectDetailComponent, ApplicationGridComponent, ApplicationsComponent, ProjectGrantsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -52,6 +48,7 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
     HasRoleModule,
     MatButtonModule,
     MatIconModule,
+    InfoRowModule,
     ContributorsModule,
     MatTabsModule,
     WarnDialogModule,
@@ -76,4 +73,4 @@ import { ProjectGrantsComponent } from './project-grants/project-grants.componen
     LocalizedDatePipeModule,
   ],
 })
-export class OwnedProjectDetailModule { }
+export class OwnedProjectDetailModule {}

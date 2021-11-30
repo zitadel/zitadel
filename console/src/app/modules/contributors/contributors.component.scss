@@ -1,79 +1,84 @@
-.groups {
-  padding: 1rem 0;
+@use '@angular/material' as mat;
 
-  .people {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    background: #ffffff20;
-    border-radius: 50vw;
-    padding: 6px 9px;
+@mixin contributors-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
 
-    .owner {
-      margin-right: 1rem;
-    }
+  .contributor-groups {
+    padding: 1rem 0;
 
-    .img-list {
-      width: 100%;
-      margin-left: 1rem;
+    .contributor-people {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
+      border-radius: 50vw;
+      padding: 6px 9px;
+      background-color: map-get($background, card);
+      padding-left: 20px;
 
-      .spinner {
-        margin-left: -15px;
-        margin-right: 20px;
-      }
-
-      .add-img {
-        float: left;
-        margin: 0 8px 0 -15px;
-      }
-
-      .fill-space {
-        flex: 1;
-      }
-
-      .refresh-img {
-        float: left;
-        margin: 0 0 0 -15px;
-
-        .icon {
-          font-size: 1.2rem;
-        }
-      }
-
-      .avatar-circle {
-        float: left;
-        margin: 0 8px 0 -15px;
-        height: 32px;
-        width: 32px;
-        border-radius: 50%;
-        -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
-        -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
-        box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
-        cursor: pointer;
+      .contributor-img-list {
+        width: 100%;
+        margin-left: 1rem;
         display: flex;
         align-items: center;
-        justify-content: center;
 
-        .avatar {
-          pointer-events: none;
+        .spinner {
+          margin-left: -15px;
+          margin-right: 20px;
         }
 
-        .sa-icon {
-          display: block;
-          width: 32px;
-          margin: 0 0.5rem;
+        .add-img {
+          float: left;
+          margin: 0 8px 0 -15px;
+        }
 
-          i {
-            margin: auto;
+        .fill-space {
+          flex: 1;
+        }
+
+        .refresh-img {
+          float: left;
+          margin: 0 0 0 -15px;
+
+          .icon {
             font-size: 1.2rem;
           }
         }
-      }
 
-      .margin-neg {
-        margin-left: -1rem;
+        .avatar-circle {
+          float: left;
+          margin: 0 8px 0 -15px;
+          height: 32px;
+          width: 32px;
+          border-radius: 50%;
+          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .avatar {
+            pointer-events: none;
+          }
+
+          .sa-icon {
+            display: block;
+            width: 32px;
+            margin: 0 0.5rem;
+
+            i {
+              margin: auto;
+              font-size: 1.2rem;
+            }
+          }
+        }
+
+        .margin-neg {
+          margin-left: -1rem;
+        }
       }
     }
   }

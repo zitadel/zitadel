@@ -1,18 +1,18 @@
-<div class="card" [ngClass]="{'nomargin': nomargin}">
-    <div *ngIf="title || description" class="header" [ngClass]="{'bottom-margin': expanded}">
-        <div *ngIf="title" class="row">
-            <h2 class="title">{{title}}</h2>
-            <span class="fill-space"></span>
-            <ng-content select="[card-actions]"></ng-content>
-            <button class="button" type="button" matTooltip="Expand or collapse" mat-icon-button
-                (click)="expanded = !expanded">
-                <mat-icon *ngIf="!expanded">keyboard_arrow_down</mat-icon>
-                <mat-icon *ngIf="expanded">keyboard_arrow_up</mat-icon>
-            </button>
-        </div>
-        <p *ngIf="description" class="desc">{{description}}</p>
+<div class="card" [ngClass]="{'nomargin': nomargin, 'stretch': stretch}">
+  <div *ngIf="title || description" class="header" [ngClass]="{'bottom-margin': expanded}">
+    <div *ngIf="title" class="row">
+      <h2 class="title">{{title}}</h2>
+      <span class="fill-space"></span>
+      <ng-content select="[card-actions]"></ng-content>
+      <button class="button" type="button" matTooltip="Expand or collapse" mat-icon-button
+        (click)="expanded = !expanded">
+        <mat-icon *ngIf="!expanded">keyboard_arrow_down</mat-icon>
+        <mat-icon *ngIf="expanded">keyboard_arrow_up</mat-icon>
+      </button>
     </div>
-    <div class="card-content" *ngIf="expanded" [@openClose]="animate">
-        <ng-content></ng-content>
-    </div>
+    <p *ngIf="description" class="desc">{{description}}</p>
+  </div>
+  <div class="card-content" *ngIf="expanded" [@openClose]="animate">
+    <ng-content></ng-content>
+  </div>
 </div>

@@ -1375,6 +1375,7 @@
     "LIST": "Apps",
     "PAGES": {
       "TITLE": "Anwendung",
+      "ID": "ID",
       "DESCRIPTION": "Hier kannst Du Deine Applikationen bearbeiten und deren Konfiguration anpassen.",
       "CREATE_OIDC": "OIDC-Anwendung",
       "CREATE_OIDC_DESC_TITLE": "Gebe die Daten der Anwendung Schritt für Schritt ein.",

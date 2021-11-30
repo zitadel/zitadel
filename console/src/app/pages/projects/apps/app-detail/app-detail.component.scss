@@ -1,3 +1,63 @@
+@use '@angular/material' as mat;
+
+@mixin app-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .app-top {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 2rem 2rem 2rem 2rem;
+    background: if($is-dark-theme, #00000020, #ffffff80);
+    // linear-gradient(90deg, #00000000, #00000020 2%, #00000020 98%, #00000000 100%),
+
+    .app-top-row {
+      display: flex;
+      align-items: center;
+      padding-bottom: 1rem;
+
+      .app-title-wrapper {
+        display: flex;
+        align-items: center;
+
+        .app-title {
+          margin: 0;
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .app-sub {
+        color: var(--grey);
+        margin: 1rem 0 0 0;
+        font-size: 14px;
+      }
+
+      .app-top-desc {
+        color: var(--grey);
+        font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .actions-trigger {
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        margin-right: 2rem;
+
+        .icon {
+          margin-left: 0.5rem;
+          margin-right: -0.5rem;
+        }
+      }
+    }
+  }
+}
+
 .head {
   display: flex;
   align-items: center;
@@ -20,7 +80,7 @@
 
     span {
       font-size: 14px;
-      margin: .5rem 0;
+      margin: 0.5rem 0;
       color: var(--grey);
     }
   }
@@ -32,7 +92,7 @@
   .desc {
     width: 100%;
     display: block;
-    font-size: .9rem;
+    font-size: 0.9rem;
     color: var(--grey);
     margin-top: 1.5rem;
   }
@@ -43,13 +103,13 @@
   }
 
   .actions-trigger {
-    margin-top: .25rem;
+    margin-top: 0.25rem;
     display: flex;
     align-items: center;
 
     .icon {
-      margin-left: .5rem;
-      margin-right: -.5rem;
+      margin-left: 0.5rem;
+      margin-right: -0.5rem;
     }
   }
 }
@@ -61,7 +121,7 @@
 
 .compliance .problem {
   font-size: 14px;
-  margin-bottom: .5rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
@@ -75,7 +135,7 @@
     outline: none;
     margin-top: 1rem;
     margin-right: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
 
     * {
       outline: none;
@@ -93,11 +153,11 @@
 
 .docs-line {
   flex-basis: 100%;
-  margin: .5rem 0;
+  margin: 0.5rem 0;
 
   p {
     margin: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
 
   p:last-child {
@@ -112,7 +172,7 @@
 
   .rt {
     margin-top: 2.3rem;
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
@@ -122,12 +182,12 @@
   .expandable {
     display: block;
     width: 100%;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
 
     .title {
       margin: 0;
       text-transform: uppercase;
-      letter-spacing: .05em;
+      letter-spacing: 0.05em;
       font-size: 14px;
     }
 
@@ -137,7 +197,7 @@
       align-items: flex-start;
 
       .devmode {
-        margin: 1rem 0 .5rem 0;
+        margin: 1rem 0 0.5rem 0;
       }
     }
 
@@ -145,12 +205,12 @@
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      margin: 0 -.5rem;
+      margin: 0 -0.5rem;
       padding-bottom: 2rem;
 
       .redirect-section {
         flex: 1;
-        margin: 0 .5rem;
+        margin: 0 0.5rem;
       }
     }
 
@@ -168,7 +228,7 @@
 
 .formfield {
   flex: 1 1 30%;
-  margin: 0 .5rem;
+  margin: 0 0.5rem;
 
   &.full-width {
     flex-basis: 100%;
@@ -181,19 +241,19 @@
 
 .full-width {
   flex-basis: 100%;
-  margin-left: .5rem;
-  margin-right: .5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .clockskew-title {
   font-size: 14px;
   color: var(--grey);
-  margin: 1rem .5rem 0 .5rem;
+  margin: 1rem 0.5rem 0 0.5rem;
 }
 
 .clockskew-slider {
   width: 100%;
-  margin: 0 .5rem;
+  margin: 0 0.5rem;
 }
 
 .desc {
@@ -205,7 +265,7 @@
 .error {
   font-size: 13px;
   color: var(--warn);
-  margin: 0 .5rem 1.5rem .5rem;
+  margin: 0 0.5rem 1.5rem 0.5rem;
 }
 
 .btn-container {
@@ -216,7 +276,7 @@
 
 .divider {
   flex-basis: 100%;
-  margin: 1.5rem .5rem;
+  margin: 1.5rem 0.5rem;
   height: 1px;
-  background-color: rgba(#8795a1, .2);
+  background-color: rgba(#8795a1, 0.2);
 }

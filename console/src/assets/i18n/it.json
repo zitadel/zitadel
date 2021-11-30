@@ -1375,6 +1375,7 @@
     "LIST": "Applicazioni",
     "PAGES": {
       "TITLE": "Applicazione",
+      "ID": "ID",
       "DESCRIPTION": "Qui puoi modificare i dati della tua applicazione e la sua configurazione.",
       "CREATE_OIDC": "Applicazione OIDC",
       "CREATE_OIDC_DESC_TITLE": "Inserisci i dettagli della tua applicazione passo dopo passo",

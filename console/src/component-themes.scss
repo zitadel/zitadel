@@ -17,6 +17,8 @@
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/orgs/org-detail/org-detail.component';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
+@import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
+@import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-list/granted-project-grid/granted-project-grid.component';
@@ -45,10 +47,12 @@
   @include app-card-theme($theme);
   @include membership-theme($theme);
   @include changes-theme($theme);
+  @include owned-project-detail-theme($theme);
   @include theme-card($theme);
   @include input-theme($theme);
   @include cnsl-form-field-theme($theme);
-  @include contributor-theme($theme);
+  @include contributors-theme($theme);
+  @include app-detail-theme($theme);
   @include cnsl-label-theme($theme);
   @include cnsl-error-theme($theme);
   @include link-theme($theme);
