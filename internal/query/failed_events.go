@@ -61,12 +61,7 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3j99J", "Errors.Internal")
 	}
-	failedEvents, err = scan(rows)
-	if err != nil {
-		return nil, err
-	}
-	failedEvents.LatestSequence, err = q.latestSequence(ctx, failedEventsTable)
-	return failedEvents, err
+	return scan(rows)
 }
 
 func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, sequence uint64) (err error) {
