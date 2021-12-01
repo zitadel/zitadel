@@ -65,19 +65,16 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	key, err := o.query.GetAuthNKeyByID(ctx, keyID, "")
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
 	if err != nil {
 		return nil, err
 	}
-	if key.Identifier != issuer {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
-	}
-	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
+	publicKey, err := crypto.BytesToPublicKey(publicKeyData)
 	if err != nil {
 		return nil, err
 	}
 	return &jose.JSONWebKey{
-		KeyID: key.ID,
+		KeyID: keyID,
 		Use:   "sig",
 		Key:   publicKey,
 	}, nil
