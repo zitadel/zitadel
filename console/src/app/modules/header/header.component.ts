@@ -6,6 +6,7 @@ import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -33,6 +34,7 @@ export class HeaderComponent implements OnDestroy {
     public authenticationService: AuthenticationService,
     private authService: GrpcAuthService,
     public mgmtService: ManagementService,
+    public breadcrumbService: BreadcrumbService,
   ) {
     this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
       this.loadOrgs(value.trim().toLowerCase());

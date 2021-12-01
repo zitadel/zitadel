@@ -1,42 +1,92 @@
-.head {
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  padding-bottom: 2rem;
+@use '@angular/material' as mat;
 
-  a {
-    display: block;
-    margin-right: 2rem;
-  }
+@mixin user-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
 
-  .head-row {
-    display: flex;
-    flex-direction: column;
+  .user-container {
+    padding-top: 1rem;
+    display: grid;
+    position: relative;
+    grid-template-columns: 1fr;
 
-    h1 {
-      margin: 0;
-      margin-right: 1rem;
+    .user-settings-list {
+      position: relative;
+
+      .user-sticky-rel {
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 50px;
+        padding: 1rem 2rem 1rem 0;
+
+        .setting-list-element {
+          border: none;
+          background: none;
+          text-align: left;
+          padding: 0.75rem 0;
+          opacity: 0.6;
+          font-size: 15px;
+          cursor: pointer;
+          color: map-get($foreground, base);
+
+          &:hover {
+            opacity: 1;
+          }
+
+          &.active {
+            font-weight: 600;
+            opacity: 1;
+          }
+        }
+      }
     }
 
-    p {
-      margin: .5rem 0;
-      font-size: 14px;
-      color: var(--grey);
+    @media only screen and (min-width: 824px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+
+      .user-settings {
+        grid-column-start: 2;
+        grid-column-end: 5;
+      }
     }
   }
 
-  .fill-space {
-    flex: 1;
-  }
+  .user-top {
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 0 2rem 1rem 2rem;
+    background-color: if($is-dark-theme, #00000020, #ffffff80);
 
-  .actions-trigger {
-    margin-top: .25rem;
-    display: flex;
-    align-items: center;
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 2rem 0;
 
-    .icon {
-      margin-left: .5rem;
-      margin-right: -.5rem;
+      .text {
+        flex: 1;
+
+        .user-title-wrapper {
+          display: flex;
+          align-items: center;
+
+          a {
+            margin-right: 1rem;
+          }
+
+          .user-title {
+            margin: 0;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+
+      .theme {
+        min-width: 250px;
+      }
     }
   }
 }

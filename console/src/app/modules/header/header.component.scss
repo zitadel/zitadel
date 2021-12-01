@@ -89,6 +89,28 @@
         }
       }
 
+      .breadcrumb-context {
+        display: flex;
+        align-items: center;
+
+        .breadcrumb-link {
+          font-size: 14px;
+          color: map-get($foreground, base);
+          text-decoration: none;
+          padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+          height: 2.5rem;
+          border-radius: 6px;
+          box-sizing: border-box;
+          display: flex;
+          align-items: center;
+          transition: all ease 0.1s;
+
+          &:hover {
+            background-color: if($is-dark-theme, #ffffff10, #00000010);
+          }
+        }
+      }
+
       .logo {
         max-height: 40px;
         width: 40px;

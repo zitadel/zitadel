@@ -4,8 +4,8 @@
       <div>
         <div class="org-title-row">
           <h1 class="org-title">{{org?.name}}</h1>
-          <div class="org-state-dot" matTooltip="{{'ORG.STATE.'+org.state | translate}}"
-            [ngClass]="{'active': org.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org.state === OrgState.ORG_STATE_INACTIVE }">
+          <div class="org-state-dot" matTooltip="{{'ORG.STATE.'+org?.state | translate}}"
+            [ngClass]="{'active': org?.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org?.state === OrgState.ORG_STATE_INACTIVE }">
           </div>
         </div>
         <p class="org-sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
@@ -29,7 +29,7 @@
     </ng-container>
 
     <ng-template cnslHasRole [hasRole]="['policy.read']">
-      <cnsl-policy-grid [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
+      <cnsl-policy-grid class="policies" [type]="PolicyComponentServiceType.MGMT"></cnsl-policy-grid>
     </ng-template>
 
     <div metainfo>

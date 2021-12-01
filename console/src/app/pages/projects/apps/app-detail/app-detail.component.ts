@@ -33,6 +33,7 @@ import {
   UpdateAPIAppConfigRequest,
   UpdateOIDCAppConfigRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -133,6 +134,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private authService: GrpcAuthService,
     private router: Router,
     private snackbar: MatSnackBar,
+    private breadcrumbService: BreadcrumbService,
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }, []],
@@ -188,6 +190,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.breadcrumbService.setBreadcrumb([]);
   }
 
   private initLinks(): void {
@@ -229,6 +232,23 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           .then((app) => {
             if (app.app) {
               this.app = app.app;
+
+              const breadcrumbs = [
+                new Breadcrumb({
+                  type: BreadcrumbType.PROJECT,
+                  name: projectId,
+                  param: { key: 'projectid', value: projectId },
+                  routerLink: ['/projects', projectId],
+                }),
+                new Breadcrumb({
+                  type: BreadcrumbType.PROJECT,
+                  name: app.app.name,
+                  param: { key: 'appid', value: appId },
+                  routerLink: ['/projects', projectId, 'apps', appId],
+                }),
+              ];
+              this.breadcrumbService.setBreadcrumb(breadcrumbs);
+
               if (this.app.oidcConfig) {
                 this.getAuthMethodOptions('OIDC');
 

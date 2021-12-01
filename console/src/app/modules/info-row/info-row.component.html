@@ -1,31 +1,32 @@
 <div class="info-row" *ngIf="user">
-  <div class="info">
-    <p class="title">{{ 'USER.PAGES.STATE' | translate }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.PAGES.STATE' | translate }}</p>
     <p *ngIf="user && user.state !== undefined" class="state"
       [ngClass]="{'active': user.state === UserState.USER_STATE_ACTIVE, 'inactive': user.state === UserState.USER_STATE_INACTIVE}">
       {{'USER.DATA.STATE'+user.state
       | translate}}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'USER.ID' | translate }}</p>
-    <p *ngIf="user && user.id" class="desc">{{user.id }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.ID' | translate }}</p>
+    <p *ngIf="user && user.id" class="info-row-desc">{{user.id }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
-    <p *ngIf="user && user.details && user.details.creationDate" class="desc">{{user.details.creationDate |
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.DETAILS.DATECREATED' | translate }}</p>
+    <p *ngIf="user && user.details && user.details.creationDate" class="info-row-desc">{{user.details.creationDate |
       timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'USER.DETAILS.DATECHANGED' | translate }}</p>
-    <p *ngIf="user && user.details && user.details.changeDate" class="desc">{{user.details.changeDate | timestampToDate
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'USER.DETAILS.DATECHANGED' | translate }}</p>
+    <p *ngIf="user && user.details && user.details.changeDate" class="info-row-desc">{{user.details.changeDate |
+      timestampToDate
       | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info width">
-    <p class="title">{{ 'USER.PAGES.LOGINNAMES' | translate }}</p>
+  <div class="info-wrapper width">
+    <p class="info-row-title">{{ 'USER.PAGES.LOGINNAMES' | translate }}</p>
     <div class="copy-row" *ngFor="let login of user?.loginNamesList">
       <button [disabled]="copied === login"
         [matTooltip]="(copied !== login ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate" cnslCopyToClipboard
@@ -37,33 +38,34 @@
 </div>
 
 <div class="info-row" *ngIf="org">
-  <div class="info">
-    <p class="title">{{ 'ORG.PAGES.STATE' | translate }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'ORG.PAGES.STATE' | translate }}</p>
     <p *ngIf="org && org.state !== undefined" class="state"
       [ngClass]="{'active': org.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org.state === OrgState.ORG_STATE_INACTIVE}">
       {{'ORG.STATE.'+org.state
       | translate}}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'RESOURCEID' | translate }}</p>
-    <p *ngIf="org && org.id" class="desc">{{org.id }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p *ngIf="org && org.id" class="info-row-desc">{{org.id }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
-    <p *ngIf="org && org.details && org.details.creationDate" class="desc">{{org.details.creationDate |
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'ORG.PAGES.CREATIONDATE' | translate }}</p>
+    <p *ngIf="org && org.details && org.details.creationDate" class="info-row-desc">{{org.details.creationDate |
       timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
-    <p *ngIf="org && org.details && org.details.changeDate" class="desc">{{org.details.changeDate | timestampToDate
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'ORG.PAGES.DATECHANGED' | translate }}</p>
+    <p *ngIf="org && org.details && org.details.changeDate" class="info-row-desc">{{org.details.changeDate |
+      timestampToDate
       | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info width">
-    <p class="title">{{ 'ORG.PAGES.PRIMARYDOMAIN' | translate }}</p>
+  <div class="info-wrapper width">
+    <p class="info-row-title">{{ 'ORG.PAGES.PRIMARYDOMAIN' | translate }}</p>
     <div class="copy-row" *ngIf="org.primaryDomain">
       <button [disabled]="copied === org.primaryDomain"
         [matTooltip]="(copied !== org.primaryDomain ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
@@ -74,34 +76,66 @@
   </div>
 </div>
 
+<div class="info-row" *ngIf="project">
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.STATE.TITLE' | translate }}</p>
+    <p *ngIf="project && project.state !== undefined" class="state"
+      [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE}">
+      {{'PROJECT.STATE.'+project.state
+      | translate}}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p *ngIf="project && project.id" class="info-row-desc">{{project.id }}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
+    <p *ngIf="project && project.details && project.details.creationDate" class="info-row-desc">
+      {{project.details.creationDate |
+      timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}</p>
+    <p *ngIf="project && project.details && project.details.changeDate" class="info-row-desc">
+      {{project.details.changeDate |
+      timestampToDate
+      | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+</div>
+
 <div class="info-row" *ngIf="app">
-  <div class="info">
-    <p class="title">{{ 'APP.PAGES.STATE' | translate }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'APP.PAGES.STATE' | translate }}</p>
     <p *ngIf="app && app.state !== undefined" class="state"
       [ngClass]="{'active': app.state === AppState.APP_STATE_ACTIVE, 'inactive': app.state === AppState.APP_STATE_INACTIVE}">
       {{'APP.PAGES.DETAIL.STATE.'+app.state
       | translate}}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'APP.PAGES.ID' | translate }}</p>
-    <p *ngIf="app && app.id" class="desc">{{app.id }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'APP.PAGES.ID' | translate }}</p>
+    <p *ngIf="app && app.id" class="info-row-desc">{{app.id }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'APP.PAGES.DATECREATED' | translate }}</p>
-    <p *ngIf="app && app.details && app.details.creationDate" class="desc">{{app.details.creationDate | timestampToDate
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'APP.PAGES.DATECREATED' | translate }}</p>
+    <p *ngIf="app && app.details && app.details.creationDate" class="info-row-desc">{{app.details.creationDate |
+      timestampToDate
       | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'APP.PAGES.DATECHANGED' | translate }}</p>
-    <p *ngIf="app && app.details && app.details.changeDate" class="desc">{{app.details.changeDate | timestampToDate |
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'APP.PAGES.DATECHANGED' | translate }}</p>
+    <p *ngIf="app && app.details && app.details.changeDate" class="info-row-desc">{{app.details.changeDate |
+      timestampToDate |
       localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'APP.OIDC.INFO.CLIENTID' | translate }}</p>
     <div class="copy-row" *ngIf="app?.oidcConfig?.clientId">
       <button *ngIf="app.oidcConfig && app.oidcConfig?.clientId" [disabled]="copied === app.oidcConfig?.clientId"
         [matTooltip]="(copied !== app.oidcConfig?.clientId ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
@@ -119,8 +153,8 @@
     </div>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'APP.PAGES.URLS' | translate }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'APP.PAGES.URLS' | translate }}</p>
     <div class="copy-row" *ngFor="let environmentV of (environmentMap | keyvalue)">
       <div *ngIf="environmentV.value" class="environment">
         <span class="key">{{environmentV.key}}</span>
@@ -135,8 +169,8 @@
 </div>
 
 <div class="info-row" *ngIf="idp">
-  <div class="info width">
-    <p class="title">{{ 'IDP.ID' | translate }}</p>
+  <div class="info-wrapper width">
+    <p class="info-row-title">{{ 'IDP.ID' | translate }}</p>
     <div class="copy-row">
       <button [disabled]="copied === idp.id"
         [matTooltip]="(copied !== idp.id ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate" cnslCopyToClipboard
@@ -146,20 +180,22 @@
     </div>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'IDP.DETAIL.DATECREATED' | translate }}</p>
-    <p class="desc" *ngIf="idp && idp.details && idp.details.creationDate">{{idp.details.creationDate | timestampToDate
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'IDP.DETAIL.DATECREATED' | translate }}</p>
+    <p class="info-row-desc" *ngIf="idp && idp.details && idp.details.creationDate">{{idp.details.creationDate |
+      timestampToDate
       | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'IDP.DETAIL.DATECHANGED' | translate }}</p>
-    <p class="desc" *ngIf="idp && idp.details && idp.details.changeDate">{{idp.details.changeDate | timestampToDate |
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'IDP.DETAIL.DATECHANGED' | translate }}</p>
+    <p class="info-row-desc" *ngIf="idp && idp.details && idp.details.changeDate">{{idp.details.changeDate |
+      timestampToDate |
       localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
   </div>
 
-  <div class="info">
-    <p class="title">{{ 'IDP.STATE' | translate }}</p>
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'IDP.STATE' | translate }}</p>
     <p *ngIf="idp && idp.state !== undefined" class="state"
       [ngClass]="{'active': idp.state === IDPState.IDP_STATE_ACTIVE, 'inactive': idp.state === IDPState.IDP_STATE_INACTIVE}">
       {{'IDP.STATES.'+idp.state

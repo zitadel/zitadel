@@ -17,6 +17,12 @@ import { ToastService } from 'src/app/services/toast.service';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 
+interface UserSetting {
+  id: string;
+  i18nKey: string;
+  featureRequired: string[] | false;
+}
+
 @Component({
   selector: 'cnsl-user-detail',
   templateUrl: './user-detail.component.html',
@@ -41,6 +47,13 @@ export class UserDetailComponent implements OnInit {
 
   public error: string = '';
 
+  public settingsList: UserSetting[] = [
+    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
+    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
+    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
+  ];
+  public currentSetting: UserSetting = this.settingsList[0];
+
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
@@ -60,6 +73,24 @@ export class UserDetailComponent implements OnInit {
         .then((resp) => {
           if (resp.user) {
             this.user = resp.user;
+
+            if (this.user.human) {
+              this.settingsList = [
+                { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
+                { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false },
+                { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false },
+                { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false },
+                { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
+                { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
+              ];
+            } else if (this.user.machine) {
+              this.settingsList = [
+                { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
+                { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false },
+                { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
+                { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
+              ];
+            }
           }
         })
         .catch((err) => {

@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -18,17 +18,20 @@ import { ListAppsResponse, UpdateProjectRequest } from 'src/app/proto/generated/
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { PrivateLabelingSetting, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { NameDialogComponent } from '../../../../modules/name-dialog/name-dialog.component';
+
+const ROUTEPARAM = 'projectid';
 
 @Component({
   selector: 'cnsl-owned-project-detail',
   templateUrl: './owned-project-detail.component.html',
   styleUrls: ['./owned-project-detail.component.scss'],
 })
-export class OwnedProjectDetailComponent implements OnInit {
+export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
   public projectId: string = '';
   public project!: Project.AsObject;
 
@@ -61,14 +64,19 @@ export class OwnedProjectDetailComponent implements OnInit {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
+    private breadcrumbService: BreadcrumbService,
   ) {}
 
   public ngOnInit(): void {
-    const projectId = this.route.snapshot.paramMap.get('projectid');
+    const projectId = this.route.snapshot.paramMap.get(ROUTEPARAM);
     if (projectId) {
       this.projectId = projectId;
       this.getData(projectId);
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.breadcrumbService.setBreadcrumb([]);
   }
 
   public openNameDialog(): void {
@@ -116,6 +124,16 @@ export class OwnedProjectDetailComponent implements OnInit {
       .then((resp) => {
         if (resp.project) {
           this.project = resp.project;
+
+          const breadcrumbs = [
+            new Breadcrumb({
+              type: BreadcrumbType.PROJECT,
+              name: resp.project.name,
+              param: { key: ROUTEPARAM, value: projectId },
+              routerLink: ['/projects', projectId],
+            }),
+          ];
+          this.breadcrumbService.setBreadcrumb(breadcrumbs);
         }
       })
       .catch((error) => {

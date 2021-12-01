@@ -200,6 +200,7 @@
       "GENERAL": "Allgemein",
       "IDP": "Identity Provider",
       "MFA": "Multifactor Authentication",
+      "KEYS": "Schlüssel",
       "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "METADATA": "Metadata"

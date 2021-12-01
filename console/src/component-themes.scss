@@ -20,6 +20,7 @@
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
+@import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-list/granted-project-grid/granted-project-grid.component';
 @import 'src/app/app.component.scss';
@@ -57,6 +58,7 @@
   @include cnsl-error-theme($theme);
   @include link-theme($theme);
   @include auth-user-detail-theme($theme);
+  @include user-detail-theme($theme);
   @include org-detail-theme($theme);
   @include meta-theme($theme);
   @include info-section-theme($theme);

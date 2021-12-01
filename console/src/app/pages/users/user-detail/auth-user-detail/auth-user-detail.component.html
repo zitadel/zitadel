@@ -3,7 +3,8 @@
     <div class="header-row">
       <div class="text">
         <h1 class="h1">
-          <span *ngIf="user.human?.profile?.displayName; else defTitle">{{user.human?.profile?.displayName}}</span>
+          <span
+            *ngIf="user && user.human?.profile?.displayName; else defTitle">{{user.human?.profile?.displayName}}</span>
           <ng-template #defTitle>{{ 'USER.TITLE' | translate }}</ng-template>
         </h1>
         <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>

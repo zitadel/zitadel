@@ -8,7 +8,8 @@
           </a>
           <div class="project-title-row">
             <h2 class="project-title">{{project?.name}}</h2>
-            <div class="project-state-dot" matTooltip="{{'ORG.STATE.'+project.state | translate}}"
+            <div class="project-state-dot" *ngIf="project && project.state !== undefined"
+              matTooltip="{{'ORG.STATE.'+project.state | translate}}"
               [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE }">
             </div>
           </div>
