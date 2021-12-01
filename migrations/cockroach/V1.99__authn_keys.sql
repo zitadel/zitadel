@@ -10,6 +10,7 @@ CREATE TABLE zitadel.projections.authn_keys(
     , identifier STRING NOT NULL
     , public_key BYTES NOT NULL
     , enabled BOOLEAN NOT NULL DEFAULT true
+    , type INT2 NOT NULL DEFAULT 0
 
     , PRIMARY KEY (id)
 );
