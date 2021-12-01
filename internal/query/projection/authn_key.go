@@ -22,18 +22,14 @@ const (
 	AuthNKeyTable            = "zitadel.projections.authn_keys"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
-	AuthNKeyChangeDateCol    = "change_date"
 	AuthNKeyResourceOwnerCol = "resource_owner"
 	AuthNKeyAggregateIDCol   = "aggregate_id"
 	AuthNKeySequenceCol      = "sequence"
 	AuthNKeyObjectIDCol      = "object_id"
 	AuthNKeyExpirationCol    = "expiration"
-)
-
-const (
-	AuthNKeyPublicIDCol         = "key_id"
-	AuthNKeyPublicIdentifierCol = "identifier"
-	AuthNKeyPublicKeyCol        = "key"
+	AuthNKeyIdentifierCol    = "identifier"
+	AuthNKeyPublicKeyCol     = "public_key"
+	AuthNKeyEnabledCol       = "enabled"
 )
 
 type AuthNKeyProjection struct {
@@ -63,11 +59,11 @@ func (p *AuthNKeyProjection) reducers() []handler.AggregateReducer {
 				},
 				{
 					Event:  project.APIConfigChangedType,
-					Reduce: p.reduceAuthNKeyRemoved,
+					Reduce: p.reduceAuthNKeyEnabledChanged,
 				},
 				{
 					Event:  project.OIDCConfigChangedType,
-					Reduce: p.reduceAuthNKeyRemoved,
+					Reduce: p.reduceAuthNKeyEnabledChanged,
 				},
 				{
 					Event:  project.ApplicationRemovedType,
@@ -100,51 +96,75 @@ func (p *AuthNKeyProjection) reducers() []handler.AggregateReducer {
 }
 
 func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (*handler.Statement, error) {
-	var baseEvent eventstore.BaseEvent
-	var keyID, objectID, identifier string
-	var expiration time.Time
-	var publicKey []byte
+	var authNKeyEvent struct {
+		eventstore.BaseEvent
+		keyID      string
+		objectID   string
+		expiration time.Time
+		identifier string
+		publicKey  []byte
+	}
 	switch e := event.(type) {
 	case *project.ApplicationKeyAddedEvent:
-		baseEvent = e.BaseEvent
-		keyID = e.KeyID
-		objectID = e.AppID
-		expiration = e.ExpirationDate
-		identifier = e.ClientID
-		publicKey = e.PublicKey
+		authNKeyEvent.BaseEvent = e.BaseEvent
+		authNKeyEvent.keyID = e.KeyID
+		authNKeyEvent.objectID = e.AppID
+		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.identifier = e.ClientID
+		authNKeyEvent.publicKey = e.PublicKey
 	case *user.MachineKeyAddedEvent:
-		baseEvent = e.BaseEvent
-		keyID = e.KeyID
-		objectID = e.Aggregate().ID
-		expiration = e.ExpirationDate
-		identifier = e.Aggregate().ID
-		publicKey = e.PublicKey
+		authNKeyEvent.BaseEvent = e.BaseEvent
+		authNKeyEvent.keyID = e.KeyID
+		authNKeyEvent.objectID = e.Aggregate().ID
+		authNKeyEvent.expiration = e.ExpirationDate
+		authNKeyEvent.identifier = e.Aggregate().ID
+		authNKeyEvent.publicKey = e.PublicKey
 	default:
 		logging.LogWithFields("PROJE-Dbr3g", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dgb32", "reduce.wrong.event.type")
 	}
 	return crdb.NewMultiStatement(
-		&baseEvent,
+		&authNKeyEvent,
 		crdb.AddCreateStatement(
 			[]handler.Column{
-				handler.NewCol(AuthNKeyIDCol, keyID),
-				handler.NewCol(AuthNKeyCreationDateCol, baseEvent.CreationDate()),
-				handler.NewCol(AuthNKeyChangeDateCol, baseEvent.CreationDate()),
-				handler.NewCol(AuthNKeyResourceOwnerCol, baseEvent.Aggregate().ResourceOwner),
-				handler.NewCol(AuthNKeyAggregateIDCol, baseEvent.Aggregate().ID),
-				handler.NewCol(AuthNKeySequenceCol, baseEvent.Sequence()),
-				handler.NewCol(AuthNKeyObjectIDCol, objectID),
-				handler.NewCol(AuthNKeyExpirationCol, expiration),
+				handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
+				handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
+				handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
+				handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
+				handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
+				handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
+				handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
+				handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
+				handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
 			},
 		),
-		crdb.AddCreateStatement(
-			[]handler.Column{
-				handler.NewCol(AuthNKeyPublicIDCol, keyID),
-				handler.NewCol(AuthNKeyPublicIdentifierCol, identifier),
-				handler.NewCol(AuthNKeyPublicKeyCol, publicKey),
-			},
-			crdb.WithTableSuffix("public"),
-		),
+	), nil
+}
+
+func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.EventReader) (*handler.Statement, error) {
+	var appID string
+	var enabled bool
+	switch e := event.(type) {
+	case *project.APIConfigChangedEvent:
+		if e.AuthMethodType == nil {
+			return crdb.NewNoOpStatement(event), nil
+		}
+		appID = e.AppID
+		enabled = *e.AuthMethodType == domain.APIAuthMethodTypePrivateKeyJWT
+	case *project.OIDCConfigChangedEvent:
+		if e.AuthMethodType == nil {
+			return crdb.NewNoOpStatement(event), nil
+		}
+		appID = e.AppID
+		enabled = *e.AuthMethodType == domain.OIDCAuthMethodTypePrivateKeyJWT
+	default:
+		logging.LogWithFields("PROJE-Db5u3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dbrt1", "reduce.wrong.event.type")
+	}
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{handler.NewCol(AuthNKeyEnabledCol, enabled)},
+		[]handler.Condition{handler.NewCond(AuthNKeyObjectIDCol, appID)},
 	), nil
 }
 
@@ -153,14 +173,6 @@ func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.EventReader)
 	switch e := event.(type) {
 	case *project.ApplicationKeyRemovedEvent:
 		condition = handler.NewCond(AuthNKeyIDCol, e.KeyID)
-	case *project.APIConfigChangedEvent:
-		if e.AuthMethodType != nil && *e.AuthMethodType != domain.APIAuthMethodTypePrivateKeyJWT {
-			condition = handler.NewCond(AuthNKeyObjectIDCol, e.AppID)
-		}
-	case *project.OIDCConfigChangedEvent:
-		if e.AuthMethodType != nil && *e.AuthMethodType != domain.OIDCAuthMethodTypePrivateKeyJWT {
-			condition = handler.NewCond(AuthNKeyObjectIDCol, e.AppID)
-		}
 	case *project.ApplicationRemovedEvent:
 		condition = handler.NewCond(AuthNKeyObjectIDCol, e.AppID)
 	case *project.ProjectRemovedEvent:
@@ -170,11 +182,9 @@ func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.EventReader)
 	case *user.UserRemovedEvent:
 		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
 	default:
-		logging.LogWithFields("PROJE-Sfdg3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dn41s", "reduce.wrong.event.type")
-	}
-	if condition.Name == "" {
-		return crdb.NewNoOpStatement(event), nil
+		logging.LogWithFields("PROJE-Sfdg3", "seq", event.Sequence(), "expectedTypes",
+			[]eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-BGge42", "reduce.wrong.event.type")
 	}
 	return crdb.NewDeleteStatement(
 		event,

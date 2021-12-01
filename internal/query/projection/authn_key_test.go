@@ -39,22 +39,15 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, change_date, resource_owner, aggregate_id, sequence, object_id, expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"keyId",
-								anyArg{},
 								anyArg{},
 								"ro-id",
 								"agg-id",
 								uint64(15),
 								"appId",
 								anyArg{},
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO zitadel.projections.authn_keys_public (key_id, identifier, key) VALUES ($1, $2, $3)",
-							expectedArgs: []interface{}{
-								"keyId",
 								"clientId",
 								[]byte("publicKey"),
 							},
@@ -81,22 +74,15 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, change_date, resource_owner, aggregate_id, sequence, object_id, expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"keyId",
-								anyArg{},
 								anyArg{},
 								"ro-id",
 								"agg-id",
 								uint64(15),
 								"agg-id",
 								anyArg{},
-							},
-						},
-						{
-							expectedStmt: "INSERT INTO zitadel.projections.authn_keys_public (key_id, identifier, key) VALUES ($1, $2, $3)",
-							expectedArgs: []interface{}{
-								"keyId",
 								"agg-id",
 								[]byte("publicKey"),
 							},
@@ -133,15 +119,35 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceAuthNKeyRemoved api config basic",
+			name: "reduceAuthNKeyEnabledChanged api no change",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationKeyRemovedEventType),
+					repository.EventType(project.APIConfigChangedType),
+					project.AggregateType,
+					[]byte(`{"appId": "appId"}`),
+				), project.APIConfigChangedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyEnabledChanged api config basic",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.APIConfigChangedType),
 					project.AggregateType,
 					[]byte(`{"appId": "appId", "authMethodType": 0}`),
-				), project.ApplicationKeyRemovedEventMapper),
+				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -150,8 +156,9 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (object_id = $1)",
+							expectedStmt: "UPDATE zitadel.projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
+								false,
 								"appId",
 							},
 						},
@@ -160,15 +167,15 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceAuthNKeyRemoved api config basic",
+			name: "reduceAuthNKeyEnabledChanged api config jwt",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(project.ApplicationKeyRemovedEventType),
+					repository.EventType(project.APIConfigChangedType),
 					project.AggregateType,
-					[]byte(`{"appId": "appId", "authMethodType": 0}`),
-				), project.ApplicationKeyRemovedEventMapper),
+					[]byte(`{"appId": "appId", "authMethodType": 1}`),
+				), project.APIConfigChangedEventMapper),
 			},
-			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
 			want: wantReduce{
 				projection:       AuthNKeyTable,
 				aggregateType:    eventstore.AggregateType("project"),
@@ -177,8 +184,9 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (object_id = $1)",
+							expectedStmt: "UPDATE zitadel.projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
 							expectedArgs: []interface{}{
+								true,
 								"appId",
 							},
 						},
@@ -207,6 +215,217 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"keyId",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyEnabledChanged oidc no change",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.OIDCConfigChangedType),
+					project.AggregateType,
+					[]byte(`{"appId": "appId"}`),
+				), project.OIDCConfigChangedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyEnabledChanged oidc config basic",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.OIDCConfigChangedType),
+					project.AggregateType,
+					[]byte(`{"appId": "appId", "authMethodType": 0}`),
+				), project.OIDCConfigChangedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedArgs: []interface{}{
+								false,
+								"appId",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyEnabledChanged oidc config jwt",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.OIDCConfigChangedType),
+					project.AggregateType,
+					[]byte(`{"appId": "appId", "authMethodType": 3}`),
+				), project.OIDCConfigChangedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyEnabledChanged,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.authn_keys SET (enabled) = ($1) WHERE (object_id = $2)",
+							expectedArgs: []interface{}{
+								true,
+								"appId",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyRemoved app key removed",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ApplicationKeyRemovedEventType),
+					project.AggregateType,
+					[]byte(`{"keyId": "keyId"}`),
+				), project.ApplicationKeyRemovedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (id = $1)",
+							expectedArgs: []interface{}{
+								"keyId",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyRemoved app removed",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ApplicationRemovedType),
+					project.AggregateType,
+					[]byte(`{"appId": "appId"}`),
+				), project.ApplicationRemovedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (object_id = $1)",
+							expectedArgs: []interface{}{
+								"appId",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyRemoved project removed",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectRemovedType),
+					project.AggregateType,
+					nil,
+				), project.ProjectRemovedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("project"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (aggregate_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyRemoved machine key removed",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.MachineKeyRemovedEventType),
+					user.AggregateType,
+					[]byte(`{"keyId": "keyId"}`),
+				), user.MachineKeyRemovedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (id = $1)",
+							expectedArgs: []interface{}{
+								"keyId",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceAuthNKeyRemoved user removed",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserRemovedType),
+					user.AggregateType,
+					[]byte(`{"keyId": "keyId"}`),
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyRemoved,
+			want: wantReduce{
+				projection:       AuthNKeyTable,
+				aggregateType:    eventstore.AggregateType("user"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.authn_keys WHERE (aggregate_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
 							},
 						},
 					},
