@@ -48,19 +48,19 @@ func IDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 	return mapped
 }
 
-func ExternalIDPViewsToLoginPolicyLinkPb(links []*iam_model.IDPProviderView) []*idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinksToPb(links []*query.IDPLoginPolicyLink) []*idp_pb.IDPLoginPolicyLink {
 	l := make([]*idp_pb.IDPLoginPolicyLink, len(links))
 	for i, link := range links {
-		l[i] = ExternalIDPViewToLoginPolicyLinkPb(link)
+		l[i] = IDPLoginPolicyLinkToPb(link)
 	}
 	return l
 }
 
-func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinkToPb(link *query.IDPLoginPolicyLink) *idp_pb.IDPLoginPolicyLink {
 	return &idp_pb.IDPLoginPolicyLink{
-		IdpId:   link.IDPConfigID,
-		IdpName: link.Name,
-		IdpType: IDPTypeToPb(link.IDPConfigType),
+		IdpId:   link.IDPID,
+		IdpName: link.IDPName,
+		IdpType: IDPTypeToPb(link.IDPType),
 	}
 }
 
@@ -84,13 +84,13 @@ func IDPUserLinkToPb(link *query.UserIDPLink) *idp_pb.IDPUserLink {
 	}
 }
 
-func IDPTypeToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
 	switch idpType {
-	case iam_model.IDPConfigTypeOIDC:
+	case domain.IDPConfigTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case iam_model.IDPConfigTypeSAML:
+	case domain.IDPConfigTypeSAML:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case iam_model.IDPConfigTypeJWT:
+	case domain.IDPConfigTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
