@@ -4,25 +4,15 @@ import { RoleGuard } from 'src/app/guards/role.guard';
 import { FeatureServiceType } from 'src/app/modules/features/features.component';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
-import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 
 const routes: Routes = [
-  {
-    path: 'create',
-    component: OrgCreateComponent,
-    canActivate: [RoleGuard],
-    data: {
-      roles: ['(org.create)?(iam.write)?'],
-    },
-    loadChildren: () => import('./org-create/org-create.module').then(m => m.OrgCreateModule),
-  },
   {
     path: 'idp',
     children: [
       {
         path: 'create',
-        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then(m => m.IdpCreateModule),
+        loadChildren: () => import('src/app/modules/idp-create/idp-create.module').then((m) => m.IdpCreateModule),
         canActivate: [RoleGuard],
         data: {
           roles: ['org.idp.write'],
@@ -31,7 +21,7 @@ const routes: Routes = [
       },
       {
         path: ':id',
-        loadChildren: () => import('src/app/modules/idp/idp.module').then(m => m.IdpModule),
+        loadChildren: () => import('src/app/modules/idp/idp.module').then((m) => m.IdpModule),
         canActivate: [RoleGuard],
         data: {
           roles: ['org.idp.read'],
@@ -42,7 +32,7 @@ const routes: Routes = [
   },
   {
     path: 'features',
-    loadChildren: () => import('src/app/modules/features/features.module').then(m => m.FeaturesModule),
+    loadChildren: () => import('src/app/modules/features/features.module').then((m) => m.FeaturesModule),
     canActivate: [RoleGuard],
     data: {
       roles: ['features.read'],
@@ -57,78 +47,86 @@ const routes: Routes = [
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/password-age-policy/password-age-policy.module')
-          .then(m => m.PasswordAgePolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/password-age-policy/password-age-policy.module').then(
+            (m) => m.PasswordAgePolicyModule,
+          ),
       },
       {
         path: PolicyComponentType.LOCKOUT,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module')
-          .then(m => m.PasswordLockoutPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/password-lockout-policy/password-lockout-policy.module').then(
+            (m) => m.PasswordLockoutPolicyModule,
+          ),
       },
       {
         path: PolicyComponentType.PRIVATELABEL,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/private-labeling-policy/private-labeling-policy.module')
-          .then(m => m.PrivateLabelingPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/private-labeling-policy/private-labeling-policy.module').then(
+            (m) => m.PrivateLabelingPolicyModule,
+          ),
       },
       {
         path: PolicyComponentType.COMPLEXITY,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module')
-          .then(m => m.PasswordComplexityPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/password-complexity-policy/password-complexity-policy.module').then(
+            (m) => m.PasswordComplexityPolicyModule,
+          ),
       },
       {
         path: PolicyComponentType.IAM,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/org-iam-policy/org-iam-policy.module')
-          .then(m => m.OrgIamPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/org-iam-policy/org-iam-policy.module').then((m) => m.OrgIamPolicyModule),
       },
       {
         path: PolicyComponentType.LOGIN,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/login-policy/login-policy.module')
-          .then(m => m.LoginPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/login-policy/login-policy.module').then((m) => m.LoginPolicyModule),
       },
       {
         path: PolicyComponentType.MESSAGETEXTS,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/message-texts/message-texts.module')
-          .then(m => m.MessageTextsPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/message-texts/message-texts.module').then((m) => m.MessageTextsPolicyModule),
       },
       {
         path: PolicyComponentType.LOGINTEXTS,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/login-texts/login-texts.module')
-          .then(m => m.LoginTextsPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/login-texts/login-texts.module').then((m) => m.LoginTextsPolicyModule),
       },
       {
         path: PolicyComponentType.PRIVACYPOLICY,
         data: {
           serviceType: PolicyComponentServiceType.MGMT,
         },
-        loadChildren: () => import('src/app/modules/policies/privacy-policy/privacy-policy.module')
-          .then(m => m.PrivacyPolicyModule),
+        loadChildren: () =>
+          import('src/app/modules/policies/privacy-policy/privacy-policy.module').then((m) => m.PrivacyPolicyModule),
       },
     ],
   },
   {
     path: 'members',
-    loadChildren: () => import('./org-members/org-members.module').then(m => m.OrgMembersModule),
+    loadChildren: () => import('./org-members/org-members.module').then((m) => m.OrgMembersModule),
   },
   {
     path: '',
@@ -136,7 +134,7 @@ const routes: Routes = [
   },
   {
     path: 'overview',
-    loadChildren: () => import('./org-list/org-list.module').then(m => m.OrgListModule),
+    loadChildren: () => import('./org-list/org-list.module').then((m) => m.OrgListModule),
   },
 ];
 
@@ -144,4 +142,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class OrgsRoutingModule { }
+export class OrgsRoutingModule {}
