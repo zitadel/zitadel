@@ -182,28 +182,29 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 }
 
 func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (*mgmt_pb.GetAppKeyResponse, error) {
-	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.AppId, req.KeyId)
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
+	//req.ProjectId, req.AppId, //TODO: ?
 	return &mgmt_pb.GetAppKeyResponse{
 		Key: authn_grpc.KeyToPb(key),
 	}, nil
 }
 
 func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*mgmt_pb.ListAppKeysResponse, error) {
-	queries, err := ListAPIClientKeysRequestToModel(req)
+	queries, err := ListAPIClientKeysRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	keys, err := s.project.SearchClientKeys(ctx, queries)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppKeysResponse{
-		Result: authn_grpc.KeyViewsToPb(keys.Result),
+		Result: authn_grpc.KeysToPb(keys.AuthNKeys),
 		Details: object_grpc.ToListDetails(
-			keys.TotalResult,
+			keys.Count,
 			keys.Sequence,
 			keys.Timestamp,
 		),
