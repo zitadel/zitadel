@@ -29,6 +29,7 @@ const (
 	AuthNKeyExpirationCol    = "expiration"
 	AuthNKeyIdentifierCol    = "identifier"
 	AuthNKeyPublicKeyCol     = "public_key"
+	AuthNKeyTypeCol          = "type"
 	AuthNKeyEnabledCol       = "enabled"
 )
 
@@ -103,6 +104,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (
 		expiration time.Time
 		identifier string
 		publicKey  []byte
+		keyType    domain.AuthNKeyType
 	}
 	switch e := event.(type) {
 	case *project.ApplicationKeyAddedEvent:
@@ -112,6 +114,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (
 		authNKeyEvent.expiration = e.ExpirationDate
 		authNKeyEvent.identifier = e.ClientID
 		authNKeyEvent.publicKey = e.PublicKey
+		authNKeyEvent.keyType = e.KeyType
 	case *user.MachineKeyAddedEvent:
 		authNKeyEvent.BaseEvent = e.BaseEvent
 		authNKeyEvent.keyID = e.KeyID
@@ -119,6 +122,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (
 		authNKeyEvent.expiration = e.ExpirationDate
 		authNKeyEvent.identifier = e.Aggregate().ID
 		authNKeyEvent.publicKey = e.PublicKey
+		authNKeyEvent.keyType = e.KeyType
 	default:
 		logging.LogWithFields("PROJE-Dbr3g", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dgb32", "reduce.wrong.event.type")
@@ -136,6 +140,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (
 				handler.NewCol(AuthNKeyExpirationCol, authNKeyEvent.expiration),
 				handler.NewCol(AuthNKeyIdentifierCol, authNKeyEvent.identifier),
 				handler.NewCol(AuthNKeyPublicKeyCol, authNKeyEvent.publicKey),
+				handler.NewCol(AuthNKeyTypeCol, authNKeyEvent.keyType),
 			},
 		),
 	), nil
