@@ -332,6 +332,7 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_OWNER_GLOBAL'
       Permissions:
+        - "org.create"
         - "org.global.read"
         - "policy.read"
         - "project.read"
@@ -353,7 +354,6 @@ InternalAuthZ:
         - "user.membership.read"
     - Role: 'PROJECT_OWNER_VIEWER_GLOBAL'
       Permissions:
-        - "org.create"
         - "policy.read"
         - "project.read"
         - "project.member.read"
