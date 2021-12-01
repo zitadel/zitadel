@@ -79,7 +79,7 @@ type AuthNKey struct {
 	ObjectID   string
 	Expiration time.Time
 	Identifier string
-	PublicKey  interface{}
+	PublicKey  []byte
 	Type       domain.AuthNKeyType
 	Enabled    bool
 }

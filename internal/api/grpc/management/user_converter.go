@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -213,9 +212,7 @@ func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachine
 func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.MachineKey {
 	expDate := time.Time{}
 	if req.ExpirationDate != nil {
-		var err error
-		expDate, err = ptypes.Timestamp(req.ExpirationDate)
-		logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+		expDate = req.ExpirationDate.AsTime()
 	}
 
 	return &domain.MachineKey{
