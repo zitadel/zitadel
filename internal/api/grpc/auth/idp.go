@@ -13,7 +13,7 @@ func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinked
 	if err != nil {
 		return nil, err
 	}
-	idps, err := s.query.UserIDPLinks(ctx, q)
+	idps, err := s.query.IDPUserLinks(ctx, q)
 	if err != nil {
 		return nil, err
 	}

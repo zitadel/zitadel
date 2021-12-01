@@ -235,17 +235,17 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 	}
 }
 
-func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.UserIDPLinksSearchQuery, error) {
+func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	userQuery, err := query.NewUserIDPLinksUserIDSearchQuery(req.UserId)
+	userQuery, err := query.NewIDPUserLinksUserIDSearchQuery(req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	resourceOwnerQuery, err := query.NewUserIDPLinksResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	resourceOwnerQuery, err := query.NewIDPUserLinksResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &query.UserIDPLinksSearchQuery{
+	return &query.IDPUserLinksSearchQuery{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
 			Limit:  limit,

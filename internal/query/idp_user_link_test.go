@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	userIDPLinksQuery = regexp.QuoteMeta(`SELECT zitadel.projections.idp_user_links.idp_id,` +
+	idpUserLinksQuery = regexp.QuoteMeta(`SELECT zitadel.projections.idp_user_links.idp_id,` +
 		` zitadel.projections.idp_user_links.user_id,` +
 		` zitadel.projections.idps.name,` +
 		` zitadel.projections.idp_user_links.external_user_id,` +
@@ -21,7 +21,7 @@ var (
 		` COUNT(*) OVER ()` +
 		` FROM zitadel.projections.idp_user_links` +
 		` LEFT JOIN zitadel.projections.idps ON zitadel.projections.idp_user_links.idp_id = zitadel.projections.idps.id`)
-	userIDPLinksCols = []string{
+	idpUserLinksCols = []string{
 		"idp_id",
 		"user_id",
 		"name",
@@ -32,7 +32,7 @@ var (
 	}
 )
 
-func Test_UserIDPLinkPrepares(t *testing.T) {
+func Test_IDPUserLinkPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -45,11 +45,11 @@ func Test_UserIDPLinkPrepares(t *testing.T) {
 	}{
 		{
 			name:    "prepareIDPsQuery found",
-			prepare: prepareUserIDPLinksQuery,
+			prepare: prepareIDPUserLinksQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					userIDPLinksQuery,
-					userIDPLinksCols,
+					idpUserLinksQuery,
+					idpUserLinksCols,
 					[][]driver.Value{
 						{
 							"idp-id",
@@ -62,11 +62,11 @@ func Test_UserIDPLinkPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &UserIDPLinks{
+			object: &IDPUserLinks{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Links: []*UserIDPLink{
+				Links: []*IDPUserLink{
 					{
 						IDPID:            "idp-id",
 						UserID:           "user-id",
@@ -80,11 +80,11 @@ func Test_UserIDPLinkPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareIDPsQuery no idp",
-			prepare: prepareUserIDPLinksQuery,
+			prepare: prepareIDPUserLinksQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					userIDPLinksQuery,
-					userIDPLinksCols,
+					idpUserLinksQuery,
+					idpUserLinksCols,
 					[][]driver.Value{
 						{
 							"idp-id",
@@ -97,11 +97,11 @@ func Test_UserIDPLinkPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &UserIDPLinks{
+			object: &IDPUserLinks{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Links: []*UserIDPLink{
+				Links: []*IDPUserLink{
 					{
 						IDPID:            "idp-id",
 						UserID:           "user-id",
@@ -115,10 +115,10 @@ func Test_UserIDPLinkPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareIDPsQuery sql err",
-			prepare: prepareUserIDPLinksQuery,
+			prepare: prepareIDPUserLinksQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					userIDPLinksQuery,
+					idpUserLinksQuery,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

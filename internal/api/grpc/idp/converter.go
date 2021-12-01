@@ -64,7 +64,7 @@ func IDPLoginPolicyLinkToPb(link *query.IDPLoginPolicyLink) *idp_pb.IDPLoginPoli
 	}
 }
 
-func IDPUserLinksToPb(res []*query.UserIDPLink) []*idp_pb.IDPUserLink {
+func IDPUserLinksToPb(res []*query.IDPUserLink) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
 		links[i] = IDPUserLinkToPb(link)
@@ -72,7 +72,7 @@ func IDPUserLinksToPb(res []*query.UserIDPLink) []*idp_pb.IDPUserLink {
 	return links
 }
 
-func IDPUserLinkToPb(link *query.UserIDPLink) *idp_pb.IDPUserLink {
+func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
 		IdpId:            link.IDPID,
