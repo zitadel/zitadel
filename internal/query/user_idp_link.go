@@ -10,6 +10,33 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
+type UserIDPLink struct {
+	IDPID            string
+	UserID           string
+	IDPName          string
+	ProvidedUserID   string
+	ProvidedUsername string
+	IDPType          domain.IDPConfigType
+}
+
+type UserIDPLinks struct {
+	SearchResponse
+	Links []*UserIDPLink
+}
+
+type UserIDPLinksSearchQuery struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
+func (q *UserIDPLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.toQuery(query)
+	}
+	return query
+}
+
 var (
 	idpUserLinkTable = table{
 		name: projection.IDPUserLinkTable,
@@ -47,33 +74,6 @@ var (
 		table: idpUserLinkTable,
 	}
 )
-
-type UserIDPLink struct {
-	IDPID            string
-	UserID           string
-	IDPName          string
-	ProvidedUserID   string
-	ProvidedUsername string
-	IDPType          domain.IDPConfigType
-}
-
-type UserIDPLinks struct {
-	SearchResponse
-	Links []*UserIDPLink
-}
-
-type UserIDPLinksSearchQuery struct {
-	SearchRequest
-	Queries []SearchQuery
-}
-
-func (q *UserIDPLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	query = q.SearchRequest.toQuery(query)
-	for _, q := range q.Queries {
-		query = q.toQuery(query)
-	}
-	return query
-}
 
 func (q *Queries) UserIDPLinks(ctx context.Context, queries *UserIDPLinksSearchQuery) (idps *UserIDPLinks, err error) {
 	query, scan := prepareUserIDPLinksQuery()

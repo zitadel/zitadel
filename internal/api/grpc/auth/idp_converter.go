@@ -10,7 +10,7 @@ import (
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
-func ListMyLinkedIDPsRequestToModel(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*query.UserIDPLinksSearchQuery, error) {
+func ListMyLinkedIDPsRequestToQuery(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*query.UserIDPLinksSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	q, err := query.NewUserIDPLinksUserIDSearchQuery(authz.GetCtxData(ctx).UserID)
 	if err != nil {

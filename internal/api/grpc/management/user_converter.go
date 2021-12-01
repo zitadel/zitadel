@@ -235,7 +235,7 @@ func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.Remov
 	}
 }
 
-func ListHumanLinkedIDPsRequestToModel(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.UserIDPLinksSearchQuery, error) {
+func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*query.UserIDPLinksSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	userQuery, err := query.NewUserIDPLinksUserIDSearchQuery(req.UserId)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 )
 
 func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*auth_pb.ListMyLinkedIDPsResponse, error) {
-	q, err := ListMyLinkedIDPsRequestToModel(ctx, req)
+	q, err := ListMyLinkedIDPsRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -18,7 +18,7 @@ func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinked
 		return nil, err
 	}
 	return &auth_pb.ListMyLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(idps.Links),
+		Result: idp_grpc.IDPUserLinksToPb(idps.Links),
 		Details: object.ToListDetails(
 			idps.Count,
 			idps.Sequence,
