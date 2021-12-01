@@ -16,8 +16,7 @@
       align-items: center;
       padding-bottom: 1rem;
 
-      .project-title {
-        margin: 0;
+      .project-link-row {
         display: flex;
         align-items: center;
 
@@ -26,8 +25,32 @@
           display: block;
           position: relative;
         }
-      }
 
+        .project-title-row {
+          display: flex;
+          align-items: center;
+
+          .project-title {
+            margin: 0;
+            margin-right: 0.5rem;
+            font-size: 2rem;
+          }
+
+          .project-state-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+
+            &.active {
+              background-color: var(--success);
+            }
+
+            &.inactive {
+              background-color: var(--warn);
+            }
+          }
+        }
+      }
       .project-sub {
         color: var(--grey);
         margin: 1rem 0 0 0;
@@ -49,14 +72,14 @@
       }
 
       .actions-trigger {
-        margin-top: .25rem;
+        margin-top: 0.25rem;
         display: flex;
         align-items: center;
         margin-right: 2rem;
 
         .icon {
-          margin-left: .5rem;
-          margin-right: -.5rem;
+          margin-left: 0.5rem;
+          margin-right: -0.5rem;
         }
       }
     }
@@ -82,7 +105,7 @@
     align-items: center;
 
     .icon-button {
-      margin-left: .5rem;
+      margin-left: 0.5rem;
     }
   }
 }

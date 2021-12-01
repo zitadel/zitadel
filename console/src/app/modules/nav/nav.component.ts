@@ -1,6 +1,7 @@
-import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { ActivatedRoute, ActivationEnd, Router } from '@angular/router';
+import { BehaviorSubject, filter, map, Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -12,7 +13,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
 })
-export class NavComponent implements OnDestroy {
+export class NavComponent implements OnInit, OnDestroy {
   @ViewChild('input', { static: false }) input!: ElementRef;
 
   @Input() public isDarkTheme: boolean = true;
@@ -26,8 +27,30 @@ export class NavComponent implements OnDestroy {
   public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
 
-  constructor(public authenticationService: AuthenticationService, public mgmtService: ManagementService) {
+  constructor(
+    public authenticationService: AuthenticationService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    public mgmtService: ManagementService,
+  ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
+
+    // this.router.events.pipe(takeUntil(this.destroy$)).subscribe((route) => {
+    //   console.log(route);
+    // });
+  }
+
+  ngOnInit(): void {
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof ActivationEnd),
+        map((e) => (e instanceof ActivationEnd ? e.snapshot : {})),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((params) => {
+        console.log(params);
+        // Do whatever you want here!!!!
+      });
   }
 
   public toggleAdminHide(): void {

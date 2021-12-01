@@ -1,10 +1,10 @@
 import { Location } from '@angular/common';
-import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
@@ -27,9 +27,8 @@ import { NameDialogComponent } from '../../../../modules/name-dialog/name-dialog
   selector: 'cnsl-owned-project-detail',
   templateUrl: './owned-project-detail.component.html',
   styleUrls: ['./owned-project-detail.component.scss'],
-
 })
-export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
+export class OwnedProjectDetailComponent implements OnInit {
   public projectId: string = '';
   public project!: Project.AsObject;
 
@@ -42,7 +41,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
   public ChangeType: any = ChangeType;
 
   public grid: boolean = true;
-  private subscription?: Subscription;
 
   public isZitadel: boolean = false;
 
@@ -50,8 +48,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
 
   // members
   public totalMemberResult: number = 0;
-  public membersSubject: BehaviorSubject<Member.AsObject[]>
-    = new BehaviorSubject<Member.AsObject[]>([]);
+  public membersSubject: BehaviorSubject<Member.AsObject[]> = new BehaviorSubject<Member.AsObject[]>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
@@ -64,14 +61,14 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
-  ) { }
+  ) {}
 
   public ngOnInit(): void {
-    this.subscription = this.route.params.subscribe(params => this.getData(params));
-  }
-
-  public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    const projectId = this.route.snapshot.paramMap.get('projectid');
+    if (projectId) {
+      this.projectId = projectId;
+      this.getData(projectId);
+    }
   }
 
   public openNameDialog(): void {
@@ -85,7 +82,7 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(name => {
+    dialogRef.afterClosed().subscribe((name) => {
       if (name) {
         this.project.name = name;
         this.updateName();
@@ -109,41 +106,44 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     });
   }
 
-  private async getData({ id }: Params): Promise<void> {
-    this.projectId = id;
-
-    this.mgmtService.getIAM().then(iam => {
+  private async getData(projectId: string): Promise<void> {
+    this.mgmtService.getIAM().then((iam) => {
       this.isZitadel = iam.iamProjectId === this.projectId;
     });
 
-    this.mgmtService.getProjectByID(id).then(resp => {
-      if (resp.project) {
-        this.project = resp.project;
-      }
-    }).catch(error => {
-      console.error(error);
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .getProjectByID(projectId)
+      .then((resp) => {
+        if (resp.project) {
+          this.project = resp.project;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        this.toast.showError(error);
+      });
 
     this.loadMembers();
   }
 
   public loadMembers(): void {
     this.loadingSubject.next(true);
-    from(this.mgmtService.listProjectMembers(this.projectId, 100, 0)).pipe(
-      map(resp => {
-        if (resp.details?.totalResult) {
-          this.totalMemberResult = resp.details?.totalResult;
-        } else {
-          this.totalMemberResult = 0;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+    from(this.mgmtService.listProjectMembers(this.projectId, 100, 0))
+      .pipe(
+        map((resp) => {
+          if (resp.details?.totalResult) {
+            this.totalMemberResult = resp.details?.totalResult;
+          } else {
+            this.totalMemberResult = 0;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
 
   public changeState(newState: ProjectState): void {
@@ -157,18 +157,20 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         },
         width: '400px',
       });
-      dialogRef.afterClosed().subscribe(resp => {
+      dialogRef.afterClosed().subscribe((resp) => {
         if (resp) {
-          this.mgmtService.reactivateProject(this.projectId).then(() => {
-            this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
-            this.project.state = ProjectState.PROJECT_STATE_ACTIVE;
-            this.refreshChanges$.emit();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          this.mgmtService
+            .reactivateProject(this.projectId)
+            .then(() => {
+              this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
+              this.project.state = ProjectState.PROJECT_STATE_ACTIVE;
+              this.refreshChanges$.emit();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       });
-
     } else if (newState === ProjectState.PROJECT_STATE_INACTIVE) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
         data: {
@@ -179,15 +181,18 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
         },
         width: '400px',
       });
-      dialogRef.afterClosed().subscribe(resp => {
+      dialogRef.afterClosed().subscribe((resp) => {
         if (resp) {
-          this.mgmtService.deactivateProject(this.projectId).then(() => {
-            this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
-            this.project.state = ProjectState.PROJECT_STATE_INACTIVE;
-            this.refreshChanges$.emit();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          this.mgmtService
+            .deactivateProject(this.projectId)
+            .then(() => {
+              this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
+              this.project.state = ProjectState.PROJECT_STATE_INACTIVE;
+              this.refreshChanges$.emit();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       });
     }
@@ -203,17 +208,20 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
       },
       width: '400px',
     });
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.mgmtService.removeProject(this.projectId).then(() => {
-          this.toast.showInfo('PROJECT.TOAST.DELETED', true);
-          const params: Params = {
-            'deferredReload': true,
-          };
-          this.router.navigate(['/projects'], { queryParams: params });
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.mgmtService
+          .removeProject(this.projectId)
+          .then(() => {
+            this.toast.showInfo('PROJECT.TOAST.DELETED', true);
+            const params: Params = {
+              deferredReload: true,
+            };
+            this.router.navigate(['/projects'], { queryParams: params });
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
@@ -227,12 +235,15 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
     req.setHasProjectCheck(this.project.hasProjectCheck);
     req.setPrivateLabelingSetting(this.project.privateLabelingSetting);
 
-    this.mgmtService.updateProject(req).then(() => {
-      this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
-      this.refreshChanges$.emit();
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .updateProject(req)
+      .then(() => {
+        this.toast.showInfo('PROJECT.TOAST.UPDATED', true);
+        this.refreshChanges$.emit();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public navigateBack(): void {
@@ -252,20 +263,22 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const users: User.AsObject[] = resp.users;
         const roles: string[] = resp.roles;
 
         if (users && users.length && roles && roles.length) {
-          users.forEach(user => {
-            return this.mgmtService.addProjectMember(this.projectId, user.id, roles)
+          users.forEach((user) => {
+            return this.mgmtService
+              .addProjectMember(this.projectId, user.id, roles)
               .then(() => {
                 this.toast.showInfo('PROJECT.TOAST.MEMBERADDED', true);
                 setTimeout(() => {
                   this.loadMembers();
                 }, 1000);
-              }).catch(error => {
+              })
+              .catch((error) => {
                 this.toast.showError(error);
               });
           });

@@ -2,11 +2,16 @@
   <div class="max-width-container">
     <div class="project-top-row">
       <div>
-        <div class="project-title">
+        <div class="project-link-row">
           <a class="link" [routerLink]="[ '/projects' ]" mat-icon-button>
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
-          <h2>{{project?.name}}</h2>
+          <div class="project-title-row">
+            <h2 class="project-title">{{project?.name}}</h2>
+            <div class="project-state-dot" matTooltip="{{'ORG.STATE.'+project.state | translate}}"
+              [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE }">
+            </div>
+          </div>
         </div>
         <p class="project-sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
         <p *ngIf="isZitadel" class="project-sub zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>

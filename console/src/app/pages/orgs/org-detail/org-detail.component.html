@@ -2,7 +2,12 @@
   <div class="max-width-container">
     <div class="org-top-row">
       <div>
-        <h1 class="org-title">{{org?.name}}</h1>
+        <div class="org-title-row">
+          <h1 class="org-title">{{org?.name}}</h1>
+          <div class="org-state-dot" matTooltip="{{'ORG.STATE.'+org.state | translate}}"
+            [ngClass]="{'active': org.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org.state === OrgState.ORG_STATE_INACTIVE }">
+          </div>
+        </div>
         <p class="org-sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p>
       </div>
       <span class="fill-space"></span>

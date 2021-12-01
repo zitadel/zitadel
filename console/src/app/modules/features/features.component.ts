@@ -2,7 +2,6 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import {
   GetOrgFeaturesResponse,
   SetDefaultFeaturesRequest,
@@ -60,31 +59,33 @@ export class FeaturesComponent implements OnDestroy {
     if (temporg) {
       this.org = temporg;
     }
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
+
+    const serviceType = this.route.snapshot.data.serviceType;
+    if (serviceType !== undefined) {
+      this.serviceType = serviceType;
       if (this.serviceType === FeatureServiceType.MGMT) {
         this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
       }
-      return this.route.params;
-    })).subscribe(_ => {
-      this.fetchData();
-    });
 
-    if (this.serviceType === FeatureServiceType.MGMT) {
-      this.customerLoading = true;
-      this.subService.getCustomer(this.org.id)
-        .then(payload => {
-          this.customerLoading = false;
-          this.stripeCustomer = payload;
-          if (this.customerValid) {
-            this.getLinkToStripe();
-          }
-        })
-        .catch(error => {
-          this.customerLoading = false;
-          console.error(error);
-        });
+      if (this.serviceType === FeatureServiceType.MGMT) {
+        this.customerLoading = true;
+        this.subService
+          .getCustomer(this.org.id)
+          .then((payload) => {
+            this.customerLoading = false;
+            this.stripeCustomer = payload;
+            if (this.customerValid) {
+              this.getLinkToStripe();
+            }
+          })
+          .catch((error) => {
+            this.customerLoading = false;
+            console.error(error);
+          });
+      }
     }
+
+    this.fetchData();
   }
 
   public ngOnDestroy(): void {
@@ -99,13 +100,16 @@ export class FeaturesComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRefPhone.afterClosed().subscribe(customer => {
+    dialogRefPhone.afterClosed().subscribe((customer) => {
       if (customer) {
         console.log(customer);
         this.stripeCustomer = customer;
-        this.subService.setCustomer(this.org.id, customer).then(() => {
-          this.getLinkToStripe();
-        }).catch(console.error);
+        this.subService
+          .setCustomer(this.org.id, customer)
+          .then(() => {
+            this.getLinkToStripe();
+          })
+          .catch(console.error);
       }
     });
   }
@@ -113,12 +117,13 @@ export class FeaturesComponent implements OnDestroy {
   public getLinkToStripe(): void {
     if (this.serviceType === FeatureServiceType.MGMT) {
       this.stripeLoading = true;
-      this.subService.getLink(this.org.id, window.location.href)
-        .then(payload => {
+      this.subService
+        .getLink(this.org.id, window.location.href)
+        .then((payload) => {
           this.stripeLoading = false;
           this.stripeURL = payload.redirect_url;
         })
-        .catch(error => {
+        .catch((error) => {
           this.stripeLoading = false;
           console.error(error);
         });
@@ -126,7 +131,7 @@ export class FeaturesComponent implements OnDestroy {
   }
 
   public fetchData(): void {
-    this.getData().then(resp => {
+    this.getData().then((resp) => {
       if (resp?.features) {
         this.features = resp.features;
       }
@@ -169,11 +174,14 @@ export class FeaturesComponent implements OnDestroy {
         req.setLockoutPolicy(this.features.lockoutPolicy);
         req.setActions(this.features.actions);
 
-        this.adminService.setOrgFeatures(req).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.adminService
+          .setOrgFeatures(req)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
       case FeatureServiceType.ADMIN:
         // update Default org iam policy?
@@ -194,25 +202,31 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setLockoutPolicy(this.features.lockoutPolicy);
         dreq.setActions(this.features.actions);
 
-        this.adminService.setDefaultFeatures(dreq).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.adminService
+          .setDefaultFeatures(dreq)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
     }
   }
 
   public resetFeatures(): void {
     if (this.serviceType === FeatureServiceType.MGMT) {
-      this.adminService.resetOrgFeatures(this.org.id).then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        setTimeout(() => {
-          this.fetchData();
-        }, 1000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.adminService
+        .resetOrgFeatures(this.org.id)
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
@@ -225,13 +239,15 @@ export class FeaturesComponent implements OnDestroy {
   }
 
   get customerValid(): boolean {
-    return !!this.stripeCustomer?.contact &&
+    return (
+      !!this.stripeCustomer?.contact &&
       !!this.stripeCustomer?.address &&
       !!this.stripeCustomer?.city &&
-      !!this.stripeCustomer?.postal_code;
+      !!this.stripeCustomer?.postal_code
+    );
   }
 
   get customerCountry(): Country | undefined {
-    return COUNTRIES.find(country => country.isoCode === this.stripeCustomer.country);
+    return COUNTRIES.find((country) => country.isoCode === this.stripeCustomer.country);
   }
 }
