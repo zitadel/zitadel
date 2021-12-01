@@ -14,7 +14,7 @@
       flex-wrap: wrap;
       border-radius: 50vw;
       padding: 6px 9px;
-      background-color: map-get($background, card);
+      background-color: map-get($background, contributor);
       padding-left: 20px;
 
       .contributor-img-list {
@@ -52,9 +52,9 @@
           height: 32px;
           width: 32px;
           border-radius: 50%;
-          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
-          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
-          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -67,7 +67,7 @@
           .sa-icon {
             display: block;
             width: 32px;
-            margin: 0 0.5rem;
+            margin: 0 .5rem;
 
             i {
               margin: auto;

@@ -1,41 +1,49 @@
-<cnsl-detail-layout [maxWidth]="false" [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate"
-    [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
+<cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+  [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate" [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
 
-    <div class="top-actions">
-      <div class="message-type">
-        <button (click)="setCurrentType($any(type).value)" [ngClass]="{'active': currentType === type.value}" mat-button *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
-      </div>
-
-      <cnsl-form-field class="language">
-        <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
-        <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
-            <mat-option *ngFor="let loc of LOCALES" [value]="loc">
-                <div class="centerline">
-                    <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
-                </div>
-            </mat-option>
-        </mat-select>
-    </cnsl-form-field>
+  <div class="top-actions">
+    <div class="message-type">
+      <button (click)="setCurrentType($any(type).value)" [ngClass]="{'active': currentType === type.value}" mat-button
+        *ngFor="let type of MESSAGETYPES | keyvalue">{{'POLICY.MESSAGE_TEXTS.TYPES.'+type.value | translate}}</button>
     </div>
 
-  <cnsl-info-section *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
+    <cnsl-form-field class="language">
+      <cnsl-label>{{ 'POLICY.LOGIN_TEXTS.LOCALE' | translate }}</cnsl-label>
+      <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
+        <mat-option *ngFor="let loc of LOCALES" [value]="loc">
+          <div class="centerline">
+            <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
+          </div>
+        </mat-option>
+      </mat-select>
+    </cnsl-form-field>
+  </div>
+
+  <cnsl-info-section
+    *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+    [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
     <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_text.message'})"></span>
   </cnsl-info-section>
 
-    <div class="content" >
-      <cnsl-edit-text [chips]="chips[currentType]" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
+  <div class="content">
+    <cnsl-edit-text [chips]="chips[currentType]"
+      [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+      label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
         $event)"></cnsl-edit-text>
-    </div>
+  </div>
 
-    <div class="actions">
-      <button class="reset-button" [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" (click)="resetDefault()" color="warn" type="submit"
-      mat-stroked-button><i class="las la-history"></i> {{ 'ACTIONS.RESETDEFAULT' | translate }}</button>
-      <button class="save-button" [disabled]="!updateRequest || serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false" (click)="saveCurrentMessage()" color="primary" type="submit"
-        mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-    </div>
+  <div class="actions">
+    <button class="reset-button"
+      [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+      (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
+      'ACTIONS.RESETDEFAULT' | translate }}</button>
+    <button class="save-button"
+      [disabled]="!updateRequest || serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+      (click)="saveCurrentMessage()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
+      }}</button>
+  </div>
 
-    <div class="divider"></div>
+  <div class="divider"></div>
 
-    <cnsl-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
+  <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="text"></cnsl-policy-grid>
 </cnsl-detail-layout>

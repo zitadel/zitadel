@@ -9,7 +9,7 @@
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
 
-  .policy {
+  .privatelabeling-policy {
     .header {
       display: flex;
 
@@ -83,7 +83,7 @@
       }
     }
 
-    .top-row {
+    .privatelabeling-top-row {
       display: flex;
 
       .fill-space {

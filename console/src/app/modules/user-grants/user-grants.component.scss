@@ -9,12 +9,12 @@
 
     td,
     th {
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
+      padding-left: .5rem;
+      padding-right: .5rem;
 
       &:first-child {
         padding-left: 0;
-        padding-right: 0.5rem;
+        padding-right: .5rem;
       }
 
       &:last-child {
@@ -55,7 +55,7 @@
   .role {
     display: flex;
     flex-direction: column;
-    margin: 0.25rem;
+    margin: .25rem;
     font-size: 14px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -68,7 +68,7 @@
   }
 
   button {
-    margin: 0.5rem 0;
+    margin: .5rem 0;
     display: block;
     max-width: 120px;
     box-sizing: border-box;
@@ -98,7 +98,7 @@
 }
 
 .date-block {
-  margin: 0.5rem 0;
+  margin: .5rem 0;
   display: block;
   min-width: 120px;
 

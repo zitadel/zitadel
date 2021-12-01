@@ -9,5 +9,4 @@ export class DetailLayoutComponent {
   @Input() backRouterLink: any = undefined;
   @Input() title: string | null = '';
   @Input() description: string | null = '';
-  @Input() maxWidth: boolean = true;
 }

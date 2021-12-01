@@ -1,20 +1,22 @@
-<cnsl-meta-layout>
+<div class="max-width-container">
+  <cnsl-meta-layout>
     <div class="enlarged-container">
-        <h1 class="h1">{{'IAM.POLICIES.TITLE' | translate}}</h1>
-        <p class="sub">{{'IAM.POLICIES.DESCRIPTION' | translate}} </p>
+      <h1 class="h1">{{'IAM.POLICIES.TITLE' | translate}}</h1>
+      <p class="sub">{{'IAM.POLICIES.DESCRIPTION' | translate}} </p>
 
-        <h2>{{'FEATURES.TITLE' | translate}}</h2>
-        <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
-        <cnsl-zitadel-tier [features]="features" [iam]="true"></cnsl-zitadel-tier>
+      <h2>{{'FEATURES.TITLE' | translate}}</h2>
+      <p class="top-desc">{{'FEATURES.DESCRIPTION' | translate}}</p>
+      <cnsl-zitadel-tier [features]="features" [iam]="true"></cnsl-zitadel-tier>
 
-        <cnsl-policy-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>
+      <cnsl-policy-grid [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>
     </div>
 
     <div metainfo>
-        <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
-            [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-            description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-            (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
-        </cnsl-contributors>
+      <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
+        [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+        (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
+      </cnsl-contributors>
     </div>
-</cnsl-meta-layout>
+  </cnsl-meta-layout>
+</div>

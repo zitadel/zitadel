@@ -24,8 +24,8 @@
           border: none;
           background: none;
           text-align: left;
-          padding: 0.75rem 0;
-          opacity: 0.6;
+          padding: .75rem 0;
+          opacity: .6;
           font-size: 15px;
           cursor: pointer;
           color: map-get($foreground, base);
@@ -53,7 +53,6 @@
   }
 
   .user-top {
-    margin-bottom: 2rem;
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 0 2rem 1rem 2rem;

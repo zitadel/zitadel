@@ -5,7 +5,6 @@
   $is-dark-theme: map-get($theme, is-dark);
 
   .project-top {
-    margin-bottom: 2rem;
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 2rem 2rem 1rem 2rem;
@@ -21,6 +20,12 @@
         margin: 0;
         display: flex;
         align-items: center;
+
+        .link {
+          margin-right: 1rem;
+          display: block;
+          position: relative;
+        }
       }
 
       .project-sub {
@@ -44,14 +49,14 @@
       }
 
       .actions-trigger {
-        margin-top: 0.25rem;
+        margin-top: .25rem;
         display: flex;
         align-items: center;
         margin-right: 2rem;
 
         .icon {
-          margin-left: 0.5rem;
-          margin-right: -0.5rem;
+          margin-left: .5rem;
+          margin-right: -.5rem;
         }
       }
     }
@@ -62,7 +67,7 @@
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #81868a30;
-  padding: 0.5rem 0 1rem 0;
+  padding: 2rem 0 1rem 0;
 
   .setting-title {
     font-size: 14px;
@@ -77,7 +82,7 @@
     align-items: center;
 
     .icon-button {
-      margin-left: 0.5rem;
+      margin-left: .5rem;
     }
   }
 }

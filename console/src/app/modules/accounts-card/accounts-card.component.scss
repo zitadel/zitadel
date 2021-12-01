@@ -1,5 +1,5 @@
 .card {
-  border-radius: 0.5rem;
+  border-radius: .5rem;
   z-index: 300;
   border: 1px solid #ffffff30;
   width: 350px;
@@ -20,7 +20,7 @@
   }
 
   .u-email {
-    font-size: 0.8rem;
+    font-size: .8rem;
     margin-top: 0;
   }
 
@@ -30,10 +30,10 @@
 
   button {
     border-radius: 50vh;
-    margin: 0.5rem;
+    margin: .5rem;
 
     .mat-button-wrapper {
-      font-size: 0.8rem;
+      font-size: .8rem;
     }
   }
 
@@ -41,14 +41,14 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 0.5rem 0;
+    padding: .5rem 0;
     max-height: 450px;
     overflow-y: auto;
-    border-top: 1px solid rgba(#8795a1, 0.3);
-    border-bottom: 1px solid rgba(#8795a1, 0.3);
+    border-top: 1px solid rgba(#8795a1, .3);
+    border-bottom: 1px solid rgba(#8795a1, .3);
 
     .row {
-      padding: 0.5rem;
+      padding: .5rem;
       display: flex;
       align-items: center;
       color: inherit;
@@ -88,14 +88,14 @@
 
         .user-title {
           font-weight: 500;
-          font-size: 0.9rem;
+          font-size: .9rem;
           line-height: 1rem;
         }
 
         .email,
         .loginname {
           color: var(--grey);
-          font-size: 0.8rem;
+          font-size: .8rem;
           line-height: 1rem;
         }
       }

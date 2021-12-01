@@ -76,7 +76,7 @@
         [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName ?? '' : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName) ?? ''"
         [size]="38">
       </cnsl-avatar>
-      <cnsl-accounts-card @accounts class="a_card" *ngIf="showAccount" (close)="showAccount = false" [user]="user"
+      <cnsl-accounts-card @accounts class="a_card" *ngIf="showAccount" (closedCard)="showAccount = false" [user]="user"
         [iamuser]="(['iam.read$','iam.write$'] | hasRole) | async">
       </cnsl-accounts-card>
     </div>

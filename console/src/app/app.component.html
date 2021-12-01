@@ -1,11 +1,11 @@
 <ng-container *ngIf="(authService.user | async) || undefined as user">
   <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
     <div class="main-container">
-      <cnsl-header *ngIf="user" [org]="org" [user]="user" [isDarkTheme]="componentCssClass == 'dark-theme'"
+      <cnsl-header *ngIf="user" [org]="org" [user]="user" [isDarkTheme]="componentCssClass === 'dark-theme'"
         [labelpolicy]="labelpolicy" (changedActiveOrg)="changedOrg($event)"></cnsl-header>
 
       <cnsl-nav class="nav" [ngClass]="{ 'shadow': yoffset > 60}" *ngIf="user" [org]="org" [user]="user"
-        [isDarkTheme]="componentCssClass == 'dark-theme'" [labelpolicy]="labelpolicy"></cnsl-nav>
+        [isDarkTheme]="componentCssClass === 'dark-theme'" [labelpolicy]="labelpolicy"></cnsl-nav>
       <div class="router" [@routeAnimations]="prepareRoute(outlet)">
         <div class="outlet">
           <router-outlet class="outlet" #outlet="outlet"></router-outlet>

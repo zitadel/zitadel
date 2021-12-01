@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BehaviorSubject, catchError, debounceTime, finalize, from, map, Observable, of, Subject } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
@@ -14,7 +14,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnDestroy {
   @ViewChild('input', { static: false }) input!: ElementRef;
 
   @Input() public isDarkTheme: boolean = true;
@@ -40,8 +40,6 @@ export class HeaderComponent implements OnInit {
 
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
   }
-
-  ngOnInit(): void {}
 
   public ngOnDestroy() {
     this.destroy$.next();

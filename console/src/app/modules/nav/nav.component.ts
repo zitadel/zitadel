@@ -5,9 +5,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { ThemeService } from 'src/app/services/theme.service';
 
 @Component({
   selector: 'cnsl-nav',
@@ -28,24 +26,13 @@ export class NavComponent implements OnDestroy {
   public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
 
-  constructor(
-    public authenticationService: AuthenticationService,
-    private authService: GrpcAuthService,
-    public mgmtService: ManagementService,
-    private themeService: ThemeService,
-  ) {
+  constructor(public authenticationService: AuthenticationService, public mgmtService: ManagementService) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
   }
 
   public toggleAdminHide(): void {
     this.hideAdminWarn = !this.hideAdminWarn;
     localStorage.setItem('hideAdministratorWarning', this.hideAdminWarn.toString());
-  }
-
-  public ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    console.log(this.org);
   }
 
   public ngOnDestroy() {

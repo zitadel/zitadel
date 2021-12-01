@@ -7,7 +7,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   /* stylelint-enable */
 
-  $lighter-color: rgba(mat.get-color-from-palette($primary, 300), .5);
+  $lighter-color: rgba(mat.get-color-from-palette($primary, 300), 0.5);
 
   .detail-container {
     display: flex;
@@ -18,7 +18,7 @@
       flex-direction: row;
     }
 
-    .detail-left {
+    .detail-layout-left {
       align-self: flex-start;
       display: flex;
       padding: 1rem;
@@ -35,7 +35,7 @@
       }
     }
 
-    .detail-right {
+    .detail-layout-right {
       flex: 1;
       padding-left: 1rem;
 
@@ -43,10 +43,10 @@
         flex-basis: 100%;
       }
 
-      .head {
+      .detail-layout-head {
         margin-bottom: 2rem;
 
-        .top-view {
+        .detail-layout-top-view {
           display: flex;
           justify-content: space-between;
         }
@@ -59,13 +59,13 @@
 
           .head-desc {
             display: block;
-            font-size: .9rem;
+            font-size: 0.9rem;
             color: var(--grey);
           }
         }
 
         .actions-wrap {
-          padding-top: .5rem;
+          padding-top: 0.5rem;
         }
       }
     }

@@ -1,7 +1,7 @@
 .meta-wrapper {
   display: flex;
   height: 100%;
-  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: all .3s cubic-bezier(.645, .045, .355, 1);
   position: relative;
 
   .main-content {
@@ -14,7 +14,7 @@
   .meta {
     flex: 1 0 300px;
     max-width: 300px;
-    padding: 1rem 0rem 1rem 1rem;
+    padding: 1rem 0 1rem 1rem;
 
     @media only screen and (min-width: 1500px) {
       flex-basis: 400px;

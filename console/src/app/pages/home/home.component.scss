@@ -34,7 +34,7 @@
       cursor: pointer;
       box-sizing: border-box;
       position: relative;
-      border-radius: 0.5rem;
+      border-radius: .5rem;
       padding: 1.5rem;
       box-shadow: 0 3px 8px 0 rgb(0 0 0 / 6%);
 
@@ -73,7 +73,7 @@
 
       .top {
         h2 {
-          margin-top: 0.5rem;
+          margin-top: .5rem;
           display: flex;
           align-items: center;
         }
@@ -81,13 +81,13 @@
         p {
           display: block;
           color: var(--grey);
-          font-size: 0.9rem;
+          font-size: .9rem;
         }
 
         i {
           font-size: 2.5rem;
           margin-right: 1rem;
-          transition: color 0.1s;
+          transition: color .1s;
         }
       }
 
@@ -102,7 +102,7 @@
         padding-top: 1rem;
 
         a {
-          border-radius: 0.5rem;
+          border-radius: .5rem;
         }
       }
     }
@@ -116,7 +116,7 @@
 }
 
 .short-link {
-  margin-bottom: 0.5rem;
+  margin-bottom: .5rem;
   font-size: 15px;
   text-decoration: none;
   display: block;
