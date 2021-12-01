@@ -4,6 +4,7 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
+  RemoveFailed: Konnte nicht gelöscht werden
   Assets:
     EmptyKey: Asset Key ist leer
     Store:

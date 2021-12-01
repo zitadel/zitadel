@@ -4,6 +4,7 @@ Errors:
   OriginNotAllowed: Origine non consentita
   IDMissing: ID mancante
   ResourceOwnerMissing: Resource Owner mancante
+  RemoveFailed: Non può essere cancellato
   Assets:
     EmptyKey: Asset key vuoto
     Store:

@@ -13,7 +13,7 @@ import (
 const (
 	CurrentSeqTable   = "projections.current_sequences"
 	locksTable        = "projections.locks"
-	failedEventsTable = "projections.failed_events"
+	FailedEventsTable = "projections.failed_events"
 )
 
 func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config) error {
@@ -28,7 +28,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
 		LockTable:         locksTable,
-		FailedEventsTable: failedEventsTable,
+		FailedEventsTable: FailedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
 		BulkLimit:         config.BulkLimit,
 	}
