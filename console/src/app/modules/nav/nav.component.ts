@@ -5,7 +5,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
 @Component({
@@ -26,6 +26,8 @@ export class NavComponent implements OnInit, OnDestroy {
   public showAccount: boolean = false;
   public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
+
+  public BreadcrumbType: any = BreadcrumbType;
 
   constructor(
     public authenticationService: AuthenticationService,
