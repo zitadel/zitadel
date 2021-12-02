@@ -27,11 +27,11 @@
 .btn-container {
   display: flex;
   justify-content: flex-end;
-  margin: 0 -.5rem;
+  margin: 0 -0.5rem;
 
   button {
-    border-radius: .5rem;
-    margin: 0 .5rem;
+    border-radius: 0.5rem;
+    margin: 0 0.5rem;
   }
 }
 
@@ -39,11 +39,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  margin: -1.5rem -.5rem;
+  margin: -1.5rem -0.5rem;
 
   .app-card {
     flex: 1;
-    margin: .5rem;
+    margin: 0.5rem;
   }
 }
 
@@ -59,4 +59,9 @@
 
 .side-padding {
   padding-top: 1rem;
+}
+
+.delete-account-wrapper {
+  display: flex;
+  justify-content: flex-end;
 }

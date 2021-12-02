@@ -182,7 +182,11 @@
       "STATE": "Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
-      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
+      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
+      "DELETEACCOUNT": "Delete Account",
+      "DELETEACCOUNT_DESC": "Permanently remove your Personal Account and all of its contents. This action is not reversible, so please continue with caution.",
+      "DELETEACCOUNT_BTN": "Delete Account",
+      "DELETEACCOUNT_SUCCESS": "Account deleted successfully!"
     },
     "DETAILS": {
       "DATECREATED": "Created",
@@ -190,7 +194,9 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
-      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?"
+      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?",
+      "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
+      "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Send Email Notification",

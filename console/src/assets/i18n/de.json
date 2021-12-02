@@ -182,7 +182,11 @@
       "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
-      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
+      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
+      "DELETEACCOUNT": "Account löschen",
+      "DELETEACCOUNT_DESC": "Hier können Sie Ihr persönliches Konto mitsamt seinem Inhalt löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DELETEACCOUNT_BTN": "Account löschen",
+      "DELETEACCOUNT_SUCCESS": "Account erfolgreich gelöscht!"
     },
     "DETAILS": {
       "DATECREATED": "Erstellt",
@@ -190,7 +194,9 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
-      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
+      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_BTN": "Entgültig löschen"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Email Benachrichtigung senden",
@@ -807,9 +813,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "BTN":"Datei auswählen",
+      "BTN": "Datei auswählen",
       "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
-      "ACTIVATEPREVIEW":"Preview aktivieren"
+      "ACTIVATEPREVIEW": "Preview aktivieren"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",
