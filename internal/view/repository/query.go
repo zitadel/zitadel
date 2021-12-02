@@ -2,11 +2,12 @@ package repository
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 type SearchRequest interface {
@@ -30,7 +31,7 @@ type ColumnKey interface {
 func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, res interface{}) (uint64, error) {
 	return func(db *gorm.DB, res interface{}) (uint64, error) {
 		var count uint64 = 0
-		query := db.Table(table)
+		query := db.Table(table).Debug()
 		if column := request.GetSortingColumn(); column != nil {
 			order := "DESC"
 			if request.GetAsc() {
@@ -48,6 +49,9 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 		}
 
 		query = query.Count(&count)
+		if res == nil {
+			return count, nil
+		}
 		if request.GetLimit() != 0 {
 			query = query.Limit(request.GetLimit())
 		}
