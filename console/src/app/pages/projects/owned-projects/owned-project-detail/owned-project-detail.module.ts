@@ -34,10 +34,9 @@ import { ApplicationGridComponent } from './application-grid/application-grid.co
 import { ApplicationsComponent } from './applications/applications.component';
 import { OwnedProjectDetailRoutingModule } from './owned-project-detail-routing.module';
 import { OwnedProjectDetailComponent } from './owned-project-detail.component';
-import { ProjectGrantsComponent } from './project-grants/project-grants.component';
 
 @NgModule({
-  declarations: [OwnedProjectDetailComponent, ApplicationGridComponent, ApplicationsComponent, ProjectGrantsComponent],
+  declarations: [OwnedProjectDetailComponent, ApplicationGridComponent, ApplicationsComponent],
   imports: [
     CommonModule,
     FormsModule,

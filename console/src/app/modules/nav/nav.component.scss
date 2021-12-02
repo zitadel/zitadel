@@ -27,47 +27,57 @@
     transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
 
     .nav-row {
-      align-self: stretch;
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
       min-height: 40px;
+      position: relative;
+      width: 100%;
 
-      .fill-space {
-        flex: 1;
-      }
-
-      .nav-item {
+      .nav-row-abs {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
         display: flex;
         align-items: center;
-        font-size: 14px;
-        line-height: 14px;
-        padding: 0.4rem 1rem;
-        color: mat.get-color-from-palette($foreground, text) !important;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        border-radius: 50vw;
-        font-weight: 500;
-        margin: 0.25rem 0;
+        flex-wrap: wrap;
+        align-self: stretch;
 
-        .c_label {
-          .count {
-            display: none;
-            margin-left: 6px;
-          }
+        .fill-space {
+          flex: 1;
         }
 
-        &:hover {
-          background: if($is-dark-theme, #ffffff40, #00000010);
-        }
-
-        &.active {
-          background-color: $primary-color;
-          color: mat.get-color-from-palette($foreground, toolbar-items) !important;
+        .nav-item {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          line-height: 14px;
+          padding: 0.4rem 1rem;
+          color: mat.get-color-from-palette($foreground, text) !important;
+          transition: all 0.2s ease;
+          text-decoration: none;
+          border-radius: 50vw;
+          font-weight: 500;
+          margin: 0.25rem 0;
 
           .c_label {
             .count {
-              display: inline-block;
+              display: none;
+              margin-left: 6px;
+            }
+          }
+
+          &:hover {
+            background: if($is-dark-theme, #ffffff40, #00000010);
+          }
+
+          &.active {
+            background-color: $primary-color;
+            color: mat.get-color-from-palette($foreground, toolbar-items) !important;
+
+            .c_label {
+              .count {
+                display: inline-block;
+              }
             }
           }
         }

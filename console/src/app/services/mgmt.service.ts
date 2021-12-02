@@ -422,7 +422,7 @@ import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
-import { ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
+import { Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
 import {
   Gender,
   MembershipQuery,
@@ -438,6 +438,7 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
   providedIn: 'root',
 })
 export class ManagementService {
+  public ownedProjects: BehaviorSubject<Project.AsObject[]> = new BehaviorSubject<Project.AsObject[]>([]);
   public ownedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
@@ -899,32 +900,24 @@ export class ManagementService {
     return this.grpcService.mgmt.listHumanLinkedIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public getAction(
-    id: string,
-  ): Promise<GetActionResponse.AsObject> {
+  public getAction(id: string): Promise<GetActionResponse.AsObject> {
     const req = new GetActionRequest();
     req.setId(id);
-    return this.grpcService.mgmt.getAction(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.getAction(req, null).then((resp) => resp.toObject());
   }
 
-  public createAction(
-    req: CreateActionRequest,
-  ): Promise<CreateActionResponse.AsObject> {
-    return this.grpcService.mgmt.createAction(req, null).then(resp => resp.toObject());
+  public createAction(req: CreateActionRequest): Promise<CreateActionResponse.AsObject> {
+    return this.grpcService.mgmt.createAction(req, null).then((resp) => resp.toObject());
   }
 
-  public updateAction(
-    req: UpdateActionRequest,
-  ): Promise<UpdateActionResponse.AsObject> {
-    return this.grpcService.mgmt.updateAction(req, null).then(resp => resp.toObject());
+  public updateAction(req: UpdateActionRequest): Promise<UpdateActionResponse.AsObject> {
+    return this.grpcService.mgmt.updateAction(req, null).then((resp) => resp.toObject());
   }
 
-  public deleteAction(
-    id: string,
-  ): Promise<DeleteActionResponse.AsObject> {
+  public deleteAction(id: string): Promise<DeleteActionResponse.AsObject> {
     const req = new DeleteActionRequest();
     req.setId(id);
-    return this.grpcService.mgmt.deleteAction(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.deleteAction(req, null).then((resp) => resp.toObject());
   }
 
   public listActions(
@@ -949,23 +942,19 @@ export class ManagementService {
       metadata.setAsc(asc);
     }
     req.setQuery(metadata);
-    return this.grpcService.mgmt.listActions(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.listActions(req, null).then((resp) => resp.toObject());
   }
 
-  public getFlow(
-    type: FlowType
-  ): Promise<GetFlowResponse.AsObject> {
+  public getFlow(type: FlowType): Promise<GetFlowResponse.AsObject> {
     const req = new GetFlowRequest();
     req.setType(type);
-    return this.grpcService.mgmt.getFlow(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.getFlow(req, null).then((resp) => resp.toObject());
   }
 
-  public clearFlow(
-    type: FlowType
-  ): Promise<ClearFlowResponse.AsObject> {
+  public clearFlow(type: FlowType): Promise<ClearFlowResponse.AsObject> {
     const req = new ClearFlowRequest();
     req.setType(type);
-    return this.grpcService.mgmt.clearFlow(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.clearFlow(req, null).then((resp) => resp.toObject());
   }
 
   public setTriggerActions(
@@ -977,7 +966,7 @@ export class ManagementService {
     req.setActionIdsList(actionIdsList);
     req.setFlowType(type);
     req.setTriggerType(triggerType);
-    return this.grpcService.mgmt.setTriggerActions(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.setTriggerActions(req, null).then((resp) => resp.toObject());
   }
 
   public getIAM(): Promise<GetIAMResponse.AsObject> {
@@ -1760,6 +1749,7 @@ export class ManagementService {
       const obj = value.toObject();
       const count = obj.resultList.length;
       if (count >= 0) {
+        this.ownedProjects.next(obj.resultList);
         this.ownedProjectsCount.next(count);
       }
 

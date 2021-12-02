@@ -1,0 +1,68 @@
+.project-grants {
+  padding-top: 2rem;
+
+  .table-wrapper {
+    overflow: auto;
+
+    .table,
+    .paginator {
+      width: 100%;
+      background-color: #2d2e30;
+
+      td,
+      th {
+        padding: 0 1rem;
+
+        &:first-child {
+          padding-left: 0;
+          padding-right: 1rem;
+        }
+
+        &:last-child {
+          padding-right: 0;
+        }
+
+        .role {
+          display: inline-block;
+          border-radius: 0.5rem;
+          border: 1px solid #ffffff30;
+          padding: 0.5rem 1rem;
+          margin-top: 0.25rem;
+          margin-bottom: 0.25rem;
+          margin-left: 0;
+          margin-right: 0.5rem;
+          cursor: pointer;
+        }
+      }
+
+      tr {
+        outline: none;
+      }
+
+      tr.detail-row {
+        height: 0;
+      }
+    }
+  }
+
+  .pointer {
+    outline: none;
+    cursor: pointer;
+  }
+
+  .role-row {
+    min-width: 100px;
+  }
+
+  .date-block {
+    margin: 0.5rem 0;
+    display: block;
+    min-width: 120px;
+
+    .date-sub {
+      font-size: 13px;
+      color: var(--grey);
+      display: block;
+    }
+  }
+}

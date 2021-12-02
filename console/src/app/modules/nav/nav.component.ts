@@ -1,4 +1,5 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
+import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -12,8 +13,31 @@ import { ManagementService } from 'src/app/services/mgmt.service';
   selector: 'cnsl-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
+  animations: [
+    // trigger('navWrapper', [transition('* => *', [query('@navitem', stagger('50ms', animateChild()), { optional: true })])]),
+    trigger('navrow', [
+      transition(':enter', [
+        animate(
+          '.2s ease-in',
+          keyframes([
+            style({ opacity: 0, transform: 'translateY(-50%)' }),
+            style({ opacity: 1, transform: 'translateY(0%)' }),
+          ]),
+        ),
+      ]),
+      transition(':leave', [
+        animate(
+          '.2s ease-out',
+          keyframes([
+            style({ opacity: 1, transform: 'translateY(0%)' }),
+            style({ opacity: 0, transform: 'translateY(50%)' }),
+          ]),
+        ),
+      ]),
+    ]),
+  ],
 })
-export class NavComponent implements OnInit, OnDestroy {
+export class NavComponent implements OnDestroy {
   @ViewChild('input', { static: false }) input!: ElementRef;
 
   @Input() public isDarkTheme: boolean = true;
@@ -31,24 +55,10 @@ export class NavComponent implements OnInit, OnDestroy {
 
   constructor(
     public authenticationService: AuthenticationService,
-    // private router: Router,
     public breadcrumbService: BreadcrumbService,
     public mgmtService: ManagementService,
   ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
-  }
-
-  ngOnInit(): void {
-    // this.router.events
-    //   .pipe(
-    //     filter((e) => e instanceof ActivationEnd),
-    //     map((e) => (e instanceof ActivationEnd ? e.snapshot : {})),
-    //     takeUntil(this.destroy$),
-    //   )
-    //   .subscribe((params) => {
-    //     console.log(params);
-    //     // Do whatever you want here!!!!
-    //   });
   }
 
   public toggleAdminHide(): void {

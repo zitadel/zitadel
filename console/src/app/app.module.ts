@@ -33,6 +33,7 @@ import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
 import { AdminService } from './services/admin.service';
 import { AuthenticationService } from './services/authentication.service';
+import { BreadcrumbService } from './services/breadcrumb.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -165,6 +166,7 @@ const authConfig: AuthConfig = {
     SeoService,
     RefreshService,
     GrpcService,
+    BreadcrumbService,
     AuthenticationService,
     GrpcAuthService,
     ManagementService,

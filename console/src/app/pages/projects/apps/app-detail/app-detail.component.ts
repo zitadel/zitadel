@@ -236,7 +236,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               const breadcrumbs = [
                 new Breadcrumb({
                   type: BreadcrumbType.PROJECT,
-                  name: projectId,
+                  name: '',
                   param: { key: 'projectid', value: projectId },
                   routerLink: ['/projects', projectId],
                 }),

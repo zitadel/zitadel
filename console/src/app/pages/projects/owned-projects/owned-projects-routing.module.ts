@@ -51,6 +51,19 @@ const routes: Routes = [
         loadChildren: () => import('src/app/pages/projects/apps/apps.module').then((m) => m.AppsModule),
       },
       {
+        path: 'projectgrants',
+        data: {
+          animation: 'AddPage',
+          // roles: ['project.grant.read:' + ':projectid', 'project.grant.read'],
+        },
+        // canActivate: [RoleGuard],
+        loadChildren: () =>
+          import('src/app/pages/projects/owned-projects/project-grants/project-grants.module').then(
+            (m) => m.ProjectGrantsModule,
+          ),
+      },
+
+      {
         path: 'roles/create',
         loadChildren: () =>
           import('../project-role-create/project-role-create.module').then((m) => m.ProjectRoleCreateModule),

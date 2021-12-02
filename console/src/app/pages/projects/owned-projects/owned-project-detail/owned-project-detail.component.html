@@ -87,7 +87,7 @@
     </ng-template>
 
     <ng-container *ngIf="isZitadel === false">
-      <ng-template cnslHasRole [hasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
+      <!-- <ng-template cnslHasRole [hasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
         <cnsl-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
           description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
           <cnsl-project-grants
@@ -96,7 +96,7 @@
             [projectId]="projectId">
           </cnsl-project-grants>
         </cnsl-card>
-      </ng-template>
+      </ng-template> -->
 
       <ng-template cnslHasRole [hasRole]="['project.role.read:' + project.id, 'project.role.read']">
         <cnsl-card id="roles" title="{{ 'PROJECT.ROLE.TITLE' | translate }}"
