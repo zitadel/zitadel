@@ -31,7 +31,7 @@ type ColumnKey interface {
 func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, res interface{}) (uint64, error) {
 	return func(db *gorm.DB, res interface{}) (uint64, error) {
 		var count uint64 = 0
-		query := db.Table(table).Debug()
+		query := db.Table(table)
 		if column := request.GetSortingColumn(); column != nil {
 			order := "DESC"
 			if request.GetAsc() {
