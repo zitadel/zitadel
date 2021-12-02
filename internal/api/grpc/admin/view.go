@@ -24,7 +24,12 @@ func (s *Server) ListViews(ctx context.Context, _ *admin_pb.ListViewsRequest) (*
 }
 
 func (s *Server) ClearView(ctx context.Context, req *admin_pb.ClearViewRequest) (*admin_pb.ClearViewResponse, error) {
-	err := s.administrator.ClearView(ctx, req.Database, req.ViewName)
+	var err error
+	if req.Database == "" || req.Database != "zitadel" {
+		err = s.administrator.ClearView(ctx, req.Database, req.ViewName)
+	} else {
+		err = s.query.ClearCurrentSequence(ctx, req.ViewName)
+	}
 	if err != nil {
 		return nil, err
 	}

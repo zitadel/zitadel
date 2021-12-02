@@ -62,18 +62,18 @@ func (q *Queries) latestSequence(ctx context.Context, projection table) (*Latest
 	return scan(row)
 }
 
-func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName, aggregateType string) (err error) {
+func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
 	tx, err := q.client.Begin()
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
 	_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s", projectionName))
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
+		return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 	}
-	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET (%s) = ($1) WHERE (%s = $2) AND (%s = $3)", currentSequencesTable, CurrentSequenceColCurrentSequence, CurrentSequenceColProjectionName, CurrentSequenceColAggregateType), 0, projectionName, aggregateType)
+	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET (%s) = ($1) WHERE (%s = $2)", currentSequencesTable, CurrentSequenceColCurrentSequence, CurrentSequenceColProjectionName), 0, projectionName)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
+		return errors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}
 	return tx.Commit()
 }
