@@ -8,6 +8,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/lib/pq"
 )
 
 type Memberships struct {
@@ -73,6 +74,10 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
+	latestSequence, err := q.latestSequence(ctx, orgMemberTable, iamMemberTable, projectMemberTable, projectGrantMemberTable)
+	if err != nil {
+		return nil, err
+	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
@@ -82,8 +87,8 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, err
 	}
-	// TODO: memberships.LatestSequence, err = q.latestSequence(ctx, idpTable)
-	return memberships, err
+	memberships.LatestSequence = latestSequence
+	return memberships, nil
 }
 
 var (
@@ -151,16 +156,19 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			memberships := make([]*Membership, 0)
 			var count uint64
 			for rows.Next() {
-				membership := new(Membership)
 
-				orgID := sql.NullString{}
-				iamID := sql.NullString{}
-				projectID := sql.NullString{}
-				grantID := sql.NullString{}
+				var (
+					membership = new(Membership)
+					orgID      = sql.NullString{}
+					iamID      = sql.NullString{}
+					projectID  = sql.NullString{}
+					grantID    = sql.NullString{}
+					roles      = pq.StringArray{}
+				)
 
 				err := rows.Scan(
 					&membership.UserID,
-					&membership.Roles,
+					&roles,
 					&membership.CreationDate,
 					&membership.ChangeDate,
 					&membership.Sequence,
@@ -176,6 +184,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					return nil, err
 				}
 
+				membership.Roles = roles
+
 				if orgID.Valid {
 					membership.Org = &OrgMembership{
 						OrgID: orgID.String,
@@ -186,7 +196,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					}
 				} else if projectID.Valid && grantID.Valid {
 					membership.ProjectGrant = &ProjectGrantMembership{
-						GrantID: grantID.String,
+						ProjectID: projectID.String,
+						GrantID:   grantID.String,
 					}
 				} else if projectID.Valid {
 					membership.Project = &ProjectMembership{
