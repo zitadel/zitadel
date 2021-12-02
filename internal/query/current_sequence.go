@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
+	"fmt"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -15,6 +16,66 @@ import (
 type LatestSequence struct {
 	Sequence  uint64
 	Timestamp time.Time
+}
+
+type CurrentSequences struct {
+	SearchResponse
+	CurrentSequences []*CurrentSequence
+}
+
+type CurrentSequence struct {
+	ProjectionName  string
+	AggregateType   string
+	CurrentSequence uint64
+	Timestamp       time.Time
+}
+
+type CurrentSequencesSearchQueries struct {
+	SearchRequest
+	Queries []SearchQuery
+}
+
+func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentSequences, err error) {
+	query, scan := prepareCurrentSequencesQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-MmFef", "Errors.Query.InvalidRequest")
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-22H8f", "Errors.Internal")
+	}
+	return scan(rows)
+}
+
+func (q *Queries) latestSequence(ctx context.Context, projection table) (*LatestSequence, error) {
+	query, scan := prepareLatestSequence()
+	stmt, args, err := query.Where(sq.Eq{
+		CurrentSequenceColProjectionName.identifier(): projection.name,
+	}).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
+}
+
+func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName, aggregateType string) (err error) {
+	tx, err := q.client.Begin()
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
+	}
+	_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s", projectionName))
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
+	}
+	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET (%s) = ($1) WHERE (%s = $2) AND (%s = $3)", currentSequencesTable, CurrentSequenceColCurrentSequence, CurrentSequenceColProjectionName, CurrentSequenceColAggregateType), 0, projectionName, aggregateType)
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
+	}
+	return tx.Commit()
 }
 
 func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
@@ -38,17 +99,43 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 		}
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projection table) (*LatestSequence, error) {
-	query, scan := prepareLatestSequence()
-	stmt, args, err := query.Where(sq.Eq{
-		CurrentSequenceColProjectionName.identifier(): projection.name,
-	}).ToSql()
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
-	}
+func prepareCurrentSequencesQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentSequences, error)) {
+	return sq.Select(
+			CurrentSequenceColAggregateType.identifier(),
+			CurrentSequenceColCurrentSequence.identifier(),
+			CurrentSequenceColTimestamp.identifier(),
+			CurrentSequenceColProjectionName.identifier(),
+			countColumn.identifier()).
+			From(currentSequencesTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*CurrentSequences, error) {
+			currentSequences := make([]*CurrentSequence, 0)
+			var count uint64
+			for rows.Next() {
+				currentSequence := new(CurrentSequence)
+				err := rows.Scan(
+					&currentSequence.AggregateType,
+					&currentSequence.CurrentSequence,
+					&currentSequence.Timestamp,
+					&currentSequence.ProjectionName,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				currentSequences = append(currentSequences, currentSequence)
+			}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-jbJ77", "Errors.Query.CloseRows")
+			}
+
+			return &CurrentSequences{
+				CurrentSequences: currentSequences,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
 }
 
 var (
