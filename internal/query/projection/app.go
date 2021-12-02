@@ -57,6 +57,10 @@ func (p *AppProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceAppRemoved,
 				},
 				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
+				{
 					Event:  project.APIConfigAddedType,
 					Reduce: p.reduceAPIConfigAdded,
 				},
@@ -209,6 +213,20 @@ func (p *AppProjection) reduceAppRemoved(event eventstore.EventReader) (*handler
 		e,
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
+		},
+	), nil
+}
+
+func (p *AppProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-ZxQnj", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DlUlO", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(AppColumnProjectID, e.Aggregate().ID),
 		},
 	), nil
 }
