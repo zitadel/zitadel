@@ -45,10 +45,6 @@ func (v *View) GetGlobalUserByLoginName(email string) (*model.UserView, error) {
 	return view.GetGlobalUserByLoginName(v.Db, userTable, email)
 }
 
-func (v *View) IsUserUnique(userName, email string) (bool, error) {
-	return view.IsUserUnique(v.Db, userTable, userName, email)
-}
-
 func (v *View) UserMFAs(userID string) ([]*usr_model.MultiFactor, error) {
 	return view.UserMFAs(v.Db, userTable, userID)
 }

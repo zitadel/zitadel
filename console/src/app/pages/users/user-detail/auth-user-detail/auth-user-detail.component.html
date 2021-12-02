@@ -19,7 +19,7 @@
     <cnsl-card *ngIf="user && user.human && user.human.profile" class=" app-card"
       title="{{ 'USER.PROFILE.TITLE' | translate }}">
       <cnsl-detail-form [showEditImage]="true" [preferredLoginName]="user.preferredLoginName" [genders]="genders"
-        [languages]="languages" [username]="user.userName" [user]="user.human"
+        [languages]="languages" [username]="user.userName" [user]="user.human" [disabled]="false"
         (changedLanguage)="changedLanguage($event)" (changeUsernameClicked)="changeUsername()"
         (submitData)="saveProfile($event)">
       </cnsl-detail-form>

@@ -1,7 +1,8 @@
 <form [formGroup]="profileForm" *ngIf="profileForm" (ngSubmit)="submitForm()">
   <div class="user-form-content">
     <div class="user-form-content inner">
-      <button class="camera-wrapper" type="button" (click)="showEditImage ? openUploadDialog() : null">
+      <button [disabled]="user && disabled" class="camera-wrapper" type="button"
+        (click)="showEditImage ? openUploadDialog() : null">
         <div class="i-wrapper" *ngIf="showEditImage">
           <i class="las la-camera"></i>
         </div>
@@ -16,7 +17,7 @@
           <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
           <input cnslInput formControlName="userName" />
         </cnsl-form-field>
-        <button type="button" color="primary" mat-stroked-button class="edit"
+        <button [disabled]="user && disabled" type="button" color="primary" mat-stroked-button class="edit"
           (click)="changeUsername()">{{'USER.PROFILE.CHANGEUSERNAME' |
           translate}}</button>
       </div>

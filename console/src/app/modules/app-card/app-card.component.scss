@@ -1,4 +1,4 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
 @mixin app-card-theme($theme) {
   /* stylelint-disable */
