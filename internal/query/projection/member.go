@@ -42,7 +42,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 	config := reduceMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(MemberUserIDCol, e.UserID),
-			handler.NewCol(MemberRolesCol, (*pq.StringArray)(&e.Roles)),
+			handler.NewCol(MemberRolesCol, pq.StringArray(e.Roles)),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
@@ -59,7 +59,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
-			handler.NewCol(MemberRolesCol, (*pq.StringArray)(&e.Roles)),
+			handler.NewCol(MemberRolesCol, pq.StringArray(e.Roles)),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},
