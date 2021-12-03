@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/lib/pq"
 )
 
 type AppProjection struct {
@@ -151,6 +152,9 @@ func (p *AppProjection) reduceAppChanged(event eventstore.EventReader) (*handler
 	if !ok {
 		logging.LogWithFields("HANDL-4Fjh2", "seq", event.Sequence(), "expectedType", project.ApplicationChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type")
+	}
+	if e.Name == "" {
+		return crdb.NewNoOpStatement(event), nil
 	}
 	return crdb.NewUpdateStatement(
 		e,
