@@ -10,6 +10,7 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -231,7 +232,10 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+		sq.Or{
+			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+		},
 	).ToSql()
 	if err != nil {
 		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
