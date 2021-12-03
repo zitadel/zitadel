@@ -1382,10 +1382,11 @@ func Test_AppIDsPrepare(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppIDsQuery,
-					[]string{"id"},
+					[]string{"client_id", "client_id"},
 					[][]driver.Value{
 						{
 							"app-id",
+							nil,
 						},
 					},
 				),
@@ -1398,13 +1399,15 @@ func Test_AppIDsPrepare(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppIDsQuery,
-					[]string{"id"},
+					[]string{"client_id", "client_id"},
 					[][]driver.Value{
 						{
+							nil,
 							"oidc-app-id",
 						},
 						{
 							"api-app-id",
+							nil,
 						},
 					},
 				),
