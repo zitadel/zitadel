@@ -82,7 +82,7 @@ var (
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
 		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.apps_api_configs.client_id,` +
-		` zitadel.projections.apps_oidc_configs.client_id,` +
+		` zitadel.projections.apps_oidc_configs.client_id` +
 		` FROM zitadel.projections.apps` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
 		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
