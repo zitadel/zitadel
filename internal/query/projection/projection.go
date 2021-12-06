@@ -59,6 +59,10 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewFeatureProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["features"]))
 	NewUserProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["users"]))
 	NewLoginNameProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_names"]))
+	NewOrgMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_members"]))
+	NewIAMMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
+	NewProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
+	NewProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
 	_, err := NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), defaults.KeyConfig)
 
 	return err
