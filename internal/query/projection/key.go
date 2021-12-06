@@ -81,13 +81,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
 		return crdb.NewNoOpStatement(e), nil
 	}
-	publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
-	if err != nil {
-		logging.LogWithFields("HANDL-SDfw2", "seq", event.Sequence()).Error("cannot decrypt public key")
-		return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
-	}
-
-	return crdb.NewMultiStatement(e,
+	creates := []func(eventstore.EventReader) crdb.Exec{
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyColumnID, e.Aggregate().ID),
@@ -99,21 +93,31 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 				handler.NewCol(KeyColumnUse, e.Usage),
 			},
 		),
-		crdb.AddCreateStatement(
+	}
+	if e.PrivateKey.Expiry.After(time.Now()) {
+		creates = append(creates, crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
 				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
 				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
-		),
-		crdb.AddCreateStatement(
+		))
+	}
+	if e.PublicKey.Expiry.After(time.Now()) {
+		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
+		if err != nil {
+			logging.LogWithFields("HANDL-SDfw2", "seq", event.Sequence()).Error("cannot decrypt public key")
+			return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
+		}
+		creates = append(creates, crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
 				handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
 				handler.NewCol(KeyPublicColumnKey, publicKey),
 			},
 			crdb.WithTableSuffix(publicKeyTableSuffix),
-		),
-	), nil
+		))
+	}
+	return crdb.NewMultiStatement(e, creates...), nil
 }
