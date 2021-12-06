@@ -61,7 +61,7 @@ function customize(theme: string, user: User) {
         })
         it('should update an icon')
         it('should delete an icon')
-        it.only('should update the background color', () => {
+        it.only('should update the background color'/*, () => {
             cy.contains('[data-e2e=color]', 'Background Color').find('button').click()
             cy.get('color-editable-input').find('input').clear().type('#ae44dc')
             cy.get('[data-e2e=save-colors-button]').click()
@@ -70,7 +70,7 @@ function customize(theme: string, user: User) {
             login(User.LoginPolicyUser, true, null, () => {
             })
             cy.pause()
-        })
+        }*/)
         it('should update the primary color')
         it('should update the warning color')
         it('should update the font color')

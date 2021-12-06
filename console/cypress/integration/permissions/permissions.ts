@@ -37,7 +37,7 @@ describe.only('permissions', () => {
 
                 it.only('should add a role', () => {
                     cy.contains('[data-e2e=app-card]', 'Roles').within(() => {
-                        cy.contains('a', 'New').click()
+                        cy.contains('a', 'New').click({ force: true })
                     })
                     cy.get('[formcontrolname^=key]').type(testRoleName)
                     cy.get('[formcontrolname^=displayName]').type(testRoleDisplay)
