@@ -16,7 +16,7 @@
             </ng-template>
 
             <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a class="nav-item" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']"
+              <a class="nav-item" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
                 [routerLink]="[ '/projects', breadc[0]?.param?.value, 'roles']">
 
                 <div class="c_label">
@@ -26,7 +26,7 @@
             </ng-template>
 
             <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a class="nav-item" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']"
+              <a class="nav-item" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
                 [routerLink]="[ '/projects', breadc[0]?.param?.value, 'projectgrants' ]">
 
                 <div class="c_label">
