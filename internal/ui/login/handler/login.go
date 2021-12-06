@@ -168,12 +168,7 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 			{
 				Key:    usr_model.UserSearchKeyPreferredLoginName,
 				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  domain.NewIAMDomainName(orgName, l.iamDomain),
-			},
-			{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
+				Value:  "@" + domain.NewIAMDomainName(orgName, l.iamDomain),
 			},
 		},
 	})

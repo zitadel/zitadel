@@ -10,6 +10,7 @@ import (
 	"github.com/lib/pq"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -231,7 +232,10 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+		sq.Or{
+			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
+		},
 	).ToSql()
 	if err != nil {
 		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
@@ -288,8 +292,8 @@ func (q *Queries) SearchApps(ctx context.Context, queries *AppSearchQueries) (*A
 	return apps, err
 }
 
-func (q *Queries) SearchAppIDs(ctx context.Context, queries *AppSearchQueries) ([]string, error) {
-	query, scan := prepareAppIDsQuery()
+func (q *Queries) SearchClientIDs(ctx context.Context, queries *AppSearchQueries) ([]string, error) {
+	query, scan := prepareClientIDsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fajp8", "Errors.Query.InvalidRequest")
@@ -555,22 +559,30 @@ func prepareAppsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Apps, error)) {
 		}
 }
 
-func prepareAppIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
+func prepareClientIDsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]string, error)) {
 	return sq.Select(
-			AppColumnID.identifier(),
+			AppAPIConfigColumnClientID.identifier(),
+			AppOIDCConfigColumnClientID.identifier(),
 		).From(appsTable.identifier()).
 			LeftJoin(join(AppAPIConfigColumnAppID, AppColumnID)).
 			LeftJoin(join(AppOIDCConfigColumnAppID, AppColumnID)).
-			PlaceholderFormat(sq.Dollar), func(row *sql.Rows) ([]string, error) {
+			PlaceholderFormat(sq.Dollar), func(rows *sql.Rows) ([]string, error) {
 			ids := []string{}
 
-			for row.Next() {
-				var id string
-				if err := row.Scan(&id); err != nil {
+			for rows.Next() {
+				var apiID sql.NullString
+				var oidcID sql.NullString
+				if err := rows.Scan(
+					&apiID,
+					&oidcID,
+				); err != nil {
 					return nil, errors.ThrowInternal(err, "QUERY-0R2Nw", "Errors.Internal")
 				}
-
-				ids = append(ids, id)
+				if apiID.Valid {
+					ids = append(ids, apiID.String)
+				} else if oidcID.Valid {
+					ids = append(ids, oidcID.String)
+				}
 			}
 
 			return ids, nil

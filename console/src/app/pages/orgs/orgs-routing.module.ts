@@ -4,20 +4,10 @@ import { RoleGuard } from 'src/app/guards/role.guard';
 import { FeatureServiceType } from 'src/app/modules/features/features.component';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
-import { OrgCreateComponent } from './org-create/org-create.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgDomainsComponent } from './org-domains/org-domains.component';
 
 const routes: Routes = [
-  {
-    path: 'create',
-    component: OrgCreateComponent,
-    canActivate: [RoleGuard],
-    data: {
-      roles: ['(org.create)?(iam.write)?'],
-    },
-    loadChildren: () => import('./org-create/org-create.module').then((m) => m.OrgCreateModule),
-  },
   {
     path: 'idp',
     children: [
