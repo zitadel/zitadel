@@ -3,14 +3,14 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
@@ -68,12 +68,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain str
 			{
 				Key:    usr_model.UserSearchKeyPreferredLoginName,
 				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  orgDomain,
-			},
-			{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
+				Value:  "@" + orgDomain,
 			},
 		},
 	})

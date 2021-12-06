@@ -353,7 +353,7 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 		cols = append(cols, handler.NewCol(OIDCConfigClientIDCol, *idpEvent.ClientID))
 	}
 	if idpEvent.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigClientSecretCol, *idpEvent.ClientSecret))
+		cols = append(cols, handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret))
 	}
 	if idpEvent.Issuer != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigIssuerCol, *idpEvent.Issuer))

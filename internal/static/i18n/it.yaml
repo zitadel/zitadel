@@ -810,6 +810,7 @@ EventTypes:
     removed: Azione rimossa
 Application:
   OIDC:
+    UnsupportedVersion: La tua versione di OIDC non è supportata
     V1:
       NotCompliant: La tua configurazione non è conforme e differisce dallo standard OIDC 1.0.
       NoRedirectUris: Deve essere registrato almeno un URI di reindirizzamento.

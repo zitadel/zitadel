@@ -71,7 +71,15 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
-	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email)
+	orgID := authz.GetCtxData(ctx).OrgID
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if !policy.UserLoginMustBeDomain {
+		orgID = ""
+	}
+	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email, orgID)
 	if err != nil {
 		return nil, err
 	}
