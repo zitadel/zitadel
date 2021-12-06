@@ -113,6 +113,8 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
+	LoginNameCol = "login_name"
+
 	loginNameUserSuffix           = "users"
 	LoginNameUserIDCol            = "id"
 	LoginNameUserUserNameCol      = "user_name"
