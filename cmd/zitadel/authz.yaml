@@ -337,7 +337,6 @@ InternalAuthZ:
         - "user.self.delete"
     - Role: 'PROJECT_OWNER_GLOBAL'
       Permissions:
-        - "org.create"
         - "org.global.read"
         - "policy.read"
         - "project.read"
@@ -353,7 +352,6 @@ InternalAuthZ:
         - "project.app.write"
         - "project.app.delete"
         - "user.global.read"
-        - "user.self.delete"
         - "user.grant.read"
         - "user.grant.write"
         - "user.grant.delete"
@@ -368,7 +366,6 @@ InternalAuthZ:
         - "project.grant.read"
         - "project.grant.member.read"
         - "user.global.read"
-        - "user.self.delete"
         - "user.grant.read"
         - "user.membership.read"
     - Role: 'PROJECT_GRANT_OWNER'
