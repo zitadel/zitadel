@@ -68,7 +68,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator, assetsAPI)
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm, queries, idGenerator, assetsAPI)
 	if err != nil {
 		return nil, err
 	}
@@ -92,12 +92,21 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		SystemDefaults:  systemDefaults,
 		PrefixAvatarURL: assetsAPI,
 	}
+	//TODO: remove as soon as possible
+	queryView := struct {
+		*query.Queries
+		*auth_view.View
+	}{
+		queries,
+		view,
+	}
 	return &EsRepository{
 		spool,
 		es,
 		userRepo,
 		eventstore.AuthRequestRepo{
 			PrivacyPolicyProvider:      queries,
+			LabelPolicyProvider:        queries,
 			Command:                    command,
 			OrgViewProvider:            queries,
 			AuthRequests:               authReq,
@@ -110,8 +119,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IDPProviderViewProvider:    view,
 			LockoutPolicyViewProvider:  queries,
 			LoginPolicyViewProvider:    queries,
-			UserGrantProvider:          view,
-			ProjectProvider:            view,
+			Query:                      queries,
+			UserGrantProvider:          queryView,
+			ProjectProvider:            queryView,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
@@ -142,7 +152,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,
-			View:     view,
+			Query:    queries,
 		},
 
 		eventstore.UserSessionRepo{

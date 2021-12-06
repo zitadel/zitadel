@@ -12,11 +12,11 @@ const (
 )
 
 func (v *View) StylingByAggregateIDAndState(aggregateID string, state int32) (*model.LabelPolicyView, error) {
-	return view.GetLabelPolicyByAggregateIDAndState(v.Db, stylingTyble, aggregateID, state)
+	return view.GetStylingByAggregateIDAndState(v.Db, stylingTyble, aggregateID, state)
 }
 
 func (v *View) PutStyling(policy *model.LabelPolicyView, event *models.Event) error {
-	err := view.PutLabelPolicy(v.Db, stylingTyble, policy)
+	err := view.PutStyling(v.Db, stylingTyble, policy)
 	if err != nil {
 		return err
 	}

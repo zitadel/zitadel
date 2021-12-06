@@ -18,7 +18,7 @@ ENV PROTOC_ARCH x86_64
 FROM ${BUILDARCH}-base AS base
 ARG PROTOC_VERSION=3.13.0
 ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
-ARG GRPC_WEB_VERSION=1.2.1
+ARG GRPC_WEB_VERSION=1.3.0
 # no arm specific version available and x86 works fine at the moment:
 ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
 
