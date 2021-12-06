@@ -22,15 +22,15 @@ func (s *Step21) execute(ctx context.Context, commandSide *Commands) error {
 func (c *Commands) SetupStep21(ctx context.Context, step *Step21) error {
 	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
 		events := make([]eventstore.EventPusher, 0)
-		globalMembers := newGlobalOrgMemberWriteModel("133997951151288877", "ORG_PROJECT_CREATOR")
+		globalMembers := newGlobalOrgMemberWriteModel(iam.GlobalOrgID, domain.RoleOrgProjectCreator)
 		orgAgg := OrgAggregateFromWriteModel(&globalMembers.WriteModel)
 		if err := c.eventstore.FilterToQueryReducer(ctx, globalMembers); err != nil {
 			return nil, err
 		}
 		for userID, roles := range globalMembers.members {
 			for i, role := range roles {
-				if role == "ORG_PROJECT_CREATOR" {
-					roles[i] = "SELF_MANAGEMENT_GLOBAL"
+				if role == domain.RoleOrgProjectCreator {
+					roles[i] = domain.RoleSelfManagementGlobal
 				}
 			}
 			events = append(events, org.NewMemberChangedEvent(ctx, orgAgg, userID, roles...))
