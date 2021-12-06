@@ -19,7 +19,7 @@ CREATE TABLE zitadel.projections.keys_private(
 );
 
 CREATE TABLE zitadel.projections.keys_public (
-    id STRING,
+    id STRING REFERENCES zitadel.projections.keys ON DELETE NO ACTION,
     expiry TIMESTAMPTZ NOT NULL,
     key BYTES NOT NULL,
 
