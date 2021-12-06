@@ -60,7 +60,7 @@ func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb
 	return &idp_pb.IDPLoginPolicyLink{
 		IdpId:   link.IDPConfigID,
 		IdpName: link.Name,
-		IdpType: IDPTypeToPb(link.IDPConfigType),
+		IdpType: IDPTypeViewToPb(link.IDPConfigType),
 	}
 }
 
@@ -79,18 +79,30 @@ func IDPUserLinkToPb(link *query.UserIDPLink) *idp_pb.IDPUserLink {
 		IdpName:          link.IDPName,
 		ProvidedUserId:   link.ProvidedUserID,
 		ProvidedUserName: link.ProvidedUsername,
-		//TODO: as soon as saml is implemented we need to switch here
-		//IdpType: IDPTypeToPb(link.Type),
+		IdpType:          IDPTypeToPb(link.IDPType),
 	}
 }
 
-func IDPTypeToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
+func IDPTypeViewToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
 	switch idpType {
 	case iam_model.IDPConfigTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
 	case iam_model.IDPConfigTypeSAML:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	case iam_model.IDPConfigTypeJWT:
+		return idp_pb.IDPType_IDP_TYPE_JWT
+	default:
+		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
+	}
+}
+
+func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
+	switch idpType {
+	case domain.IDPConfigTypeOIDC:
+		return idp_pb.IDPType_IDP_TYPE_OIDC
+	case domain.IDPConfigTypeSAML:
+		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
+	case domain.IDPConfigTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
