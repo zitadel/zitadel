@@ -39,7 +39,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect
@@ -81,7 +81,6 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.7
 	google.golang.org/api v0.60.0
-	google.golang.org/genproto v0.0.0-20211129164237-f09f9a12af12
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
