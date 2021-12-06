@@ -7,17 +7,18 @@ import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import {
+  ProjectRoleDetailComponent,
+} from '../../pages/projects/project-roles/project-role-detail/project-role-detail.component';
 import { PaginatorComponent } from '../paginator/paginator.component';
-import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
-import { ProjectRolesDataSource } from './project-roles-datasource';
-
+import { ProjectRolesDataSource } from './project-roles-table-datasource';
 
 @Component({
-  selector: 'cnsl-project-roles',
-  templateUrl: './project-roles.component.html',
-  styleUrls: ['./project-roles.component.scss'],
+  selector: 'cnsl-project-roles-table',
+  templateUrl: './project-roles-table.component.html',
+  styleUrls: ['./project-roles-table.component.scss'],
 })
-export class ProjectRolesComponent implements AfterViewInit, OnInit {
+export class ProjectRolesTableComponent implements AfterViewInit, OnInit {
   @Input() public projectId: string = '';
   @Input() public disabled: boolean = false;
   @Input() public actionsVisible: boolean = false;
@@ -43,25 +44,16 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
   }
 
   public ngAfterViewInit(): void {
-    this.paginator.page
-      .pipe(
-        tap(() => this.loadRolesPage()),
-      )
-      .subscribe();
+    this.paginator.page.pipe(tap(() => this.loadRolesPage())).subscribe();
   }
 
   public selectAllOfGroup(group: string): void {
-    const groupRoles: Role.AsObject[] = this.dataSource.rolesSubject.getValue()
-      .filter(role => role.group === group);
+    const groupRoles: Role.AsObject[] = this.dataSource.rolesSubject.getValue().filter((role) => role.group === group);
     this.selection.select(...groupRoles);
   }
 
   private loadRolesPage(): void {
-    this.dataSource.loadRoles(
-      this.projectId,
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-    );
+    this.dataSource.loadRoles(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
   }
 
   public changePage(): void {
@@ -76,13 +68,13 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
   }
 
   public deleteRole(role: Role.AsObject): Promise<any> {
-    const index = this.dataSource.rolesSubject.value.findIndex(iter => iter.key === role.key);
+    const index = this.dataSource.rolesSubject.value.findIndex((iter) => iter.key === role.key);
 
     return this.mgmtService.removeProjectRole(this.projectId, role.key).then(() => {
       this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
@@ -102,7 +94,7 @@ export class ProjectRolesComponent implements AfterViewInit, OnInit {
         this.dataSource.rolesSubject.value.splice(index, 1);
         this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
       })
-      .catch(error => {
+      .catch((error) => {
         this.toast.showError(error);
       });
   }

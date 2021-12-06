@@ -13,42 +13,38 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
+import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
-import { PaginatorModule } from '../paginator/paginator.module';
-import { RefreshTableModule } from '../refresh-table/refresh-table.module';
-import { ProjectRoleDetailComponent } from './project-role-detail/project-role-detail.component';
-import { ProjectRolesComponent } from './project-roles.component';
-
+import { ProjectRolesTableComponent } from './project-roles-table.component';
 
 @NgModule({
-    declarations: [ProjectRolesComponent, ProjectRoleDetailComponent],
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        HasRoleModule,
-        MatTableModule,
-        PaginatorModule,
-        MatDialogModule,
-        InputModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
-        RouterModule,
-        MatTooltipModule,
-        HasRolePipeModule,
-        TranslateModule,
-        MatMenuModule,
-        TimestampToDatePipeModule,
-        RefreshTableModule,
-        LocalizedDatePipeModule,
-    ],
-    exports: [
-        ProjectRolesComponent,
-    ],
+  declarations: [ProjectRolesTableComponent],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    HasRoleModule,
+    MatTableModule,
+    PaginatorModule,
+    MatDialogModule,
+    InputModule,
+    RouterModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    HasRolePipeModule,
+    TranslateModule,
+    MatMenuModule,
+    TimestampToDatePipeModule,
+    RefreshTableModule,
+    LocalizedDatePipeModule,
+  ],
+  exports: [ProjectRolesTableComponent],
 })
-export class ProjectRolesModule { }
+export class ProjectRolesTableModule {}

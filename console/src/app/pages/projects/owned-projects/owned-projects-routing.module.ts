@@ -53,7 +53,7 @@ const routes: Routes = [
       {
         path: 'projectgrants',
         data: {
-          animation: 'AddPage',
+          // animation: 'AddPage',
           // roles: ['project.grant.read:' + ':projectid', 'project.grant.read'],
         },
         // canActivate: [RoleGuard],
@@ -62,7 +62,11 @@ const routes: Routes = [
             (m) => m.ProjectGrantsModule,
           ),
       },
-
+      {
+        path: 'roles',
+        loadChildren: () =>
+          import('src/app/pages/projects/project-roles/project-roles.module').then((m) => m.ProjectRolesModule),
+      },
       {
         path: 'roles/create',
         loadChildren: () =>

@@ -22,7 +22,7 @@ import { InfoRowModule } from 'src/app/modules/info-row/info-row.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
-import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
+import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
@@ -52,7 +52,7 @@ import { OwnedProjectDetailComponent } from './owned-project-detail.component';
     MatTabsModule,
     WarnDialogModule,
     MatTooltipModule,
-    ProjectRolesModule,
+    ProjectRolesTableModule,
     HasRolePipeModule,
     UserGrantsModule,
     TimestampToDatePipeModule,

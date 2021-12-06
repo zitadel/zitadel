@@ -11,31 +11,31 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InputModule } from 'src/app/modules/input/input.module';
-import { ProjectRolesModule } from 'src/app/modules/project-roles/project-roles.module';
+import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ProjectGrantCreateRoutingModule } from './project-grant-create-routing.module';
 import { ProjectGrantCreateComponent } from './project-grant-create.component';
 
 @NgModule({
-    declarations: [ProjectGrantCreateComponent],
-    imports: [
-        ProjectGrantCreateRoutingModule,
-        CommonModule,
-        MatAutocompleteModule,
-        MatChipsModule,
-        MatButtonModule,
-        InputModule,
-        CardModule,
-        MatCheckboxModule,
-        ProjectRolesModule,
-        MatIconModule,
-        MatTooltipModule,
-        HasRolePipeModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
-        FormsModule,
-        TranslateModule,
-    ],
+  declarations: [ProjectGrantCreateComponent],
+  imports: [
+    ProjectGrantCreateRoutingModule,
+    CommonModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatButtonModule,
+    InputModule,
+    CardModule,
+    MatCheckboxModule,
+    ProjectRolesTableModule,
+    MatIconModule,
+    MatTooltipModule,
+    HasRolePipeModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+    TranslateModule,
+  ],
 })
-export class ProjectGrantCreateModule { }
+export class ProjectGrantCreateModule {}

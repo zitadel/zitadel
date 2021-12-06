@@ -118,14 +118,10 @@
             {{'PROJECT.HAS_PROJECT' | translate}}</mat-checkbox>
           <p class="desc">{{'PROJECT.HAS_PROJECT_DESCRIPTION' | translate}}</p>
           <div class="divider"></div>
-          <cnsl-project-roles
-            [disabled]="(['project.role.write$', 'project.role.write:'+ project.id]| hasRole | async) === false"
-            [actionsVisible]="true" [projectId]="projectId">
-          </cnsl-project-roles>
         </cnsl-card>
       </ng-template>
 
-      <ng-template cnslHasRole [hasRole]="['user.grant.read']">
+      <!-- <ng-template cnslHasRole [hasRole]="['user.grant.read']">
         <cnsl-card *ngIf="project?.id" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
           description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
           <cnsl-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
@@ -134,7 +130,7 @@
             [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) === false">
           </cnsl-user-grants>
         </cnsl-card>
-      </ng-template>
+      </ng-template> -->
     </ng-container>
   </ng-container>
 </div>

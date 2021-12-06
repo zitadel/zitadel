@@ -1,77 +1,76 @@
 <div class="container">
-    <div class="abort-container">
-        <button (click)="close()" mat-icon-button>
-            <mat-icon>close</mat-icon>
-        </button>
-        <h1 class="abort">{{ 'GRANTS.CREATE.TITLE' | translate }}</h1><span class="abort-2">Step
-            {{ currentCreateStep }} of
-            {{ STEPS }}</span>
-    </div>
+  <div class="abort-container">
+    <button (click)="close()" mat-icon-button>
+      <mat-icon>close</mat-icon>
+    </button>
+    <h1 class="abort">{{ 'GRANTS.CREATE.TITLE' | translate }}</h1><span class="abort-2">Step
+      {{ currentCreateStep }} of
+      {{ STEPS }}</span>
+  </div>
 
 
+  <ng-container *ngIf="currentCreateStep === 1">
+    <p class="desc">
+      {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION' | translate: org}}
+      <br>
+      {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}
+    </p>
+
+    <ng-container>
+      <h2>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h2>
+
+      <cnsl-search-user-autocomplete class="block" [singleOutput]="true" [users]="user ? [user] : []"
+        (selectionChanged)="selectUser($event)"
+        [target]="context === UserGrantContext.USER ? UserTarget.EXTERNAL : UserTarget.SELF">
+      </cnsl-search-user-autocomplete>
+    </ng-container>
+
+    <ng-container *ngIf="context && (context === UserGrantContext.USER || context === UserGrantContext.NONE)">
+      <h2>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
+
+      <cnsl-search-project-autocomplete class="block" [singleOutput]="true" (selectionChanged)="selectProject($event)">
+      </cnsl-search-project-autocomplete>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="currentCreateStep === STEPS">
+    <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
+    <ng-container
+      *ngIf="$any(project)?.id && (context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE)">
+      <cnsl-card>
+        <cnsl-project-roles-table (changedSelection)="selectRoles($event)" [projectId]="projectId">
+        </cnsl-project-roles-table>
+      </cnsl-card>
+    </ng-container>
+
+    <ng-container
+      *ngIf="$any(project)?.projectId && (context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantedRoleKeysList">
+      <cnsl-form-field class="form-field" appearance="outline">
+        <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
+        <mat-select multiple (selectionChange)="rolesList = $event.value">
+          <mat-option *ngFor="let role of grantedRoleKeysList" [value]="role">
+            {{role}}
+          </mat-option>
+        </mat-select>
+      </cnsl-form-field>
+    </ng-container>
+  </ng-container>
+
+  <div class="btn-container">
     <ng-container *ngIf="currentCreateStep === 1">
-        <p class="desc">
-            {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION' | translate: org}}
-            <br>
-            {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}
-        </p>
-
-        <ng-container>
-            <h2>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h2>
-
-            <cnsl-search-user-autocomplete class="block" [singleOutput]="true" [users]="user ? [user] : []"
-                (selectionChanged)="selectUser($event)"
-                [target]="context === UserGrantContext.USER ? UserTarget.EXTERNAL : UserTarget.SELF">
-            </cnsl-search-user-autocomplete>
-        </ng-container>
-
-        <ng-container *ngIf="context && (context === UserGrantContext.USER || context === UserGrantContext.NONE)">
-            <h2>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
-
-            <cnsl-search-project-autocomplete class="block" [singleOutput]="true"
-                (selectionChanged)="selectProject($event)">
-            </cnsl-search-project-autocomplete>
-        </ng-container>
+      <button [disabled]="!org || !projectId || !userId" (click)="next()" color="primary" mat-raised-button
+        class="big-button" cdkFocusInitial>
+        {{ 'ACTIONS.CONTINUE' | translate }}
+      </button>
     </ng-container>
 
     <ng-container *ngIf="currentCreateStep === STEPS">
-        <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
-        <ng-container
-            *ngIf="$any(project)?.id && (context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE)">
-            <cnsl-card>
-                <cnsl-project-roles (changedSelection)="selectRoles($event)" [projectId]="projectId">
-                </cnsl-project-roles>
-            </cnsl-card>
-        </ng-container>
-
-        <ng-container
-            *ngIf="$any(project)?.projectId && (context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantedRoleKeysList">
-            <cnsl-form-field class="form-field" appearance="outline">
-                <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-                <mat-select multiple (selectionChange)="rolesList = $event.value">
-                    <mat-option *ngFor="let role of grantedRoleKeysList" [value]="role">
-                        {{role}}
-                    </mat-option>
-                </mat-select>
-            </cnsl-form-field>
-        </ng-container>
+      <button (click)="previous()" color="primary" mat-button class="small-button" cdkFocusInitial>
+        {{ 'ACTIONS.BACK' | translate }}
+      </button>
+      <button color="primary" (click)="addGrant()" mat-raised-button class="big-button" cdkFocusInitial>
+        {{ 'ACTIONS.SAVE' | translate }}
+      </button>
     </ng-container>
-
-    <div class="btn-container">
-        <ng-container *ngIf="currentCreateStep === 1">
-            <button [disabled]="!org || !projectId || !userId" (click)="next()" color="primary" mat-raised-button
-                class="big-button" cdkFocusInitial>
-                {{ 'ACTIONS.CONTINUE' | translate }}
-            </button>
-        </ng-container>
-
-        <ng-container *ngIf="currentCreateStep === STEPS">
-            <button (click)="previous()" color="primary" mat-button class="small-button" cdkFocusInitial>
-                {{ 'ACTIONS.BACK' | translate }}
-            </button>
-            <button color="primary" (click)="addGrant()" mat-raised-button class="big-button" cdkFocusInitial>
-                {{ 'ACTIONS.SAVE' | translate }}
-            </button>
-        </ng-container>
-    </div>
+  </div>
 </div>
