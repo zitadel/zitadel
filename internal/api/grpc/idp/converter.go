@@ -79,8 +79,7 @@ func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 		IdpName:          link.IDPName,
 		ProvidedUserId:   link.ProvidedUserID,
 		ProvidedUserName: link.ProvidedUsername,
-		//TODO: as soon as saml is implemented we need to switch here
-		//IdpType: IDPTypeToPb(link.Type),
+		IdpType:          IDPTypeToPb(link.IDPType),
 	}
 }
 

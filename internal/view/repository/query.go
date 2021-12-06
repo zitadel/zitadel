@@ -2,11 +2,12 @@ package repository
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/internal/domain"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 type SearchRequest interface {
@@ -48,6 +49,9 @@ func PrepareSearchQuery(table string, request SearchRequest) func(db *gorm.DB, r
 		}
 
 		query = query.Count(&count)
+		if res == nil {
+			return count, nil
+		}
 		if request.GetLimit() != 0 {
 			query = query.Limit(request.GetLimit())
 		}

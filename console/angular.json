@@ -22,22 +22,15 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/manifest.webmanifest"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": [
-              "./node_modules/tinycolor2/dist/tinycolor-min.js"
-            ],
+            "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
+            "styles": ["src/styles.scss"],
+            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
             "allowedCommonJsDependencies": [
               "@angular/common/locales/de",
               "src/app/proto/generated/zitadel/admin_pb",
               "src/app/proto/generated/zitadel/management_pb",
               "src/app/proto/generated/**",
+              "google-protobuf/google/protobuf/empty_pb",
               "file-saver",
               "qrcode"
             ],
@@ -126,27 +119,15 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/manifest.webmanifest"
-            ],
-            "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
-              "src/styles.scss"
-            ],
-            "scripts": [
-              "./node_modules/tinycolor2/dist/tinycolor-min.js"
-            ]
+            "assets": ["src/favicon.ico", "src/assets", "src/manifest.webmanifest"],
+            "styles": ["./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css", "src/styles.scss"],
+            "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         },
         "e2e": {

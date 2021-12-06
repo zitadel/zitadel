@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/zitadel/internal/query"
 
@@ -43,7 +43,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, qu
 	}
 
 	idGenerator := id.SonyFlakeGenerator
-	view, err := authz_view.StartView(sqlClient, idGenerator)
+	view, err := authz_view.StartView(sqlClient, idGenerator, queries)
 	if err != nil {
 		return nil, err
 	}
