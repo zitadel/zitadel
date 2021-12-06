@@ -4,9 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
+
+	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 )
 
@@ -45,11 +46,38 @@ var (
 )
 
 type OrgMembersQuery struct {
-	SearchRequest
+	MembersQuery
+	OrgID string
 }
 
-func OrgMembers(ctx context.Context, orgID string, queries *OrgMembersQuery) (*Members, error) {
-	return nil, nil
+func (q *OrgMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return q.MembersQuery.
+		toQuery(query).
+		Where(sq.Eq{OrgMemberOrgID.identifier(): q.OrgID})
+}
+
+func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (*Members, error) {
+	query, scan := prepareOrgMembersQuery()
+	stmt, args, err := queries.toQuery(query).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")
+	}
+
+	currentSequence, err := q.latestSequence(ctx, orgsTable)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := q.client.QueryContext(ctx, stmt, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-5g4yV", "Errors.Internal")
+	}
+	members, err := scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	members.LatestSequence = currentSequence
+	return members, err
 }
 
 func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, error)) {
@@ -62,7 +90,7 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 			OrgMemberRoles.identifier(),
 			LoginNameNameCol.identifier(),
 			HumanEmailCol.identifier(),
-			HumanFistNameCol.identifier(),
+			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
@@ -71,9 +99,10 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 		).From(orgMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, OrgMemberUserID)).
-			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID)).Where(
-			sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
-		).PlaceholderFormat(sq.Dollar),
+			LeftJoin(join(LoginNameUserIDCol, OrgMemberUserID)).
+			Where(
+				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
+			).PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Members, error) {
 			members := make([]*Member, 0)
 			var count uint64
