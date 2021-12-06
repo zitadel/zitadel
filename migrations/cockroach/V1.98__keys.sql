@@ -11,7 +11,7 @@ CREATE TABLE zitadel.projections.keys (
 );
 
 CREATE TABLE zitadel.projections.keys_private(
-    id STRING,
+    id STRING REFERENCES zitadel.projections.keys ON DELETE NO ACTION,
     expiry TIMESTAMPTZ NOT NULL,
     key JSONB NOT NULL,
 
