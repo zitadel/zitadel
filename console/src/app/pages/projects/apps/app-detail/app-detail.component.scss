@@ -121,10 +121,18 @@
   font-size: 14px;
 }
 
-.compliance .problem {
-  font-size: 14px;
-  margin-bottom: 0.5rem;
-  display: block;
+.compliance {
+  .title {
+    margin: 2rem 0 1rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 14px;
+  }
+  .problem {
+    font-size: 14px;
+    margin: 0rem 0 0.5rem 0;
+    display: block;
+  }
 }
 
 .name-content {
@@ -176,6 +184,11 @@
     margin-top: 2.3rem;
     margin-left: 0.5rem;
   }
+}
+
+.main-app-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .expandables {

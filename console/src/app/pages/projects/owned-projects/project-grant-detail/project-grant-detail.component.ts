@@ -1,10 +1,11 @@
-import { Component, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -19,7 +20,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
   templateUrl: './project-grant-detail.component.html',
   styleUrls: ['./project-grant-detail.component.scss'],
 })
-export class ProjectGrantDetailComponent {
+export class ProjectGrantDetailComponent implements OnDestroy {
   public INITIALPAGESIZE: number = 25;
 
   public grant!: GrantedProject.AsObject;
@@ -43,8 +44,9 @@ export class ProjectGrantDetailComponent {
     private route: ActivatedRoute,
     private toast: ToastService,
     private dialog: MatDialog,
+    private breadcrumbService: BreadcrumbService,
   ) {
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       this.projectid = params.projectid;
       this.grantid = params.grantid;
 
@@ -66,6 +68,22 @@ export class ProjectGrantDetailComponent {
       this.mgmtService.getProjectGrantByID(this.grantid, this.projectid).then((resp) => {
         if (resp.projectGrant) {
           this.grant = resp.projectGrant;
+
+          const breadcrumbs = [
+            new Breadcrumb({
+              type: BreadcrumbType.PROJECT,
+              name: '',
+              param: { key: 'projectid', value: resp.projectGrant.projectId },
+              routerLink: ['/projects', resp.projectGrant.projectId],
+            }),
+            new Breadcrumb({
+              type: BreadcrumbType.PROJECTGRANT,
+              name: resp.projectGrant.grantedOrgName,
+              param: { key: 'grantid', value: resp.projectGrant.grantId },
+              routerLink: ['/projects', resp.projectGrant.projectId, 'projectgrants', resp.projectGrant.grantId],
+            }),
+          ];
+          this.breadcrumbService.setBreadcrumb(breadcrumbs);
         }
       });
     });
@@ -73,61 +91,76 @@ export class ProjectGrantDetailComponent {
 
   public changeState(newState: ProjectGrantState): void {
     if (newState === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE) {
-      this.mgmtService.reactivateProjectGrant(this.grantid, this.projectid).then(() => {
-        this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
-        this.grant.state = newState;
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.mgmtService
+        .reactivateProjectGrant(this.grantid, this.projectid)
+        .then(() => {
+          this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
+          this.grant.state = newState;
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     } else if (newState === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE) {
-      this.mgmtService.deactivateProjectGrant(this.grantid, this.projectid).then(() => {
-        this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
-        this.grant.state = newState;
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.mgmtService
+        .deactivateProjectGrant(this.grantid, this.projectid)
+        .then(() => {
+          this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
+          this.grant.state = newState;
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
   public getRoleOptions(projectId: string): void {
-    this.mgmtService.listProjectRoles(projectId, 100, 0).then(resp => {
+    this.mgmtService.listProjectRoles(projectId, 100, 0).then((resp) => {
       this.projectRoleOptions = resp.resultList;
     });
   }
 
   public getMemberRoleOptions(): void {
-    this.mgmtService.listProjectGrantMemberRoles().then(resp => {
-      this.memberRoleOptions = resp.resultList;
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .listProjectGrantMemberRoles()
+      .then((resp) => {
+        this.memberRoleOptions = resp.resultList;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   updateRoles(selectionChange: MatSelectChange): void {
-    this.mgmtService.updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange.value)
+    this.mgmtService
+      .updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange.value)
       .then(() => {
         this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
-      }).catch(error => {
+      })
+      .catch((error) => {
         this.toast.showError(error);
       });
   }
 
   public removeProjectMemberSelection(): void {
-    Promise.all(this.selection.map(member => {
-      return this.mgmtService.removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId)
-        .then(() => {
-          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
-          setTimeout(() => {
-            this.changePage.emit();
-          }, 1000);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
-    }));
+    Promise.all(
+      this.selection.map((member) => {
+        return this.mgmtService
+          .removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId)
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
+            setTimeout(() => {
+              this.changePage.emit();
+            }, 1000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }),
+    );
   }
 
   public async openAddMember(): Promise<any> {
-    const keysList = (await this.mgmtService.listProjectGrantMemberRoles());
+    const keysList = await this.mgmtService.listProjectGrantMemberRoles();
 
     const dialogRef = this.dialog.open(ProjectGrantMembersCreateDialogComponent, {
       data: {
@@ -138,35 +171,41 @@ export class ProjectGrantDetailComponent {
 
     dialogRef.afterClosed().subscribe((dataToAdd: ProjectGrantMembersCreateDialogExportType) => {
       if (dataToAdd) {
-        Promise.all(dataToAdd.userIds.map((userid: string) => {
-          return this.mgmtService.addProjectGrantMember(
-            this.grant.projectId,
-            this.grant.grantId,
-            userid,
-            dataToAdd.rolesKeyList,
-          );
-        })).then(() => {
-          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
-          setTimeout(() => {
-            this.changePage.emit();
-          }, 3000);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        Promise.all(
+          dataToAdd.userIds.map((userid: string) => {
+            return this.mgmtService.addProjectGrantMember(
+              this.grant.projectId,
+              this.grant.grantId,
+              userid,
+              dataToAdd.rolesKeyList,
+            );
+          }),
+        )
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERADDED', true);
+            setTimeout(() => {
+              this.changePage.emit();
+            }, 3000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
 
   updateMemberRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
-    this.mgmtService.updateProjectGrantMember(
-      this.grant.projectId,
-      this.grant.grantId,
-      member.userId,
-      selectionChange.value,
-    ).then(() => {
-      this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange.value)
+      .then(() => {
+        this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public ngOnDestroy(): void {
+    this.breadcrumbService.setBreadcrumb([]);
   }
 }

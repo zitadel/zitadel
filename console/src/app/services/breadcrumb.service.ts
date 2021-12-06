@@ -6,6 +6,7 @@ import { ManagementService } from './mgmt.service';
 export enum BreadcrumbType {
   PROJECT,
   GRANTEDPROJECT,
+  PROJECTGRANT,
   APP,
   IDP,
 }
@@ -14,7 +15,7 @@ export class Breadcrumb {
   type: BreadcrumbType = BreadcrumbType.PROJECT;
   name: string = '';
   param: {
-    key: 'projectid' | 'appid' | 'id';
+    key: 'projectid' | 'appid' | 'grantid' | 'id';
     value: string;
   } = {
     key: 'projectid',

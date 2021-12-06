@@ -1377,6 +1377,7 @@
   },
   "APP": {
     "LIST": "Applicazioni",
+    "COMPLIANCE": "Conformità con OIDC",
     "PAGES": {
       "TITLE": "Applicazione",
       "ID": "ID",

@@ -31,9 +31,9 @@
 
   <ng-template cnslHasRole [hasRole]="['project.app.write']">
     <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']">
-      <div class="grid-card add" matRipple>
+      <cnsl-app-card class="grid-card" matRipple [type]="OIDCAppType.ADD">
         <mat-icon>add</mat-icon>
-      </div>
+      </cnsl-app-card>
       <span class="name">{{ 'ACTIONS.NEW' | translate }}</span>
     </div>
   </ng-template>

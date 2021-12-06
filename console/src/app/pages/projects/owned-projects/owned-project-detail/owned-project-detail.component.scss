@@ -9,7 +9,6 @@
     margin: 0 -2rem;
     padding: 2rem 2rem 1rem 2rem;
     background: if($is-dark-theme, #00000020, #ffffff80);
-    // linear-gradient(90deg, #00000000, #00000020 2%, #00000020 98%, #00000000 100%),
 
     .project-top-row {
       display: flex;
@@ -53,7 +52,7 @@
       }
       .project-sub {
         color: var(--grey);
-        margin: 1rem 0 0 0;
+        margin: 1rem 1rem 0 0;
         font-size: 14px;
 
         &.zitadel-warning {
@@ -93,10 +92,9 @@
   padding: 2rem 0 1rem 0;
 
   .setting-title {
-    font-size: 14px;
-    color: var(--grey);
     text-transform: uppercase;
     margin: 0;
+    font-size: 16px;
   }
 
   .setting-desc {

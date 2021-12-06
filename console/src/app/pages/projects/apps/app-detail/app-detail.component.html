@@ -58,11 +58,10 @@
 </div>
 <div class="max-width-container">
   <cnsl-meta-layout>
-    <div class="enlarged-container">
-
-
+    <div class="main-app-content">
       <div class="compliance"
         *ngIf="app?.oidcConfig?.complianceProblemsList && app.oidcConfig?.complianceProblemsList?.length">
+        <h2 class="title">{{'APP.COMPLIANCE' | translate}}</h2>
         <cnsl-info-section class="problem" [type]="InfoSectionType.WARN">
           <ul style="margin: 0;">
             <li style="margin: 0 0 .5rem 0;" *ngFor="let problem of app.oidcConfig?.complianceProblemsList || []">
@@ -70,7 +69,6 @@
           </ul>
         </cnsl-info-section>
       </div>
-
 
       <div *ngIf="app?.oidcConfig" class="expandables">
         <div class="expandable">
@@ -121,15 +119,15 @@
         </div>
 
         <div class="expandable">
-          <p class="title">{{'APP.ADDITIONALORIGINS' | translate}}
+          <h2 class="title">{{'APP.ADDITIONALORIGINS' | translate}}
             <button mat-icon-button (click)="showAdditionalOrigins = !showAdditionalOrigins"
               matTooltip="{{(showAdditionalOrigins ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
               <mat-icon *ngIf="!showAdditionalOrigins">expand_more</mat-icon>
               <mat-icon *ngIf="showAdditionalOrigins">expand_less</mat-icon>
             </button>
-          </p>
+          </h2>
           <ng-container *ngIf="showAdditionalOrigins">
-            <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
+            <h2 class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</h2>
             <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
               [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $any($event)"
               [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
@@ -161,7 +159,6 @@
         <button [disabled]="!canWrite" mat-stroked-button
           (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
       </div>
-
 
       <form *ngIf="oidcForm && app?.oidcConfig" [formGroup]="oidcForm" (ngSubmit)="saveOIDCApp()">
         <cnsl-card title=" {{ 'APP.OIDC.TITLE' | translate }}" *ngIf="app && app.oidcConfig" [expanded]="false">
@@ -275,8 +272,7 @@
       <cnsl-links [links]="nextLinks"></cnsl-links>
     </div>
 
-
-    <div class="side" metainfo>
+    <div metainfo>
       <cnsl-changes *ngIf="app" [changeType]="ChangeType.APP" [id]="app.id" [secId]="projectId"></cnsl-changes>
     </div>
   </cnsl-meta-layout>

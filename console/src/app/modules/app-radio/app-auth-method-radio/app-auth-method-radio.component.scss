@@ -7,7 +7,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   margin: 0;
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
   padding-top: 1rem;
 }
 
@@ -16,7 +16,7 @@
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
-  input[type="radio"] {
+  input[type='radio'] {
     appearance: none;
     opacity: 0;
     display: none;
@@ -31,8 +31,8 @@
   }
 
   .cnsl-radio-button {
-    margin: .5rem;
-    border-radius: .5rem;
+    margin: 0.5rem;
+    border-radius: 0.5rem;
     border: 1px solid if($is-dark-theme, var(--grey), white);
     display: flex;
     flex-direction: column;
@@ -40,7 +40,7 @@
     cursor: pointer;
     position: relative;
     padding-bottom: 1rem;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 
     &.first {
       margin-left: 0;
@@ -81,7 +81,7 @@
 
       .current {
         position: absolute;
-        bottom: .5rem;
+        bottom: 0.5rem;
         left: 50%;
         transform: translateX(-50%);
         display: block;
