@@ -7,7 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/change"
 	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
@@ -81,7 +80,7 @@ func (s *Server) UpdateMyUserName(ctx context.Context, req *auth_pb.UpdateMyUser
 		return nil, err
 	}
 	return &auth_pb.UpdateMyUserNameResponse{
-		Details: object.DomainToChangeDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -100,7 +99,7 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
 		Result: UserGrantsToPb(res.Result),
-		Details: object.ToListDetails(
+		Details: obj_grpc.ToListDetails(
 			res.TotalResult,
 			res.Sequence,
 			res.Timestamp,
@@ -119,13 +118,13 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
 		//TODO: not all details
-		Details: object.ToListDetails(res.TotalResult, 0, time.Time{}),
+		Details: obj_grpc.ToListDetails(res.TotalResult, 0, time.Time{}),
 		Result:  org.OrgsToPb(res.Result),
 	}, nil
 }
 
 func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) (*grant_model.UserGrantSearchRequest, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
+	offset, limit, asc := obj_grpc.ListQueryToModel(req.Query)
 	queries, err := org.OrgQueriesToUserGrantModel(req.Queries)
 	if err != nil {
 		return nil, err

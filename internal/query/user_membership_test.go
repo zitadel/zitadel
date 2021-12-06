@@ -23,6 +23,8 @@ var (
 			", iam_id" +
 			", project_id" +
 			", grant_id" +
+			", zitadel.projections.users_humans.display_name" +
+			", zitadel.projections.users_machines.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
 			"SELECT zitadel.projections.org_members.user_id" +
@@ -72,7 +74,9 @@ var (
 			", zitadel.projections.project_grant_members.project_id" +
 			", zitadel.projections.project_grant_members.grant_id" +
 			" FROM zitadel.projections.project_grant_members" +
-			") AS m")
+			") AS m" +
+			" LEFT JOIN zitadel.projections.users_humans ON user_id = zitadel.projections.users_humans.user_id" +
+			" LEFT JOIN zitadel.projections.users_machines ON user_id = zitadel.projections.users_machines.user_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -84,6 +88,8 @@ var (
 		"iam_id",
 		"project_id",
 		"grant_id",
+		"display_name",
+		"name",
 		"count",
 	}
 )
@@ -112,7 +118,7 @@ func Test_MembershipPrepares(t *testing.T) {
 			object: &Memberships{Memberships: []*Membership{}},
 		},
 		{
-			name:    "prepareMembershipsQuery one org member",
+			name:    "prepareMembershipsQuery one org member human",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -129,6 +135,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							"org-id",
 							nil,
 							nil,
+							nil,
+							"display name",
 							nil,
 						},
 					},
@@ -147,12 +155,56 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						Org:           &OrgMembership{OrgID: "org-id"},
+						DisplayName:   "display name",
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one iam member",
+			name:    "prepareMembershipsQuery one org member machine",
+			prepare: prepareMembershipsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					membershipsStmt,
+					membershipCols,
+					[][]driver.Value{
+						{
+							"user-id",
+							pq.StringArray{"role1", "role2"},
+							testNow,
+							testNow,
+							uint64(20211202),
+							"ro",
+							"org-id",
+							nil,
+							nil,
+							nil,
+							nil,
+							"machine-name",
+						},
+					},
+				),
+			},
+			object: &Memberships{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Memberships: []*Membership{
+					{
+						UserID:        "user-id",
+						Roles:         []string{"role1", "role2"},
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						Sequence:      20211202,
+						ResourceOwner: "ro",
+						Org:           &OrgMembership{OrgID: "org-id"},
+						DisplayName:   "machine-name",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareMembershipsQuery one iam member human",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -169,6 +221,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"iam-id",
 							nil,
+							nil,
+							"display name",
 							nil,
 						},
 					},
@@ -187,12 +241,56 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						IAM:           &IAMMembership{IAMID: "iam-id"},
+						DisplayName:   "display name",
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one project member",
+			name:    "prepareMembershipsQuery one iam member machine",
+			prepare: prepareMembershipsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					membershipsStmt,
+					membershipCols,
+					[][]driver.Value{
+						{
+							"user-id",
+							pq.StringArray{"role1", "role2"},
+							testNow,
+							testNow,
+							uint64(20211202),
+							"ro",
+							nil,
+							"iam-id",
+							nil,
+							nil,
+							nil,
+							"machine-name",
+						},
+					},
+				),
+			},
+			object: &Memberships{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Memberships: []*Membership{
+					{
+						UserID:        "user-id",
+						Roles:         []string{"role1", "role2"},
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						Sequence:      20211202,
+						ResourceOwner: "ro",
+						IAM:           &IAMMembership{IAMID: "iam-id"},
+						DisplayName:   "machine-name",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareMembershipsQuery one project member human",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -209,6 +307,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"project-id",
+							nil,
+							"display name",
 							nil,
 						},
 					},
@@ -227,12 +327,56 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						Project:       &ProjectMembership{ProjectID: "project-id"},
+						DisplayName:   "display name",
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one project grant member",
+			name:    "prepareMembershipsQuery one project member machine",
+			prepare: prepareMembershipsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					membershipsStmt,
+					membershipCols,
+					[][]driver.Value{
+						{
+							"user-id",
+							pq.StringArray{"role1", "role2"},
+							testNow,
+							testNow,
+							uint64(20211202),
+							"ro",
+							nil,
+							nil,
+							"project-id",
+							nil,
+							nil,
+							"machine-name",
+						},
+					},
+				),
+			},
+			object: &Memberships{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Memberships: []*Membership{
+					{
+						UserID:        "user-id",
+						Roles:         []string{"role1", "role2"},
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						Sequence:      20211202,
+						ResourceOwner: "ro",
+						Project:       &ProjectMembership{ProjectID: "project-id"},
+						DisplayName:   "machine-name",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareMembershipsQuery one project grant member human",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -250,6 +394,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							"grant-id",
+							"display name",
+							nil,
 						},
 					},
 				),
@@ -270,6 +416,53 @@ func Test_MembershipPrepares(t *testing.T) {
 							GrantID:   "grant-id",
 							ProjectID: "project-id",
 						},
+						DisplayName: "display name",
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareMembershipsQuery one project grant member machine",
+			prepare: prepareMembershipsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					membershipsStmt,
+					membershipCols,
+					[][]driver.Value{
+						{
+							"user-id",
+							pq.StringArray{"role1", "role2"},
+							testNow,
+							testNow,
+							uint64(20211202),
+							"ro",
+							nil,
+							nil,
+							"project-id",
+							"grant-id",
+							nil,
+							"machine-name",
+						},
+					},
+				),
+			},
+			object: &Memberships{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Memberships: []*Membership{
+					{
+						UserID:        "user-id",
+						Roles:         []string{"role1", "role2"},
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						Sequence:      20211202,
+						ResourceOwner: "ro",
+						ProjectGrant: &ProjectGrantMembership{
+							GrantID:   "grant-id",
+							ProjectID: "project-id",
+						},
+						DisplayName: "machine-name",
 					},
 				},
 			},
@@ -293,6 +486,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							"display name",
+							nil,
 						},
 						{
 							"user-id",
@@ -305,6 +500,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							"iam-id",
 							nil,
 							nil,
+							"display name",
+							nil,
 						},
 						{
 							"user-id",
@@ -316,6 +513,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							"project-id",
+							nil,
+							"display name",
 							nil,
 						},
 						{
@@ -329,6 +528,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							"grant-id",
+							"display name",
+							nil,
 						},
 					},
 				),
@@ -346,6 +547,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						Org:           &OrgMembership{OrgID: "org-id"},
+						DisplayName:   "display name",
 					},
 					{
 						UserID:        "user-id",
@@ -355,6 +557,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						IAM:           &IAMMembership{IAMID: "iam-id"},
+						DisplayName:   "display name",
 					},
 					{
 						UserID:        "user-id",
@@ -364,6 +567,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						Project:       &ProjectMembership{ProjectID: "project-id"},
+						DisplayName:   "display name",
 					},
 					{
 						UserID:        "user-id",
@@ -376,6 +580,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							ProjectID: "project-id",
 							GrantID:   "grant-id",
 						},
+						DisplayName: "display name",
 					},
 				},
 			},

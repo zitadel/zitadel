@@ -23,6 +23,7 @@ type Membership struct {
 	ChangeDate    time.Time
 	Sequence      uint64
 	ResourceOwner string
+	DisplayName   string
 
 	Org          *OrgMembership
 	IAM          *IAMMembership
@@ -58,6 +59,22 @@ func NewMembershipUserIDQuery(userID string) (SearchQuery, error) {
 
 func NewMembershipResourceOwnerQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipResourceOwner.setTable(membershipAlias), value, TextEquals)
+}
+
+func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(OrgMemberOrgID, value, TextEquals)
+}
+
+func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectMemberProjectID, value, TextEquals)
+}
+
+func NewMembershipProjectGrantIDQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(ProjectGrantMemberGrantID, value, TextEquals)
+}
+
+func NewMembershipIsIAMQuery() (SearchQuery, error) {
+	return NewNotNullQuery(IAMMemberIAMID)
 }
 
 func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -150,20 +167,26 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			membershipIAMID.identifier(),
 			membershipProjectID.identifier(),
 			membershipGrantID.identifier(),
+			HumanDisplayNameCol.identifier(),
+			MachineNameCol.identifier(),
 			countColumn.identifier(),
-		).From(membershipFrom),
+		).From(membershipFrom).
+			LeftJoin(join(HumanUserIDCol, membershipUserID)).
+			LeftJoin(join(MachineUserIDCol, membershipUserID)),
 		func(rows *sql.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
 			var count uint64
 			for rows.Next() {
 
 				var (
-					membership = new(Membership)
-					orgID      = sql.NullString{}
-					iamID      = sql.NullString{}
-					projectID  = sql.NullString{}
-					grantID    = sql.NullString{}
-					roles      = pq.StringArray{}
+					membership  = new(Membership)
+					orgID       = sql.NullString{}
+					iamID       = sql.NullString{}
+					projectID   = sql.NullString{}
+					grantID     = sql.NullString{}
+					roles       = pq.StringArray{}
+					displayName = sql.NullString{}
+					machineName = sql.NullString{}
 				)
 
 				err := rows.Scan(
@@ -177,6 +200,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					&iamID,
 					&projectID,
 					&grantID,
+					&displayName,
+					&machineName,
 					&count,
 				)
 
@@ -185,6 +210,12 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 				}
 
 				membership.Roles = roles
+
+				if displayName.Valid {
+					membership.DisplayName = displayName.String
+				} else if machineName.Valid {
+					membership.DisplayName = machineName.String
+				}
 
 				if orgID.Valid {
 					membership.Org = &OrgMembership{

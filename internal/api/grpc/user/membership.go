@@ -4,32 +4,33 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func MembershipQueriesToModel(queries []*user_pb.MembershipQuery) (_ []*user_model.UserMembershipSearchQuery, err error) {
-	q := make([]*user_model.UserMembershipSearchQuery, 0)
+func MembershipQueriesToQuery(queries []*user_pb.MembershipQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, 0)
 	for _, query := range queries {
-		qs, err := MembershipQueryToModel(query)
+		qs, err := MembershipQueryToQuery(query)
 		if err != nil {
 			return nil, err
 		}
-		q = append(q, qs...)
+		q = append(q, qs)
 	}
 	return q, nil
 }
 
-func MembershipQueryToModel(query *user_pb.MembershipQuery) ([]*user_model.UserMembershipSearchQuery, error) {
-	switch q := query.Query.(type) {
+func MembershipQueryToQuery(req *user_pb.MembershipQuery) (query.SearchQuery, error) {
+	switch q := req.Query.(type) {
 	case *user_pb.MembershipQuery_OrgQuery:
-		return MembershipOrgQueryToModel(q.OrgQuery), nil
+		return query.NewMembershipOrgIDQuery(q.OrgQuery.OrgId)
 	case *user_pb.MembershipQuery_ProjectQuery:
-		return MembershipProjectQueryToModel(q.ProjectQuery), nil
+		return query.NewMembershipProjectIDQuery(q.ProjectQuery.ProjectId)
 	case *user_pb.MembershipQuery_ProjectGrantQuery:
-		return MembershipProjectGrantQueryToModel(q.ProjectGrantQuery), nil
+		return query.NewMembershipProjectGrantIDQuery(q.ProjectGrantQuery.ProjectGrantId)
 	case *user_pb.MembershipQuery_IamQuery:
-		return MembershipIAMQueryToModel(q.IamQuery), nil
+		return query.NewMembershipIsIAMQuery()
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "USER-dsg3z", "List.Query.Invalid")
 	}
@@ -91,7 +92,7 @@ func MembershipProjectGrantQueryToModel(q *user_pb.MembershipProjectGrantQuery) 
 	}
 }
 
-func MembershipsToMembershipsPb(memberships []*user_model.UserMembershipView) []*user_pb.Membership {
+func MembershipsToMembershipsPb(memberships []*query.Membership) []*user_pb.Membership {
 	converted := make([]*user_pb.Membership, len(memberships))
 	for i, membership := range memberships {
 		converted[i] = MembershipToMembershipPb(membership)
@@ -99,7 +100,7 @@ func MembershipsToMembershipsPb(memberships []*user_model.UserMembershipView) []
 	return converted
 }
 
-func MembershipToMembershipPb(membership *user_model.UserMembershipView) *user_pb.Membership {
+func MembershipToMembershipPb(membership *query.Membership) *user_pb.Membership {
 	return &user_pb.Membership{
 		UserId:      membership.UserID,
 		Type:        memberTypeToPb(membership),
@@ -114,25 +115,23 @@ func MembershipToMembershipPb(membership *user_model.UserMembershipView) *user_p
 	}
 }
 
-func memberTypeToPb(membership *user_model.UserMembershipView) user_pb.MembershipType {
-	switch membership.MemberType {
-	case user_model.MemberTypeOrganisation:
+func memberTypeToPb(membership *query.Membership) user_pb.MembershipType {
+	if membership.Org != nil {
 		return &user_pb.Membership_OrgId{
-			OrgId: membership.AggregateID,
+			OrgId: membership.Org.OrgID,
 		}
-	case user_model.MemberTypeProject:
+	} else if membership.Project != nil {
 		return &user_pb.Membership_ProjectId{
-			ProjectId: membership.AggregateID,
+			ProjectId: membership.Project.ProjectID,
 		}
-	case user_model.MemberTypeProjectGrant:
+	} else if membership.ProjectGrant != nil {
 		return &user_pb.Membership_ProjectGrantId{
-			ProjectGrantId: membership.ObjectID,
+			ProjectGrantId: membership.ProjectGrant.GrantID,
 		}
-	case user_model.MemberTypeIam:
+	} else if membership.IAM != nil {
 		return &user_pb.Membership_Iam{
-			Iam: true, //TODO: ?
+			Iam: true,
 		}
-	default:
-		return nil //TODO: ?
 	}
+	return nil
 }
