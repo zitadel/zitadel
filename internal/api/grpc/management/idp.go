@@ -76,7 +76,7 @@ func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOr
 	return &mgmt_pb.ReactivateOrgIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
 func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequest) (*mgmt_pb.RemoveOrgIDPResponse, error) {
-	idpProviders, err := s.org.GetIDPProvidersByIDPConfigID(ctx, authz.GetCtxData(ctx).OrgID, req.IdpId)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, len(idpProviders) > 0, externalIDPViewsToDomain(externalIDPs)...)
+	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, idp != nil, externalIDPViewsToDomain(externalIDPs)...)
 	if err != nil {
 		return nil, err
 	}
