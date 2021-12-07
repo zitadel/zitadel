@@ -157,22 +157,23 @@ var (
 
 func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships, error)) {
 	return sq.Select(
-			membershipUserID.identifier(),
-			membershipRoles.identifier(),
-			membershipCreationDate.identifier(),
-			membershipChangeDate.identifier(),
-			membershipSequence.identifier(),
-			membershipResourceOwner.identifier(),
-			membershipOrgID.identifier(),
-			membershipIAMID.identifier(),
-			membershipProjectID.identifier(),
-			membershipGrantID.identifier(),
+			membershipUserID.setTable(membershipAlias).identifier(),
+			membershipRoles.setTable(membershipAlias).identifier(),
+			membershipCreationDate.setTable(membershipAlias).identifier(),
+			membershipChangeDate.setTable(membershipAlias).identifier(),
+			membershipSequence.setTable(membershipAlias).identifier(),
+			membershipResourceOwner.setTable(membershipAlias).identifier(),
+			membershipOrgID.setTable(membershipAlias).identifier(),
+			membershipIAMID.setTable(membershipAlias).identifier(),
+			membershipProjectID.setTable(membershipAlias).identifier(),
+			membershipGrantID.setTable(membershipAlias).identifier(),
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
 			countColumn.identifier(),
 		).From(membershipFrom).
-			LeftJoin(join(HumanUserIDCol, membershipUserID)).
-			LeftJoin(join(MachineUserIDCol, membershipUserID)),
+			LeftJoin(join(HumanUserIDCol, membershipUserID.setTable(membershipAlias))).
+			LeftJoin(join(MachineUserIDCol, membershipUserID.setTable(membershipAlias))).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
 			var count uint64

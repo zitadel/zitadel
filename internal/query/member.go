@@ -35,6 +35,7 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
+	//TODO: fails
 	return NewTextQuery(memberUserID, value, TextEquals)
 }
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {

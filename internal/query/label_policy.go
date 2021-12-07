@@ -276,9 +276,9 @@ func prepareLabelPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LabelPolicy, 
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return nil, errors.ThrowNotFound(err, "QUERY-bJEsm", "errors.policy.label.not_found")
+					return nil, errors.ThrowNotFound(err, "QUERY-bJEsm", "Errors.Org.PolicyNotExisting")
 				}
-				return nil, errors.ThrowInternal(err, "QUERY-awLM6", "errors.internal")
+				return nil, errors.ThrowInternal(err, "QUERY-awLM6", "Errors.Internal")
 			}
 
 			policy.FontURL = fontURL.String
