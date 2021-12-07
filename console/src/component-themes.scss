@@ -18,6 +18,7 @@
 @import 'src/app/pages/orgs/org-detail/org-detail.component';
 @import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
+@import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
@@ -66,6 +67,7 @@
   @include tier-theme($theme);
   @include private-label-theme($theme);
   @include owned-project-grid-theme($theme);
+  @include granted-project-detail-theme($theme);
   @include granted-project-grid-theme($theme);
   @include info-row-theme($theme);
 }

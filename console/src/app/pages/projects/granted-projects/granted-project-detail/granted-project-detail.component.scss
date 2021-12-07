@@ -1,41 +1,122 @@
-.head {
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ffffff20;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+@use '@angular/material' as mat;
 
-  a {
-    display: block;
+@mixin granted-project-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .granted-project-top {
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 2rem 2rem 1rem 2rem;
+    background: if($is-dark-theme, #00000020, #ffffff80);
+
+    .granted-project-top-row {
+      display: flex;
+      align-items: center;
+      padding-bottom: 1rem;
+      flex-wrap: wrap;
+
+      .granted-project-link-row {
+        display: flex;
+        align-items: center;
+
+        .link {
+          margin-right: 1rem;
+          display: block;
+          position: relative;
+        }
+
+        .granted-project-title-row {
+          display: flex;
+          align-items: center;
+
+          .granted-project-title {
+            margin: 0;
+            margin-right: 0.5rem;
+            font-size: 2rem;
+          }
+
+          .granted-project-state-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+
+            &.active {
+              background-color: var(--success);
+            }
+
+            &.inactive {
+              background-color: var(--warn);
+            }
+          }
+        }
+      }
+      .granted-project-sub {
+        color: var(--grey);
+        margin: 1rem 1rem 0 0;
+        font-size: 14px;
+
+        &.zitadel-warning {
+          font-size: 14px;
+          color: rgb(201, 51, 71);
+        }
+      }
+
+      .granted-project-top-desc {
+        color: var(--grey);
+        font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .actions-trigger {
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        margin-right: 2rem;
+
+        .icon {
+          margin-left: 0.5rem;
+          margin-right: -0.5rem;
+        }
+      }
+    }
   }
 
-  .h1 {
-    font-size: 2rem;
-    margin: 0 1rem;
-    margin-left: 2rem;
-    font-weight: normal;
-  }
+  .project-detail-privatelabel-info {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 1rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid map-get($foreground, divider);
 
-  .full-width {
-    padding-top: 1rem;
-    width: 100%;
-    display: block;
-
-    .desc {
-      font-size: .9rem;
-      color: var(--grey);
+    .setting-title {
+      margin: 0;
+      font-size: 16px;
     }
 
-    .zitadel-warning {
-      font-size: 14px;
-      color: rgb(201, 51, 71);
+    .setting-desc {
+      margin: 0;
+      display: flex;
+      align-items: center;
+
+      .icon-button {
+        margin-left: 0.5rem;
+      }
     }
   }
 }
 
 .desc {
-  width: 100%;
-  display: block;
-  font-size: .9rem;
   color: var(--grey);
+  font-size: 14px;
+  margin-bottom: 2rem;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--grey);
+  margin-bottom: 1.5rem;
 }

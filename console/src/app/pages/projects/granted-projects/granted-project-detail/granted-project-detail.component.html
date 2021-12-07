@@ -1,17 +1,39 @@
-<cnsl-meta-layout>
+<div class="granted-project-top">
   <div class="max-width-container">
-    <div class="head" *ngIf="project?.projectId">
-      <a [routerLink]="[ '/granted-projects' ]" mat-icon-button>
-        <mat-icon class="icon">arrow_back</mat-icon>
-      </a>
-      <h1 class="h1">{{ 'PROJECT.PAGES.TITLE' | translate }} {{project?.projectName}}</h1>
+    <div class="granted-project-top-row">
+      <div>
+        <div class="granted-project-link-row">
+          <a class="link" [routerLink]="[ '/granted-projects' ]" mat-icon-button>
+            <mat-icon class="icon">arrow_back</mat-icon>
+          </a>
+          <div class="granted-project-title-row">
+            <h2 class="granted-project-title">{{project?.projectName}}</h2>
+            <div class="granted-project-state-dot" *ngIf="project && project.state !== undefined"
+              matTooltip="{{'ORG.STATE.'+project.state | translate}}"
+              [ngClass]="{'active': project.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': project.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE }">
+            </div>
+          </div>
+        </div>
+        <p class="granted-project-sub">{{'PROJECT.PAGES.DESCRIPTION' | translate}}</p>
+        <p *ngIf="isZitadel" class="granted-project-sub zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
+        </p>
 
-      <div class="full-width">
-        <p class="desc">{{ 'PROJECT.PAGES.DESCRIPTION' | translate }}</p>
-        <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
       </div>
-    </div>
+      <span class="fill-space"></span>
 
+      <cnsl-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
+        [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+        (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
+        [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) === false">
+      </cnsl-contributors>
+    </div>
+    <cnsl-info-row *ngIf="project" [grantedProject]="project"></cnsl-info-row>
+  </div>
+</div>
+
+<div class="max-width-container">
+  <cnsl-meta-layout>
     <ng-template cnslHasRole [hasRole]="['user.grant.read', 'user.grant.read:'+grantId]">
       <cnsl-card *ngIf="project?.projectId" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
         description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
@@ -24,33 +46,10 @@
         </cnsl-user-grants>
       </cnsl-card>
     </ng-template>
-  </div>
-  <div class="side" metainfo>
-    <div class="meta-details">
-      <div class="meta-row">
-        <span class="first">{{'RESOURCEID' | translate}}:</span>
-        <span *ngIf="projectId" class="second">{{ project?.grantId }}</span>
-      </div>
-      <div class="meta-row">
-        <span class="first">{{'PROJECT.STATE.TITLE' | translate}}:</span>
-        <span *ngIf="project && project.state !== undefined" class="state"
-          [ngClass]="{'active': project.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': project.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE}">{{'PROJECT.STATE.'+project.state
-          | translate}}</span>
-      </div>
+
+    <div metainfo>
+      <cnsl-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></cnsl-changes>
     </div>
 
-    <mat-tab-group mat-stretch-tabs class="tab-group" [disablePagination]="true">
-      <mat-tab label="Details">
-        <cnsl-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
-          [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-          description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-          (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-          [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) === false">
-        </cnsl-contributors>
-      </mat-tab>
-      <mat-tab label="{{ 'CHANGES.PROJECT.TITLE' | translate }}" class="meta-flex-col">
-        <cnsl-changes *ngIf="project" [changeType]="ChangeType.PROJECT" [id]="project.projectId"></cnsl-changes>
-      </mat-tab>
-    </mat-tab-group>
-  </div>
-</cnsl-meta-layout>
+  </cnsl-meta-layout>
+</div>

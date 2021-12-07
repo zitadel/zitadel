@@ -106,6 +106,36 @@
   </div>
 </div>
 
+<div class="info-row" *ngIf="grantedProject">
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.STATE.TITLE' | translate }}</p>
+    <p *ngIf="grantedProject && grantedProject.state !== undefined" class="state"
+      [ngClass]="{'active': grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': grantedProject.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE}">
+      {{'PROJECT.STATE.'+grantedProject.state
+      | translate}}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'RESOURCEID' | translate }}</p>
+    <p *ngIf="grantedProject && grantedProject.projectId" class="info-row-desc">{{grantedProject.projectId }}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.PAGES.CREATEDON' | translate }}</p>
+    <p *ngIf="grantedProject && grantedProject.details && grantedProject.details.creationDate" class="info-row-desc">
+      {{grantedProject.details.creationDate |
+      timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+
+  <div class="info-wrapper">
+    <p class="info-row-title">{{ 'PROJECT.PAGES.LASTMODIFIED' | translate }}</p>
+    <p *ngIf="grantedProject && grantedProject.details && grantedProject.details.changeDate" class="info-row-desc">
+      {{grantedProject.details.changeDate |
+      timestampToDate
+      | localizedDate: 'dd. MMMM YYYY, HH:mm' }}</p>
+  </div>
+</div>
+
 <div class="info-row" *ngIf="app">
   <div class="info-wrapper">
     <p class="info-row-title">{{ 'APP.PAGES.STATE' | translate }}</p>

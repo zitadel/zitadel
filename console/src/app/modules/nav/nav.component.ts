@@ -93,9 +93,8 @@ export class NavComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  // public get isUserLinkActive(): boolean {
-  //   const url = this.router.url;
-  //   console.log(url.substring(0, 6));
-  //   return url.substring(0, 5) === 'users';
-  // }
+  public get isUserLinkActive(): boolean {
+    const url = this.router.url;
+    return url.substring(0, 6) === '/users';
+  }
 }

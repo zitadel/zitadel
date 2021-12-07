@@ -203,7 +203,7 @@
       "GENERAL": "General",
       "IDP": "Identity Providers",
       "MFA": "Multifactor Authentication",
-      "KEYS": "KEYS",
+      "KEYS": "Keys",
       "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "METADATA": "Metadata"

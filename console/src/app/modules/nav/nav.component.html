@@ -84,7 +84,7 @@
 
             <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
               <a matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLink]="[ '/users', 'list']" [routerLinkActiveOptions]="{ exact: false }">
+                [routerLink]="[ '/users', 'list', 'humans']" [routerLinkActiveOptions]="{ exact: false }">
                 <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
               </a>
               <a matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"

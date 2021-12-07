@@ -20,8 +20,16 @@ import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dia
 interface UserSetting {
   id: string;
   i18nKey: string;
-  featureRequired: string[] | false;
+  featureRequired?: string[];
 }
+
+const GENERAL = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
+const GRANTS = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
+const METADATA = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] };
+const IDP = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false };
+const PASSWORDLESS = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false };
+const MFA = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false };
+const KEYS = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false };
 
 @Component({
   selector: 'cnsl-user-detail',
@@ -47,11 +55,7 @@ export class UserDetailComponent implements OnInit {
 
   public error: string = '';
 
-  public settingsList: UserSetting[] = [
-    { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
-    { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
-    { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
-  ];
+  public settingsList: UserSetting[] = [GENERAL, GRANTS, METADATA];
   public currentSetting: UserSetting = this.settingsList[0];
 
   constructor(
@@ -75,21 +79,9 @@ export class UserDetailComponent implements OnInit {
             this.user = resp.user;
 
             if (this.user.human) {
-              this.settingsList = [
-                { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
-                { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false },
-                { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false },
-                { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false },
-                { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
-                { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
-              ];
+              this.settingsList = [GENERAL, IDP, PASSWORDLESS, MFA, GRANTS, METADATA];
             } else if (this.user.machine) {
-              this.settingsList = [
-                { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
-                { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false },
-                { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
-                { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
-              ];
+              this.settingsList = [GENERAL, KEYS, GRANTS, METADATA];
             }
           }
         })
