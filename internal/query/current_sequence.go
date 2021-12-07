@@ -67,11 +67,16 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
+	row := tx.QueryRow("select schema_name, table_name from [show tables from zitadel.projections] where concat('zitadel.projections.', table_name) = '$1';", projectionName)
+	if row.Err() != nil {
+		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+	}
 	_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s", projectionName))
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 	}
-	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET (%s) = ($1) WHERE (%s = $2)", currentSequencesTable, CurrentSequenceColCurrentSequence, CurrentSequenceColProjectionName), 0, projectionName)
+
+	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET (%s) = 0 WHERE (%s = $1)", currentSequencesTable, CurrentSequenceColCurrentSequence, CurrentSequenceColProjectionName), projectionName)
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}

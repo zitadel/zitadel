@@ -5,6 +5,8 @@ Errors:
   IDMissing: ID mancante
   ResourceOwnerMissing: Resource Owner mancante
   RemoveFailed: Non può essere cancellato
+  ProjectionName:
+    Invalid: Nome della proiezione non valido
   Assets:
     EmptyKey: Asset key vuoto
     Store:

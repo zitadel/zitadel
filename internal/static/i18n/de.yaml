@@ -5,6 +5,8 @@ Errors:
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
   RemoveFailed: Konnte nicht gelöscht werden
+  ProjectionName:
+    Invalid: Ungültiger Projektions name
   Assets:
     EmptyKey: Asset Key ist leer
     Store:
