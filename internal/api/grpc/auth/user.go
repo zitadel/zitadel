@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/change"
@@ -10,8 +9,9 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/caos/zitadel/internal/query"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
@@ -108,31 +108,93 @@ func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGr
 }
 
 func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProjectOrgsRequest) (*auth_pb.ListMyProjectOrgsResponse, error) {
-	r, err := ListMyProjectOrgsRequestToModel(req)
+	queries, err := ListMyProjectOrgsRequestToQuery(req)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.repo.SearchMyProjectOrgs(ctx, r)
+
+	iam, err := s.query.IAMByID(ctx, domain.IAMID)
+	if err != nil {
+		return nil, err
+	}
+	ctxData := authz.GetCtxData(ctx)
+
+	//client of user is not in project of ZITADEL
+	if ctxData.ProjectID != iam.IAMProjectID {
+		grants, err := s.repo.UserGrantsByProjectAndUserID(ctxData.ProjectID, ctxData.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		ids := make([]string, 0, len(grants))
+		for _, grant := range grants {
+			ids = appendIfNotExists(ids, grant.ResourceOwner)
+		}
+
+		idsQuery, err := query.NewOrgIDsSearchQuery(ids...)
+		if err != nil {
+			return nil, err
+		}
+		queries.Queries = append(queries.Queries, idsQuery)
+	} else if authz.HasGlobalExplicitPermission(authz.GetAllPermissionsFromCtx(ctx), "iam.read") {
+		//user is allowed to read all organisation
+		//no additional query required
+	} else {
+		// all orgs of my meberships
+		userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
+		if err != nil {
+			return nil, err
+		}
+		memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+			Queries: []query.SearchQuery{userQuery},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		ids := make([]string, 0, len(memberships.Memberships))
+		for _, grant := range memberships.Memberships {
+			ids = appendIfNotExists(ids, grant.ResourceOwner)
+		}
+
+		idsQuery, err := query.NewOrgIDsSearchQuery(ids...)
+		if err != nil {
+			return nil, err
+		}
+		queries.Queries = append(queries.Queries, idsQuery)
+	}
+
+	orgs, err := s.query.SearchOrgs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyProjectOrgsResponse{
-		//TODO: not all details
-		Details: obj_grpc.ToListDetails(res.TotalResult, 0, time.Time{}),
-		Result:  org.OrgsToPb(res.Result),
+		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
+		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
 }
 
-func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) (*grant_model.UserGrantSearchRequest, error) {
+func appendIfNotExists(array []string, value string) []string {
+	for _, a := range array {
+		if a == value {
+			return array
+		}
+	}
+	return append(array, value)
+}
+
+func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*query.OrgSearchQueries, error) {
 	offset, limit, asc := obj_grpc.ListQueryToModel(req.Query)
-	queries, err := org.OrgQueriesToUserGrantModel(req.Queries)
+	queries, err := org.OrgQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.UserGrantSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
+	return &query.OrgSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }

@@ -13,7 +13,6 @@ import (
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -64,6 +63,7 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	if ctxData.ProjectID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "APP-7lqva", "Could not get ProjectID")
 	}
+
 	err = repo.AuthZRepo.FillIamProjectID(ctx)
 	if err != nil {
 		return nil, err
@@ -90,17 +90,21 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	return repo.userOrg(ctxData)
 }
 
-func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, count uint64) *grant_model.ProjectOrgSearchResponse {
-	orgs := make([]*grant_model.Org, 0, len(memberships))
-	for _, m := range memberships {
+func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) (*grant_model.ProjectOrgSearchResponse, error) {
+	orgs := make([]*grant_model.Org, 0, len(memberships.Memberships))
+	for _, m := range memberships.Memberships {
 		if !containsOrg(orgs, m.ResourceOwner) {
-			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: m.ResourceOwnerName})
+			org, err := repo.Query.OrgByID(context.TODO(), m.ResourceOwner)
+			if err != nil {
+				return nil, err
+			}
+			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: org.Name})
 		}
 	}
 	return &grant_model.ProjectOrgSearchResponse{
-		TotalResult: count,
+		TotalResult: memberships.Count,
 		Result:      orgs,
-	}
+	}, nil
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
@@ -117,46 +121,36 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	return permissions.Permissions, nil
 }
 
-func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*user_view_model.UserMembershipView, error) {
+func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*query.Membership, error) {
 	ctxData := authz.GetCtxData(ctx)
-	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
-		Queries: []*user_model.UserMembershipSearchQuery{
-			{
-				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.UserID,
-			},
-			{
-				Key:    user_model.UserMembershipSearchKeyResourceOwner,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.OrgID,
-			},
-		},
+	userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMembershipUserIDQuery(ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	iamQuery, err := query.NewMembershipIsIAMQuery()
+	if err != nil {
+		return nil, err
+	}
+	orgMemberships, err := repo.Query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery, ownerQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	iamMemberships, iamCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
-		Queries: []*user_model.UserMembershipSearchQuery{
-			{
-				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.UserID,
-			},
-			{
-				Key:    user_model.UserMembershipSearchKeyAggregateID,
-				Method: domain.SearchMethodEquals,
-				Value:  repo.IamID,
-			},
-		},
+	iamMemberships, err := repo.Query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery, iamQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	if orgCount == 0 && iamCount == 0 {
-		return []*user_view_model.UserMembershipView{}, nil
+	if orgMemberships.Count == 0 && iamMemberships.Count == 0 {
+		return []*query.Membership{}, nil
 	}
-	return append(orgMemberships, iamMemberships...), nil
+	return append(orgMemberships.Memberships, iamMemberships.Memberships...), nil
 }
 
 func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
@@ -236,33 +230,35 @@ func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectO
 }
 
 func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
-	memberships, count, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
-		Offset: request.Offset,
-		Limit:  request.Limit,
-		Asc:    request.Asc,
-		Queries: []*user_model.UserMembershipSearchQuery{
-			{
-				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.UserID,
-			},
+	userQuery, err := query.NewMemberUserIDSearchQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := repo.Query.Memberships(context.TODO(), &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: request.Offset,
+			Limit:  request.Limit,
+			Asc:    request.Asc,
 		},
+		Queries: []query.SearchQuery{userQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(memberships) > 0 {
-		return membershipsToOrgResp(memberships, count), nil
+	if len(memberships.Memberships) > 0 {
+		return repo.membershipsToOrgResp(memberships)
 	}
 	return repo.userOrg(ctxData)
 }
 
-func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissions, membership *user_view_model.UserMembershipView, role string) *grant_model.Permissions {
+func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissions, membership *query.Membership, role string) *grant_model.Permissions {
 	for _, mapping := range repo.Auth.RolePermissionMappings {
 		if mapping.Role == role {
 			ctxID := ""
-			if membership.MemberType == int32(user_model.MemberTypeProject) || membership.MemberType == int32(user_model.MemberTypeProjectGrant) {
-				ctxID = membership.ObjectID
+			if membership.Project != nil {
+				ctxID = membership.Project.ProjectID
+			} else if membership.ProjectGrant != nil {
+				ctxID = membership.ProjectGrant.GrantID
 			}
 			permissions.AppendPermissions(ctxID, mapping.Permissions...)
 		}
