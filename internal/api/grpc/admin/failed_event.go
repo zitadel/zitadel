@@ -25,7 +25,7 @@ func (s *Server) ListFailedEvents(ctx context.Context, req *admin_pb.ListFailedE
 
 func (s *Server) RemoveFailedEvent(ctx context.Context, req *admin_pb.RemoveFailedEventRequest) (*admin_pb.RemoveFailedEventResponse, error) {
 	var err error
-	if req.Database == "" || req.Database != "zitadel" {
+	if req.Database != "zitadel" {
 		err = s.administrator.RemoveFailedEvent(ctx, RemoveFailedEventRequestToModel(req))
 	} else {
 		err = s.query.RemoveFailedEvent(ctx, req.ViewName, req.FailedSequence)
