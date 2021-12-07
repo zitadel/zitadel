@@ -1092,6 +1092,10 @@
         }
       }
     },
+    "SETTINGS": {
+      "TITLE": "Einstellungen",
+      "DESCRIPTION": ""
+    },
     "STATE": {
       "TITLE": "Status",
       "0": "Nicht definiert",

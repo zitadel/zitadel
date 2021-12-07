@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 
+import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
 import { GrantedProjectsComponent } from './granted-projects.component';
 
 const routes: Routes = [
@@ -17,6 +18,11 @@ const routes: Routes = [
       roles: ['project.grant.member.read'],
     },
     loadChildren: () => import('src/app/modules/project-members/project-members.module').then((m) => m.ProjectMembersModule),
+  },
+  {
+    path: ':id/grant/:grantId',
+    component: GrantedProjectDetailComponent,
+    data: { animation: 'HomePage' },
   },
 ];
 

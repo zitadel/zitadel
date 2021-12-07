@@ -4,7 +4,7 @@
       <ng-container
         *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc">
         <ng-container *ngIf="breadc[0]?.type === BreadcrumbType.PROJECT && breadc[0]?.param?.value; else defaultNav">
-          <div class="nav-row-abs" @navrow>
+          <div class="nav-row-abs" @navrowproject>
             <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
               <a class="nav-item" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']"
                 [routerLink]="[ '/projects', breadc[0]?.param?.value ]">
@@ -48,7 +48,7 @@
         </ng-container>
       </ng-container>
       <ng-template #defaultNav>
-        <div class="nav-row-abs" @navrow>
+        <div class="nav-row-abs" @navroworg>
           <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
             <ng-template cnslHasRole [hasRole]="['org.read']">
               <a matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"
@@ -84,11 +84,11 @@
 
             <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
               <a matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLink]="[ '/users/list/humans']" [routerLinkActiveOptions]="{ exact: true }">
+                [routerLink]="[ '/users', 'list']" [routerLinkActiveOptions]="{ exact: false }">
                 <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
               </a>
               <a matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
-                [routerLinkActive]="['active']" [routerLink]="[ '/users/list/machines']"
+                [routerLinkActive]="['active']" [routerLink]="[ '/users','list','machines']"
                 [routerLinkActiveOptions]="{ exact: true }">
                 <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
               </a>

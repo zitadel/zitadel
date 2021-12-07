@@ -477,12 +477,6 @@ h2 {
 
 .enlarged-container {
   padding: 2rem 0 0 0;
-  max-width: 1690px;
-
-  @media only screen and (max-width: 500px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
 }
 
 i {

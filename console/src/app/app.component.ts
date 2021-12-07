@@ -171,9 +171,6 @@ export class AppComponent implements OnDestroy {
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/mdi/arrow-decision-outline.svg'),
     );
 
-    // const orgid = this.activatedRoute.snapshot.queryParamMap.get('org');
-    // console.log(orgid);
-
     this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
       const { org } = route;
       if (org) {
