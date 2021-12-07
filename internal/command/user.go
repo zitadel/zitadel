@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 
@@ -169,7 +170,7 @@ func (c *Commands) UnlockUser(ctx context.Context, userID, resourceOwner string)
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*domain.UserMembership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string, cascadingUserMemberships []*query.Membership, cascadingGrantIDs ...string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2M0ds", "Errors.User.UserIDMissing")
 	}
@@ -200,7 +201,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	}
 
 	if len(cascadingUserMemberships) > 0 {
-		membershipEvents, err := c.removeUserMemberships(ctx, cascadingUserMemberships, true)
+		membershipEvents, err := c.removeUserMemberships(ctx, cascadingUserMemberships)
 		if err != nil {
 			return nil, err
 		}

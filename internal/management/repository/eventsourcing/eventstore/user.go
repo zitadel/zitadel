@@ -334,44 +334,6 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 	return user.GetAddress()
 }
 
-func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
-	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
-
-	result := handleSearchUserMembershipsPermissions(ctx, request, sequence)
-	if result != nil {
-		return result, nil
-	}
-
-	memberships, count, err := repo.View.SearchUserMemberships(request)
-	if err != nil {
-		return nil, err
-	}
-	result = &usr_model.UserMembershipSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.UserMembershipsToModel(memberships),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) UserMembershipsByUserID(ctx context.Context, userID string) ([]*usr_model.UserMembershipView, error) {
-	memberships, err := repo.View.UserMembershipsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserMembershipsToModel(memberships), nil
-}
-
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {
 	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending, retention)
 

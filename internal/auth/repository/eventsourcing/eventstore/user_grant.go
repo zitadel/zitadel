@@ -103,32 +103,6 @@ func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, cou
 	}
 }
 
-func (repo *UserGrantRepo) SearchMyUserMemberships(ctx context.Context, request *user_model.UserMembershipSearchRequest) (*user_model.UserMembershipSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
-	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
-	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
-
-	memberships, count, err := repo.View.SearchUserMemberships(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &user_model.UserMembershipSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      user_view_model.UserMembershipsToModel(memberships),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
 	memberships, err := repo.searchUserMemberships(ctx)
 	if err != nil {

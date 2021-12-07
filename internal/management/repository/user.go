@@ -41,7 +41,4 @@ type UserRepository interface {
 	PhoneByID(ctx context.Context, userID string) (*model.Phone, error)
 
 	AddressByID(ctx context.Context, userID string) (*model.Address, error)
-
-	SearchUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
-	UserMembershipsByUserID(ctx context.Context, userID string) ([]*model.UserMembershipView, error)
 }

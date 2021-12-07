@@ -38,38 +38,6 @@ type ProjectRepo struct {
 	PrefixAvatarURL string
 }
 
-func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectMemberView, error) {
-	member, err := repo.View.ProjectMemberByIDs(projectID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ProjectMemberToModel(member, repo.PrefixAvatarURL), nil
-}
-
-func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestProjectMemberSequence()
-	logging.Log("EVENT-3dgt6").OnError(sequenceErr).Warn("could not read latest project member sequence")
-	members, count, err := repo.View.SearchProjectMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &proj_model.ProjectMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: uint64(count),
-		Result:      model.ProjectMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ProjectChanges, error) {
 	changes, err := repo.getProjectChanges(ctx, id, lastSequence, limit, sortAscending, retention)
 	if err != nil {

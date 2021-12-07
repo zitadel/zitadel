@@ -13,18 +13,6 @@ const (
 	userMembershipTable = "auth.user_memberships"
 )
 
-func (v *View) UserMembershipByIDs(userID, aggregateID, objectID string, memberType usr_model.MemberType) (*model.UserMembershipView, error) {
-	return view.UserMembershipByIDs(v.Db, userMembershipTable, userID, aggregateID, objectID, memberType)
-}
-
-func (v *View) UserMembershipsByAggregateID(aggregateID string) ([]*model.UserMembershipView, error) {
-	return view.UserMembershipsByAggregateID(v.Db, userMembershipTable, aggregateID)
-}
-
-func (v *View) UserMembershipsByResourceOwner(resourceOwner string) ([]*model.UserMembershipView, error) {
-	return view.UserMembershipsByResourceOwner(v.Db, userMembershipTable, resourceOwner)
-}
-
 func (v *View) SearchUserMemberships(request *usr_model.UserMembershipSearchRequest) ([]*model.UserMembershipView, uint64, error) {
 	return view.SearchUserMemberships(v.Db, userMembershipTable, request)
 }
