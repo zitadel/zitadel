@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/lib/pq"
 )
 
 type AppProjection struct {
@@ -55,6 +56,10 @@ func (p *AppProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.ApplicationRemovedType,
 					Reduce: p.reduceAppRemoved,
+				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
 				},
 				{
 					Event:  project.APIConfigAddedType,
@@ -148,6 +153,9 @@ func (p *AppProjection) reduceAppChanged(event eventstore.EventReader) (*handler
 		logging.LogWithFields("HANDL-4Fjh2", "seq", event.Sequence(), "expectedType", project.ApplicationChangedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type")
 	}
+	if e.Name == "" {
+		return crdb.NewNoOpStatement(event), nil
+	}
 	return crdb.NewUpdateStatement(
 		e,
 		[]handler.Column{
@@ -209,6 +217,20 @@ func (p *AppProjection) reduceAppRemoved(event eventstore.EventReader) (*handler
 		e,
 		[]handler.Condition{
 			handler.NewCond(AppColumnID, e.AppID),
+		},
+	), nil
+}
+
+func (p *AppProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-ZxQnj", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DlUlO", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(
+		e,
+		[]handler.Condition{
+			handler.NewCond(AppColumnProjectID, e.Aggregate().ID),
 		},
 	), nil
 }

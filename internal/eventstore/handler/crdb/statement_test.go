@@ -795,6 +795,182 @@ func TestNewMultiStatement(t *testing.T) {
 	}
 }
 
+func TestNewCopyStatement(t *testing.T) {
+	type args struct {
+		table string
+		event *testEvent
+		cols  []handler.Column
+		conds []handler.Condition
+	}
+	type want struct {
+		aggregateType    eventstore.AggregateType
+		sequence         uint64
+		previousSequence uint64
+		table            string
+		executer         *wantExecuter
+		isErr            func(error) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want want
+	}{
+		{
+			name: "no table",
+			args: args{
+				table: "",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conds: []handler.Condition{
+					{
+						Name:  "col2",
+						Value: 1,
+					},
+				},
+			},
+			want: want{
+				table:            "",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 0,
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoProjection)
+				},
+			},
+		},
+		{
+			name: "no conditions",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conds: []handler.Condition{},
+				cols: []handler.Column{
+					{
+						Name: "col",
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoCondition)
+				},
+			},
+		},
+		{
+			name: "no values",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				conds: []handler.Condition{
+					{
+						Name: "col",
+					},
+				},
+				cols: []handler.Column{},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					shouldExecute: false,
+				},
+				isErr: func(err error) bool {
+					return errors.Is(err, handler.ErrNoValues)
+				},
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				table: "my_table",
+				event: &testEvent{
+					aggregateType:    "agg",
+					sequence:         1,
+					previousSequence: 0,
+				},
+				cols: []handler.Column{
+					{
+						Name:  "state",
+						Value: 1,
+					},
+					{
+						Name: "id",
+					},
+					{
+						Name: "col_a",
+					},
+					{
+						Name: "col_b",
+					},
+				},
+				conds: []handler.Condition{
+					{
+						Name:  "id",
+						Value: 2,
+					},
+					{
+						Name:  "state",
+						Value: 3,
+					},
+				},
+			},
+			want: want{
+				table:            "my_table",
+				aggregateType:    "agg",
+				sequence:         1,
+				previousSequence: 1,
+				executer: &wantExecuter{
+					params: []params{
+						{
+							query: "UPSERT INTO my_table (state, id, col_a, col_b) SELECT $1, id, col_a, col_b FROM my_table AS copy_table WHERE copy_table.id = $2 AND copy_table.state = $3",
+							args:  []interface{}{1, 2, 3},
+						},
+					},
+					shouldExecute: true,
+				},
+				isErr: func(err error) bool {
+					return err == nil
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.want.executer.t = t
+			stmt := NewCopyStatement(tt.args.event, tt.args.cols, tt.args.conds)
+
+			err := stmt.Execute(tt.want.executer, tt.args.table)
+			if !tt.want.isErr(err) {
+				t.Errorf("unexpected error: %v", err)
+			}
+			tt.want.executer.check(t)
+		})
+	}
+}
+
 func TestStatement_Execute(t *testing.T) {
 	type fields struct {
 		execute func(ex handler.Executer, projectionName string) error

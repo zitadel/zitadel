@@ -24,7 +24,7 @@ func (v *View) UserSessionsByAgentID(agentID string) ([]*model.UserSessionView, 
 	return view.UserSessionsByAgentID(v.Db, userSessionTable, agentID)
 }
 
-func (v *View) ActiveUserSessions() ([]*model.UserSessionView, error) {
+func (v *View) ActiveUserSessionsCount() (uint64, error) {
 	return view.ActiveUserSessions(v.Db, userSessionTable)
 }
 

@@ -241,7 +241,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {
-		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo)
+		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo, query)
 		apis.RegisterHandler("/assets/v1", assetsHandler)
 	}
 

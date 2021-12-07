@@ -12,6 +12,22 @@ import (
 	errs "github.com/caos/zitadel/internal/errors"
 )
 
+var (
+	projectCols = []string{
+		"id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"state",
+		"sequence",
+		"name",
+		"project_role_assertion",
+		"project_role_check",
+		"has_project_check",
+		"private_labeling_setting",
+	}
+)
+
 func Test_ProjectPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
