@@ -46,13 +46,13 @@ const (
 	HumanUserIDCol  = "user_id"
 
 	// profile
-	HumanFistNameCol          = "first_name"
+	HumanFirstNameCol         = "fist_name"
 	HumanLastNameCol          = "last_name"
 	HumanNickNameCol          = "nick_name"
 	HumanDisplayNameCol       = "display_name"
 	HumanPreferredLanguageCol = "preferred_language"
 	HumanGenderCol            = "gender"
-	HumanAvaterURLCol         = "avater_key"
+	HumanAvaterURLCol         = "avater_url"
 
 	// email
 	HumanEmailCol           = "email"
@@ -207,7 +207,7 @@ func (p *UserProjection) reduceHumanAdded(event eventstore.EventReader) (*handle
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCol(HumanFistNameCol, e.FirstName),
+				handler.NewCol(HumanFirstNameCol, e.FirstName),
 				handler.NewCol(HumanLastNameCol, e.LastName),
 				handler.NewCol(HumanNickNameCol, &sql.NullString{String: e.NickName, Valid: e.NickName != ""}),
 				handler.NewCol(HumanDisplayNameCol, &sql.NullString{String: e.DisplayName, Valid: e.DisplayName != ""}),
@@ -243,7 +243,7 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.EventReader) (*h
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCol(HumanFistNameCol, e.FirstName),
+				handler.NewCol(HumanFirstNameCol, e.FirstName),
 				handler.NewCol(HumanLastNameCol, e.LastName),
 				handler.NewCol(HumanNickNameCol, &sql.NullString{String: e.NickName, Valid: e.NickName != ""}),
 				handler.NewCol(HumanDisplayNameCol, &sql.NullString{String: e.DisplayName, Valid: e.DisplayName != ""}),
@@ -380,7 +380,7 @@ func (p *UserProjection) reduceHumanProfileChanged(event eventstore.EventReader)
 	}
 	cols := make([]handler.Column, 0, 6)
 	cols = append(cols,
-		handler.NewCol(HumanFistNameCol, e.FirstName),
+		handler.NewCol(HumanFirstNameCol, e.FirstName),
 		handler.NewCol(HumanLastNameCol, e.LastName),
 	)
 

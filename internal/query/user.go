@@ -50,8 +50,8 @@ var (
 		name:  projection.HumanUserIDCol,
 		table: humanTable,
 	}
-	HumanFistNameCol = Column{
-		name:  projection.HumanFistNameCol,
+	HumanFirstNameCol = Column{
+		name:  projection.HumanFirstNameCol,
 		table: humanTable,
 	}
 	HumanLastNameCol = Column{
