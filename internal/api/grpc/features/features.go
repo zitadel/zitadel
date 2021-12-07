@@ -5,16 +5,14 @@ import (
 
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
-	features_model "github.com/caos/zitadel/internal/features/model"
+	"github.com/caos/zitadel/internal/query"
 	features_pb "github.com/caos/zitadel/pkg/grpc/features"
 )
 
-func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Features {
+func ModelFeaturesToPb(features *query.Features) *features_pb.Features {
 	return &features_pb.Features{
-		Details:   object_grpc.ToViewDetailsPb(features.Sequence, features.CreationDate, features.ChangeDate, features.AggregateID),
-		Tier:      FeatureTierToPb(features.TierName, features.TierDescription, features.State, features.StateDescription),
-		IsDefault: features.Default,
-
+		IsDefault:                features.IsDefault,
+		Tier:                     FeatureTierToPb(features.TierName, features.TierDescription, features.State, features.StateDescription),
 		AuditLogRetention:        durationpb.New(features.AuditLogRetention),
 		LoginPolicyFactors:       features.LoginPolicyFactors,
 		LoginPolicyIdp:           features.LoginPolicyIDP,
@@ -32,6 +30,13 @@ func FeaturesFromModel(features *features_model.FeaturesView) *features_pb.Featu
 		CustomTextMessage:        features.CustomTextMessage,
 		CustomTextLogin:          features.CustomTextLogin,
 		MetadataUser:             features.MetadataUser,
+		LockoutPolicy:            features.LockoutPolicy,
+		Actions:                  features.Actions,
+		Details: object_grpc.ChangeToDetailsPb(
+			features.Sequence,
+			features.ChangeDate,
+			features.AggregateID,
+		),
 	}
 }
 

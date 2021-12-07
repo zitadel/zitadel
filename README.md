@@ -7,6 +7,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![codecov](https://codecov.io/gh/caos/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
 
+[![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
+
 ## What Is ZITADEL
 
 **ZITADEL** is a "Cloud Native Identity and Access Management" solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
@@ -49,7 +51,7 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 
 ### CAOS-Managed
 
-* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/usage/get-started) and try the free tier, including already unlimited users and all necessary security features.
+* **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
 * **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
 ## Start using ZITADEL

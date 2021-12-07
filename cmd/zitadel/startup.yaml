@@ -34,6 +34,7 @@ EventstoreBase:
   MaxOpenConns: 3
   MaxConnLifetime: 30m
   MaxConnIdleTime: 30m
+  Options: $CR_OPTIONS
   SSL:
     Mode: $CR_SSL_MODE
     RootCert: $CR_ROOT_CERT
@@ -60,6 +61,7 @@ Queries:
     MaxOpenConns: 2
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
+    Options: $CR_OPTIONS
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -71,6 +73,7 @@ Projections:
   RetryFailedAfter: 1s
   MaxFailureCount: 5
   BulkLimit: 200
+  MaxIterators: 1
   CRDB:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
@@ -81,6 +84,7 @@ Projections:
     MaxOpenConns: 3
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
+    Options: $CR_OPTIONS
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -104,6 +108,7 @@ AuthZ:
           MaxOpenConns: 3
           MaxConnLifetime: 30m
           MaxConnIdleTime: 30m
+          Options: $CR_OPTIONS
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -122,6 +127,7 @@ AuthZ:
       MaxOpenConns: 3
       MaxConnLifetime: 30m
       MaxConnIdleTime: 30m
+      Options: $CR_OPTIONS
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
@@ -148,6 +154,7 @@ Auth:
         MaxOpenConns: 3
         MaxConnLifetime: 30m
         MaxConnIdleTime: 30m
+        Options: $CR_OPTIONS
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -167,6 +174,7 @@ Auth:
       MaxOpenConns: 3
       MaxConnLifetime: 30m
       MaxConnIdleTime: 30m
+      Options: $CR_OPTIONS
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
@@ -181,6 +189,7 @@ Auth:
     MaxOpenConns: 3
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
+    Options: $CR_OPTIONS
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -207,6 +216,7 @@ Admin:
         MaxOpenConns: 3
         MaxConnLifetime: 30m
         MaxConnIdleTime: 30m
+        Options: $CR_OPTIONS
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -225,6 +235,7 @@ Admin:
     MaxOpenConns: 3
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
+    Options: $CR_OPTIONS
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
@@ -251,6 +262,7 @@ Mgmt:
         MaxOpenConns: 3
         MaxConnLifetime: 30m
         MaxConnIdleTime: 30m
+        Options: $CR_OPTIONS
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
@@ -264,6 +276,7 @@ Mgmt:
     Host: $ZITADEL_EVENTSTORE_HOST
     Port: $ZITADEL_EVENTSTORE_PORT
     User: 'management'
+    Options: $CR_OPTIONS
     Database: 'management'
     Password: $CR_MANAGEMENT_PASSWORD
     MaxOpenConns: 3
@@ -289,8 +302,6 @@ API:
     OPConfig:
       Issuer: $ZITADEL_ISSUER
       DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
-      CodeMethodS256: true
-      AuthMethodPrivateKeyJWT: true
     StorageConfig:
       DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
       DefaultAccessTokenLifetime: 12h
@@ -317,6 +328,9 @@ API:
       Introspection:
         Path: 'introspect'
         URL: '$ZITADEL_OAUTH/introspect'
+      Revocation:
+        Path: 'revoke'
+        URL: '$ZITADEL_OAUTH/revoke'
       EndSession:
         Path: 'endsession'
         URL: '$ZITADEL_AUTHORIZE/endsession'
@@ -381,6 +395,7 @@ Notification:
           MaxOpenConns: 2
           MaxConnLifetime: 30m
           MaxConnIdleTime: 30m
+          Options: $CR_OPTIONS
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
@@ -399,6 +414,7 @@ Notification:
       MaxOpenConns: 2
       MaxConnLifetime: 30m
       MaxConnIdleTime: 30m
+      Options: $CR_OPTIONS
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT

@@ -3,30 +3,101 @@ package management
 import (
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
 )
 
-func ListProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*proj_model.ProjectGrantViewSearchRequest, error) {
+func listProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := proj_grpc.ProjectGrantQueriesToModel(req.Queries)
-	queries = append(queries, &proj_model.ProjectGrantViewSearchQuery{
-		Key:    proj_model.GrantedProjectSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
-	return &proj_model.ProjectGrantViewSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
+	queries, err := ProjectGrantQueriesToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		Queries: queries,
 	}, nil
 }
 
+func ProjectGrantQueriesToModel(req *mgmt_pb.ListProjectGrantsRequest) (_ []query.SearchQuery, err error) {
+	queries := make([]query.SearchQuery, 0, len(req.Queries)+1)
+	for _, query := range req.Queries {
+		q, err := ProjectGrantQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, q)
+	}
+	projectIDQuery, err := query.NewProjectGrantProjectIDSearchQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, projectIDQuery)
+
+	return queries, nil
+}
+
+func ProjectGrantQueryToModel(apiQuery *proj_pb.ProjectGrantQuery) (query.SearchQuery, error) {
+	switch q := apiQuery.Query.(type) {
+	case *proj_pb.ProjectGrantQuery_ProjectNameQuery:
+		return query.NewProjectGrantProjectNameSearchQuery(object.TextMethodToQuery(q.ProjectNameQuery.Method), q.ProjectNameQuery.Name)
+	case *proj_pb.ProjectGrantQuery_RoleKeyQuery:
+		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyQuery.RoleKey)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+	}
+}
+func listAllProjectGrantsRequestToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := AllProjectGrantQueriesToModel(req)
+	if err != nil {
+		return nil, err
+	}
+	return &query.ProjectGrantSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
+}
+
+func AllProjectGrantQueriesToModel(req *mgmt_pb.ListAllProjectGrantsRequest) (_ []query.SearchQuery, err error) {
+	queries := make([]query.SearchQuery, 0, len(req.Queries))
+	for _, query := range req.Queries {
+		q, err := AllProjectGrantQueryToModel(query)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, q)
+	}
+	return queries, nil
+}
+
+func AllProjectGrantQueryToModel(apiQuery *proj_pb.AllProjectGrantQuery) (query.SearchQuery, error) {
+	switch q := apiQuery.Query.(type) {
+	case *proj_pb.AllProjectGrantQuery_ProjectNameQuery:
+		return query.NewProjectGrantProjectNameSearchQuery(object.TextMethodToQuery(q.ProjectNameQuery.Method), q.ProjectNameQuery.Name)
+	case *proj_pb.AllProjectGrantQuery_RoleKeyQuery:
+		return query.NewProjectGrantRoleKeySearchQuery(q.RoleKeyQuery.RoleKey)
+	case *proj_pb.AllProjectGrantQuery_ProjectIdQuery:
+		return query.NewProjectGrantProjectIDSearchQuery(q.ProjectIdQuery.ProjectId)
+	case *proj_pb.AllProjectGrantQuery_GrantedOrgIdQuery:
+		return query.NewProjectGrantGrantedOrgIDSearchQuery(q.GrantedOrgIdQuery.GrantedOrgId)
+	default:
+		return nil, errors.ThrowInvalidArgument(nil, "PROJECT-M099f", "List.Query.Invalid")
+	}
+}
 func AddProjectGrantRequestToDomain(req *mgmt_pb.AddProjectGrantRequest) *domain.ProjectGrant {
 	return &domain.ProjectGrant{
 		ObjectRoot: models.ObjectRoot{

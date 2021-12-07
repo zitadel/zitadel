@@ -2,12 +2,12 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@a
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { Gender, Human, User } from 'src/app/proto/generated/zitadel/user_pb';
+import { Gender, Human, Profile } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { ProfilePictureComponent } from './profile-picture/profile-picture.component';
 
 @Component({
-  selector: 'app-detail-form',
+  selector: 'cnsl-detail-form',
   templateUrl: './detail-form.component.html',
   styleUrls: ['./detail-form.component.scss'],
 })
@@ -16,24 +16,20 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   @Input() public preferredLoginName: string = '';
   @Input() public username!: string;
   @Input() public user!: Human.AsObject;
-  @Input() public disabled: boolean = false;
+  @Input() public disabled: boolean = true;
   @Input() public genders: Gender[] = [];
   @Input() public languages: string[] = ['de', 'en'];
-  @Output() public submitData: EventEmitter<User> = new EventEmitter<User>();
+  @Output() public submitData: EventEmitter<Profile.AsObject> = new EventEmitter<Profile.AsObject>();
   @Output() public changedLanguage: EventEmitter<string> = new EventEmitter<string>();
+  @Output() public changeUsernameClicked: EventEmitter<void> = new EventEmitter();
 
   public profileForm!: FormGroup;
 
   private sub: Subscription = new Subscription();
 
-  constructor(
-    private fb: FormBuilder,
-    private dialog: MatDialog,
-  ) {
+  constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.profileForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [
-        Validators.required,
-      ]],
+      userName: [{ value: '', disabled: true }, [Validators.required]],
       firstName: [{ value: '', disabled: this.disabled }, Validators.required],
       lastName: [{ value: '', disabled: this.disabled }, Validators.required],
       nickName: [{ value: '', disabled: this.disabled }],
@@ -45,9 +41,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
 
   public ngOnChanges(): void {
     this.profileForm = this.fb.group({
-      userName: [{ value: '', disabled: true }, [
-        Validators.required,
-      ]],
+      userName: [{ value: '', disabled: true }, [Validators.required]],
       firstName: [{ value: '', disabled: this.disabled }, Validators.required],
       lastName: [{ value: '', disabled: this.disabled }, Validators.required],
       nickName: [{ value: '', disabled: this.disabled }],
@@ -59,7 +53,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
     this.profileForm.patchValue({ userName: this.username, ...this.user.profile });
 
     if (this.preferredLanguage) {
-      this.sub = this.preferredLanguage.valueChanges.subscribe(value => {
+      this.sub = this.preferredLanguage.valueChanges.subscribe((value) => {
         this.changedLanguage.emit(value);
       });
     }
@@ -73,6 +67,10 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
     this.submitData.emit(this.profileForm.value);
   }
 
+  public changeUsername(): void {
+    this.changeUsernameClicked.emit();
+  }
+
   public openUploadDialog(): void {
     const dialogRef = this.dialog.open(ProfilePictureComponent, {
       data: {
@@ -81,7 +79,7 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
       }
     });
@@ -109,5 +107,4 @@ export class DetailFormComponent implements OnDestroy, OnChanges {
   public get preferredLanguage(): AbstractControl | null {
     return this.profileForm.get('preferredLanguage');
   }
-
 }

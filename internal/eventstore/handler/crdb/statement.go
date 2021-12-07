@@ -23,7 +23,7 @@ func WithTableSuffix(name string) func(*execConfig) {
 	}
 }
 
-func NewCreateStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) handler.Statement {
+func NewCreateStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -40,7 +40,7 @@ func NewCreateStatement(event eventstore.EventReader, values []handler.Column, o
 		return "INSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -48,7 +48,7 @@ func NewCreateStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) handler.Statement {
+func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -65,7 +65,7 @@ func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, o
 		return "UPSERT INTO " + config.tableName + " (" + columnNames + ") VALUES (" + valuesPlaceholder + ")"
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -73,7 +73,7 @@ func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, conditions []handler.Condition, opts ...execOption) handler.Statement {
+func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -98,7 +98,7 @@ func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, c
 		return "UPDATE " + config.tableName + " SET (" + columnNames + ") = (" + valuesPlaceholder + ") WHERE " + wheresPlaceholders
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -106,7 +106,7 @@ func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, c
 	}
 }
 
-func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condition, opts ...execOption) handler.Statement {
+func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	wheres, args := conditionsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
@@ -123,7 +123,7 @@ func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condi
 		return "DELETE FROM " + config.tableName + " WHERE " + wheresPlaceholders
 	}
 
-	return handler.Statement{
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
@@ -131,11 +131,133 @@ func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condi
 	}
 }
 
-func NewNoOpStatement(event eventstore.EventReader) handler.Statement {
-	return handler.Statement{
+func NewNoOpStatement(event eventstore.EventReader) *handler.Statement {
+	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
 		PreviousSequence: event.PreviousAggregateTypeSequence(),
+	}
+}
+
+func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.EventReader) Exec) *handler.Statement {
+	if len(opts) == 0 {
+		return NewNoOpStatement(event)
+	}
+	execs := make([]Exec, len(opts))
+	for i, opt := range opts {
+		execs[i] = opt(event)
+	}
+	return &handler.Statement{
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          multiExec(execs),
+	}
+}
+
+type Exec func(ex handler.Executer, projectionName string) error
+
+func AddCreateStatement(columns []handler.Column, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
+		return NewCreateStatement(event, columns, opts...).Execute
+	}
+}
+
+func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
+		return NewUpsertStatement(event, values, opts...).Execute
+	}
+}
+
+func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
+		return NewUpdateStatement(event, values, conditions, opts...).Execute
+	}
+}
+
+func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
+	return func(event eventstore.EventReader) Exec {
+		return NewDeleteStatement(event, conditions, opts...).Execute
+	}
+}
+
+func NewArrayAppendCol(column string, value interface{}) handler.Column {
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "array_append(" + column + ", " + placeholder + ")"
+		},
+	}
+}
+
+func NewArrayRemoveCol(column string, value interface{}) handler.Column {
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "array_remove(" + column + ", " + placeholder + ")"
+		},
+	}
+}
+
+//NewCopyStatement creates a new upsert statement which updates a column from an existing row
+// cols represent the columns which are objective to change.
+// if the value of a col is empty the data will be copied from the selected row
+// if the value of a col is not empty the data will be set by the static value
+// conds represent the conditions for the selection subquery
+func NewCopyStatement(event eventstore.EventReader, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+	columnNames := make([]string, len(cols))
+	selectColumns := make([]string, len(cols))
+	argCounter := 0
+	args := []interface{}{}
+
+	for i, col := range cols {
+		columnNames[i] = col.Name
+		selectColumns[i] = col.Name
+		if col.Value != nil {
+			argCounter++
+			selectColumns[i] = "$" + strconv.Itoa(argCounter)
+			args = append(args, col.Value)
+		}
+	}
+
+	wheres := make([]string, len(conds))
+	for i, cond := range conds {
+		argCounter++
+		wheres[i] = "copy_table." + cond.Name + " = $" + strconv.Itoa(argCounter)
+		args = append(args, cond.Value)
+	}
+
+	config := execConfig{
+		args: args,
+	}
+
+	if len(cols) == 0 {
+		config.err = handler.ErrNoValues
+	}
+
+	if len(conds) == 0 {
+		config.err = handler.ErrNoCondition
+	}
+
+	q := func(config execConfig) string {
+		return "UPSERT INTO " +
+			config.tableName +
+			" (" +
+			strings.Join(columnNames, ", ") +
+			") SELECT " +
+			strings.Join(selectColumns, ", ") +
+			" FROM " +
+			config.tableName + " AS copy_table WHERE " +
+			strings.Join(wheres, " AND ")
+	}
+
+	return &handler.Statement{
+		AggregateType:    event.Aggregate().Type,
+		Sequence:         event.Sequence(),
+		PreviousSequence: event.PreviousAggregateTypeSequence(),
+		Execute:          exec(config, q, opts),
 	}
 }
 
@@ -147,7 +269,9 @@ func columnsToQuery(cols []handler.Column) (names []string, parameters []string,
 		names[i] = col.Name
 		values[i] = col.Value
 		parameters[i] = "$" + strconv.Itoa(i+1)
-
+		if col.ParameterOpt != nil {
+			parameters[i] = col.ParameterOpt(parameters[i])
+		}
 	}
 	return names, parameters, values
 }
@@ -166,7 +290,7 @@ func conditionsToWhere(cols []handler.Condition, paramOffset int) (wheres []stri
 
 type query func(config execConfig) string
 
-func exec(config execConfig, q query, opts []execOption) func(ex handler.Executer, projectionName string) error {
+func exec(config execConfig, q query, opts []execOption) Exec {
 	return func(ex handler.Executer, projectionName string) error {
 		if projectionName == "" {
 			return handler.ErrNoProjection
@@ -185,6 +309,17 @@ func exec(config execConfig, q query, opts []execOption) func(ex handler.Execute
 			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
+		return nil
+	}
+}
+
+func multiExec(execList []Exec) Exec {
+	return func(ex handler.Executer, projectionName string) error {
+		for _, exec := range execList {
+			if err := exec(ex, projectionName); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 }

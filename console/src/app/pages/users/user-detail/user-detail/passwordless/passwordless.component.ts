@@ -10,21 +10,22 @@ import { ToastService } from 'src/app/services/toast.service';
 
 export interface WebAuthNOptions {
   challenge: string;
-  rp: { name: string, id: string; };
-  user: { name: string, id: string, displayName: string; };
+  rp: { name: string; id: string };
+  user: { name: string; id: string; displayName: string };
   pubKeyCredParams: any;
-  authenticatorSelection: { userVerification: string; };
+  authenticatorSelection: { userVerification: string };
   timeout: number;
   attestation: string;
 }
 
 @Component({
-  selector: 'app-passwordless',
+  selector: 'cnsl-passwordless',
   templateUrl: './passwordless.component.html',
   styleUrls: ['./passwordless.component.scss'],
 })
 export class PasswordlessComponent implements OnInit, OnDestroy {
-  @Input() private user!: User.AsObject;
+  @Input() public user!: User.AsObject;
+  @Input() public disabled: boolean = true;
   public displayedColumns: string[] = ['name', 'state', 'actions'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -36,9 +37,7 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
   public AuthFactorState: any = AuthFactorState;
   public error: string = '';
 
-  constructor(private service: ManagementService,
-    private toast: ToastService,
-    private dialog: MatDialog) { }
+  constructor(private service: ManagementService, private toast: ToastService, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     this.getPasswordless();
@@ -49,12 +48,15 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
   }
 
   public getPasswordless(): void {
-    this.service.listHumanPasswordless(this.user.id).then(passwordless => {
-      this.dataSource = new MatTableDataSource(passwordless.resultList);
-      this.dataSource.sort = this.sort;
-    }).catch(error => {
-      this.error = error.message;
-    });
+    this.service
+      .listHumanPasswordless(this.user.id)
+      .then((passwordless) => {
+        this.dataSource = new MatTableDataSource(passwordless.resultList);
+        this.dataSource.sort = this.sort;
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
   }
 
   public deletePasswordless(id?: string): void {
@@ -68,23 +70,29 @@ export class PasswordlessComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp && id) {
-        this.service.removeHumanPasswordless(id, this.user.id).then(() => {
-          this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
-          this.getPasswordless();
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.service
+          .removeHumanPasswordless(id, this.user.id)
+          .then(() => {
+            this.toast.showInfo('USER.TOAST.PASSWORDLESSREMOVED', true);
+            this.getPasswordless();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
 
   public sendPasswordlessRegistration(): void {
-    this.service.sendPasswordlessRegistration(this.user.id).then(() => {
-      this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT');
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.service
+      .sendPasswordlessRegistration(this.user.id)
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.PASSWORDLESSREGISTRATIONSENT');
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 }

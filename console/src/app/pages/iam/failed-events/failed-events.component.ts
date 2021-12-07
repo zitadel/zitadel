@@ -8,45 +8,43 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
-    selector: 'app-iam-failed-events',
-    templateUrl: './failed-events.component.html',
-    styleUrls: ['./failed-events.component.scss'],
+  selector: 'cnsl-iam-failed-events',
+  templateUrl: './failed-events.component.html',
+  styleUrls: ['./failed-events.component.scss'],
 })
 export class FailedEventsComponent implements AfterViewInit {
-    // public viewTimestamp!: Timestamp.AsObject;
+  @ViewChild(MatPaginator) public eventPaginator!: MatPaginator;
+  public eventDataSource!: MatTableDataSource<FailedEvent.AsObject>;
 
-    @ViewChild(MatPaginator) public eventPaginator!: MatPaginator;
-    public eventDataSource!: MatTableDataSource<FailedEvent.AsObject>;
+  public eventDisplayedColumns: string[] = ['viewName', 'database', 'failedSequence', 'failureCount', 'errorMessage', 'actions'];
 
-    public eventDisplayedColumns: string[] = ['viewName', 'database', 'failedSequence', 'failureCount', 'errorMessage', 'actions'];
+  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+  constructor(private adminService: AdminService, private toast: ToastService) {
+    this.loadEvents();
+  }
 
-    private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-    constructor(private adminService: AdminService, private toast: ToastService) {
-        this.loadEvents();
-    }
+  ngAfterViewInit(): void {
+    this.loadEvents();
+  }
 
-    ngAfterViewInit(): void {
-        this.loadEvents();
-    }
+  public loadEvents(): void {
+    this.loadingSubject.next(true);
+    from(this.adminService.listFailedEvents()).pipe(
+      map(resp => {
+        return resp?.resultList;
+      }),
+      catchError(() => of([])),
+      finalize(() => this.loadingSubject.next(false)),
+    ).subscribe(views => {
+      this.eventDataSource = new MatTableDataSource(views);
+      this.eventDataSource.paginator = this.eventPaginator;
+    });
+  }
 
-    public loadEvents(): void {
-        this.loadingSubject.next(true);
-        from(this.adminService.listFailedEvents()).pipe(
-            map(resp => {
-                return resp?.resultList;
-            }),
-            catchError(() => of([])),
-            finalize(() => this.loadingSubject.next(false)),
-        ).subscribe(views => {
-            this.eventDataSource = new MatTableDataSource(views);
-            this.eventDataSource.paginator = this.eventPaginator;
-        });
-    }
-
-    public cancelEvent(viewname: string, db: string, seq: number): void {
-        this.adminService.removeFailedEvent(viewname, db, seq).then(() => {
-            this.toast.showInfo('IAM.FAILEDEVENTS.DELETESUCCESS', true);
-        });
-    }
+  public cancelEvent(viewname: string, db: string, seq: number): void {
+    this.adminService.removeFailedEvent(viewname, db, seq).then(() => {
+      this.toast.showInfo('IAM.FAILEDEVENTS.DELETESUCCESS', true);
+    });
+  }
 }

@@ -1,4 +1,4 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
 .radio-button-wrapper {
   display: flex;
@@ -12,13 +12,13 @@
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
 
-  input[type="radio"] {
+  input[type="radio"].app {
     appearance: none;
     opacity: 0;
     display: none;
   }
 
-  input:checked + label {
+  input.app:checked + label {
     border-color: if($is-dark-theme, white, var(--grey));
 
     .cnsl-type-radio-header span {

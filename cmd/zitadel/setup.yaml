@@ -9,6 +9,7 @@ Eventstore:
   User: 'eventstore'
   Database: 'eventstore'
   Password: $CR_EVENTSTORE_PASSWORD
+  Options: $CR_OPTIONS
   SSL:
     Mode: $CR_SSL_MODE
     RootCert: $CR_ROOT_CERT
@@ -83,7 +84,7 @@ SetUp:
     DefaultLabelPolicy:
       PrimaryColor: '#5282c1'
       BackgroundColor: '#141735'
-      WarnColor: '#f44336'
+      WarnColor: '#ff3b5b'
       FontColor: '#ffffff'
   Step7:
     OTP: true

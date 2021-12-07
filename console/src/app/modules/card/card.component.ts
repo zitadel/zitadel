@@ -2,7 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-card',
+  selector: 'cnsl-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
   animations: [

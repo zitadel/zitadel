@@ -15,7 +15,7 @@
         {{'ACTIONS.CLOSE' | translate}}
     </button>
 
-    <button [disabled]="setting == undefined" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
+    <button [disabled]="setting === undefined" cdkFocusInitial color="primary" mat-raised-button class="ok-button"
         (click)="closeDialog(setting)">
         {{'ACTIONS.OK' | translate}}
     </button>

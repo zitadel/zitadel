@@ -1,4 +1,4 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
 @mixin cnsl-form-field-theme($theme) {
   $primary: map-get($theme, primary);

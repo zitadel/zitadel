@@ -12,7 +12,7 @@ import (
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {
-	app, err := s.project.ApplicationByID(ctx, req.ProjectId, req.AppId)
+	app, err := s.query.AppByProjectAndAppID(ctx, req.ProjectId, req.AppId)
 	if err != nil {
 		return nil, err
 	}
@@ -26,23 +26,23 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchApplications(ctx, queries)
+	apps, err := s.query.SearchApps(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppsResponse{
-		Result: project_grpc.AppsToPb(domains.Result),
+		Result: project_grpc.AppsToPb(apps.Apps),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			apps.Count,
+			apps.Sequence,
+			apps.Timestamp,
 		),
 	}, nil
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -196,16 +196,16 @@ func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysReques
 	if err != nil {
 		return nil, err
 	}
-	domains, err := s.project.SearchClientKeys(ctx, queries)
+	keys, err := s.project.SearchClientKeys(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppKeysResponse{
-		Result: authn_grpc.KeyViewsToPb(domains.Result),
+		Result: authn_grpc.KeyViewsToPb(keys.Result),
 		Details: object_grpc.ToListDetails(
-			domains.TotalResult,
-			domains.Sequence,
-			domains.Timestamp,
+			keys.TotalResult,
+			keys.Sequence,
+			keys.Timestamp,
 		),
 	}, nil
 }

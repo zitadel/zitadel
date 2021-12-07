@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 )
 
 const (
@@ -51,6 +52,10 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		l.handleRegister(w, r)
+		return
+	}
+	if authReq == nil {
+		l.renderLogin(w, r, nil, errors.ThrowInvalidArgument(nil, "LOGIN-adrg3", "Errors.AuthRequest.NotFound"))
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())

@@ -26,3 +26,16 @@ func (f UserState) Valid() bool {
 func (s UserState) Exists() bool {
 	return s != UserStateUnspecified && s != UserStateDeleted
 }
+
+type UserType int32
+
+const (
+	UserTypeUnspecified UserType = iota
+	UserTypeHuman
+	UserTypeMachine
+	userTypeCount
+)
+
+func (f UserType) Valid() bool {
+	return f >= 0 && f < userTypeCount
+}

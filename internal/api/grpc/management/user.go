@@ -20,7 +20,7 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
-	user, err := s.user.UserByID(ctx, req.Id)
+	user, err := s.user.UserByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,15 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
-	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email)
+	orgID := authz.GetCtxData(ctx).OrgID
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if !policy.UserLoginMustBeDomain {
+		orgID = ""
+	}
+	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +115,7 @@ func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetada
 
 func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetadataRequest) (*mgmt_pb.SetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.ResourceOwner)
+	result, err := s.command.SetUserMetadata(ctx, &domain.Metadata{Key: req.Key, Value: req.Value}, req.Id, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +130,7 @@ func (s *Server) SetUserMetadata(ctx context.Context, req *mgmt_pb.SetUserMetada
 
 func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUserMetadataRequest) (*mgmt_pb.BulkSetUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.ResourceOwner, BulkSetMetadataToDomain(req)...)
+	result, err := s.command.BulkSetUserMetadata(ctx, req.Id, ctxData.OrgID, BulkSetMetadataToDomain(req)...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +141,7 @@ func (s *Server) BulkSetUserMetadata(ctx context.Context, req *mgmt_pb.BulkSetUs
 
 func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUserMetadataRequest) (*mgmt_pb.RemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.ResourceOwner)
+	result, err := s.command.RemoveUserMetadata(ctx, req.Key, req.Id, ctxData.OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +152,7 @@ func (s *Server) RemoveUserMetadata(ctx context.Context, req *mgmt_pb.RemoveUser
 
 func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRemoveUserMetadataRequest) (*mgmt_pb.BulkRemoveUserMetadataResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.ResourceOwner, req.Keys...)
+	result, err := s.command.BulkRemoveUserMetadata(ctx, req.Id, ctxData.OrgID, req.Keys...)
 	if err != nil {
 		return nil, err
 	}
@@ -184,8 +192,9 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	}
 	if code != nil {
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
-			Lifetime: durationpb.New(code.Expiration),
+			Link:       code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Lifetime:   durationpb.New(code.Expiration),
+			Expiration: durationpb.New(code.Expiration),
 		}
 	}
 	return resp, nil
@@ -493,6 +502,19 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
+func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.AddPasswordlessRegistrationRequest) (*mgmt_pb.AddPasswordlessRegistrationResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddPasswordlessRegistrationResponse{
+		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+		Expiration: durationpb.New(initCode.Expiration),
+	}, nil
+}
+
 func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
@@ -598,7 +620,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	}, nil
 }
 func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) (*mgmt_pb.RemoveHumanLinkedIDPResponse, error) {
-	objectDetails, err := s.command.RemoveHumanExternalIDP(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
+	objectDetails, err := s.command.RemoveUserIDPLink(ctx, RemoveHumanLinkedIDPRequestToDomain(ctx, req))
 	if err != nil {
 		return nil, err
 	}

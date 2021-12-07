@@ -16,9 +16,9 @@
             [isApiApp]="app.apiConfig !== undefined">
             {{ app.name.charAt(0)}}
             <ng-container *ngIf="app.oidcConfig?.appType !== undefined">
-                <i *ngIf="app.oidcConfig?.appType == OIDCAppType.OIDC_APP_TYPE_NATIVE" class="las la-mobile"></i>
-                <i *ngIf="app.oidcConfig?.appType == OIDCAppType.OIDC_APP_TYPE_WEB" class="las la-code"></i>
-                <i *ngIf="app.oidcConfig?.appType == OIDCAppType.OIDC_APP_TYPE_USER_AGENT" class="las la-code"></i>
+                <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE" class="las la-mobile"></i>
+                <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_WEB" class="las la-code"></i>
+                <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT" class="las la-code"></i>
                 <i *ngIf="app.apiConfig" class="las la-code"></i>
             </ng-container>
         </cnsl-app-card>
@@ -29,7 +29,7 @@
 
     </div>
 
-    <ng-template appHasRole [appHasRole]="['project.app.write']">
+    <ng-template cnslHasRole [hasRole]="['project.app.write']">
         <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']" [attr.data-e2e]="'app-card-add'">
             <cnsl-app-card class="grid-card add" matRipple>
                 <mat-icon>add</mat-icon>

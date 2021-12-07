@@ -6,6 +6,10 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
+	"github.com/gorilla/csrf"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -23,9 +27,6 @@ import (
 	"github.com/caos/zitadel/internal/static"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-	"github.com/gorilla/csrf"
-	"github.com/rakyll/statik/fs"
-	"golang.org/x/text/language"
 )
 
 type Login struct {
@@ -167,12 +168,7 @@ func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string
 			{
 				Key:    usr_model.UserSearchKeyPreferredLoginName,
 				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  domain.NewIAMDomainName(orgName, l.iamDomain),
-			},
-			{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
+				Value:  "@" + domain.NewIAMDomainName(orgName, l.iamDomain),
 			},
 		},
 	})

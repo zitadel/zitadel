@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/grpc"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -45,7 +47,7 @@ type API struct {
 type health interface {
 	Health(ctx context.Context) error
 	IamByID(ctx context.Context) (*iam_model.IAM, error)
-	VerifierClientID(ctx context.Context, appName string) (string, error)
+	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
 type auth interface {
@@ -57,11 +59,20 @@ type admin interface {
 	GetSpoolerDiv(database, viewName string) int64
 }
 
-func Create(config Config, authZ authz.Config, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
-	api.verifier = authz.Start(authZRepo)
+
+	repo := struct {
+		authz_es.EsRepository
+		query.Queries
+	}{
+		*authZRepo,
+		*q,
+	}
+
+	api.verifier = authz.Start(&repo)
 	api.health = authZRepo
 	api.auth = authRepo
 	api.admin = adminRepo
@@ -148,7 +159,7 @@ func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *
 }
 
 func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
-	id, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
+	id, _, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
 	if err != nil {
 		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
 		return
@@ -185,9 +196,9 @@ func (a *API) registerSpoolerDivCounters() {
 		metrics.SpoolerDivCounterDescription,
 		func(ctx context.Context, result metric.Int64ObserverResult) {
 			for _, view := range views {
-				labels := map[string]interface{}{
-					metrics.Database: view.Database,
-					metrics.ViewName: view.ViewName,
+				labels := map[string]attribute.Value{
+					metrics.Database: attribute.StringValue(view.Database),
+					metrics.ViewName: attribute.StringValue(view.ViewName),
 				}
 				result.Observe(
 					a.admin.GetSpoolerDiv(view.Database, view.ViewName),

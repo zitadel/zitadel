@@ -3,22 +3,23 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
+	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
-
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {
-	isUnique, err := s.org.IsOrgUnique(ctx, req.Name, req.Domain)
+	isUnique, err := s.query.IsOrgUnique(ctx, req.Name, req.Domain)
 	return &admin_pb.IsOrgUniqueResponse{IsUnique: isUnique}, err
 }
 
 func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest) (*admin_pb.GetOrgByIDResponse, error) {
-	org, err := s.org.OrgByID(ctx, req.Id)
+	org, err := s.query.OrgByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -26,15 +27,22 @@ func (s *Server) GetOrgByID(ctx context.Context, req *admin_pb.GetOrgByIDRequest
 }
 
 func (s *Server) ListOrgs(ctx context.Context, req *admin_pb.ListOrgsRequest) (*admin_pb.ListOrgsResponse, error) {
-	query, err := listOrgRequestToModel(req)
+	queries, err := listOrgRequestToModel(req)
 	if err != nil {
 		return nil, err
 	}
-	orgs, err := s.org.SearchOrgs(ctx, query)
+	orgs, err := s.query.SearchOrgs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.ListOrgsResponse{Result: org_grpc.OrgViewsToPb(orgs.Result)}, nil
+	return &admin_pb.ListOrgsResponse{
+		Result: org_grpc.OrgViewsToPb(orgs.Orgs),
+		Details: &obj_pb.ListDetails{
+			TotalResult:       orgs.Count,
+			ProcessedSequence: orgs.Sequence,
+			ViewTimestamp:     timestamppb.New(orgs.Timestamp),
+		},
+	}, nil
 }
 
 func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*admin_pb.SetUpOrgResponse, error) {
@@ -60,12 +68,7 @@ func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain str
 			{
 				Key:    usr_model.UserSearchKeyPreferredLoginName,
 				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  orgDomain,
-			},
-			{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
+				Value:  "@" + orgDomain,
 			},
 		},
 	})

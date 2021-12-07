@@ -20,6 +20,7 @@ type TokenView struct {
 	Scopes            []string
 	Sequence          uint64
 	PreferredLanguage string
+	RefreshTokenID    string
 }
 
 type TokenSearchRequest struct {
@@ -36,6 +37,7 @@ const (
 	TokenSearchKeyUnspecified TokenSearchKey = iota
 	TokenSearchKeyTokenID
 	TokenSearchKeyUserID
+	TokenSearchKeyRefreshTokenID
 	TokenSearchKeyApplicationID
 	TokenSearchKeyUserAgentID
 	TokenSearchKeyExpiration

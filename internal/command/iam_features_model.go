@@ -63,6 +63,7 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	loginPolicyPasswordless,
 	loginPolicyRegistration,
 	loginPolicyUsernameLogin,
+	loginPolicyPasswordReset,
 	passwordComplexityPolicy,
 	labelPolicyPrivateLabel,
 	labelPolicyWatermark,
@@ -70,7 +71,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	privacyPolicy,
 	metadataUser,
 	customTextMessage,
-	customTextLogin bool,
+	customTextLogin,
+	lockoutPolicy,
+	actions bool,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -105,6 +108,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if wm.LoginPolicyUsernameLogin != loginPolicyUsernameLogin {
 		changes = append(changes, features.ChangeLoginPolicyUsernameLogin(loginPolicyUsernameLogin))
 	}
+	if wm.LoginPolicyPasswordReset != loginPolicyPasswordReset {
+		changes = append(changes, features.ChangeLoginPolicyPasswordReset(loginPolicyPasswordReset))
+	}
 	if wm.PasswordComplexityPolicy != passwordComplexityPolicy {
 		changes = append(changes, features.ChangePasswordComplexityPolicy(passwordComplexityPolicy))
 	}
@@ -128,6 +134,12 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.CustomTextLogin != customTextLogin {
 		changes = append(changes, features.ChangeCustomTextLogin(customTextLogin))
+	}
+	if wm.LockoutPolicy != lockoutPolicy {
+		changes = append(changes, features.ChangeLockoutPolicy(lockoutPolicy))
+	}
+	if wm.Actions != actions {
+		changes = append(changes, features.ChangeActions(actions))
 	}
 	if len(changes) == 0 {
 		return nil, false

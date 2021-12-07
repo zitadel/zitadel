@@ -20,11 +20,13 @@ const (
 	FeatureLabelPolicyWatermark     = FeatureLabelPolicy + ".watermark"
 	FeatureCustomDomain             = "custom_domain"
 	FeaturePrivacyPolicy            = "privacy_policy"
+	FeatureLockoutPolicy            = "lockout_policy"
 	FeatureMetadata                 = "metadata"
 	FeatureCustomText               = "custom_text"
 	FeatureCustomTextMessage        = FeatureCustomText + ".message"
 	FeatureCustomTextLogin          = FeatureCustomText + ".login"
 	FeatureMetadataUser             = FeatureMetadata + ".user"
+	FeatureActions                  = "actions"
 )
 
 type Features struct {
@@ -51,6 +53,8 @@ type Features struct {
 	CustomTextLogin          bool
 	PrivacyPolicy            bool
 	MetadataUser             bool
+	LockoutPolicy            bool
+	Actions                  bool
 }
 
 type FeaturesState int32

@@ -2,10 +2,15 @@ package command
 
 import (
 	"context"
+
+	"github.com/caos/logging"
+
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
@@ -143,6 +148,38 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	result.ClientSecretString = stringPW
 	return result, err
 }
+
+func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, secret string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+
+	app, err := c.getAPIAppWriteModel(ctx, projectID, appID, "")
+	if err != nil {
+		return err
+	}
+	if !app.State.Exists() {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-DFnbf", "Errors.Project.App.NoExisting")
+	}
+	if !app.IsAPI() {
+		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Bf3fw", "Errors.Project.App.IsNotAPI")
+	}
+	if app.ClientSecret == nil {
+		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-D3t5g", "Errors.Project.App.APIConfigInvalid")
+	}
+
+	projectAgg := ProjectAggregateFromWriteModel(&app.WriteModel)
+	ctx, spanPasswordComparison := tracing.NewNamedSpan(ctx, "crypto.CompareHash")
+	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
+	spanPasswordComparison.EndWithError(err)
+	if err == nil {
+		_, err = c.eventstore.PushEvents(ctx, project.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
+		return err
+	}
+	_, err = c.eventstore.PushEvents(ctx, project.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
+	logging.Log("COMMAND-g3f12").OnError(err).Error("could not push event APIClientSecretCheckFailed")
+	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
+}
+
 func (c *Commands) getAPIAppWriteModel(ctx context.Context, projectID, appID, resourceOwner string) (*APIApplicationWriteModel, error) {
 	appWriteModel := NewAPIApplicationWriteModelWithAppID(projectID, appID, resourceOwner)
 	err := c.eventstore.FilterToQueryReducer(ctx, appWriteModel)

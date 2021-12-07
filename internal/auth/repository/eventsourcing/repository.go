@@ -47,7 +47,6 @@ type EsRepository struct {
 	eventstore.UserGrantRepo
 	eventstore.OrgRepository
 	eventstore.IAMRepository
-	eventstore.FeaturesRepo
 }
 
 func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
@@ -69,7 +68,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm, idGenerator, assetsAPI)
+	view, err := auth_view.StartView(sqlClient, keyAlgorithm, queries, idGenerator, assetsAPI)
 	if err != nil {
 		return nil, err
 	}
@@ -93,12 +92,23 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		SystemDefaults:  systemDefaults,
 		PrefixAvatarURL: assetsAPI,
 	}
+	//TODO: remove as soon as possible
+	queryView := struct {
+		*query.Queries
+		*auth_view.View
+	}{
+		queries,
+		view,
+	}
 	return &EsRepository{
 		spool,
 		es,
 		userRepo,
 		eventstore.AuthRequestRepo{
+			PrivacyPolicyProvider:      queries,
+			LabelPolicyProvider:        queries,
 			Command:                    command,
+			OrgViewProvider:            queries,
 			AuthRequests:               authReq,
 			View:                       view,
 			Eventstore:                 es,
@@ -106,12 +116,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			UserViewProvider:           view,
 			UserCommandProvider:        command,
 			UserEventProvider:          &userRepo,
-			OrgViewProvider:            view,
 			IDPProviderViewProvider:    view,
-			LoginPolicyViewProvider:    view,
-			LockoutPolicyViewProvider:  view,
-			UserGrantProvider:          view,
-			ProjectProvider:            view,
+			LockoutPolicyViewProvider:  queries,
+			LoginPolicyViewProvider:    queries,
+			Query:                      queries,
+			UserGrantProvider:          queryView,
+			ProjectProvider:            queryView,
 			IdGenerator:                idGenerator,
 			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
 			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
@@ -142,7 +152,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,
-			View:     view,
+			Query:    queries,
 		},
 
 		eventstore.UserSessionRepo{
@@ -154,21 +164,19 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			IamID:       systemDefaults.IamID,
 			Auth:        authZ,
 			AuthZRepo:   authZRepo,
+			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
 			View:           view,
 			SystemDefaults: systemDefaults,
 			Eventstore:     es,
+			Query:          queries,
 		},
 		eventstore.IAMRepository{
 			IAMID:          systemDefaults.IamID,
 			LoginDir:       statikLoginFS,
 			IAMV2QuerySide: queries,
-		},
-		eventstore.FeaturesRepo{
-			Eventstore: es,
-			View:       view,
 		},
 	}, nil
 }

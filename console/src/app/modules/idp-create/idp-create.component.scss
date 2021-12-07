@@ -1,3 +1,7 @@
+.desc {
+  color: var(--grey);
+  font-size: 14px;
+}
 
 .container {
   padding: 4rem 4rem 2rem 4rem;
@@ -28,7 +32,16 @@
   }
 }
 
-.content {
+.auto-reg-info {
+  display: block;
+  width: 100%;
+
+  .auto-reg-desc {
+    margin: 0 0 1rem 0;
+  }
+}
+
+.idp-content {
   display: flex;
   margin: 0 -.5rem;
   flex-wrap: wrap;
@@ -41,7 +54,7 @@
   }
 
   .formfield {
-    flex: 1 0 auto;
+    flex: 1;
     margin: 0 .5rem;
 
     @media only screen and (max-width: 450px) {
@@ -50,13 +63,17 @@
   }
 }
 
-.continue-button {
-  margin-top: 3rem;
-  display: block;
-  padding: .5rem 4rem;
-
-  @media only screen and (max-width: 450px) {
+.actions {
+  button[mat-stroked-button] {
+    float: left;
     margin-top: 1rem;
-    margin-bottom: 2rem;
+    border-radius: .5rem;
+  }
+
+  button[mat-raised-button] {
+    float: right;
+    margin-top: 1rem;
+    border-radius: .5rem;
+    min-width: 100px;
   }
 }

@@ -1,14 +1,16 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
+
+	"github.com/caos/zitadel/internal/domain"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
 const (
 	queryAuthRequestID = "authRequestID"
+	queryUserAgentID   = "userAgentID"
 )
 
 func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
@@ -23,7 +25,7 @@ func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {
 	authReq, err := l.getAuthRequest(r)
 	if err != nil {
-		return nil, err
+		return authReq, err
 	}
 	err = l.parser.Parse(r, data)
 	return authReq, err

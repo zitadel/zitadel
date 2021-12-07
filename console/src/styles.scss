@@ -1,7 +1,7 @@
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
 @import './component-themes';
-@import '~@angular/material/theming';
+@import '@angular/material/theming';
 
 // Plus imports for other components in your app.
 
@@ -17,6 +17,8 @@
 
 :root {
   --grey: #8795a1;
+  --warn: #ff3b5b;
+  --success: #10b981;
   --table-row-back: #363738;
 }
 
@@ -338,12 +340,19 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   border-radius: 6px !important;
 }
 
+.mat-menu-item {
+  line-height: 35px !important;
+  height: 35px !important;
+}
+
 .light-theme {
   @include component-themes($caos-light-app-theme);
   @include mat.all-component-themes($caos-light-app-theme);
 
-  --grey: #697386;
   --color-main: var(--theme-light-primary-500);
+  --warn: #cd3d56;
+  --success: #10b981;
+
   $background: map-get($caos-light-app-theme, background);
 
   .sidenav,
@@ -382,6 +391,8 @@ $custom-typography: mat.define-typography-config($font-family: 'Lato');
   @include mat.all-component-themes($caos-dark-app-theme);
 
   --color-main: var(--theme-dark-primary-500);
+  --warn: #ff3b5b;
+  --success: #10b981;
   $background: map-get($caos-dark-app-theme, background);
 
   .sidenav,
@@ -471,8 +482,8 @@ h2 {
   }
 
   @media only screen and (max-width: 500px) {
-    padding-left: .5rem;
-    padding-right: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
@@ -480,6 +491,7 @@ h2 {
   padding: 0 1.5rem;
   padding-top: 2rem;
   padding-left: 2rem;
+  max-width: 1690px;
 
   @media only screen and (max-width: 500px) {
     padding-left: 1rem;

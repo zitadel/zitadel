@@ -24,6 +24,10 @@ type SQL struct {
 	MaxOpenConns    uint32
 	MaxConnLifetime Duration
 	MaxConnIdleTime Duration
+
+	//Additional options to be appended as options=<Options>
+	//The value will be taken as is. So be sure to separate multiple options by a space
+	Options string
 }
 
 type SQLBase struct {
@@ -32,6 +36,10 @@ type SQLBase struct {
 	Database string
 	Schema   string
 	SSL      sslBase
+
+	//Additional options to be appended as options=<Options>
+	//The value will be taken as is. So be sure to separate multiple options by a space
+	Options string
 }
 
 type SQLUser struct {
@@ -68,23 +76,27 @@ func (s *SQL) connectionString() string {
 		"application_name=zitadel",
 		"sslmode=" + s.SSL.Mode,
 	}
+	if s.Options != "" {
+		fields = append(fields, "options="+s.Options)
+	}
 	if s.Password != "" {
 		fields = append(fields, "password="+s.Password)
 	}
-
+	s.checkSSL()
 	if s.SSL.Mode != sslDisabledMode {
-		fields = append(fields, []string{
-			"sslrootcert=" + s.SSL.RootCert,
-			"sslcert=" + s.SSL.Cert,
-			"sslkey=" + s.SSL.Key,
-		}...)
+		fields = append(fields, "sslrootcert="+s.SSL.RootCert)
+		if s.SSL.Cert != "" {
+			fields = append(fields, "sslcert="+s.SSL.Cert)
+		}
+		if s.SSL.Cert != "" {
+			fields = append(fields, "sslkey="+s.SSL.Key)
+		}
 	}
 
 	return strings.Join(fields, " ")
 }
 
 func (s *SQL) Start() (*sql.DB, error) {
-	s.checkSSL()
 	client, err := sql.Open("postgres", s.connectionString())
 	if err != nil {
 		return nil, errors.ThrowPreconditionFailed(err, "TYPES-9qBtr", "unable to open database connection")
@@ -103,7 +115,7 @@ func (s *SQL) checkSSL() {
 		s.SSL = &ssl{sslBase: sslBase{Mode: sslDisabledMode}}
 		return
 	}
-	if s.SSL.Cert == "" || s.SSL.Key == "" || s.SSL.RootCert == "" {
+	if s.SSL.RootCert == "" {
 		logging.LogWithFields("TYPES-LFdzP",
 			"cert set", s.SSL.Cert != "",
 			"key set", s.SSL.Key != "",
@@ -119,6 +131,7 @@ func (u SQLUser) Start(base SQLBase) (*sql.DB, error) {
 		User:     u.User,
 		Password: u.Password,
 		Database: base.Database,
+		Options:  base.Options,
 		SSL: &ssl{
 			sslBase: sslBase{
 				Mode:     base.SSL.Mode,

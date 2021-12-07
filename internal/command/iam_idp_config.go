@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,7 +14,7 @@ import (
 )
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
-	if config.OIDCConfig == nil {
+	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
 	}
 
@@ -22,11 +23,6 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 		return nil, err
 	}
 	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
-
-	clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
-	if err != nil {
-		return nil, err
-	}
 
 	iamAgg := IAMAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.EventPusher{
@@ -37,8 +33,16 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.Name,
 			config.Type,
 			config.StylingType,
+			config.AutoRegister,
 		),
-		iam_repo.NewIDPOIDCConfigAddedEvent(
+	}
+	if config.OIDCConfig != nil {
+		clientSecret, err := crypto.Encrypt([]byte(config.OIDCConfig.ClientSecretString), c.idpConfigSecretCrypto)
+		if err != nil {
+			return nil, err
+		}
+
+		events = append(events, iam_repo.NewIDPOIDCConfigAddedEvent(
 			ctx,
 			iamAgg,
 			config.OIDCConfig.ClientID,
@@ -50,9 +54,18 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.OIDCConfig.IDPDisplayNameMapping,
 			config.OIDCConfig.UsernameMapping,
 			config.OIDCConfig.Scopes...,
-		),
+		))
+	} else if config.JWTConfig != nil {
+		events = append(events, iam_repo.NewIDPJWTConfigAddedEvent(
+			ctx,
+			iamAgg,
+			idpConfigID,
+			config.JWTConfig.JWTEndpoint,
+			config.JWTConfig.Issuer,
+			config.JWTConfig.KeysEndpoint,
+			config.JWTConfig.HeaderName,
+		))
 	}
-
 	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
 	if err != nil {
 		return nil, err
@@ -73,11 +86,11 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 		return nil, err
 	}
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-m0e3r", "Errors.IDPConfig.NotExisting")
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, iamAgg, config.IDPConfigID, config.Name, config.StylingType)
+	changedEvent, hasChanged := existingIDP.NewChangedEvent(ctx, iamAgg, config.IDPConfigID, config.Name, config.StylingType, config.AutoRegister)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
@@ -98,7 +111,7 @@ func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, err
 	}
 	if existingIDP.State != domain.IDPConfigStateActive {
-		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9so", "Errors.IAM.IDPConfig.NotActive")
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-2n0fs", "Errors.IAM.IDPConfig.NotActive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
 	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigDeactivatedEvent(ctx, iamAgg, idpID))
@@ -132,7 +145,7 @@ func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string)
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.ExternalIDP) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
 	existingIDP, err := c.iamIDPConfigWriteModelByID(ctx, idpID)
 	if err != nil {
 		return nil, err
@@ -173,7 +186,7 @@ func (c *Commands) getIAMIDPConfigByID(ctx context.Context, idpID string) (*doma
 		return nil, err
 	}
 	if !config.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "IAM-4M9so", "Errors.IDPConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "IAM-p0pFF", "Errors.IDPConfig.NotExisting")
 	}
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }

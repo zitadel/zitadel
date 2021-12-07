@@ -44,7 +44,7 @@
     position: relative;
     z-index: 100;
     margin: 1rem;
-    flex-basis: 260px;
+    flex-basis: 270px;
     display: flex;
     text-decoration: none;
     cursor: pointer;
@@ -81,10 +81,29 @@
         color: var(--grey);
       }
 
-      .name {
-        margin-top: 1rem;
-        font-size: 1.2rem;
-        margin-bottom: .5rem;
+      .name-row {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0 .5rem 0;
+
+        .name {
+          font-size: 1.2rem;
+          margin-right: .5rem;
+        }
+
+        .state-dot {
+          height: 8px;
+          width: 8px;
+          border-radius: 50%;
+
+          &.active {
+            background-color: var(--success);
+          }
+
+          &.inactive {
+            background-color: var(--warn);
+          }
+        }
       }
 
       .description {

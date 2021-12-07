@@ -9,9 +9,9 @@ type dockerhubImage image
 type zitadelImage image
 
 const (
-	CockroachImage       dockerhubImage = "cockroachdb/cockroach:v21.1.8"
+	CockroachImage       dockerhubImage = "cockroachdb/cockroach:v21.2.1"
 	PostgresImage        dockerhubImage = "postgres:9.6.17"
-	FlywayImage          dockerhubImage = "flyway/flyway:7.12.1"
+	FlywayImage          dockerhubImage = "flyway/flyway:8.0.2"
 	AlpineImage          dockerhubImage = "alpine:3.11"
 	ZITADELImage         zitadelImage   = "caos/zitadel"
 	BackupImage          zitadelImage   = "caos/zitadel-crbackup"

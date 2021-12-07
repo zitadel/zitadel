@@ -17,6 +17,10 @@ func (v *View) UserByID(userID string) (*model.UserView, error) {
 	return view.UserByID(v.Db, userTable, userID)
 }
 
+func (v *View) UserByIDAndResourceOwner(userID, resourceOwner string) (*model.UserView, error) {
+	return view.UserByIDAndResourceOwner(v.Db, userTable, userID, resourceOwner)
+}
+
 func (v *View) SearchUsers(request *usr_model.UserSearchRequest) ([]*model.UserView, uint64, error) {
 	return view.SearchUsers(v.Db, userTable, request)
 }
@@ -33,8 +37,8 @@ func (v *View) UserIDsByDomain(domain string) ([]string, error) {
 	return view.UserIDsByDomain(v.Db, userTable, domain)
 }
 
-func (v *View) IsUserUnique(userName, email string) (bool, error) {
-	return view.IsUserUnique(v.Db, userTable, userName, email)
+func (v *View) IsUserUnique(userName, email, orgID string) (bool, error) {
+	return view.IsUserUnique(v.Db, userTable, userName, email, orgID)
 }
 
 func (v *View) UserMFAs(userID string) ([]*usr_model.MultiFactor, error) {
