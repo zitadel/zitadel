@@ -13,7 +13,8 @@ import (
 
 var (
 	orgMemberTable = table{
-		name: projection.OrgMemberProjectionTable,
+		name:  projection.OrgMemberProjectionTable,
+		alias: "m",
 	}
 	OrgMemberUserID = Column{
 		name:  projection.MemberUserIDCol,
@@ -109,9 +110,9 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 
 			for rows.Next() {
 				member := new(Member)
-				roles := pq.StringArray{}
 
 				var (
+					roles              = pq.StringArray{}
 					preferredLoginName = sql.NullString{}
 					email              = sql.NullString{}
 					firstName          = sql.NullString{}

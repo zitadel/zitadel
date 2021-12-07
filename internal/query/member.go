@@ -35,11 +35,10 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
-	//TODO: fails
-	return NewTextQuery(memberUserID, value, TextEquals)
+	return NewTextQuery(memberUserID.setTable(membershipAlias), value, TextEquals)
 }
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(memberResourceOwner, value, TextEquals)
+	return NewTextQuery(memberResourceOwner.setTable(membershipAlias), value, TextEquals)
 }
 
 type Members struct {

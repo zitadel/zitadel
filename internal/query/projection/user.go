@@ -46,13 +46,13 @@ const (
 	HumanUserIDCol  = "user_id"
 
 	// profile
-	HumanFistNameCol          = "first_name"
+	HumanFistNameCol          = "fist_name"
 	HumanLastNameCol          = "last_name"
 	HumanNickNameCol          = "nick_name"
 	HumanDisplayNameCol       = "display_name"
 	HumanPreferredLanguageCol = "preferred_language"
 	HumanGenderCol            = "gender"
-	HumanAvaterURLCol         = "avater_key"
+	HumanAvaterURLCol         = "avater_url"
 
 	// email
 	HumanEmailCol           = "email"
