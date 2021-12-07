@@ -9,14 +9,18 @@ import (
 )
 
 func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*auth_pb.ListMyLinkedIDPsResponse, error) {
-	idps, err := s.repo.SearchMyExternalIDPs(ctx, ListMyLinkedIDPsRequestToModel(req))
+	q, err := ListMyLinkedIDPsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	idps, err := s.query.UserIDPLinks(ctx, q)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(idps.Result),
+		Result: idp_grpc.IDPUserLinksToPb(idps.Links),
 		Details: object.ToListDetails(
-			idps.TotalResult,
+			idps.Count,
 			idps.Sequence,
 			idps.Timestamp,
 		),

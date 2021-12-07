@@ -78,6 +78,7 @@ const (
 
 	//count is for validation
 	idpConfigTypeCount
+	IDPConfigTypeUnspecified IDPConfigType = -1
 )
 
 func (f IDPConfigType) Valid() bool {

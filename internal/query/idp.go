@@ -98,6 +98,10 @@ var (
 		name:  projection.IDPAutoRegisterCol,
 		table: idpTable,
 	}
+	IDPTypeCol = Column{
+		name:  projection.IDPTypeCol,
+		table: idpTable,
+	}
 )
 
 var (
