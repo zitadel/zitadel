@@ -7,15 +7,12 @@ import (
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/domain"
-
-	"github.com/caos/zitadel/internal/repository/user"
-
-	"github.com/caos/zitadel/internal/repository/project"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 )
 
 const (
