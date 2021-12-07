@@ -9,7 +9,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import {
   ProjectRoleDetailComponent,
-} from '../../pages/projects/project-roles/project-role-detail/project-role-detail.component';
+} from '../../pages/projects/owned-projects/project-roles/project-role-detail/project-role-detail.component';
 import { PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectRolesDataSource } from './project-roles-table-datasource';
 

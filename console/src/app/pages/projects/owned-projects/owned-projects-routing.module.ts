@@ -16,6 +16,7 @@ const routes: Routes = [
     loadChildren: () => import('../project-create/project-create.module').then((m) => m.ProjectCreateModule),
     canActivate: [RoleGuard],
     data: {
+      animation: 'AddPage',
       roles: ['project.create'],
     },
   },
@@ -65,17 +66,19 @@ const routes: Routes = [
       {
         path: 'roles',
         loadChildren: () =>
-          import('src/app/pages/projects/project-roles/project-roles.module').then((m) => m.ProjectRolesModule),
+          import('src/app/pages/projects/owned-projects/project-roles/project-roles.module').then(
+            (m) => m.ProjectRolesModule,
+          ),
       },
       {
         path: 'roles/create',
         loadChildren: () =>
-          import('../project-role-create/project-role-create.module').then((m) => m.ProjectRoleCreateModule),
+          import('./project-role-create/project-role-create.module').then((m) => m.ProjectRoleCreateModule),
       },
       {
-        path: 'grants/create',
+        path: 'projectgrants/create',
         loadChildren: () =>
-          import('../project-grant-create/project-grant-create.module').then((m) => m.ProjectGrantCreateModule),
+          import('./project-grant-create/project-grant-create.module').then((m) => m.ProjectGrantCreateModule),
       },
       {
         path: 'projectgrants/:grantid',

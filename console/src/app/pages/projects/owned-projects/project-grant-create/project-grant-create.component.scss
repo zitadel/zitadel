@@ -1,9 +1,5 @@
 .container {
-  padding: 4rem 4rem 2rem 4rem;
-
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
-  }
+  padding: 4rem 0 2rem 0;
 
   .abort-container {
     display: flex;
@@ -21,6 +17,10 @@
       margin-left: 2rem;
       white-space: nowrap;
     }
+  }
+
+  .create-content {
+    padding-left: 4.5rem;
   }
 }
 
@@ -46,6 +46,6 @@
 
   .big-button {
     display: block;
-    padding: .5rem 4rem;
+    padding: 0.5rem 4rem;
   }
 }

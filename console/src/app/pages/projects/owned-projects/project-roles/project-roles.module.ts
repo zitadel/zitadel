@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -22,6 +23,7 @@ import { ProjectRolesComponent } from './project-roles.component';
     HasRolePipeModule,
     InputModule,
     TranslateModule,
+    MatButtonModule,
     FormsModule,
   ],
   exports: [ProjectRolesComponent],

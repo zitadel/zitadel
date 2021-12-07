@@ -4,12 +4,7 @@
 
 .desc {
   color: var(--grey);
-  font-size: .9rem;
-}
-
-.full-width,
-.formfield {
-  width: 100%;
+  font-size: 0.9rem;
 }
 
 .action {
@@ -17,6 +12,6 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

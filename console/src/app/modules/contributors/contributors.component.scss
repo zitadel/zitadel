@@ -6,7 +6,7 @@
   $is-dark-theme: map-get($theme, is-dark);
 
   .contributor-groups {
-    padding: 1rem 0;
+    padding: 0.5rem 0;
 
     .contributor-people {
       display: flex;
@@ -52,9 +52,9 @@
           height: 32px;
           width: 32px;
           border-radius: 50%;
-          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
-          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, .5);
+          -webkit-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          -moz-box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
+          box-shadow: 2px 0 7px -1px rgba(33, 34, 36, 0.5);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -67,7 +67,7 @@
           .sa-icon {
             display: block;
             width: 32px;
-            margin: 0 .5rem;
+            margin: 0 0.5rem;
 
             i {
               margin: auto;

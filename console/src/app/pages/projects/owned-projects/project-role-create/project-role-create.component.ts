@@ -13,13 +13,7 @@ import { ToastService } from 'src/app/services/toast.service';
   templateUrl: './project-role-create.component.html',
   styleUrls: ['./project-role-create.component.scss'],
   animations: [
-    trigger('list', [
-      transition(':enter', [
-        query('@animate',
-          stagger(80, animateChild()),
-        ),
-      ]),
-    ]),
+    trigger('list', [transition(':enter', [query('@animate', stagger(80, animateChild()))])]),
     trigger('animate', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(-100%)' }),
@@ -71,7 +65,7 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.subscription = this.route.params.subscribe(params => this.getData(params));
+    this.subscription = this.route.params.subscribe((params) => this.getData(params));
   }
 
   public ngOnDestroy(): void {
@@ -84,20 +78,22 @@ export class ProjectRoleCreateComponent implements OnInit, OnDestroy {
 
   public addRole(): void {
     const rolesToAdd: BulkAddProjectRolesRequest.Role[] = this.formArray.value.map((element: any) => {
-      const role = new BulkAddProjectRolesRequest.Role;
+      const role = new BulkAddProjectRolesRequest.Role();
       role.setKey(element.key);
       role.setDisplayName(element.displayName);
       role.setGroup(element.group);
       return role;
     });
 
-    this.mgmtService.bulkAddProjectRoles(this.projectId, rolesToAdd).then(() => {
-      this.router.navigate(['projects', this.projectId]);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .bulkAddProjectRoles(this.projectId, rolesToAdd)
+      .then(() => {
+        this.router.navigate(['projects', this.projectId, 'roles']);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
-
 
   public close(): void {
     this._location.back();
