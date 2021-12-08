@@ -2,17 +2,16 @@
 <span *ngIf="id" class="title" mat-dialog-title>{{'FLOWS.DIALOG.UPDATE.TITLE' | translate}}</span>
 
 <div mat-dialog-content>
-  <!-- <p class="desc"> {{'FLOWS.DIALOG.ADD.DESCRIPTION' | translate}}</p> -->
-
   <cnsl-form-field class="form-field" appearance="outline">
     <cnsl-label>{{'FLOWS.NAME' | translate}}</cnsl-label>
     <input cnslInput [(ngModel)]="name">
   </cnsl-form-field>
 
-  <cnsl-form-field class="form-field" appearance="outline">
-    <cnsl-label>{{'FLOWS.SCRIPT' | translate}}</cnsl-label>
-    <textarea class="script" cnslInput [(ngModel)]="script"></textarea>
-  </cnsl-form-field>
+  <ngx-codemirror *ngIf="opened$ | async" [(ngModel)]="script" [options]="{
+    lineNumbers: true,
+    theme: 'material',
+    mode: 'javascript'
+  }"></ngx-codemirror>
 
   <cnsl-form-field class="form-field" appearance="outline">
     <cnsl-label>{{'FLOWS.TIMEOUTINSEC' | translate}}</cnsl-label>
