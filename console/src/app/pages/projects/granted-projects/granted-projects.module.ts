@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -74,6 +75,7 @@ import { GrantedProjectsComponent } from './granted-projects.component';
     InfoRowModule,
     LocalizedDatePipeModule,
     MemberCreateDialogModule,
+    MatRippleModule,
     RefreshTableModule,
   ],
 })

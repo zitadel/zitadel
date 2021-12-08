@@ -8,16 +8,25 @@
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
           <div>
-            <h1 class="app-title"><span>{{app?.name}}</span></h1>
+            <div class="app-title-row">
+              <h2 class="app-title">{{app?.name}}</h2>
+              <div class="app-state-dot" *ngIf="app && app.state !== undefined"
+                matTooltip="{{'APP.STATE.'+app.state | translate}}"
+                [ngClass]="{'active': app.state === AppState.APP_STATE_ACTIVE, 'inactive': app.state === AppState.APP_STATE_INACTIVE }">
+              </div>
+            </div>
             <span *ngIf="app?.oidcConfig">{{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType |
               translate}}</span>
             <span *ngIf="app?.apiConfig">API</span>
           </div>
         </div>
 
-        <p class="app-sub">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
-        <p *ngIf="isZitadel" class="app-sub zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
+        <p *ngIf="isZitadel; else notZitadel" class="app-zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
+        </p>
 
+        <ng-template #notZitadel>
+          <p class="app-sub">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
+        </ng-template>
       </div>
       <span class="fill-space"></span>
 
@@ -49,12 +58,11 @@
         </ng-template>
       </ng-container>
     </div>
-    <p *ngIf="isZitadel" class="zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
 
     <cnsl-info-row *ngIf="app" [app]="app"></cnsl-info-row>
   </div>
 
-  <span *ngIf="errorMessage" class="err-container">{{errorMessage}}</span>
+  <span *ngIf="errorMessage" class="app-err-container">{{errorMessage}}</span>
 </div>
 <div class="max-width-container">
   <cnsl-meta-layout>

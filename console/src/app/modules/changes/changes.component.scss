@@ -25,11 +25,18 @@
   $foreground: map-get($theme, foreground);
 
   .scroll-container {
-    max-height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
     border-bottom: 1px solid map-get($foreground, divider);
     margin-bottom: 0.5rem;
     box-sizing: border-box;
+
+    &.maxheight {
+      max-height: 500px;
+    }
+
+    @media only screen and (max-width: 1100px) {
+      max-height: 500px;
+    }
 
     .date {
       font-weight: 500;
@@ -135,11 +142,19 @@
       }
     }
 
+    .load-more-button {
+      margin-bottom: 1rem;
+    }
+
     .end-container {
-      font-size: 14px;
       margin: 1rem 0 1rem 0;
-      display: block;
-      color: var(--grey);
+      display: flex;
+      flex-direction: column;
+
+      span {
+        color: var(--grey);
+        font-size: 14px;
+      }
     }
   }
 }

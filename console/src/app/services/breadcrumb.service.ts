@@ -22,6 +22,7 @@ export class Breadcrumb {
     value: '',
   };
   routerLink: any[] = [];
+  isZitadel?: boolean = false;
 
   constructor(init: Partial<Breadcrumb>) {
     Object.assign(this, init);

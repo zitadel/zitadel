@@ -10,7 +10,7 @@
       </a>
 
       <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-        stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
+        stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
         <path d="M16.88 3.549L7.12 20.451"></path>
       </svg>
     </ng-container>
@@ -60,7 +60,7 @@
 
     <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async">
       <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-        stroke-linecap="round" stroke-linejoin="round" fill="none" shape-rendering="geometricPrecision">
+        stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
         <path d="M16.88 3.549L7.12 20.451"></path>
       </svg>
 
@@ -82,7 +82,8 @@
       <i class="las la-cog"></i>
     </a>
 
-    <div cnslOutsideClick (clickOutside)="closeAccountCard()" class="icon-container">
+    <div cnslOutsideClick (clickOutside)="closeAccountCard()" class="icon-container"
+      [ngClass]="{'iam-user': (['iam.read$','iam.write$'] | hasRole | async)}">
       <cnsl-avatar
         *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
         class="avatar-toggle dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"

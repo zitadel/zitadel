@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, ElementRef, HostBinding, HostListener, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -25,7 +25,7 @@ import { UpdateService } from './services/update.service';
   styleUrls: ['./app.component.scss'],
   animations: [toolbarAnimation, ...navAnimations, accountCard, routeAnimations, adminLineAnimation],
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
   @ViewChild('input', { static: false }) input!: ElementRef;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
@@ -180,8 +180,6 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    this.loadPrivateLabelling();
-
     this.getProjectCount();
 
     this.authService.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
@@ -212,6 +210,10 @@ export class AppComponent implements OnDestroy {
     });
 
     this.loadPolicies();
+  }
+
+  public ngOnInit(): void {
+    this.loadPrivateLabelling();
   }
 
   public ngOnDestroy(): void {

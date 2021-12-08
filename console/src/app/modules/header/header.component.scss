@@ -26,6 +26,7 @@
 
       .slash {
         color: map-get($foreground, divider);
+        fill: map-get($foreground, divider);
       }
 
       .org-context {
@@ -152,10 +153,14 @@
         user-select: none;
         border: 2px solid #ffffff80;
         border-radius: 50%;
-        transition: border ease 0.2s;
+        transition: border ease 0.15s;
+
+        &.iam-user {
+          border: 2px solid $primary-color;
+        }
 
         &:hover {
-          border-color: #ffffff;
+          border-color: if($is-dark-theme, #ffffff, #00000050);
         }
 
         .docs {

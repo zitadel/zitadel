@@ -81,17 +81,6 @@
       </ng-template>
 
       <ng-container *ngIf="isZitadel === false">
-        <!-- <ng-template cnslHasRole [hasRole]="['project.grant.read:' + project.id, 'project.grant.read']">
-          <cnsl-card title="{{ 'PROJECT.GRANT.TITLE' | translate }}"
-            description="{{ 'PROJECT.GRANT.DESCRIPTION' | translate }}">
-            <cnsl-project-grants
-              [refreshOnPreviousRoutes]="['/projects/'+projectId+'/grants/create','/projects/'+projectId+'/roles/create']"
-              [disabled]="((['project.grant.write$', 'project.grant.write:'+ project.id]| hasRole | async)) === false"
-              [projectId]="projectId">
-            </cnsl-project-grants>
-          </cnsl-card>
-        </ng-template> -->
-
         <ng-template cnslHasRole [hasRole]="['project.role.read:' + project.id, 'project.role.read']">
           <cnsl-card id="roles" title="{{ 'PROJECT.SETTINGS.TITLE' | translate }}"
             description="{{ 'PROJECT.SETTINGS.DESCRIPTION' | translate }}">

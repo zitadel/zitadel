@@ -3,13 +3,14 @@
 @mixin app-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
 
   .app-top {
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 2rem 2rem 2rem 2rem;
     background: if($is-dark-theme, #00000020, #ffffff80);
-    // linear-gradient(90deg, #00000000, #00000020 2%, #00000020 98%, #00000000 100%),
 
     .app-top-row {
       display: flex;
@@ -24,10 +25,29 @@
           margin-right: 1rem;
         }
 
-        .app-title {
-          margin: 0;
+        .app-title-row {
           display: flex;
           align-items: center;
+
+          .app-title {
+            margin: 0;
+            margin-right: 0.5rem;
+            font-size: 2rem;
+          }
+
+          .app-state-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+
+            &.active {
+              background-color: var(--success);
+            }
+
+            &.inactive {
+              background-color: var(--warn);
+            }
+          }
         }
       }
 
@@ -57,6 +77,16 @@
         }
       }
     }
+  }
+
+  .app-zitadel-warning {
+    font-size: 14px;
+    color: $warn-color;
+  }
+
+  .app-err-container {
+    color: $warn-color;
+    font-size: 14px;
   }
 }
 
@@ -99,11 +129,6 @@
     margin-top: 1.5rem;
   }
 
-  .zitadel-warning {
-    font-size: 14px;
-    color: rgb(201, 51, 71);
-  }
-
   .actions-trigger {
     margin-top: 0.25rem;
     display: flex;
@@ -114,11 +139,6 @@
       margin-right: -0.5rem;
     }
   }
-}
-
-.err-container {
-  color: rgb(201, 51, 71);
-  font-size: 14px;
 }
 
 .compliance {

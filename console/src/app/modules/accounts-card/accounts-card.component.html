@@ -1,14 +1,15 @@
-<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+<div class="accounts-card" cnslOutsideClick (clickOutside)="closeCard($event)">
   <cnsl-avatar
     *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
-    class="avatar" [forColor]="user.preferredLoginName" [avatarUrl]="user.human?.profile?.avatarUrl || ''"
+    class="avatar" [ngClass]="{'iam-user': iamuser}" [forColor]="user.preferredLoginName"
+    [avatarUrl]="user.human?.profile?.avatarUrl || ''"
     [name]="(user.human && user.human.profile && user.human.profile.displayName) ? user.human.profile.displayName : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
     [size]="80">
   </cnsl-avatar>
 
   <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
   <span class="u-email" *ngIf="user.preferredLoginName">{{user.preferredLoginName}}</span>
-  <span class="iamuser" *ngIf="iamuser">IAM USER</span>
+  <div class="iamuser" *ngIf="iamuser">IAM USER</div>
 
   <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
   <div class="l-accounts">

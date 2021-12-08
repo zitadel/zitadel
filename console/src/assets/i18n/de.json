@@ -1637,6 +1637,7 @@
   "CHANGES": {
     "LISTTITLE": "Letzte Änderungen",
     "BOTTOM": "Ende",
+    "LOADMORE": "Mehr laden",
     "ORG": {
       "TITLE": "Aktivität",
       "DESCRIPTION": "Hier siehst Du die letzten Vorkommnisse, die die Organisation betreffen."

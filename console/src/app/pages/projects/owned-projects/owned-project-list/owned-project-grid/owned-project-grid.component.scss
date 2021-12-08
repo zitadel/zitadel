@@ -10,7 +10,7 @@
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
 
   .anim-list {
     display: flex;
@@ -52,10 +52,10 @@
     padding-right: 0;
     padding-bottom: 0;
     padding-left: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     box-sizing: border-box;
     min-height: 166px;
-    transition: box-shadow .1s ease-in;
+    transition: box-shadow 0.1s ease-in;
 
     img {
       height: 50px;
@@ -68,23 +68,23 @@
       display: flex;
       flex-direction: column;
       min-height: 70px;
-      padding: .5rem 1rem 0 0;
+      padding: 0.5rem 1rem 0 0;
 
       .top {
-        font-size: .8rem;
+        font-size: 0.8rem;
         margin-bottom: 0;
-        margin-top: .5rem;
+        margin-top: 0.5rem;
         color: var(--grey);
       }
 
       .name-row {
         display: flex;
         align-items: center;
-        margin: 1rem 0 .5rem 0;
+        margin: 1rem 0 0.5rem 0;
 
         .name {
           font-size: 1.2rem;
-          margin-right: .5rem;
+          margin-right: 0.5rem;
         }
 
         .state-dot {
@@ -103,11 +103,11 @@
       }
 
       .description {
-        font-size: .8rem;
+        font-size: 0.8rem;
       }
 
       .created {
-        font-size: .8rem;
+        font-size: 0.8rem;
         color: var(--grey);
       }
 
@@ -141,7 +141,7 @@
       bottom: 0;
       right: 30px;
       margin: 0;
-      margin-bottom: .25rem;
+      margin-bottom: 0.25rem;
 
       &:not(:hover) {
         color: #8795a1;
@@ -155,7 +155,7 @@
       bottom: 0;
       right: 0;
       margin: 0;
-      margin-bottom: .25rem;
+      margin-bottom: 0.25rem;
       color: var(--grey);
 
       &.selected {
@@ -164,7 +164,7 @@
     }
 
     &:hover {
-      box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
 
       .delete-button,
       .edit-button {
@@ -190,17 +190,17 @@
 
   .add-project-button {
     z-index: 100;
-    flex-basis: 260px;
+    flex-basis: 270px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
     min-height: 166px;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     margin: 1rem;
     box-sizing: border-box;
-    transition: box-shadow .1s ease-in;
+    transition: box-shadow 0.1s ease-in;
 
     .icon {
       display: flex;
@@ -213,7 +213,7 @@
     }
 
     &:hover {
-      box-shadow: 0 5px 10px rgba(0, 0, 0, .12);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
 
       .icon,
       span {
@@ -231,7 +231,7 @@
 
 .n-items {
   padding: 0 1rem;
-  font-size: .8rem;
+  font-size: 0.8rem;
   color: var(--grey);
   flex-basis: 100%;
 }

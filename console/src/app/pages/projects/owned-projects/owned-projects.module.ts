@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -25,20 +26,14 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { NameDialogModule } from '../../../modules/name-dialog/name-dialog.module';
-import {
-  ProjectPrivateLabelingDialogModule,
-} from '../../../modules/project-private-labeling-dialog/project-private-labeling-dialog.module';
+import { ProjectPrivateLabelingDialogModule } from '../../../modules/project-private-labeling-dialog/project-private-labeling-dialog.module';
 import { OwnedProjectGridComponent } from './owned-project-list/owned-project-grid/owned-project-grid.component';
 import { OwnedProjectListComponent } from './owned-project-list/owned-project-list.component';
 import { OwnedProjectsRoutingModule } from './owned-projects-routing.module';
 import { OwnedProjectsComponent } from './owned-projects.component';
 
 @NgModule({
-  declarations: [
-    OwnedProjectsComponent,
-    OwnedProjectListComponent,
-    OwnedProjectGridComponent,
-  ],
+  declarations: [OwnedProjectsComponent, OwnedProjectListComponent, OwnedProjectGridComponent],
   imports: [
     CommonModule,
     OwnedProjectsRoutingModule,
@@ -69,6 +64,7 @@ import { OwnedProjectsComponent } from './owned-projects.component';
     LocalizedDatePipeModule,
     SharedModule,
     RefreshTableModule,
+    MatRippleModule,
   ],
 })
-export class OwnedProjectsModule { }
+export class OwnedProjectsModule {}

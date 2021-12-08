@@ -3,6 +3,8 @@
 @mixin granted-project-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
 
   .granted-project-top {
     border-bottom: 1px solid map-get($foreground, divider);
@@ -58,7 +60,7 @@
 
         &.zitadel-warning {
           font-size: 14px;
-          color: rgb(201, 51, 71);
+          color: $warn-color;
         }
       }
 

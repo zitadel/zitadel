@@ -1637,6 +1637,7 @@
   "CHANGES": {
     "LISTTITLE": "Last Changes",
     "BOTTOM": "You've reached the end of the list.",
+    "LOADMORE": "Load more",
     "ORG": {
       "TITLE": "Activity",
       "DESCRIPTION": "Here you can see the latest events that have generated an organisation change."

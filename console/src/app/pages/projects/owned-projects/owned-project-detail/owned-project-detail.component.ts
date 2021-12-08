@@ -8,9 +8,7 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import {
-  ProjectPrivateLabelingDialogComponent,
-} from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
+import { ProjectPrivateLabelingDialogComponent } from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
@@ -115,25 +113,26 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
   }
 
   private async getData(projectId: string): Promise<void> {
-    this.mgmtService.getIAM().then((iam) => {
-      this.isZitadel = iam.iamProjectId === this.projectId;
-    });
-
     this.mgmtService
       .getProjectByID(projectId)
       .then((resp) => {
         if (resp.project) {
           this.project = resp.project;
 
-          const breadcrumbs = [
-            new Breadcrumb({
-              type: BreadcrumbType.PROJECT,
-              name: resp.project.name,
-              param: { key: ROUTEPARAM, value: projectId },
-              routerLink: ['/projects', projectId],
-            }),
-          ];
-          this.breadcrumbService.setBreadcrumb(breadcrumbs);
+          this.mgmtService.getIAM().then((iam) => {
+            this.isZitadel = iam.iamProjectId === this.projectId;
+
+            const breadcrumbs = [
+              new Breadcrumb({
+                type: BreadcrumbType.PROJECT,
+                name: this.project.name,
+                param: { key: ROUTEPARAM, value: projectId },
+                routerLink: ['/projects', projectId],
+                isZitadel: this.isZitadel,
+              }),
+            ];
+            this.breadcrumbService.setBreadcrumb(breadcrumbs);
+          });
         }
       })
       .catch((error) => {
