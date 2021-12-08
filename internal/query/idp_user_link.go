@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
-type UserIDPLink struct {
+type IDPUserLink struct {
 	IDPID            string
 	UserID           string
 	IDPName          string
@@ -19,17 +19,17 @@ type UserIDPLink struct {
 	IDPType          domain.IDPConfigType
 }
 
-type UserIDPLinks struct {
+type IDPUserLinks struct {
 	SearchResponse
-	Links []*UserIDPLink
+	Links []*IDPUserLink
 }
 
-type UserIDPLinksSearchQuery struct {
+type IDPUserLinksSearchQuery struct {
 	SearchRequest
 	Queries []SearchQuery
 }
 
-func (q *UserIDPLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+func (q *IDPUserLinksSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
 		query = q.toQuery(query)
@@ -75,8 +75,8 @@ var (
 	}
 )
 
-func (q *Queries) UserIDPLinks(ctx context.Context, queries *UserIDPLinksSearchQuery) (idps *UserIDPLinks, err error) {
-	query, scan := prepareUserIDPLinksQuery()
+func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery) (idps *IDPUserLinks, err error) {
+	query, scan := prepareIDPUserLinksQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
@@ -94,15 +94,15 @@ func (q *Queries) UserIDPLinks(ctx context.Context, queries *UserIDPLinksSearchQ
 	return idps, err
 }
 
-func NewUserIDPLinksUserIDSearchQuery(value string) (SearchQuery, error) {
+func NewIDPUserLinksUserIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkUserIDCol, value, TextEquals)
 }
 
-func NewUserIDPLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+func NewIDPUserLinksResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkResourceOwnerCol, value, TextEquals)
 }
 
-func prepareUserIDPLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserIDPLinks, error)) {
+func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLinks, error)) {
 	return sq.Select(
 			IDPUserLinkIDPIDCol.identifier(),
 			IDPUserLinkUserIDCol.identifier(),
@@ -113,14 +113,14 @@ func prepareUserIDPLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserIDPLink
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
 			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*UserIDPLinks, error) {
-			idps := make([]*UserIDPLink, 0)
+		func(rows *sql.Rows) (*IDPUserLinks, error) {
+			idps := make([]*IDPUserLink, 0)
 			var count uint64
 			for rows.Next() {
 				var (
 					idpName = sql.NullString{}
 					idpType = sql.NullInt16{}
-					idp     = new(UserIDPLink)
+					idp     = new(IDPUserLink)
 				)
 				err := rows.Scan(
 					&idp.IDPID,
@@ -148,7 +148,7 @@ func prepareUserIDPLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserIDPLink
 				return nil, errors.ThrowInternal(err, "QUERY-nwx6U", "Errors.Query.CloseRows")
 			}
 
-			return &UserIDPLinks{
+			return &IDPUserLinks{
 				Links: idps,
 				SearchResponse: SearchResponse{
 					Count: count,

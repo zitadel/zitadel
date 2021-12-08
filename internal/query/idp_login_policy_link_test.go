@@ -12,27 +12,21 @@ import (
 )
 
 var (
-	userIDPLinksQuery = regexp.QuoteMeta(`SELECT zitadel.projections.idp_user_links.idp_id,` +
-		` zitadel.projections.idp_user_links.user_id,` +
+	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT zitadel.projections.idp_login_policy_links.idp_id,` +
 		` zitadel.projections.idps.name,` +
-		` zitadel.projections.idp_user_links.external_user_id,` +
-		` zitadel.projections.idp_user_links.display_name,` +
 		` zitadel.projections.idps.type,` +
 		` COUNT(*) OVER ()` +
-		` FROM zitadel.projections.idp_user_links` +
-		` LEFT JOIN zitadel.projections.idps ON zitadel.projections.idp_user_links.idp_id = zitadel.projections.idps.id`)
-	userIDPLinksCols = []string{
+		` FROM zitadel.projections.idp_login_policy_links` +
+		` LEFT JOIN zitadel.projections.idps ON zitadel.projections.idp_login_policy_links.idp_id = zitadel.projections.idps.id`)
+	loginPolicyIDPLinksCols = []string{
 		"idp_id",
-		"user_id",
 		"name",
-		"external_user_id",
-		"display_name",
 		"type",
 		"count",
 	}
 )
 
-func Test_UserIDPLinkPrepares(t *testing.T) {
+func Test_IDPLoginPolicyLinkPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -45,80 +39,68 @@ func Test_UserIDPLinkPrepares(t *testing.T) {
 	}{
 		{
 			name:    "prepareIDPsQuery found",
-			prepare: prepareUserIDPLinksQuery,
+			prepare: prepareIDPLoginPolicyLinksQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					userIDPLinksQuery,
-					userIDPLinksCols,
+					loginPolicyIDPLinksQuery,
+					loginPolicyIDPLinksCols,
 					[][]driver.Value{
 						{
 							"idp-id",
-							"user-id",
 							"idp-name",
-							"external-user-id",
-							"display-name",
 							domain.IDPConfigTypeJWT,
 						},
 					},
 				),
 			},
-			object: &UserIDPLinks{
+			object: &IDPLoginPolicyLinks{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Links: []*UserIDPLink{
+				Links: []*IDPLoginPolicyLink{
 					{
-						IDPID:            "idp-id",
-						UserID:           "user-id",
-						IDPName:          "idp-name",
-						ProvidedUserID:   "external-user-id",
-						ProvidedUsername: "display-name",
-						IDPType:          domain.IDPConfigTypeJWT,
+						IDPID:   "idp-id",
+						IDPName: "idp-name",
+						IDPType: domain.IDPConfigTypeJWT,
 					},
 				},
 			},
 		},
 		{
 			name:    "prepareIDPsQuery no idp",
-			prepare: prepareUserIDPLinksQuery,
+			prepare: prepareIDPLoginPolicyLinksQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					userIDPLinksQuery,
-					userIDPLinksCols,
+					loginPolicyIDPLinksQuery,
+					loginPolicyIDPLinksCols,
 					[][]driver.Value{
 						{
 							"idp-id",
-							"user-id",
 							nil,
-							"external-user-id",
-							"display-name",
 							nil,
 						},
 					},
 				),
 			},
-			object: &UserIDPLinks{
+			object: &IDPLoginPolicyLinks{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				Links: []*UserIDPLink{
+				Links: []*IDPLoginPolicyLink{
 					{
-						IDPID:            "idp-id",
-						UserID:           "user-id",
-						IDPName:          "",
-						ProvidedUserID:   "external-user-id",
-						ProvidedUsername: "display-name",
-						IDPType:          domain.IDPConfigTypeUnspecified,
+						IDPID:   "idp-id",
+						IDPName: "",
+						IDPType: domain.IDPConfigTypeUnspecified,
 					},
 				},
 			},
 		},
 		{
 			name:    "prepareIDPsQuery sql err",
-			prepare: prepareUserIDPLinksQuery,
+			prepare: prepareIDPLoginPolicyLinksQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					userIDPLinksQuery,
+					loginPolicyIDPLinksQuery,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

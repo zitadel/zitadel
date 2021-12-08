@@ -35,18 +35,18 @@ func (s *Server) UpdateLoginPolicy(ctx context.Context, p *admin_pb.UpdateLoginP
 }
 
 func (s *Server) ListLoginPolicyIDPs(ctx context.Context, req *admin_pb.ListLoginPolicyIDPsRequest) (*admin_pb.ListLoginPolicyIDPsResponse, error) {
-	res, err := s.iam.SearchDefaultIDPProviders(ctx, ListLoginPolicyIDPsRequestToModel(req))
+	res, err := s.query.IDPLoginPolicyLinks(ctx, domain.IAMID, ListLoginPolicyIDPsRequestToQuery(req))
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListLoginPolicyIDPsResponse{
-		Result:  idp.ExternalIDPViewsToLoginPolicyLinkPb(res.Result),
-		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
+		Result:  idp.IDPLoginPolicyLinksToPb(res.Links),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
 	}, nil
 }
 
 func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPToLoginPolicyRequest) (*admin_pb.AddIDPToLoginPolicyResponse, error) {
-	idp, err := s.command.AddIDPProviderToDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}) //TODO: old way was to also add type but this doesnt make sense in my point of view
+	idp, err := s.command.AddIDPProviderToDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId})
 	if err != nil {
 		return nil, err
 	}
