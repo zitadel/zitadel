@@ -9,9 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
-	"github.com/lib/pq"
 )
 
 var (
@@ -80,7 +81,8 @@ var (
 		` FROM zitadel.projections.apps` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
 		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
-	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.apps.id` +
+	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.apps_api_configs.client_id,` +
+		` zitadel.projections.apps_oidc_configs.client_id` +
 		` FROM zitadel.projections.apps` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
 		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
@@ -1363,8 +1365,8 @@ func Test_AppIDsPrepare(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareAppIDsQuery no result",
-			prepare: prepareAppIDsQuery,
+			name:    "prepareClientIDsQuery no result",
+			prepare: prepareClientIDsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppIDsQuery,
@@ -1375,15 +1377,16 @@ func Test_AppIDsPrepare(t *testing.T) {
 			object: []string{},
 		},
 		{
-			name:    "prepareAppIDsQuery one result",
-			prepare: prepareAppIDsQuery,
+			name:    "prepareClientIDsQuery one result",
+			prepare: prepareClientIDsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppIDsQuery,
-					[]string{"id"},
+					[]string{"client_id", "client_id"},
 					[][]driver.Value{
 						{
 							"app-id",
+							nil,
 						},
 					},
 				),
@@ -1391,18 +1394,20 @@ func Test_AppIDsPrepare(t *testing.T) {
 			object: []string{"app-id"},
 		},
 		{
-			name:    "prepareAppIDsQuery multiple result",
-			prepare: prepareAppIDsQuery,
+			name:    "prepareClientIDsQuery multiple result",
+			prepare: prepareClientIDsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedAppIDsQuery,
-					[]string{"id"},
+					[]string{"client_id", "client_id"},
 					[][]driver.Value{
 						{
+							nil,
 							"oidc-app-id",
 						},
 						{
 							"api-app-id",
+							nil,
 						},
 					},
 				),
@@ -1410,8 +1415,8 @@ func Test_AppIDsPrepare(t *testing.T) {
 			object: []string{"oidc-app-id", "api-app-id"},
 		},
 		{
-			name:    "prepareAppIDsQuery sql err",
-			prepare: prepareAppIDsQuery,
+			name:    "prepareClientIDsQuery sql err",
+			prepare: prepareClientIDsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
 					expectedAppIDsQuery,

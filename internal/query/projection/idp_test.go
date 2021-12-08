@@ -227,10 +227,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								domain.IDPConfigTypeOIDC,
 								"idp-config-id",
 							},
 						},
@@ -353,10 +354,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								domain.IDPConfigTypeJWT,
 								"idp-config-id",
 							},
 						},
@@ -643,10 +645,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								domain.IDPConfigTypeOIDC,
 								"idp-config-id",
 							},
 						},
@@ -769,10 +772,11 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE zitadel.projections.idps SET (change_date, sequence, type) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
+								domain.IDPConfigTypeJWT,
 								"idp-config-id",
 							},
 						},
