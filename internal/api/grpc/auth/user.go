@@ -136,32 +136,24 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 			return nil, err
 		}
 		queries.Queries = append(queries.Queries, idsQuery)
-	} else if authz.HasGlobalExplicitPermission(authz.GetAllPermissionsFromCtx(ctx), "iam.read") {
-		//user is allowed to read all organisation
-		//no additional query required
 	} else {
-		// all orgs of my meberships
-		userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
-		if err != nil {
-			return nil, err
-		}
-		memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
-			Queries: []query.SearchQuery{userQuery},
-		})
+		memberships, err := s.myOrgsQuery(ctx, ctxData)
 		if err != nil {
 			return nil, err
 		}
 
-		ids := make([]string, 0, len(memberships.Memberships))
-		for _, grant := range memberships.Memberships {
-			ids = appendIfNotExists(ids, grant.ResourceOwner)
-		}
+		if !isIAMAdmin(memberships.Memberships) {
+			ids := make([]string, 0, len(memberships.Memberships))
+			for _, grant := range memberships.Memberships {
+				ids = appendIfNotExists(ids, grant.ResourceOwner)
+			}
 
-		idsQuery, err := query.NewOrgIDsSearchQuery(ids...)
-		if err != nil {
-			return nil, err
+			idsQuery, err := query.NewOrgIDsSearchQuery(ids...)
+			if err != nil {
+				return nil, err
+			}
+			queries.Queries = append(queries.Queries, idsQuery)
 		}
-		queries.Queries = append(queries.Queries, idsQuery)
 	}
 
 	orgs, err := s.query.SearchOrgs(ctx, queries)
@@ -172,6 +164,25 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		Details: obj_grpc.ToListDetails(orgs.Count, orgs.Sequence, orgs.Timestamp),
 		Result:  org.OrgsToPb(orgs.Orgs),
 	}, nil
+}
+
+func (s *Server) myOrgsQuery(ctx context.Context, ctxData authz.CtxData) (*query.Memberships, error) {
+	userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery},
+	})
+}
+
+func isIAMAdmin(memberships []*query.Membership) bool {
+	for _, m := range memberships {
+		if m.IAM != nil {
+			return true
+		}
+	}
+	return false
 }
 
 func appendIfNotExists(array []string, value string) []string {
