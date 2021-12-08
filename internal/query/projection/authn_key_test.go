@@ -3,6 +3,7 @@ package projection
 import (
 	"testing"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -27,7 +28,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(project.ApplicationKeyAddedEventType),
 					project.AggregateType,
-					[]byte(`{"applicationId": "appId", "clientId":"clientId","keyId": "keyId", "type": 0, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
+					[]byte(`{"applicationId": "appId", "clientId":"clientId","keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
 				), project.ApplicationKeyAddedEventMapper),
 			},
 			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyAdded,
@@ -39,7 +40,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -50,6 +51,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								anyArg{},
 								"clientId",
 								[]byte("publicKey"),
+								domain.AuthNKeyTypeJSON,
 							},
 						},
 					},
@@ -62,7 +64,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(user.MachineKeyAddedEventType),
 					user.AggregateType,
-					[]byte(`{"keyId": "keyId", "type": 0, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
+					[]byte(`{"keyId": "keyId", "type": 1, "expirationDate": "2021-11-30T15:00:00Z", "publicKey": "cHVibGljS2V5"}`),
 				), user.MachineKeyAddedEventMapper),
 			},
 			reduce: (&AuthNKeyProjection{}).reduceAuthNKeyAdded,
@@ -74,7 +76,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO zitadel.projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
@@ -85,6 +87,7 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 								anyArg{},
 								"agg-id",
 								[]byte("publicKey"),
+								domain.AuthNKeyTypeJSON,
 							},
 						},
 					},
