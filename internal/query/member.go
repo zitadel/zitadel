@@ -35,10 +35,10 @@ func NewMemberLastNameSearchQuery(method TextComparison, value string) (SearchQu
 }
 
 func NewMemberUserIDSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(memberUserID.setTable(membershipAlias), value, TextEquals)
+	return NewTextQuery(memberUserID, value, TextEquals)
 }
 func NewMemberResourceOwnerSearchQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(memberResourceOwner.setTable(membershipAlias), value, TextEquals)
+	return NewTextQuery(memberResourceOwner, value, TextEquals)
 }
 
 type Members struct {
@@ -76,10 +76,16 @@ func (r *Queries) IAMMemberByID(ctx context.Context, iamID, userID string) (memb
 }
 
 var (
+	memberTableAlias = table{
+		name:  "members",
+		alias: "members",
+	}
 	memberUserID = Column{
-		name: projection.MemberUserIDCol,
+		name:  projection.MemberUserIDCol,
+		table: memberTableAlias,
 	}
 	memberResourceOwner = Column{
-		name: projection.MemberResourceOwner,
+		name:  projection.MemberResourceOwner,
+		table: memberTableAlias,
 	}
 )

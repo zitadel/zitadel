@@ -13,12 +13,12 @@ import (
 
 var (
 	orgMembersQuery = regexp.QuoteMeta("SELECT" +
-		" zitadel.projections.org_members.creation_date" +
-		", zitadel.projections.org_members.change_date" +
-		", zitadel.projections.org_members.sequence" +
-		", zitadel.projections.org_members.resource_owner" +
-		", zitadel.projections.org_members.user_id" +
-		", zitadel.projections.org_members.roles" +
+		" members.creation_date" +
+		", members.change_date" +
+		", members.sequence" +
+		", members.resource_owner" +
+		", members.user_id" +
+		", members.roles" +
 		", zitadel.projections.login_names.login_name" +
 		", zitadel.projections.users_humans.email" +
 		", zitadel.projections.users_humans.first_name" +
@@ -27,13 +27,13 @@ var (
 		", zitadel.projections.users_machines.name" +
 		", zitadel.projections.users_humans.avater_key" +
 		", COUNT(*) OVER () " +
-		"FROM zitadel.projections.org_members " +
+		"FROM zitadel.projections.org_members as members " +
 		"LEFT JOIN zitadel.projections.users_humans " +
-		"ON zitadel.projections.org_members.user_id = zitadel.projections.users_humans.user_id " +
+		"ON members.user_id = zitadel.projections.users_humans.user_id " +
 		"LEFT JOIN zitadel.projections.users_machines " +
-		"ON zitadel.projections.org_members.user_id = zitadel.projections.users_machines.user_id " +
+		"ON members.user_id = zitadel.projections.users_machines.user_id " +
 		"LEFT JOIN zitadel.projections.login_names " +
-		"ON zitadel.projections.org_members.user_id = zitadel.projections.login_names.user_id " +
+		"ON members.user_id = zitadel.projections.login_names.user_id " +
 		"WHERE zitadel.projections.login_names.is_primary = $1")
 	orgMembersColumns = []string{
 		"creation_date",

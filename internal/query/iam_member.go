@@ -13,7 +13,7 @@ import (
 var (
 	iamMemberTable = table{
 		name:  projection.IAMMemberProjectionTable,
-		alias: "m",
+		alias: "members",
 	}
 	IAMMemberUserID = Column{
 		name:  projection.MemberUserIDCol,
