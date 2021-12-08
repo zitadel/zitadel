@@ -29,7 +29,6 @@ require (
 	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
 	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/getsentry/sentry-go v0.11.0
-	github.com/ghodss/yaml v1.0.0
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -93,6 +92,7 @@ require (
 	k8s.io/apimachinery v0.22.4
 	k8s.io/client-go v0.22.4
 	sigs.k8s.io/controller-runtime v0.10.3
+	sigs.k8s.io/yaml v1.3.0
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
