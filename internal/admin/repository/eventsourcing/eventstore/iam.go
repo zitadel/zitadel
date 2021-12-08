@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/ghodss/yaml"
 	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
 
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"

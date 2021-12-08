@@ -4,7 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
@@ -19,13 +19,13 @@ func updateLoginPolicyToDomain(p *admin_pb.UpdateLoginPolicyRequest) *domain.Log
 	}
 }
 
-func ListLoginPolicyIDPsRequestToModel(req *admin_pb.ListLoginPolicyIDPsRequest) *model.IDPProviderSearchRequest {
+func ListLoginPolicyIDPsRequestToQuery(req *admin_pb.ListLoginPolicyIDPsRequest) *query.IDPLoginPolicyLinksSearchQuery {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &model.IDPProviderSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		// SortingColumn: model.IDPProviderSearchKey, //TODO: not in proto
-		// Queries: []*model.IDPProviderSearchQuery, //TODO: not in proto
+	return &query.IDPLoginPolicyLinksSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 	}
 }

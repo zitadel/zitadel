@@ -20,7 +20,7 @@ import { AddActionDialogComponent } from '../add-action-dialog/add-action-dialog
 @Component({
   selector: 'cnsl-action-table',
   templateUrl: './action-table.component.html',
-  styleUrls: ['./action-table.component.scss']
+  styleUrls: ['./action-table.component.scss'],
 })
 export class ActionTableComponent implements OnInit {
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -34,8 +34,12 @@ export class ActionTableComponent implements OnInit {
   @Output() public changedSelection: EventEmitter<Array<Action.AsObject>> = new EventEmitter();
 
   public ActionState: any = ActionState;
-  constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
-    private toast: ToastService) {
+  constructor(
+    public translate: TranslateService,
+    private mgmtService: ManagementService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+  ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
@@ -45,7 +49,6 @@ export class ActionTableComponent implements OnInit {
     this.getData(10, 0);
   }
 
-
   public isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
@@ -53,39 +56,42 @@ export class ActionTableComponent implements OnInit {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
-
 
   public changePage(event: PageEvent): void {
     this.getData(event.pageSize, event.pageIndex * event.pageSize);
   }
 
   public deleteKey(action: Action.AsObject): void {
-    this.mgmtService.deleteAction(action.id).then(() => {
-      this.selection.clear();
-      this.toast.showInfo('FLOWS.TOAST.SELECTEDKEYSDELETED', true);
-      this.getData(10, 0);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .deleteAction(action.id)
+      .then(() => {
+        this.selection.clear();
+        this.toast.showInfo('FLOWS.TOAST.SELECTEDKEYSDELETED', true);
+        this.getData(10, 0);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public openAddAction(): void {
     const dialogRef = this.dialog.open(AddActionDialogComponent, {
       data: {},
-      width: '400px',
+      width: '500px',
     });
 
     dialogRef.afterClosed().subscribe((req: CreateActionRequest) => {
       if (req) {
-        this.mgmtService.createAction(req).then(resp => {
-          this.refreshPage();
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        this.mgmtService
+          .createAction(req)
+          .then((resp) => {
+            this.refreshPage();
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
@@ -95,31 +101,37 @@ export class ActionTableComponent implements OnInit {
       data: {
         action: action,
       },
-      width: '400px',
+      width: '500px',
     });
 
     dialogRef.afterClosed().subscribe((req: UpdateActionRequest) => {
       if (req) {
-        this.mgmtService.updateAction(req).then(resp => {
-          this.refreshPage();
-        }).catch((error: any) => {
-          this.toast.showError(error);
-        });
+        this.mgmtService
+          .updateAction(req)
+          .then((resp) => {
+            this.refreshPage();
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
 
   private async getData(limit: number, offset: number): Promise<void> {
     this.loadingSubject.next(true);
-    
-    this.mgmtService.listActions(limit, offset).then(resp => {
-      this.actionsResult = resp;
-      this.dataSource.data = this.actionsResult.resultList;
-      this.loadingSubject.next(false);
-    }).catch((error: any) => {
-      this.toast.showError(error);
-      this.loadingSubject.next(false);
-    });
+
+    this.mgmtService
+      .listActions(limit, offset)
+      .then((resp) => {
+        this.actionsResult = resp;
+        this.dataSource.data = this.actionsResult.resultList;
+        this.loadingSubject.next(false);
+      })
+      .catch((error: any) => {
+        this.toast.showError(error);
+        this.loadingSubject.next(false);
+      });
   }
 
   public refreshPage(): void {
