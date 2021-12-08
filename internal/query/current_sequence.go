@@ -69,7 +69,7 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	}
 	row := tx.QueryRow("select count(*) from [show tables from zitadel.projections] where concat('zitadel.projections.', table_name) = $1;", projectionName)
 	var count int
-	if row.Scan(&count) != nil || count == 0 {
+	if err := row.Scan(&count); err != nil || count == 0 {
 		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 	}
 	_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", projectionName))
