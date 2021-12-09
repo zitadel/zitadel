@@ -184,7 +184,7 @@
       "UNLOCK": "Benutzer entsperren",
       "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
       "DELETEACCOUNT": "Account löschen",
-      "DELETEACCOUNT_DESC": "Hier können Sie Ihr persönliches Konto mitsamt seinem Inhalt löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DELETEACCOUNT_DESC": "Wenn du diese Aktion ausführst, wirst du abgemeldet und danach keinen Zugriff mehr auf dein Konto haben. Diese Aktion kann nicht rückgängig gemacht werden.",
       "DELETEACCOUNT_BTN": "Account löschen",
       "DELETEACCOUNT_SUCCESS": "Account erfolgreich gelöscht!"
     },
