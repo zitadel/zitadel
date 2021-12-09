@@ -246,6 +246,10 @@
     "TABLE": {
       "DEACTIVATE": "Disattiva",
       "ACTIVATE": "Attiva",
+      "TYPES": {
+        "HUMAN": "Utenti",
+        "MACHINE": "Utenti di servizio"
+      },
       "FILTER": {
         "0": "Filtro per DisplayName",
         "1": "Filtro per nome utente",

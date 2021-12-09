@@ -42,16 +42,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       {
-        path: 'list',
-        loadChildren: () => import('src/app/pages/users/user-list/user-list.module').then((m) => m.UserListModule),
-        canActivate: [RoleGuard],
-        data: {
-          roles: ['user.read'],
-        },
-      },
-      {
         path: '',
-        loadChildren: () => import('src/app/pages/users/user-detail/user-detail.module').then((m) => m.UserDetailModule),
+        loadChildren: () => import('src/app/pages/users/users.module').then((m) => m.UsersModule),
+        // canActivate: [RoleGuard],
+        // data: {
+        //   roles: ['user.read'],
+        // },
       },
     ],
   },

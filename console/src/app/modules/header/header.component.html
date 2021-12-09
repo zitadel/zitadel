@@ -78,7 +78,8 @@
     </a>
 
     <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/iam','policies']" class="iam-settings"
-      mat-icon-button>
+      mat-stroked-button>
+      <span>IAM</span>
       <i class="las la-cog"></i>
     </a>
 

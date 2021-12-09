@@ -38,14 +38,12 @@ enum UserListSearchKey {
   selector: 'cnsl-user-table',
   templateUrl: './user-table.component.html',
   styleUrls: ['./user-table.component.scss'],
-  animations: [
-    enterAnimations,
-  ],
+  animations: [enterAnimations],
 })
 export class UserTableComponent implements OnInit {
   public userSearchKey: UserListSearchKey | undefined = undefined;
   public Type: any = Type;
-  @Input() type: Type = Type.TYPE_HUMAN;
+  @Input() public type: Type = Type.TYPE_HUMAN;
   @Input() refreshOnPreviousRoutes: string[] = [];
   @Input() disabled: boolean = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
@@ -77,14 +75,19 @@ export class UserTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(take(1)).subscribe(params => {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
       this.getData(10, 0, this.type);
       if (params.deferredReload) {
         setTimeout(() => {
-          this.getData(10, 0, this.type);
+          this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
         }, 2000);
       }
     });
+  }
+
+  public setType(type: Type): void {
+    this.type = type;
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
   }
 
   public isAllSelected(): boolean {
@@ -94,11 +97,8 @@ export class UserTableComponent implements OnInit {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
-
 
   public changePage(event: PageEvent): void {
     this.selection.clear();
@@ -106,31 +106,39 @@ export class UserTableComponent implements OnInit {
   }
 
   public deactivateSelectedUsers(): void {
-    Promise.all(this.selection.selected.map(value => {
-      return this.userService.deactivateUser(value.id);
-    })).then(() => {
-      this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
-      this.selection.clear();
-      setTimeout(() => {
-        this.refreshPage();
-      }, 1000);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    Promise.all(
+      this.selection.selected.map((value) => {
+        return this.userService.deactivateUser(value.id);
+      }),
+    )
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
+        this.selection.clear();
+        setTimeout(() => {
+          this.refreshPage();
+        }, 1000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public reactivateSelectedUsers(): void {
-    Promise.all(this.selection.selected.map(value => {
-      return this.userService.reactivateUser(value.id);
-    })).then(() => {
-      this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
-      this.selection.clear();
-      setTimeout(() => {
-        this.refreshPage();
-      }, 1000);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    Promise.all(
+      this.selection.selected.map((value) => {
+        return this.userService.reactivateUser(value.id);
+      }),
+    )
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
+        this.selection.clear();
+        setTimeout(() => {
+          this.refreshPage();
+        }, 1000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   private async getData(limit: number, offset: number, type: Type, searchValue?: string): Promise<void> {
@@ -180,21 +188,25 @@ export class UserTableComponent implements OnInit {
       }
     }
 
-    this.userService.listUsers(limit, offset, [query]).then(resp => {
-      if (resp.details?.totalResult) {
-        this.totalResult = resp.details?.totalResult;
-      } else {
-        this.totalResult = 0;
-      }
-      if (resp.details?.viewTimestamp) {
-        this.viewTimestamp = resp.details?.viewTimestamp;
-      }
-      this.dataSource.data = resp.resultList;
-      this.loadingSubject.next(false);
-    }).catch(error => {
-      this.toast.showError(error);
-      this.loadingSubject.next(false);
-    });
+    this.userService
+      .listUsers(limit, offset, [query])
+      .then((resp) => {
+        console.log(resp);
+        if (resp.details?.totalResult) {
+          this.totalResult = resp.details?.totalResult;
+        } else {
+          this.totalResult = 0;
+        }
+        if (resp.details?.viewTimestamp) {
+          this.viewTimestamp = resp.details?.viewTimestamp;
+        }
+        this.dataSource.data = resp.resultList;
+        this.loadingSubject.next(false);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loadingSubject.next(false);
+      });
   }
 
   public refreshPage(): void {
@@ -205,12 +217,7 @@ export class UserTableComponent implements OnInit {
     this.selection.clear();
     const filterValue = (event.target as HTMLInputElement).value;
 
-    this.getData(
-      this.paginator.pageSize,
-      this.paginator.pageIndex * this.paginator.pageSize,
-      this.type,
-      filterValue,
-    );
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, filterValue);
   }
 
   public setFilter(key: UserListSearchKey): void {
@@ -239,16 +246,19 @@ export class UserTableComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.userService.removeUser(user.id).then(() => {
-          setTimeout(() => {
-            this.refreshPage();
-          }, 1000);
-          this.toast.showInfo('USER.TOAST.DELETED', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.userService
+          .removeUser(user.id)
+          .then(() => {
+            setTimeout(() => {
+              this.refreshPage();
+            }, 1000);
+            this.toast.showInfo('USER.TOAST.DELETED', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }

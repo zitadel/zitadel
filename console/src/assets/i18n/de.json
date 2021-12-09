@@ -246,6 +246,10 @@
     "TABLE": {
       "DEACTIVATE": "Deaktivieren",
       "ACTIVATE": "Aktivieren",
+      "TYPES": {
+        "HUMAN": "Benutzer",
+        "MACHINE": "Service Users"
+      },
       "FILTER": {
         "0": "Nach Anzeigename filtern",
         "1": "Nach Username filtern",

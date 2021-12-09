@@ -246,6 +246,10 @@
     "TABLE": {
       "DEACTIVATE": "Deactivate",
       "ACTIVATE": "Activate",
+      "TYPES": {
+        "HUMAN": "Users",
+        "MACHINE": "Service Users"
+      },
       "FILTER": {
         "0": "Filter for DisplayName",
         "1": "Filter for Username",

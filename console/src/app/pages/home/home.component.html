@@ -112,9 +112,7 @@
             </h2>
             <p>{{'HOME.USERS_DESC'| translate}}</p>
             <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
-              <a class="short-link" [routerLink]="[ '/users', 'list', 'humans']">{{'HOME.USERS_HUMANS' |
-                translate}}<i class="las la-link"></i></a>
-              <a class="short-link" [routerLink]="[ '/users', 'list', 'machines']">{{'HOME.USERS_MACHINES' |
+              <a class="short-link" [routerLink]="[ '/users']">{{'HOME.USERS_HUMANS' |
                 translate}}<i class="las la-link"></i></a>
             </ng-template>
             <ng-template cnslHasRole [hasRole]="['user.read']">
@@ -124,7 +122,7 @@
           </div>
           <span class="fill-space"></span>
           <div class="footer">
-            <a color="primary" mat-stroked-button [routerLink]="['/users/list/humans']">{{'HOME.USERS_BUTTON' |
+            <a color="primary" mat-stroked-button [routerLink]="['/users']">{{'HOME.USERS_BUTTON' |
               translate}}</a>
           </div>
         </cnsl-card>

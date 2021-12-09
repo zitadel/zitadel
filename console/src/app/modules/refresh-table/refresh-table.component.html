@@ -1,20 +1,26 @@
 <div class="table-header-row">
-    <div class="row" *ngIf="selection.hasValue()">
-        <div>
-        <span class="count">{{selection?.selected?.length}}</span>
-        <span class="desc" >{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+  <div class="row" *ngIf="selection.hasValue(); else leftActions">
+    <div>
+      <span class="count">{{selection?.selected?.length}}</span>
+      <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
     </div>
-        <span class="slash">|</span>
-        <a (click)="selection.clear()">{{'ORG_DETAIL.TABLE.CLEAR' | translate}}</a>
-    </div>
-    <span class="fill-space"></span>
-    <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>
-    <ng-content select="[actions]"></ng-content>
 
-    <button *ngIf="!hideRefresh" mat-icon-button (click)="emitRefresh()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
-        <mat-icon class="icon">refresh</mat-icon>
-    </button>
+    <span class="slash">|</span>
+    <a (click)="selection.clear()">{{'ORG_DETAIL.TABLE.CLEAR' | translate}}</a>
+  </div>
+  <ng-template #leftActions>
+    <ng-content select="[leftActions]"></ng-content>
+  </ng-template>
+  <span class="fill-space"></span>
+  <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>
+
+  <button *ngIf="!hideRefresh" mat-icon-button (click)="emitRefresh()" class="icon-button"
+    matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+    <mat-icon class="icon">refresh</mat-icon>
+  </button>
+
+  <ng-content select="[actions]"></ng-content>
 </div>
 <div class="table-wrapper">
-    <ng-content></ng-content>
+  <ng-content></ng-content>
 </div>

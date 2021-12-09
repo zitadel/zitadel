@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { QrCodeModule } from 'ng-qrcode';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
@@ -26,7 +27,6 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
-import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -37,9 +37,7 @@ import { HasFeatureModule } from '../../../directives/has-feature/has-feature.mo
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
-import {
-  DialogPasswordlessComponent,
-} from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
+import { DialogPasswordlessComponent } from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
@@ -55,7 +53,6 @@ import { MembershipsComponent } from './memberships/memberships.component';
 import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
 import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
-import { UserDetailRoutingModule } from './user-detail-routing.module';
 import { PasswordlessComponent } from './user-detail/passwordless/passwordless.component';
 import { UserDetailComponent } from './user-detail/user-detail.component';
 import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
@@ -83,7 +80,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MetadataComponent,
   ],
   imports: [
-    UserDetailRoutingModule,
     ChangesModule,
     CommonModule,
     MatTabsModule,
@@ -111,7 +107,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     InfoRowModule,
     PaginatorModule,
     MatMenuModule,
-    SharedModule,
+    RouterModule,
     RefreshTableModule,
     CopyToClipboardModule,
     DetailLayoutModule,
