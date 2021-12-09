@@ -3,122 +3,156 @@
     <div class="nav-row">
       <ng-container
         *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc">
-        <ng-container *ngIf="breadc[0]?.type === BreadcrumbType.PROJECT && breadc[0]?.param?.value; else defaultNav">
-          <div class="nav-row-abs" @navrowproject>
-            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a class="nav-item" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']"
-                [routerLink]="[ '/projects', breadc[0]?.param?.value ]">
+        <ng-container *ngIf="breadc[0]; else defaultNav" [ngSwitch]="breadc[0].type">
+          <ng-container *ngSwitchCase="BreadcrumbType.IAM">
+            <div class="nav-row-abs" @navroworg>
+              <ng-template cnslHasRole [hasRole]="['iam.read']">
+                <a class="nav-item" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/iam' ]">
 
-                <div class="c_label">
-                  <span> {{'MENU.PROJECTOVERVIEW' | translate}} </span>
-                </div>
-              </a>
-            </ng-template>
+                  <div class="c_label">
+                    <span> {{'MENU.IAM' | translate}} </span>
+                  </div>
+                </a>
 
-            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a *ngIf="!breadc[0]?.isZitadel" class="nav-item" [routerLinkActiveOptions]="{ exact: false }"
-                [routerLinkActive]="['active']" [routerLink]="[ '/projects', breadc[0]?.param?.value, 'roles']">
+                <a class="nav-item" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/iam', 'eventstore']">
 
-                <div class="c_label">
-                  <span> {{'MENU.ROLES' | translate}} </span>
-                </div>
-              </a>
-            </ng-template>
+                  <div class="c_label">
+                    <span> {{'MENU.VIEWS' | translate}} </span>
+                  </div>
+                </a>
 
-            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a *ngIf="!breadc[0]?.isZitadel" class="nav-item" [routerLinkActiveOptions]="{ exact: false }"
-                [routerLinkActive]="['active']"
-                [routerLink]="[ '/projects', breadc[0]?.param?.value, 'projectgrants' ]">
+                <a class="nav-item" [routerLinkActiveOptions]="{ exact: false }" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/iam', 'eventstore']">
 
-                <div class="c_label">
-                  <span> {{'MENU.PROJECTGRANTS' | translate}} </span>
-                </div>
-              </a>
-            </ng-template>
-
-            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a *ngIf="!breadc[0]?.isZitadel" class="nav-item" [routerLinkActiveOptions]="{ exact: true }"
-                [routerLinkActive]="['active']" [routerLink]="[ '/projects', breadc[0]?.param?.value, 'grants' ]">
-
-                <div class="c_label">
-                  <span> {{'MENU.GRANTS' | translate}} </span>
-                </div>
-              </a>
-            </ng-template>
-          </div>
-        </ng-container>
-      </ng-container>
-      <ng-template #defaultNav>
-        <div class="nav-row-abs" @navroworg>
-          <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
-            <ng-template cnslHasRole [hasRole]="['org.read']">
-              <a matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLinkActiveOptions]="{ exact: true }" [routerLink]="[ '/org']">
-                <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
-              </a>
-            </ng-template>
-
-            <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-              <a matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
-                [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
-                [routerLink]="[ '/projects']">
-
-                <div class="c_label">
-                  <span> {{'MENU.PROJECT' | translate}} </span>
-                  <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
-                    class="count">{{(mgmtService?.ownedProjectsCount
-                    |
-                    async)}}</span>
-                </div>
-              </a>
-
-              <a matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
-                *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
-                class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
-                [routerLink]="[ '/granted-projects']">
-                <div class="c_label">
-                  <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
-                  <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
-                </div>
-              </a>
-            </ng-template>
-
-            <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
-              <a matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLink]="[ '/users']" [routerLinkActiveOptions]="{ exact: false }">
-                <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
-              </a>
-              <!-- <a matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
-                [routerLinkActive]="['active']" [routerLink]="[ '/users','list','machines']"
-                [routerLinkActiveOptions]="{ exact: true }">
-                <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
-              </a> -->
-            </ng-template>
-
-            <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
-              <a matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLink]="[ '/grants']" [routerLinkActiveOptions]="{ exact: true }">
-                <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
-              </a>
-            </ng-template>
-
-            <ng-template cnslHasFeature [hasFeature]="['actions']">
-              <a matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLink]="[ '/actions']" [routerLinkActiveOptions]="{ exact: true }">
-                <i class="icon las la-exchange-alt"></i>
-                <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
-              </a>
-            </ng-template>
-
-            <ng-template cnslHasRole [hasRole]="['org.read']">
-              <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org/domains']"
-                [routerLinkActiveOptions]="{ exact: true }">
-                <span class="label">{{'MENU.DOMAINS' | translate}}</span>
-              </a>
-            </ng-template>
+                  <div class="c_label">
+                    <span> {{'MENU.FAILEDEVENTS' | translate}} </span>
+                  </div>
+                </a>
+              </ng-template>
+            </div>
           </ng-container>
-        </div>
-      </ng-template>
+
+          <ng-container *ngSwitchCase="BreadcrumbType.PROJECT">
+            <div *ngIf="breadc[0]?.param?.value" class="nav-row-abs" @navrowproject>
+              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
+                <a class="nav-item" [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/projects', breadc[0]?.param?.value ]">
+
+                  <div class="c_label">
+                    <span> {{'MENU.PROJECTOVERVIEW' | translate}} </span>
+                  </div>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
+                <a *ngIf="!breadc[0]?.isZitadel" class="nav-item" [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/projects', breadc[0]?.param?.value, 'roles']">
+
+                  <div class="c_label">
+                    <span> {{'MENU.ROLES' | translate}} </span>
+                  </div>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
+                <a *ngIf="!breadc[0]?.isZitadel" class="nav-item" [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLinkActive]="['active']"
+                  [routerLink]="[ '/projects', breadc[0]?.param?.value, 'projectgrants' ]">
+
+                  <div class="c_label">
+                    <span> {{'MENU.PROJECTGRANTS' | translate}} </span>
+                  </div>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
+                <a *ngIf="!breadc[0]?.isZitadel" class="nav-item" [routerLinkActiveOptions]="{ exact: true }"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/projects', breadc[0]?.param?.value, 'grants' ]">
+
+                  <div class="c_label">
+                    <span> {{'MENU.GRANTS' | translate}} </span>
+                  </div>
+                </a>
+              </ng-template>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <ng-template #defaultNav>
+          <div class="nav-row-abs" @navroworg>
+            <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
+              <ng-template cnslHasRole [hasRole]="['org.read']">
+                <a matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"
+                  [routerLinkActiveOptions]="{ exact: true }" [routerLink]="[ '/org']">
+                  <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
+                <a matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLink]="[ '/projects']">
+
+                  <div class="c_label">
+                    <span> {{'MENU.PROJECT' | translate}} </span>
+                    <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
+                      class="count">{{(mgmtService?.ownedProjectsCount
+                      |
+                      async)}}</span>
+                  </div>
+                </a>
+
+                <a matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
+                  *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
+                  class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
+                  [routerLink]="[ '/granted-projects']">
+                  <div class="c_label">
+                    <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
+                    <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
+                  </div>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
+                <a matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/users']"
+                  [routerLinkActiveOptions]="{ exact: false }">
+                  <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
+                </a>
+                <!-- <a matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
+                  [routerLinkActive]="['active']" [routerLink]="[ '/users','list','machines']"
+                  [routerLinkActiveOptions]="{ exact: true }">
+                  <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
+                </a> -->
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
+                <a matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/grants']" [routerLinkActiveOptions]="{ exact: true }">
+                  <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasFeature [hasFeature]="['actions']">
+                <a matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item" [routerLinkActive]="['active']"
+                  [routerLink]="[ '/actions']" [routerLinkActiveOptions]="{ exact: true }">
+                  <i class="icon las la-exchange-alt"></i>
+                  <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
+                </a>
+              </ng-template>
+
+              <ng-template cnslHasRole [hasRole]="['org.read']">
+                <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/org/domains']"
+                  [routerLinkActiveOptions]="{ exact: true }">
+                  <span class="label">{{'MENU.DOMAINS' | translate}}</span>
+                </a>
+              </ng-template>
+            </ng-container>
+          </div>
+        </ng-template>
+      </ng-container>
     </div>
   </div>
 

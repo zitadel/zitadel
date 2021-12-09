@@ -26,6 +26,7 @@
 @import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-list/granted-project-grid/granted-project-grid.component';
 @import 'src/app/app.component.scss';
+@import 'src/app/pages/iam/iam.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
@@ -64,6 +65,7 @@
   @include auth-user-detail-theme($theme);
   @include user-detail-theme($theme);
   @include org-detail-theme($theme);
+  @include iam-detail-theme($theme);
   @include meta-theme($theme);
   @include accounts-card-theme($theme);
   @include info-section-theme($theme);

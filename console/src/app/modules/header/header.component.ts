@@ -6,7 +6,7 @@ import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
@@ -30,6 +30,8 @@ export class HeaderComponent implements OnDestroy {
   public showAccount: boolean = false;
   public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
+
+  public BreadcrumbType: any = BreadcrumbType;
   constructor(
     public authenticationService: AuthenticationService,
     private authService: GrpcAuthService,

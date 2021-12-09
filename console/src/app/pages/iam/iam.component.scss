@@ -1,20 +1,57 @@
-.h1 {
-  margin-top: 0;
+@use '@angular/material' as mat;
+
+@mixin iam-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+
+  .iam-top {
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 2rem 2rem 1rem 2rem;
+    background: if($is-dark-theme, #00000020, #ffffff80);
+    // linear-gradient(90deg, #00000000, #00000020 2%, #00000020 98%, #00000000 100%),
+
+    .iam-top-row {
+      display: flex;
+      align-items: center;
+      padding-bottom: 1rem;
+
+      .iam-title-row {
+        display: flex;
+        align-items: center;
+
+        .iam-title {
+          margin: 0;
+          margin-right: 0.5rem;
+        }
+      }
+
+      .iam-sub {
+        color: var(--grey);
+        margin: 1rem 0 0 0;
+        font-size: 14px;
+      }
+
+      .iam-top-desc {
+        color: var(--grey);
+        font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+    }
+  }
 }
 
-.sub {
-  color: var(--grey);
-  margin-bottom: 2rem;
-}
-
-.top-desc {
-  color: var(--grey);
-  font-size: 14px;
-}
-
-h2 {
+.iam-subtitle {
   font-size: 1.2rem;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   margin-top: 2rem;
+}
+
+.policies {
+  display: block;
+  padding-top: 2rem;
 }

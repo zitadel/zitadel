@@ -15,6 +15,21 @@
       </svg>
     </ng-container>
 
+    <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async">
+      <ng-container *ngIf="bread.type === BreadcrumbType.IAM">
+        <div class="breadcrumb-context">
+          <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
+            {{bread.name}}
+          </a>
+        </div>
+
+        <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+          stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
+          <path d="M16.88 3.549L7.12 20.451"></path>
+        </svg>
+      </ng-container>
+    </ng-container>
+
     <div class="org-context" *ngIf="user && org">
       <a matRipple [matRippleUnbounded]="false" class="org-link" [routerLink]="[ '/org']">
         {{org?.name ? org.name : 'NO NAME'}}</a>
@@ -59,16 +74,18 @@
     </mat-menu>
 
     <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async">
-      <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-        stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
-        <path d="M16.88 3.549L7.12 20.451"></path>
-      </svg>
+      <ng-container *ngIf="bread.type !== BreadcrumbType.IAM">
+        <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+          stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
+          <path d="M16.88 3.549L7.12 20.451"></path>
+        </svg>
 
-      <div class="breadcrumb-context">
-        <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
-          {{bread.name}}
-        </a>
-      </div>
+        <div class="breadcrumb-context">
+          <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
+            {{bread.name}}
+          </a>
+        </div>
+      </ng-container>
     </ng-container>
 
     <span class="fill-space"></span>
@@ -77,7 +94,7 @@
       {{'MENU.DOCUMENTATION' | translate}}
     </a>
 
-    <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/iam','policies']" class="iam-settings"
+    <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/iam']" class="iam-settings"
       mat-stroked-button>
       <span>IAM</span>
       <i class="las la-cog"></i>
