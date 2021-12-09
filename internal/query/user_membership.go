@@ -62,19 +62,19 @@ func NewMembershipResourceOwnerQuery(value string) (SearchQuery, error) {
 }
 
 func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(OrgMemberOrgID, value, TextEquals)
+	return NewTextQuery(membershipOrgID, value, TextEquals)
 }
 
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectMemberProjectID, value, TextEquals)
+	return NewTextQuery(membershipProjectID, value, TextEquals)
 }
 
 func NewMembershipProjectGrantIDQuery(value string) (SearchQuery, error) {
-	return NewTextQuery(ProjectGrantMemberGrantID, value, TextEquals)
+	return NewTextQuery(membershipGrantID, value, TextEquals)
 }
 
 func NewMembershipIsIAMQuery() (SearchQuery, error) {
-	return NewNotNullQuery(IAMMemberIAMID)
+	return NewNotNullQuery(membershipIAMID)
 }
 
 func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
@@ -111,37 +111,47 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 var (
 	//membershipAlias is a hack to satisfy checks in the queries
 	membershipAlias = table{
-		name: "m",
+		name: "memberships",
 	}
 	membershipUserID = Column{
-		name: projection.MemberUserIDCol,
+		name:  projection.MemberUserIDCol,
+		table: membershipAlias,
 	}
 	membershipRoles = Column{
-		name: projection.MemberRolesCol,
+		name:  projection.MemberRolesCol,
+		table: membershipAlias,
 	}
 	membershipCreationDate = Column{
-		name: projection.MemberCreationDate,
+		name:  projection.MemberCreationDate,
+		table: membershipAlias,
 	}
 	membershipChangeDate = Column{
-		name: projection.MemberChangeDate,
+		name:  projection.MemberChangeDate,
+		table: membershipAlias,
 	}
 	membershipSequence = Column{
-		name: projection.MemberSequence,
+		name:  projection.MemberSequence,
+		table: membershipAlias,
 	}
 	membershipResourceOwner = Column{
-		name: projection.MemberResourceOwner,
+		name:  projection.MemberResourceOwner,
+		table: membershipAlias,
 	}
 	membershipOrgID = Column{
-		name: projection.OrgMemberOrgIDCol,
+		name:  projection.OrgMemberOrgIDCol,
+		table: membershipAlias,
 	}
 	membershipIAMID = Column{
-		name: projection.IAMMemberIAMIDCol,
+		name:  projection.IAMMemberIAMIDCol,
+		table: membershipAlias,
 	}
 	membershipProjectID = Column{
-		name: projection.ProjectMemberProjectIDCol,
+		name:  projection.ProjectMemberProjectIDCol,
+		table: membershipAlias,
 	}
 	membershipGrantID = Column{
-		name: projection.ProjectGrantMemberGrantIDCol,
+		name:  projection.ProjectGrantMemberGrantIDCol,
+		table: membershipAlias,
 	}
 
 	membershipFrom = "(" +
@@ -172,7 +182,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			countColumn.identifier(),
 		).From(membershipFrom).
 			LeftJoin(join(HumanUserIDCol, membershipUserID)).
-			LeftJoin(join(MachineUserIDCol, membershipUserID)),
+			LeftJoin(join(MachineUserIDCol, membershipUserID)).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
 			var count uint64
@@ -261,9 +272,9 @@ func prepareOrgMember() string {
 		OrgMemberSequence.identifier(),
 		OrgMemberResourceOwner.identifier(),
 		OrgMemberOrgID.identifier(),
-		"NULL::STRING AS "+membershipIAMID.identifier(),
-		"NULL::STRING AS "+membershipProjectID.identifier(),
-		"NULL::STRING AS "+membershipGrantID.identifier(),
+		"NULL::STRING AS "+membershipIAMID.name,
+		"NULL::STRING AS "+membershipProjectID.name,
+		"NULL::STRING AS "+membershipGrantID.name,
 	).From(orgMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -276,10 +287,10 @@ func prepareIAMMember() string {
 		IAMMemberChangeDate.identifier(),
 		IAMMemberSequence.identifier(),
 		IAMMemberResourceOwner.identifier(),
-		"NULL::STRING AS "+membershipOrgID.identifier(),
+		"NULL::STRING AS "+membershipOrgID.name,
 		IAMMemberIAMID.identifier(),
-		"NULL::STRING AS "+membershipProjectID.identifier(),
-		"NULL::STRING AS "+membershipGrantID.identifier(),
+		"NULL::STRING AS "+membershipProjectID.name,
+		"NULL::STRING AS "+membershipGrantID.name,
 	).From(iamMemberTable.identifier()).MustSql()
 	return stmt
 }
@@ -292,10 +303,10 @@ func prepareProjectMember() string {
 		ProjectMemberChangeDate.identifier(),
 		ProjectMemberSequence.identifier(),
 		ProjectMemberResourceOwner.identifier(),
-		"NULL::STRING AS "+membershipOrgID.identifier(),
-		"NULL::STRING AS "+membershipIAMID.identifier(),
+		"NULL::STRING AS "+membershipOrgID.name,
+		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectMemberProjectID.identifier(),
-		"NULL::STRING AS "+membershipGrantID.identifier(),
+		"NULL::STRING AS "+membershipGrantID.name,
 	).From(projectMemberTable.identifier()).MustSql()
 
 	return stmt
@@ -309,8 +320,8 @@ func prepareProjectGrantMember() string {
 		ProjectGrantMemberChangeDate.identifier(),
 		ProjectGrantMemberSequence.identifier(),
 		ProjectGrantMemberResourceOwner.identifier(),
-		"NULL::STRING AS "+membershipOrgID.identifier(),
-		"NULL::STRING AS "+membershipIAMID.identifier(),
+		"NULL::STRING AS "+membershipOrgID.name,
+		"NULL::STRING AS "+membershipIAMID.name,
 		ProjectGrantMemberProjectID.identifier(),
 		ProjectGrantMemberGrantID.identifier(),
 	).From(projectGrantMemberTable.identifier()).MustSql()

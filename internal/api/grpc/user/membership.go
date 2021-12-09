@@ -32,7 +32,7 @@ func MembershipQueryToQuery(req *user_pb.MembershipQuery) (query.SearchQuery, er
 	case *user_pb.MembershipQuery_IamQuery:
 		return query.NewMembershipIsIAMQuery()
 	default:
-		return nil, errors.ThrowInvalidArgument(nil, "USER-dsg3z", "List.Query.Invalid")
+		return nil, errors.ThrowInvalidArgument(nil, "USER-dsg3z", "Errors.List.Query.Invalid")
 	}
 }
 

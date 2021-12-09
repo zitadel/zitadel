@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+
+	sq "github.com/Masterminds/squirrel"
 )
 
 type MembersQuery struct {
@@ -76,10 +77,16 @@ func (r *Queries) IAMMemberByID(ctx context.Context, iamID, userID string) (memb
 }
 
 var (
+	memberTableAlias = table{
+		name:  "members",
+		alias: "members",
+	}
 	memberUserID = Column{
-		name: projection.MemberUserIDCol,
+		name:  projection.MemberUserIDCol,
+		table: memberTableAlias,
 	}
 	memberResourceOwner = Column{
-		name: projection.MemberResourceOwner,
+		name:  projection.MemberResourceOwner,
+		table: memberTableAlias,
 	}
 )
