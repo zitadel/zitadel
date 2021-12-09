@@ -7,15 +7,16 @@ import (
 )
 
 const (
-	IAMRolePrefix          = "IAM"
-	OrgRolePrefix          = "ORG"
-	ProjectRolePrefix      = "PROJECT"
-	ProjectGrantRolePrefix = "PROJECT_GRANT"
-	RoleOrgOwner           = "ORG_OWNER"
-	RoleOrgProjectCreator  = "ORG_PROJECT_CREATOR"
-	RoleIAMOwner           = "IAM_OWNER"
-	RoleProjectOwner       = "PROJECT_OWNER"
-	RoleProjectOwnerGlobal = "PROJECT_OWNER_GLOBAL"
+	IAMRolePrefix            = "IAM"
+	OrgRolePrefix            = "ORG"
+	ProjectRolePrefix        = "PROJECT"
+	ProjectGrantRolePrefix   = "PROJECT_GRANT"
+	RoleOrgOwner             = "ORG_OWNER"
+	RoleOrgProjectCreator    = "ORG_PROJECT_CREATOR"
+	RoleIAMOwner             = "IAM_OWNER"
+	RoleProjectOwner         = "PROJECT_OWNER"
+	RoleProjectOwnerGlobal   = "PROJECT_OWNER_GLOBAL"
+	RoleSelfManagementGlobal = "SELF_MANAGEMENT_GLOBAL"
 )
 
 func CheckForInvalidRoles(roles []string, rolePrefix string, validRoles []authz.RoleMapping) []string {

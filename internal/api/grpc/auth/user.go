@@ -11,7 +11,9 @@ import (
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/org"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
@@ -22,6 +24,25 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 		return nil, err
 	}
 	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user)}, nil
+}
+
+func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	grants, err := s.repo.SearchMyUserGrants(ctx, &grant_model.UserGrantSearchRequest{Queries: []*grant_model.UserGrantSearchQuery{}})
+	if err != nil {
+		return nil, err
+	}
+	membersShips, err := s.repo.SearchMyUserMemberships(ctx, &user_model.UserMembershipSearchRequest{Queries: []*user_model.UserMembershipSearchQuery{}})
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, UserMembershipViewsToDomain(membersShips.Result), userGrantsToIDs(grants.Result)...)
+	if err != nil {
+		return nil, err
+	}
+	return &auth_pb.RemoveMyUserResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(details),
+	}, nil
 }
 
 func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserChangesRequest) (*auth_pb.ListMyUserChangesResponse, error) {
@@ -136,4 +157,47 @@ func ListMyProjectOrgsRequestToModel(req *auth_pb.ListMyProjectOrgsRequest) (*gr
 		Asc:     asc,
 		Queries: queries,
 	}, nil
+}
+
+func UserMembershipViewsToDomain(memberships []*user_model.UserMembershipView) []*domain.UserMembership {
+	result := make([]*domain.UserMembership, len(memberships))
+	for i, membership := range memberships {
+		result[i] = &domain.UserMembership{
+			UserID:            membership.UserID,
+			MemberType:        MemberTypeToDomain(membership.MemberType),
+			AggregateID:       membership.AggregateID,
+			ObjectID:          membership.ObjectID,
+			Roles:             membership.Roles,
+			DisplayName:       membership.DisplayName,
+			CreationDate:      membership.CreationDate,
+			ChangeDate:        membership.ChangeDate,
+			ResourceOwner:     membership.ResourceOwner,
+			ResourceOwnerName: membership.ResourceOwnerName,
+			Sequence:          membership.Sequence,
+		}
+	}
+	return result
+}
+
+func MemberTypeToDomain(mType user_model.MemberType) domain.MemberType {
+	switch mType {
+	case user_model.MemberTypeIam:
+		return domain.MemberTypeIam
+	case user_model.MemberTypeOrganisation:
+		return domain.MemberTypeOrganisation
+	case user_model.MemberTypeProject:
+		return domain.MemberTypeProject
+	case user_model.MemberTypeProjectGrant:
+		return domain.MemberTypeProjectGrant
+	default:
+		return domain.MemberTypeUnspecified
+	}
+}
+
+func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
+	converted := make([]string, len(userGrants))
+	for i, grant := range userGrants {
+		converted[i] = grant.ID
+	}
+	return converted
 }
