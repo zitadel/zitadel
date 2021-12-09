@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -379,10 +380,13 @@ func (p *UserProjection) reduceHumanProfileChanged(event eventstore.EventReader)
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-769v4", "reduce.wrong.event.type")
 	}
 	cols := make([]handler.Column, 0, 6)
-	cols = append(cols,
-		handler.NewCol(HumanFirstNameCol, e.FirstName),
-		handler.NewCol(HumanLastNameCol, e.LastName),
-	)
+	if e.FirstName != "" {
+		cols = append(cols, handler.NewCol(HumanFirstNameCol, e.FirstName))
+	}
+
+	if e.LastName != "" {
+		cols = append(cols, handler.NewCol(HumanLastNameCol, e.LastName))
+	}
 
 	if e.NickName != nil {
 		cols = append(cols, handler.NewCol(HumanNickNameCol, *e.NickName))
