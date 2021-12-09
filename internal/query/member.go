@@ -6,6 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
@@ -74,3 +75,12 @@ func (r *Queries) IAMMemberByID(ctx context.Context, iamID, userID string) (memb
 
 	return member, nil
 }
+
+var (
+	memberUserID = Column{
+		name: projection.MemberUserIDCol,
+	}
+	memberResourceOwner = Column{
+		name: projection.MemberResourceOwner,
+	}
+)
