@@ -182,7 +182,11 @@
       "STATE": "Stato",
       "DELETE": "Elimina utente",
       "UNLOCK": "Sblocca utente",
-      "LOCKEDDESCRIPTION": "Questo utente \u00e8 stato bloccato a causa del superamento dei tentativi massimi di accesso e deve essere sbloccato per essere utilizzato di nuovo."
+      "LOCKEDDESCRIPTION": "Questo utente \u00e8 stato bloccato a causa del superamento dei tentativi massimi di accesso e deve essere sbloccato per essere utilizzato di nuovo.",
+      "DELETEACCOUNT": "Elimina account personale",
+      "DELETEACCOUNT_DESC": "Se esegui questa azione, sarai disconnesso e non avrai più accesso al tuo account. Questa azione non può essere invertita.",
+      "DELETEACCOUNT_BTN": "Elimina",
+      "DELETEACCOUNT_SUCCESS": "Account eliminato con successo!"
     },
     "DETAILS": {
       "DATECREATED": "Creato",
@@ -190,7 +194,9 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Elimina utente",
-      "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un utente. Sei sicuro?"
+      "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un utente. Sei sicuro?",
+      "DELETE_AUTH_DESCRIPTION": "Stai per eleminare il tuo account personale in modo permanente. Vuoi continuare?",
+      "DELETE_BTN": "Elimina"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Invia una notifica via e-mail",
