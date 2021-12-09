@@ -2,8 +2,9 @@ package projection
 
 import (
 	"database/sql"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -47,9 +48,7 @@ func (e *testExecuter) Validate(t *testing.T) {
 				if _, ok := execution.expectedArgs[i].(anyArg); ok {
 					continue
 				}
-				if !reflect.DeepEqual(execution.expectedArgs[i], execution.gottenArgs[i]) {
-					t.Errorf("wrong argument at index %d: got: %v want: %v", i, execution.gottenArgs[i], execution.expectedArgs[i])
-				}
+				assert.Equal(t, execution.expectedArgs[i], execution.gottenArgs[i], "wrong argument at index %d", i)
 			}
 		}
 		if execution.gottenStmt != execution.expectedStmt {

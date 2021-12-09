@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type View struct {
@@ -14,9 +15,10 @@ type View struct {
 	keyAlgorithm    crypto.EncryptionAlgorithm
 	idGenerator     id.Generator
 	prefixAvatarURL string
+	query           *query.Queries
 }
 
-func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, idGenerator id.Generator, prefixAvatarURL string) (*View, error) {
+func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, queries *query.Queries, idGenerator id.Generator, prefixAvatarURL string) (*View, error) {
 	gorm, err := gorm.Open("postgres", sqlClient)
 	if err != nil {
 		return nil, err
@@ -26,6 +28,7 @@ func StartView(sqlClient *sql.DB, keyAlgorithm crypto.EncryptionAlgorithm, idGen
 		keyAlgorithm:    keyAlgorithm,
 		idGenerator:     idGenerator,
 		prefixAvatarURL: prefixAvatarURL,
+		query:           queries,
 	}, nil
 }
 

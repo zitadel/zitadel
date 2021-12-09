@@ -1,0 +1,32 @@
+@use '@angular/material' as mat;
+
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.desc {
+  color: var(--grey);
+  font-size: .9rem;
+}
+
+@mixin action-dialog-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $foreground: map-get($theme, foreground);
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .ok-button {
+    margin-left: .5rem;
+  }
+}

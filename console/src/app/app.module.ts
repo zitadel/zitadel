@@ -30,6 +30,7 @@ import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { HasFeatureModule } from './directives/has-feature/has-feature.module';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { OutsideClickModule } from './directives/outside-click/outside-click.module';
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
@@ -39,6 +40,7 @@ import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
+import { AdminService } from './services/admin.service';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { GrpcService } from './services/grpc.service';
@@ -46,6 +48,7 @@ import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
+import { ManagementService } from './services/mgmt.service';
 import { RefreshService } from './services/refresh.service';
 import { SeoService } from './services/seo.service';
 import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
@@ -118,6 +121,7 @@ const authConfig: AuthConfig = {
     InputModule,
     HasRolePipeModule,
     HasFeaturePipeModule,
+    HasFeatureModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
     MatToolbarModule,
@@ -181,6 +185,8 @@ const authConfig: AuthConfig = {
     GrpcService,
     AuthenticationService,
     GrpcAuthService,
+    ManagementService,
+    AdminService,
     SubscriptionService,
     AssetService,
     { provide: 'windowObject', useValue: window },

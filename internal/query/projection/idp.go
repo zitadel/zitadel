@@ -134,6 +134,7 @@ const (
 	IDPStylingTypeCol   = "styling_type"
 	IDPOwnerTypeCol     = "owner_type"
 	IDPAutoRegisterCol  = "auto_register"
+	IDPTypeCol          = "type"
 
 	OIDCConfigIDPIDCol                 = "idp_id"
 	OIDCConfigClientIDCol              = "client_id"
@@ -311,6 +312,7 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*ha
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTypeCol, domain.IDPConfigTypeOIDC),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),
@@ -351,7 +353,7 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 		cols = append(cols, handler.NewCol(OIDCConfigClientIDCol, *idpEvent.ClientID))
 	}
 	if idpEvent.ClientSecret != nil {
-		cols = append(cols, handler.NewCol(OIDCConfigClientSecretCol, *idpEvent.ClientSecret))
+		cols = append(cols, handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret))
 	}
 	if idpEvent.Issuer != nil {
 		cols = append(cols, handler.NewCol(OIDCConfigIssuerCol, *idpEvent.Issuer))
@@ -413,6 +415,7 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.EventReader) (*han
 			[]handler.Column{
 				handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 				handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
+				handler.NewCol(IDPTypeCol, domain.IDPConfigTypeJWT),
 			},
 			[]handler.Condition{
 				handler.NewCond(IDPIDCol, idpEvent.IDPConfigID),

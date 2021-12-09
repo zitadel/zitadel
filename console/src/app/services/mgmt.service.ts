@@ -3,11 +3,13 @@ import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
 
+import { FlowType, TriggerType } from '../proto/generated/zitadel/action_pb';
 import { AppQuery } from '../proto/generated/zitadel/app_pb';
 import { KeyType } from '../proto/generated/zitadel/auth_n_key_pb';
 import { ChangeQuery } from '../proto/generated/zitadel/change_pb';
 import { IDPOwnerType } from '../proto/generated/zitadel/idp_pb';
 import {
+  ActionQuery,
   ActivateCustomLabelPolicyRequest,
   ActivateCustomLabelPolicyResponse,
   AddAPIAppRequest,
@@ -68,6 +70,10 @@ import {
   BulkRemoveUserGrantResponse,
   BulkSetUserMetadataRequest,
   BulkSetUserMetadataResponse,
+  ClearFlowRequest,
+  ClearFlowResponse,
+  CreateActionRequest,
+  CreateActionResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -80,8 +86,12 @@ import {
   DeactivateProjectResponse,
   DeactivateUserRequest,
   DeactivateUserResponse,
+  DeleteActionRequest,
+  DeleteActionResponse,
   GenerateOrgDomainValidationRequest,
   GenerateOrgDomainValidationResponse,
+  GetActionRequest,
+  GetActionResponse,
   GetAppByIDRequest,
   GetAppByIDResponse,
   GetCustomDomainClaimedMessageTextRequest,
@@ -118,6 +128,8 @@ import {
   GetDefaultVerifyPhoneMessageTextResponse,
   GetFeaturesRequest,
   GetFeaturesResponse,
+  GetFlowRequest,
+  GetFlowResponse,
   GetGrantedProjectByIDRequest,
   GetGrantedProjectByIDResponse,
   GetHumanEmailRequest,
@@ -167,6 +179,8 @@ import {
   GetUserMetadataRequest,
   GetUserMetadataResponse,
   IDPQuery,
+  ListActionsRequest,
+  ListActionsResponse,
   ListAppChangesRequest,
   ListAppChangesResponse,
   ListAppKeysRequest,
@@ -344,10 +358,14 @@ import {
   SetHumanInitialPasswordRequest,
   SetPrimaryOrgDomainRequest,
   SetPrimaryOrgDomainResponse,
+  SetTriggerActionsRequest,
+  SetTriggerActionsResponse,
   SetUserMetadataRequest,
   SetUserMetadataResponse,
   UnlockUserRequest,
   UnlockUserResponse,
+  UpdateActionRequest,
+  UpdateActionResponse,
   UpdateAPIAppConfigRequest,
   UpdateAPIAppConfigResponse,
   UpdateAppRequest,
@@ -879,6 +897,87 @@ export class ManagementService {
     }
     req.setQuery(metadata);
     return this.grpcService.mgmt.listHumanLinkedIDPs(req, null).then((resp) => resp.toObject());
+  }
+
+  public getAction(
+    id: string,
+  ): Promise<GetActionResponse.AsObject> {
+    const req = new GetActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.getAction(req, null).then(resp => resp.toObject());
+  }
+
+  public createAction(
+    req: CreateActionRequest,
+  ): Promise<CreateActionResponse.AsObject> {
+    return this.grpcService.mgmt.createAction(req, null).then(resp => resp.toObject());
+  }
+
+  public updateAction(
+    req: UpdateActionRequest,
+  ): Promise<UpdateActionResponse.AsObject> {
+    return this.grpcService.mgmt.updateAction(req, null).then(resp => resp.toObject());
+  }
+
+  public deleteAction(
+    id: string,
+  ): Promise<DeleteActionResponse.AsObject> {
+    const req = new DeleteActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.deleteAction(req, null).then(resp => resp.toObject());
+  }
+
+  public listActions(
+    limit?: number,
+    offset?: number,
+    asc?: boolean,
+    queryList?: ActionQuery[],
+  ): Promise<ListActionsResponse.AsObject> {
+    const req = new ListActionsRequest();
+    const metadata = new ListQuery();
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (asc) {
+      metadata.setAsc(asc);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.mgmt.listActions(req, null).then(resp => resp.toObject());
+  }
+
+  public getFlow(
+    type: FlowType
+  ): Promise<GetFlowResponse.AsObject> {
+    const req = new GetFlowRequest();
+    req.setType(type);
+    return this.grpcService.mgmt.getFlow(req, null).then(resp => resp.toObject());
+  }
+
+  public clearFlow(
+    type: FlowType
+  ): Promise<ClearFlowResponse.AsObject> {
+    const req = new ClearFlowRequest();
+    req.setType(type);
+    return this.grpcService.mgmt.clearFlow(req, null).then(resp => resp.toObject());
+  }
+
+  public setTriggerActions(
+    actionIdsList: string[],
+    type: FlowType,
+    triggerType: TriggerType,
+  ): Promise<SetTriggerActionsResponse.AsObject> {
+    const req = new SetTriggerActionsRequest();
+    req.setActionIdsList(actionIdsList);
+    req.setFlowType(type);
+    req.setTriggerType(triggerType);
+    return this.grpcService.mgmt.setTriggerActions(req, null).then(resp => resp.toObject());
   }
 
   public getIAM(): Promise<GetIAMResponse.AsObject> {

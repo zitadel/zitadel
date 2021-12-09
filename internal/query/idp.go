@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"log"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -97,6 +96,10 @@ var (
 	}
 	IDPAutoRegisterCol = Column{
 		name:  projection.IDPAutoRegisterCol,
+		table: idpTable,
+	}
+	IDPTypeCol = Column{
+		name:  projection.IDPTypeCol,
 		table: idpTable,
 	}
 )
@@ -216,7 +219,6 @@ func (q *Queries) SearchIDPs(ctx context.Context, resourceOwner string, queries 
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		log.Println(err)
 		return nil, errors.ThrowInternal(err, "QUERY-YTug9", "Errors.Internal")
 	}
 	idps, err = scan(rows)
@@ -247,7 +249,7 @@ func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }
@@ -424,6 +426,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&idp.StylingType,
 					&idp.OwnerType,
 					&idp.AutoRegister,
+					// oidc config
 					&oidcIDPID,
 					&oidcClientID,
 					oidcClientSecret,
@@ -433,6 +436,7 @@ func prepareIDPsQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPs, error)) {
 					&oidcUsernameMapping,
 					&oidcAuthorizationEndpoint,
 					&oidcTokenEndpoint,
+					// jwt config
 					&jwtIDPID,
 					&jwtIssuer,
 					&jwtKeysEndpoint,

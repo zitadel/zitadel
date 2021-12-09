@@ -24,7 +24,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "org.reduceFeatureSet",
+			name: "org.reduceFeatureSet new",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(org.FeaturesSetEventType),
@@ -63,10 +63,9 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, creation_date, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)",
+							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								anyArg{},
 								anyArg{},
 								uint64(15),
 								false,
@@ -91,6 +90,109 @@ func TestFeatureProjection_reduces(t *testing.T) {
 								true,
 								true,
 								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.reduceFeatureSet old",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.FeaturesSetEventType),
+					org.AggregateType,
+					[]byte(`{
+						"tierName": "TierName",
+						"tierDescription": "TierDescription",
+						"state": 1,
+						"stateDescription": "StateDescription",
+						"auditLogRetention": 1,
+						"loginPolicyFactors": true,
+						"loginPolicyIDP": true,
+						"loginPolicyPasswordless": true,
+						"loginPolicyRegistration": true,
+						"loginPolicyUsernameLogin": true,
+						"loginPolicyPasswordReset": true,
+						"passwordComplexityPolicy": true,
+						"labelPolicy": true,
+						"labelPolicyWatermark": true,
+						"customDomain": true,
+						"privacyPolicy": true,
+						"metadataUser": true,
+						"customTextMessage": true,
+						"customTextLogin": true,
+						"lockoutPolicy": true,
+						"actions": true
+					}`),
+				), org.FeaturesSetEventMapper),
+			},
+			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       FeatureTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								uint64(15),
+								false,
+								"TierName",
+								"TierDescription",
+								domain.FeaturesStateActive,
+								"StateDescription",
+								time.Nanosecond,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.reduceFeatureSet required values only",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.FeaturesSetEventType),
+					org.AggregateType,
+					[]byte(`{}`),
+				), org.FeaturesSetEventMapper),
+			},
+			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("org"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       FeatureTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default) VALUES ($1, $2, $3, $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								uint64(15),
+								false,
 							},
 						},
 					},
@@ -125,7 +227,80 @@ func TestFeatureProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceFeatureSet",
+			name:   "iam.reduceFeatureSet old",
+			reduce: (&FeatureProjection{}).reduceFeatureSet,
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(iam.FeaturesSetEventType),
+					iam.AggregateType,
+					[]byte(`{
+				"tierName": "TierName",
+				"tierDescription": "TierDescription",
+				"state": 1,
+				"stateDescription": "StateDescription",
+				"auditLogRetention": 1,
+				"loginPolicyFactors": true,
+				"loginPolicyIDP": true,
+				"loginPolicyPasswordless": true,
+				"loginPolicyRegistration": true,
+				"loginPolicyUsernameLogin": true,
+				"loginPolicyPasswordReset": true,
+				"passwordComplexityPolicy": true,
+				"labelPolicy": true,
+				"labelPolicyWatermark": true,
+				"customDomain": true,
+				"privacyPolicy": true,
+				"metadataUser": true,
+				"customTextMessage": true,
+				"customTextLogin": true,
+				"lockoutPolicy": true,
+				"actions": true
+			}`),
+				), iam.FeaturesSetEventMapper),
+			},
+			want: wantReduce{
+				aggregateType:    eventstore.AggregateType("iam"),
+				sequence:         15,
+				previousSequence: 10,
+				projection:       FeatureTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								uint64(15),
+								true,
+								"TierName",
+								"TierDescription",
+								domain.FeaturesStateActive,
+								"StateDescription",
+								time.Nanosecond,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+								true,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:   "iam.reduceFeatureSet new",
 			reduce: (&FeatureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
@@ -164,10 +339,9 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, creation_date, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)",
+							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								anyArg{},
 								anyArg{},
 								uint64(15),
 								true,
@@ -203,7 +377,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			event := baseEvent(t)
 			got, err := tt.reduce(event)
-			if _, ok := err.(errors.InvalidArgument); !ok {
+			if !errors.IsErrorInvalidArgument(err) {
 				t.Errorf("no wrong event mapping: %v, got: %v", err, got)
 			}
 

@@ -227,7 +227,7 @@ func (q *ProjectGrantSearchQueries) AppendPermissionQueries(permissions []string
 func (q *ProjectGrantSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	query = q.SearchRequest.toQuery(query)
 	for _, q := range q.Queries {
-		query = q.ToQuery(query)
+		query = q.toQuery(query)
 	}
 	return query
 }
@@ -255,20 +255,25 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 			LeftJoin(join(resourceOwnerIDColumn, ProjectGrantColumnResourceOwner)).
 			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(row *sql.Row) (*ProjectGrant, error) {
-			p := new(ProjectGrant)
+			grant := new(ProjectGrant)
+			var (
+				projectName       sql.NullString
+				orgName           sql.NullString
+				resourceOwnerName sql.NullString
+			)
 			err := row.Scan(
-				&p.ProjectID,
-				&p.GrantID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.State,
-				&p.Sequence,
-				&p.ProjectName,
-				&p.GrantedOrgID,
-				&p.OrgName,
-				&p.GrantedRoleKeys,
-				&p.ResourceOwnerName,
+				&grant.ProjectID,
+				&grant.GrantID,
+				&grant.CreationDate,
+				&grant.ChangeDate,
+				&grant.ResourceOwner,
+				&grant.State,
+				&grant.Sequence,
+				&projectName,
+				&grant.GrantedOrgID,
+				&orgName,
+				&grant.GrantedRoleKeys,
+				&resourceOwnerName,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -276,7 +281,12 @@ func prepareProjectGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*ProjectGrant
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-w9fsH", "Errors.Internal")
 			}
-			return p, nil
+
+			grant.ProjectName = projectName.String
+			grant.ResourceOwnerName = resourceOwnerName.String
+			grant.OrgName = orgName.String
+
+			return grant, nil
 		}
 }
 
@@ -305,28 +315,38 @@ func prepareProjectGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*ProjectGra
 			LeftJoin(join(grantedOrgIDColumn, ProjectGrantColumnGrantedOrgID)),
 		func(rows *sql.Rows) (*ProjectGrants, error) {
 			projects := make([]*ProjectGrant, 0)
-			var count uint64
+			var (
+				count             uint64
+				projectName       sql.NullString
+				orgName           sql.NullString
+				resourceOwnerName sql.NullString
+			)
 			for rows.Next() {
-				project := new(ProjectGrant)
+				grant := new(ProjectGrant)
 				err := rows.Scan(
-					&project.ProjectID,
-					&project.GrantID,
-					&project.CreationDate,
-					&project.ChangeDate,
-					&project.ResourceOwner,
-					&project.State,
-					&project.Sequence,
-					&project.ProjectName,
-					&project.GrantedOrgID,
-					&project.OrgName,
-					&project.GrantedRoleKeys,
-					&project.ResourceOwnerName,
+					&grant.ProjectID,
+					&grant.GrantID,
+					&grant.CreationDate,
+					&grant.ChangeDate,
+					&grant.ResourceOwner,
+					&grant.State,
+					&grant.Sequence,
+					&projectName,
+					&grant.GrantedOrgID,
+					&orgName,
+					&grant.GrantedRoleKeys,
+					&resourceOwnerName,
 					&count,
 				)
 				if err != nil {
 					return nil, err
 				}
-				projects = append(projects, project)
+
+				grant.ProjectName = projectName.String
+				grant.ResourceOwnerName = resourceOwnerName.String
+				grant.OrgName = orgName.String
+
+				projects = append(projects, grant)
 			}
 
 			if err := rows.Close(); err != nil {

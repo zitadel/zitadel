@@ -36,7 +36,7 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChanges
 }
 
 func (s *Server) AddOrg(ctx context.Context, req *mgmt_pb.AddOrgRequest) (*mgmt_pb.AddOrgResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, s.systemDefaults.Domain))
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, domain.NewIAMDomainName(req.Name, s.systemDefaults.Domain), "")
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func GenerateOrgDomainValidationRequestToDomain(ctx context.Context, req *mgmt_p
 }
 
 func (s *Server) ValidateOrgDomain(ctx context.Context, req *mgmt_pb.ValidateOrgDomainRequest) (*mgmt_pb.ValidateOrgDomainResponse, error) {
-	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain)
+	userIDs, err := s.getClaimedUserIDsOfOrgDomain(ctx, req.Domain, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -284,20 +284,24 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 	}, nil
 }
 
-func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain string) ([]string, error) {
-	users, err := s.user.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{
-			{
-				Key:    usr_model.UserSearchKeyPreferredLoginName,
-				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  orgDomain,
-			},
-			{
+func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
+	queries := []*usr_model.UserSearchQuery{
+		{
+			Key:    usr_model.UserSearchKeyPreferredLoginName,
+			Method: domain.SearchMethodEndsWithIgnoreCase,
+			Value:  "@" + orgDomain,
+		},
+	}
+	if orgID != "" {
+		queries = append(queries,
+			&usr_model.UserSearchQuery{
 				Key:    usr_model.UserSearchKeyResourceOwner,
 				Method: domain.SearchMethodNotEquals,
-				Value:  authz.GetCtxData(ctx).OrgID,
-			},
-		},
+				Value:  orgID,
+			})
+	}
+	users, err := s.user.SearchUsers(ctx, &usr_model.UserSearchRequest{
+		Queries: queries,
 	}, false)
 	if err != nil {
 		return nil, err

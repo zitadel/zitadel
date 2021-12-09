@@ -57,7 +57,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,15 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
-	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email)
+	orgID := authz.GetCtxData(ctx).OrgID
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if !policy.UserLoginMustBeDomain {
+		orgID = ""
+	}
+	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -184,8 +192,9 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	}
 	if code != nil {
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
-			Lifetime: durationpb.New(code.Expiration),
+			Link:       code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Lifetime:   durationpb.New(code.Expiration),
+			Expiration: durationpb.New(code.Expiration),
 		}
 	}
 	return resp, nil
@@ -597,14 +606,18 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	res, err := s.user.SearchExternalIDPs(ctx, ListHumanLinkedIDPsRequestToModel(req))
+	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IDPUserLinks(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(res.Result),
+		Result: idp_grpc.IDPUserLinksToPb(res.Links),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),

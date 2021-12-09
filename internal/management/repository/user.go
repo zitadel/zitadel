@@ -16,7 +16,7 @@ type UserRepository interface {
 	UserIDsByDomain(ctx context.Context, domain string) ([]string, error)
 
 	GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
-	IsUserUnique(ctx context.Context, userName, email string) (bool, error)
+	IsUserUnique(ctx context.Context, userName, email, orgID string) (bool, error)
 
 	GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error)
 	SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error)

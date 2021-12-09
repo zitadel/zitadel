@@ -70,40 +70,52 @@ var (
 		name: projection.PasswordComplexityTable,
 	}
 	PasswordComplexityColID = Column{
-		name: projection.ComplexityPolicyIDCol,
+		name:  projection.ComplexityPolicyIDCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColSequence = Column{
-		name: projection.ComplexityPolicySequenceCol,
+		name:  projection.ComplexityPolicySequenceCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColCreationDate = Column{
-		name: projection.ComplexityPolicyCreationDateCol,
+		name:  projection.ComplexityPolicyCreationDateCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColChangeDate = Column{
-		name: projection.ComplexityPolicyChangeDateCol,
+		name:  projection.ComplexityPolicyChangeDateCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColResourceOwner = Column{
-		name: projection.ComplexityPolicyResourceOwnerCol,
+		name:  projection.ComplexityPolicyResourceOwnerCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColMinLength = Column{
-		name: projection.ComplexityPolicyMinLengthCol,
+		name:  projection.ComplexityPolicyMinLengthCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasLowercase = Column{
-		name: projection.ComplexityPolicyHasLowercaseCol,
+		name:  projection.ComplexityPolicyHasLowercaseCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasUpperCase = Column{
-		name: projection.ComplexityPolicyHasUppercaseCol,
+		name:  projection.ComplexityPolicyHasUppercaseCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasNumber = Column{
-		name: projection.ComplexityPolicyHasNumberCol,
+		name:  projection.ComplexityPolicyHasNumberCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColHasSymbol = Column{
-		name: projection.ComplexityPolicyHasSymbolCol,
+		name:  projection.ComplexityPolicyHasSymbolCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColIsDefault = Column{
-		name: projection.ComplexityPolicyIsDefaultCol,
+		name:  projection.ComplexityPolicyIsDefaultCol,
+		table: passwordComplexityTable,
 	}
 	PasswordComplexityColState = Column{
-		name: projection.ComplexityPolicyStateCol,
+		name:  projection.ComplexityPolicyStateCol,
+		table: passwordComplexityTable,
 	}
 )
 

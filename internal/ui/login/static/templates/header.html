@@ -1,7 +1,7 @@
 {{define "header"}}
 <header class="lgn-header">
     {{ if hasCustomPolicy .LabelPolicy }}
-        {{ $logo := customLogoResource .OrgID .LabelPolicy .DarkMode }}
+        {{ $logo := customLogoResource .PrivateLabelingOrgID .LabelPolicy .DarkMode }}
         {{if $logo}}
             <img class="lgn-logo" src="{{$logo}}" alt="Logo">
         {{end}}

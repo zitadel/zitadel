@@ -8,11 +8,11 @@ import (
 )
 
 func (s *Server) ListMyZitadelFeatures(ctx context.Context, _ *auth_pb.ListMyZitadelFeaturesRequest) (*auth_pb.ListMyZitadelFeaturesResponse, error) {
-	features, err := s.repo.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyZitadelFeaturesResponse{
-		Result: features.FeatureList(),
+		Result: features.EnabledFeatureTypes(),
 	}, nil
 }

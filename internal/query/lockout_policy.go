@@ -31,31 +31,40 @@ var (
 		name: projection.LockoutPolicyTable,
 	}
 	LockoutColID = Column{
-		name: projection.LockoutPolicyIDCol,
+		name:  projection.LockoutPolicyIDCol,
+		table: lockoutTable,
 	}
 	LockoutColSequence = Column{
-		name: projection.LockoutPolicySequenceCol,
+		name:  projection.LockoutPolicySequenceCol,
+		table: lockoutTable,
 	}
 	LockoutColCreationDate = Column{
-		name: projection.LockoutPolicyCreationDateCol,
+		name:  projection.LockoutPolicyCreationDateCol,
+		table: lockoutTable,
 	}
 	LockoutColChangeDate = Column{
-		name: projection.LockoutPolicyChangeDateCol,
+		name:  projection.LockoutPolicyChangeDateCol,
+		table: lockoutTable,
 	}
 	LockoutColResourceOwner = Column{
-		name: projection.LockoutPolicyResourceOwnerCol,
+		name:  projection.LockoutPolicyResourceOwnerCol,
+		table: lockoutTable,
 	}
 	LockoutColShowFailures = Column{
-		name: projection.LockoutPolicyShowLockOutFailuresCol,
+		name:  projection.LockoutPolicyShowLockOutFailuresCol,
+		table: lockoutTable,
 	}
 	LockoutColMaxPasswordAttempts = Column{
-		name: projection.LockoutPolicyMaxPasswordAttemptsCol,
+		name:  projection.LockoutPolicyMaxPasswordAttemptsCol,
+		table: lockoutTable,
 	}
 	LockoutColIsDefault = Column{
-		name: projection.LockoutPolicyIsDefaultCol,
+		name:  projection.LockoutPolicyIsDefaultCol,
+		table: lockoutTable,
 	}
 	LockoutColState = Column{
-		name: projection.LockoutPolicyStateCol,
+		name:  projection.LockoutPolicyStateCol,
+		table: lockoutTable,
 	}
 )
 
