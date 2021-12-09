@@ -184,7 +184,7 @@
       "UNLOCK": "Sblocca utente",
       "LOCKEDDESCRIPTION": "Questo utente \u00e8 stato bloccato a causa del superamento dei tentativi massimi di accesso e deve essere sbloccato per essere utilizzato di nuovo.",
       "DELETEACCOUNT": "Elimina account personale",
-      "DELETEACCOUNT_DESC": "Rimuovi il tuo Account Personale con tutti i suoi dati. Questa azione non è reversibile, quindi continua con cautela.",
+      "DELETEACCOUNT_DESC": "Se esegui questa azione, sarai disconnesso e non avrai più accesso al tuo account. Questa azione non può essere invertita.",
       "DELETEACCOUNT_BTN": "Elimina",
       "DELETEACCOUNT_SUCCESS": "Account eliminato con successo!"
     },
