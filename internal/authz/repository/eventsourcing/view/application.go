@@ -9,7 +9,7 @@ import (
 )
 
 func (v *View) ApplicationByOIDCClientID(clientID string) (*query.App, error) {
-	return v.Query.AppByClientID(context.TODO(), clientID)
+	return v.Query.AppByOIDCClientID(context.TODO(), clientID)
 }
 
 func (v *View) ApplicationByProjecIDAndAppName(ctx context.Context, projectID, appName string) (_ *query.App, err error) {
