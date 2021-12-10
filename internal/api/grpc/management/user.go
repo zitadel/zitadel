@@ -15,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -551,11 +552,18 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 }
 
 func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
-	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	//req.UserId, TODO: ?
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID)
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.GetMachineKeyByIDsResponse{
 		Key: authn.KeyToPb(key),
 	}, nil

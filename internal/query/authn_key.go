@@ -116,19 +116,21 @@ func (q *Queries) SearchAuthNKeys(ctx context.Context, queries *AuthNKeySearchQu
 	return authNKeys, err
 }
 
-func (q *Queries) GetAuthNKeyByID(ctx context.Context, id string, orgID string) (*AuthNKey, error) {
-	stmt, scan := prepareAuthNKeyQuery()
-	query, args, err := stmt.Where(
+func (q *Queries) GetAuthNKeyByID(ctx context.Context, id string, queries ...SearchQuery) (*AuthNKey, error) {
+	query, scan := prepareAuthNKeyQuery()
+	for _, q := range queries {
+		query = q.toQuery(query)
+	}
+	stmt, args, err := query.Where(
 		sq.Eq{
-			AuthNKeyColumnID.identifier():            id,
-			AuthNKeyColumnResourceOwner.identifier(): orgID,
-			AuthNKeyColumnEnabled.identifier():       true,
+			AuthNKeyColumnID.identifier():      id,
+			AuthNKeyColumnEnabled.identifier(): true,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-DAb32", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
+	row := q.client.QueryRowContext(ctx, stmt, args...)
 	return scan(row)
 }
 

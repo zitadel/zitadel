@@ -8,6 +8,7 @@ import (
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -182,11 +183,22 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 }
 
 func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (*mgmt_pb.GetAppKeyResponse, error) {
-	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, authz.GetCtxData(ctx).OrgID)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	//req.ProjectId, req.AppId, //TODO: ?
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	objectID, err := query.NewAuthNKeyObjectIDQuery(req.AppId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID, objectID)
+	if err != nil {
+		return nil, err
+	}
 	return &mgmt_pb.GetAppKeyResponse{
 		Key: authn_grpc.KeyToPb(key),
 	}, nil
