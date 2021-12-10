@@ -8,6 +8,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { View } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -21,12 +22,33 @@ export class IamViewsComponent implements AfterViewInit {
   @ViewChild(MatPaginator) public paginator!: MatPaginator;
   public dataSource!: MatTableDataSource<View.AsObject>;
 
-  public displayedColumns: string[] = ['viewName', 'database', 'sequence', 'eventTimestamp', 'lastSuccessfulSpoolerRun', 'actions'];
+  public displayedColumns: string[] = [
+    'viewName',
+    'database',
+    'sequence',
+    'eventTimestamp',
+    'lastSuccessfulSpoolerRun',
+    'actions',
+  ];
 
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  constructor(private adminService: AdminService, private dialog: MatDialog, private toast: ToastService) {
+  constructor(
+    private adminService: AdminService,
+    private breadcrumbService: BreadcrumbService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+  ) {
     this.loadViews();
+
+    const breadcrumbs = [
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/iam'],
+      }),
+    ];
+    this.breadcrumbService.setBreadcrumb(breadcrumbs);
   }
 
   ngAfterViewInit(): void {
@@ -35,17 +57,19 @@ export class IamViewsComponent implements AfterViewInit {
 
   public loadViews(): void {
     this.loadingSubject.next(true);
-    from(this.adminService.listViews()).pipe(
-      map(resp => {
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(views => {
-      this.dataSource = new MatTableDataSource(views);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
+    from(this.adminService.listViews())
+      .pipe(
+        map((resp) => {
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((views) => {
+        this.dataSource = new MatTableDataSource(views);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      });
   }
 
   public cancelView(viewname: string, db: string): void {
@@ -59,14 +83,17 @@ export class IamViewsComponent implements AfterViewInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        this.adminService.clearView(viewname, db).then(() => {
-          this.toast.showInfo('IAM.VIEWS.CLEARED', true);
-          this.loadViews();
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.adminService
+          .clearView(viewname, db)
+          .then(() => {
+            this.toast.showInfo('IAM.VIEWS.CLEARED', true);
+            this.loadViews();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
       }
     });
   }

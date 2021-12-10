@@ -3,6 +3,7 @@
 @mixin user-table-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+
   .user-table-left-actions {
     display: flex;
     align-items: center;
@@ -32,6 +33,7 @@
     }
   }
 }
+
 .table-wrapper {
   overflow: auto;
 

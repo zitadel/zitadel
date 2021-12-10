@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
@@ -9,7 +9,7 @@ const ROUTEPARAM = 'projectid';
   templateUrl: './project-roles.component.html',
   styleUrls: ['./project-roles.component.scss'],
 })
-export class ProjectRolesComponent implements OnInit {
+export class ProjectRolesComponent {
   public projectId: string = '';
 
   constructor(private route: ActivatedRoute, private breadcrumbService: BreadcrumbService) {
@@ -28,6 +28,4 @@ export class ProjectRolesComponent implements OnInit {
       this.breadcrumbService.setBreadcrumb(breadcrumbs);
     }
   }
-
-  ngOnInit(): void {}
 }

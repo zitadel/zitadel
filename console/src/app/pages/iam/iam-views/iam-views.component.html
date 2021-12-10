@@ -1,5 +1,5 @@
 <div class="max-width-container">
-  <h1>{{ 'IAM.VIEWS.TITLE' | translate }}</h1>
+  <h1 class="title">{{ 'IAM.VIEWS.TITLE' | translate }}</h1>
   <p class="desc">{{'IAM.VIEWS.DESCRIPTION' | translate }}</p>
 
   <cnsl-refresh-table *ngIf="dataSource" (refreshed)="loadViews()" [dataSize]="dataSource.data.length"
@@ -49,7 +49,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
+    <mat-paginator class="paginator" [pageSize]="15" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
     </mat-paginator>
   </cnsl-refresh-table>
 </div>

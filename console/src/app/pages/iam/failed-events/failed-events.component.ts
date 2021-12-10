@@ -5,6 +5,7 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { FailedEvent } from 'src/app/proto/generated/zitadel/admin_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
@@ -16,12 +17,32 @@ export class FailedEventsComponent implements AfterViewInit {
   @ViewChild(MatPaginator) public eventPaginator!: MatPaginator;
   public eventDataSource!: MatTableDataSource<FailedEvent.AsObject>;
 
-  public eventDisplayedColumns: string[] = ['viewName', 'database', 'failedSequence', 'failureCount', 'errorMessage', 'actions'];
+  public eventDisplayedColumns: string[] = [
+    'viewName',
+    'database',
+    'failedSequence',
+    'failureCount',
+    'errorMessage',
+    'actions',
+  ];
 
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  constructor(private adminService: AdminService, private toast: ToastService) {
+  constructor(
+    private adminService: AdminService,
+    private breadcrumbService: BreadcrumbService,
+    private toast: ToastService,
+  ) {
     this.loadEvents();
+
+    const breadcrumbs = [
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/iam'],
+      }),
+    ];
+    this.breadcrumbService.setBreadcrumb(breadcrumbs);
   }
 
   ngAfterViewInit(): void {
@@ -30,16 +51,18 @@ export class FailedEventsComponent implements AfterViewInit {
 
   public loadEvents(): void {
     this.loadingSubject.next(true);
-    from(this.adminService.listFailedEvents()).pipe(
-      map(resp => {
-        return resp?.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(views => {
-      this.eventDataSource = new MatTableDataSource(views);
-      this.eventDataSource.paginator = this.eventPaginator;
-    });
+    from(this.adminService.listFailedEvents())
+      .pipe(
+        map((resp) => {
+          return resp?.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((views) => {
+        this.eventDataSource = new MatTableDataSource(views);
+        this.eventDataSource.paginator = this.eventPaginator;
+      });
   }
 
   public cancelEvent(viewname: string, db: string, seq: number): void {
