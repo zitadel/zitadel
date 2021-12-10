@@ -101,6 +101,11 @@
       "LABEL": "Erste Schritte",
       "TITLE": "Quickstarts",
       "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "SHORTCUTS": {
+      "SHORTCUTS": "Shortcuts",
+      "SETTINGS": "Settings",
+      "PROJECTS": "Projects"
     }
   },
   "MENU": {

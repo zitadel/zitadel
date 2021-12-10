@@ -1,0 +1,85 @@
+@use '@angular/material' as mat;
+
+@mixin shortcut-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  $list-background-color: mat.get-color-from-palette($background, 300);
+  $card-background-color: mat.get-color-from-palette($background, card);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-selected-color: if($is-dark-theme, #ffffff, #000000);
+
+  .shortcut-container {
+    width: 400px;
+    max-width: 100%;
+    margin: 0 25px 25px 0;
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .shortcut-list {
+    border: 1px solid $border-color;
+    min-height: 60px;
+    background-color: $list-background-color;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: block;
+    padding: 1rem;
+  }
+
+  .shortcut-box {
+    padding: 20px 10px;
+    color: map-get($foreground, text);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: move;
+    font-size: 14px;
+    background-color: $card-background-color;
+    border: 1px solid $border-color;
+    border-radius: 1rem;
+    margin: 1rem 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 1rem;
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .shortcut-box:last-child {
+    border: none;
+  }
+
+  .shortcut-list.cdk-drop-list-dragging .shortcut-box:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}

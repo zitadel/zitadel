@@ -11,26 +11,28 @@ import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { OnboardingModule } from 'src/app/modules/onboarding/onboarding.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { ShortcutsModule } from 'src/app/modules/shortcuts/shortcuts.module';
 
 import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 
 @NgModule({
-    declarations: [HomeComponent],
-    imports: [
-        CommonModule,
-        MatIconModule,
-        HasRoleModule,
-        HomeRoutingModule,
-        MatButtonModule,
-        TranslateModule,
-        AvatarModule,
-        MatTooltipModule,
-        SharedModule,
-        MatProgressSpinnerModule,
-        CardModule,
-        MatRippleModule,
-        OnboardingModule,
-    ],
+  declarations: [HomeComponent],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    HasRoleModule,
+    HomeRoutingModule,
+    MatButtonModule,
+    TranslateModule,
+    AvatarModule,
+    MatTooltipModule,
+    SharedModule,
+    MatProgressSpinnerModule,
+    ShortcutsModule,
+    CardModule,
+    MatRippleModule,
+    OnboardingModule,
+  ],
 })
-export class HomeModule { }
+export class HomeModule {}

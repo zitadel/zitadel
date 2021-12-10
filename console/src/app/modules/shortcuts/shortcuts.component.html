@@ -1,0 +1,17 @@
+<div cdkDropListGroup>
+  <div class="shortcut-container">
+    <h2>To do</h2>
+
+    <div cdkDropList [cdkDropListData]="shortcuts" class="shortcut-list" (cdkDropListDropped)="drop($event)">
+      <div class="shortcut-box" *ngFor="let item of shortcuts" cdkDrag>{{item}}</div>
+    </div>
+  </div>
+
+  <div class="shortcut-container">
+    <h2>Done</h2>
+
+    <div cdkDropList [cdkDropListData]="all" class="shortcut-list" (cdkDropListDropped)="drop($event)">
+      <div class="shortcut-box" *ngFor="let item of all" cdkDrag>{{item}}</div>
+    </div>
+  </div>
+</div>
