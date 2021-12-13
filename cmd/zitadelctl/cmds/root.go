@@ -3,6 +3,7 @@ package cmds
 import (
 	"context"
 	"os"
+	"strings"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
@@ -95,7 +96,7 @@ $ zitadelctl --gitops -f ~/.orb/myorb [command]
 
 		env := "unknown"
 		if orbID, err := rv.OrbConfig.ID(); err == nil {
-			env = orbID
+			env = strings.ReplaceAll(orbID, ".", "-")
 		}
 
 		if component == "" {
