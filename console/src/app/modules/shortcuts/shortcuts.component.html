@@ -1,17 +1,47 @@
 <div cdkDropListGroup>
   <div class="shortcut-container">
-    <h2>To do</h2>
-
+    <div class="shortcut-title-container">
+      <h2>{{'HOME.SHORTCUTS.SHORTCUTS' | translate}}</h2>
+      <button class="shortcut-btn" (click)="editState = !editState" mat-icon-button>
+        <i *ngIf="!editState" class=" las la-edit"></i>
+        <mat-icon *ngIf="editState">close</mat-icon>
+      </button>
+    </div>
     <div cdkDropList [cdkDropListData]="shortcuts" class="shortcut-list" (cdkDropListDropped)="drop($event)">
-      <div class="shortcut-box" *ngFor="let item of shortcuts" cdkDrag>{{item}}</div>
+      <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+      <ng-container *ngFor="let item of shortcuts">
+        <ng-template cnslHasRole [hasRole]="item.orgWithRole">
+          <a class="shortcut-box" [ngClass]="{'edit-state': editState}" cdkDrag [cdkDragDisabled]="!editState"
+            [routerLink]="item.orgRouterLink">
+            <div class="shortcuts-avatar {{item.color}}">
+              <mat-icon *ngIf="item.svgIcon" class="icon" [svgIcon]="item.svgIcon"></mat-icon>
+              <i *ngIf="item.icon" class="icon {{item.icon}}"></i>
+            </div>
+            <span>{{item.i18nTitle | translate}}</span>
+          </a>
+        </ng-template>
+      </ng-container>
     </div>
   </div>
 
-  <div class="shortcut-container">
-    <h2>Done</h2>
+  <div class="shortcut-container" *ngIf="editState">
+    <h2>{{'HOME.SHORTCUTS.SETTINGS' | translate}}</h2>
 
     <div cdkDropList [cdkDropListData]="all" class="shortcut-list" (cdkDropListDropped)="drop($event)">
-      <div class="shortcut-box" *ngFor="let item of all" cdkDrag>{{item}}</div>
+      <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.ADD' | translate}}</p>
+      <ng-container *ngFor="let item of all">
+        <ng-template cnslHasRole [hasRole]="item.orgWithRole">
+          <div class="shortcut-box edit-state" cdkDrag>
+            <div class="shortcuts-avatar {{item.color}}">
+              <mat-icon *ngIf="item.svgIcon" class="icon" [svgIcon]="item.svgIcon"></mat-icon>
+              <i *ngIf="item.icon" class="icon {{item.icon}}"></i>
+            </div>
+            <span>
+              {{item.i18nTitle | translate}}
+            </span>
+          </div>
+        </ng-template>
+      </ng-container>
     </div>
   </div>
 </div>

@@ -104,8 +104,10 @@
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Einstellungen",
-      "PROJECTS": "Projekte"
+      "SETTINGS": "Organisation Einstellungen",
+      "PROJECTS": "Projekte",
+      "REORDER": "Zum Verschieben Kachel halten un ziehen",
+      "ADD": "Zum Hinzufügen Kachel halten und ziehen"
     }
   },
   "MENU": {

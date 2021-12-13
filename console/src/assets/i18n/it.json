@@ -104,8 +104,10 @@
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Impostazioni",
-      "PROJECTS": "Progetti"
+      "SETTINGS": "Impostazioni dell' organizazzione",
+      "PROJECTS": "Progetti",
+      "REORDER": "Per spostare, tieni premuto e trascina il riquadro",
+      "ADD": "Per aggiungere, tieni premuto e trascina il riquadro"
     }
   },
   "MENU": {

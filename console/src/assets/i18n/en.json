@@ -104,8 +104,10 @@
     },
     "SHORTCUTS": {
       "SHORTCUTS": "Shortcuts",
-      "SETTINGS": "Settings",
-      "PROJECTS": "Projects"
+      "SETTINGS": "Organization Settings",
+      "PROJECTS": "Projects",
+      "REORDER": "Hold and drag the tile to move it",
+      "ADD": "Hold and drag a tile to add"
     }
   },
   "MENU": {

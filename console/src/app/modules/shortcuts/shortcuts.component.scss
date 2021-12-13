@@ -25,6 +25,15 @@
     margin: 0 25px 25px 0;
     display: inline-block;
     vertical-align: top;
+
+    .shortcut-title-container {
+      display: flex;
+      align-items: center;
+
+      .shortcut-btn {
+        margin-left: 0.5rem;
+      }
+    }
   }
 
   .shortcut-list {
@@ -35,22 +44,33 @@
     overflow: hidden;
     display: block;
     padding: 1rem;
+
+    .shortcut-desc {
+      align-self: center;
+      font-size: 14px;
+      color: var(--grey);
+      margin-top: 0;
+      text-align: center;
+    }
   }
 
   .shortcut-box {
-    padding: 20px 10px;
+    padding: 1rem;
     color: map-get($foreground, text);
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
     box-sizing: border-box;
-    cursor: move;
     font-size: 14px;
     background-color: $card-background-color;
     border: 1px solid $border-color;
     border-radius: 1rem;
     margin: 1rem 0;
+    text-decoration: none;
+
+    &.edit-state {
+      cursor: move;
+    }
 
     &:first-child {
       margin-top: 0;
@@ -59,11 +79,55 @@
     &:last-child {
       margin-bottom: 0;
     }
+
+    .shortcuts-avatar {
+      height: 40px;
+      width: 40px;
+      margin-right: 1rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
+
+      &.purple {
+        background: linear-gradient(40deg, #7c3aed 30%, #6d28d9);
+      }
+
+      &.red {
+        background: linear-gradient(40deg, #dc2626 30%, #db2777);
+      }
+
+      &.green {
+        background: linear-gradient(40deg, #059669 30%, #047857);
+      }
+
+      &.blue {
+        background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
+      }
+
+      &.yellow {
+        background: linear-gradient(40deg, #f59e0b 30%, #b45309);
+      }
+
+      &.black {
+        background: linear-gradient(40deg, #1f2937, #111827);
+      }
+
+      .icon,
+      i {
+        font-size: 1.5rem;
+        height: 1.5rem;
+        line-height: 1.5rem;
+        color: white;
+      }
+    }
   }
 
   .cdk-drag-preview {
     box-sizing: border-box;
     border-radius: 1rem;
+    border: 1px solid $border-color;
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
   }
 
@@ -73,10 +137,6 @@
 
   .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-  }
-
-  .shortcut-box:last-child {
-    border: none;
   }
 
   .shortcut-list.cdk-drop-list-dragging .shortcut-box:not(.cdk-drag-placeholder) {
