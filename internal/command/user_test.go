@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -921,7 +920,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			ctx                    context.Context
 			orgID                  string
 			userID                 string
-			cascadeUserMemberships []*query.Membership
+			cascadeUserMemberships []*domain.UserMembership
 			cascadeUserGrants      []string
 		}
 	)
@@ -1201,36 +1200,31 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				ctx:    context.Background(),
 				orgID:  "org1",
 				userID: "user1",
-				cascadeUserMemberships: []*query.Membership{
+				cascadeUserMemberships: []*domain.UserMembership{
 					{
-						IAM: &query.IAMMembership{
-							IAMID: "IAM",
-						},
+						MemberType:    domain.MemberTypeIam,
 						UserID:        "user1",
+						AggregateID:   "IAM",
 						ResourceOwner: "org1",
 					},
 					{
-						Org: &query.OrgMembership{
-							OrgID: "org1",
-						},
+						MemberType:    domain.MemberTypeOrganisation,
 						UserID:        "user1",
 						ResourceOwner: "org1",
+						AggregateID:   "org1",
 					},
 					{
-
-						Project: &query.ProjectMembership{
-							ProjectID: "project1",
-						},
+						MemberType:    domain.MemberTypeProject,
 						UserID:        "user1",
 						ResourceOwner: "org1",
+						AggregateID:   "project1",
 					},
 					{
-						ProjectGrant: &query.ProjectGrantMembership{
-							GrantID:   "grant1",
-							ProjectID: "project1",
-						},
+						MemberType:    domain.MemberTypeProjectGrant,
 						UserID:        "user1",
 						ResourceOwner: "org1",
+						AggregateID:   "project1",
+						ObjectID:      "grant1",
 					},
 				},
 			},
