@@ -14,8 +14,6 @@ import (
 type IAMRepository interface {
 	Languages(ctx context.Context) ([]language.Tag, error)
 
-	SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error)
-
 	GetIAMMemberRoles() []string
 
 	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)

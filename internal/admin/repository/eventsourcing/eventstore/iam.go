@@ -14,9 +14,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
 
@@ -58,38 +56,6 @@ func (repo *IAMRepository) Languages(ctx context.Context) ([]language.Tag, error
 		repo.supportedLangs = langs
 	}
 	return repo.supportedLangs, nil
-}
-
-func (repo *IAMRepository) IAMMemberByID(ctx context.Context, iamID, userID string) (*iam_model.IAMMemberView, error) {
-	member, err := repo.View.IAMMemberByIDs(iamID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.IAMMemberToModel(member, repo.PrefixAvatarURL), nil
-}
-
-func (repo *IAMRepository) SearchIAMMembers(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, err := repo.View.GetLatestIAMMemberSequence()
-	logging.Log("EVENT-Slkci").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
-	members, count, err := repo.View.SearchIAMMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &iam_model.IAMMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      iam_es_model.IAMMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if err == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
 }
 
 func (repo *IAMRepository) GetIAMMemberRoles() []string {
@@ -175,29 +141,6 @@ func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_mod
 	return iam_es_model.MailTemplateViewToModel(template), err
 }
 
-func (repo *IAMRepository) SearchIAMMembersx(ctx context.Context, request *iam_model.IAMMemberSearchRequest) (*iam_model.IAMMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, err := repo.View.GetLatestIAMMemberSequence()
-	logging.Log("EVENT-Slkci").OnError(err).Warn("could not read latest iam sequence")
-	members, count, err := repo.View.SearchIAMMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &iam_model.IAMMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      iam_es_model.IAMMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if err == nil {
-		result.Sequence = sequence.CurrentSequence
-	}
-	return result, nil
-}
-
 func (repo *IAMRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
 	repo.mutex.Lock()
 	defer repo.mutex.Unlock()
@@ -258,14 +201,6 @@ func (repo *IAMRepository) GetCustomLoginTexts(ctx context.Context, lang string)
 		return nil, err
 	}
 	return iam_es_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
-}
-
-func (repo *IAMRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
-	if err != nil {
-		return nil, err
-	}
-	return repo.Eventstore.FilterEvents(ctx, query)
 }
 
 func (repo *IAMRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
