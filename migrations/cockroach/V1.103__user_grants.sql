@@ -7,6 +7,7 @@ CREATE TABLE zitadel.projections.user_grants (
     , project_id STRING NOT NULL
     , grant_id STRING NOT NULL
     , roles STRING[]
+    , state INT2 NOT NULL
 
     , PRIMARY KEY (id)
     , INDEX idx_user (user_id)
