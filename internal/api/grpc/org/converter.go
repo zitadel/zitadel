@@ -62,9 +62,10 @@ func OrgViewsToPb(orgs []*query.Org) []*org_pb.Org {
 
 func OrgViewToPb(org *query.Org) *org_pb.Org {
 	return &org_pb.Org{
-		Id:    org.ID,
-		State: OrgStateToPb(org.State),
-		Name:  org.Name,
+		Id:            org.ID,
+		State:         OrgStateToPb(org.State),
+		Name:          org.Name,
+		PrimaryDomain: org.Domain,
 		Details: object.ToViewDetailsPb(
 			org.Sequence,
 			org.CreationDate,
