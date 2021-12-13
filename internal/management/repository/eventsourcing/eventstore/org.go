@@ -30,7 +30,6 @@ import (
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -88,40 +87,8 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	return changes, nil
 }
 
-func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (*org_model.OrgMemberView, error) {
-	member, err := repo.View.OrgMemberByIDs(orgID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.OrgMemberToModel(member, repo.PrefixAvatarURL), nil
-}
-
-func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.Queries = append(request.Queries, &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
-	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
-	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
-	members, count, err := repo.View.SearchOrgMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &org_model.OrgMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.OrgMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
 func (repo *OrgRepository) GetOrgMemberRoles() []string {
+	//TOOD: global org check?
 	roles := make([]string, 0)
 	for _, roleMap := range repo.Roles {
 		if strings.HasPrefix(roleMap, "ORG") {
