@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -54,6 +55,14 @@ func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 					Event:  usergrant.UserGrantCascadeRemovedType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  usergrant.UserGrantDeactivatedType,
+					Reduce: p.reduceDeactivated,
+				},
+				{
+					Event:  usergrant.UserGrantReactivatedType,
+					Reduce: p.reduceReactivated,
+				},
 			},
 		},
 	}
@@ -66,10 +75,12 @@ const (
 	UserGrantResourceOwner = "resource_owner"
 	UserGrantCreationDate  = "creation_date"
 	UserGrantChangeDate    = "change_date"
+	UserGrantSequence      = "sequence"
 	UserGrantUserID        = "user_id"
 	UserGrantProjectID     = "project_id"
 	UserGrantGrantID       = "grant_id"
 	UserGrantRoles         = "roles"
+	UserGrantState         = "state"
 )
 
 func (p *UserGrantProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -85,10 +96,12 @@ func (p *UserGrantProjection) reduceAdded(event eventstore.EventReader) (*handle
 			handler.NewCol(UserGrantResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(UserGrantCreationDate, e.CreationDate()),
 			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
+			handler.NewCol(UserGrantSequence, e.Sequence()),
 			handler.NewCol(UserGrantUserID, e.UserID),
 			handler.NewCol(UserGrantProjectID, e.ProjectID),
 			handler.NewCol(UserGrantGrantID, e.ProjectGrantID),
 			handler.NewCol(UserGrantRoles, pq.StringArray(e.RoleKeys)),
+			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
 		},
 	), nil
 }
@@ -111,6 +124,7 @@ func (p *UserGrantProjection) reduceChanged(event eventstore.EventReader) (*hand
 		[]handler.Column{
 			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
 			handler.NewCol(UserGrantRoles, roles),
+			handler.NewCol(UserGrantSequence, event.Sequence()),
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
@@ -129,6 +143,44 @@ func (p *UserGrantProjection) reduceRemoved(event eventstore.EventReader) (*hand
 
 	return crdb.NewDeleteStatement(
 		event,
+		[]handler.Condition{
+			handler.NewCond(UserGrantID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
+		logging.LogWithFields("PROJE-V3txf", "seq", event.Sequence(), "expectedType", usergrant.UserGrantDeactivatedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-oP7Gm", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
+			handler.NewCol(UserGrantState, domain.UserGrantStateInactive),
+			handler.NewCol(UserGrantSequence, event.Sequence()),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserGrantID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
+		logging.LogWithFields("PROJE-ly6oe", "seq", event.Sequence(), "expectedType", usergrant.UserGrantReactivatedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-DGsKh", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			handler.NewCol(UserGrantChangeDate, event.CreationDate()),
+			handler.NewCol(UserGrantState, domain.UserGrantStateActive),
+			handler.NewCol(UserGrantSequence, event.Sequence()),
+		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
 		},
