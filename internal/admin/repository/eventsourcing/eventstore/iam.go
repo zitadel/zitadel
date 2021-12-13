@@ -10,8 +10,8 @@ import (
 	"sync"
 
 	"github.com/caos/logging"
-	"github.com/ghodss/yaml"
 	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
 
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"

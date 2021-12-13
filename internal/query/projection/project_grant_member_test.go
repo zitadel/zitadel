@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/lib/pq"
 )
 
 func TestProjectGrantMemberProjection_reduces(t *testing.T) {
@@ -45,7 +46,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 							expectedStmt: "INSERT INTO zitadel.projections.project_grant_members (user_id, roles, creation_date, change_date, sequence, resource_owner, project_id, grant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
-								[]string{"role"},
+								pq.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -82,7 +83,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPDATE zitadel.projections.project_grant_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5) AND (grant_id = $6)",
 							expectedArgs: []interface{}{
-								[]string{"role", "changed"},
+								pq.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"user-id",

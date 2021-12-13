@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"

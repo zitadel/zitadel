@@ -224,7 +224,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
@@ -283,7 +283,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}

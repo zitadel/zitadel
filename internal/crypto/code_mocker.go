@@ -1,9 +1,11 @@
 package crypto
 
 import (
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/golang/mock/gomock"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+
+	"github.com/caos/zitadel/internal/errors"
 )
 
 func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
@@ -22,6 +24,14 @@ func CreateMockEncryptionAlg(ctrl *gomock.Controller) EncryptionAlgorithm {
 				return "", errors.ThrowInternal(nil, "id", "invalid key id")
 			}
 			return string(code), nil
+		},
+	)
+	mCrypto.EXPECT().Decrypt(gomock.Any(), gomock.Any()).AnyTimes().DoAndReturn(
+		func(code []byte, keyID string) ([]byte, error) {
+			if keyID != "id" {
+				return nil, errors.ThrowInternal(nil, "id", "invalid key id")
+			}
+			return code, nil
 		},
 	)
 	return mCrypto

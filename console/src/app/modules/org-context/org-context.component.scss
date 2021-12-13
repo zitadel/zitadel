@@ -1,0 +1,43 @@
+.card {
+  border-radius: 0.5rem;
+  z-index: 200;
+  border: 1px solid #ffffff30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  min-width: 220px;
+  padding-bottom: 0.5rem;
+  position: relative;
+
+  .filter-wrapper {
+    padding: 0.5rem;
+  }
+
+  .spinner-w {
+    top: 1rem;
+    left: 0;
+    right: 0;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .show-all {
+    width: 100%;
+  }
+
+  .org-wrapper {
+    max-height: 350px;
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    overflow-y: auto;
+    width: 100%;
+
+    button {
+      text-align: start;
+    }
+  }
+}
