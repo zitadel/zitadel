@@ -12,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
@@ -31,11 +30,18 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	if err != nil {
 		return nil, err
 	}
-	membersShips, err := s.repo.SearchMyUserMemberships(ctx, &user_model.UserMembershipSearchRequest{Queries: []*user_model.UserMembershipSearchQuery{}})
+
+	userQuery, err := query.NewMembershipUserIDQuery(authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, UserMembershipViewsToDomain(membersShips.Result), userGrantsToIDs(grants.Result)...)
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery},
+	})
+	// if err != nil {
+	// 	return nil, err
+	// }
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, membershipToDomain(memberships.Memberships), userGrantsToIDs(grants.Result)...)
 	if err != nil {
 		return nil, err
 	}
@@ -231,39 +237,39 @@ func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*qu
 	}, nil
 }
 
-func UserMembershipViewsToDomain(memberships []*user_model.UserMembershipView) []*domain.UserMembership {
+func membershipToDomain(memberships []*query.Membership) []*domain.UserMembership {
 	result := make([]*domain.UserMembership, len(memberships))
 	for i, membership := range memberships {
+		typ, aggID, objID := MemberTypeToDomain(membership)
 		result[i] = &domain.UserMembership{
-			UserID:            membership.UserID,
-			MemberType:        MemberTypeToDomain(membership.MemberType),
-			AggregateID:       membership.AggregateID,
-			ObjectID:          membership.ObjectID,
-			Roles:             membership.Roles,
-			DisplayName:       membership.DisplayName,
-			CreationDate:      membership.CreationDate,
-			ChangeDate:        membership.ChangeDate,
-			ResourceOwner:     membership.ResourceOwner,
-			ResourceOwnerName: membership.ResourceOwnerName,
-			Sequence:          membership.Sequence,
+			UserID:        membership.UserID,
+			MemberType:    typ,
+			AggregateID:   aggID,
+			ObjectID:      objID,
+			Roles:         membership.Roles,
+			DisplayName:   membership.DisplayName,
+			CreationDate:  membership.CreationDate,
+			ChangeDate:    membership.ChangeDate,
+			ResourceOwner: membership.ResourceOwner,
+			//TODO: implement
+			// ResourceOwnerName: membership.ResourceOwnerName,
+			Sequence: membership.Sequence,
 		}
 	}
 	return result
 }
 
-func MemberTypeToDomain(mType user_model.MemberType) domain.MemberType {
-	switch mType {
-	case user_model.MemberTypeIam:
-		return domain.MemberTypeIam
-	case user_model.MemberTypeOrganisation:
-		return domain.MemberTypeOrganisation
-	case user_model.MemberTypeProject:
-		return domain.MemberTypeProject
-	case user_model.MemberTypeProjectGrant:
-		return domain.MemberTypeProjectGrant
-	default:
-		return domain.MemberTypeUnspecified
+func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, aggID, objID string) {
+	if m.Org != nil {
+		return domain.MemberTypeOrganisation, m.Org.OrgID, ""
+	} else if m.IAM != nil {
+		return domain.MemberTypeIam, m.IAM.IAMID, ""
+	} else if m.Project != nil {
+		return domain.MemberTypeProject, m.Project.ProjectID, ""
+	} else if m.ProjectGrant != nil {
+		return domain.MemberTypeProjectGrant, m.ProjectGrant.ProjectID, m.ProjectGrant.GrantID
 	}
+	return domain.MemberTypeUnspecified, "", ""
 }
 
 func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
