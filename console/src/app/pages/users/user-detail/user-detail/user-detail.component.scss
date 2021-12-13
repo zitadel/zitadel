@@ -56,7 +56,7 @@
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 0 2rem 1rem 2rem;
-    background-color: if($is-dark-theme, #00000020, #ffffff80);
+    background-color: if($is-dark-theme, #00000020, #605f5f0f);
 
     .header-row {
       display: flex;

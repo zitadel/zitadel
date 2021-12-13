@@ -134,12 +134,13 @@
           transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
       }
+    }
 
-      .sp-wrapper {
-        padding: 0.5rem;
-        display: flex;
-        justify-content: center;
-      }
+    .ch-sp-wrapper {
+      padding: 0.5rem;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
     }
 
     .load-more-button {

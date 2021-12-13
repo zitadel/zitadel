@@ -1,6 +1,6 @@
 <div class="avatar-circle dontcloseonclick" matRipple [matRippleColor]="'#ffffff20'" [matRippleUnbounded]="false"
-  [ngStyle]="{'height': size+'px', 'width': size+'px', 'fontSize': (fontSize-1)+'px', 'background': color}"
+  [ngStyle]="{'height': size+'px', 'width': size+'px', 'fontSize': (fontSize-1)+'px','fontWeight': fontWeight, 'background': color}"
   [ngClass]="{'active': active}">
   <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl" />
-  <ng-template #creds>{{credentials}}</ng-template>
+  <ng-template #creds><span>{{credentials}}</span></ng-template>
 </div>

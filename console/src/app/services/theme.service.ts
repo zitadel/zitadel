@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 declare const tinycolor: any;
 
@@ -11,23 +11,31 @@ export interface Color {
 
 @Injectable()
 export class ThemeService {
-  private _darkTheme: Subject<boolean> = new Subject<boolean>();
+  private _darkTheme: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   public isDarkTheme: Observable<boolean> = this._darkTheme.asObservable();
 
   private primaryColorPalette: Color[] = [];
   private warnColorPalette: Color[] = [];
   private backgroundColorPalette: Color[] = [];
 
+  constructor() {
+    const theme = localStorage.getItem('theme');
+    if (theme) {
+      if (theme === 'light-theme') {
+        this.setDarkTheme(false);
+      } else {
+        this.setDarkTheme(true);
+      }
+    }
+  }
+
   setDarkTheme(isDarkTheme: boolean): void {
     this._darkTheme.next(isDarkTheme);
   }
 
   public updateTheme(colors: Color[], type: string, theme: string): void {
-    colors.forEach(color => {
-      document.documentElement.style.setProperty(
-        `--theme-${theme}-${type}-${color.name}`,
-        color.hex,
-      );
+    colors.forEach((color) => {
+      document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
       document.documentElement.style.setProperty(
         `--theme-${theme}-${type}-contrast-${color.name}`,
         color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff',

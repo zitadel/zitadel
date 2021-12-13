@@ -22,11 +22,11 @@
         <div class="theme-changer">
           <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}"
             class="light" [ngClass]="{'active': theme === Theme.LIGHT}">
-            <i class="icon las la-edit"></i>
+            <i class="icon las la-sun"></i>
           </button>
           <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark"
             [ngClass]="{'active': theme === Theme.DARK}">
-            <i class="icon las la-edit"></i>
+            <i class="icon las la-moon"></i>
           </button>
         </div>
       </div>
@@ -76,7 +76,7 @@
               <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <div class="img-wrapper mat-elevation-z3" *ngIf="images['previewDarkLogo']">
+                  <div class="img-wrapper mat-elevation-z2" *ngIf="images['previewDarkLogo']">
                     <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
                       (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
                     <img matTooltip="Preview" class="prev" [src]="images['previewDarkLogo']" alt="dark logo preview" />
@@ -244,7 +244,7 @@
           <div class="fonts">
             <cnsl-info-section class="info-section">{{'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate}}
             </cnsl-info-section>
-            <div class="font-preview mat-elevation-z3"
+            <div class="font-preview mat-elevation-z2"
               *ngIf="preview === Preview.PREVIEW && previewData.fontUrl || preview === Preview.CURRENT && data.fontUrl">
               <mat-icon class="icon">text_fields</mat-icon>
               <span>ABC • abc • 123</span>

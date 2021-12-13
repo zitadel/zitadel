@@ -1,65 +1,67 @@
-<div class="enlarged-container">
+<div class="max-width-container">
+  <div class="enlarged-container">
     <h1>{{ 'ORG.PAGES.LIST' | translate }}</h1>
     <p class="top-desc">{{'ORG.PAGES.LISTDESCRIPTION' | translate}}</p>
 
     <cnsl-refresh-table *ngIf="dataSource" (refreshed)="refresh()" [dataSize]="dataSource.data.length"
-        [loading]="loading$ | async">
+      [loading]="loading$ | async">
 
-        <cnsl-form-field @appearfade *ngIf="orgSearchKey !== undefined" actions class="filter">
-            <cnsl-label>{{'ORG.PAGES.FILTER' | translate}}</cnsl-label>
-            <input cnslInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
-                #input>
-        </cnsl-form-field>
+      <cnsl-form-field @appearfade *ngIf="orgSearchKey !== undefined" actions class="filter">
+        <cnsl-label>{{'ORG.PAGES.FILTER' | translate}}</cnsl-label>
+        <input cnslInput (keyup)="applyFilter($event)" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}"
+          #input>
+      </cnsl-form-field>
 
-        <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
+      <table [dataSource]="dataSource" mat-table class="table" matSort aria-label="Elements">
 
-            <ng-container matColumnDef="select">
-                <th class="selection" mat-header-cell *matHeaderCellDef>
-                    {{'ORG.PAGES.ACTIVE' | translate}}
-                </th>
-                <td class="selection" mat-cell *matCellDef="let row">
-                    <mat-radio-button (change)="selectOrg(row)" color="primary" (click)="$event.stopPropagation()"
-                        [checked]="row.id === activeOrg.id">
-                    </mat-radio-button>
-                </td>
-            </ng-container>
+        <ng-container matColumnDef="select">
+          <th class="selection" mat-header-cell *matHeaderCellDef>
+            {{'ORG.PAGES.ACTIVE' | translate}}
+          </th>
+          <td class="selection" mat-cell *matCellDef="let row">
+            <mat-radio-button (change)="selectOrg(row)" color="primary" (click)="$event.stopPropagation()"
+              [checked]="row.id === activeOrg.id">
+            </mat-radio-button>
+          </td>
+        </ng-container>
 
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ORG.PAGES.ID' | translate }} </th>
-                <td mat-cell *matCellDef="let org"> {{org.id}} </td>
-            </ng-container>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ORG.PAGES.ID' | translate }} </th>
+          <td mat-cell *matCellDef="let org"> {{org.id}} </td>
+        </ng-container>
 
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
-                    {{ 'ORG.PAGES.NAME' | translate }}
-                    <template [ngTemplateOutlet]="templateRef"
-                        [ngTemplateOutletContext]="{key: OrgListSearchKey.NAME}"></template>
-                </th>
-                <td mat-cell *matCellDef="let org"> {{org.name}} </td>
-            </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header
+            [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
+            {{ 'ORG.PAGES.NAME' | translate }}
+            <template [ngTemplateOutlet]="templateRef"
+              [ngTemplateOutletContext]="{key: OrgListSearchKey.NAME}"></template>
+          </th>
+          <td mat-cell *matCellDef="let org"> {{org.name}} </td>
+        </ng-container>
 
-            <ng-container matColumnDef="creationDate">
-              <th mat-header-cell *matHeaderCellDef mat-sort-header
-                  [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
-                  {{ 'ORG.PAGES.CREATIONDATE' | translate }}
-              </th>
-              <td mat-cell *matCellDef="let org">
-                {{org.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
-              </td>
-          </ng-container>
+        <ng-container matColumnDef="creationDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header
+            [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
+            {{ 'ORG.PAGES.CREATIONDATE' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let org">
+            {{org.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+          </td>
+        </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-        <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
-        </mat-paginator>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
+      </mat-paginator>
     </cnsl-refresh-table>
+  </div>
 </div>
 
 <ng-template #templateRef let-key="key">
-    <button class="search-button" mat-icon-button (click)="setFilter(key)">
-        <mat-icon *ngIf="this.orgSearchKey !== key">search</mat-icon>
-        <mat-icon *ngIf="this.orgSearchKey === key">search_off</mat-icon>
-    </button>
+  <button class="search-button" mat-icon-button (click)="setFilter(key)">
+    <mat-icon *ngIf="this.orgSearchKey !== key">search</mat-icon>
+    <mat-icon *ngIf="this.orgSearchKey === key">search_off</mat-icon>
+  </button>
 </ng-template>

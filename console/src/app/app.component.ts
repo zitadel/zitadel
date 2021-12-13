@@ -195,11 +195,11 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
 
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      this.overlayContainer.getContainerElement().classList.add(theme);
-      this.componentCssClass = theme;
-    }
+    // const theme = localStorage.getItem('theme');
+    // if (theme) {
+    //   this.overlayContainer.getContainerElement().classList.add(theme);
+    //   this.componentCssClass = theme;
+    // }
 
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));

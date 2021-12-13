@@ -16,7 +16,7 @@
 
     </div>
 
-    <cnsl-card *ngFor="let domain of domains">
+    <cnsl-card *ngFor="let domain of domains" class="domain-card">
       <div class="domain">
         <span *ngIf="(canwrite$ | async) && (['custom_domain'] | hasFeature | async); else noCustom"
           (click)="verifyDomain(domain)" class="title">{{domain.domainName}}</span>

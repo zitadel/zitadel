@@ -4,6 +4,7 @@ import { QuicklinkStrategy } from 'ngx-quicklink';
 
 import { AuthGuard } from './guards/auth.guard';
 import { RoleGuard } from './guards/role.guard';
+import { UserGrantContext } from './modules/user-grants/user-grants-datasource';
 import { OrgCreateComponent } from './pages/org-create/org-create.component';
 
 const routes: Routes = [
@@ -89,6 +90,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/grants/grants.module').then((m) => m.GrantsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
+      context: UserGrantContext.NONE,
       roles: ['user.grant.read'],
     },
   },

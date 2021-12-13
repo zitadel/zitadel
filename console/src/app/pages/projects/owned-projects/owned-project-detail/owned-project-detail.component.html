@@ -110,17 +110,6 @@
             <div class="divider"></div>
           </cnsl-card>
         </ng-template>
-
-        <!-- <ng-template cnslHasRole [hasRole]="['user.grant.read']">
-          <cnsl-card *ngIf="project?.id" title="{{ 'GRANTS.PROJECT.TITLE' | translate }}"
-            description="{{'GRANTS.PROJECT.DESCRIPTION' | translate }}">
-            <cnsl-user-grants [context]="UserGrantContext.OWNED_PROJECT" [projectId]="projectId"
-              [refreshOnPreviousRoutes]="['/grant-create/project/'+projectId]"
-              [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) === false"
-              [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) === false">
-            </cnsl-user-grants>
-          </cnsl-card>
-        </ng-template> -->
       </ng-container>
     </ng-container>
 

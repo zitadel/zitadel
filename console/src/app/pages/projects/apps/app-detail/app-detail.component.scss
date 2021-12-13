@@ -10,7 +10,7 @@
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 2rem 2rem 2rem 2rem;
-    background: if($is-dark-theme, #00000020, #ffffff80);
+    background: if($is-dark-theme, #00000020, #605f5f0f);
 
     .app-top-row {
       display: flex;
@@ -262,7 +262,7 @@
   }
 }
 
-.formfield {
+.app-formfield {
   flex: 1 1 30%;
   margin: 0 0.5rem;
 

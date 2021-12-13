@@ -24,8 +24,8 @@
           border: none;
           background: none;
           text-align: left;
-          padding: .75rem 0;
-          opacity: .6;
+          padding: 0.75rem 0;
+          opacity: 0.6;
           font-size: 15px;
           cursor: pointer;
           color: map-get($foreground, base);
@@ -56,7 +56,7 @@
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 0 2rem 1rem 2rem;
-    background-color: if($is-dark-theme, #00000020, #ffffff80);
+    background-color: if($is-dark-theme, #00000020, #605f5f0f);
 
     .header-row {
       display: flex;

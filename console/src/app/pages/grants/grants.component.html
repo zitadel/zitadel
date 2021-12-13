@@ -2,11 +2,17 @@
   <div class="enlarged-container">
     <h1>{{ 'GRANTS.TITLE' | translate }}</h1>
     <p class="desc">{{'GRANTS.DESC' | translate }}</p>
-    <cnsl-user-grants
+    <cnsl-user-grants *ngIf="grantContext === UserGrantContext.NONE"
       [displayedColumns]="['select', 'user', 'org', 'projectId', 'creationDate','changeDate', 'roleNamesList']"
       [disableWrite]="((['user.grant.write$'] | hasRole) | async) === false"
       [disableDelete]="((['user.grant.delete$'] | hasRole) | async) === false"
       [refreshOnPreviousRoutes]="['/grant-create']">
+    </cnsl-user-grants>
+
+    <cnsl-user-grants *ngIf="grantContext === UserGrantContext.OWNED_PROJECT" [context]="UserGrantContext.OWNED_PROJECT"
+      [projectId]="projectId" [refreshOnPreviousRoutes]="['/grant-create/project/'+projectId]"
+      [disableWrite]="((['user.grant.write$', 'user.grant.write:'+projectId] | hasRole) | async) === false"
+      [disableDelete]="((['user.grant.delete$','user.grant.delete:'+projectId] | hasRole) | async) === false">
     </cnsl-user-grants>
   </div>
 </div>

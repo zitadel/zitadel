@@ -12,11 +12,12 @@
     text-transform: uppercase;
     background-color: $primary-color;
     box-sizing: border-box;
-    letter-spacing: .05em;
+    letter-spacing: 0.05em;
     font-size: 14px;
     outline: none;
     color: white;
     font-weight: bold;
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont;
 
     img {
       width: 100%;

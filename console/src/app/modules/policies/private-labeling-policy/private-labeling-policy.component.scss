@@ -8,6 +8,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
+  $p-border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   .privatelabeling-policy {
     .header {
@@ -41,46 +42,7 @@
     }
 
     .spinner-wr {
-      margin: .5rem 0;
-    }
-
-    .theme-changer {
-      display: flex;
-      margin: 1rem -.5rem;
-
-      button {
-        height: 40px;
-        width: 40px;
-        border-radius: 50%;
-        border: 1px solid #81868a50;
-        margin: 0 .5rem;
-
-        .icon {
-          visibility: hidden;
-        }
-      }
-
-      .dark {
-        background-color: black;
-
-        &.active {
-          .icon {
-            visibility: visible;
-            color: white;
-          }
-        }
-      }
-
-      .light {
-        background-color: white;
-
-        &.active {
-          .icon {
-            visibility: visible;
-            color: black;
-          }
-        }
-      }
+      margin: 0.5rem 0;
     }
 
     .privatelabeling-top-row {
@@ -102,17 +64,17 @@
 
       .theme-changer {
         display: flex;
-        margin: 0 -.25rem;
+        margin: 0 -0.25rem;
 
         button {
           height: 40px;
-          width: 40px;
-          border-radius: 50%;
+          border-radius: 6px;
           border: 1px solid #81868a50;
-          margin: 0 .25rem;
+          margin: 0 0.25rem;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: pointer;
 
           .icon {
             visibility: hidden;
@@ -159,6 +121,9 @@
         margin-bottom: 2rem;
 
         .expansion {
+          box-shadow: none;
+          border: 1px solid $p-border-color;
+
           .header {
             justify-content: flex-start;
           }
@@ -168,7 +133,7 @@
             align-items: center;
 
             .icon {
-              margin-right: .5rem;
+              margin-right: 0.5rem;
             }
           }
         }
@@ -179,7 +144,7 @@
 
         .title {
           margin-top: 2rem;
-          margin-bottom: .5rem;
+          margin-bottom: 0.5rem;
           display: block;
           font-size: 18px;
         }
@@ -188,13 +153,13 @@
           outline: none;
           height: 150px;
           width: 100%;
-          border-radius: .5rem;
+          border-radius: 0.5rem;
           border: 1px solid map-get($foreground, divider);
           display: flex;
           justify-content: center;
           align-items: center;
           flex-direction: column;
-          transition: all .2s ease-in-out;
+          transition: all 0.2s ease-in-out;
 
           .file-label {
             display: flex;
@@ -202,7 +167,7 @@
             align-items: center;
 
             a {
-              margin-bottom: .5rem;
+              margin-bottom: 0.5rem;
               cursor: pointer;
             }
 
@@ -227,12 +192,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+              (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+              (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);
@@ -336,9 +300,9 @@
           .font-preview {
             display: flex;
             align-items: center;
-            padding: .5rem;
+            padding: 0.5rem;
             text-align: center;
-            border-radius: .5rem;
+            border-radius: 0.5rem;
             margin-bottom: 1rem;
 
             .icon {
@@ -354,7 +318,7 @@
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            margin: 0 -.25rem;
+            margin: 0 -0.25rem;
             padding-bottom: 1rem;
 
             .font {
@@ -363,8 +327,8 @@
               display: flex;
               justify-content: center;
               align-items: center;
-              border-radius: .5rem;
-              margin: .25rem;
+              border-radius: 0.5rem;
+              margin: 0.25rem;
               box-sizing: border-box;
               border: 2px solid if($is-dark-theme, #ffffff30, #00000030);
               font-size: 1.5rem;
@@ -385,7 +349,7 @@
           padding-bottom: 50px;
 
           .info {
-            margin-bottom: .5rem;
+            margin-bottom: 0.5rem;
           }
 
           .toggle {
@@ -408,8 +372,8 @@
 
           .preview-changer {
             position: absolute;
-            top: .5rem;
-            left: .5rem;
+            top: 0.5rem;
+            left: 0.5rem;
             border-radius: 8px !important;
             z-index: 1;
 
