@@ -3,11 +3,12 @@ package user
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func UserGrantsToPb(grants []*usr_grant_model.UserGrantView) []*user_pb.UserGrant {
+func UserGrantsToPb(grants []*query.UserGrant) []*user_pb.UserGrant {
 	u := make([]*user_pb.UserGrant, len(grants))
 	for i, grant := range grants {
 		u[i] = UserGrantToPb(grant)
@@ -15,23 +16,23 @@ func UserGrantsToPb(grants []*usr_grant_model.UserGrantView) []*user_pb.UserGran
 	return u
 }
 
-func UserGrantToPb(grant *usr_grant_model.UserGrantView) *user_pb.UserGrant {
+func UserGrantToPb(grant *query.UserGrant) *user_pb.UserGrant {
 	return &user_pb.UserGrant{
 		Id:             grant.ID,
 		UserId:         grant.UserID,
-		State:          ModelUserGrantStateToPb(grant.State),
-		RoleKeys:       grant.RoleKeys,
-		UserName:       grant.UserName,
+		State:          user_pb.UserGrantState_USER_GRANT_STATE_ACTIVE,
+		RoleKeys:       grant.Roles,
+		ProjectId:      grant.ProjectID,
+		OrgId:          grant.ResourceOwner,
+		ProjectGrantId: grant.GrantID,
+		UserName:       grant.Username,
 		FirstName:      grant.FirstName,
 		LastName:       grant.LastName,
 		Email:          grant.Email,
 		DisplayName:    grant.DisplayName,
-		OrgId:          grant.ResourceOwner,
 		OrgDomain:      grant.OrgPrimaryDomain,
 		OrgName:        grant.OrgName,
-		ProjectId:      grant.ProjectID,
 		ProjectName:    grant.ProjectName,
-		ProjectGrantId: grant.GrantID,
 		AvatarUrl:      grant.AvatarURL,
 		Details: object.ToViewDetailsPb(
 			grant.Sequence,

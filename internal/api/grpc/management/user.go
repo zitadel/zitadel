@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -256,7 +256,13 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	grants, err := s.usergrant.UserGrantsByUserID(ctx, req.Id)
+	userQuery, err := query.NewUserGrantUserIDSearchQuery(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +270,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants)...)
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +279,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	}, nil
 }
 
-func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	converted := make([]string, len(userGrants))
 	for i, grant := range userGrants {
 		converted[i] = grant.ID

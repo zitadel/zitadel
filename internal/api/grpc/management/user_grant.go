@@ -6,12 +6,14 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/query"
 
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrantByIDRequest) (*mgmt_pb.GetUserGrantByIDResponse, error) {
-	grant, err := s.usergrant.UserGrantByID(ctx, req.GrantId)
+	//TODO: resource owner
+	grant, err := s.query.UserGrantByID(ctx, req.GrantId)
 	if err != nil {
 		return nil, err
 	}
@@ -23,14 +25,17 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*mgmt_pb.ListUserGrantResponse, error) {
 	r := ListUserGrantsRequestToModel(ctx, req)
 	r.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
-	res, err := s.usergrant.SearchUserGrants(ctx, r)
+
+	//TODO: implement mapper
+	var queries *query.UserGrantsQueries
+	res, err := s.query.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserGrantResponse{
-		Result: user.UserGrantsToPb(res.Result),
+		Result: user.UserGrantsToPb(res.UserGrants),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),

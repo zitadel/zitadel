@@ -2,13 +2,12 @@ package eventstore
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
-	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
 )
 
@@ -18,73 +17,37 @@ type UserGrantRepo struct {
 	PrefixAvatarURL string
 }
 
-func (repo *UserGrantRepo) UserGrantByID(ctx context.Context, grantID string) (*grant_model.UserGrantView, error) {
-	grant, err := repo.View.UserGrantByID(grantID)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserGrantToModel(grant, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserGrantRepo) UserGrantsByProjectID(ctx context.Context, projectID string) ([]*grant_model.UserGrantView, error) {
-	grants, err := repo.View.UserGrantsByProjectID(projectID)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserGrantRepo) UserGrantsByProjectIDAndRoleKey(ctx context.Context, projectID, roleKey string) ([]*grant_model.UserGrantView, error) {
-	grants, err := repo.View.UserGrantsByProjectIDAndRoleKey(projectID, roleKey)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserGrantRepo) UserGrantsByProjectAndGrantID(ctx context.Context, projectID, grantID string) ([]*grant_model.UserGrantView, error) {
-	grants, err := repo.View.UserGrantsByProjectAndGrantID(projectID, grantID)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserGrantRepo) UserGrantsByUserID(ctx context.Context, userID string) ([]*grant_model.UserGrantView, error) {
-	grants, err := repo.View.UserGrantsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserGrantsToModel(grants, repo.PrefixAvatarURL), nil
-}
-
 func (repo *UserGrantRepo) SearchUserGrants(ctx context.Context, request *grant_model.UserGrantSearchRequest) (*grant_model.UserGrantSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestUserGrantSequence()
-	logging.Log("EVENT-5Viwf").OnError(sequenceErr).Warn("could not read latest user grant sequence")
+	// err := request.EnsureLimit(repo.SearchLimit)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// result := handleSearchUserGrantPermissions(ctx, request, sequence)
+	// if result != nil {
+	// 	return result, nil
+	// }
 
-	result := handleSearchUserGrantPermissions(ctx, request, sequence)
-	if result != nil {
-		return result, nil
-	}
+	// grants, count, err := repo.View.SearchUserGrants(request)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	grants, count, err := repo.View.SearchUserGrants(request)
-	if err != nil {
-		return nil, err
-	}
+	// result = &grant_model.UserGrantSearchResponse{
+	// 	Offset:      request.Offset,
+	// 	Limit:       request.Limit,
+	// 	TotalResult: count,
+	// 	Result:      model.UserGrantsToModel(grants, repo.PrefixAvatarURL),
+	// }
+	// if sequenceErr == nil {
+	// 	result.Sequence = sequence.CurrentSequence
+	// 	result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	// }
 
-	result = &grant_model.UserGrantSearchResponse{
+	result := &grant_model.UserGrantSearchResponse{
 		Offset:      request.Offset,
 		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.UserGrantsToModel(grants, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+		TotalResult: 0,
+		Result:      nil,
 	}
 	return result, nil
 }
@@ -121,18 +84,18 @@ func checkContainsPermID(ids []string, query *grant_model.UserGrantSearchQuery, 
 			break
 		}
 	}
-	if !containsID {
-		result := &grant_model.UserGrantSearchResponse{
-			Offset:      request.Offset,
-			Limit:       request.Limit,
-			TotalResult: uint64(0),
-			Result:      []*grant_model.UserGrantView{},
-		}
-		if sequence != nil {
-			result.Sequence = sequence.CurrentSequence
-			result.Timestamp = sequence.LastSuccessfulSpoolerRun
-		}
-		return result
+	if containsID {
+		return nil
 	}
-	return nil
+	result := &grant_model.UserGrantSearchResponse{
+		Offset:      request.Offset,
+		Limit:       request.Limit,
+		TotalResult: uint64(0),
+		Result:      []*grant_model.UserGrantView{},
+	}
+	if sequence != nil {
+		result.Sequence = sequence.CurrentSequence
+		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+	}
+	return result
 }
