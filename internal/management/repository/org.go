@@ -17,12 +17,6 @@ type OrgRepository interface {
 
 	GetOrgMemberRoles() []string
 
-	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
-	IDPConfigByID(ctx context.Context, id string) (*iam_model.IDPConfigView, error)
-
-	SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
-	GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error)
-
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 	GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 

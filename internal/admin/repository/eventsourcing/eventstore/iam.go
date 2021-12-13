@@ -9,25 +9,19 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/caos/logging"
 	"github.com/ghodss/yaml"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/i18n"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-
-	caos_errs "github.com/caos/zitadel/internal/errors"
-
-	"github.com/caos/logging"
-
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/i18n"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type IAMRepository struct {
@@ -66,71 +60,6 @@ func (repo *IAMRepository) GetIAMMemberRoles() []string {
 		}
 	}
 	return roles
-}
-
-func (repo *IAMRepository) IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
-	providers, err := repo.View.IDPProvidersByIdpConfigID(idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.IDPProviderViewsToModel(providers), nil
-}
-
-func (repo *IAMRepository) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
-func (repo *IAMRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, err := repo.View.GetLatestIDPConfigSequence()
-	logging.Log("EVENT-Dk8si").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest idp config sequence")
-	idps, count, err := repo.View.SearchIDPConfigs(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &iam_model.IDPConfigSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      iam_es_model.IdpConfigViewsToModel(idps),
-	}
-	if err == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *IAMRepository) SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.AppendAggregateIDQuery(repo.SystemDefaults.IamID)
-	sequence, err := repo.View.GetLatestIDPProviderSequence()
-	logging.Log("EVENT-Tuiks").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest iam sequence")
-	providers, count, err := repo.View.SearchIDPProviders(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &iam_model.IDPProviderSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      iam_es_model.IDPProviderViewsToModel(providers),
-	}
-	if err == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
 }
 
 func (repo *IAMRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {

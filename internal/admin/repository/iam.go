@@ -6,7 +6,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 )
@@ -15,13 +14,6 @@ type IAMRepository interface {
 	Languages(ctx context.Context) ([]language.Tag, error)
 
 	GetIAMMemberRoles() []string
-
-	SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error)
-
-	SearchDefaultIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error)
-
-	IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error)
-	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
 
 	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
 
