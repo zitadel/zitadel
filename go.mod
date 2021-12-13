@@ -15,6 +15,7 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.8.0
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
+	github.com/amdonov/xmlsig v0.1.0 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.11.2
 	github.com/aws/aws-sdk-go-v2/config v1.11.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.4
@@ -39,6 +40,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
+	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/go-types v0.0.0-20210723172823-2deba1f80ba7 // indirect

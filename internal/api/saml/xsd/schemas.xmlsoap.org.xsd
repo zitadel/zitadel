@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<!-- Schema for the SOAP/1.1 envelope
+
+Portions © 2001 DevelopMentor. 
+© 2001 W3C (Massachusetts Institute of Technology, Institut National de Recherche en Informatique et en Automatique, Keio University). All Rights Reserved.  
+ 
+This document is governed by the W3C Software License [1] as described in the FAQ [2].
+[1] http://www.w3.org/Consortium/Legal/copyright-software-19980720
+[2] http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620.html#DTD 
+By obtaining, using and/or copying this work, you (the licensee) agree that you have read, understood, and will comply with the following terms and conditions:
+
+Permission to use, copy, modify, and distribute this software and its documentation, with or without modification,  for any purpose and without fee or royalty is hereby granted, provided that you include the following on ALL copies of the software and documentation or portions thereof, including modifications, that you make:
+
+1.  The full text of this NOTICE in a location viewable to users of the redistributed or derivative work. 
+
+2.  Any pre-existing intellectual property disclaimers, notices, or terms and conditions. If none exist, a short notice of the following form (hypertext is preferred, text is permitted) should be used within the body of any redistributed or derivative code: "Copyright © 2001 World Wide Web Consortium, (Massachusetts Institute of Technology, Institut National de Recherche en Informatique et en Automatique, Keio University). All Rights Reserved. http://www.w3.org/Consortium/Legal/" 
+
+3.  Notice of any changes or modifications to the W3C files, including the date changes were made. (We recommend you provide URIs to the location from which the code is derived.)   
+
+Original W3C files; http://www.w3.org/2001/06/soap-envelope
+Changes made: 
+     - reverted namespace to http://schemas.xmlsoap.org/soap/envelope/
+     - reverted mustUnderstand to only allow 0 and 1 as lexical values
+	 - made encodingStyle a global attribute 20020825
+	 - removed default value from mustUnderstand attribute declaration
+
+THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR DOCUMENTATION.
+
+The name and trademarks of copyright holders may NOT be used in advertising or publicity pertaining to the software without specific, written prior permission. Title to copyright in this software and any associated documentation will at all times remain with copyright holders.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://schemas.xmlsoap.org/soap/envelope/"
+           targetNamespace="http://schemas.xmlsoap.org/soap/envelope/" >
+
+     
+  <!-- Envelope, header and body -->
+  <xs:element name="Envelope" type="tns:Envelope" />
+  <xs:complexType name="Envelope" >
+    <xs:sequence>
+      <xs:element ref="tns:Header" minOccurs="0" />
+      <xs:element ref="tns:Body" minOccurs="1" />
+      <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax" />
+  </xs:complexType>
+
+  <xs:element name="Header" type="tns:Header" />
+  <xs:complexType name="Header" >
+    <xs:sequence>
+      <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax" />
+  </xs:complexType>
+  
+  <xs:element name="Body" type="tns:Body" />
+  <xs:complexType name="Body" >
+    <xs:sequence>
+      <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##any" processContents="lax" >
+	  <xs:annotation>
+	    <xs:documentation>
+		  Prose in the spec does not specify that attributes are allowed on the Body element
+		</xs:documentation>
+	  </xs:annotation>
+	</xs:anyAttribute>
+  </xs:complexType>
+
+       
+  <!-- Global Attributes.  The following attributes are intended to be usable via qualified attribute names on any complex type referencing them.  -->
+  <xs:attribute name="mustUnderstand" >	
+     <xs:simpleType>
+     <xs:restriction base='xs:boolean'>
+	   <xs:pattern value='0|1' />
+	 </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="actor" type="xs:anyURI" />
+
+  <xs:simpleType name="encodingStyle" >
+    <xs:annotation>
+	  <xs:documentation>
+	    'encodingStyle' indicates any canonicalization conventions followed in the contents of the containing element.  For example, the value 'http://schemas.xmlsoap.org/soap/encoding/' indicates the pattern described in SOAP specification
+	  </xs:documentation>
+	</xs:annotation>
+    <xs:list itemType="xs:anyURI" />
+  </xs:simpleType>
+
+  <xs:attribute name="encodingStyle" type="tns:encodingStyle" />
+  <xs:attributeGroup name="encodingStyle" >
+    <xs:attribute ref="tns:encodingStyle" />
+  </xs:attributeGroup>
+
+  <xs:element name="Fault" type="tns:Fault" />
+  <xs:complexType name="Fault" final="extension" >
+    <xs:annotation>
+	  <xs:documentation>
+	    Fault reporting structure
+	  </xs:documentation>
+	</xs:annotation>
+    <xs:sequence>
+      <xs:element name="faultcode" type="xs:QName" />
+      <xs:element name="faultstring" type="xs:string" />
+      <xs:element name="faultactor" type="xs:anyURI" minOccurs="0" />
+      <xs:element name="detail" type="tns:detail" minOccurs="0" />      
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="detail">
+    <xs:sequence>
+      <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##any" processContents="lax" /> 
+  </xs:complexType>
+
+</xs:schema>
+
+
+
+
+
+
