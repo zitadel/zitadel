@@ -95,8 +95,11 @@ func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) 
 	for _, m := range memberships.Memberships {
 		if !containsOrg(orgs, m.ResourceOwner) {
 			org, err := repo.Query.OrgByID(context.TODO(), m.ResourceOwner)
-			//TODO: return error or log?
-			logging.LogWithFields("EVENT-k8Ikl", "owner", m.ResourceOwner).OnError(err).Warn("org not found")
+			if err != nil {
+				logging.LogWithFields("EVENT-k8Ikl", "owner", m.ResourceOwner).WithError(err).Warn("org not found")
+				orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner})
+				continue
+			}
 			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: org.Name})
 		}
 	}
