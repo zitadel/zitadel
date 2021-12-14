@@ -34,6 +34,14 @@ type CurrentSequencesSearchQueries struct {
 	Queries []SearchQuery
 }
 
+func (q *CurrentSequencesSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	query = q.SearchRequest.toQuery(query)
+	for _, q := range q.Queries {
+		query = q.toQuery(query)
+	}
+	return query
+}
+
 func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSequencesSearchQueries) (failedEvents *CurrentSequences, err error) {
 	query, scan := prepareCurrentSequencesQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()
@@ -66,26 +74,41 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
-	row := tx.QueryRow("select type from [show tables from zitadel.projections] where table_name not in ('locks', 'current_sequences', 'failed_events') and concat('zitadel.projections.', table_name) = $1;", projectionName)
-	var tableType string
-	if err := row.Scan(&tableType); err != nil || tableType == "" {
+	projectionQuery, args, err := sq.Select("count(*)").
+		From("[show tables from zitadel.projections]").
+		Where(
+			sq.And{
+				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
+				sq.Eq{"concat('zitadel.projections.', table_name)": projectionName},
+			}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	row := tx.QueryRowContext(ctx, projectionQuery, args...)
+	var count int
+	if err := row.Scan(&count); err != nil || count == 0 {
 		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 	}
+	tablesQuery, args, err := sq.Select("concat('zitadel.projections.', table_name)").
+		From("[show tables from zitadel.projections]").
+		Where(
+			sq.And{
+				sq.Eq{"type": "table"},
+				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
+				sq.Like{"concat('zitadel.projections.', table_name)": projectionName + "%"},
+			}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 	var tables []string
-	if tableType == "table" {
-		tables = append(tables, projectionName)
-	} else if tableType == "view" {
-		rows, err := tx.Query("select concat('zitadel.projections.', table_name) from [show tables from zitadel.projections] where type = 'table' and concat('zitadel.projections.', table_name) like $1;", projectionName+"_%")
-		if err != nil {
-			return errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
+	rows, err := tx.QueryContext(ctx, tablesQuery, args...)
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
+	}
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 		}
-		for rows.Next() {
-			var tableName string
-			if err := rows.Scan(&tableName); err != nil {
-				return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
-			}
-			tables = append(tables, tableName)
-		}
+		tables = append(tables, tableName)
 	}
 	for _, tableName := range tables {
 		_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
@@ -93,7 +116,15 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 			return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 		}
 	}
-	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET %s = 0 WHERE (%s = $1)", currentSequencesTable.identifier(), CurrentSequenceColCurrentSequence.name, CurrentSequenceColProjectionName.name), projectionName)
+	update, args, err := sq.Update(currentSequencesTable.identifier()).
+		Set(CurrentSequenceColCurrentSequence.name, 0).
+		Where(sq.Eq{CurrentSequenceColProjectionName.name: projectionName}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-Ff3tw", "Errors.RemoveFailed")
+	}
+	_, err = tx.Exec(update, args...)
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}

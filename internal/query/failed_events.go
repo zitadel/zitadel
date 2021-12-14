@@ -4,11 +4,18 @@ import (
 	"context"
 	"database/sql"
 	errs "errors"
-	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
+)
+
+const (
+	failedEventsColumnProjectionName = "projection_name"
+	failedEventsColumnFailedSequence = "failed_sequence"
+	failedEventsColumnFailureCount   = "failure_count"
+	failedEventsColumnError          = "error"
 )
 
 var (
@@ -16,19 +23,19 @@ var (
 		name: projection.FailedEventsTable,
 	}
 	FailedEventsColumnProjectionName = Column{
-		name:  projection.FailedEventsColumnProjectionName,
+		name:  failedEventsColumnProjectionName,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnFailedSequence = Column{
-		name:  projection.FailedEventsColumnFailedSequence,
+		name:  failedEventsColumnFailedSequence,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnFailureCount = Column{
-		name:  projection.FailedEventsColumnFailureCount,
+		name:  failedEventsColumnFailureCount,
 		table: failedEventsTable,
 	}
 	FailedEventsColumnError = Column{
-		name:  projection.FailedEventsColumnError,
+		name:  failedEventsColumnError,
 		table: failedEventsTable,
 	}
 )
@@ -65,7 +72,15 @@ func (q *Queries) SearchFailedEvents(ctx context.Context, queries *FailedEventSe
 }
 
 func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, sequence uint64) (err error) {
-	_, err = q.client.Exec(fmt.Sprintf("DELETE FROM %s WHERE %s = $1 and %s = $2", projection.FailedEventsTable, projection.FailedEventsColumnProjectionName, projection.FailedEventsColumnFailedSequence), projectionName, sequence)
+	stmt, args, err := sq.Delete(projection.FailedEventsTable).
+		Where(sq.Eq{
+			failedEventsColumnProjectionName: projectionName,
+			failedEventsColumnFailedSequence: sequence,
+		}).ToSql()
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-DGgh3", "Errors.RemoveFailed")
+	}
+	_, err = q.client.Exec(stmt, args...)
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-0kbFF", "Errors.RemoveFailed")
 	}

@@ -71,7 +71,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					{
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
-						ProjectionName:  "project-name",
+						ProjectionName:  "projection-name",
 					},
 				},
 			},
@@ -97,12 +97,12 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						{
 							uint64(20211108),
 							testNow,
-							"project-name",
+							"projection-name",
 						},
 						{
 							uint64(20211108),
 							testNow,
-							"project-name-2",
+							"projection-name-2",
 						},
 					},
 				),
@@ -115,12 +115,12 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					{
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
-						ProjectionName:  "project-name",
+						ProjectionName:  "projection-name",
 					},
 					{
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
-						ProjectionName:  "project-name-2",
+						ProjectionName:  "projection-name-2",
 					},
 				},
 			},
