@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/user"
 )
 
 type IAMMemberProjection struct {
@@ -51,6 +52,15 @@ func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
 	}
 }
 
@@ -66,7 +76,7 @@ func (p *IAMMemberProjection) reduceAdded(event eventstore.EventReader) (*handle
 		logging.LogWithFields("HANDL-c8SBb", "seq", event.Sequence(), "expectedType", iam.MemberAddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pGNCu", "reduce.wrong.event.type")
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberAdded(e.MemberAddedEvent)
 }
 
 func (p *IAMMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
@@ -75,7 +85,7 @@ func (p *IAMMemberProjection) reduceChanged(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-QsjwO", "seq", event.Sequence(), "expected", iam.MemberChangedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-5WQcZ", "reduce.wrong.event.type")
 	}
-	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberChanged(e.MemberChangedEvent)
 }
 
 func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
@@ -84,7 +94,7 @@ func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.EventReader)
 		logging.LogWithFields("HANDL-mOncs", "seq", event.Sequence(), "expected", iam.MemberCascadeRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dmdf2", "reduce.wrong.event.type")
 	}
-	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent)
 }
 
 func (p *IAMMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
@@ -93,5 +103,14 @@ func (p *IAMMemberProjection) reduceRemoved(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-lW1Zv", "seq", event.Sequence(), "expected", iam.MemberRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-exVqy", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(e.MemberRemovedEvent, withMemberCond(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.UserID))
+}
+
+func (p *IAMMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-rBuvT", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-mkDHF", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
