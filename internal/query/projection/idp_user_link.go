@@ -8,6 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
@@ -42,6 +44,37 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
+				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: iam.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  iam.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
 	}
 }
 
@@ -63,6 +96,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-v2qC3", "seq", event.Sequence(), "expectedType", user.UserIDPLinkAddedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DpmXq", "reduce.wrong.event.type")
 	}
+
 	return crdb.NewCreateStatement(e,
 		[]handler.Column{
 			handler.NewCol(IDPUserLinkIDPIDCol, e.IDPConfigID),
@@ -83,6 +117,7 @@ func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.EventReader) (*ha
 		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", user.UserIDPLinkRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
 	}
+
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
@@ -98,11 +133,61 @@ func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.EventReade
 		logging.LogWithFields("HANDL-I0s2H", "seq", event.Sequence(), "expectedType", user.UserIDPLinkCascadeRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jQpv9", "reduce.wrong.event.type")
 	}
+
 	return crdb.NewDeleteStatement(e,
 		[]handler.Condition{
 			handler.NewCond(IDPUserLinkIDPIDCol, e.IDPConfigID),
 			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
 			handler.NewCond(IDPUserLinkExternalUserIDCol, e.ExternalUserID),
+		},
+	), nil
+}
+
+func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(e,
+		[]handler.Condition{
+			handler.NewCond(IDPUserLinkResourceOwnerCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-yM6u6", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uwlWE", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(e,
+		[]handler.Condition{
+			handler.NewCond(IDPUserLinkUserIDCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	var idpID string
+
+	switch e := event.(type) {
+	case *org.IDPConfigRemovedEvent:
+		idpID = e.ConfigID
+	case *iam.IDPConfigRemovedEvent:
+		idpID = e.ConfigID
+	default:
+		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-iCKSj", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(event,
+		[]handler.Condition{
+			handler.NewCond(IDPUserLinkIDPIDCol, idpID),
+			handler.NewCond(IDPUserLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
 		},
 	), nil
 }

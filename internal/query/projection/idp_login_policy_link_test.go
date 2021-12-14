@@ -218,6 +218,93 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduceOrgRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					[]byte(`{}`),
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&IDPLoginPolicyLinkProjection{}).reduceOrgRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPLoginPolicyLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (resource_owner = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.IDPConfigRemovedEvent",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPConfigRemovedEventType),
+					org.AggregateType,
+					[]byte(`{
+						"idpConfigId": "idp-config-id"
+					}`),
+				), org.IDPConfigRemovedEventMapper),
+			},
+			reduce: (&IDPLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPLoginPolicyLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"ro-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "iam.IDPConfigRemovedEvent",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(iam.IDPConfigRemovedEventType),
+					iam.AggregateType,
+					[]byte(`{
+						"idpConfigId": "idp-config-id"
+					}`),
+				), iam.IDPConfigRemovedEventMapper),
+			},
+			reduce: (&IDPLoginPolicyLinkProjection{}).reduceIDPConfigRemoved,
+			want: wantReduce{
+				aggregateType:    iam.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPLoginPolicyLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"ro-id",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
