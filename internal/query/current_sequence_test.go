@@ -25,12 +25,12 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.current_sequences.aggregate_type,`+
-						` projections.current_sequences.current_sequence,`+
-						` projections.current_sequences.timestamp,`+
+					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
+						` max(projections.current_sequences.timestamp) as timestamp,`+
 						` projections.current_sequences.projection_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`),
+						` FROM projections.current_sequences`+
+						` GROUP BY projections.current_sequences.projection_name`),
 					nil,
 					nil,
 				),
@@ -42,14 +42,13 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.current_sequences.aggregate_type,`+
-						` projections.current_sequences.current_sequence,`+
-						` projections.current_sequences.timestamp,`+
+					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
+						` max(projections.current_sequences.timestamp) as timestamp,`+
 						` projections.current_sequences.projection_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`),
+						` FROM projections.current_sequences`+
+						` GROUP BY projections.current_sequences.projection_name`),
 					[]string{
-						"aggregate_type",
 						"current_sequence",
 						"timestamp",
 						"projection_name",
@@ -57,7 +56,6 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					},
 					[][]driver.Value{
 						{
-							"type",
 							uint64(20211108),
 							testNow,
 							"project-name",
@@ -71,7 +69,6 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				},
 				CurrentSequences: []*CurrentSequence{
 					{
-						AggregateType:   "type",
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
 						ProjectionName:  "project-name",
@@ -84,14 +81,13 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.current_sequences.aggregate_type,`+
-						` projections.current_sequences.current_sequence,`+
-						` projections.current_sequences.timestamp,`+
+					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
+						` max(projections.current_sequences.timestamp) as timestamp,`+
 						` projections.current_sequences.projection_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`),
+						` FROM projections.current_sequences`+
+						` GROUP BY projections.current_sequences.projection_name`),
 					[]string{
-						"aggregate_type",
 						"current_sequence",
 						"timestamp",
 						"projection_name",
@@ -99,13 +95,11 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 					},
 					[][]driver.Value{
 						{
-							"type",
 							uint64(20211108),
 							testNow,
 							"project-name",
 						},
 						{
-							"type",
 							uint64(20211108),
 							testNow,
 							"project-name-2",
@@ -119,13 +113,11 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 				},
 				CurrentSequences: []*CurrentSequence{
 					{
-						AggregateType:   "type",
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
 						ProjectionName:  "project-name",
 					},
 					{
-						AggregateType:   "type",
 						Timestamp:       testNow,
 						CurrentSequence: 20211108,
 						ProjectionName:  "project-name-2",
@@ -138,12 +130,12 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 			prepare: prepareCurrentSequencesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.current_sequences.aggregate_type,`+
-						` projections.current_sequences.current_sequence,`+
-						` projections.current_sequences.timestamp,`+
+					regexp.QuoteMeta(`SELECT max(projections.current_sequences.current_sequence) as current_sequence,`+
+						` max(projections.current_sequences.timestamp) as timestamp,`+
 						` projections.current_sequences.projection_name,`+
 						` COUNT(*) OVER ()`+
-						` FROM projections.current_sequences`),
+						` FROM projections.current_sequences`+
+						` GROUP BY projections.current_sequences.projection_name`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

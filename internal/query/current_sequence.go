@@ -25,7 +25,6 @@ type CurrentSequences struct {
 
 type CurrentSequence struct {
 	ProjectionName  string
-	AggregateType   string
 	CurrentSequence uint64
 	Timestamp       time.Time
 }
@@ -67,14 +66,32 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
-	row := tx.QueryRow("select count(*) from [show tables from zitadel.projections] where concat('zitadel.projections.', table_name) = $1;", projectionName)
-	var count int
-	if err := row.Scan(&count); err != nil || count == 0 {
+	row := tx.QueryRow("select type from [show tables from zitadel.projections] where table_name not in ('locks', 'current_sequences', 'failed_events') and concat('zitadel.projections.', table_name) = $1;", projectionName)
+	var tableType string
+	if err := row.Scan(&tableType); err != nil || tableType == "" {
 		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 	}
-	_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", projectionName))
-	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
+	var tables []string
+	if tableType == "table" {
+		tables = append(tables, projectionName)
+	} else if tableType == "view" {
+		rows, err := tx.Query("select concat('zitadel.projections.', table_name) from [show tables from zitadel.projections] where concat('zitadel.projections.', table_name) like $1;", projectionName+"_%")
+		if err != nil {
+			return errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
+		}
+		for rows.Next() {
+			var tableName string
+			if err := rows.Scan(&tableName); err != nil {
+				return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+			}
+			tables = append(tables, tableName)
+		}
+	}
+	for _, tableName := range tables {
+		_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
+		if err != nil {
+			return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
+		}
 	}
 	_, err = tx.Exec(fmt.Sprintf("UPDATE %s SET %s = 0 WHERE (%s = $1)", currentSequencesTable.identifier(), CurrentSequenceColCurrentSequence.name, CurrentSequenceColProjectionName.name), projectionName)
 	if err != nil {
@@ -106,19 +123,19 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 
 func prepareCurrentSequencesQuery() (sq.SelectBuilder, func(*sql.Rows) (*CurrentSequences, error)) {
 	return sq.Select(
-			CurrentSequenceColAggregateType.identifier(),
-			CurrentSequenceColCurrentSequence.identifier(),
-			CurrentSequenceColTimestamp.identifier(),
+			"max("+CurrentSequenceColCurrentSequence.identifier()+") as "+CurrentSequenceColCurrentSequence.name,
+			"max("+CurrentSequenceColTimestamp.identifier()+") as "+CurrentSequenceColTimestamp.name,
 			CurrentSequenceColProjectionName.identifier(),
 			countColumn.identifier()).
-			From(currentSequencesTable.identifier()).PlaceholderFormat(sq.Dollar),
+			From(currentSequencesTable.identifier()).
+			GroupBy(CurrentSequenceColProjectionName.identifier()).
+			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*CurrentSequences, error) {
 			currentSequences := make([]*CurrentSequence, 0)
 			var count uint64
 			for rows.Next() {
 				currentSequence := new(CurrentSequence)
 				err := rows.Scan(
-					&currentSequence.AggregateType,
 					&currentSequence.CurrentSequence,
 					&currentSequence.Timestamp,
 					&currentSequence.ProjectionName,
