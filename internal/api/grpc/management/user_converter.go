@@ -255,21 +255,27 @@ func ListHumanLinkedIDPsRequestToQuery(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
-func ListUserMembershipsRequestToModel(req *mgmt_pb.ListUserMembershipsRequest) (*user_model.UserMembershipSearchRequest, error) {
+func ListUserMembershipsRequestToModel(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*query.MembershipSearchQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries, err := user_grpc.MembershipQueriesToModel(req.Queries)
+	queries, err := user_grpc.MembershipQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	queries = append(queries, &user_model.UserMembershipSearchQuery{
-		Key:    user_model.UserMembershipSearchKeyUserID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.UserId,
-	})
-	return &user_model.UserMembershipSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
+	userQuery, err := query.NewMembershipUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMembershipResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, userQuery, ownerQuery)
+	return &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil

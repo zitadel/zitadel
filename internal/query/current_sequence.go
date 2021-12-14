@@ -38,11 +38,16 @@ func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence,
 		}
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projection table) (*LatestSequence, error) {
+func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*LatestSequence, error) {
 	query, scan := prepareLatestSequence()
-	stmt, args, err := query.Where(sq.Eq{
-		CurrentSequenceColProjectionName.identifier(): projection.name,
-	}).ToSql()
+	or := make(sq.Or, len(projections))
+	for i, projection := range projections {
+		or[i] = sq.Eq{CurrentSequenceColProjectionName.identifier(): projection.name}
+	}
+	stmt, args, err := query.
+		Where(or).
+		OrderBy(CurrentSequenceColCurrentSequence.identifier()).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
