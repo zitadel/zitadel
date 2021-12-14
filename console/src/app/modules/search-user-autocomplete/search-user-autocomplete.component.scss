@@ -36,17 +36,16 @@
 
 .sm-dlt {
   cursor: pointer;
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .found {
-  margin: .5rem 0;
+  margin: 0.5rem 0;
   background: #4072b410;
-  border-radius: .5rem;
-  padding: .5rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
 
   .found-user-row {
-    padding: .5rem 0;
     display: flex;
     align-items: center;
     min-height: 56px;
@@ -63,13 +62,25 @@
   }
 
   .found-label {
-    font-size: .9rem;
+    font-size: 0.9rem;
     color: var(--grey);
+  }
+
+  .fill-space {
+    flex: 1;
+  }
+
+  .search-user-dl-btn {
+    transition: color 0.2s ease;
+
+    &:not(:hover) {
+      color: var(--grey);
+    }
   }
 }
 
 .circle {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 input {

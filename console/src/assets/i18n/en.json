@@ -818,8 +818,8 @@
     "RETENTIONDAYS": "Days"
   },
   "POLICY": {
-    "TITLE": "Explore Policies",
-    "DESCRIPTION": "Pre-packaged policies that enhance your security.",
+    "TITLE": "Explore Settings",
+    "DESCRIPTION": "Pre-packaged settings that enhance your security.",
     "PWD_COMPLEXITY": {
       "TITLE": "Password Complexity",
       "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",

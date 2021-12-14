@@ -47,16 +47,16 @@
         font-size: 14px;
       }
 
-      .org-top-desc {
-        color: var(--grey);
-        font-size: 14px;
-      }
-
       .fill-space {
         flex: 1;
       }
     }
   }
+}
+
+.org-top-desc {
+  color: var(--grey);
+  font-size: 14px;
 }
 
 .org-subtitle {

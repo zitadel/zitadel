@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, takeUntil } from 'rxjs';
@@ -16,7 +16,7 @@ export enum GrantType {
   templateUrl: './grants.component.html',
   styleUrls: ['./grants.component.scss'],
 })
-export class GrantsComponent {
+export class GrantsComponent implements OnDestroy {
   public grantContext: UserGrantContext = UserGrantContext.NONE;
   public projectId: string = '';
   public UserGrantContext: any = UserGrantContext;

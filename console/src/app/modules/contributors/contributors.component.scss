@@ -15,7 +15,7 @@
       border-radius: 50vw;
       padding: 6px 9px;
       background-color: map-get($background, contributor);
-      padding-left: 20px;
+      padding-left: 9px;
 
       .contributor-img-list {
         width: 100%;
@@ -46,7 +46,7 @@
           }
         }
 
-        .avatar-circle {
+        .contributor-avatar-circle {
           float: left;
           margin: 0 8px 0 -15px;
           height: 32px;
@@ -60,7 +60,7 @@
           align-items: center;
           justify-content: center;
 
-          .avatar {
+          .contributor-avatar {
             pointer-events: none;
           }
 
