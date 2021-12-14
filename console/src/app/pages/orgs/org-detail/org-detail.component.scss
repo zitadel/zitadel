@@ -14,6 +14,7 @@
     .org-top-row {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       padding-bottom: 1rem;
 
       .org-title-row {

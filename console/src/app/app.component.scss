@@ -111,17 +111,6 @@
     }
   }
 
-  .filter-form {
-    margin: 0 0.5rem;
-    color: mat.get-color-from-palette($foreground, text) !important;
-  }
-
-  .show-all {
-    color: mat.get-color-from-palette($primary, 300) !important;
-    border-bottom: 1px solid var(--grey);
-    margin-bottom: 0.5rem;
-  }
-
   .menu {
     position: relative;
 

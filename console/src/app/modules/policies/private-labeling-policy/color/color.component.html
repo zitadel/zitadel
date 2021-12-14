@@ -1,4 +1,4 @@
-<p class="name">{{name}} (current {{color}})</p>
+<p class="name">{{name}} <span *ngIf="color">(current {{color}})</span></p>
 
 <div class="wrapper">
   <button class="color-shadow" [style.background-color]="previewColor" (click)="isOpen = !isOpen" cdkOverlayOrigin

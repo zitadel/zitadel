@@ -41,7 +41,6 @@ export class AppComponent implements OnInit, OnDestroy {
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
   public showAccount: boolean = false;
-  public showOrgContext: boolean = false;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
@@ -312,16 +311,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.language = lang;
         this.document.documentElement.lang = lang;
       }
-    });
-  }
-
-  public setActiveOrg(org: Org.AsObject): void {
-    console.log(this.org);
-    this.org = org;
-    this.authService.setActiveOrg(org);
-    this.loadPrivateLabelling();
-    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
-      this.router.navigate(['/']);
     });
   }
 

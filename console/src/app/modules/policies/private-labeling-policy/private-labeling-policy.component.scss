@@ -400,12 +400,7 @@
             border-radius: 8px !important;
             z-index: 1;
 
-            span {
-              color: if($is-dark-theme, #ffffff50, #00000050);
-            }
-
             .strong {
-              color: if($is-dark-theme, #fff, #000);
               font-weight: bold;
               font-size: 18px;
             }

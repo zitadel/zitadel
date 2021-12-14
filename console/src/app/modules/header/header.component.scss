@@ -12,6 +12,16 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
 
+  .show-all {
+    color: mat.get-color-from-palette($primary, 300) !important;
+    border-top: 1px solid map-get($foreground, divider);
+  }
+
+  .filter-form {
+    margin: 0 0.5rem;
+    color: mat.get-color-from-palette($foreground, text) !important;
+  }
+
   .header-wrapper {
     padding: 0.5rem 2rem;
     background-color: map-get($background, toolbar) !important;
@@ -50,42 +60,58 @@
           }
         }
 
-        .org-switch-button {
-          font-weight: bold;
-          padding-right: 0.5rem;
-          border: none;
-          color: map-get($foreground, base);
-          border-radius: 6px;
+        .org-context-wrapper {
+          display: flex;
+          justify-content: space-between;
           position: relative;
-          font-size: 14px;
-          padding: 0.5rem 1.5rem 0.5rem 0.75rem;
-          height: 2.5rem;
-          text-align: left;
-          background-color: transparent;
-          cursor: pointer;
-          transition: all ease 0.2s;
+          user-select: none;
 
-          &:hover {
-            background-color: if($is-dark-theme, #ffffff10, #00000010);
+          .org-switch-button {
+            font-weight: bold;
+            padding-right: 0.5rem;
+            border: none;
+            color: map-get($foreground, base);
+            border-radius: 6px;
+            position: relative;
+            font-size: 14px;
+            padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+            height: 2.5rem;
+            text-align: left;
+            background-color: transparent;
+            cursor: pointer;
+            transition: all ease 0.2s;
+
+            &:hover {
+              background-color: if($is-dark-theme, #ffffff10, #00000010);
+            }
+
+            .svgsapn {
+              margin-left: 0.75rem;
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              right: 0;
+              display: flex;
+              align-items: center;
+              padding-right: 0.5rem;
+              pointer-events: none;
+
+              svg {
+                opacity: 0.7;
+                fill: map-get($foreground, base);
+                height: 1.25rem;
+                width: 1.25rem;
+              }
+            }
           }
 
-          .svgsapn {
-            margin-left: 0.75rem;
+          .context_card {
             position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            display: flex;
-            align-items: center;
-            padding-right: 0.5rem;
-            pointer-events: none;
-
-            svg {
-              opacity: 0.7;
-              fill: map-get($foreground, base);
-              height: 1.25rem;
-              width: 1.25rem;
-            }
+            top: 60px;
+            right: -3rem;
+            z-index: 300;
+            overflow: hidden;
+            border-radius: 0.5rem;
           }
         }
       }

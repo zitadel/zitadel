@@ -32,8 +32,8 @@
           (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
         <span class="fill-space"></span>
-        <button class="rem-button" [disabled]="(canwrite$ | async) === false" matTooltip="Remove domain" color="warn"
-          mat-icon-button (click)="removeDomain(domain.domainName)"><i class="las la-trash"></i></button>
+        <button class="domain-rem-button" [disabled]="(canwrite$ | async) === false" matTooltip="Remove domain"
+          color="warn" mat-icon-button (click)="removeDomain(domain.domainName)"><i class="las la-trash"></i></button>
       </div>
     </cnsl-card>
 
