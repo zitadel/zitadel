@@ -13,70 +13,70 @@ import (
 
 var (
 	membershipsStmt = regexp.QuoteMeta(
-		"SELECT user_id" +
-			", roles" +
-			", creation_date" +
-			", change_date" +
-			", sequence" +
-			", resource_owner" +
-			", org_id" +
-			", iam_id" +
-			", project_id" +
-			", grant_id" +
+		"SELECT memberships.user_id" +
+			", memberships.roles" +
+			", memberships.creation_date" +
+			", memberships.change_date" +
+			", memberships.sequence" +
+			", memberships.resource_owner" +
+			", memberships.org_id" +
+			", memberships.iam_id" +
+			", memberships.project_id" +
+			", memberships.grant_id" +
 			", zitadel.projections.users_humans.display_name" +
 			", zitadel.projections.users_machines.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
-			"SELECT zitadel.projections.org_members.user_id" +
-			", zitadel.projections.org_members.roles" +
-			", zitadel.projections.org_members.creation_date" +
-			", zitadel.projections.org_members.change_date" +
-			", zitadel.projections.org_members.sequence" +
-			", zitadel.projections.org_members.resource_owner" +
-			", zitadel.projections.org_members.org_id" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
+			", members.org_id" +
 			", NULL::STRING AS iam_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.org_members" +
+			" FROM zitadel.projections.org_members as members" +
 			" UNION ALL " +
-			"SELECT zitadel.projections.iam_members.user_id" +
-			", zitadel.projections.iam_members.roles" +
-			", zitadel.projections.iam_members.creation_date" +
-			", zitadel.projections.iam_members.change_date" +
-			", zitadel.projections.iam_members.sequence" +
-			", zitadel.projections.iam_members.resource_owner" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
-			", zitadel.projections.iam_members.iam_id" +
+			", members.iam_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.iam_members" +
+			" FROM zitadel.projections.iam_members as members" +
 			" UNION ALL " +
-			"SELECT zitadel.projections.project_members.user_id" +
-			", zitadel.projections.project_members.roles" +
-			", zitadel.projections.project_members.creation_date" +
-			", zitadel.projections.project_members.change_date" +
-			", zitadel.projections.project_members.sequence" +
-			", zitadel.projections.project_members.resource_owner" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
 			", NULL::STRING AS iam_id" +
-			", zitadel.projections.project_members.project_id" +
+			", members.project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.project_members" +
+			" FROM zitadel.projections.project_members as members" +
 			" UNION ALL " +
-			"SELECT zitadel.projections.project_grant_members.user_id" +
-			", zitadel.projections.project_grant_members.roles" +
-			", zitadel.projections.project_grant_members.creation_date" +
-			", zitadel.projections.project_grant_members.change_date" +
-			", zitadel.projections.project_grant_members.sequence" +
-			", zitadel.projections.project_grant_members.resource_owner" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
 			", NULL::STRING AS iam_id" +
-			", zitadel.projections.project_grant_members.project_id" +
-			", zitadel.projections.project_grant_members.grant_id" +
-			" FROM zitadel.projections.project_grant_members" +
-			") AS m" +
-			" LEFT JOIN zitadel.projections.users_humans ON user_id = zitadel.projections.users_humans.user_id" +
-			" LEFT JOIN zitadel.projections.users_machines ON user_id = zitadel.projections.users_machines.user_id")
+			", members.project_id" +
+			", members.grant_id" +
+			" FROM zitadel.projections.project_grant_members as members" +
+			") AS memberships" +
+			" LEFT JOIN zitadel.projections.users_humans ON memberships.user_id = zitadel.projections.users_humans.user_id" +
+			" LEFT JOIN zitadel.projections.users_machines ON memberships.user_id = zitadel.projections.users_machines.user_id")
 	membershipCols = []string{
 		"user_id",
 		"roles",

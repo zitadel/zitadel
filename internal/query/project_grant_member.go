@@ -4,7 +4,8 @@ import "github.com/caos/zitadel/internal/query/projection"
 
 var (
 	projectGrantMemberTable = table{
-		name: projection.ProjectGrantMemberProjectionTable,
+		name:  projection.ProjectGrantMemberProjectionTable,
+		alias: "members",
 	}
 	ProjectGrantMemberUserID = Column{
 		name:  projection.MemberUserIDCol,

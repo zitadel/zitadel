@@ -6,7 +6,7 @@ services:
     restart: always
     networks:
       - zitadel
-    image: cockroachdb/cockroach:v21.1.11
+    image: cockroachdb/cockroach:v21.2.2
     command: start-single-node --insecure --listen-addr=0.0.0.0
     ports:
       - 8080:8080
