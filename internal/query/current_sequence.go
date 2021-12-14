@@ -75,7 +75,7 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if tableType == "table" {
 		tables = append(tables, projectionName)
 	} else if tableType == "view" {
-		rows, err := tx.Query("select concat('zitadel.projections.', table_name) from [show tables from zitadel.projections] where concat('zitadel.projections.', table_name) like $1;", projectionName+"_%")
+		rows, err := tx.Query("select concat('zitadel.projections.', table_name) from [show tables from zitadel.projections] where type = 'table' and concat('zitadel.projections.', table_name) like $1;", projectionName+"_%")
 		if err != nil {
 			return errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
 		}
