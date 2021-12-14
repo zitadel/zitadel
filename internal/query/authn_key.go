@@ -9,7 +9,6 @@ import (
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/caos/zitadel/internal/domain"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -127,7 +126,7 @@ func (q *Queries) GetAuthNKeyByID(ctx context.Context, id string, queries ...Sea
 			AuthNKeyColumnEnabled.identifier(): true,
 		}).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-DAb32", "Errors.Query.SQLStatement")
+		return nil, errors.ThrowInternal(err, "QUERY-AGhg4", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, stmt, args...)
