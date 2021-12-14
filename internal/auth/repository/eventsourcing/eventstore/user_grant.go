@@ -288,7 +288,6 @@ func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissi
 			if membership.Project != nil {
 				ctxID = membership.Project.ProjectID
 			} else if membership.ProjectGrant != nil {
-				//DISCUSS: projectID or grantID?
 				ctxID = membership.ProjectGrant.GrantID
 			}
 			permissions.AppendPermissions(ctxID, mapping.Permissions...)
