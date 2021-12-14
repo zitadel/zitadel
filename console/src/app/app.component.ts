@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, ElementRef, HostBinding, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, HostListener, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -27,7 +27,6 @@ import { UpdateService } from './services/update.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
-  @ViewChild('input', { static: false }) input!: ElementRef;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
       return result.matches;
@@ -41,6 +40,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
   public org!: Org.AsObject;
   public orgs$: Observable<Org.AsObject[]> = of([]);
+  public showAccount: boolean = false;
+  public showOrgContext: boolean = false;
   public isDarkTheme: Observable<boolean> = of(true);
 
   public showProjectSection: boolean = false;
@@ -311,6 +312,16 @@ export class AppComponent implements OnInit, OnDestroy {
         this.language = lang;
         this.document.documentElement.lang = lang;
       }
+    });
+  }
+
+  public setActiveOrg(org: Org.AsObject): void {
+    console.log(this.org);
+    this.org = org;
+    this.authService.setActiveOrg(org);
+    this.loadPrivateLabelling();
+    this.authService.zitadelPermissionsChanged.pipe(take(1)).subscribe(() => {
+      this.router.navigate(['/']);
     });
   }
 

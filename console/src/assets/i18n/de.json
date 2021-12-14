@@ -236,7 +236,11 @@
       "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
-      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
+      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
+      "DELETEACCOUNT": "Account löschen",
+      "DELETEACCOUNT_DESC": "Wenn du diese Aktion ausführst, wirst du abgemeldet und danach keinen Zugriff mehr auf dein Konto haben. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DELETEACCOUNT_BTN": "Account löschen",
+      "DELETEACCOUNT_SUCCESS": "Account erfolgreich gelöscht!"
     },
     "DETAILS": {
       "DATECREATED": "Erstellt",
@@ -244,7 +248,9 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
-      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
+      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_BTN": "Entgültig löschen"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Email Benachrichtigung senden",

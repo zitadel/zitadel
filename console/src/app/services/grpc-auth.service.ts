@@ -56,6 +56,8 @@ import {
   RemoveMyPasswordlessResponse,
   RemoveMyPhoneRequest,
   RemoveMyPhoneResponse,
+  RemoveMyUserRequest,
+  RemoveMyUserResponse,
   ResendMyEmailVerificationRequest,
   ResendMyEmailVerificationResponse,
   ResendMyPhoneVerificationRequest,
@@ -398,6 +400,11 @@ export class GrpcAuthService {
     }
     req.setQuery(metadata);
     return this.grpcService.auth.listMyMemberships(req, null).then((resp) => resp.toObject());
+  }
+
+  public RemoveMyUser(): Promise<RemoveMyUserResponse.AsObject> {
+    const req = new RemoveMyUserRequest();
+    return this.grpcService.auth.removeMyUser(req, null).then((resp) => resp.toObject());
   }
 
   public getMyEmail(): Promise<GetMyEmailResponse.AsObject> {

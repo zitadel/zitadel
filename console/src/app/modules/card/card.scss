@@ -19,6 +19,10 @@
     border-radius: 0.5rem;
     outline: none;
 
+    &.warn {
+      border-color: var(--warn);
+    }
+
     .selection-icon {
       opacity: 0;
       position: absolute;

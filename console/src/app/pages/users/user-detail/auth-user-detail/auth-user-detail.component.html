@@ -68,6 +68,17 @@
               (resendPhoneVerification)="resendPhoneVerification()">
             </cnsl-contact>
           </cnsl-card>
+
+          <ng-template cnslHasRole [hasRole]="['user.self.delete']">
+            <cnsl-card title="{{'USER.PAGES.DELETEACCOUNT'| translate}}" [warn]="true">
+              <p>{{'USER.PAGES.DELETEACCOUNT_DESC'| translate}}</p>
+
+              <div class="delete-account-wrapper">
+                <button color="warn" mat-raised-button (click)="deleteAccount()">{{'USER.PAGES.DELETEACCOUNT_BTN' |
+                  translate}}</button>
+              </div>
+            </cnsl-card>
+          </ng-template>
         </ng-container>
 
         <ng-container *ngIf="currentSetting.id === 'idp'">

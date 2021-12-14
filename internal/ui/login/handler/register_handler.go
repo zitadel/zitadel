@@ -68,7 +68,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resourceOwner := iam.GlobalOrgID
-	memberRoles := []string{domain.RoleOrgProjectCreator}
+	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authRequest.RequestedOrgID != "" && authRequest.RequestedOrgID != iam.GlobalOrgID {
 		memberRoles = nil

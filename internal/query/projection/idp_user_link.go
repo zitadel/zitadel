@@ -15,10 +15,6 @@ type IDPUserLinkProjection struct {
 	crdb.StatementHandler
 }
 
-const (
-	IDPUserLinkTable = "zitadel.projections.idp_user_links"
-)
-
 func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPUserLinkProjection {
 	p := &IDPUserLinkProjection{}
 	config.ProjectionName = IDPUserLinkTable
@@ -50,6 +46,7 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
+	IDPUserLinkTable             = "zitadel.projections.idp_user_links"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"

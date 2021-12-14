@@ -28,6 +28,7 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { FooterModule } from './modules/footer/footer.module';
 import { HeaderModule } from './modules/header/header.module';
 import { NavModule } from './modules/nav/nav.module';
+import { OrgContextModule } from './modules/org-context/org-context.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasRolePipeModule } from './pipes/has-role-pipe/has-role-pipe.module';
@@ -103,6 +104,7 @@ const authConfig: AuthConfig = {
     MatNativeDateModule,
     QuicklinkModule,
     AccountsCardModule,
+    OrgContextModule,
     HasRoleModule,
     BrowserAnimationsModule,
     HttpClientModule,

@@ -83,6 +83,17 @@ service AuthService {
         };
     }
 
+    // Changes the user state to deleted
+    rpc RemoveMyUser(RemoveMyUserRequest) returns (RemoveMyUserResponse) {
+        option (google.api.http) = {
+            delete: "/users/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.self.delete"
+        };
+    }
+
     // Returns the history of the authorized user (each event)
     rpc ListMyUserChanges(ListMyUserChangesRequest) returns (ListMyUserChangesResponse) {
         option (google.api.http) = {
@@ -612,6 +623,14 @@ message GetMyUserResponse {
             description: "The timestamp of the last successful login";
         }
     ];
+}
+
+//This is an empty request
+// the request parameters are read from the token-header
+message RemoveMyUserRequest {}
+
+message RemoveMyUserResponse{
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListMyUserChangesRequest {

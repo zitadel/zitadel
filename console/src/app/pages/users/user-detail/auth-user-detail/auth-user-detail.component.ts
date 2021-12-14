@@ -4,7 +4,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -52,6 +54,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     private toast: ToastService,
     public userService: GrpcAuthService,
     private dialog: MatDialog,
+    private auth: AuthenticationService,
   ) {
     this.loading = true;
     this.refreshUser();
@@ -267,5 +270,31 @@ export class AuthUserDetailComponent implements OnDestroy {
         });
         break;
     }
+  }
+
+  public deleteAccount(): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'USER.DIALOG.DELETE_BTN',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'USER.DIALOG.DELETE_TITLE',
+        descriptionKey: 'USER.DIALOG.DELETE_AUTH_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.userService
+          .RemoveMyUser()
+          .then(() => {
+            this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
+            this.auth.signout();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 }

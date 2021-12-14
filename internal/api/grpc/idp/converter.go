@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	idp_pb "github.com/caos/zitadel/pkg/grpc/idp"
 )
 
@@ -49,49 +48,48 @@ func IDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 	return mapped
 }
 
-func ExternalIDPViewsToLoginPolicyLinkPb(links []*iam_model.IDPProviderView) []*idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinksToPb(links []*query.IDPLoginPolicyLink) []*idp_pb.IDPLoginPolicyLink {
 	l := make([]*idp_pb.IDPLoginPolicyLink, len(links))
 	for i, link := range links {
-		l[i] = ExternalIDPViewToLoginPolicyLinkPb(link)
+		l[i] = IDPLoginPolicyLinkToPb(link)
 	}
 	return l
 }
 
-func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinkToPb(link *query.IDPLoginPolicyLink) *idp_pb.IDPLoginPolicyLink {
 	return &idp_pb.IDPLoginPolicyLink{
-		IdpId:   link.IDPConfigID,
-		IdpName: link.Name,
-		IdpType: IDPTypeToPb(link.IDPConfigType),
+		IdpId:   link.IDPID,
+		IdpName: link.IDPName,
+		IdpType: IDPTypeToPb(link.IDPType),
 	}
 }
 
-func IDPsToUserLinkPb(res []*user_model.ExternalIDPView) []*idp_pb.IDPUserLink {
+func IDPUserLinksToPb(res []*query.IDPUserLink) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
-		links[i] = ExternalIDPViewToUserLinkPb(link)
+		links[i] = IDPUserLinkToPb(link)
 	}
 	return links
 }
 
-func ExternalIDPViewToUserLinkPb(link *user_model.ExternalIDPView) *idp_pb.IDPUserLink {
+func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
-		IdpId:            link.IDPConfigID,
+		IdpId:            link.IDPID,
 		IdpName:          link.IDPName,
-		ProvidedUserId:   link.ExternalUserID,
-		ProvidedUserName: link.UserDisplayName,
-		//TODO: as soon as saml is implemented we need to switch here
-		//IdpType: IDPTypeToPb(link.Type),
+		ProvidedUserId:   link.ProvidedUserID,
+		ProvidedUserName: link.ProvidedUsername,
+		IdpType:          IDPTypeToPb(link.IDPType),
 	}
 }
 
-func IDPTypeToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
+func IDPTypeToPb(idpType domain.IDPConfigType) idp_pb.IDPType {
 	switch idpType {
-	case iam_model.IDPConfigTypeOIDC:
+	case domain.IDPConfigTypeOIDC:
 		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case iam_model.IDPConfigTypeSAML:
+	case domain.IDPConfigTypeSAML:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case iam_model.IDPConfigTypeJWT:
+	case domain.IDPConfigTypeJWT:
 		return idp_pb.IDPType_IDP_TYPE_JWT
 	default:
 		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED

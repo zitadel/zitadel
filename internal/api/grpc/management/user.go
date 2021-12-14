@@ -606,14 +606,18 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	res, err := s.user.SearchExternalIDPs(ctx, ListHumanLinkedIDPsRequestToModel(req))
+	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IDPUserLinks(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(res.Result),
+		Result: idp_grpc.IDPUserLinksToPb(res.Links),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),
@@ -630,18 +634,18 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
-	request, err := ListUserMembershipsRequestToModel(req)
+	request, err := ListUserMembershipsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.user.SearchUserMemberships(ctx, request)
+	response, err := s.query.Memberships(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
+		Result: user_grpc.MembershipsToMembershipsPb(response.Memberships),
 		Details: obj_grpc.ToListDetails(
-			response.TotalResult,
+			response.Count,
 			response.Sequence,
 			response.Timestamp,
 		),
