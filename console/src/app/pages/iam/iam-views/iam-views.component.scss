@@ -28,6 +28,11 @@
 tr {
   button {
     visibility: hidden;
+    transition: color 0.2s ease;
+
+    &:not(:hover) {
+      color: var(--grey);
+    }
   }
 
   &:hover {

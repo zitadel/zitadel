@@ -698,7 +698,7 @@
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
       "ORGDOMAIN": {
         "TITLE": "Organisation Domain Ownership Verification",
-        "VERIFICATION": "Verify the ownership of your domain. You need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
+        "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
         "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
         "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",

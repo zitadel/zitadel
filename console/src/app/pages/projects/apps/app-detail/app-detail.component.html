@@ -78,8 +78,8 @@
         </cnsl-info-section>
       </div>
 
-      <div *ngIf="app?.oidcConfig" class="expandables">
-        <div class="expandable">
+      <div *ngIf="app?.oidcConfig" class="app-expandables">
+        <div class="app-expandable">
           <p class="title">{{'APP.OIDC.REDIRECTSECTIONTITLE' | translate}}
             <button mat-icon-button (click)="showRedirects = !showRedirects"
               matTooltip="{{(showRedirects ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
@@ -126,7 +126,7 @@
           </ng-container>
         </div>
 
-        <div class="expandable">
+        <div class="app-expandable">
           <h2 class="title">{{'APP.ADDITIONALORIGINS' | translate}}
             <button mat-icon-button (click)="showAdditionalOrigins = !showAdditionalOrigins"
               matTooltip="{{(showAdditionalOrigins ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
@@ -175,8 +175,8 @@
               (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
           </div>
 
-          <div class="content">
-            <div class="grid">
+          <div class="app-oidc-content">
+            <div class="app-oidc-grid">
               <cnsl-form-field class="app-formfield" appearance="outline">
                 <cnsl-label>{{ 'APP.OIDC.CLIENTID' | translate }}</cnsl-label>
                 <input cnslInput formControlName="clientId" />
@@ -227,7 +227,7 @@
 
             <div class="divider"></div>
 
-            <p class="full-width section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
+            <p class="app-full-width app-section-title">{{'APP.OIDC.TOKENSECTIONTITLE' | translate}}</p>
 
             <cnsl-form-field appearance="outline" class="app-formfield">
               <cnsl-label>{{ 'APP.OIDC.TOKENTYPE' | translate }}</cnsl-label>
@@ -242,20 +242,20 @@
               formControlName="accessTokenRoleAssertion" color="primary">
               {{'APP.OIDC.ACCESSTOKENROLEASSERTION' | translate}}</mat-checkbox>
 
-            <cnsl-info-section class="full-width desc">
+            <cnsl-info-section class="app-full-width desc">
               <span>{{'APP.OIDC.ACCESSTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
             </cnsl-info-section>
-            <mat-checkbox class="full-width" style="margin-bottom: .5rem" formControlName="idTokenRoleAssertion"
+            <mat-checkbox class="app-full-width" style="margin-top: 1.5rem" formControlName="idTokenRoleAssertion"
               color="primary">
               {{'APP.OIDC.IDTOKENROLEASSERTION' | translate}}</mat-checkbox>
             <cnsl-info-section class="full-width desc">
               <span>{{'APP.OIDC.IDTOKENROLEASSERTION_DESCRIPTION' | translate}}</span>
             </cnsl-info-section>
 
-            <mat-checkbox class="full-width" style="margin-bottom: .5rem" formControlName="idTokenUserinfoAssertion"
+            <mat-checkbox class="app-full-width" style="margin-top: 1.5rem" formControlName="idTokenUserinfoAssertion"
               color="primary">
               {{'APP.OIDC.IDTOKENUSERINFOASSERTION' | translate}}</mat-checkbox>
-            <cnsl-info-section class="full-width desc">
+            <cnsl-info-section class="app-full-width desc">
               <span>{{'APP.OIDC.IDTOKENUSERINFOASSERTION_DESCRIPTION' | translate}}</span>
             </cnsl-info-section>
 
@@ -263,7 +263,7 @@
             <mat-slider color="primary" formControlName="clockSkewSeconds" class="clockskew-slider" thumbLabel
               [displayWith]="formatClockSkewLabel" tickInterval=".1" min="0" [step]="1" max="5">
             </mat-slider>
-            <cnsl-info-section class="full-width desc">
+            <cnsl-info-section class="app-full-width desc">
               <span>{{'APP.OIDC.CLOCKSKEW' | translate}}</span>
             </cnsl-info-section>
           </div>

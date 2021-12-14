@@ -196,9 +196,10 @@
   }
 }
 
-.grid {
+.app-oidc-grid {
   width: 100%;
   display: grid;
+  grid-gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 
   .rt {
@@ -212,13 +213,12 @@
   flex-direction: column;
 }
 
-.expandables {
+.app-expandables {
   padding-top: 1rem;
 
-  .expandable {
+  .app-expandable {
     display: block;
     width: 100%;
-    margin: 0 0.5rem;
 
     .title {
       margin: 0;
@@ -264,20 +264,18 @@
 
 .app-formfield {
   flex: 1 1 30%;
-  margin: 0 0.5rem;
 
   &.full-width {
     flex-basis: 100%;
   }
 }
 
-.section-title {
+.app-section-title {
   margin: 1.5rem 0 0 0;
 }
 
-.full-width {
+.app-full-width {
   flex-basis: 100%;
-  margin-left: 0.5rem;
   margin-right: 0.5rem;
 }
 

@@ -198,7 +198,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
       {
         i18nTitle: 'APP.PAGES.NEXTSTEPS.0.TITLE',
         i18nDesc: 'APP.PAGES.NEXTSTEPS.0.DESC',
-        routerLink: ['/projects', this.projectId],
+        routerLink: ['/projects', this.projectId, 'roles'],
         iconClasses: 'las la-user-tag',
       },
       {

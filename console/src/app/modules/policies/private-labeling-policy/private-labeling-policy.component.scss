@@ -68,6 +68,7 @@
 
         button {
           height: 40px;
+          width: 40px;
           border-radius: 6px;
           border: 1px solid #81868a50;
           margin: 0 0.25rem;
@@ -79,18 +80,36 @@
           .icon {
             visibility: hidden;
           }
+
+          .edit-icon {
+            display: none;
+          }
+
+          &:hover:not(.active) {
+            .edit-icon {
+              display: inline;
+            }
+
+            .icon {
+              display: none;
+            }
+          }
         }
 
         .dark {
           background-color: black;
 
           &.active {
-            transform: scale(1.1);
+            transform: scale(1.2);
 
             .icon {
               visibility: visible;
               color: white;
             }
+          }
+
+          .edit-icon {
+            color: #ffffff60;
           }
         }
 
@@ -104,6 +123,10 @@
               visibility: visible;
               color: black;
             }
+          }
+
+          .edit-icon {
+            color: #00000060;
           }
         }
       }
