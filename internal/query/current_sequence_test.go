@@ -58,7 +58,7 @@ func Test_CurrentSequencesPrepares(t *testing.T) {
 						{
 							uint64(20211108),
 							testNow,
-							"project-name",
+							"projection-name",
 						},
 					},
 				),
