@@ -7,7 +7,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/lib/pq"
 )
 
@@ -144,6 +146,87 @@ func TestProjectMemberProjection_reduces(t *testing.T) {
 							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (user_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
 								"user-id",
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "user.UserRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserRemovedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceUserRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.OrgRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					[]byte(`{}`),
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceOrgRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (resource_owner = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.ProjectRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectRemovedType),
+					project.AggregateType,
+					[]byte(`{}`),
+				), project.ProjectRemovedEventMapper),
+			},
+			reduce: (&ProjectMemberProjection{}).reduceProjectRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_members WHERE (project_id = $1)",
+							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},
