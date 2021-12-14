@@ -419,8 +419,8 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "validated",
-        "ISVERIFIED": "Verified",
-        "ISVERIFIEDDESC": "If the e-mail is indicated as verified, no initialization e-mail will be sent.",
+        "ISVERIFIED": "Email Verified",
+        "ISVERIFIEDDESC": "If the email is indicated as verified, no initialization email will be sent.",
         "RESEND": "Resend Verification E-mail",
         "EDITTITLE": "Change Email",
         "EDITDESC": "Enter the new email in the field below."

@@ -419,7 +419,7 @@
       "EMAIL": {
         "TITLE": "E-Mail",
         "VALID": "Validiert",
-        "ISVERIFIED": "Verifiziert",
+        "ISVERIFIED": "Email Verifiziert",
         "ISVERIFIEDDESC": "Wenn die Email als verifiziert angegeben wird, wird keine Initialisierungsmail versendet.",
         "RESEND": "Verifikationsmail erneut senden",
         "EDITTITLE": "Email ändern",
