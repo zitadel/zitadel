@@ -11,7 +11,6 @@ import (
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
@@ -216,33 +215,21 @@ func (s *Server) ListOrgMemberRoles(ctx context.Context, req *mgmt_pb.ListOrgMem
 }
 
 func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*mgmt_pb.ListOrgMembersResponse, error) {
-	queries, err := ListOrgMembersRequestToModel(req)
+	queries, err := ListOrgMembersRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.org.SearchMyOrgMembers(ctx, queries)
+	members, err := s.query.OrgMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
-		Result: member_grpc.OrgMembersToPb(members.Result),
+		Result: member_grpc.MembersToPb(members.Members),
 		Details: object.ToListDetails(
-			members.TotalResult,
+			members.Count,
 			members.Sequence,
 			members.Timestamp,
 		),
-	}, nil
-}
-
-func ListOrgMembersRequestToModel(req *mgmt_pb.ListOrgMembersRequest) (*org_model.OrgMemberSearchRequest, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := member_grpc.MemberQueriesToOrgMember(req.Queries)
-	return &org_model.OrgMemberSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
 	}, nil
 }
 
