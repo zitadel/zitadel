@@ -419,6 +419,8 @@
       "EMAIL": {
         "TITLE": "E-Mail",
         "VALID": "Validiert",
+        "ISVERIFIED": "Verifiziert",
+        "ISVERIFIEDDESC": "Wenn die Email als verifiziert angegeben wird, wird keine Initialisierungsmail versendet.",
         "RESEND": "Verifikationsmail erneut senden",
         "EDITTITLE": "Email ändern",
         "EDITDESC": "Geben Sie die neue Email in dem darunterliegenden Feld ein!"
