@@ -83,6 +83,9 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 			}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-Dfwf2", "Errors.ProjectionName.Invalid")
+	}
 	row := tx.QueryRowContext(ctx, projectionQuery, args...)
 	var count int
 	if err := row.Scan(&count); err != nil || count == 0 {
@@ -98,6 +101,9 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 			}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-ASff2", "Errors.ProjectionName.Invalid")
+	}
 	var tables []string
 	rows, err := tx.QueryContext(ctx, tablesQuery, args...)
 	if err != nil {
