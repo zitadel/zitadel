@@ -2,9 +2,13 @@
   <div class="shortcut-container">
     <div class="shortcut-title-container">
       <h2>{{'HOME.SHORTCUTS.SHORTCUTS' | translate}}</h2>
-      <button class="shortcut-btn" (click)="editState = !editState" mat-icon-button>
+      <button [matTooltip]="(editState ? 'ACTIONS.CLOSE' : 'ACTIONS.EDIT') | translate" class="shortcut-btn"
+        (click)="editState = !editState" mat-icon-button>
         <i *ngIf="!editState" class=" las la-edit"></i>
         <mat-icon *ngIf="editState">close</mat-icon>
+      </button>
+      <button matTooltip="{{'ACTIONS.RESETDEFAULT' | translate}}" (click)="reset()" *ngIf="editState" mat-icon-button>
+        <i *ngIf="editState" class="las la-undo-alt"></i>
       </button>
     </div>
 
@@ -14,7 +18,8 @@
         <ng-container *ngFor="let shortcut of main">
           <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+            <div class="shortcut-box" [ngClass]="{'edit-state': editState}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled">
               <div class="shortcuts-avatar {{shortcut.color}}">
                 <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
                 <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
@@ -32,7 +37,8 @@
         <ng-container *ngFor="let shortcut of secondary">
           <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+            <div class="shortcut-box" [ngClass]="{'edit-state': editState}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled">
               <div class="shortcuts-avatar {{shortcut.color}}">
                 <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
                 <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
@@ -49,7 +55,8 @@
         <ng-container *ngFor="let shortcut of third">
           <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+            <div class="shortcut-box" [ngClass]="{'edit-state': editState}" cdkDrag
+              [cdkDragDisabled]="shortcut.disabled">
               <div class="shortcuts-avatar {{shortcut.color}}">
                 <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
                 <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>

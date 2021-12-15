@@ -1,4 +1,4 @@
-import { CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -132,21 +132,30 @@ export class ShortcutsComponent implements OnDestroy {
   public drop(event: CdkDragDrop<ShortcutItem[]>, listName: string) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-      if (listName) {
-        this.saveToStorage(event.container, listName);
-      }
+      this.saveStateToStorage();
     } else {
       transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
-      if (listName) {
-        this.saveToStorage(event.container, listName);
-      }
+      this.saveStateToStorage();
     }
   }
 
-  public saveToStorage(list: CdkDropList, listName: string): void {
+  public saveStateToStorage(): void {
     const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
     if (org && org.id) {
-      this.storageService.setItem(`shortcuts:${listName}:${org.id}`, JSON.stringify(list.data), StorageLocation.local);
+      this.storageService.setItem(`shortcuts:main:${org.id}`, JSON.stringify(this.main), StorageLocation.local);
+      this.storageService.setItem(`shortcuts:secondary:${org.id}`, JSON.stringify(this.secondary), StorageLocation.local);
+      this.storageService.setItem(`shortcuts:third:${org.id}`, JSON.stringify(this.third), StorageLocation.local);
+    }
+  }
+
+  public reset(): void {
+    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+    if (org && org.id) {
+      ['main', 'secondary', 'third'].map((listName) => {
+        this.storageService.removeItem(`shortcuts:${listName}:${org.id}`, StorageLocation.local);
+      });
+
+      this.loadShortcuts(org);
     }
   }
 }

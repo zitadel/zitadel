@@ -171,12 +171,19 @@
       .iam-settings {
         margin-right: 1rem;
 
-        span {
+        .iam-label {
           margin-right: 0.25rem;
+          display: none;
         }
 
         i {
           margin-right: -0.5rem;
+        }
+
+        @media only screen and (min-width: 800px) {
+          .iam-label {
+            display: inline;
+          }
         }
       }
 
