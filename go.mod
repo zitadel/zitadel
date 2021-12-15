@@ -93,4 +93,4 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
+replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.7
