@@ -5,7 +5,13 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
-import { POLICIES } from '../policy-grid/policies';
+import {
+  LOGIN_POLICY,
+  LOGIN_TEXTS_POLICY,
+  MESSAGE_TEXTS_POLICY,
+  POLICIES,
+  PRIVATELABEL_POLICY,
+} from '../policy-grid/policies';
 
 export interface ShortcutItem {
   title?: string;
@@ -33,6 +39,14 @@ const CREATE_ORG: ShortcutItem = {
   i18nTitle: 'ORG.PAGES.CREATE',
   routerLink: ['/org', 'create'],
   withRole: ['org.create', 'iam.write'],
+  icon: 'las la-plus',
+  disabled: true,
+};
+
+const CREATE_PROJECT: ShortcutItem = {
+  i18nTitle: 'PROJECT.PAGES.CREATE',
+  routerLink: ['/projects', 'create'],
+  withRole: ['project.create'],
   icon: 'las la-plus',
   disabled: true,
 };
@@ -104,13 +118,35 @@ export class ShortcutsComponent implements OnDestroy {
       } else {
         switch (listName) {
           case 'main':
-            this.main = [PROFILE_SHORTCUT, CREATE_ORG];
+            this.main = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT];
             break;
           case 'secondary':
-            this.secondary = [];
+            this.secondary = [LOGIN_POLICY, PRIVATELABEL_POLICY].map((p) => {
+              const policy: ShortcutItem = {
+                i18nTitle: p.i18nTitle,
+                i18nDesc: p.i18nDesc,
+                routerLink: p.orgRouterLink,
+                withRole: p.orgWithRole,
+                icon: p.icon ?? '',
+                color: p.color ?? '',
+                disabled: false,
+              };
+              return policy;
+            });
             break;
           case 'third':
-            this.third = [];
+            this.third = [LOGIN_TEXTS_POLICY, MESSAGE_TEXTS_POLICY].map((p) => {
+              const policy: ShortcutItem = {
+                i18nTitle: p.i18nTitle,
+                i18nDesc: p.i18nDesc,
+                routerLink: p.orgRouterLink,
+                withRole: p.orgWithRole,
+                icon: p.icon ?? '',
+                color: p.color ?? '',
+                disabled: false,
+              };
+              return policy;
+            });
             break;
         }
         this.organizeAllItems();

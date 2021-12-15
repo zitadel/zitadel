@@ -42,6 +42,11 @@
       }
     }
 
+    .user-settings {
+      width: 100%;
+      overflow-x: auto;
+    }
+
     @media only screen and (min-width: 824px) {
       grid-template-columns: 1fr 1fr 1fr 1fr;
 

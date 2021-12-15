@@ -59,6 +59,8 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          background-color: map-get($background, contributor-avatar);
+          color: white;
 
           .contributor-avatar {
             pointer-events: none;

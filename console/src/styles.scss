@@ -228,6 +228,7 @@ $caos-dark-theme-background: (
   hover: rgba(black, 0.04),
   card: map_get($caos-dark-background, 400),
   contributor: map_get($caos-dark-background, 400),
+  contributor-avatar: map_get($caos-dark-background, 300),
   dialog: map_get($caos-dark-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -240,7 +241,8 @@ $caos-dark-theme-background: (
   tooltip: map_get($mat-gray, 700),
   infosection: map_get($caos-dark-background, 300),
   warninfosection: map_get($caos-dark-background, 400),
-  successinfosection: #4f566b,
+  successinfosection: map_get($caos-dark-background, 300),
+  state: map_get($caos-dark-background, 300),
   toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
   footer: #00000020,
 );
@@ -252,6 +254,7 @@ $caos-light-theme-background: (
   hover: rgba(black, 0.04),
   card: map_get($caos-light-background, 400),
   contributor: #00000010,
+  contributor-avatar: map_get($caos-light-primary, 300),
   dialog: map_get($caos-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -331,10 +334,9 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography:
-  mat.define-typography-config(
-    $font-family: 'Lato',
-  );
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
 
 @include mat.core($custom-typography);
 @include component-themes($caos-dark-app-theme);
@@ -455,19 +457,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 h1 {

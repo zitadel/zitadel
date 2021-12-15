@@ -31,7 +31,7 @@
       </p>
     </div>
 
-    <p class="error" *ngIf="(stripeCustomer || stripeCustomer === null) && !customerValid">
+    <p class="error-tier-message" *ngIf="(stripeCustomer || stripeCustomer === null) && !customerValid">
       {{'FEATURES.TIER.CUSTOMERINVALID' | translate}}</p>
 
     <div class="current-tier">

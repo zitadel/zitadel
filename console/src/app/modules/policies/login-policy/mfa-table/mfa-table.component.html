@@ -1,8 +1,8 @@
 <div class="sp_wrapper">
   <mat-spinner diameter="30" *ngIf="loading$ | async"></mat-spinner>
 </div>
-<div class="mfa-list">
-  <div class="mfa mat-elevation-z1" *ngFor="let mfa of mfas">
+<div class="login-policy-mfa-list">
+  <div class="mfa" *ngFor="let mfa of mfas">
     <span>
       {{(componentType === LoginMethodComponentType.SecondFactor ? 'MFA.SECONDFACTORTYPES.':
       LoginMethodComponentType.MultiFactor ? 'MFA.MULTIFACTORTYPES.': '')+mfa | translate}}

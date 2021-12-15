@@ -63,40 +63,18 @@
     "DOCS": "Docs"
   },
   "HOME": {
-    "TITLE": "ZITADEL",
-    "SECURITYANDPRIVACY": "Protezione dei dati e personalizzazione",
-    "SECURITYANDPRIVACY_DESC": "Gestisci le tue informazioni e le impostazioni di sicurezza",
-    "SECURITYANDPRIVACY_BUTTON": "Personalizza",
-    "CHANGE_PWD": "Ripristina password",
-    "PROTECTION": "Impostazioni organizzative",
-    "PROTECTION_DESC": "Gestisci le tue impostazioni organizzative. Esplora soluzioni che ti fanno risparmiare tempo e garantiscono la sicurezza.",
-    "PROTECTION_BUTTON": "Esplora",
-    "PROJECTS": "Crea e gestisci le tue applicazioni e progetti",
-    "PROJECTS_DESC": "Autorizza altri ad usare i tuoi progetti o a definire ruoli personalizzati.",
-    "PROJECTS_BUTTON": "Panoramica del progetto",
-    "PROJECTS_NEW_LINK": "Crea un nuovo progetto",
-    "ORG_POLICY_COMPLEXITY": "Impostazioni complessit\u00e0 password",
-    "ORG_POLICY_IAM": "Impostazioni Org IAM",
-    "ORG_POLICY_LOGIN": "Impostazioni di accesso",
-    "ORG_POLICY_LABEL": "Impostazioni Private Labelling",
-    "IAM_CREATE_ORG": "Crea un'organizzazione",
-    "IAM_POLICY_COMPLEXITY": "Impostazioni complessit\u00e0 password di sistema",
-    "IAM_POLICY_IAM": "Impostazioni di sistema",
-    "IAM_POLICY_LOGIN": "Impostazioni di accesso di sistema",
-    "IAM_POLICY_LABEL": "Impostazioni Private Labelling di sistema",
-    "USERS": "Crea e gestisci i tuoi utenti",
-    "USERS_DESC": "Controlla il tuo concetto di ruolo in tempo reale. Prendere azioni immediate.",
-    "USERS_HUMANS": "Mostra gli utenti umani",
-    "USERS_MACHINES": "Mostra gli utenti di servizio",
-    "USERS_CREATE": "Crea utente",
-    "USERS_BUTTON": "Mostra utenti",
-    "IAM": "Identity and Access Management",
-    "IAM_DESC": "Gestisci le tue organizzazioni e i tuoi amministratori.",
-    "IAM_BUTTON": "Gestire ZITADEL",
     "WELCOME": "Iniziare con ZITADEL",
     "WELCOMESENTENCE": "Qui puoi trovare le azioni raccomandate in base alle tue ultime autorizzazioni acquisite.",
     "DISCLAIMER": "Puoi vedere solo le impostazioni della tua attuale organizzazione specificata nel navbar. ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
     "DISCLAIMERLINK": "Ulteriori informazioni",
+    "DOCUMENTATION": {
+      "TITLE": "Documentazione",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "GETSTARTED": {
+      "TITLE": "Come iniziare con ZITADEL",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
     "QUICKSTARTS": {
       "LABEL": "Primi passi",
       "TITLE": "Quickstarts",
@@ -111,7 +89,7 @@
     }
   },
   "MENU": {
-    "DASHBOARD": "Panoramica",
+    "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
     "IAM": "Panoramica IAM",
@@ -1288,7 +1266,8 @@
     },
     "TYPES": {
       "0": "sconosciuto",
-      "1": "OIDC"
+      "1": "OIDC",
+      "3": "JWT"
     },
     "STATES": {
       "1": "attivo",

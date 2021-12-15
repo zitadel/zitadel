@@ -63,40 +63,18 @@
     "DOCS": "Docs"
   },
   "HOME": {
-    "TITLE": "ZITADEL",
-    "SECURITYANDPRIVACY": "Data Protection and Personalisation",
-    "SECURITYANDPRIVACY_DESC": "Manage Your Information and Security Settings",
-    "SECURITYANDPRIVACY_BUTTON": "Personalise Information and Security",
-    "CHANGE_PWD": "Change Password",
-    "PROTECTION": "Organizational Policies",
-    "PROTECTION_DESC": "Manage your organisational guidelines. Explore some pre-packaged solutions that save you time and ensure security.",
-    "PROTECTION_BUTTON": "Explore",
-    "PROJECTS": "Create and Manage Your Applications and Projects",
-    "PROJECTS_DESC": "Authorize others to use your projects or define custom roles on eligible projects.",
-    "PROJECTS_BUTTON": "Project Overview",
-    "PROJECTS_NEW_LINK": "Create new project",
-    "ORG_POLICY_COMPLEXITY": "Password Complexity Settings",
-    "ORG_POLICY_IAM": "Organisation Access Properties",
-    "ORG_POLICY_LOGIN": "Login Policy",
-    "ORG_POLICY_LABEL": "Private Label Policy",
-    "IAM_CREATE_ORG": "Create organisation",
-    "IAM_POLICY_COMPLEXITY": "System Password Complexity Settings",
-    "IAM_POLICY_IAM": "System Access Properties",
-    "IAM_POLICY_LOGIN": "System Login Policy",
-    "IAM_POLICY_LABEL": "System Private Label Policy",
-    "USERS": "Create and Manage Your Users",
-    "USERS_DESC": "Monitor your role concept in real time. Take immediate action.",
-    "USERS_HUMANS": "Show human users",
-    "USERS_MACHINES": "Show machine users",
-    "USERS_CREATE": "Create User",
-    "USERS_BUTTON": "Show Users",
-    "IAM": "Identity and Access Management",
-    "IAM_DESC": "Manage your organisations and administrators.",
-    "IAM_BUTTON": "Manage ZITADEL",
     "WELCOME": "Get started with ZITADEL",
     "WELCOMESENTENCE": "Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
     "DISCLAIMER": "You can only see settings of your current organisation specified in the header. ZITADEL treats your data confidentially and securely.",
     "DISCLAIMERLINK": "Further information",
+    "DOCUMENTATION": {
+      "TITLE": "Documentation",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "GETSTARTED": {
+      "TITLE": "Get started with ZITADEL",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
     "QUICKSTARTS": {
       "LABEL": "First Steps",
       "TITLE": "Quickstarts",
@@ -111,7 +89,7 @@
     }
   },
   "MENU": {
-    "DASHBOARD": "Overview",
+    "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
     "IAM": "IAM Overview",
@@ -1062,7 +1040,7 @@
       "LIST": "Projects",
       "LISTDESCRIPTION": "Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
       "DETAIL": "Detail",
-      "CREATE": "Create project",
+      "CREATE": "Create Project",
       "CREATE_DESC": "Insert your project's name.",
       "ROLE": "Role",
       "NOITEMS": "No projects",
@@ -1288,7 +1266,8 @@
     },
     "TYPES": {
       "0": "unknown",
-      "1": "OIDC"
+      "1": "OIDC",
+      "3": "JWT"
     },
     "STATES": {
       "1": "active",

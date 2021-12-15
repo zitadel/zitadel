@@ -82,6 +82,11 @@
 
         <ng-template #defaultNav>
           <div class="nav-row-abs" @navroworg>
+            <a matTooltip="{{'MENU.TOOLTIP.HOME' | translate}}" class="nav-item" [routerLinkActive]="['active']"
+              [routerLinkActiveOptions]="{ exact: true }" [routerLink]="[ '/']">
+              <span class="label">{{'MENU.DASHBOARD' | translate}}</span>
+            </a>
+
             <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
               <ng-template cnslHasRole [hasRole]="['org.read']">
                 <a matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"

@@ -23,8 +23,12 @@
   }
 
   .header-wrapper {
-    padding: 0.5rem 2rem;
+    padding: 0.5rem 1rem;
     background-color: map-get($background, toolbar) !important;
+
+    @media only screen and (min-width: 500px) {
+      padding: 0.5rem 2rem;
+    }
 
     .header-content {
       display: flex;
@@ -107,7 +111,7 @@
 
           .context_card {
             position: absolute;
-            top: 60px;
+            top: 55px;
             right: -3rem;
             z-index: 300;
             overflow: hidden;
@@ -176,13 +180,13 @@
           display: none;
         }
 
-        i {
-          margin-right: -0.5rem;
-        }
-
-        @media only screen and (min-width: 800px) {
+        @media only screen and (min-width: 600px) {
           .iam-label {
             display: inline;
+          }
+
+          i {
+            margin-right: -0.5rem;
           }
         }
       }
@@ -223,7 +227,7 @@
         .a_card {
           position: absolute;
           z-index: 300;
-          top: 60px;
+          top: 55px;
           right: 0;
           overflow: hidden;
           box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);

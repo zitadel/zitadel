@@ -63,40 +63,18 @@
     "DOCS": "Docs"
   },
   "HOME": {
-    "TITLE": "ZITADEL",
-    "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
-    "SECURITYANDPRIVACY_DESC": "Verwalte Deine Informationen und Sicherheitseinstellungen.",
-    "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
-    "CHANGE_PWD": "Password ändern",
-    "PROTECTION": "Organisationsrichtlinien",
-    "PROTECTION_DESC": "Verwalte Deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
-    "PROTECTION_BUTTON": "Erkunden",
-    "PROJECTS": "Volle Skalierbarkeit und Anpassungsfähigkeit",
-    "PROJECTS_DESC": "Autorisiere andere Benutzer, Deine eigenen Projekte zu verwenden, oder erstelle benutzerdefinierte Rollen für berechtigte Projekte",
-    "PROJECTS_BUTTON": "Projektübersicht",
-    "PROJECTS_NEW_LINK": "Neues Projekt erstellen",
-    "IAM_CREATE_ORG": "Organisation erstellen",
-    "ORG_POLICY_COMPLEXITY": "Passwort Komplexität",
-    "ORG_POLICY_IAM": "Organisation Zugangseinstellungen",
-    "ORG_POLICY_LOGIN": "Login Richtlinie",
-    "ORG_POLICY_LABEL": "Private Label Richtlinie",
-    "IAM_POLICY_COMPLEXITY": "Systemweite Passwort Komplexität",
-    "IAM_POLICY_IAM": "Systemweite Zugangseinstellungen",
-    "IAN_POLICY_LOGIN": "Systemweite Login Richtlinie",
-    "IAN_POLICY_LABEL": "Systemweite Private Label Richtlinie",
-    "USERS": "Erstelle und verwalte Deine Benutzer.",
-    "USERS_DESC": "Überwache Dein Rollenkonzept in Echtzeit. Ergreife sofort Massnahmen.",
-    "USERS_HUMANS": "Zeige Benutzer",
-    "USERS_MACHINES": "Zeige Service User",
-    "USERS_CREATE": "User erstellen",
-    "USERS_BUTTON": "Benutzer anzeigen",
-    "IAM": "Identity- und Access-Management",
-    "IAM_DESC": "Verwalte Deine Organisationen und Administratoren.",
-    "IAM_BUTTON": "ZITADEL verwalten",
     "WELCOME": "Loslegen mit ZITADEL",
     "WELCOMESENTENCE": "Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
     "DISCLAIMER": "Du kannst nur die Einstellungen Deiner aktuellen Organisation, die in der Kopfzeile angegeben ist, sehen. ZITADEL behandelt Deine Daten vertraulich und sicher.",
     "DISCLAIMERLINK": "Mehr Informationen zur Sicherheit",
+    "DOCUMENTATION": {
+      "TITLE": "Dokumentation",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
+    "GETSTARTED": {
+      "TITLE": "Starten mit ZITADEL",
+      "DESCRIPTION": "Mit ZITADEL schnell durchstarten."
+    },
     "QUICKSTARTS": {
       "LABEL": "Erste Schritte",
       "TITLE": "Quickstarts",
@@ -111,7 +89,7 @@
     }
   },
   "MENU": {
-    "DASHBOARD": "Übersicht",
+    "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
     "IAM": "IAM Übersicht",
@@ -1288,7 +1266,8 @@
     },
     "TYPES": {
       "0": "unknown",
-      "1": "OIDC"
+      "1": "OIDC",
+      "3": "JWT"
     },
     "STATES": {
       "1": "aktiv",

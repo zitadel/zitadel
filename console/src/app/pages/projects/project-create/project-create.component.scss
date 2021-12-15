@@ -2,33 +2,25 @@ h1 {
   font-weight: 500;
 }
 
-.container {
-  padding: 2rem 0 2rem 0;
+.abort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
   }
+}
 
-  .project-create-content {
-    padding-left: 4.5rem;
-  }
+.project-create-content {
+  padding-left: 4.5rem;
 }
 
 .margin-right {

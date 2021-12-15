@@ -1,63 +1,75 @@
-.idps {
-  display: flex;
-  flex-direction: column;
+@use '@angular/material' as mat;
 
-  .idp {
+@mixin login-policy-idps-theme($theme) {
+  $foreground: map-get($theme, foreground);
+
+  .login-policy-idps {
     display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: .5rem;
-    position: relative;
-    margin-bottom: .5rem;
-    min-height: 40px;
+    flex-direction: column;
 
-    img {
-      height: 30px;
-      width: 30px;
-      margin: .5rem;
-      border-radius: .5rem;
-      object-fit: contain;
-    }
+    .idp {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0;
+      position: relative;
+      min-height: 40px;
+      border-bottom: 1px solid map-get($foreground, dividers);
 
-    div {
-      display: block;
-      margin-left: .5rem;
-
-      * {
-        display: block;
+      &:last-child {
+        border: none;
       }
-    }
 
-    .meta-info {
-      font-size: 14px;
-      color: var(--grey);
-    }
+      img {
+        height: 30px;
+        width: 30px;
+        margin: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        object-fit: contain;
+      }
 
-    .fill-space {
-      flex: 1;
-    }
+      div {
+        display: block;
 
-    .rm {
-      display: none;
-      transition: all .2s ease;
-      cursor: pointer;
-    }
+        * {
+          display: block;
+        }
+      }
 
-    &:hover {
+      .meta-info {
+        font-size: 14px;
+        color: var(--grey);
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
       .rm {
-        display: block;
+        display: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+
+        &:not(:hover) {
+          color: var(--grey);
+        }
+      }
+
+      &:hover {
+        .rm {
+          display: block;
+        }
       }
     }
-  }
 
-  .new-idp {
-    display: flex;
-    align-items: center;
-    align-self: flex-end;
-    margin-top: .5rem;
+    .new-idp {
+      display: flex;
+      align-items: center;
+      align-self: flex-end;
+      margin-top: 0.5rem;
 
-    .icon {
-      margin-left: .5rem;
+      .icon {
+        margin-left: 0.5rem;
+      }
     }
   }
 }

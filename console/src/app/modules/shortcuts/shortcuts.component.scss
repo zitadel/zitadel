@@ -69,16 +69,23 @@
   }
 
   .shortcut-grid {
-    width: 100%;
     border: 1px solid $border-color;
     min-height: 60px;
     background-color: $list-background-color;
     border-radius: 1rem;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr;
     grid-gap: 1rem;
     padding: 1rem;
+
+    @media only screen and (min-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and (min-width: 1200px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
 
     .shortcut-desc {
       align-self: center;
