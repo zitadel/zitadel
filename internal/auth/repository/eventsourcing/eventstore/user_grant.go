@@ -90,15 +90,21 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	return repo.userOrg(ctxData)
 }
 
-func membershipsToOrgResp(memberships []*user_view_model.UserMembershipView, count uint64) *grant_model.ProjectOrgSearchResponse {
-	orgs := make([]*grant_model.Org, 0, len(memberships))
-	for _, m := range memberships {
+func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) *grant_model.ProjectOrgSearchResponse {
+	orgs := make([]*grant_model.Org, 0, len(memberships.Memberships))
+	for _, m := range memberships.Memberships {
 		if !containsOrg(orgs, m.ResourceOwner) {
-			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: m.ResourceOwnerName})
+			org, err := repo.Query.OrgByID(context.TODO(), m.ResourceOwner)
+			if err != nil {
+				logging.LogWithFields("EVENT-k8Ikl", "owner", m.ResourceOwner).WithError(err).Warn("org not found")
+				orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner})
+				continue
+			}
+			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: org.Name})
 		}
 	}
 	return &grant_model.ProjectOrgSearchResponse{
-		TotalResult: count,
+		TotalResult: memberships.Count,
 		Result:      orgs,
 	}
 }
@@ -143,50 +149,42 @@ func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]st
 	return permissions.Permissions, nil
 }
 
-func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*user_view_model.UserMembershipView, error) {
+func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*query.Membership, error) {
 	ctxData := authz.GetCtxData(ctx)
-	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
-		Queries: []*user_model.UserMembershipSearchQuery{
-			{
-				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.UserID,
-			},
-			{
-				Key:    user_model.UserMembershipSearchKeyResourceOwner,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.OrgID,
-			},
-		},
+	userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMembershipResourceOwnerQuery(ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+
+	orgMemberships, err := repo.Query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery, ownerQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	iamMemberships, iamCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
-		Queries: []*user_model.UserMembershipSearchQuery{
-			{
-				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.UserID,
-			},
-			{
-				Key:    user_model.UserMembershipSearchKeyAggregateID,
-				Method: domain.SearchMethodEquals,
-				Value:  repo.IamID,
-			},
-		},
+	iamQuery, err := query.NewMembershipIsIAMQuery()
+	if err != nil {
+		return nil, err
+	}
+	iamMemberships, err := repo.Query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery, iamQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	if orgCount == 0 && iamCount == 0 {
-		return []*user_view_model.UserMembershipView{}, nil
+	if orgMemberships.Count == 0 && iamMemberships.Count == 0 {
+		return []*query.Membership{}, nil
 	}
-	return append(orgMemberships, iamMemberships...), nil
+	return append(orgMemberships.Memberships, iamMemberships.Memberships...), nil
 }
 
 func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
 	ctxData := authz.GetCtxData(ctx)
+	//TODO: blocked until user grants moved to query-pkg
 	usergrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, ctxData.ProjectID, ctxData.UserID)
 	if err != nil {
 		return nil, err
@@ -224,6 +222,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 }
 
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
+	//TODO: blocked until user grants moved to query
 	grantSearch := &grant_model.UserGrantSearchRequest{
 		Queries: []*grant_model.UserGrantSearchQuery{
 			{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: repo.IamID},
@@ -247,6 +246,7 @@ func (repo *UserGrantRepo) UserGrantsByProjectAndUserID(projectID, userID string
 }
 
 func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectOrgSearchResponse, error) {
+	//TODO: blocked until user moved to query pkg
 	user, err := repo.View.UserByID(ctxData.UserID)
 	if err != nil {
 		return nil, err
@@ -255,40 +255,43 @@ func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectO
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{&grant_model.Org{
+	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{{
 		OrgID:   org.ID,
 		OrgName: org.Name,
 	}}}, nil
 }
 
 func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
-	memberships, count, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
-		Offset: request.Offset,
-		Limit:  request.Limit,
-		Asc:    request.Asc,
-		Queries: []*user_model.UserMembershipSearchQuery{
-			{
-				Key:    user_model.UserMembershipSearchKeyUserID,
-				Method: domain.SearchMethodEquals,
-				Value:  ctxData.UserID,
-			},
+	userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := repo.Query.Memberships(context.TODO(), &query.MembershipSearchQuery{
+		SearchRequest: query.SearchRequest{
+			Offset: request.Offset,
+			Limit:  request.Limit,
+			Asc:    request.Asc,
+			//TODO: sorting column
 		},
+		Queries: []query.SearchQuery{userQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(memberships) > 0 {
-		return membershipsToOrgResp(memberships, count), nil
+	if len(memberships.Memberships) > 0 {
+		return repo.membershipsToOrgResp(memberships), nil
 	}
 	return repo.userOrg(ctxData)
 }
 
-func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissions, membership *user_view_model.UserMembershipView, role string) *grant_model.Permissions {
+func (repo *UserGrantRepo) mapRoleToPermission(permissions *grant_model.Permissions, membership *query.Membership, role string) *grant_model.Permissions {
 	for _, mapping := range repo.Auth.RolePermissionMappings {
 		if mapping.Role == role {
 			ctxID := ""
-			if membership.MemberType == int32(user_model.MemberTypeProject) || membership.MemberType == int32(user_model.MemberTypeProjectGrant) {
-				ctxID = membership.ObjectID
+			if membership.Project != nil {
+				ctxID = membership.Project.ProjectID
+			} else if membership.ProjectGrant != nil {
+				ctxID = membership.ProjectGrant.GrantID
 			}
 			permissions.AppendPermissions(ctxID, mapping.Permissions...)
 		}
