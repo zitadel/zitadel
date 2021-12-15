@@ -42,6 +42,10 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 					Event:  user.UserIDPLinkRemovedType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
 			},
 		},
 		{
@@ -63,15 +67,6 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  iam.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
 				},
 			},
 		},
