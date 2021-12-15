@@ -56,19 +56,27 @@ func (q *Queries) SearchCurrentSequences(ctx context.Context, queries *CurrentSe
 	return scan(rows)
 }
 
-func (q *Queries) latestSequence(ctx context.Context, projection table) (*LatestSequence, error) {
+func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*LatestSequence, error) {
 	query, scan := prepareLatestSequence()
-	stmt, args, err := query.Where(sq.Eq{
-		CurrentSequenceColProjectionName.identifier(): projection.name,
-	}).ToSql()
+	or := make(sq.Or, len(projections))
+	for i, projection := range projections {
+		or[i] = sq.Eq{CurrentSequenceColProjectionName.identifier(): projection.name}
+	}
+	stmt, args, err := query.
+		Where(or).
+		OrderBy(CurrentSequenceColCurrentSequence.identifier()).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, stmt, args...)
-	return scan(row)
+	return &CurrentSequences{
+		CurrentSequences: currentSequences,
+		SearchResponse: SearchResponse{
+			Count: count,
+		},
+	}, nil
 }
-
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
 	tx, err := q.client.Begin()
 	if err != nil {

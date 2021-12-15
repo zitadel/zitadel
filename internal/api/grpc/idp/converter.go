@@ -48,23 +48,23 @@ func IDPViewToPb(idp *query.IDP) *idp_pb.IDP {
 	return mapped
 }
 
-func ExternalIDPViewsToLoginPolicyLinkPb(links []*iam_model.IDPProviderView) []*idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinksToPb(links []*query.IDPLoginPolicyLink) []*idp_pb.IDPLoginPolicyLink {
 	l := make([]*idp_pb.IDPLoginPolicyLink, len(links))
 	for i, link := range links {
-		l[i] = ExternalIDPViewToLoginPolicyLinkPb(link)
+		l[i] = IDPLoginPolicyLinkToPb(link)
 	}
 	return l
 }
 
-func ExternalIDPViewToLoginPolicyLinkPb(link *iam_model.IDPProviderView) *idp_pb.IDPLoginPolicyLink {
+func IDPLoginPolicyLinkToPb(link *query.IDPLoginPolicyLink) *idp_pb.IDPLoginPolicyLink {
 	return &idp_pb.IDPLoginPolicyLink{
-		IdpId:   link.IDPConfigID,
-		IdpName: link.Name,
-		IdpType: IDPTypeViewToPb(link.IDPConfigType),
+		IdpId:   link.IDPID,
+		IdpName: link.IDPName,
+		IdpType: IDPTypeToPb(link.IDPType),
 	}
 }
 
-func IDPUserLinksToPb(res []*query.UserIDPLink) []*idp_pb.IDPUserLink {
+func IDPUserLinksToPb(res []*query.IDPUserLink) []*idp_pb.IDPUserLink {
 	links := make([]*idp_pb.IDPUserLink, len(res))
 	for i, link := range res {
 		links[i] = IDPUserLinkToPb(link)
@@ -72,7 +72,7 @@ func IDPUserLinksToPb(res []*query.UserIDPLink) []*idp_pb.IDPUserLink {
 	return links
 }
 
-func IDPUserLinkToPb(link *query.UserIDPLink) *idp_pb.IDPUserLink {
+func IDPUserLinkToPb(link *query.IDPUserLink) *idp_pb.IDPUserLink {
 	return &idp_pb.IDPUserLink{
 		UserId:           link.UserID,
 		IdpId:            link.IDPID,
@@ -80,19 +80,6 @@ func IDPUserLinkToPb(link *query.UserIDPLink) *idp_pb.IDPUserLink {
 		ProvidedUserId:   link.ProvidedUserID,
 		ProvidedUserName: link.ProvidedUsername,
 		IdpType:          IDPTypeToPb(link.IDPType),
-	}
-}
-
-func IDPTypeViewToPb(idpType iam_model.IdpConfigType) idp_pb.IDPType {
-	switch idpType {
-	case iam_model.IDPConfigTypeOIDC:
-		return idp_pb.IDPType_IDP_TYPE_OIDC
-	case iam_model.IDPConfigTypeSAML:
-		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
-	case iam_model.IDPConfigTypeJWT:
-		return idp_pb.IDPType_IDP_TYPE_JWT
-	default:
-		return idp_pb.IDPType_IDP_TYPE_UNSPECIFIED
 	}
 }
 

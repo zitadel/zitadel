@@ -1,19 +1,17 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { DOCUMENT, ViewportScroller } from '@angular/common';
-import { Component, ElementRef, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, HostBinding, Inject, OnDestroy, ViewChild } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { catchError, debounceTime, finalize, map, take, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { map, take, takeUntil } from 'rxjs/operators';
 
 import { accountCard, adminLineAnimation, navAnimations, routeAnimations, toolbarAnimation } from './animations';
-import { TextQueryMethod } from './proto/generated/zitadel/object_pb';
-import { Org, OrgNameQuery, OrgQuery } from './proto/generated/zitadel/org_pb';
+import { Org } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
@@ -29,7 +27,6 @@ import { UpdateService } from './services/update.service';
 })
 export class AppComponent implements OnDestroy {
   @ViewChild('drawer') public drawer!: MatDrawer;
-  @ViewChild('input', { static: false }) input!: ElementRef;
   public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
     map((result) => {
       return result.matches;
@@ -38,16 +35,13 @@ export class AppComponent implements OnDestroy {
   @HostBinding('class') public componentCssClass: string = 'dark-theme';
 
   public showAccount: boolean = false;
+  public showOrgContext: boolean = false;
   public org!: Org.AsObject;
-  public orgs$: Observable<Org.AsObject[]> = of([]);
   // public user!: User.AsObject;
   public isDarkTheme: Observable<boolean> = of(true);
 
-  public orgLoading$: BehaviorSubject<any> = new BehaviorSubject(false);
-
   public showProjectSection: boolean = false;
 
-  public filterControl: FormControl = new FormControl('');
   private destroy$: Subject<void> = new Subject();
   public labelpolicy!: LabelPolicy.AsObject;
 
@@ -215,10 +209,6 @@ export class AppComponent implements OnDestroy {
       this.language = language.lang;
     });
 
-    this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
-      this.loadOrgs(value.trim().toLowerCase());
-    });
-
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
 
     this.loadPolicies();
@@ -290,29 +280,6 @@ export class AppComponent implements OnDestroy {
     });
   }
 
-  public loadOrgs(filter?: string): void {
-    let query;
-    if (filter) {
-      query = new OrgQuery();
-      const orgNameQuery = new OrgNameQuery();
-      orgNameQuery.setName(filter);
-      orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-      query.setNameQuery(orgNameQuery);
-    }
-
-    this.orgLoading$.next(true);
-    this.orgs$ = from(this.authService.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
-      map((resp) => {
-        return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
-      }),
-      catchError(() => of([])),
-      finalize(() => {
-        this.orgLoading$.next(false);
-        this.focusFilter();
-      }),
-    );
-  }
-
   public prepareRoute(outlet: RouterOutlet): boolean {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData.animation;
   }
@@ -350,6 +317,7 @@ export class AppComponent implements OnDestroy {
   }
 
   public setActiveOrg(org: Org.AsObject): void {
+    console.log(this.org);
     this.org = org;
     this.authService.setActiveOrg(org);
     this.loadPrivateLabelling();
@@ -365,11 +333,5 @@ export class AppComponent implements OnDestroy {
         this.mgmtService.listGrantedProjects(0, 0);
       }
     });
-  }
-
-  focusFilter(): void {
-    setTimeout(() => {
-      this.input.nativeElement.focus();
-    }, 0);
   }
 }

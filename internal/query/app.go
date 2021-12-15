@@ -232,13 +232,26 @@ func (q *Queries) AppByID(ctx context.Context, appID string) (*App, error) {
 func (q *Queries) ProjectIDFromOIDCClientID(ctx context.Context, appID string) (string, error) {
 	stmt, scan := prepareProjectIDByAppQuery()
 	query, args, err := stmt.Where(
+		sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
+	).ToSql()
+	if err != nil {
+		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) ProjectIDFromClientID(ctx context.Context, appID string) (string, error) {
+	stmt, scan := prepareProjectIDByAppQuery()
+	query, args, err := stmt.Where(
 		sq.Or{
 			sq.Eq{AppOIDCConfigColumnClientID.identifier(): appID},
 			sq.Eq{AppAPIConfigColumnClientID.identifier(): appID},
 		},
 	).ToSql()
 	if err != nil {
-		return "", errors.ThrowInternal(err, "QUERY-7d92U", "Errors.Query.SQLStatement")
+		return "", errors.ThrowInternal(err, "QUERY-SDfg3", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
@@ -267,6 +280,22 @@ func (q *Queries) AppByOIDCClientID(ctx context.Context, clientID string) (*App,
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-JgVop", "Errors.Query.SQLStatement")
+	}
+
+	row := q.client.QueryRowContext(ctx, query, args...)
+	return scan(row)
+}
+
+func (q *Queries) AppByClientID(ctx context.Context, clientID string) (*App, error) {
+	stmt, scan := prepareAppQuery()
+	query, args, err := stmt.Where(
+		sq.Or{
+			sq.Eq{AppOIDCConfigColumnClientID.identifier(): clientID},
+			sq.Eq{AppAPIConfigColumnClientID.identifier(): clientID},
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-Dfge2", "Errors.Query.SQLStatement")
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)

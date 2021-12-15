@@ -65,19 +65,16 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	key, err := o.repo.MachineKeyByID(ctx, keyID)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
 	if err != nil {
 		return nil, err
 	}
-	if key.AuthIdentifier != issuer {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
-	}
-	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
+	publicKey, err := crypto.BytesToPublicKey(publicKeyData)
 	if err != nil {
 		return nil, err
 	}
 	return &jose.JSONWebKey{
-		KeyID: key.ID,
+		KeyID: keyID,
 		Use:   "sig",
 		Key:   publicKey,
 	}, nil
@@ -224,7 +221,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
@@ -283,7 +280,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}

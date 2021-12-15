@@ -108,7 +108,7 @@
     }
   },
   "ACTIONS": {
-    "ACTIONS": "Aktionen",
+    "ACTIONS": "Actions",
     "RENAME": "Rename",
     "SET": "Set",
     "COPY": "Copy to Clipboard",
@@ -182,7 +182,11 @@
       "STATE": "Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
-      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
+      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
+      "DELETEACCOUNT": "Delete Account",
+      "DELETEACCOUNT_DESC": "If you perform this action, you will be logged out and will no longer have access to your account. This action is not reversible, so please continue with caution.",
+      "DELETEACCOUNT_BTN": "Delete Account",
+      "DELETEACCOUNT_SUCCESS": "Account deleted successfully!"
     },
     "DETAILS": {
       "DATECREATED": "Created",
@@ -190,7 +194,9 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
-      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?"
+      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?",
+      "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
+      "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Send Email Notification",
@@ -413,6 +419,8 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "validated",
+        "ISVERIFIED": "Email Verified",
+        "ISVERIFIEDDESC": "If the email is indicated as verified, no initialization email will be sent.",
         "RESEND": "Resend Verification E-mail",
         "EDITTITLE": "Change Email",
         "EDITDESC": "Enter the new email in the field below."
@@ -1045,7 +1053,7 @@
       }
     },
     "STATE": {
-      "TITLE": "State",
+      "TITLE": "Status",
       "0": "Not defined",
       "1": "Active",
       "2": "Inactive"
@@ -1102,7 +1110,7 @@
         "GRANTEDORG": "Granted Organisation",
         "RESOURCEOWNER": "Resource Owner"
       },
-      "STATE": "State",
+      "STATE": "Status",
       "STATES": {
         "1": "Active",
         "2": "Inactive"
@@ -1241,7 +1249,7 @@
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Configuration",
-    "STATE": "State",
+    "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
@@ -1335,7 +1343,7 @@
       "CREATE_OIDC": "OIDC Application",
       "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
-      "STATE": "State",
+      "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
       "URLS": "Urls",
