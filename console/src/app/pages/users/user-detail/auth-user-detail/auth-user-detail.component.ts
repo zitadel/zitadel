@@ -7,6 +7,7 @@ import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-dataso
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -55,7 +56,10 @@ export class AuthUserDetailComponent implements OnDestroy {
     public userService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
+    breadcrumbService: BreadcrumbService,
   ) {
+    breadcrumbService.setBreadcrumb([]);
+
     this.loading = true;
     this.refreshUser();
 

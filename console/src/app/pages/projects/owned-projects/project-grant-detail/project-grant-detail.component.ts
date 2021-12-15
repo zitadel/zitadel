@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
@@ -20,7 +20,7 @@ import { ProjectGrantMembersDataSource } from './project-grant-members-datasourc
   templateUrl: './project-grant-detail.component.html',
   styleUrls: ['./project-grant-detail.component.scss'],
 })
-export class ProjectGrantDetailComponent implements OnDestroy {
+export class ProjectGrantDetailComponent {
   public INITIALPAGESIZE: number = 25;
 
   public grant!: GrantedProject.AsObject;
@@ -203,9 +203,5 @@ export class ProjectGrantDetailComponent implements OnDestroy {
       .catch((error) => {
         this.toast.showError(error);
       });
-  }
-
-  public ngOnDestroy(): void {
-    this.breadcrumbService.setBreadcrumb([]);
   }
 }

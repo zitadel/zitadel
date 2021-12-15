@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
@@ -17,7 +17,7 @@ import { ToastService } from 'src/app/services/toast.service';
   templateUrl: './iam.component.html',
   styleUrls: ['./iam.component.scss'],
 })
-export class IamComponent implements OnDestroy {
+export class IamComponent {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -45,10 +45,6 @@ export class IamComponent implements OnDestroy {
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);
-  }
-
-  public ngOnDestroy(): void {
-    this.breadcrumbService.setBreadcrumb([]);
   }
 
   public loadMembers(): void {

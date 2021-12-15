@@ -57,7 +57,6 @@ export class GrantsComponent implements OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.breadcrumbService.setBreadcrumb([]);
     this.destroy$.next();
     this.destroy$.complete();
   }

@@ -11,6 +11,7 @@ import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -38,7 +39,14 @@ export class OrgDetailComponent implements OnInit {
     public mgmtService: ManagementService,
     private toast: ToastService,
     private router: Router,
-  ) {}
+    breadcrumbService: BreadcrumbService,
+  ) {
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([bread]);
+  }
 
   public ngOnInit(): void {
     this.getData();

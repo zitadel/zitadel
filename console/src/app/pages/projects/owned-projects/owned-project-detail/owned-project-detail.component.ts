@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -8,7 +8,9 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
-import { ProjectPrivateLabelingDialogComponent } from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
+import {
+  ProjectPrivateLabelingDialogComponent,
+} from 'src/app/modules/project-private-labeling-dialog/project-private-labeling-dialog.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { App } from 'src/app/proto/generated/zitadel/app_pb';
@@ -29,7 +31,7 @@ const ROUTEPARAM = 'projectid';
   templateUrl: './owned-project-detail.component.html',
   styleUrls: ['./owned-project-detail.component.scss'],
 })
-export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
+export class OwnedProjectDetailComponent implements OnInit {
   public projectId: string = '';
   public project!: Project.AsObject;
 
@@ -71,10 +73,6 @@ export class OwnedProjectDetailComponent implements OnInit, OnDestroy {
       this.projectId = projectId;
       this.getData(projectId);
     }
-  }
-
-  public ngOnDestroy(): void {
-    this.breadcrumbService.setBreadcrumb([]);
   }
 
   public openNameDialog(): void {

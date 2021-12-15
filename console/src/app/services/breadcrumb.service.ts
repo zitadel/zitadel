@@ -5,6 +5,7 @@ import { ManagementService } from './mgmt.service';
 
 export enum BreadcrumbType {
   IAM,
+  ORG,
   PROJECT,
   GRANTEDPROJECT,
   PROJECTGRANT,
@@ -14,8 +15,8 @@ export enum BreadcrumbType {
 
 export class Breadcrumb {
   type: BreadcrumbType = BreadcrumbType.PROJECT;
-  name: string = '';
-  param: {
+  name?: string = '';
+  param?: {
     key: 'projectid' | 'appid' | 'grantid' | 'id';
     value: string;
   } = {
@@ -39,7 +40,7 @@ export class BreadcrumbService {
     map(([breadcrumbs, projects]) => {
       const newValues = breadcrumbs.map((b) => {
         if (!b.name && b.type === BreadcrumbType.PROJECT) {
-          const project = projects.find((project) => project.id === b.param.value);
+          const project = projects.find((project) => b.param && project.id === b.param.value);
           b.name = project?.name ?? '';
           return b;
         } else {

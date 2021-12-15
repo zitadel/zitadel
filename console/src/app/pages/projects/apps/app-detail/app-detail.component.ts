@@ -190,7 +190,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subscription?.unsubscribe();
-    this.breadcrumbService.setBreadcrumb([]);
   }
 
   private initLinks(): void {

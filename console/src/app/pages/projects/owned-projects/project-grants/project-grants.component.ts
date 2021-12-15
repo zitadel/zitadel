@@ -1,6 +1,6 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
@@ -27,7 +27,7 @@ const ROUTEPARAM = 'projectid';
     ]),
   ],
 })
-export class ProjectGrantsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   public projectId: string = '';
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<GrantedProject.AsObject>;
@@ -66,10 +66,6 @@ export class ProjectGrantsComponent implements OnInit, OnDestroy, AfterViewInit 
     this.dataSource = new ProjectGrantsDataSource(this.mgmtService);
     this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
     this.getRoleOptions(this.projectId);
-  }
-
-  public ngOnDestroy(): void {
-    this.breadcrumbService.setBreadcrumb([]);
   }
 
   public ngAfterViewInit(): void {
