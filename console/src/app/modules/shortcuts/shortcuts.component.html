@@ -7,41 +7,96 @@
         <mat-icon *ngIf="editState">close</mat-icon>
       </button>
     </div>
-    <div cdkDropList [cdkDropListData]="shortcuts" class="shortcut-list" (cdkDropListDropped)="drop($event)">
-      <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
-      <ng-container *ngFor="let item of shortcuts">
-        <ng-template cnslHasRole [hasRole]="item.orgWithRole">
-          <a class="shortcut-box" [ngClass]="{'edit-state': editState}" cdkDrag [cdkDragDisabled]="!editState"
-            [routerLink]="item.orgRouterLink">
-            <div class="shortcuts-avatar {{item.color}}">
-              <mat-icon *ngIf="item.svgIcon" class="icon" [svgIcon]="item.svgIcon"></mat-icon>
-              <i *ngIf="item.icon" class="icon {{item.icon}}"></i>
+
+    <div class="shortcut-list-row">
+      <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of main">
+          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+              </div>
+              <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+              <span *ngIf="shortcut.title">{{shortcut.title}}</span>
             </div>
-            <span>{{item.i18nTitle | translate}}</span>
-          </a>
-        </ng-template>
-      </ng-container>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div cdkDropList [cdkDropListData]="secondary" class="shortcut-list"
+        (cdkDropListDropped)="drop($event, 'secondary')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of secondary">
+          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+              </div>
+              <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+              <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+
+      <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event, 'third')">
+        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
+        <ng-container *ngFor="let shortcut of third">
+          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+              </div>
+              <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+              <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
     </div>
   </div>
 
   <div class="shortcut-container" *ngIf="editState">
     <h2>{{'HOME.SHORTCUTS.SETTINGS' | translate}}</h2>
 
-    <div cdkDropList [cdkDropListData]="all" class="shortcut-list" (cdkDropListDropped)="drop($event)">
+    <div class="shortcut-grid-row">
       <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.ADD' | translate}}</p>
-      <ng-container *ngFor="let item of all">
-        <ng-template cnslHasRole [hasRole]="item.orgWithRole">
-          <div class="shortcut-box edit-state" cdkDrag>
-            <div class="shortcuts-avatar {{item.color}}">
-              <mat-icon *ngIf="item.svgIcon" class="icon" [svgIcon]="item.svgIcon"></mat-icon>
-              <i *ngIf="item.icon" class="icon {{item.icon}}"></i>
+
+      <div cdkDropList [cdkDropListData]="all" class="shortcut-grid" (cdkDropListDropped)="drop($event, '')">
+        <ng-container *ngFor="let shortcut of all">
+          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
+          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+            <div class="shortcut-box no-margin edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+              <div class="shortcuts-avatar {{shortcut.color}}">
+                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+              </div>
+              <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+              <span *ngIf="shortcut.title">{{shortcut.title}}</span>
             </div>
-            <span>
-              {{item.i18nTitle | translate}}
-            </span>
-          </div>
-        </ng-template>
-      </ng-container>
+          </ng-template>
+        </ng-container>
+      </div>
     </div>
   </div>
 </div>
+
+<ng-template #shortcutRef let-shortcut="shortcut">
+  <ng-template cnslHasRole [hasRole]="shortcut.withRole">
+    <div class="shortcut-box edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+      <div class="shortcuts-avatar {{shortcut.color}}">
+        <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
+        <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
+      </div>
+      <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
+      <span *ngIf="shortcut.title">{{shortcut.title}}</span>
+    </div>
+  </ng-template>
+</ng-template>

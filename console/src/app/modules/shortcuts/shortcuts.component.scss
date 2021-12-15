@@ -20,8 +20,7 @@
   $border-selected-color: if($is-dark-theme, #ffffff, #000000);
 
   .shortcut-container {
-    width: 400px;
-    max-width: 100%;
+    width: 100%;
     margin: 0 25px 25px 0;
     display: inline-block;
     vertical-align: top;
@@ -36,13 +35,49 @@
     }
   }
 
-  .shortcut-list {
+  .shortcut-list-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+    width: 100%;
+
+    @media only screen and (min-width: 800px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media only screen and (min-width: 1200px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .shortcut-list {
+      border: 1px solid $border-color;
+      min-height: 60px;
+      background-color: $list-background-color;
+      border-radius: 1rem;
+      overflow: hidden;
+      display: block;
+      padding: 1rem;
+
+      .shortcut-desc {
+        align-self: center;
+        font-size: 14px;
+        color: var(--grey);
+        margin-top: 0;
+        text-align: center;
+      }
+    }
+  }
+
+  .shortcut-grid {
+    width: 100%;
     border: 1px solid $border-color;
     min-height: 60px;
     background-color: $list-background-color;
     border-radius: 1rem;
     overflow: hidden;
-    display: block;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 1rem;
     padding: 1rem;
 
     .shortcut-desc {
@@ -78,6 +113,10 @@
 
     &:last-child {
       margin-bottom: 0;
+    }
+
+    &.no-margin {
+      margin: 0;
     }
 
     .shortcuts-avatar {
