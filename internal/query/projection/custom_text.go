@@ -145,6 +145,6 @@ func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.EventReade
 		[]handler.Condition{
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
-			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
 		}), nil
 }
