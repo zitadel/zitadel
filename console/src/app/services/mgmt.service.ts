@@ -1758,8 +1758,8 @@ export class ManagementService {
   }
 
   public listGrantedProjects(
-    limit: number,
-    offset: number,
+    limit?: number,
+    offset?: number,
     queryList?: ProjectQuery[],
   ): Promise<ListGrantedProjectsResponse.AsObject> {
     const req = new ListGrantedProjectsRequest();

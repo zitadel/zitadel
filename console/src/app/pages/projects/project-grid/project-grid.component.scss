@@ -1,4 +1,4 @@
-@mixin owned-project-grid-theme($theme) {
+@mixin project-grid-theme($theme) {
   $foreground: map-get($theme, foreground);
 
   .view-toggle {

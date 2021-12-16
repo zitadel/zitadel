@@ -3,14 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { GrantedProjectsComponent } from './granted-projects.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: GrantedProjectsComponent,
-    data: { animation: 'HomePage' },
-  },
   {
     path: ':projectid/grant/:grantid/members',
     data: {

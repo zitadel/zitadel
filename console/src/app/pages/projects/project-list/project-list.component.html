@@ -1,0 +1,78 @@
+<cnsl-refresh-table (refreshed)="refreshPage()" [dataSize]="totalResult" [timestamp]="viewTimestamp"
+  [selection]="selection" [loading]="loading$ | async">
+
+  <ng-template actions cnslHasRole [hasRole]="['project.create']">
+    <a [routerLink]="[ '/projects', 'create']" color="primary" mat-raised-button>
+      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+    </a>
+  </ng-template>
+  <div class="table-wrapper">
+    <table class="table" mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="select">
+        <th class="selection" mat-header-cell *matHeaderCellDef>
+          <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td class="selection" mat-cell *matCellDef="let row">
+          <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.NAME' | translate }} </th>
+        <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project"> {{project.name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.STATE' | translate }} </th>
+        <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project">
+          <span class="state"
+            [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE}"
+            *ngIf="project.state">{{'PROJECT.STATE.'+project.state | translate}}</span>
+        </td>
+      </ng-container>
+
+
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CREATIONDATE' | translate }} </th>
+        <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project">
+          <span *ngIf="project.details.creationDate">{{project.details.creationDate | timestampToDate |
+            localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
+        </td>
+      </ng-container>
+
+
+      <ng-container matColumnDef="changeDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CHANGEDATE' | translate }} </th>
+        <td [routerLink]="['/projects', project.id]" mat-cell *matCellDef="let project">
+          <span *ngIf="project.details.changeDate">{{project.details.changeDate | timestampToDate |
+            localizedDate: 'EEE dd. MMM, HH:mm'}}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions" stickyEnd>
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let project">
+          <button class="dlt-button" *ngIf="project.id !== zitadelProjectId" color="warn" mat-icon-button
+            matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteProject(project.id)">
+            <i class="las la-trash"></i>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+    <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">
+      <i class="las la-exclamation"></i>
+      <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
+    </div>
+    <cnsl-paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
+  </div>
+</cnsl-refresh-table>

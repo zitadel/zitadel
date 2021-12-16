@@ -1,0 +1,224 @@
+import { animate, animateChild, query, stagger, style, transition, trigger } from '@angular/animations';
+import { SelectionModel } from '@angular/cdk/collections';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
+import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
+
+@Component({
+  selector: 'cnsl-project-list',
+  templateUrl: './project-list.component.html',
+  styleUrls: ['./project-list.component.scss'],
+  animations: [
+    trigger('list', [transition(':enter', [query('@animate', stagger(80, animateChild()))])]),
+    trigger('animate', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-100%)' }),
+        animate('100ms', style({ opacity: 1, transform: 'translateY(0)' })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1, transform: 'translateY(0)' }),
+        animate('100ms', style({ opacity: 0, transform: 'translateY(100%)' })),
+      ]),
+    ]),
+  ],
+})
+export class ProjectListComponent implements OnInit, OnDestroy {
+  public totalResult: number = 0;
+  public viewTimestamp!: Timestamp.AsObject;
+
+  public dataSource: MatTableDataSource<Project.AsObject | GrantedProject.AsObject> = new MatTableDataSource<
+    Project.AsObject | GrantedProject.AsObject
+  >();
+
+  @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
+  @Output() public emitAddProject: EventEmitter<void> = new EventEmitter();
+  @Input() public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
+  public projectList: Project.AsObject[] | GrantedProject.AsObject[] = [];
+  public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
+  public selection: SelectionModel<Project.AsObject | GrantedProject.AsObject> = new SelectionModel<
+    Project.AsObject | GrantedProject.AsObject
+  >(true, []);
+
+  private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loading$: Observable<boolean> = this.loadingSubject.asObservable();
+
+  public grid: boolean = true;
+  private subscription?: Subscription;
+
+  @Input() public zitadelProjectId: string = '';
+  public ProjectState: any = ProjectState;
+
+  constructor(
+    private route: ActivatedRoute,
+    public translate: TranslateService,
+    private mgmtService: ManagementService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
+
+  public ngOnInit(): void {
+    this.route.queryParams.pipe(take(1)).subscribe((params) => {
+      this.getData();
+      if (params.deferredReload) {
+        setTimeout(() => {
+          this.getData();
+        }, 2000);
+      }
+    });
+  }
+
+  public ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+  }
+
+  public isAllSelected(): boolean {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  public masterToggle(): void {
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
+  }
+
+  public changePage(event: PageEvent): void {
+    this.getData(event.pageSize, event.pageSize * event.pageIndex);
+  }
+
+  public addProject(): void {
+    this.emitAddProject.emit();
+  }
+
+  private async getData(limit?: number, offset?: number): Promise<void> {
+    this.loadingSubject.next(true);
+    switch (this.projectType) {
+      case ProjectType.PROJECTTYPE_OWNED:
+        this.mgmtService
+          .listProjects(limit, offset)
+          .then((resp) => {
+            this.projectList = resp.resultList;
+            if (resp.details?.totalResult) {
+              this.totalResult = resp.details.totalResult;
+            } else {
+              this.totalResult = 0;
+            }
+            if (this.totalResult > 10) {
+              this.grid = false;
+            }
+            if (resp.details?.viewTimestamp) {
+              this.viewTimestamp = resp.details?.viewTimestamp;
+            }
+            this.dataSource.data = this.projectList;
+            this.loadingSubject.next(false);
+          })
+          .catch((error) => {
+            console.error(error);
+            this.toast.showError(error);
+            this.loadingSubject.next(false);
+          });
+        break;
+      case ProjectType.PROJECTTYPE_GRANTED:
+        this.mgmtService
+          .listGrantedProjects(limit, offset)
+          .then((resp) => {
+            this.projectList = resp.resultList;
+            if (resp.details?.totalResult) {
+              this.totalResult = resp.details.totalResult;
+            } else {
+              this.totalResult = 0;
+            }
+            if (resp.details?.viewTimestamp) {
+              this.viewTimestamp = resp.details?.viewTimestamp;
+            }
+            if (this.totalResult > 5) {
+              this.grid = false;
+            }
+            this.dataSource.data = this.projectList;
+
+            this.loadingSubject.next(false);
+          })
+          .catch((error) => {
+            console.error(error);
+            this.toast.showError(error);
+            this.loadingSubject.next(false);
+          });
+        break;
+    }
+  }
+
+  public reactivateSelectedProjects(): void {
+    const promises = this.selection.selected.map((project) => {
+      if ((project as Project.AsObject).id) {
+        this.mgmtService.reactivateProject((project as Project.AsObject).id);
+      }
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        this.toast.showInfo('PROJECT.TOAST.REACTIVATED', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public deactivateSelectedProjects(): void {
+    const promises = this.selection.selected.map((project) => {
+      if ((project as Project.AsObject).id) {
+        this.mgmtService.deactivateProject((project as Project.AsObject).id);
+      }
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        this.toast.showInfo('PROJECT.TOAST.DEACTIVATED', true);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
+  }
+
+  public refreshPage(): void {
+    this.selection.clear();
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+  }
+
+  public deleteProject(id: string): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'PROJECT.PAGES.DIALOG.DELETE.TITLE',
+        descriptionKey: 'PROJECT.PAGES.DIALOG.DELETE.DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (this.zitadelProjectId && resp && id !== this.zitadelProjectId) {
+        this.mgmtService
+          .removeProject(id)
+          .then(() => {
+            this.toast.showInfo('PROJECT.TOAST.DELETED', true);
+            setTimeout(() => {
+              this.refreshPage();
+            }, 1000);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+}

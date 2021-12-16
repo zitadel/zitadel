@@ -1,13 +1,8 @@
-<div class="view-toggle">
-  <button (click)="closeGridView()" mat-icon-button matTooltip="{{'PROJECT.TABLE.SHOWTABLE' | translate}}">
-    <i class="show list view las la-th-list"></i>
-  </button>
-</div>
-
 <div class="owned-project-grid-container">
-  <mat-progress-bar *ngIf="loading" class="spinner" color="primary" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar *ngIf="(loading$| async) " class="spinner" color="primary" mode="indeterminate"></mat-progress-bar>
 
-  <p class="n-items" *ngIf="!loading && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}</p>
+  <p class="n-items" *ngIf="!(loading$ | async) && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}
+  </p>
 
   <div class="item card" matRipple *ngFor="let item of selection.selected; index as i"
     (click)="navigateToProject(item.id, $event)"
@@ -33,7 +28,7 @@
 
 </div>
 <div class="owned-project-grid-container">
-  <p class="n-items" *ngIf="!loading && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
+  <p class="n-items" *ngIf="!(loading$ | async) && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
   <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
     (click)="navigateToProject(item.id, $event)"
@@ -59,7 +54,8 @@
     <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
   </div>
 
-  <p class="n-items" *ngIf="!loading && items.length === 0">{{'PROJECT.PAGES.NOITEMS' | translate}}</p>
+  <p class="n-items" *ngIf="!(loading$ | async) && ownedProjectList.length === 0">{{'PROJECT.PAGES.NOITEMS' |
+    translate}}</p>
 
   <ng-template cnslHasRole [hasRole]="['project.create']">
     <div class="add-project-button card" matRipple (click)="addItem()">

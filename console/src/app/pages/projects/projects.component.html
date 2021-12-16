@@ -1,0 +1,29 @@
+<div class="max-width-container">
+  <div class="enlarged-container">
+    <h1>{{ 'PROJECT.PAGES.LIST' | translate }}</h1>
+    <p class="sub max-width-description">{{ 'PROJECT.PAGES.LISTDESCRIPTION' | translate }}</p>
+
+    <!-- <cnsl-owned-project-list></cnsl-owned-project-list> -->
+
+    <div class="projects-controls">
+      <div class="project-type-actions">
+        <button class="type-button" [ngClass]="{'active': projectType === ProjectType.PROJECTTYPE_OWNED}"
+          (click)="setType(ProjectType.PROJECTTYPE_OWNED)">{{'PROJECT.PAGES.TYPE.OWNED' | translate}}</button>
+        <button class="type-button" [ngClass]="{'active': projectType === ProjectType.PROJECTTYPE_GRANTED}"
+          (click)="setType(ProjectType.PROJECTTYPE_GRANTED)">{{'PROJECT.PAGES.TYPE.GRANTED' | translate}}</button>
+      </div>
+      <span class="fill-space"></span>
+      <button (click)="grid = !grid" mat-icon-button>
+        <i *ngIf="grid" class="show list view las la-th-list"></i>
+        <i *ngIf="!grid" class="las la-border-all"></i>
+      </button>
+    </div>
+
+    <cnsl-project-grid *ngIf="grid" [projectType]="projectType" [zitadelProjectId]="zitadelProjectId"
+      (emitAddProject)="addProject()">
+    </cnsl-project-grid>
+
+    <cnsl-project-list *ngIf="!grid">
+    </cnsl-project-list>
+  </div>
+</div>

@@ -24,7 +24,7 @@ const routes: Routes = [
   },
   {
     path: 'projects',
-    loadChildren: () => import('./pages/projects/owned-projects/owned-projects.module').then((m) => m.OwnedProjectsModule),
+    loadChildren: () => import('./pages/projects/projects.module').then((m) => m.ProjectsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['project.read'],

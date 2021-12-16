@@ -58,20 +58,10 @@
 
                     <div class="c_label">
                       <span> {{'MENU.PROJECT' | translate}} </span>
-                      <span *ngIf="(mgmtService?.ownedProjectsCount | async)"
-                        class="count">{{(mgmtService?.ownedProjectsCount
-                        |
-                        async)}}</span>
-                    </div>
-                  </a>
-
-                  <a matTooltip="{{'MENU.TOOLTIP.GRANTEDPROJECTS' | translate}}"
-                    *ngIf="mgmtService?.grantedProjectsCount && (mgmtService?.grantedProjectsCount | async)"
-                    class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
-                    [routerLink]="[ '/granted-projects']">
-                    <div class="c_label">
-                      <span>{{ 'MENU.GRANTEDPROJECT' | translate }}</span>
-                      <span class="count">{{mgmtService?.grantedProjectsCount | async}}</span>
+                      <small
+                        *ngIf="(mgmtService?.ownedProjectsCount | async) && (mgmtService?.grantedProjectsCount | async)"
+                        class="count">({{((mgmtService?.ownedProjectsCount | async) ?? 0) +
+                        ((mgmtService?.grantedProjectsCount | async) ?? 0)}})</small>
                     </div>
                   </a>
                 </ng-template>

@@ -20,11 +20,11 @@
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
+@import 'src/app/pages/projects/projects.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
-@import 'src/app/pages/projects/owned-projects/owned-project-list/owned-project-grid/owned-project-grid.component';
-@import 'src/app/pages/projects/granted-projects/granted-project-list/granted-project-grid/granted-project-grid.component';
+@import 'src/app/pages/projects/project-grid/project-grid.component';
 @import 'src/app/app.component.scss';
 @import 'src/app/pages/iam/iam.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
@@ -48,6 +48,7 @@
   @include nav-theme($theme);
   @include header-theme($theme);
   @include app-type-radio-theme($theme);
+  @include projects-theme($theme);
   @include idp-type-radio-theme($theme);
   @include app-auth-method-radio-theme($theme);
   @include card-theme($theme);
@@ -80,9 +81,8 @@
   @include info-section-theme($theme);
   @include tier-theme($theme);
   @include private-label-theme($theme);
-  @include owned-project-grid-theme($theme);
+  @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);
-  @include granted-project-grid-theme($theme);
   @include info-row-theme($theme);
   @include action-dialog-theme($theme);
   @include codemirror-theme($theme);

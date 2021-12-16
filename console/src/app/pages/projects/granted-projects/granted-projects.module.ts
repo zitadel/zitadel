@@ -31,18 +31,10 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { GrantedProjectDetailComponent } from './granted-project-detail/granted-project-detail.component';
-import { GrantedProjectGridComponent } from './granted-project-list/granted-project-grid/granted-project-grid.component';
-import { GrantedProjectListComponent } from './granted-project-list/granted-project-list.component';
 import { GrantedProjectsRoutingModule } from './granted-projects-routing.module';
-import { GrantedProjectsComponent } from './granted-projects.component';
 
 @NgModule({
-  declarations: [
-    GrantedProjectsComponent,
-    GrantedProjectListComponent,
-    GrantedProjectGridComponent,
-    GrantedProjectDetailComponent,
-  ],
+  declarations: [GrantedProjectDetailComponent],
   imports: [
     CommonModule,
     UserGrantsModule,
