@@ -46,6 +46,23 @@ type SearchQuery interface {
 	toQuery(sq.SelectBuilder) sq.SelectBuilder
 }
 
+type NotNullQuery struct {
+	Column Column
+}
+
+func NewNotNullQuery(col Column) (*NotNullQuery, error) {
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &NotNullQuery{
+		Column: col,
+	}, nil
+}
+
+func (q *NotNullQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(sq.NotEq{q.Column.identifier(): nil})
+}
+
 type TextQuery struct {
 	Column  Column
 	Text    string

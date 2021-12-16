@@ -46,6 +46,7 @@ type AuthRequestRepo struct {
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
+	ApplicationProvider       applicationProvider
 
 	IdGenerator id.Generator
 
@@ -111,6 +112,10 @@ type projectProvider interface {
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
 }
 
+type applicationProvider interface {
+	AppByOIDCClientID(context.Context, string) (*query.App, error)
+}
+
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
 	return repo.AuthRequests.Health(ctx)
 }
@@ -131,7 +136,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 	if err != nil {
 		return nil, err
 	}
-	appIDs, err := repo.Query.SearchAppIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	appIDs, err := repo.Query.SearchClientIDs(ctx, &query.AppSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
 	if err != nil {
 		return nil, err
 	}
@@ -798,6 +803,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, &domain.GrantRequiredStep{}), nil
 	}
 
+	ok, err = repo.hasSucceededPage(ctx, request, repo.ApplicationProvider)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		steps = append(steps, &domain.LoginSucceededStep{})
+	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
 }
 
@@ -984,6 +996,14 @@ func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID stri
 		return nil, err
 	}
 	return query.CustomTextsToDomain(loginTexts), err
+}
+
+func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *domain.AuthRequest, provider applicationProvider) (bool, error) {
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+	if err != nil {
+		return false, err
+	}
+	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {

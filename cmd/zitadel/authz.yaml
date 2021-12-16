@@ -330,6 +330,11 @@ InternalAuthZ:
         - "user.global.read"
         - "user.grant.read"
         - "user.membership.read"
+    - Role: 'SELF_MANAGEMENT_GLOBAL'
+      Permissions:
+        - "org.create"
+        - "policy.read"
+        - "user.self.delete"
     - Role: 'PROJECT_OWNER_GLOBAL'
       Permissions:
         - "org.global.read"

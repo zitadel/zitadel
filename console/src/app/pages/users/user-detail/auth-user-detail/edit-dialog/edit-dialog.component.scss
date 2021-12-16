@@ -2,6 +2,10 @@
   width: 100%;
 }
 
+.verified-checkbox {
+  margin-top: 1.5rem;
+}
+
 .desc {
   font-size: 14px;
   color: var(--grey);
@@ -12,10 +16,10 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   button {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }

@@ -47,8 +47,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			systemDefaults.IamID),
-		newAuthNKeys(
-			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(

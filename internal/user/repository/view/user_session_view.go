@@ -1,14 +1,14 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	auth_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
-
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view/model"
+	"github.com/caos/zitadel/internal/view/repository"
 )
 
 func UserSessionByIDs(db *gorm.DB, table, agentID, userID string) (*model.UserSessionView, error) {
@@ -59,8 +59,7 @@ func UserSessionsByAgentID(db *gorm.DB, table, agentID string) ([]*model.UserSes
 	return userSessions, err
 }
 
-func ActiveUserSessions(db *gorm.DB, table string) ([]*model.UserSessionView, error) {
-	userSessions := make([]*model.UserSessionView, 0)
+func ActiveUserSessions(db *gorm.DB, table string) (uint64, error) {
 	activeQuery := &usr_model.UserSessionSearchQuery{
 		Key:    usr_model.UserSessionSearchKeyState,
 		Method: domain.SearchMethodEquals,
@@ -69,8 +68,7 @@ func ActiveUserSessions(db *gorm.DB, table string) ([]*model.UserSessionView, er
 	query := repository.PrepareSearchQuery(table, model.UserSessionSearchRequest{
 		Queries: []*usr_model.UserSessionSearchQuery{activeQuery},
 	})
-	_, err := query(db, &userSessions)
-	return userSessions, err
+	return query(db, nil)
 }
 
 func PutUserSession(db *gorm.DB, table string, session *model.UserSessionView) error {
