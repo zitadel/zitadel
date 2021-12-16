@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
 )
 
 type OrgMemberProjection struct {
@@ -48,6 +49,24 @@ func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  org.MemberRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
 				},
 			},
 		},
@@ -93,5 +112,30 @@ func (p *OrgMemberProjection) reduceRemoved(event eventstore.EventReader) (*hand
 		logging.LogWithFields("HANDL-KPyxE", "seq", event.Sequence(), "expected", org.MemberRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-avatH", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(e.MemberRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
+	return reduceMemberRemoved(e,
+		withMemberCond(MemberUserIDCol, e.UserID),
+		withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID),
+	)
+}
+
+func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-f5pgn", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-eBMqH", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
+}
+
+func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	//TODO: as soon as org deletion is implemented:
+	// Case: The user has resource owner A and an org has resource owner B
+	// if org B deleted it works
+	// if org A is deleted, the membership wouldn't be deleted
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-E5lDs", "seq", event.Sequence(), "expected", org.OrgRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jnGAV", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }

@@ -134,14 +134,18 @@ func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*mgmt_pb.ListProjectGrantMembersResponse, error) {
-	response, err := s.project.SearchProjectGrantMembers(ctx, ListProjectGrantMembersRequestToModel(req))
+	queries, err := ListProjectGrantMembersRequestToModel(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	response, err := s.query.ProjectGrantMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
-		Result: member_grpc.ProjectGrantMembersToPb(response.Result),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix, response.Members),
 		Details: object_grpc.ToListDetails(
-			response.TotalResult,
+			response.Count,
 			response.Sequence,
 			response.Timestamp,
 		),
