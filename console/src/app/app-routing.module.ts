@@ -14,14 +14,6 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: 'firststeps',
-    loadChildren: () => import('./modules/onboarding/onboarding.module').then((m) => m.OnboardingModule),
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.write'],
-    },
-  },
-  {
     path: 'granted-projects',
     loadChildren: () =>
       import('./pages/projects/granted-projects/granted-projects.module').then((m) => m.GrantedProjectsModule),
@@ -45,10 +37,6 @@ const routes: Routes = [
       {
         path: '',
         loadChildren: () => import('src/app/pages/users/users.module').then((m) => m.UsersModule),
-        // canActivate: [RoleGuard],
-        // data: {
-        //   roles: ['user.read'],
-        // },
       },
     ],
   },

@@ -13,7 +13,7 @@
   $back: map-get($background, background);
 
   .footer-wrapper {
-    padding: 0.5rem 2rem;
+    padding: 2rem 2rem 1rem 2rem;
     background-color: map-get($background, footer) !important;
     border-top: 1px solid map-get($foreground, divider);
     padding-bottom: 50px;

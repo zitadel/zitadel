@@ -16,6 +16,14 @@ import { ManagementService } from 'src/app/services/mgmt.service';
   styleUrls: ['./nav.component.scss'],
   animations: [
     // trigger('navWrapper', [transition('* => *', [query('@navitem', stagger('50ms', animateChild()), { optional: true })])]),
+    trigger('navrow', [
+      transition(':enter', [
+        animate('.2s ease-in', keyframes([style({ opacity: 0, height: '0' }), style({ opacity: 1, height: '*' })])),
+      ]),
+      transition(':leave', [
+        animate('.2s ease-out', keyframes([style({ opacity: 1, height: '*' }), style({ opacity: 0, height: '0' })])),
+      ]),
+    ]),
     trigger('navroworg', [
       transition(':enter', [
         animate(

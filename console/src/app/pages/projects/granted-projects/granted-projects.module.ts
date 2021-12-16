@@ -69,7 +69,6 @@ import { GrantedProjectsComponent } from './granted-projects.component';
     MatTooltipModule,
     MatSortModule,
     HasRolePipeModule,
-    TranslateModule,
     TimestampToDatePipeModule,
     SharedModule,
     InfoRowModule,

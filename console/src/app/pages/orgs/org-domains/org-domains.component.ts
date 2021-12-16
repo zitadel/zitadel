@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -19,7 +20,18 @@ export class OrgDomainsComponent implements OnInit {
   public primaryDomain: string = '';
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {}
+  constructor(
+    private mgmtService: ManagementService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+    breadcrumbService: BreadcrumbService,
+  ) {
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([bread]);
+  }
 
   ngOnInit(): void {
     this.loadDomains();

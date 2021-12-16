@@ -82,13 +82,13 @@
     box-shadow: 0 0 3px #0000001a;
 
     &.active {
-      background-color: if($is-dark-theme, map-get($background, state), #cbf4c9);
+      background-color: if($is-dark-theme, map-get($background, state-active), #cbf4c9);
       color: if($is-dark-theme, #cbf4c9, #0e6245);
     }
 
     &.inactive {
       color: if($is-dark-theme, #ffc1c1, #620e0e);
-      background-color: if($is-dark-theme, map-get($background, state), #ffc1c1);
+      background-color: if($is-dark-theme, map-get($background, state-inactive), #ffc1c1);
     }
   }
 

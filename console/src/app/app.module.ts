@@ -1,4 +1,3 @@
-import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import localeDe from '@angular/common/locales/de';
@@ -15,16 +14,12 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
-import { OnboardingModule } from 'src/app/modules/onboarding/onboarding.module';
-import { RegExpPipeModule } from 'src/app/pipes/regexp-pipe/regexp-pipe.module';
 import { AssetService } from 'src/app/services/asset.service';
 import { SubscriptionService } from 'src/app/services/subscription.service';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
-import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
-import { AvatarModule } from './modules/avatar/avatar.module';
 import { FooterModule } from './modules/footer/footer.module';
 import { HeaderModule } from './modules/header/header.module';
 import { NavModule } from './modules/nav/nav.module';
@@ -81,7 +76,6 @@ const authConfig: AuthConfig = {
     CommonModule,
     BrowserModule,
     HeaderModule,
-    OverlayModule,
     OAuthModule.forRoot({
       resourceServer: {
         allowedUrls: [
@@ -102,7 +96,6 @@ const authConfig: AuthConfig = {
     NavModule,
     MatNativeDateModule,
     QuicklinkModule,
-    AccountsCardModule,
     HasRoleModule,
     BrowserAnimationsModule,
     HttpClientModule,
@@ -111,11 +104,8 @@ const authConfig: AuthConfig = {
     FooterModule,
     HasRolePipeModule,
     MatSnackBarModule,
-    AvatarModule,
     WarnDialogModule,
     MatDialogModule,
-    RegExpPipeModule,
-    OnboardingModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [

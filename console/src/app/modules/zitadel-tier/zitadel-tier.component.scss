@@ -31,9 +31,10 @@
       }
     }
 
-    .text {
+    .tier-text {
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
 
       p:not(.state) {
         margin: 0;

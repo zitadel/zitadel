@@ -21,14 +21,12 @@
     flex-direction: column;
     width: 100%;
     min-height: 100%;
-    // height: 100%;
     position: relative;
 
     .router {
       padding: 0 2rem;
 
       .outlet {
-        // max-width: 80rem;
         margin: 0 auto;
       }
     }
@@ -45,34 +43,6 @@
 
       &.shadow {
         box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
-      }
-    }
-
-    .theme-section {
-      display: block;
-      padding: 0 0.5rem;
-      margin-top: 2rem;
-      align-self: flex-start;
-      border-radius: 1rem;
-
-      .round-light {
-        display: inline-block;
-        border-radius: 50%;
-        height: 30px;
-        width: 30px;
-        margin: 0.5rem;
-        cursor: pointer;
-        background: linear-gradient(315deg, #e6e6e6, #fff);
-      }
-
-      .round-dark {
-        display: inline-block;
-        border-radius: 50%;
-        height: 30px;
-        width: 30px;
-        margin: 0.5rem;
-        cursor: pointer;
-        background: linear-gradient(315deg, #000, #000);
       }
     }
 
@@ -109,28 +79,5 @@
       visibility: hidden;
       width: 4rem;
     }
-  }
-
-  .menu {
-    position: relative;
-
-    .filter-wrapper {
-      padding: 4px;
-    }
-
-    .spinner-w {
-      top: 1rem;
-      left: 0;
-      right: 0;
-      position: absolute;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-  }
-
-  .org-wrapper {
-    max-height: 350px;
-    overflow-y: auto;
   }
 }

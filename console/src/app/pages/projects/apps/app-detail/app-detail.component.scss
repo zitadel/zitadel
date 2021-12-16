@@ -88,6 +88,13 @@
     color: $warn-color;
     font-size: 14px;
   }
+
+  .app-divider {
+    flex-basis: 100%;
+    margin: 1.5rem 0;
+    height: 1px;
+    background-color: map-get($foreground, dividers);
+  }
 }
 
 .head {
@@ -306,11 +313,4 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
-}
-
-.divider {
-  flex-basis: 100%;
-  margin: 1.5rem 0.5rem;
-  height: 1px;
-  background-color: rgba(#8795a1, 0.2);
 }

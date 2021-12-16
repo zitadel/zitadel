@@ -52,6 +52,12 @@ export class GrantsComponent implements OnDestroy {
             this.breadcrumbService.setBreadcrumb(breadcrumbs);
           });
         }
+      } else if (context === UserGrantContext.NONE) {
+        const bread: Breadcrumb = {
+          type: BreadcrumbType.ORG,
+          routerLink: ['/org'],
+        };
+        breadcrumbService.setBreadcrumb([bread]);
       }
     });
   }

@@ -243,6 +243,8 @@ $caos-dark-theme-background: (
   warninfosection: map_get($caos-dark-background, 400),
   successinfosection: map_get($caos-dark-background, 300),
   state: map_get($caos-dark-background, 300),
+  state-active: #68cf8340,
+  state-inactive: #af455359,
   toolbar: rgba(map_get($caos-dark-background, 500), 0.9),
   footer: #00000020,
 );
@@ -477,6 +479,10 @@ h2 {
 .max-width-container {
   max-width: 80rem;
   margin: 0 auto;
+}
+
+.max-width-description {
+  max-width: 50rem;
 }
 
 .enlarged-container {

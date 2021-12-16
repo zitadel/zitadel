@@ -19,14 +19,13 @@
         <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE" class="las la-mobile"></i>
         <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_WEB" class="las la-code"></i>
         <i *ngIf="app.oidcConfig?.appType === OIDCAppType.OIDC_APP_TYPE_USER_AGENT" class="las la-code"></i>
-        <i *ngIf="app.apiConfig" class="las la-code"></i>
+        <i *ngIf="app.apiConfig" class="las la-robot"></i>
       </ng-container>
     </cnsl-app-card>
     <span class="name">{{app.name}}</span>
     <span *ngIf="app.oidcConfig?.appType !== undefined && app.oidcConfig?.appType !== null" class="type">
       {{'APP.OIDC.APPTYPE.'+app.oidcConfig?.appType | translate}}</span>
     <span *ngIf="app.apiConfig !== undefined" class="type"> API</span>
-
   </div>
 
   <ng-template cnslHasRole [hasRole]="['project.app.write']">

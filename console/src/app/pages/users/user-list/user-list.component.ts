@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { Type } from 'src/app/proto/generated/zitadel/user_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 
 @Component({
   selector: 'cnsl-user-list',
@@ -16,10 +17,16 @@ export class UserListComponent {
   public displayedColumnsHuman: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
   public displayedColumnsMachine: string[] = ['select', 'displayName', 'username', 'state', 'actions'];
 
-  constructor(public translate: TranslateService, activatedRoute: ActivatedRoute) {
+  constructor(public translate: TranslateService, activatedRoute: ActivatedRoute, breadcrumbService: BreadcrumbService) {
     activatedRoute.data.pipe(take(1)).subscribe((params) => {
       const { type } = params;
       this.type = type;
     });
+
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([bread]);
   }
 }

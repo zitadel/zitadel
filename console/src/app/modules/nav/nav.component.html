@@ -4,8 +4,8 @@
     <ng-container
       *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc">
 
-      <ng-container *ngIf="breadc[0]" [ngSwitch]="breadc[0].type">
-        <div class="nav-row">
+      <ng-container *ngIf="breadc[0] && breadc.length < 2" [ngSwitch]="breadc[0].type">
+        <div class="nav-row" @navrow>
           <ng-container *ngSwitchCase="BreadcrumbType.IAM">
             <div class="nav-row-abs" @navroworg>
               <ng-template cnslHasRole [hasRole]="['iam.read']">
