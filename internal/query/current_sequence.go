@@ -13,6 +13,14 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
+const (
+	lockStmtFormat = "INSERT INTO %[1]s" +
+		" (locker_id, locked_until, projection_name) VALUES ($1, now()+$2::INTERVAL, $3)" +
+		" ON CONFLICT (projection_name)" +
+		" DO UPDATE SET locker_id = $1, locked_until = now()+$2::INTERVAL"
+	lockerIDReset = "reset"
+)
+
 type LatestSequence struct {
 	Sequence  uint64
 	Timestamp time.Time
@@ -70,18 +78,32 @@ func (q *Queries) latestSequence(ctx context.Context, projections ...table) (*La
 		return nil, errors.ThrowInternal(err, "QUERY-5CfX9", "Errors.Query.SQLStatement")
 	}
 
-	return &CurrentSequences{
-		CurrentSequences: currentSequences,
-		SearchResponse: SearchResponse{
-			Count: count,
-		},
-	}, nil
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
 }
+
 func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName string) (err error) {
+	err = q.checkAndLock(ctx, projectionName)
+	if err != nil {
+		return err
+	}
+
 	tx, err := q.client.Begin()
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-9iOpr", "Errors.RemoveFailed")
 	}
+	tables, err := tablesForReset(ctx, tx, projectionName)
+	if err != nil {
+		return err
+	}
+	err = reset(tx, tables, projectionName)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error {
 	projectionQuery, args, err := sq.Select("count(*)").
 		From("[show tables from zitadel.projections]").
 		Where(
@@ -94,11 +116,29 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-Dfwf2", "Errors.ProjectionName.Invalid")
 	}
-	row := tx.QueryRowContext(ctx, projectionQuery, args...)
+	row := q.client.QueryRowContext(ctx, projectionQuery, args...)
 	var count int
 	if err := row.Scan(&count); err != nil || count == 0 {
 		return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 	}
+	lock := fmt.Sprintf(lockStmtFormat, locksTable.identifier())
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-DVfg3", "Errors.RemoveFailed")
+	}
+	//lock for twice the default duration (10s)
+	res, err := q.client.ExecContext(ctx, lock, lockerIDReset, 20*time.Second, projectionName)
+	if err != nil {
+		return errors.ThrowInternal(err, "QUERY-WEfr2", "Errors.RemoveFailed")
+	}
+	rows, err := res.RowsAffected()
+	if err != nil || rows == 0 {
+		return errors.ThrowInternal(err, "QUERY-Bh3ws", "Errors.RemoveFailed")
+	}
+	time.Sleep(7 * time.Second) //more than twice the default lock duration (10s)
+	return nil
+}
+
+func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) ([]string, error) {
 	tablesQuery, args, err := sq.Select("concat('zitadel.projections.', table_name)").
 		From("[show tables from zitadel.projections]").
 		Where(
@@ -110,22 +150,26 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-ASff2", "Errors.ProjectionName.Invalid")
+		return nil, errors.ThrowInternal(err, "QUERY-ASff2", "Errors.ProjectionName.Invalid")
 	}
 	var tables []string
 	rows, err := tx.QueryContext(ctx, tablesQuery, args...)
 	if err != nil {
-		return errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
+		return nil, errors.ThrowInternal(err, "QUERY-Dgfw", "Errors.ProjectionName.Invalid")
 	}
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
-			return errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
+			return nil, errors.ThrowInternal(err, "QUERY-ej8fn", "Errors.ProjectionName.Invalid")
 		}
 		tables = append(tables, tableName)
 	}
+	return tables, nil
+}
+
+func reset(tx *sql.Tx, tables []string, projectionName string) error {
 	for _, tableName := range tables {
-		_, err = tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
+		_, err := tx.Exec(fmt.Sprintf("TRUNCATE %s cascade", tableName))
 		if err != nil {
 			return errors.ThrowInternal(err, "QUERY-3n92f", "Errors.RemoveFailed")
 		}
@@ -142,7 +186,7 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-NFiws", "Errors.RemoveFailed")
 	}
-	return tx.Commit()
+	return nil
 }
 
 func prepareLatestSequence() (sq.SelectBuilder, func(*sql.Row) (*LatestSequence, error)) {
@@ -224,5 +268,23 @@ var (
 	CurrentSequenceColProjectionName = Column{
 		name:  "projection_name",
 		table: currentSequencesTable,
+	}
+)
+
+var (
+	locksTable = table{
+		name: projection.LocksTable,
+	}
+	LocksColLockerID = Column{
+		name:  "locker_id",
+		table: locksTable,
+	}
+	LocksColUntil = Column{
+		name:  "locked_until",
+		table: locksTable,
+	}
+	LocksColProjectionName = Column{
+		name:  "projection_name",
+		table: locksTable,
 	}
 )

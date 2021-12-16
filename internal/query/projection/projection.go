@@ -13,7 +13,7 @@ import (
 
 const (
 	CurrentSeqTable   = "projections.current_sequences"
-	locksTable        = "projections.locks"
+	LocksTable        = "projections.locks"
 	FailedEventsTable = "projections.failed_events"
 )
 
@@ -28,7 +28,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
-		LockTable:         locksTable,
+		LockTable:         LocksTable,
 		FailedEventsTable: FailedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
 		BulkLimit:         config.BulkLimit,

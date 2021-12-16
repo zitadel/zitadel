@@ -6,7 +6,7 @@ Errors:
   ResourceOwnerMissing: Organisation fehlt
   RemoveFailed: Konnte nicht gelöscht werden
   ProjectionName:
-    Invalid: Ungültiger Projektions name
+    Invalid: Ungültiger Projektionsname
   Assets:
     EmptyKey: Asset Key ist leer
     Store:
