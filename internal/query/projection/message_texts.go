@@ -147,7 +147,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-fm0ge", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	cols := []handler.Column{
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
@@ -192,7 +192,7 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventRead
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n9rs", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	return crdb.NewDeleteStatement(
 		templateEvent,
