@@ -6,25 +6,22 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/caos/logging"
 	"golang.org/x/text/language"
-	"sigs.k8s.io/yaml"
 
+	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-
-	"github.com/caos/logging"
-
-	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
+	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type IAMRepository struct {

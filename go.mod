@@ -36,14 +36,11 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.1
-	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kevinburke/twilio-go v0.0.0-20210327194925-1623146bcf73
 	github.com/lib/pq v1.10.4
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/manifoldco/promptui v0.9.0
-	github.com/mattn/go-colorable v0.1.12 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/minio/minio-go/v7 v7.0.16
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
@@ -70,7 +67,6 @@ require (
 	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.8
 	google.golang.org/api v0.61.0
@@ -96,15 +92,15 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.1 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.6.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.10.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.6.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.11.1 // indirect
 	github.com/aws/smithy-go v1.9.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
@@ -126,6 +122,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/fxamacker/cbor/v2 v2.2.0 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.0.0 // indirect
 	github.com/go-git/go-git/v5 v5.2.0 // indirect
@@ -161,7 +158,7 @@ require (
 	github.com/klauspost/cpuid v1.3.1 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
-	github.com/mattn/go-colorable v0.1.11 // indirect; indirect github.com/mitchellh/copystructure v1.0.0 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
@@ -198,9 +195,9 @@ require (
 	go.opentelemetry.io/otel/internal/metric v0.25.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
-	golang.org/x/mod v0.5.0 // indirect
+	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
-	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
+	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
 	golang.org/x/term v0.0.0-20210503060354-a79de5458b56 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
@@ -216,7 +213,6 @@ require (
 	k8s.io/utils v0.0.0-20210819203725-bdf08cb9a70a // indirect
 	sigs.k8s.io/controller-tools v0.7.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
-	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4

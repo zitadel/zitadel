@@ -9,12 +9,13 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/ghodss/yaml"
-	"golang.org/x/text/language"
 )
 
 type CustomTexts struct {
