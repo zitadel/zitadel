@@ -1,69 +1,83 @@
-<div class="owned-project-grid-container">
-  <mat-progress-bar *ngIf="(loading$| async) " class="spinner" color="primary" mode="indeterminate"></mat-progress-bar>
+<ng-container *ngIf="projectType$ | async as type">
+  <div class="owned-project-grid-container">
+    <mat-progress-bar *ngIf="(loading$| async) " class="spinner" color="primary" mode="indeterminate">
+    </mat-progress-bar>
 
-  <p class="n-items" *ngIf="!(loading$ | async) && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' | translate}}
-  </p>
+    <p class="n-items" *ngIf="!(loading$ | async) && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' |
+      translate}}
+    </p>
 
-  <div class="item card" matRipple *ngFor="let item of selection.selected; index as i"
-    (click)="navigateToProject(item.id, $event)"
-    [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
-    <div class="text-part">
-      <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
-        {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
-      <div class="name-row">
-        <span class="name" *ngIf="item.name">{{ item.name }}</span>
-        <div class="state-dot"
-          [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
+    <div class="item card" matRipple *ngFor="let item of selection.selected; index as i"
+      (click)="navigateToProject(type, item, $event)"
+      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
+      <div class="text-part">
+        <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+        <div class="name-row">
+          <span class="name" *ngIf="$any(item).name">{{ $any(item).name ?? '' }}</span>
+          <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName ?? '' }}</span>
+
+          <div class="state-dot"
+            [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
+          </div>
         </div>
+
+        <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' |
+          translate}}
+          {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+        <span class="fill-space"></span>
       </div>
 
-      <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-        {{ item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
-      <span class="fill-space"></span>
+      <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
+      <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
 
-    <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
-    <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
   </div>
+  <div class="owned-project-grid-container">
+    <p class="n-items" *ngIf="!(loading$ | async) && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
 
-</div>
-<div class="owned-project-grid-container">
-  <p class="n-items" *ngIf="!(loading$ | async) && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
+    <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
+      (click)="navigateToProject(type, $any(item), $event)"
+      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
+      <div class="text-part">
+        <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+          {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
+        <div class="name-row">
+          <span class="name" *ngIf="$any(item).name">{{ $any(item).name ?? '' }}</span>
+          <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName ?? '' }}</span>
 
-  <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
-    (click)="navigateToProject(item.id, $event)"
-    [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
-    <div class="text-part">
-      <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
-        {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
-      <div class="name-row">
-        <span class="name" *ngIf="item.name">{{ item.name }}</span>
-        <div class="state-dot"
-          [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
+          <div class="state-dot"
+            [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
+          </div>
         </div>
+
+        <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' |
+          translate}}
+          {{
+          item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
+          }}</span>
+        <span class="fill-space"></span>
       </div>
 
-      <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' | translate}}
-        {{
-        item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
-        }}</span>
-      <span class="fill-space"></span>
+      <ng-container *ngIf="type === ProjectType.PROJECTTYPE_OWNED">
+        <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
+      </ng-container>
+      <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
 
-    <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
-    <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
+    <p class="n-items" *ngIf="!(loading$ | async) && projectList.length === 0">{{'PROJECT.PAGES.NOITEMS' |
+      translate}}</p>
+
+    <ng-container *ngIf="type === ProjectType.PROJECTTYPE_OWNED">
+      <ng-template cnslHasRole [hasRole]="['project.create']">
+        <div class="add-project-button card" matRipple (click)="addItem()">
+          <mat-icon class="icon">add</mat-icon>
+          <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>
+        </div>
+      </ng-template>
+    </ng-container>
   </div>
-
-  <p class="n-items" *ngIf="!(loading$ | async) && ownedProjectList.length === 0">{{'PROJECT.PAGES.NOITEMS' |
-    translate}}</p>
-
-  <ng-template cnslHasRole [hasRole]="['project.create']">
-    <div class="add-project-button card" matRipple (click)="addItem()">
-      <mat-icon class="icon">add</mat-icon>
-      <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>
-    </div>
-  </ng-template>
-</div>
+</ng-container>
 
 <ng-template #deleteButton let-key="key">
   <button *ngIf="key.id !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"

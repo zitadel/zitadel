@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -11,7 +12,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 })
 export class ProjectsComponent {
   public zitadelProjectId: string = '';
-  public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
+  public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
   public ProjectType: any = ProjectType;
   public grid: boolean = true;
   constructor(private router: Router, mgmtService: ManagementService, breadcrumbService: BreadcrumbService) {
@@ -31,6 +32,6 @@ export class ProjectsComponent {
   }
 
   public setType(type: ProjectType) {
-    this.projectType = type;
+    this.projectType$.next(type);
   }
 }

@@ -7,9 +7,9 @@
 
     <div class="projects-controls">
       <div class="project-type-actions">
-        <button class="type-button" [ngClass]="{'active': projectType === ProjectType.PROJECTTYPE_OWNED}"
+        <button class="type-button" [ngClass]="{'active': (projectType$ | async) === ProjectType.PROJECTTYPE_OWNED}"
           (click)="setType(ProjectType.PROJECTTYPE_OWNED)">{{'PROJECT.PAGES.TYPE.OWNED' | translate}}</button>
-        <button class="type-button" [ngClass]="{'active': projectType === ProjectType.PROJECTTYPE_GRANTED}"
+        <button class="type-button" [ngClass]="{'active': (projectType$ | async) === ProjectType.PROJECTTYPE_GRANTED}"
           (click)="setType(ProjectType.PROJECTTYPE_GRANTED)">{{'PROJECT.PAGES.TYPE.GRANTED' | translate}}</button>
       </div>
       <span class="fill-space"></span>
@@ -19,7 +19,7 @@
       </button>
     </div>
 
-    <cnsl-project-grid *ngIf="grid" [projectType]="projectType" [zitadelProjectId]="zitadelProjectId"
+    <cnsl-project-grid *ngIf="grid" [projectType$]="projectType$" [zitadelProjectId]="zitadelProjectId"
       (emitAddProject)="addProject()">
     </cnsl-project-grid>
 
