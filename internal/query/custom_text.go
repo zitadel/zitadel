@@ -1,79 +1,270 @@
-package model
+package query
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
 
 	"github.com/caos/zitadel/internal/domain"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
-
-	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-
-	"github.com/caos/logging"
-
-	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/query/projection"
 )
 
-const (
-	CustomTextKeyAggregateID = "aggregate_id"
-	CustomTextKeyTemplate    = "template"
-	CustomTextKeyLanguage    = "language"
-	CustomTextKeyKey         = "key"
-)
-
-type CustomTextView struct {
-	AggregateID  string    `json:"-" gorm:"column:aggregate_id;primary_key"`
-	CreationDate time.Time `json:"-" gorm:"column:creation_date"`
-	ChangeDate   time.Time `json:"-" gorm:"column:change_date"`
-
-	Template string `json:"template" gorm:"column:template;primary_key"`
-	Language string `json:"language" gorm:"column:language;primary_key"`
-	Key      string `json:"key" gorm:"column:key;primary_key"`
-	Text     string `json:"text" gorm:"column:text"`
-
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
+type CustomTexts struct {
+	SearchResponse
+	CustomTexts []*CustomText
 }
 
-func (i *CustomTextView) AppendEvent(event *models.Event) (err error) {
-	i.Sequence = event.Sequence
-	switch event.Type {
-	case es_model.CustomTextSet, org_es_model.CustomTextSet:
-		i.setRootData(event)
-		err = i.SetData(event)
-		if err != nil {
-			return err
+type CustomText struct {
+	AggregateID  string
+	Sequence     uint64
+	CreationDate time.Time
+	ChangeDate   time.Time
+
+	Template string
+	Language language.Tag
+	Key      string
+	Text     string
+}
+
+var (
+	customTextTable = table{
+		name: projection.CustomTextTable,
+	}
+	CustomTextColAggregateID = Column{
+		name:  projection.CustomTextAggregateIDCol,
+		table: customTextTable,
+	}
+	CustomTextColSequence = Column{
+		name:  projection.CustomTextSequenceCol,
+		table: customTextTable,
+	}
+	CustomTextColCreationDate = Column{
+		name:  projection.CustomTextCreationDateCol,
+		table: customTextTable,
+	}
+	CustomTextColChangeDate = Column{
+		name:  projection.CustomTextChangeDateCol,
+		table: customTextTable,
+	}
+	CustomTextColTemplate = Column{
+		name:  projection.CustomTextTemplateCol,
+		table: customTextTable,
+	}
+	CustomTextColLanguage = Column{
+		name:  projection.CustomTextLanguageCol,
+		table: customTextTable,
+	}
+	CustomTextColKey = Column{
+		name:  projection.CustomTextKeyCol,
+		table: customTextTable,
+	}
+	CustomTextColText = Column{
+		name:  projection.CustomTextTextCol,
+		table: customTextTable,
+	}
+)
+
+func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, language string) (texts *CustomTexts, err error) {
+	stmt, scan := prepareCustomTextsQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			CustomTextColAggregateID.identifier(): aggregateID,
+			CustomTextColTemplate.identifier():    template,
+			CustomTextColLanguage.identifier():    language,
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-M9gse", "Errors.Query.SQLStatement")
+	}
+
+	rows, err := q.client.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-2j00f", "Errors.Internal")
+	}
+	texts, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	texts.LatestSequence, err = q.latestSequence(ctx, projectsTable)
+	return texts, err
+}
+
+func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, template string) (texts *CustomTexts, err error) {
+	stmt, scan := prepareCustomTextsQuery()
+	query, args, err := stmt.Where(
+		sq.Eq{
+			CustomTextColAggregateID.identifier(): aggregateID,
+			CustomTextColTemplate.identifier():    template,
+		},
+	).ToSql()
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-M49fs", "Errors.Query.SQLStatement")
+	}
+
+	rows, err := q.client.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-3n9ge", "Errors.Internal")
+	}
+	texts, err = scan(rows)
+	if err != nil {
+		return nil, err
+	}
+	texts.LatestSequence, err = q.latestSequence(ctx, projectsTable)
+	return texts, err
+}
+
+func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	contents, err := q.readLoginTranslationFile(lang)
+	if err != nil {
+		return nil, err
+	}
+	loginText := new(domain.CustomLoginText)
+	if err := yaml.Unmarshal(contents, loginText); err != nil {
+		return nil, errors.ThrowInternal(err, "TEXT-M0p4s", "Errors.TranslationFile.ReadError")
+	}
+	return loginText, nil
+}
+
+func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang string) (*domain.CustomLoginText, error) {
+	texts, err := q.CustomTextList(ctx, aggregateID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	return CustomTextsToLoginDomain(domain.IAMID, lang, texts), err
+}
+
+func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
+	contents, err := q.readLoginTranslationFile(lang)
+	if err != nil {
+		return nil, err
+	}
+	loginTextMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-m0Jf3", "Errors.TranslationFile.ReadError")
+	}
+	texts, err := q.CustomTextList(ctx, domain.IAMID, domain.LoginCustomText, lang)
+	if err != nil {
+		return nil, err
+	}
+	for _, text := range texts.CustomTexts {
+		keys := strings.Split(text.Key, ".")
+		screenTextMap, ok := loginTextMap[keys[0]].(map[string]interface{})
+		if !ok {
+			continue
 		}
-		i.ChangeDate = event.CreationDate
+		screenTextMap[keys[1]] = text.Text
 	}
-	return err
-}
-
-func (r *CustomTextView) setRootData(event *models.Event) {
-	r.AggregateID = event.AggregateID
-}
-
-func (r *CustomTextView) SetData(event *models.Event) error {
-	if err := json.Unmarshal(event.Data, r); err != nil {
-		logging.Log("MODEL-3n9fs").WithError(err).Error("could not unmarshal event data")
-		return caos_errs.ThrowInternal(err, "MODEL-5CVaR", "Could not unmarshal data")
+	jsonbody, err := json.Marshal(loginTextMap)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-0nJ3f", "Errors.TranslationFile.MergeError")
 	}
-	return nil
+	loginText := new(domain.CustomLoginText)
+	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
+		return nil, errors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
+	}
+	return loginText, nil
 }
 
-func (r *CustomTextView) IsMessageTemplate() bool {
-	return r.Template == domain.InitCodeMessageType ||
-		r.Template == domain.PasswordResetMessageType ||
-		r.Template == domain.VerifyEmailMessageType ||
-		r.Template == domain.VerifyPhoneMessageType ||
-		r.Template == domain.DomainClaimedMessageType ||
-		r.Template == domain.PasswordlessRegistrationMessageType
+func (q *Queries) readLoginTranslationFile(lang string) ([]byte, error) {
+	q.mutex.Lock()
+	defer q.mutex.Unlock()
+	contents, ok := q.LoginTranslationFileContents[lang]
+	var err error
+	if !ok {
+		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
+		if errors.IsNotFound(err) {
+			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
+		}
+		if err != nil {
+			return nil, err
+		}
+		q.LoginTranslationFileContents[lang] = contents
+	}
+	return contents, nil
 }
 
-func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomLoginText {
+func prepareCustomTextsQuery() (sq.SelectBuilder, func(*sql.Rows) (*CustomTexts, error)) {
+	return sq.Select(
+			CustomTextColAggregateID.identifier(),
+			CustomTextColSequence.identifier(),
+			CustomTextColCreationDate.identifier(),
+			CustomTextColChangeDate.identifier(),
+			CustomTextColLanguage.identifier(),
+			CustomTextColTemplate.identifier(),
+			CustomTextColKey.identifier(),
+			CustomTextColText.identifier(),
+			countColumn.identifier()).
+			From(customTextTable.identifier()).PlaceholderFormat(sq.Dollar),
+		func(rows *sql.Rows) (*CustomTexts, error) {
+			customTexts := make([]*CustomText, 0)
+			var count uint64
+			for rows.Next() {
+				customText := new(CustomText)
+				lang := ""
+				err := rows.Scan(
+					&customText.AggregateID,
+					&customText.Sequence,
+					&customText.CreationDate,
+					&customText.ChangeDate,
+					&lang,
+					&customText.Template,
+					&customText.Key,
+					&customText.Text,
+					&count,
+				)
+				if err != nil {
+					return nil, err
+				}
+				customText.Language = language.Make(lang)
+				customTexts = append(customTexts, customText)
+			}
+
+			if err := rows.Close(); err != nil {
+				return nil, errors.ThrowInternal(err, "QUERY-3n9fs", "Errors.Query.CloseRows")
+			}
+
+			return &CustomTexts{
+				CustomTexts: customTexts,
+				SearchResponse: SearchResponse{
+					Count: count,
+				},
+			}, nil
+		}
+}
+
+func CustomTextsToDomain(texts *CustomTexts) []*domain.CustomText {
+	result := make([]*domain.CustomText, len(texts.CustomTexts))
+	for i, text := range texts.CustomTexts {
+		result[i] = CustomTextToDomain(text)
+	}
+	return result
+}
+
+func CustomTextToDomain(text *CustomText) *domain.CustomText {
+	return &domain.CustomText{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID:  text.AggregateID,
+			Sequence:     text.Sequence,
+			CreationDate: text.CreationDate,
+			ChangeDate:   text.ChangeDate,
+		},
+		Template: text.Template,
+		Language: text.Language,
+		Key:      text.Key,
+		Text:     text.Text,
+	}
+}
+
+func CustomTextsToLoginDomain(aggregateID, lang string, texts *CustomTexts) *domain.CustomLoginText {
 	langTag := language.Make(lang)
 	result := &domain.CustomLoginText{
 		ObjectRoot: models.ObjectRoot{
@@ -81,7 +272,7 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 		},
 		Language: langTag,
 	}
-	for _, text := range texts {
+	for _, text := range texts.CustomTexts {
 		if text.CreationDate.Before(result.CreationDate) {
 			result.CreationDate = text.CreationDate
 		}
@@ -191,7 +382,7 @@ func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextV
 	return result
 }
 
-func selectAccountKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func selectAccountKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeySelectAccountTitle {
 		result.SelectAccount.Title = text.Text
 	}
@@ -218,7 +409,7 @@ func selectAccountKeyToDomain(text *CustomTextView, result *domain.CustomLoginTe
 	}
 }
 
-func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func loginKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLoginTitle {
 		result.Login.Title = text.Text
 	}
@@ -254,7 +445,7 @@ func loginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	}
 }
 
-func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordTitle {
 		result.Password.Title = text.Text
 	}
@@ -293,7 +484,7 @@ func passwordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	}
 }
 
-func usernameChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func usernameChangeKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyUsernameChangeTitle {
 		result.UsernameChange.Title = text.Text
 	}
@@ -311,7 +502,7 @@ func usernameChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 	}
 }
 
-func usernameChangeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func usernameChangeDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyUsernameChangeDoneTitle {
 		result.UsernameChangeDone.Title = text.Text
 	}
@@ -323,7 +514,7 @@ func usernameChangeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLo
 	}
 }
 
-func initPasswordKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initPasswordKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitPasswordTitle {
 		result.InitPassword.Title = text.Text
 	}
@@ -347,7 +538,7 @@ func initPasswordKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
-func initPasswordDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initPasswordDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitPasswordDoneTitle {
 		result.InitPasswordDone.Title = text.Text
 	}
@@ -362,7 +553,7 @@ func initPasswordDoneKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	}
 }
 
-func emailVerificationKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func emailVerificationKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyEmailVerificationTitle {
 		result.EmailVerification.Title = text.Text
 	}
@@ -380,7 +571,7 @@ func emailVerificationKeyToDomain(text *CustomTextView, result *domain.CustomLog
 	}
 }
 
-func emailVerificationDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func emailVerificationDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyEmailVerificationDoneTitle {
 		result.EmailVerificationDone.Title = text.Text
 	}
@@ -398,7 +589,7 @@ func emailVerificationDoneKeyToDomain(text *CustomTextView, result *domain.Custo
 	}
 }
 
-func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initializeUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitializeUserTitle {
 		result.InitUser.Title = text.Text
 	}
@@ -422,7 +613,7 @@ func initializeUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 	}
 }
 
-func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initializeUserDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitUserDoneTitle {
 		result.InitUserDone.Title = text.Text
 	}
@@ -437,7 +628,7 @@ func initializeUserDoneKeyToDomain(text *CustomTextView, result *domain.CustomLo
 	}
 }
 
-func initMFAPromptKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initMFAPromptKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFAPromptTitle {
 		result.InitMFAPrompt.Title = text.Text
 	}
@@ -458,7 +649,7 @@ func initMFAPromptKeyToDomain(text *CustomTextView, result *domain.CustomLoginTe
 	}
 }
 
-func initMFAOTPKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initMFAOTPKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFAOTPTitle {
 		result.InitMFAOTP.Title = text.Text
 	}
@@ -482,7 +673,7 @@ func initMFAOTPKeyToDomain(text *CustomTextView, result *domain.CustomLoginText)
 	}
 }
 
-func initMFAU2FKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initMFAU2FKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFAU2FTitle {
 		result.InitMFAU2F.Title = text.Text
 	}
@@ -503,7 +694,7 @@ func initMFAU2FKeyToDomain(text *CustomTextView, result *domain.CustomLoginText)
 	}
 }
 
-func initMFADoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func initMFADoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyInitMFADoneTitle {
 		result.InitMFADone.Title = text.Text
 	}
@@ -518,7 +709,7 @@ func initMFADoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText
 	}
 }
 
-func mfaProvidersKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func mfaProvidersKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyMFAProvidersChooseOther {
 		result.MFAProvider.ChooseOther = text.Text
 	}
@@ -530,7 +721,7 @@ func mfaProvidersKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
-func verifyMFAOTPKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func verifyMFAOTPKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyVerifyMFAOTPTitle {
 		result.VerifyMFAOTP.Title = text.Text
 	}
@@ -545,7 +736,7 @@ func verifyMFAOTPKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
-func verifyMFAU2FKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func verifyMFAU2FKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyVerifyMFAU2FTitle {
 		result.VerifyMFAU2F.Title = text.Text
 	}
@@ -563,7 +754,7 @@ func verifyMFAU2FKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
-func passwordlessKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordlessKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordlessTitle {
 		result.Passwordless.Title = text.Text
 	}
@@ -584,7 +775,7 @@ func passwordlessKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
-func passwordlessPromptKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordlessPromptKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordlessPromptTitle {
 		result.PasswordlessPrompt.Title = text.Text
 	}
@@ -605,7 +796,7 @@ func passwordlessPromptKeyToDomain(text *CustomTextView, result *domain.CustomLo
 	}
 }
 
-func passwordlessRegistrationKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordlessRegistrationKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordlessRegistrationTitle {
 		result.PasswordlessRegistration.Title = text.Text
 	}
@@ -626,7 +817,7 @@ func passwordlessRegistrationKeyToDomain(text *CustomTextView, result *domain.Cu
 	}
 }
 
-func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordlessRegistrationDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordlessRegistrationDoneTitle {
 		result.PasswordlessRegistrationDone.Title = text.Text
 	}
@@ -644,7 +835,7 @@ func passwordlessRegistrationDoneKeyToDomain(text *CustomTextView, result *domai
 	}
 }
 
-func passwordChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordChangeKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordChangeTitle {
 		result.PasswordChange.Title = text.Text
 	}
@@ -668,7 +859,7 @@ func passwordChangeKeyToDomain(text *CustomTextView, result *domain.CustomLoginT
 	}
 }
 
-func passwordChangeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordChangeDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordChangeDoneTitle {
 		result.PasswordChangeDone.Title = text.Text
 	}
@@ -680,7 +871,7 @@ func passwordChangeDoneKeyToDomain(text *CustomTextView, result *domain.CustomLo
 	}
 }
 
-func passwordResetDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func passwordResetDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyPasswordResetDoneTitle {
 		result.PasswordResetDone.Title = text.Text
 	}
@@ -692,7 +883,7 @@ func passwordResetDoneKeyToDomain(text *CustomTextView, result *domain.CustomLog
 	}
 }
 
-func registrationOptionKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func registrationOptionKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyRegistrationOptionTitle {
 		result.RegisterOption.Title = text.Text
 	}
@@ -707,7 +898,7 @@ func registrationOptionKeyToDomain(text *CustomTextView, result *domain.CustomLo
 	}
 }
 
-func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func registrationUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyRegistrationUserTitle {
 		result.RegistrationUser.Title = text.Text
 	}
@@ -764,7 +955,7 @@ func registrationUserKeyToDomain(text *CustomTextView, result *domain.CustomLogi
 	}
 }
 
-func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func registrationOrgKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyRegisterOrgTitle {
 		result.RegistrationOrg.Title = text.Text
 	}
@@ -812,7 +1003,7 @@ func registrationOrgKeyToDomain(text *CustomTextView, result *domain.CustomLogin
 	}
 }
 
-func linkingUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func linkingUserKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLinkingUserDoneTitle {
 		result.LinkingUsersDone.Title = text.Text
 	}
@@ -827,7 +1018,7 @@ func linkingUserKeyToDomain(text *CustomTextView, result *domain.CustomLoginText
 	}
 }
 
-func externalUserNotFoundKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func externalUserNotFoundKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyExternalNotFoundTitle {
 		result.ExternalNotFoundOption.Title = text.Text
 	}
@@ -857,7 +1048,7 @@ func externalUserNotFoundKeyToDomain(text *CustomTextView, result *domain.Custom
 	}
 }
 
-func successLoginKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func successLoginKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeySuccessLoginTitle {
 		result.LoginSuccess.Title = text.Text
 	}
@@ -872,7 +1063,7 @@ func successLoginKeyToDomain(text *CustomTextView, result *domain.CustomLoginTex
 	}
 }
 
-func logoutDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func logoutDoneKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyLogoutDoneTitle {
 		result.LogoutDone.Title = text.Text
 	}
@@ -884,7 +1075,7 @@ func logoutDoneKeyToDomain(text *CustomTextView, result *domain.CustomLoginText)
 	}
 }
 
-func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
+func footerKeyToDomain(text *CustomText, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterTOS {
 		result.Footer.TOS = text.Text
 	}
