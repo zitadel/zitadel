@@ -63,13 +63,13 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -97,7 +97,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
@@ -105,7 +105,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(org.NewDomainAddedEvent(context.Background(),
-								&org.NewAggregate("", "").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							)),
 						},
@@ -115,11 +115,18 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				domain: &domain.OrgDomain{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID: "org1",
+					},
 					Domain: "domain.ch",
 				},
 			},
 			res: res{
 				want: &domain.OrgDomain{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "org1",
+						ResourceOwner: "org1",
+					},
 					Domain: "domain.ch",
 				},
 			},
@@ -228,7 +235,7 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
@@ -257,19 +264,19 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -298,13 +305,13 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -350,13 +357,13 @@ func TestCommandSide_GenerateOrgDomainValidation(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -483,7 +490,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
@@ -512,19 +519,19 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -553,13 +560,13 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -588,19 +595,19 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerificationAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 								domain.OrgDomainValidationTypeDNS,
 								&crypto.CryptoValue{
@@ -646,19 +653,19 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerificationAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 								domain.OrgDomainValidationTypeDNS,
 								&crypto.CryptoValue{
@@ -707,19 +714,19 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerificationAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 								domain.OrgDomainValidationTypeDNS,
 								&crypto.CryptoValue{
@@ -770,19 +777,19 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerificationAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 								domain.OrgDomainValidationTypeDNS,
 								&crypto.CryptoValue{
@@ -941,7 +948,7 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
@@ -970,13 +977,13 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -1004,19 +1011,19 @@ func TestCommandSide_SetPrimaryDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -1128,7 +1135,7 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
@@ -1157,25 +1164,25 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainPrimarySetEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -1203,13 +1210,13 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
@@ -1247,19 +1254,19 @@ func TestCommandSide_RemoveOrgDomain(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							org.NewOrgAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"name",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainAddedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
 						eventFromEventPusher(
 							org.NewDomainVerifiedEvent(context.Background(),
-								&user.NewAggregate("user1", "org1").Aggregate,
+								&org.NewAggregate("org1", "org1").Aggregate,
 								"domain.ch",
 							),
 						),
