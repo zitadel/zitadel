@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -39,7 +39,7 @@ import { ProjectsComponent } from './projects.component';
     InputModule,
     MatIconModule,
     MatButtonModule,
-    MatProgressBarModule,
+    MatProgressSpinnerModule,
     MatCheckboxModule,
     CardModule,
     MatTooltipModule,
