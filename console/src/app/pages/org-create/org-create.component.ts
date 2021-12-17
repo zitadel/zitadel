@@ -212,11 +212,6 @@ export class OrgCreateComponent {
         .addOrg(this.name.value)
         .then(() => {
           this.router.navigate(['/org/overview']);
-          // const newOrg = org.toObject();
-          // setTimeout(() => {
-          //     this.authService.setActiveOrg(newOrg);
-          //     this.router.navigate(['/org']);
-          // }, 1000);
         })
         .catch((error) => {
           this.toast.showError(error);
