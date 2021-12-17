@@ -7,6 +7,7 @@
   align-items: center;
   padding: 0;
   min-width: 220px;
+  max-width: 240px;
   padding-bottom: 0.5rem;
   position: relative;
 
@@ -37,7 +38,11 @@
     width: 100%;
 
     button {
+      min-height: 36px;
+      position: relative;
+      overflow: hidden;
       text-align: start;
+      text-overflow: ellipsis;
     }
   }
 }
