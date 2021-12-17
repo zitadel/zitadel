@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
-	"golang.org/x/text/language"
 )
 
 func TestCustomTextProjection_reduces(t *testing.T) {
@@ -122,7 +121,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
-								language.English,
+								"en",
 							},
 						},
 					},
@@ -229,7 +228,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
-								language.English,
+								"en",
 							},
 						},
 					},
