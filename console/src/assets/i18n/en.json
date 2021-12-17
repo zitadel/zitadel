@@ -641,6 +641,7 @@
       "LISTDESCRIPTION": "Choose an organisation.",
       "ACTIVE": "Active",
       "CREATE": "Create Organisation",
+      "USERSELFACCOUNT": "Use your personal account as organisation owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",

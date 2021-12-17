@@ -44,9 +44,7 @@ function passwordConfirmValidator(c: AbstractControl): any {
         style({ height: '0', opacity: 0 }),
         animate('150ms ease-in-out', style({ height: '*', opacity: 1 })),
       ]),
-      transition(':leave', [
-        animate('150ms ease-in-out', style({ height: '0', opacity: 0 })),
-      ]),
+      transition(':leave', [animate('150ms ease-in-out', style({ height: '0', opacity: 0 }))]),
     ]),
   ],
 })
@@ -72,11 +70,14 @@ export class OrgCreateComponent {
     private mgmtService: ManagementService,
     private authService: GrpcAuthService,
   ) {
-    this.authService.isAllowed(['iam.write']).pipe(take(1)).subscribe((allowed) => {
-      if (allowed) {
-        this.forSelf = false;
-      }
-    });
+    this.authService
+      .isAllowed(['iam.write'])
+      .pipe(take(1))
+      .subscribe((allowed) => {
+        if (allowed) {
+          this.forSelf = false;
+        }
+      });
 
     this.orgForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -123,7 +124,7 @@ export class OrgCreateComponent {
         //     this.router.navigate(['/org', 'overview']);
         // }
       })
-      .catch(error => {
+      .catch((error) => {
         this.toast.showError(error);
       });
   }
@@ -152,7 +153,7 @@ export class OrgCreateComponent {
     const validators: Validators[] = [Validators.required];
 
     if (this.usePassword) {
-      this.mgmtService.getDefaultPasswordComplexityPolicy().then(data => {
+      this.mgmtService.getDefaultPasswordComplexityPolicy().then((data) => {
         if (data.policy) {
           this.policy = data.policy;
 
@@ -195,7 +196,6 @@ export class OrgCreateComponent {
       this.orgForm = this.fb.group({
         name: ['', [Validators.required]],
       });
-
     } else {
       this.createSteps = 2;
 
@@ -208,16 +208,19 @@ export class OrgCreateComponent {
 
   public createOrgForSelf(): void {
     if (this.name && this.name.value) {
-      this.mgmtService.addOrg(this.name.value).then(() => {
-        this.router.navigate(['/org/overview']);
-        // const newOrg = org.toObject();
-        // setTimeout(() => {
-        //     this.authService.setActiveOrg(newOrg);
-        //     this.router.navigate(['/org']);
-        // }, 1000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.mgmtService
+        .addOrg(this.name.value)
+        .then(() => {
+          this.router.navigate(['/org/overview']);
+          // const newOrg = org.toObject();
+          // setTimeout(() => {
+          //     this.authService.setActiveOrg(newOrg);
+          //     this.router.navigate(['/org']);
+          // }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
