@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -144,6 +145,6 @@ func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.EventReade
 		[]handler.Condition{
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
-			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
 		}), nil
 }
