@@ -3,12 +3,11 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
@@ -43,7 +42,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @Output() public emitAddProject: EventEmitter<void> = new EventEmitter();
-  @Input() public projectType: ProjectType = ProjectType.PROJECTTYPE_OWNED;
+  @Input() public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
   public projectList: Project.AsObject[] | GrantedProject.AsObject[] = [];
   public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
   public selection: SelectionModel<Project.AsObject | GrantedProject.AsObject> = new SelectionModel<
@@ -54,13 +53,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
   public grid: boolean = true;
-  private subscription?: Subscription;
 
   @Input() public zitadelProjectId: string = '';
   public ProjectState: any = ProjectState;
+  public ProjectType: any = ProjectType;
+  private destroy$: Subject<void> = new Subject();
 
   constructor(
-    private route: ActivatedRoute,
     public translate: TranslateService,
     private mgmtService: ManagementService,
     private toast: ToastService,
@@ -68,18 +67,24 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   ) {}
 
   public ngOnInit(): void {
-    this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      this.getData();
-      if (params.deferredReload) {
-        setTimeout(() => {
-          this.getData();
-        }, 2000);
+    this.projectType$.pipe(takeUntil(this.destroy$)).subscribe((type) => {
+      switch (type) {
+        case ProjectType.PROJECTTYPE_OWNED:
+          this.displayedColumns = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
+          break;
+        case ProjectType.PROJECTTYPE_GRANTED:
+          this.displayedColumns = ['select', 'name', 'projectOwnerName', 'state', 'creationDate', 'changeDate'];
+          break;
       }
+
+      this.getData(type);
+      console.log('load');
     });
   }
 
   public ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public isAllSelected(): boolean {
@@ -92,17 +97,17 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
 
-  public changePage(event: PageEvent): void {
-    this.getData(event.pageSize, event.pageSize * event.pageIndex);
+  public changePage(type: ProjectType): void {
+    this.getData(type, this.paginator.pageSize, this.paginator.pageSize * this.paginator.pageIndex);
   }
 
   public addProject(): void {
     this.emitAddProject.emit();
   }
 
-  private async getData(limit?: number, offset?: number): Promise<void> {
+  private async getData(type: ProjectType, limit?: number, offset?: number): Promise<void> {
     this.loadingSubject.next(true);
-    switch (this.projectType) {
+    switch (type) {
       case ProjectType.PROJECTTYPE_OWNED:
         this.mgmtService
           .listProjects(limit, offset)
@@ -113,9 +118,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
             } else {
               this.totalResult = 0;
             }
-            if (this.totalResult > 10) {
-              this.grid = false;
-            }
             if (resp.details?.viewTimestamp) {
               this.viewTimestamp = resp.details?.viewTimestamp;
             }
@@ -123,7 +125,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
             this.loadingSubject.next(false);
           })
           .catch((error) => {
-            console.error(error);
             this.toast.showError(error);
             this.loadingSubject.next(false);
           });
@@ -141,15 +142,10 @@ export class ProjectListComponent implements OnInit, OnDestroy {
             if (resp.details?.viewTimestamp) {
               this.viewTimestamp = resp.details?.viewTimestamp;
             }
-            if (this.totalResult > 5) {
-              this.grid = false;
-            }
             this.dataSource.data = this.projectList;
-
             this.loadingSubject.next(false);
           })
           .catch((error) => {
-            console.error(error);
             this.toast.showError(error);
             this.loadingSubject.next(false);
           });
@@ -189,9 +185,9 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       });
   }
 
-  public refreshPage(): void {
+  public refreshPage(type: ProjectType): void {
     this.selection.clear();
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
+    this.getData(type, this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
   public deleteProject(id: string): void {
@@ -212,7 +208,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('PROJECT.TOAST.DELETED', true);
             setTimeout(() => {
-              this.refreshPage();
+              this.refreshPage(ProjectType.PROJECTTYPE_OWNED);
             }, 1000);
           })
           .catch((error) => {

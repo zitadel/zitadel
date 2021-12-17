@@ -14,30 +14,34 @@ h1 {
 
   .icon-button {
     display: block;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }
 
-.table-wrapper {
-  overflow: auto;
+.projects-table-wrapper {
+  padding-top: 0.5rem;
 
-  .table,
-  .paginator {
-    width: 100%;
-    background-color: #2d2e30;
+  .table-wrapper {
+    overflow: auto;
 
-    td,
-    th {
-      padding-left: .5rem;
-      padding-right: .5rem;
+    .table,
+    .paginator {
+      width: 100%;
+      background-color: #2d2e30;
 
-      &:first-child {
-        padding-left: 0;
-        padding-right: .5rem;
-      }
+      td,
+      th {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
 
-      &:last-child {
-        padding-right: 0;
+        &:first-child {
+          padding-left: 0;
+          padding-right: 0.5rem;
+        }
+
+        &:last-child {
+          padding-right: 0;
+        }
       }
     }
   }

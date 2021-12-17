@@ -3,7 +3,7 @@
     <mat-progress-bar *ngIf="(loading$| async) " class="spinner" color="primary" mode="indeterminate">
     </mat-progress-bar>
 
-    <p class="n-items" *ngIf="!(loading$ | async) && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' |
+    <p class="n-items" *ngIf="(loading$ | async) === false && selection.selected.length > 0">{{'PROJECT.PAGES.PINNED' |
       translate}}
     </p>
 
@@ -34,7 +34,8 @@
 
   </div>
   <div class="owned-project-grid-container">
-    <p class="n-items" *ngIf="!(loading$ | async) && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}</p>
+    <p class="n-items" *ngIf="(loading$ | async) === false && notPinned.length > 0">{{'PROJECT.PAGES.ALL' | translate}}
+    </p>
 
     <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
       (click)="navigateToProject(type, $any(item), $event)"
@@ -65,7 +66,7 @@
       <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
 
-    <p class="n-items" *ngIf="!(loading$ | async) && projectList.length === 0">{{'PROJECT.PAGES.NOITEMS' |
+    <p class="n-items" *ngIf="(loading$ | async) === false && projectList.length === 0">{{'PROJECT.PAGES.NOITEMS' |
       translate}}</p>
 
     <ng-container *ngIf="type === ProjectType.PROJECTTYPE_OWNED">
