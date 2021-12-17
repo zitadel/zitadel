@@ -23,7 +23,7 @@ require (
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
 	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51
 	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
-	github.com/duo-labs/webauthn v0.0.0-20210727191636-9f1b88ef44cc
+	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
 	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/golang/glog v1.0.0
@@ -113,7 +113,6 @@ require (
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
@@ -132,6 +131,7 @@ require (
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
