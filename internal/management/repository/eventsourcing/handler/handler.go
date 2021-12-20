@@ -36,16 +36,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			defaults.IamID),
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
-		newOrgMember(
-			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
-		newIDPConfig(
-			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newIDPProvider(
-			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			defaults),
-		newExternalIDP(
-			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			defaults),
 		newMetadata(
 			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}

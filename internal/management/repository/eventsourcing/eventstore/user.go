@@ -227,46 +227,6 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 	return user.GetProfile()
 }
 
-func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
-	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest external idp sequence")
-	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &usr_model.ExternalIDPSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.ExternalIDPViewsToModel(externalIDPS),
-	}
-	if seqErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
-func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*usr_model.ExternalIDPView, error) {
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwner(idpConfigID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
