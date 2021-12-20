@@ -3,8 +3,27 @@ package text
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	text_pb "github.com/caos/zitadel/pkg/grpc/text"
 )
+
+func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomText {
+	return &text_pb.MessageCustomText{
+		Title:      msg.Title,
+		PreHeader:  msg.PreHeader,
+		Subject:    msg.Subject,
+		Greeting:   msg.Greeting,
+		Text:       msg.Text,
+		ButtonText: msg.ButtonText,
+		FooterText: msg.Footer,
+		Details: object.ToViewDetailsPb(
+			msg.Sequence,
+			msg.CreationDate,
+			msg.ChangeDate,
+			msg.AggregateID,
+		),
+	}
+}
 
 func DomainCustomMsgTextToPb(msg *domain.CustomMessageText) *text_pb.MessageCustomText {
 	return &text_pb.MessageCustomText{

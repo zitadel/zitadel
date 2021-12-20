@@ -51,7 +51,7 @@ var (
 		table: humanTable,
 	}
 	HumanFirstNameCol = Column{
-		name:  projection.HumanFistNameCol,
+		name:  projection.HumanFirstNameCol,
 		table: humanTable,
 	}
 	HumanLastNameCol = Column{

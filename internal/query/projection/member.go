@@ -1,9 +1,11 @@
 package projection
 
 import (
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/member"
+	"github.com/lib/pq"
 )
 
 const (
@@ -41,7 +43,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 	config := reduceMemberConfig{
 		cols: []handler.Column{
 			handler.NewCol(MemberUserIDCol, e.UserID),
-			handler.NewCol(MemberRolesCol, e.Roles),
+			handler.NewCol(MemberRolesCol, pq.StringArray(e.Roles)),
 			handler.NewCol(MemberCreationDate, e.CreationDate()),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
@@ -58,7 +60,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 func reduceMemberChanged(e member.MemberChangedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		cols: []handler.Column{
-			handler.NewCol(MemberRolesCol, e.Roles),
+			handler.NewCol(MemberRolesCol, pq.StringArray(e.Roles)),
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 		},
@@ -85,14 +87,13 @@ func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...redu
 	return crdb.NewDeleteStatement(&e, config.conds), nil
 }
 
-func reduceMemberRemoved(e member.MemberRemovedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
+func reduceMemberRemoved(e eventstore.EventReader, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
-		conds: []handler.Condition{
-			handler.NewCond(MemberUserIDCol, e.UserID),
-		}}
+		conds: []handler.Condition{},
+	}
 
 	for _, opt := range opts {
 		config = opt(config)
 	}
-	return crdb.NewDeleteStatement(&e, config.conds), nil
+	return crdb.NewDeleteStatement(e, config.conds), nil
 }

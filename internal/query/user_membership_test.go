@@ -13,70 +13,70 @@ import (
 
 var (
 	membershipsStmt = regexp.QuoteMeta(
-		"SELECT user_id" +
-			", roles" +
-			", creation_date" +
-			", change_date" +
-			", sequence" +
-			", resource_owner" +
-			", org_id" +
-			", iam_id" +
-			", project_id" +
-			", grant_id" +
-			", zitadel.projections.users_humans.display_name" +
-			", zitadel.projections.users_machines.name" +
+		"SELECT memberships.user_id" +
+			", memberships.roles" +
+			", memberships.creation_date" +
+			", memberships.change_date" +
+			", memberships.sequence" +
+			", memberships.resource_owner" +
+			", memberships.org_id" +
+			", memberships.iam_id" +
+			", memberships.project_id" +
+			", memberships.grant_id" +
+			", zitadel.projections.projects.name" +
+			", zitadel.projections.orgs.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
-			"SELECT zitadel.projections.org_members.user_id" +
-			", zitadel.projections.org_members.roles" +
-			", zitadel.projections.org_members.creation_date" +
-			", zitadel.projections.org_members.change_date" +
-			", zitadel.projections.org_members.sequence" +
-			", zitadel.projections.org_members.resource_owner" +
-			", zitadel.projections.org_members.org_id" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
+			", members.org_id" +
 			", NULL::STRING AS iam_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.org_members" +
+			" FROM zitadel.projections.org_members as members" +
 			" UNION ALL " +
-			"SELECT zitadel.projections.iam_members.user_id" +
-			", zitadel.projections.iam_members.roles" +
-			", zitadel.projections.iam_members.creation_date" +
-			", zitadel.projections.iam_members.change_date" +
-			", zitadel.projections.iam_members.sequence" +
-			", zitadel.projections.iam_members.resource_owner" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
-			", zitadel.projections.iam_members.iam_id" +
+			", members.iam_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.iam_members" +
+			" FROM zitadel.projections.iam_members as members" +
 			" UNION ALL " +
-			"SELECT zitadel.projections.project_members.user_id" +
-			", zitadel.projections.project_members.roles" +
-			", zitadel.projections.project_members.creation_date" +
-			", zitadel.projections.project_members.change_date" +
-			", zitadel.projections.project_members.sequence" +
-			", zitadel.projections.project_members.resource_owner" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
 			", NULL::STRING AS iam_id" +
-			", zitadel.projections.project_members.project_id" +
+			", members.project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.project_members" +
+			" FROM zitadel.projections.project_members as members" +
 			" UNION ALL " +
-			"SELECT zitadel.projections.project_grant_members.user_id" +
-			", zitadel.projections.project_grant_members.roles" +
-			", zitadel.projections.project_grant_members.creation_date" +
-			", zitadel.projections.project_grant_members.change_date" +
-			", zitadel.projections.project_grant_members.sequence" +
-			", zitadel.projections.project_grant_members.resource_owner" +
+			"SELECT members.user_id" +
+			", members.roles" +
+			", members.creation_date" +
+			", members.change_date" +
+			", members.sequence" +
+			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
 			", NULL::STRING AS iam_id" +
-			", zitadel.projections.project_grant_members.project_id" +
-			", zitadel.projections.project_grant_members.grant_id" +
-			" FROM zitadel.projections.project_grant_members" +
-			") AS m" +
-			" LEFT JOIN zitadel.projections.users_humans ON user_id = zitadel.projections.users_humans.user_id" +
-			" LEFT JOIN zitadel.projections.users_machines ON user_id = zitadel.projections.users_machines.user_id")
+			", members.project_id" +
+			", members.grant_id" +
+			" FROM zitadel.projections.project_grant_members as members" +
+			") AS memberships" +
+			" LEFT JOIN zitadel.projections.projects ON memberships.project_id = zitadel.projections.projects.id" +
+			" LEFT JOIN zitadel.projections.orgs ON memberships.org_id = zitadel.projections.orgs.id")
 	membershipCols = []string{
 		"user_id",
 		"roles",
@@ -88,8 +88,8 @@ var (
 		"iam_id",
 		"project_id",
 		"grant_id",
-		"display_name",
-		"name",
+		"name", //project name
+		"name", //org name
 		"count",
 	}
 )
@@ -118,50 +118,7 @@ func Test_MembershipPrepares(t *testing.T) {
 			object: &Memberships{Memberships: []*Membership{}},
 		},
 		{
-			name:    "prepareMembershipsQuery one org member human",
-			prepare: prepareMembershipsQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					membershipsStmt,
-					membershipCols,
-					[][]driver.Value{
-						{
-							"user-id",
-							pq.StringArray{"role1", "role2"},
-							testNow,
-							testNow,
-							uint64(20211202),
-							"ro",
-							"org-id",
-							nil,
-							nil,
-							nil,
-							"display name",
-							nil,
-						},
-					},
-				),
-			},
-			object: &Memberships{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
-				Memberships: []*Membership{
-					{
-						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						Sequence:      20211202,
-						ResourceOwner: "ro",
-						Org:           &OrgMembership{OrgID: "org-id"},
-						DisplayName:   "display name",
-					},
-				},
-			},
-		},
-		{
-			name:    "prepareMembershipsQuery one org member machine",
+			name:    "prepareMembershipsQuery one org member",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -180,7 +137,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							"machine-name",
+							"org-name",
 						},
 					},
 				),
@@ -197,57 +154,13 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						Org:           &OrgMembership{OrgID: "org-id"},
-						DisplayName:   "machine-name",
+						Org:           &OrgMembership{OrgID: "org-id", Name: "org-name"},
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one iam member human",
-			prepare: prepareMembershipsQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					membershipsStmt,
-					membershipCols,
-					[][]driver.Value{
-						{
-							"user-id",
-							pq.StringArray{"role1", "role2"},
-							testNow,
-							testNow,
-							uint64(20211202),
-							"ro",
-							nil,
-							"iam-id",
-							nil,
-							nil,
-							"display name",
-							nil,
-						},
-					},
-				),
-			},
-			object: &Memberships{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
-				Memberships: []*Membership{
-					{
-						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						Sequence:      20211202,
-						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id"},
-						DisplayName:   "display name",
-					},
-				},
-			},
-		},
-		{
-			name:    "prepareMembershipsQuery one iam member machine",
+			name:    "prepareMembershipsQuery one iam member",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -266,7 +179,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							"machine-name",
+							nil,
 						},
 					},
 				),
@@ -283,14 +196,13 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id"},
-						DisplayName:   "machine-name",
+						IAM:           &IAMMembership{IAMID: "iam-id", Name: "iam-id"},
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one project member human",
+			name:    "prepareMembershipsQuery one project member",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -308,7 +220,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							nil,
-							"display name",
+							"project-name",
 							nil,
 						},
 					},
@@ -326,57 +238,13 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						Project:       &ProjectMembership{ProjectID: "project-id"},
-						DisplayName:   "display name",
+						Project:       &ProjectMembership{ProjectID: "project-id", Name: "project-name"},
 					},
 				},
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one project member machine",
-			prepare: prepareMembershipsQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					membershipsStmt,
-					membershipCols,
-					[][]driver.Value{
-						{
-							"user-id",
-							pq.StringArray{"role1", "role2"},
-							testNow,
-							testNow,
-							uint64(20211202),
-							"ro",
-							nil,
-							nil,
-							"project-id",
-							nil,
-							nil,
-							"machine-name",
-						},
-					},
-				),
-			},
-			object: &Memberships{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
-				Memberships: []*Membership{
-					{
-						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						Sequence:      20211202,
-						ResourceOwner: "ro",
-						Project:       &ProjectMembership{ProjectID: "project-id"},
-						DisplayName:   "machine-name",
-					},
-				},
-			},
-		},
-		{
-			name:    "prepareMembershipsQuery one project grant member human",
+			name:    "prepareMembershipsQuery one project grant member",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
@@ -394,7 +262,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							"grant-id",
-							"display name",
+							"project-name",
 							nil,
 						},
 					},
@@ -413,56 +281,10 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						ProjectGrant: &ProjectGrantMembership{
-							GrantID:   "grant-id",
-							ProjectID: "project-id",
+							GrantID:     "grant-id",
+							ProjectID:   "project-id",
+							ProjectName: "project-name",
 						},
-						DisplayName: "display name",
-					},
-				},
-			},
-		},
-		{
-			name:    "prepareMembershipsQuery one project grant member machine",
-			prepare: prepareMembershipsQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					membershipsStmt,
-					membershipCols,
-					[][]driver.Value{
-						{
-							"user-id",
-							pq.StringArray{"role1", "role2"},
-							testNow,
-							testNow,
-							uint64(20211202),
-							"ro",
-							nil,
-							nil,
-							"project-id",
-							"grant-id",
-							nil,
-							"machine-name",
-						},
-					},
-				),
-			},
-			object: &Memberships{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
-				Memberships: []*Membership{
-					{
-						UserID:        "user-id",
-						Roles:         []string{"role1", "role2"},
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						Sequence:      20211202,
-						ResourceOwner: "ro",
-						ProjectGrant: &ProjectGrantMembership{
-							GrantID:   "grant-id",
-							ProjectID: "project-id",
-						},
-						DisplayName: "machine-name",
 					},
 				},
 			},
@@ -486,8 +308,8 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							nil,
 							nil,
-							"display name",
 							nil,
+							"org-name",
 						},
 						{
 							"user-id",
@@ -500,7 +322,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							"iam-id",
 							nil,
 							nil,
-							"display name",
+							nil,
 							nil,
 						},
 						{
@@ -514,7 +336,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							nil,
-							"display name",
+							"project-name",
 							nil,
 						},
 						{
@@ -528,7 +350,7 @@ func Test_MembershipPrepares(t *testing.T) {
 							nil,
 							"project-id",
 							"grant-id",
-							"display name",
+							"project-name",
 							nil,
 						},
 					},
@@ -546,8 +368,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						Org:           &OrgMembership{OrgID: "org-id"},
-						DisplayName:   "display name",
+						Org:           &OrgMembership{OrgID: "org-id", Name: "org-name"},
 					},
 					{
 						UserID:        "user-id",
@@ -556,8 +377,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						IAM:           &IAMMembership{IAMID: "iam-id"},
-						DisplayName:   "display name",
+						IAM:           &IAMMembership{IAMID: "iam-id", Name: "iam-id"},
 					},
 					{
 						UserID:        "user-id",
@@ -566,8 +386,7 @@ func Test_MembershipPrepares(t *testing.T) {
 						ChangeDate:    testNow,
 						Sequence:      20211202,
 						ResourceOwner: "ro",
-						Project:       &ProjectMembership{ProjectID: "project-id"},
-						DisplayName:   "display name",
+						Project:       &ProjectMembership{ProjectID: "project-id", Name: "project-name"},
 					},
 					{
 						UserID:        "user-id",
@@ -577,10 +396,10 @@ func Test_MembershipPrepares(t *testing.T) {
 						Sequence:      20211202,
 						ResourceOwner: "ro",
 						ProjectGrant: &ProjectGrantMembership{
-							ProjectID: "project-id",
-							GrantID:   "grant-id",
+							ProjectID:   "project-id",
+							GrantID:     "grant-id",
+							ProjectName: "project-name",
 						},
-						DisplayName: "display name",
 					},
 				},
 			},

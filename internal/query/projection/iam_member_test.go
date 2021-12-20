@@ -8,6 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/lib/pq"
 )
 
 func TestIAMMemberProjection_reduces(t *testing.T) {
@@ -44,7 +46,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 							expectedStmt: "INSERT INTO zitadel.projections.iam_members (user_id, roles, creation_date, change_date, sequence, resource_owner, iam_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"user-id",
-								[]string{"role"},
+								pq.StringArray{"role"},
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -77,13 +79,12 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.iam_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (iam_id = $5)",
+							expectedStmt: "UPDATE zitadel.projections.iam_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4)",
 							expectedArgs: []interface{}{
-								[]string{"role", "changed"},
+								pq.StringArray{"role", "changed"},
 								anyArg{},
 								uint64(15),
 								"user-id",
-								"agg-id",
 							},
 						},
 					},
@@ -110,10 +111,9 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.iam_members WHERE (user_id = $1) AND (iam_id = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.iam_members WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"user-id",
-								"agg-id",
 							},
 						},
 					},
@@ -140,9 +140,35 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.iam_members WHERE (user_id = $1) AND (iam_id = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.iam_members WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"user-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "user.UserRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserRemovedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&IAMMemberProjection{}).reduceUserRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IAMMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.iam_members WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
 								"agg-id",
 							},
 						},

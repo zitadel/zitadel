@@ -13,7 +13,7 @@
 
   .org-button {
     font-weight: bold;
-    padding-right: .5rem;
+    padding-right: 0.5rem;
   }
 
   .logo {
@@ -30,7 +30,7 @@
   }
 
   .context-menu {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     background-color: #2d2e30;
   }
 
@@ -43,6 +43,21 @@
 
     @media only screen and (max-width: 500px) {
       display: none;
+    }
+  }
+
+  .org-context-wrapper {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    user-select: none;
+
+    .context_card {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      overflow: hidden;
+      border-radius: 0.5rem;
     }
   }
 
@@ -73,7 +88,7 @@
       top: 60px;
       right: 0;
       overflow: hidden;
-      border-radius: .5rem;
+      border-radius: 0.5rem;
     }
   }
 }
@@ -117,18 +132,18 @@
           text-decoration: none;
           cursor: pointer;
           padding: 0 1rem;
-          margin-right: .5rem;
+          margin-right: 0.5rem;
           border-top-right-radius: 1.5rem;
           border-bottom-right-radius: 1.5rem;
 
           .icon {
-            margin: .5rem 1rem;
+            margin: 0.5rem 1rem;
           }
 
           .iam-i {
             object-fit: contain;
             max-height: 24px;
-            margin: .5rem 1rem;
+            margin: 0.5rem 1rem;
           }
 
           .label {
@@ -184,7 +199,7 @@
         }
 
         .slash {
-          margin: 0 .5rem;
+          margin: 0 0.5rem;
           color: var(--grey);
         }
       }
@@ -207,7 +222,7 @@
 
   .theme-section {
     display: block;
-    padding: 0 .5rem;
+    padding: 0 0.5rem;
     margin-top: 2rem;
     align-self: flex-start;
     border-radius: 1rem;
@@ -217,7 +232,7 @@
       border-radius: 50%;
       height: 30px;
       width: 30px;
-      margin: .5rem;
+      margin: 0.5rem;
       cursor: pointer;
       background: linear-gradient(315deg, #e6e6e6, #fff);
     }
@@ -227,7 +242,7 @@
       border-radius: 50%;
       height: 30px;
       width: 30px;
-      margin: .5rem;
+      margin: 0.5rem;
       cursor: pointer;
       background: linear-gradient(315deg, #000, #000);
     }
@@ -252,7 +267,7 @@
     display: block;
     background-color: #81868a40;
     height: 1px;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
     flex: 1;
     min-width: 10px;
   }
@@ -266,7 +281,7 @@
 
 @mixin textvar($theme) {
   .filter-form {
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
     /* stylelint-disable */
     $foreground: map-get($theme, foreground);
     color: mat.get-color-from-palette($foreground, text) !important;
@@ -276,30 +291,7 @@
     $primary: map-get($theme, primary);
     color: mat.get-color-from-palette($primary, 300) !important;
     border-bottom: 1px solid var(--grey);
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
   /* stylelint-enable */
-}
-
-.menu {
-  position: relative;
-
-  .filter-wrapper {
-    padding: 4px;
-  }
-
-  .spinner-w {
-    top: 1rem;
-    left: 0;
-    right: 0;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-.org-wrapper {
-  max-height: 350px;
-  overflow-y: auto;
 }

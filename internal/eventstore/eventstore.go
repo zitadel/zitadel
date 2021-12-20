@@ -64,6 +64,18 @@ func eventsToRepository(pushEvents []EventPusher) (events []*repository.Event, c
 		if err != nil {
 			return nil, nil, err
 		}
+		if event.Aggregate().ID == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Afdfe", "aggregate id must not be empty")
+		}
+		if event.Aggregate().Type == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Dfg32", "aggregate type must not be empty")
+		}
+		if event.Type() == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Drg34", "event type must not be empty")
+		}
+		if event.Aggregate().Version == "" {
+			return nil, nil, errors.ThrowInvalidArgument(nil, "V2-Dgfg4", "aggregate version must not be empty")
+		}
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
 			AggregateType: repository.AggregateType(event.Aggregate().Type),

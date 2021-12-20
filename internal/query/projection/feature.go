@@ -142,8 +142,14 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.EventReader) (*han
 	if featureEvent.PasswordComplexityPolicy != nil {
 		cols = append(cols, handler.NewCol(FeaturePasswordComplexityPolicyCol, *featureEvent.PasswordComplexityPolicy))
 	}
-	if featureEvent.LabelPolicyPrivateLabel != nil {
-		cols = append(cols, handler.NewCol(FeatureLabelPolicyPrivateLabelCol, *featureEvent.LabelPolicyPrivateLabel))
+	if featureEvent.LabelPolicyPrivateLabel != nil || featureEvent.LabelPolicy != nil {
+		var value bool
+		if featureEvent.LabelPolicyPrivateLabel != nil {
+			value = *featureEvent.LabelPolicyPrivateLabel
+		} else {
+			value = *featureEvent.LabelPolicy
+		}
+		cols = append(cols, handler.NewCol(FeatureLabelPolicyPrivateLabelCol, value))
 	}
 	if featureEvent.LabelPolicyWatermark != nil {
 		cols = append(cols, handler.NewCol(FeatureLabelPolicyWatermarkCol, *featureEvent.LabelPolicyWatermark))

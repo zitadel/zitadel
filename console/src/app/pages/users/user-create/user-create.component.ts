@@ -38,26 +38,29 @@ export class UserCreateComponent implements OnDestroy {
   ) {
     this.loading = true;
     this.loadOrg();
-    this.mgmtService.getOrgIAMPolicy().then((resp) => {
-      if (resp.policy?.userLoginMustBeDomain) {
-        this.userLoginMustBeDomain = resp.policy.userLoginMustBeDomain;
-      }
-      this.initForm();
-      this.loading = false;
-      this.envSuffixLabel = this.envSuffix();
-      this.changeDetRef.detectChanges();
-    }).catch(error => {
-      console.error(error);
-      this.initForm();
-      this.loading = false;
-      this.envSuffixLabel = this.envSuffix();
-      this.changeDetRef.detectChanges();
-    });
+    this.mgmtService
+      .getOrgIAMPolicy()
+      .then((resp) => {
+        if (resp.policy?.userLoginMustBeDomain) {
+          this.userLoginMustBeDomain = resp.policy.userLoginMustBeDomain;
+        }
+        this.initForm();
+        this.loading = false;
+        this.envSuffixLabel = this.envSuffix();
+        this.changeDetRef.detectChanges();
+      })
+      .catch((error) => {
+        console.error(error);
+        this.initForm();
+        this.loading = false;
+        this.envSuffixLabel = this.envSuffix();
+        this.changeDetRef.detectChanges();
+      });
   }
 
   private async loadOrg(): Promise<void> {
-    const domains = (await this.mgmtService.listOrgDomains());
-    const found = domains.resultList.find(resp => resp.isPrimary);
+    const domains = await this.mgmtService.listOrgDomains();
+    const found = domains.resultList.find((resp) => resp.isPrimary);
     if (found) {
       this.primaryDomain = found;
     }
@@ -66,32 +69,26 @@ export class UserCreateComponent implements OnDestroy {
   private initForm(): void {
     this.userForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      userName: ['',
-        [
-          Validators.required,
-          Validators.minLength(2),
-        ],
-      ],
+      userName: ['', [Validators.required, Validators.minLength(2)]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       nickName: [''],
       gender: [],
       preferredLanguage: [''],
       phone: [''],
+      isVerified: [false, []],
     });
 
-    this.userForm.controls['phone'].valueChanges.pipe(
-      takeUntil(this.destroyed$),
-      debounceTime(300)).subscribe(value => {
-        const phoneNumber = parsePhoneNumber(value ?? '', 'CH');
-        if (phoneNumber) {
-          const formmatted = phoneNumber.formatInternational();
-          const country = phoneNumber.country;
-          if (this.phone && country && this.phone.value && this.phone.value !== formmatted) {
-            this.phone.setValue(formmatted);
-          }
+    this.userForm.controls['phone'].valueChanges.pipe(takeUntil(this.destroyed$), debounceTime(300)).subscribe((value) => {
+      const phoneNumber = parsePhoneNumber(value ?? '', 'CH');
+      if (phoneNumber) {
+        const formmatted = phoneNumber.formatInternational();
+        const country = phoneNumber.country;
+        if (this.phone && country && this.phone.value && this.phone.value !== formmatted) {
+          this.phone.setValue(formmatted);
         }
-      });
+      }
+    });
   }
 
   public createUser(): void {
@@ -110,7 +107,10 @@ export class UserCreateComponent implements OnDestroy {
     humanReq.setUserName(this.userName?.value);
     humanReq.setProfile(profileReq);
 
-    humanReq.setEmail(new AddHumanUserRequest.Email().setEmail(this.email?.value));
+    const emailreq = new AddHumanUserRequest.Email();
+    emailreq.setEmail(this.email?.value);
+    emailreq.setIsEmailVerified(this.isVerified?.value);
+    humanReq.setEmail(emailreq);
 
     if (this.phone && this.phone.value) {
       humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone.value));
@@ -123,7 +123,7 @@ export class UserCreateComponent implements OnDestroy {
         this.toast.showInfo('USER.TOAST.CREATED', true);
         this.router.navigate(['users', data.userId]);
       })
-      .catch(error => {
+      .catch((error) => {
         this.loading = false;
         this.toast.showError(error);
       });
@@ -136,6 +136,9 @@ export class UserCreateComponent implements OnDestroy {
 
   public get email(): AbstractControl | null {
     return this.userForm.get('email');
+  }
+  public get isVerified(): AbstractControl | null {
+    return this.userForm.get('isVerified');
   }
   public get userName(): AbstractControl | null {
     return this.userForm.get('userName');

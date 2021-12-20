@@ -38,30 +38,6 @@ type CustomTextView struct {
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
 }
 
-func CustomTextViewsToDomain(texts []*CustomTextView) []*domain.CustomText {
-	result := make([]*domain.CustomText, len(texts))
-	for i, text := range texts {
-		result[i] = CustomTextViewToDomain(text)
-	}
-	return result
-}
-
-func CustomTextViewToDomain(text *CustomTextView) *domain.CustomText {
-	lang := language.Make(text.Language)
-	return &domain.CustomText{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID:  text.AggregateID,
-			Sequence:     text.Sequence,
-			CreationDate: text.CreationDate,
-			ChangeDate:   text.ChangeDate,
-		},
-		Template: text.Template,
-		Language: lang,
-		Key:      text.Key,
-		Text:     text.Text,
-	}
-}
-
 func (i *CustomTextView) AppendEvent(event *models.Event) (err error) {
 	i.Sequence = event.Sequence
 	switch event.Type {
@@ -95,46 +71,6 @@ func (r *CustomTextView) IsMessageTemplate() bool {
 		r.Template == domain.VerifyPhoneMessageType ||
 		r.Template == domain.DomainClaimedMessageType ||
 		r.Template == domain.PasswordlessRegistrationMessageType
-}
-
-func CustomTextViewsToMessageDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomMessageText {
-	langTag := language.Make(lang)
-	result := &domain.CustomMessageText{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: aggregateID,
-		},
-		Language: langTag,
-	}
-	for _, text := range texts {
-		if text.CreationDate.Before(result.CreationDate) {
-			result.CreationDate = text.CreationDate
-		}
-		if text.ChangeDate.After(result.ChangeDate) {
-			result.ChangeDate = text.ChangeDate
-		}
-		if text.Key == domain.MessageTitle {
-			result.Title = text.Text
-		}
-		if text.Key == domain.MessagePreHeader {
-			result.PreHeader = text.Text
-		}
-		if text.Key == domain.MessageSubject {
-			result.Subject = text.Text
-		}
-		if text.Key == domain.MessageGreeting {
-			result.Greeting = text.Text
-		}
-		if text.Key == domain.MessageText {
-			result.Text = text.Text
-		}
-		if text.Key == domain.MessageButtonText {
-			result.ButtonText = text.Text
-		}
-		if text.Key == domain.MessageFooterText {
-			result.FooterText = text.Text
-		}
-	}
-	return result
 }
 
 func CustomTextViewsToLoginDomain(aggregateID, lang string, texts []*CustomTextView) *domain.CustomLoginText {

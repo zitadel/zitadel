@@ -143,7 +143,7 @@ func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListP
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectGrantMembersResponse{
-		Result: member_grpc.MembersToPb(response.Members),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix, response.Members),
 		Details: object_grpc.ToListDetails(
 			response.Count,
 			response.Sequence,

@@ -10,7 +10,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/member"
+	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 )
 
 type ProjectGrantMemberProjection struct {
@@ -49,6 +51,32 @@ func (p *ProjectGrantMemberProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  project.GrantMemberRemovedType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
+				{
+					Event:  project.GrantRemovedType,
+					Reduce: p.reduceProjectGrantRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
 				},
 			},
 		},
@@ -107,9 +135,52 @@ func (p *ProjectGrantMemberProjection) reduceRemoved(event eventstore.EventReade
 		logging.LogWithFields("HANDL-6Z4dH", "seq", event.Sequence(), "expectedType", project.GrantMemberRemovedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-MGNnA", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(
-		*member.NewRemovedEvent(&e.BaseEvent, e.UserID),
+	return reduceMemberRemoved(e,
+		withMemberCond(MemberUserIDCol, e.UserID),
 		withMemberCond(ProjectGrantMemberProjectIDCol, e.Aggregate().ID),
 		withMemberCond(ProjectGrantMemberGrantIDCol, e.GrantID),
+	)
+}
+
+func (p *ProjectGrantMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-UVMmT", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-rufJr", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
+}
+
+func (p *ProjectGrantMemberProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	//TODO: as soon as org deletion is implemented:
+	// Case: The user has resource owner A and project has resource owner B
+	// if org B deleted it works
+	// if org A is deleted, the membership wouldn't be deleted
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-Sq9FV", "seq", event.Sequence(), "expected", org.OrgRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Zzp6o", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
+}
+
+func (p *ProjectGrantMemberProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.ProjectRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-sGmCA", "seq", event.Sequence(), "expected", project.ProjectRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-JLODy", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(ProjectGrantMemberProjectIDCol, e.Aggregate().ID))
+}
+
+func (p *ProjectGrantMemberProjection) reduceProjectGrantRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.GrantRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-sHabO", "seq", event.Sequence(), "expected", project.GrantRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-D1J9R", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e,
+		withMemberCond(ProjectGrantMemberGrantIDCol, e.GrantID),
+		withMemberCond(ProjectGrantMemberProjectIDCol, e.Aggregate().ID),
 	)
 }

@@ -224,7 +224,7 @@ func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembers
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
-		Result: member_grpc.MembersToPb(members.Members),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix, members.Members),
 		Details: object.ToListDetails(
 			members.Count,
 			members.Sequence,

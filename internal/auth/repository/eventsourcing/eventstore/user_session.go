@@ -22,6 +22,6 @@ func (repo *UserSessionRepo) GetMyUserSessions(ctx context.Context) ([]*usr_mode
 }
 
 func (repo *UserSessionRepo) ActiveUserSessionCount() int64 {
-	userSessions, _ := repo.View.ActiveUserSessions()
-	return int64(len(userSessions))
+	userSessions, _ := repo.View.ActiveUserSessionsCount()
+	return int64(userSessions)
 }
