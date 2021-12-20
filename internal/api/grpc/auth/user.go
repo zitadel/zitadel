@@ -38,10 +38,10 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
 		Queries: []query.SearchQuery{userQuery},
 	})
-	// if err != nil {
-	// 	return nil, err
-	// }
-	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, membershipToDomain(memberships.Memberships), userGrantsToIDs(grants.Result)...)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, memberships.Memberships, userGrantsToIDs(grants.Result)...)
 	if err != nil {
 		return nil, err
 	}
@@ -240,14 +240,14 @@ func ListMyProjectOrgsRequestToQuery(req *auth_pb.ListMyProjectOrgsRequest) (*qu
 func membershipToDomain(memberships []*query.Membership) []*domain.UserMembership {
 	result := make([]*domain.UserMembership, len(memberships))
 	for i, membership := range memberships {
-		typ, aggID, objID := MemberTypeToDomain(membership)
+		typ, displayName, aggID, objID := MemberTypeToDomain(membership)
 		result[i] = &domain.UserMembership{
 			UserID:        membership.UserID,
 			MemberType:    typ,
 			AggregateID:   aggID,
 			ObjectID:      objID,
 			Roles:         membership.Roles,
-			DisplayName:   membership.DisplayName,
+			DisplayName:   displayName,
 			CreationDate:  membership.CreationDate,
 			ChangeDate:    membership.ChangeDate,
 			ResourceOwner: membership.ResourceOwner,
@@ -259,17 +259,17 @@ func membershipToDomain(memberships []*query.Membership) []*domain.UserMembershi
 	return result
 }
 
-func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, aggID, objID string) {
+func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, displayName, aggID, objID string) {
 	if m.Org != nil {
-		return domain.MemberTypeOrganisation, m.Org.OrgID, ""
+		return domain.MemberTypeOrganisation, m.Org.Name, m.Org.OrgID, ""
 	} else if m.IAM != nil {
-		return domain.MemberTypeIam, m.IAM.IAMID, ""
+		return domain.MemberTypeIam, m.IAM.Name, m.IAM.IAMID, ""
 	} else if m.Project != nil {
-		return domain.MemberTypeProject, m.Project.ProjectID, ""
+		return domain.MemberTypeProject, m.Project.Name, m.Project.ProjectID, ""
 	} else if m.ProjectGrant != nil {
-		return domain.MemberTypeProjectGrant, m.ProjectGrant.ProjectID, m.ProjectGrant.GrantID
+		return domain.MemberTypeProjectGrant, m.ProjectGrant.ProjectName, m.ProjectGrant.ProjectID, m.ProjectGrant.GrantID
 	}
-	return domain.MemberTypeUnspecified, "", ""
+	return domain.MemberTypeUnspecified, "", "", ""
 }
 
 func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {

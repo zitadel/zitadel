@@ -16,6 +16,7 @@ type IDPUserLink struct {
 	IDPName          string
 	ProvidedUserID   string
 	ProvidedUsername string
+	ResourceOwner    string
 	IDPType          domain.IDPConfigType
 }
 
@@ -94,6 +95,10 @@ func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQ
 	return idps, err
 }
 
+func NewIDPUserLinkIDPIDSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPUserLinkIDPIDCol, value, TextEquals)
+}
+
 func NewIDPUserLinksUserIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPUserLinkUserIDCol, value, TextEquals)
 }
@@ -110,6 +115,7 @@ func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLink
 			IDPUserLinkExternalUserIDCol.identifier(),
 			IDPUserLinkDisplayNameCol.identifier(),
 			IDPTypeCol.identifier(),
+			IDPUserLinkResourceOwnerCol.identifier(),
 			countColumn.identifier()).
 			From(idpUserLinkTable.identifier()).
 			LeftJoin(join(IDPIDCol, IDPUserLinkIDPIDCol)).PlaceholderFormat(sq.Dollar),
@@ -129,6 +135,7 @@ func prepareIDPUserLinksQuery() (sq.SelectBuilder, func(*sql.Rows) (*IDPUserLink
 					&idp.ProvidedUserID,
 					&idp.ProvidedUsername,
 					&idpType,
+					&idp.ResourceOwner,
 					&count,
 				)
 				if err != nil {

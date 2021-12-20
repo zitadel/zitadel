@@ -93,6 +93,7 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *mgmt_pb.AddIDPToL
 }
 
 func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *mgmt_pb.RemoveIDPFromLoginPolicyRequest) (*mgmt_pb.RemoveIDPFromLoginPolicyResponse, error) {
+
 	externalIDPs, err := s.user.ExternalIDPsByIDPConfigID(ctx, req.IdpId)
 	if err != nil {
 		return nil, err

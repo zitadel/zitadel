@@ -93,6 +93,11 @@ func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPR
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
+	// providerQuery, err := query.NewIDPIDSearchQuery(req.IdpId)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// idps, err := s.query.SearchIDPs(ctx, resourceOwner string, queries *query.IDPSearchQueries)
 	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, req.IdpId)
 	if err != nil {
 		return nil, err
