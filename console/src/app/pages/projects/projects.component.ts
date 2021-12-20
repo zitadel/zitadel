@@ -15,7 +15,7 @@ export class ProjectsComponent {
   public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
   public ProjectType: any = ProjectType;
   public grid: boolean = true;
-  constructor(private router: Router, mgmtService: ManagementService, breadcrumbService: BreadcrumbService) {
+  constructor(private router: Router, public mgmtService: ManagementService, breadcrumbService: BreadcrumbService) {
     mgmtService.getIAM().then((iam) => {
       this.zitadelProjectId = iam.iamProjectId;
     });

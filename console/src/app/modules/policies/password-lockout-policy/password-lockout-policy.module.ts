@@ -12,6 +12,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
+import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
 import { PasswordLockoutPolicyRoutingModule } from './password-lockout-policy-routing.module';
 import { PasswordLockoutPolicyComponent } from './password-lockout-policy.component';
 
@@ -30,7 +31,8 @@ import { PasswordLockoutPolicyComponent } from './password-lockout-policy.compon
     TranslateModule,
     DetailLayoutModule,
     HasFeaturePipeModule,
+    PolicyGridModule,
     InfoSectionModule,
   ],
 })
-export class PasswordLockoutPolicyModule { }
+export class PasswordLockoutPolicyModule {}

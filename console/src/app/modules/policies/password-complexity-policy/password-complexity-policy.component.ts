@@ -10,6 +10,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -39,29 +40,36 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
+    breadcrumbService: BreadcrumbService,
   ) {
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
 
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-          break;
-      }
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.service = this.injector.get(ManagementService as Type<ManagementService>);
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.service = this.injector.get(AdminService as Type<AdminService>);
+              break;
+          }
 
-      return this.route.params;
-    })).subscribe(() => {
-      this.fetchData();
-    });
+          return this.route.params;
+        }),
+      )
+      .subscribe(() => {
+        this.fetchData();
+      });
+
+    breadcrumbService.setBreadcrumb([]);
   }
 
   public fetchData(): void {
     this.loading = true;
 
-    this.getData().then(data => {
+    this.getData().then((data) => {
       if (data.policy) {
         console.log(data);
         this.complexityData = data.policy;
@@ -74,8 +82,9 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
     this.sub.unsubscribe();
   }
 
-  private async getData():
-    Promise<MgmtGetPasswordComplexityPolicyResponse.AsObject | AdminGetPasswordComplexityPolicyResponse.AsObject> {
+  private async getData(): Promise<
+    MgmtGetPasswordComplexityPolicyResponse.AsObject | AdminGetPasswordComplexityPolicyResponse.AsObject
+  > {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).getPasswordComplexityPolicy();
@@ -86,14 +95,17 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
   public removePolicy(): void {
     if (this.service instanceof ManagementService) {
-      this.service.resetPasswordComplexityPolicyToDefault().then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        setTimeout(() => {
-          this.fetchData();
-        }, 1000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.service
+        .resetPasswordComplexityPolicyToDefault()
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
@@ -113,44 +125,52 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.complexityData as PasswordComplexityPolicy.AsObject).isDefault) {
-          (this.service as ManagementService).addCustomPasswordComplexityPolicy(
-
-            this.complexityData.hasLowercase,
-            this.complexityData.hasUppercase,
-            this.complexityData.hasNumber,
-            this.complexityData.hasSymbol,
-            this.complexityData.minLength,
-          ).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as ManagementService)
+            .addCustomPasswordComplexityPolicy(
+              this.complexityData.hasLowercase,
+              this.complexityData.hasUppercase,
+              this.complexityData.hasNumber,
+              this.complexityData.hasSymbol,
+              this.complexityData.minLength,
+            )
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         } else {
-          (this.service as ManagementService).updateCustomPasswordComplexityPolicy(
-            this.complexityData.hasLowercase,
-            this.complexityData.hasUppercase,
-            this.complexityData.hasNumber,
-            this.complexityData.hasSymbol,
-            this.complexityData.minLength,
-          ).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as ManagementService)
+            .updateCustomPasswordComplexityPolicy(
+              this.complexityData.hasLowercase,
+              this.complexityData.hasUppercase,
+              this.complexityData.hasNumber,
+              this.complexityData.hasSymbol,
+              this.complexityData.minLength,
+            )
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
         break;
       case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).updatePasswordComplexityPolicy(
-          this.complexityData.hasLowercase,
-          this.complexityData.hasUppercase,
-          this.complexityData.hasNumber,
-          this.complexityData.hasSymbol,
-          this.complexityData.minLength,
-        ).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        (this.service as AdminService)
+          .updatePasswordComplexityPolicy(
+            this.complexityData.hasLowercase,
+            this.complexityData.hasUppercase,
+            this.complexityData.hasNumber,
+            this.complexityData.hasSymbol,
+            this.complexityData.minLength,
+          )
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
     }
   }

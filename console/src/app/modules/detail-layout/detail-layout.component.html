@@ -1,25 +1,22 @@
 <div class="max-width-container">
   <div class="enlarged-container">
-    <div class="detail-container">
-      <div class="detail-layout-left">
-        <a *ngIf="backRouterLink" [routerLink]="backRouterLink" mat-icon-button>
-          <mat-icon class="icon">arrow_back</mat-icon>
-        </a>
-      </div>
-      <div class="detail-layout-right">
-        <div class="detail-layout-head">
-          <div class="detail-layout-top-view">
-            <div>
-              <h1>{{ title }}</h1>
-              <p class="head-desc">{{ description }}</p>
-            </div>
-            <div class="actions-wrap">
-              <ng-content select="[actions]"></ng-content>
-            </div>
+    <div class="detail-layout-head">
+      <div class="detail-layout-top-view">
+        <div>
+          <div class="back-row">
+            <a *ngIf="backRouterLink" [routerLink]="backRouterLink" mat-icon-button>
+              <mat-icon class="icon">arrow_back</mat-icon>
+            </a>
+            <h1>{{ title }}</h1>
           </div>
-          <ng-content></ng-content>
+          <p class="head-desc max-width-description">{{ description }}</p>
+        </div>
+        <div class="actions-wrap">
+          <ng-content select="[actions]"></ng-content>
         </div>
       </div>
+      <ng-content></ng-content>
     </div>
+
   </div>
 </div>

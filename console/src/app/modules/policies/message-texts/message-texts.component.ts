@@ -37,6 +37,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -111,8 +112,9 @@ const REQUESTMAP = {
       get: new GetCustomPasswordResetMessageTextRequest(),
       set: new SetCustomPasswordResetMessageTextRequest(),
       getDefault: new GetDefaultPasswordResetMessageTextRequest(),
-      setFcn: (map: Partial<SetCustomPasswordResetMessageTextRequest.AsObject>):
-        SetCustomPasswordResetMessageTextRequest => {
+      setFcn: (
+        map: Partial<SetCustomPasswordResetMessageTextRequest.AsObject>,
+      ): SetCustomPasswordResetMessageTextRequest => {
         const req = new SetCustomPasswordResetMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -129,8 +131,9 @@ const REQUESTMAP = {
       get: new GetCustomDomainClaimedMessageTextRequest(),
       set: new SetCustomDomainClaimedMessageTextRequest(),
       getDefault: new GetDefaultDomainClaimedMessageTextRequest(),
-      setFcn: (map: Partial<SetCustomDomainClaimedMessageTextRequest.AsObject>):
-        SetCustomDomainClaimedMessageTextRequest => {
+      setFcn: (
+        map: Partial<SetCustomDomainClaimedMessageTextRequest.AsObject>,
+      ): SetCustomDomainClaimedMessageTextRequest => {
         const req = new SetCustomDomainClaimedMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -147,8 +150,9 @@ const REQUESTMAP = {
       get: new GetCustomPasswordlessRegistrationMessageTextRequest(),
       set: new SetCustomPasswordlessRegistrationMessageTextRequest(),
       getDefault: new GetDefaultPasswordlessRegistrationMessageTextRequest(),
-      setFcn: (map: Partial<SetCustomPasswordlessRegistrationMessageTextRequest.AsObject>):
-        SetCustomPasswordlessRegistrationMessageTextRequest => {
+      setFcn: (
+        map: Partial<SetCustomPasswordlessRegistrationMessageTextRequest.AsObject>,
+      ): SetCustomPasswordlessRegistrationMessageTextRequest => {
         const req = new SetCustomPasswordlessRegistrationMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -166,8 +170,7 @@ const REQUESTMAP = {
     [MESSAGETYPES.INIT]: {
       get: new AdminGetDefaultInitMessageTextRequest(),
       set: new SetDefaultInitMessageTextRequest(),
-      setFcn: (map: Partial<MessageCustomText.AsObject>):
-        SetDefaultInitMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultInitMessageTextRequest => {
         const req = new SetDefaultInitMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -183,8 +186,7 @@ const REQUESTMAP = {
     [MESSAGETYPES.VERIFYEMAIL]: {
       get: new AdminGetDefaultVerifyEmailMessageTextRequest(),
       set: new SetDefaultVerifyEmailMessageTextRequest(),
-      setFcn: (map: Partial<MessageCustomText.AsObject>):
-        SetDefaultVerifyEmailMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyEmailMessageTextRequest => {
         const req = new SetDefaultVerifyEmailMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -200,8 +202,7 @@ const REQUESTMAP = {
     [MESSAGETYPES.VERIFYPHONE]: {
       get: new AdminGetDefaultVerifyPhoneMessageTextRequest(),
       set: new SetDefaultVerifyPhoneMessageTextRequest(),
-      setFcn: (map: Partial<MessageCustomText.AsObject>):
-        SetDefaultVerifyPhoneMessageTextRequest => {
+      setFcn: (map: Partial<MessageCustomText.AsObject>): SetDefaultVerifyPhoneMessageTextRequest => {
         const req = new SetDefaultVerifyPhoneMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -217,8 +218,9 @@ const REQUESTMAP = {
     [MESSAGETYPES.PASSWORDRESET]: {
       get: new AdminGetCustomPasswordResetMessageTextRequest(),
       set: new SetDefaultPasswordResetMessageTextRequest(),
-      setFcn: (map: Partial<SetDefaultPasswordResetMessageTextRequest.AsObject>):
-        SetDefaultPasswordResetMessageTextRequest => {
+      setFcn: (
+        map: Partial<SetDefaultPasswordResetMessageTextRequest.AsObject>,
+      ): SetDefaultPasswordResetMessageTextRequest => {
         const req = new SetDefaultPasswordResetMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -234,8 +236,9 @@ const REQUESTMAP = {
     [MESSAGETYPES.DOMAINCLAIMED]: {
       get: new GetDefaultDomainClaimedMessageTextRequest(),
       set: new SetDefaultDomainClaimedMessageTextRequest(),
-      setFcn: (map: Partial<SetDefaultDomainClaimedMessageTextRequest.AsObject>):
-        SetDefaultDomainClaimedMessageTextRequest => {
+      setFcn: (
+        map: Partial<SetDefaultDomainClaimedMessageTextRequest.AsObject>,
+      ): SetDefaultDomainClaimedMessageTextRequest => {
         const req = new SetDefaultDomainClaimedMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -251,8 +254,9 @@ const REQUESTMAP = {
     [MESSAGETYPES.PASSWORDLESS]: {
       get: new GetDefaultPasswordlessRegistrationMessageTextRequest(),
       set: new SetDefaultPasswordlessRegistrationMessageTextRequest(),
-      setFcn: (map: Partial<SetDefaultPasswordlessRegistrationMessageTextRequest.AsObject>):
-        SetDefaultPasswordlessRegistrationMessageTextRequest => {
+      setFcn: (
+        map: Partial<SetDefaultPasswordlessRegistrationMessageTextRequest.AsObject>,
+      ): SetDefaultPasswordlessRegistrationMessageTextRequest => {
         const req = new SetDefaultPasswordlessRegistrationMessageTextRequest();
         req.setButtonText(map.buttonText ?? '');
         req.setFooterText(map.footerText ?? '');
@@ -273,8 +277,8 @@ const REQUESTMAP = {
   styleUrls: ['./message-texts.component.scss'],
 })
 export class MessageTextsComponent implements OnDestroy {
-  public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string; }> = of({});
-  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string; }> = new BehaviorSubject({});
+  public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
+  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string }> = new BehaviorSubject({});
 
   public currentType: MESSAGETYPES = MESSAGETYPES.INIT;
 
@@ -288,99 +292,99 @@ export class MessageTextsComponent implements OnDestroy {
 
   public InfoSectionType: any = InfoSectionType;
   public chips: {
-    [messagetype: string]: Array<{ key: string; value: string; }>;
+    [messagetype: string]: Array<{ key: string; value: string }>;
   } = {
-      [MESSAGETYPES.DOMAINCLAIMED]: [
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.domain', value: '{{.Domain}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.tempUsername', value: '{{.TempUsername}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
-      ],
-      [MESSAGETYPES.INIT]: [
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
-      ],
-      [MESSAGETYPES.PASSWORDRESET]: [
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
-      ],
-      [MESSAGETYPES.VERIFYEMAIL]: [
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
-      ],
-      [MESSAGETYPES.VERIFYPHONE]: [
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
-      ],
-      [MESSAGETYPES.PASSWORDLESS]: [
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
-        { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
-      ],
-    };
+    [MESSAGETYPES.DOMAINCLAIMED]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.domain', value: '{{.Domain}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.tempUsername', value: '{{.TempUsername}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+    [MESSAGETYPES.INIT]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+    [MESSAGETYPES.PASSWORDRESET]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+    [MESSAGETYPES.VERIFYEMAIL]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+    [MESSAGETYPES.VERIFYPHONE]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.code', value: '{{.Code}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+    [MESSAGETYPES.PASSWORDLESS]: [
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.preferredLoginName', value: '{{.PreferredLoginName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.username', value: '{{.UserName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.firstname', value: '{{.FirstName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastname', value: '{{.Lastname}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.nickName', value: '{{.NickName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.displayName', value: '{{.DisplayName}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastEmail', value: '{{.LastEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedEmail', value: '{{.VerifiedEmail}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.lastPhone', value: '{{.LastPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.verifiedPhone', value: '{{.VerifiedPhone}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.loginnames', value: '{{.LoginNames}}' },
+      { key: 'POLICY.MESSAGE_TEXTS.CHIPS.changedate', value: '{{.ChangeDate}}' },
+    ],
+  };
 
   public locale: string = 'en';
   public LOCALES: string[] = ['en', 'de', 'it'];
@@ -392,44 +396,51 @@ export class MessageTextsComponent implements OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private dialog: MatDialog,
+    breadcrumbService: BreadcrumbService,
   ) {
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.service.getSupportedLanguages().then(lang => {
-            this.LOCALES = lang.languagesList;
-          });
-          this.loadData(this.currentType);
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.service.getSupportedLanguages().then(lang => {
-            this.LOCALES = lang.languagesList;
-          });
-          this.loadData(this.currentType);
-          break;
-      }
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.service = this.injector.get(ManagementService as Type<ManagementService>);
+              this.service.getSupportedLanguages().then((lang) => {
+                this.LOCALES = lang.languagesList;
+              });
+              this.loadData(this.currentType);
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.service = this.injector.get(AdminService as Type<AdminService>);
+              this.service.getSupportedLanguages().then((lang) => {
+                this.LOCALES = lang.languagesList;
+              });
+              this.loadData(this.currentType);
+              break;
+          }
 
-      return this.route.params;
-    })).subscribe();
+          return this.route.params;
+        }),
+      )
+      .subscribe();
+
+    breadcrumbService.setBreadcrumb([]);
   }
 
   public getDefaultValues(type: MESSAGETYPES, req: any): Promise<any> {
     switch (type) {
       case MESSAGETYPES.INIT:
-        return this.stripDetails((this.service).getDefaultInitMessageText(req));
+        return this.stripDetails(this.service.getDefaultInitMessageText(req));
       case MESSAGETYPES.VERIFYPHONE:
-        return this.stripDetails((this.service).getDefaultVerifyPhoneMessageText(req));
+        return this.stripDetails(this.service.getDefaultVerifyPhoneMessageText(req));
       case MESSAGETYPES.VERIFYEMAIL:
-        return this.stripDetails((this.service).getDefaultVerifyEmailMessageText(req));
+        return this.stripDetails(this.service.getDefaultVerifyEmailMessageText(req));
       case MESSAGETYPES.PASSWORDRESET:
-        return this.stripDetails((this.service).getDefaultPasswordResetMessageText(req));
+        return this.stripDetails(this.service.getDefaultPasswordResetMessageText(req));
       case MESSAGETYPES.DOMAINCLAIMED:
-        return this.stripDetails((this.service).getDefaultDomainClaimedMessageText(req));
+        return this.stripDetails(this.service.getDefaultDomainClaimedMessageText(req));
       case MESSAGETYPES.PASSWORDLESS:
-        return this.stripDetails((this.service).getDefaultPasswordlessRegistrationMessageText(req));
+        return this.stripDetails(this.service.getDefaultPasswordlessRegistrationMessageText(req));
     }
   }
 
@@ -484,18 +495,14 @@ export class MessageTextsComponent implements OnDestroy {
 
       reqDefaultInit.setLanguage(this.locale);
       console.log(this.locale);
-      this.getDefaultInitMessageTextMap$ = from(
-        this.getDefaultValues(type, reqDefaultInit),
-      );
+      this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(type, reqDefaultInit));
     }
 
     const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.locale);
-    this.getCustomInitMessageTextMap$.next(
-      await this.getCurrentValues(type, reqCustomInit),
-    );
+    this.getCustomInitMessageTextMap$.next(await this.getCurrentValues(type, reqCustomInit));
   }
 
-  public updateCurrentValues(values: { [key: string]: string; }): void {
+  public updateCurrentValues(values: { [key: string]: string }): void {
     const req = REQUESTMAP[this.serviceType][this.currentType].setFcn;
     const mappedValues = req(values);
     this.updateRequest = mappedValues;
@@ -504,9 +511,11 @@ export class MessageTextsComponent implements OnDestroy {
 
   public saveCurrentMessage(): any {
     const handler = (prom: Promise<any>): Promise<any> => {
-      return prom.then(() => {
-        this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
-      }).catch(error => this.toast.showError(error));
+      return prom
+        .then(() => {
+          this.toast.showInfo('POLICY.MESSAGE_TEXTS.TOAST.UPDATED', true);
+        })
+        .catch((error) => this.toast.showError(error));
     };
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       switch (this.currentType) {
@@ -521,8 +530,9 @@ export class MessageTextsComponent implements OnDestroy {
         case MESSAGETYPES.DOMAINCLAIMED:
           return handler((this.service as ManagementService).setCustomDomainClaimedMessageCustomText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
-          return handler((this.service as ManagementService)
-            .getCustomPasswordlessRegistrationMessageText(this.updateRequest));
+          return handler(
+            (this.service as ManagementService).getCustomPasswordlessRegistrationMessageText(this.updateRequest),
+          );
       }
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       switch (this.currentType) {
@@ -537,8 +547,7 @@ export class MessageTextsComponent implements OnDestroy {
         case MESSAGETYPES.DOMAINCLAIMED:
           return handler((this.service as AdminService).setDefaultDomainClaimedMessageText(this.updateRequest));
         case MESSAGETYPES.PASSWORDLESS:
-          return handler((this.service as AdminService)
-            .setDefaultPasswordlessRegistrationMessageText(this.updateRequest));
+          return handler((this.service as AdminService).setDefaultPasswordlessRegistrationMessageText(this.updateRequest));
       }
     }
   }
@@ -555,16 +564,18 @@ export class MessageTextsComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp && this.serviceType === PolicyComponentServiceType.MGMT) {
         const handler = (prom: Promise<any>): Promise<any> => {
-          return prom.then(() => {
-            setTimeout(() => {
-              this.loadData(this.currentType);
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          return prom
+            .then(() => {
+              setTimeout(() => {
+                this.loadData(this.currentType);
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         };
 
         switch (this.currentType) {
@@ -579,8 +590,9 @@ export class MessageTextsComponent implements OnDestroy {
           case MESSAGETYPES.DOMAINCLAIMED:
             return handler((this.service as ManagementService).resetCustomDomainClaimedMessageTextToDefault(this.locale));
           case MESSAGETYPES.DOMAINCLAIMED:
-            return handler((this.service as ManagementService)
-              .resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale));
+            return handler(
+              (this.service as ManagementService).resetCustomPasswordlessRegistrationMessageTextToDefault(this.locale),
+            );
           default:
             return Promise.reject();
         }
@@ -591,10 +603,10 @@ export class MessageTextsComponent implements OnDestroy {
   }
 
   private stripDetails(prom: Promise<any>): Promise<any> {
-    return prom.then(res => {
+    return prom.then((res) => {
       if (res.customText) {
         delete res.customText.details;
-        return Object.assign({}, res.customText as unknown as { [key: string]: string; });
+        return Object.assign({}, res.customText as unknown as { [key: string]: string });
       } else {
         return {};
       }

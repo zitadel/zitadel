@@ -9,7 +9,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { HasFeatureModule } from 'src/app/directives/has-feature/has-feature.module';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { SharedModule } from '../shared/shared.module';
@@ -26,6 +28,8 @@ import { NavComponent } from './nav.component';
     RouterModule,
     MatTooltipModule,
     HasRolePipeModule,
+    HasFeaturePipeModule,
+    HasFeatureModule,
     HasRoleModule,
     MatMenuModule,
     MatButtonModule,

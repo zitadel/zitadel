@@ -4,7 +4,7 @@
 }
 
 .del-button {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .master-row {
@@ -22,10 +22,10 @@
       max-width: 400px;
       display: flex;
       align-items: center;
-      padding: .5rem 0;
+      padding: 0.5rem 0;
 
       span {
-        font-size: .9rem;
+        font-size: 0.9rem;
       }
 
       .first {
@@ -46,4 +46,8 @@
 .divider {
   height: 1px;
   background-color: #8795a140;
+}
+
+.project-grant-h2 {
+  margin-top: 1rem;
 }

@@ -8,11 +8,11 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordAgePolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PolicyComponentServiceType } from '../policy-component-types.enum';
-
 
 @Component({
   selector: 'cnsl-password-age-policy',
@@ -32,35 +32,40 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
+    breadcrumbService: BreadcrumbService,
   ) {
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-          break;
-      }
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.service = this.injector.get(ManagementService as Type<ManagementService>);
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.service = this.injector.get(AdminService as Type<AdminService>);
+              break;
+          }
 
-      return this.route.params;
-    })).subscribe(() => {
-      this.getData().then(resp => {
-        if (resp.policy) {
-          this.ageData = resp.policy;
-        }
+          return this.route.params;
+        }),
+      )
+      .subscribe(() => {
+        this.getData().then((resp) => {
+          if (resp.policy) {
+            this.ageData = resp.policy;
+          }
+        });
       });
-    });
+
+    breadcrumbService.setBreadcrumb([]);
   }
 
   public ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  private async getData():
-    Promise<MgmtGetPasswordAgePolicyResponse.AsObject | AdminGetPasswordAgePolicyResponse.AsObject> {
-
+  private async getData(): Promise<MgmtGetPasswordAgePolicyResponse.AsObject | AdminGetPasswordAgePolicyResponse.AsObject> {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         return (this.service as ManagementService).getPasswordAgePolicy();
@@ -71,14 +76,17 @@ export class PasswordAgePolicyComponent implements OnDestroy {
 
   public removePolicy(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      (this.service as ManagementService).resetPasswordAgePolicyToDefault().then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        setTimeout(() => {
-          this.getData();
-        }, 1000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      (this.service as ManagementService)
+        .resetPasswordAgePolicyToDefault()
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+          setTimeout(() => {
+            this.getData();
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
@@ -110,34 +118,34 @@ export class PasswordAgePolicyComponent implements OnDestroy {
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if (this.ageData.isDefault) {
-          (this.service as ManagementService).addCustomPasswordAgePolicy(
-            this.ageData.maxAgeDays,
-            this.ageData.expireWarnDays,
-          ).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as ManagementService)
+            .addCustomPasswordAgePolicy(this.ageData.maxAgeDays, this.ageData.expireWarnDays)
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         } else {
-          (this.service as ManagementService).updateCustomPasswordAgePolicy(
-            this.ageData.maxAgeDays,
-            this.ageData.expireWarnDays,
-          ).then(() => {
-            this.toast.showInfo('POLICY.TOAST.SET', true);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as ManagementService)
+            .updateCustomPasswordAgePolicy(this.ageData.maxAgeDays, this.ageData.expireWarnDays)
+            .then(() => {
+              this.toast.showInfo('POLICY.TOAST.SET', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
         break;
       case PolicyComponentServiceType.ADMIN:
-        (this.service as AdminService).updatePasswordAgePolicy(
-          this.ageData.maxAgeDays,
-          this.ageData.expireWarnDays,
-        ).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        (this.service as AdminService)
+          .updatePasswordAgePolicy(this.ageData.maxAgeDays, this.ageData.expireWarnDays)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
     }
   }

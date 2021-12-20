@@ -72,11 +72,6 @@
                     [routerLinkActiveOptions]="{ exact: false }">
                     <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
                   </a>
-                  <!-- <a matTooltip="{{'MENU.TOOLTIP.MACHINEUSERS' | translate}}" class="nav-item"
-                    [routerLinkActive]="['active']" [routerLink]="[ '/users','list','machines']"
-                    [routerLinkActiveOptions]="{ exact: true }">
-                    <span class="label">{{ 'MENU.MACHINEUSERS' | translate }}</span>
-                  </a> -->
                 </ng-template>
 
                 <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
@@ -90,7 +85,6 @@
                   <a matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item"
                     [routerLinkActive]="['active']" [routerLink]="[ '/actions']"
                     [routerLinkActiveOptions]="{ exact: true }">
-                    <i class="icon las la-exchange-alt"></i>
                     <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
                   </a>
                 </ng-template>

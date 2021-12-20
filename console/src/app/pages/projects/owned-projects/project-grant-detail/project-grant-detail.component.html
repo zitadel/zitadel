@@ -42,8 +42,8 @@
 
   <div class="divider"></div>
 
-  <h1 class="h1">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h1>
-  <p class="desc">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
+  <h2 class="project-grant-h2">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h2>
+  <p class="desc max-width-description">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
 
   <cnsl-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource"
     [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async"

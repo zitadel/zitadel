@@ -23,8 +23,12 @@
     min-height: 100%;
     position: relative;
 
-    .router {
+    .router-container {
       padding: 0 2rem;
+
+      @media only screen and (max-width: 500px) {
+        padding: 0 1.5rem;
+      }
 
       .outlet {
         margin: 0 auto;

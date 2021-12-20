@@ -6,7 +6,7 @@
 
       <cnsl-nav class="nav" [ngClass]="{ 'shadow': yoffset > 60}" *ngIf="user" [org]="org" [user]="user"
         [isDarkTheme]="componentCssClass === 'dark-theme'" [labelpolicy]="labelpolicy"></cnsl-nav>
-      <div class="router" [@routeAnimations]="prepareRoute(outlet)">
+      <div class="router-container" [@routeAnimations]="prepareRoute(outlet)">
         <div class="outlet">
           <router-outlet class="outlet" #outlet="outlet"></router-outlet>
         </div>

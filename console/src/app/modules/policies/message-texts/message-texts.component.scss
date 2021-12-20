@@ -1,34 +1,57 @@
-.spinner-wr {
-  margin: .5rem 0;
-}
+@use '@angular/material' as mat;
 
-.top-actions {
-  display: flex;
-  margin: 0 -.5rem;
-  justify-content: space-between;
-  align-items: flex-end;
+@mixin message-texts-theme($theme) {
+  $primary: map-get($theme, primary);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+  $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
 
-  .message-type {
+  .spinner-wr {
+    margin: 0.5rem 0;
+  }
+
+  .message-texts-top-actions {
     display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 11px;
+    margin: 0 -0.5rem;
+    justify-content: space-between;
+    align-items: flex-end;
 
-    .active {
-      background: #cbf4c9;
-      color: #0e6245;
+    .message-type {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 11px;
+
+      .active {
+        background: $primary-color;
+        color: mat.get-color-from-palette($primary, default-contrast);
+      }
+    }
+
+    .language {
+      display: block;
+      margin: 0 0.5rem;
+      min-width: 150px;
+
+      mat-select {
+        height: 36px;
+        padding: 0 10px;
+        line-height: 36px;
+      }
+
+      .lighter {
+        font-size: 12px;
+        color: var(--grey);
+        padding: 0 0.5rem;
+      }
     }
   }
 
-  .language {
-    display: block;
-    margin: 0 .5rem;
-    min-width: 150px;
-
-    .lighter {
-      font-size: 12px;
-      color: var(--grey);
-      padding: 0 .5rem;
-    }
+  .message-texts-divider {
+    width: 100%;
+    height: 1px;
+    background-color: rgba(var(--grey), 0.5);
+    margin: 1rem 0;
   }
 }
 
@@ -41,13 +64,6 @@
   padding-top: 1rem;
 }
 
-.divider {
-  width: 100%;
-  height: 1px;
-  background-color: rgba(var(--grey), .5);
-  margin: 1rem 0;
-}
-
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -55,7 +71,7 @@
   .save-button,
   .reset-button {
     display: block;
-    margin: 0 .25rem 3rem .25rem;
+    margin: 0 0.25rem 3rem 0.25rem;
   }
 
   .reset-button {

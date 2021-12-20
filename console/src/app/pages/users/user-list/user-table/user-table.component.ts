@@ -143,10 +143,13 @@ export class UserTableComponent implements OnInit {
 
   private async getData(limit: number, offset: number, type: Type, searchValue?: string): Promise<void> {
     this.loadingSubject.next(true);
-    const query = new SearchQuery();
+
+    let query = new SearchQuery();
+
+    let queryT = new SearchQuery();
     const typeQuery = new TypeQuery();
     typeQuery.setType(type);
-    query.setTypeQuery(typeQuery);
+    queryT.setTypeQuery(typeQuery);
 
     if (searchValue && this.userSearchKey !== undefined) {
       switch (this.userSearchKey) {
@@ -171,7 +174,7 @@ export class UserTableComponent implements OnInit {
 
           query.setFirstNameQuery(fNQuery);
           break;
-        case UserListSearchKey.FIRST_NAME:
+        case UserListSearchKey.LAST_NAME:
           const lNQuery = new LastNameQuery();
           lNQuery.setLastName(searchValue);
           lNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
@@ -188,10 +191,11 @@ export class UserTableComponent implements OnInit {
       }
     }
 
+    console.log([query.toObject(), queryT.toObject()]);
+
     this.userService
-      .listUsers(limit, offset, [query])
+      .listUsers(limit, offset, searchValue && this.userSearchKey !== undefined ? [query, queryT] : [queryT])
       .then((resp) => {
-        console.log(resp);
         if (resp.details?.totalResult) {
           this.totalResult = resp.details?.totalResult;
         } else {

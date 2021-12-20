@@ -1,73 +1,48 @@
 @use '@angular/material' as mat;
 
 @mixin detail-layout-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
-  /* stylelint-enable */
-
   $lighter-color: rgba(mat.get-color-from-palette($primary, 300), 0.5);
 
-  .detail-container {
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 3rem;
+  .detail-layout-head {
+    margin-bottom: 2rem;
+    padding-top: 0.5rem;
 
-    @media only screen and (min-width: 550px) {
-      flex-direction: row;
-    }
-
-    .detail-layout-left {
-      align-self: flex-start;
+    .detail-layout-top-view {
       display: flex;
-      padding: 1rem;
-      padding-top: 0;
-      justify-content: center;
+      justify-content: space-between;
 
-      @media only screen and (min-width: 550px) {
-        width: 60px;
-      }
+      .back-row {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-      a {
-        margin-top: 13px;
-        color: inherit;
+        a {
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          color: inherit;
+          margin-right: 1rem;
+        }
       }
     }
 
-    .detail-layout-right {
-      flex: 1;
-      padding-left: 1rem;
-
-      @media only screen and (max-width: 500px) {
-        flex-basis: 100%;
+    div {
+      h1 {
+        font-size: 1.5rem;
       }
 
-      .detail-layout-head {
-        margin-bottom: 2rem;
-
-        .detail-layout-top-view {
-          display: flex;
-          justify-content: space-between;
-        }
-
-        div {
-          h1 {
-            font-size: 1.5rem;
-            margin-top: 10px;
-          }
-
-          .head-desc {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--grey);
-          }
-        }
-
-        .actions-wrap {
-          padding-top: 0.5rem;
-        }
+      .head-desc {
+        display: block;
+        font-size: 0.9rem;
+        color: var(--grey);
       }
+    }
+
+    .actions-wrap {
+      padding-top: 0.5rem;
     }
   }
 }
