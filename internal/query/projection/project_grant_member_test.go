@@ -7,7 +7,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/lib/pq"
 )
 
@@ -153,6 +155,115 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 								"user-id",
 								"agg-id",
 								"grant-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "user.UserRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserRemovedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&ProjectGrantMemberProjection{}).reduceUserRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectGrantMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.OrgRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					[]byte(`{}`),
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&ProjectGrantMemberProjection{}).reduceOrgRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectGrantMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (resource_owner = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.ProjectRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectRemovedType),
+					project.AggregateType,
+					[]byte(`{}`),
+				), project.ProjectRemovedEventMapper),
+			},
+			reduce: (&ProjectGrantMemberProjection{}).reduceProjectRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectGrantMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (project_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "project.GrantRemovedEventType",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantRemovedType),
+					project.AggregateType,
+					[]byte(`{"grantId": "grant-id"}`),
+				), project.GrantRemovedEventMapper),
+			},
+			reduce: (&ProjectGrantMemberProjection{}).reduceProjectGrantRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       ProjectGrantMemberProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedArgs: []interface{}{
+								"grant-id",
+								"agg-id",
 							},
 						},
 					},

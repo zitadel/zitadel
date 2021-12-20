@@ -227,9 +227,9 @@ export class AuthUserDetailComponent implements OnDestroy {
           width: '400px',
         });
 
-        dialogRefPhone.afterClosed().subscribe((resp) => {
-          if (resp) {
-            this.savePhone(resp);
+        dialogRefPhone.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.savePhone(resp.value);
           }
         });
         break;
@@ -247,9 +247,9 @@ export class AuthUserDetailComponent implements OnDestroy {
           width: '400px',
         });
 
-        dialogRefEmail.afterClosed().subscribe((resp) => {
-          if (resp) {
-            this.saveEmail(resp);
+        dialogRefEmail.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.saveEmail(resp.value);
           }
         });
         break;

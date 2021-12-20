@@ -5,8 +5,6 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/domain"
-	key_model "github.com/caos/zitadel/internal/key/model"
-
 	"github.com/caos/zitadel/internal/user/model"
 )
 
@@ -17,8 +15,6 @@ type UserRepository interface {
 
 	UserByID(ctx context.Context, userID string) (*model.UserView, error)
 	UserByLoginName(ctx context.Context, loginName string) (*model.UserView, error)
-
-	MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error)
 
 	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 

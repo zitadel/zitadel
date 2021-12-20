@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/domain"
-	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
@@ -32,9 +31,6 @@ type UserRepository interface {
 	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*model.ExternalIDPView, error)
 	ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*model.ExternalIDPView, error)
-
-	SearchMachineKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error)
-	GetMachineKey(ctx context.Context, userID, keyID string) (*key_model.AuthNKeyView, error)
 
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 

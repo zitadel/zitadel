@@ -4,6 +4,9 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
   ResourceOwnerMissing: Resource Owner Organisation missing
+  RemoveFailed: Could not be removed
+  ProjectionName:
+    Invalid: Invalid projection name
   Assets:
     EmptyKey: Asset key is empty
     Store:

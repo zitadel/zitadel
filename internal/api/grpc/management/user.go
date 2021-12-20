@@ -558,7 +558,15 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 }
 
 func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
-	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -568,14 +576,18 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	result, err := s.user.SearchMachineKeys(ctx, ListMachineKeysRequestToModel(req))
+	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchAuthNKeys(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
-		Result: authn.KeyViewsToPb(result.Result),
+		Result: authn.KeysToPb(result.AuthNKeys),
 		Details: obj_grpc.ToListDetails(
-			result.TotalResult,
+			result.Count,
 			result.Sequence,
 			result.Timestamp,
 		),

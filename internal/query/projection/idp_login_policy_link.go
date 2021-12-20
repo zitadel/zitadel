@@ -47,6 +47,14 @@ func (p *IDPLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 					Event:  org.LoginPolicyIDPProviderRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
+				{
+					Event:  org.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
+				},
 			},
 		},
 		{
@@ -63,6 +71,10 @@ func (p *IDPLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  iam.LoginPolicyIDPProviderRemovedEventType,
 					Reduce: p.reduceRemoved,
+				},
+				{
+					Event:  iam.IDPConfigRemovedEventType,
+					Reduce: p.reduceIDPConfigRemoved,
 				},
 			},
 		},
@@ -96,6 +108,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.EventReader)
 		logging.LogWithFields("HANDL-oce92", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, iam.LoginPolicyIDPProviderAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Nlp55", "reduce.wrong.event.type")
 	}
+
 	return crdb.NewCreateStatement(&idp,
 		[]handler.Column{
 			handler.NewCol(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
@@ -111,6 +124,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.EventReader)
 
 func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	var idp policy.IdentityProviderRemovedEvent
+
 	switch e := event.(type) {
 	case *org.IdentityProviderRemovedEvent:
 		idp = e.IdentityProviderRemovedEvent
@@ -120,6 +134,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.EventReade
 		logging.LogWithFields("HANDL-vAH3I", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, iam.LoginPolicyIDPProviderRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-tUMYY", "reduce.wrong.event.type")
 	}
+
 	return crdb.NewDeleteStatement(&idp,
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
@@ -130,6 +145,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.EventReade
 
 func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
 	var idp policy.IdentityProviderCascadeRemovedEvent
+
 	switch e := event.(type) {
 	case *org.IdentityProviderCascadeRemovedEvent:
 		idp = e.IdentityProviderCascadeRemovedEvent
@@ -139,10 +155,45 @@ func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, iam.LoginPolicyIDPProviderCascadeRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-iCKSj", "reduce.wrong.event.type")
 	}
+
 	return crdb.NewDeleteStatement(&idp,
 		[]handler.Condition{
 			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idp.IDPConfigID),
 			handler.NewCond(IDPLoginPolicyLinkAggregateIDCol, idp.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	var idpID string
+
+	switch e := event.(type) {
+	case *org.IDPConfigRemovedEvent:
+		idpID = e.ConfigID
+	case *iam.IDPConfigRemovedEvent:
+		idpID = e.ConfigID
+	default:
+		logging.LogWithFields("HANDL-aJvob", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-u6tze", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(event,
+		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkIDPIDCol, idpID),
+			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, event.Aggregate().ResourceOwner),
+		},
+	), nil
+}
+
+func (p *IDPLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-WTYC1", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-QSoSe", "reduce.wrong.event.type")
+	}
+	return crdb.NewDeleteStatement(e,
+		[]handler.Condition{
+			handler.NewCond(IDPLoginPolicyLinkResourceOwnerCol, e.Aggregate().ID),
 		},
 	), nil
 }

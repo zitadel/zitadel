@@ -90,13 +90,15 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	return repo.userOrg(ctxData)
 }
 
-func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) (*grant_model.ProjectOrgSearchResponse, error) {
+func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) *grant_model.ProjectOrgSearchResponse {
 	orgs := make([]*grant_model.Org, 0, len(memberships.Memberships))
 	for _, m := range memberships.Memberships {
 		if !containsOrg(orgs, m.ResourceOwner) {
 			org, err := repo.Query.OrgByID(context.TODO(), m.ResourceOwner)
 			if err != nil {
-				return nil, err
+				logging.LogWithFields("EVENT-k8Ikl", "owner", m.ResourceOwner).WithError(err).Warn("org not found")
+				orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner})
+				continue
 			}
 			orgs = append(orgs, &grant_model.Org{OrgID: m.ResourceOwner, OrgName: org.Name})
 		}
@@ -104,7 +106,7 @@ func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) 
 	return &grant_model.ProjectOrgSearchResponse{
 		TotalResult: memberships.Count,
 		Result:      orgs,
-	}, nil
+	}
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {
@@ -127,17 +129,18 @@ func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*query.
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMembershipUserIDQuery(ctxData.OrgID)
+	ownerQuery, err := query.NewMembershipResourceOwnerQuery(ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+
+	orgMemberships, err := repo.Query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{userQuery, ownerQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
 	iamQuery, err := query.NewMembershipIsIAMQuery()
-	if err != nil {
-		return nil, err
-	}
-	orgMemberships, err := repo.Query.Memberships(ctx, &query.MembershipSearchQuery{
-		Queries: []query.SearchQuery{userQuery, ownerQuery},
-	})
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +158,7 @@ func (repo *UserGrantRepo) searchUserMemberships(ctx context.Context) ([]*query.
 
 func (repo *UserGrantRepo) SearchMyProjectPermissions(ctx context.Context) ([]string, error) {
 	ctxData := authz.GetCtxData(ctx)
+	//TODO: blocked until user grants moved to query-pkg
 	usergrant, err := repo.View.UserGrantByIDs(ctxData.OrgID, ctxData.ProjectID, ctxData.UserID)
 	if err != nil {
 		return nil, err
@@ -192,6 +196,7 @@ func (repo *UserGrantRepo) SearchAdminOrgs(request *grant_model.UserGrantSearchR
 }
 
 func (repo *UserGrantRepo) IsIamAdmin(ctx context.Context) (bool, error) {
+	//TODO: blocked until user grants moved to query
 	grantSearch := &grant_model.UserGrantSearchRequest{
 		Queries: []*grant_model.UserGrantSearchQuery{
 			{Key: grant_model.UserGrantSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: repo.IamID},
@@ -215,6 +220,7 @@ func (repo *UserGrantRepo) UserGrantsByProjectAndUserID(projectID, userID string
 }
 
 func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectOrgSearchResponse, error) {
+	//TODO: blocked until user moved to query pkg
 	user, err := repo.View.UserByID(ctxData.UserID)
 	if err != nil {
 		return nil, err
@@ -223,14 +229,14 @@ func (repo *UserGrantRepo) userOrg(ctxData authz.CtxData) (*grant_model.ProjectO
 	if err != nil {
 		return nil, err
 	}
-	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{&grant_model.Org{
+	return &grant_model.ProjectOrgSearchResponse{Result: []*grant_model.Org{{
 		OrgID:   org.ID,
 		OrgName: org.Name,
 	}}}, nil
 }
 
 func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *grant_model.UserGrantSearchRequest) (*grant_model.ProjectOrgSearchResponse, error) {
-	userQuery, err := query.NewMemberUserIDSearchQuery(ctxData.UserID)
+	userQuery, err := query.NewMembershipUserIDQuery(ctxData.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -239,6 +245,7 @@ func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *gra
 			Offset: request.Offset,
 			Limit:  request.Limit,
 			Asc:    request.Asc,
+			//TODO: sorting column
 		},
 		Queries: []query.SearchQuery{userQuery},
 	})
@@ -246,7 +253,7 @@ func (repo *UserGrantRepo) searchZitadelOrgs(ctxData authz.CtxData, request *gra
 		return nil, err
 	}
 	if len(memberships.Memberships) > 0 {
-		return repo.membershipsToOrgResp(memberships)
+		return repo.membershipsToOrgResp(memberships), nil
 	}
 	return repo.userOrg(ctxData)
 }

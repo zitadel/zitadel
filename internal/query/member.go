@@ -4,9 +4,10 @@ import (
 	"context"
 	"time"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+
+	sq "github.com/Masterminds/squirrel"
 )
 
 type MembersQuery struct {

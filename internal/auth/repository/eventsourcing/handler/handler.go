@@ -45,8 +45,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newUserGrant(
 			handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es},
 			systemDefaults.IamID),
-		newAuthNKeys(
-			handler{view, bulkLimit, configs.cycleDuration("MachineKey"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(
@@ -56,7 +54,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			systemDefaults),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
-		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),
 	}
