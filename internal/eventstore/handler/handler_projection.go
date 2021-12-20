@@ -2,8 +2,11 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"runtime"
 	"runtime/debug"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -107,6 +110,7 @@ func (h *ProjectionHandler) Process(
 	//handle panic
 	defer func() {
 		cause := recover()
+		fmt.Println(identifyPanic())
 		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause, "stack", string(debug.Stack())).Error("projection handler paniced")
 	}()
 
@@ -314,4 +318,32 @@ func (h *ProjectionHandler) shutdown() {
 		<-h.shouldPush.C
 	}
 	logging.Log("EVENT-XG5Og").Info("stop processing")
+}
+
+func identifyPanic() string {
+	var name, file string
+	var line int
+	var pc [16]uintptr
+
+	n := runtime.Callers(3, pc[:])
+	for _, pc := range pc[:n] {
+		fn := runtime.FuncForPC(pc)
+		if fn == nil {
+			continue
+		}
+		file, line = fn.FileLine(pc)
+		name = fn.Name()
+		if !strings.HasPrefix(name, "runtime.") {
+			break
+		}
+	}
+
+	switch {
+	case name != "":
+		return fmt.Sprintf("%v:%v", name, line)
+	case file != "":
+		return fmt.Sprintf("%v:%v", file, line)
+	}
+
+	return fmt.Sprintf("pc:%x", pc)
 }
