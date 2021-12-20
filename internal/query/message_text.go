@@ -161,12 +161,20 @@ func (q *Queries) DefaultMessageTextByTypeAndLanguageFromFileSystem(messageType,
 func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggregateID, messageType, language string) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(
-		sq.Eq{
-			MessageTextColAggregateID.identifier(): aggregateID,
-			MessageTextColType.identifier():        messageType,
-			MessageTextColLanguage.identifier():    language,
+		sq.Or{
+			sq.Eq{
+				MessageTextColAggregateID.identifier(): aggregateID,
+				MessageTextColType.identifier():        messageType,
+				MessageTextColLanguage.identifier():    language,
+			},
+			sq.Eq{
+				MessageTextColAggregateID.identifier(): domain.IAMID,
+				MessageTextColType.identifier():        messageType,
+				MessageTextColLanguage.identifier():    language,
+			},
 		},
 	).
+		OrderBy(MessageTextColAggregateID.identifier()).
 		Limit(1).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-1b9mf", "Errors.Query.SQLStatement")
