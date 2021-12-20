@@ -6,6 +6,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador/skipcrd"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
 )
 
@@ -43,15 +44,15 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			if skipEnsure, err := skipcrd.EnsureFunc(monitor, k8sClient, "mappings.getambassador.io"); err != nil || skipEnsure != nil {
+				return skipEnsure, err
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 
 			queryConsole, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, ConsoleName),
 				false,
@@ -68,6 +69,7 @@ func AdaptFunc(
 			}
 
 			queryAcc, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, AccountsName),
 				false,

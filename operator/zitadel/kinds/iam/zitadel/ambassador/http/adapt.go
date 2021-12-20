@@ -5,6 +5,7 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/ambassador/mapping"
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador/skipcrd"
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
@@ -93,9 +94,8 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			if skipEnsure, err := skipcrd.EnsureFunc(monitor, k8sClient, "mappings.getambassador.io"); err != nil || skipEnsure != nil {
+				return skipEnsure, err
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
@@ -112,6 +112,7 @@ func AdaptFunc(
 			}
 
 			queryAdminR, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, AdminRName),
 				false,
@@ -128,6 +129,7 @@ func AdaptFunc(
 			}
 
 			queryUpload, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, Upload),
 				false,
@@ -144,6 +146,7 @@ func AdaptFunc(
 			}
 
 			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, MgmtName),
 				false,
@@ -160,6 +163,7 @@ func AdaptFunc(
 			}
 
 			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, OauthName),
 				false,
@@ -176,6 +180,7 @@ func AdaptFunc(
 			}
 
 			queryAuthR, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, AuthRName),
 				false,
@@ -192,6 +197,7 @@ func AdaptFunc(
 			}
 
 			queryAuthorize, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, AuthorizeName),
 				false,
@@ -208,6 +214,7 @@ func AdaptFunc(
 			}
 
 			queryEndsession, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, EndsessionName),
 				false,
@@ -224,6 +231,7 @@ func AdaptFunc(
 			}
 
 			queryIssuer, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, IssuerName),
 				false,
@@ -240,6 +248,7 @@ func AdaptFunc(
 			}
 
 			queryOpenAPI, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, OpenAPIName),
 				false,
