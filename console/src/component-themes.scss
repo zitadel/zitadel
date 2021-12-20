@@ -35,6 +35,7 @@
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
 @import 'src/app/modules/info-row/info-row.component.scss';
+@import 'src/app/modules/user-grants/user-grants.component.scss';
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
 @import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
@@ -85,6 +86,7 @@
   @include private-label-theme($theme);
   @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);
+  @include user-grants-theme($theme);
   @include info-row-theme($theme);
   @include action-dialog-theme($theme);
   @include codemirror-theme($theme);
