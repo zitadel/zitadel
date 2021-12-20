@@ -186,8 +186,13 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 }
 
 func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	templateEvent, ok := event.(*org.CustomTextTemplateRemovedEvent)
-	if !ok {
+	var templateEvent policy.CustomTextTemplateRemovedEvent
+	switch e := event.(type) {
+	case *org.CustomTextTemplateRemovedEvent:
+		templateEvent = e.CustomTextTemplateRemovedEvent
+	case *iam.CustomTextTemplateRemovedEvent:
+		templateEvent = e.CustomTextTemplateRemovedEvent
+	default:
 		logging.LogWithFields("PROJE-m03ng", "seq", event.Sequence(), "expectedType", org.CustomTextTemplateRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n9rs", "reduce.wrong.event.type")
 	}
@@ -195,7 +200,7 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventRead
 		return crdb.NewNoOpStatement(event), nil
 	}
 	return crdb.NewDeleteStatement(
-		templateEvent,
+		event,
 		[]handler.Condition{
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
