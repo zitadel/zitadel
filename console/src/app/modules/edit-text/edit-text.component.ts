@@ -12,14 +12,14 @@ import { InfoSectionType } from '../info-section/info-section.component';
 })
 export class EditTextComponent implements OnInit, OnDestroy {
   @Input() label: string = '';
-  @Input() current$!: Observable<{ [key: string]: any | string; }>;
-  @Input() default$!: Observable<{ [key: string]: any | string; }>;
+  @Input() current$!: Observable<{ [key: string]: any | string }>;
+  @Input() default$!: Observable<{ [key: string]: any | string }>;
   @Input() currentlyDragged: string = '';
-  @Output() changedValues: EventEmitter<{ [key: string]: string; }> = new EventEmitter();
-  public currentMap: { [key: string]: string; } = {};
+  @Output() changedValues: EventEmitter<{ [key: string]: string }> = new EventEmitter();
+  public currentMap: { [key: string]: string } = {};
   private destroy$: Subject<void> = new Subject();
   public form!: FormGroup;
-  public warnText: { [key: string]: string | undefined; } = {};
+  public warnText: { [key: string]: string | undefined } = {};
 
   @Input() public chips: any[] = [];
   @Input() public disabled: boolean = true;
@@ -28,17 +28,18 @@ export class EditTextComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
 
   public ngOnInit(): void {
-    this.current$.pipe(takeUntil(this.destroy$)).subscribe(value => {
+    this.current$.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       this.currentMap = value;
       this.form = new FormGroup({});
-      Object.keys(value).map(key => {
-        const control = new FormControl({ value: value[key], disabled: this.disabled });
-        this.form.addControl(key, control);
+      Object.keys(value).map((key) => {
+        if (key !== 'isDefault') {
+          const control = new FormControl({ value: value[key], disabled: this.disabled });
+          this.form.addControl(key, control);
+        }
       });
 
-      this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(values => this.changedValues.emit(values));
+      this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((values) => this.changedValues.emit(values));
     });
-
   }
 
   public ngOnDestroy(): void {
