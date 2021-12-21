@@ -5,13 +5,14 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
 )
 
@@ -34,20 +35,20 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, systemDefaults sd.SystemDefaults, dir http.FileSystem, apiDomain string) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, apiDomain string) []queryv1.Handler {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
 	}
-	return []query.Handler{
+	return []queryv1.Handler{
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			systemDefaults.IamID,
 		),
-		newCustomText(handler{view, bulkLimit, configs.cycleDuration("CustomText"), errorCount, es}),
 		newNotification(
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
 			command,
+			queries,
 			systemDefaults,
 			aesCrypto,
 			dir,

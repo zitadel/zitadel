@@ -5,6 +5,7 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
@@ -105,6 +106,7 @@ const authConfig: AuthConfig = {
     HasRolePipeModule,
     MatSnackBarModule,
     WarnDialogModule,
+    MatSelectModule,
     MatDialogModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],

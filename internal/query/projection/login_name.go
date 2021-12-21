@@ -39,11 +39,19 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 			Aggregate: user.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
+					Event:  user.UserV1AddedType,
+					Reduce: p.reduceUserCreated,
+				},
+				{
 					Event:  user.HumanAddedType,
 					Reduce: p.reduceUserCreated,
 				},
 				{
 					Event:  user.HumanRegisteredType,
+					Reduce: p.reduceUserCreated,
+				},
+				{
+					Event:  user.UserV1RegisteredType,
 					Reduce: p.reduceUserCreated,
 				},
 				{
@@ -113,6 +121,8 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 }
 
 const (
+	LoginNameCol = "login_name"
+
 	loginNameUserSuffix           = "users"
 	LoginNameUserIDCol            = "id"
 	LoginNameUserUserNameCol      = "user_name"
@@ -140,7 +150,7 @@ func (p *LoginNameProjection) reduceUserCreated(event eventstore.EventReader) (*
 	case *user.MachineAddedEvent:
 		userName = e.UserName
 	default:
-		logging.LogWithFields("HANDL-tDUx3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanAddedType, user.HumanRegisteredType, user.MachineAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-tDUx3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.UserV1AddedType, user.HumanAddedType, user.UserV1RegisteredType, user.HumanRegisteredType, user.MachineAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ayo69", "reduce.wrong.event.type")
 	}
 

@@ -23,7 +23,6 @@ type Membership struct {
 	ChangeDate    time.Time
 	Sequence      uint64
 	ResourceOwner string
-	DisplayName   string
 
 	Org          *OrgMembership
 	IAM          *IAMMembership
@@ -33,19 +32,23 @@ type Membership struct {
 
 type OrgMembership struct {
 	OrgID string
+	Name  string
 }
 
 type IAMMembership struct {
 	IAMID string
+	Name  string
 }
 
 type ProjectMembership struct {
 	ProjectID string
+	Name      string
 }
 
 type ProjectGrantMembership struct {
-	ProjectID string
-	GrantID   string
+	ProjectID   string
+	ProjectName string
+	GrantID     string
 }
 
 type MembershipSearchQuery struct {
@@ -177,12 +180,12 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 			membershipIAMID.identifier(),
 			membershipProjectID.identifier(),
 			membershipGrantID.identifier(),
-			HumanDisplayNameCol.identifier(),
-			MachineNameCol.identifier(),
+			ProjectColumnName.identifier(),
+			OrgColumnName.identifier(),
 			countColumn.identifier(),
 		).From(membershipFrom).
-			LeftJoin(join(HumanUserIDCol, membershipUserID)).
-			LeftJoin(join(MachineUserIDCol, membershipUserID)).
+			LeftJoin(join(ProjectColumnID, membershipProjectID)).
+			LeftJoin(join(OrgColumnID, membershipOrgID)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*Memberships, error) {
 			memberships := make([]*Membership, 0)
@@ -196,8 +199,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					projectID   = sql.NullString{}
 					grantID     = sql.NullString{}
 					roles       = pq.StringArray{}
-					displayName = sql.NullString{}
-					machineName = sql.NullString{}
+					projectName = sql.NullString{}
+					orgName     = sql.NullString{}
 				)
 
 				err := rows.Scan(
@@ -211,8 +214,8 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 					&iamID,
 					&projectID,
 					&grantID,
-					&displayName,
-					&machineName,
+					&projectName,
+					&orgName,
 					&count,
 				)
 
@@ -222,28 +225,26 @@ func prepareMembershipsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memberships,
 
 				membership.Roles = roles
 
-				if displayName.Valid {
-					membership.DisplayName = displayName.String
-				} else if machineName.Valid {
-					membership.DisplayName = machineName.String
-				}
-
 				if orgID.Valid {
 					membership.Org = &OrgMembership{
 						OrgID: orgID.String,
+						Name:  orgName.String,
 					}
 				} else if iamID.Valid {
 					membership.IAM = &IAMMembership{
 						IAMID: iamID.String,
+						Name:  iamID.String,
 					}
 				} else if projectID.Valid && grantID.Valid {
 					membership.ProjectGrant = &ProjectGrantMembership{
-						ProjectID: projectID.String,
-						GrantID:   grantID.String,
+						ProjectID:   projectID.String,
+						ProjectName: projectName.String,
+						GrantID:     grantID.String,
 					}
 				} else if projectID.Valid {
 					membership.Project = &ProjectMembership{
 						ProjectID: projectID.String,
+						Name:      projectName.String,
 					}
 				}
 

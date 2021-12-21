@@ -52,6 +52,15 @@
         </span>
       </cnsl-form-field>
 
+      <div class="email-is-verified">
+        <mat-checkbox class="verified-checkbox" formControlName="isVerified">
+          {{'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate}}
+        </mat-checkbox>
+        <cnsl-info-section class="full-width desc">
+          <span>{{'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC' | translate}}</span>
+        </cnsl-info-section>
+      </div>
+
       <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 
       <cnsl-form-field class="formfield">

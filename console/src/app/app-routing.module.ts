@@ -49,21 +49,21 @@ const routes: Routes = [
     },
   },
   {
+    path: 'org/create',
+    component: OrgCreateComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['(org.create)?(iam.write)?'],
+    },
+    loadChildren: () => import('./pages/org-create/org-create.module').then((m) => m.OrgCreateModule),
+  },
+  {
     path: 'org',
     loadChildren: () => import('./pages/orgs/orgs.module').then((m) => m.OrgsModule),
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['org.read'],
     },
-  },
-  {
-    path: 'org/create',
-    component: OrgCreateComponent,
-    canActivate: [RoleGuard],
-    data: {
-      roles: ['(org.create)?(iam.write)?'],
-    },
-    loadChildren: () => import('./pages/org-create/org-create.module').then((m) => m.OrgCreateModule),
   },
   {
     path: 'actions',

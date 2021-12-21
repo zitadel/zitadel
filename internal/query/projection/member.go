@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/member"
@@ -86,14 +87,13 @@ func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...redu
 	return crdb.NewDeleteStatement(&e, config.conds), nil
 }
 
-func reduceMemberRemoved(e member.MemberRemovedEvent, opts ...reduceMemberOpt) (*handler.Statement, error) {
+func reduceMemberRemoved(e eventstore.EventReader, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
-		conds: []handler.Condition{
-			handler.NewCond(MemberUserIDCol, e.UserID),
-		}}
+		conds: []handler.Condition{},
+	}
 
 	for _, opt := range opts {
 		config = opt(config)
 	}
-	return crdb.NewDeleteStatement(&e, config.conds), nil
+	return crdb.NewDeleteStatement(e, config.conds), nil
 }

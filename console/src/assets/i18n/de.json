@@ -456,6 +456,8 @@
       "EMAIL": {
         "TITLE": "E-Mail",
         "VALID": "Validiert",
+        "ISVERIFIED": "Email Verifiziert",
+        "ISVERIFIEDDESC": "Wenn die Email als verifiziert angegeben wird, wird keine Initialisierungsmail versendet.",
         "RESEND": "Verifikationsmail erneut senden",
         "EDITTITLE": "Email ändern",
         "EDITDESC": "Geben Sie die neue Email in dem darunterliegenden Feld ein!"
@@ -677,6 +679,7 @@
       "LISTDESCRIPTION": "Wähle eine Organisation aus.",
       "ACTIVE": "Aktiv",
       "CREATE": "Organisation erstellen",
+      "USERSELFACCOUNT": "Verwenden Sie Ihr persönliches Konto als Organisationsinhaber",
       "ORGDETAIL_TITLE": "Gebe den Namen und die Domain für die neue Organisation ein.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",

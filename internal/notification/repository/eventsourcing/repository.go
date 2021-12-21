@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	"github.com/caos/zitadel/internal/query"
 
 	"golang.org/x/text/language"
 
@@ -27,7 +28,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 }
 
-func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands, apiDomain string) (*EsRepository, error) {
+func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, apiDomain string) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, systemDefaults, dir, apiDomain)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, command, queries, systemDefaults, dir, apiDomain)
 
 	return &EsRepository{
 		spool,

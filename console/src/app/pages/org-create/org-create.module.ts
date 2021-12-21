@@ -16,22 +16,22 @@ import { OrgCreateRoutingModule } from './org-create-routing.module';
 import { OrgCreateComponent } from './org-create.component';
 
 @NgModule({
-    declarations: [OrgCreateComponent],
-    imports: [
-        OrgCreateRoutingModule,
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        InputModule,
-        MatButtonModule,
-        MatIconModule,
-        MatSelectModule,
-        HasRolePipeModule,
-        TranslateModule,
-        HasRoleModule,
-        MatCheckboxModule,
-        PasswordComplexityViewModule,
-        MatSlideToggleModule,
-    ],
+  declarations: [OrgCreateComponent],
+  imports: [
+    OrgCreateRoutingModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    InputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSelectModule,
+    HasRolePipeModule,
+    TranslateModule,
+    HasRoleModule,
+    MatCheckboxModule,
+    PasswordComplexityViewModule,
+    MatSlideToggleModule,
+  ],
 })
-export class OrgCreateModule { }
+export class OrgCreateModule {}

@@ -278,6 +278,8 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 			l.chooseNextStep(w, r, authReq, 1, err)
 			return
 		}
+		l.redirectToCallback(w, r, authReq)
+	case *domain.LoginSucceededStep:
 		l.redirectToLoginSuccess(w, r, authReq.ID)
 	case *domain.ChangePasswordStep:
 		l.renderChangePassword(w, r, authReq, err)

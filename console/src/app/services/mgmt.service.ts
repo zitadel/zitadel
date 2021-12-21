@@ -1457,10 +1457,13 @@ export class ManagementService {
     return this.grpcService.mgmt.getHumanEmail(req, null).then((resp) => resp.toObject());
   }
 
-  public updateHumanEmail(userId: string, email: string): Promise<UpdateHumanEmailResponse.AsObject> {
+  public updateHumanEmail(userId: string, email: string, isVerified?: boolean): Promise<UpdateHumanEmailResponse.AsObject> {
     const req = new UpdateHumanEmailRequest();
     req.setUserId(userId);
     req.setEmail(email);
+    if (isVerified) {
+      req.setIsEmailVerified(isVerified);
+    }
     return this.grpcService.mgmt.updateHumanEmail(req, null).then((resp) => resp.toObject());
   }
 

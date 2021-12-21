@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -92,7 +93,7 @@ func (p *CustomTextProjection) reduceSet(event eventstore.EventReader) (*handler
 		logging.LogWithFields("PROJE-g0Jfs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KKfw4", "reduce.wrong.event.type")
 	}
-	return crdb.NewCreateStatement(
+	return crdb.NewUpsertStatement(
 		&customTextEvent,
 		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
@@ -124,7 +125,7 @@ func (p *CustomTextProjection) reduceRemoved(event eventstore.EventReader) (*han
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
 			handler.NewCond(CustomTextKeyCol, customTextEvent.Key),
-			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
 		}), nil
 }
 
@@ -144,6 +145,6 @@ func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.EventReade
 		[]handler.Condition{
 			handler.NewCond(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
 			handler.NewCond(CustomTextTemplateCol, customTextEvent.Template),
-			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language),
+			handler.NewCond(CustomTextLanguageCol, customTextEvent.Language.String()),
 		}), nil
 }

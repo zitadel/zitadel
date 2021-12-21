@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -96,7 +97,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*hand
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n90r", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 
 	cols := []handler.Column{
@@ -198,7 +199,7 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventRead
 		[]handler.Condition{
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
-			handler.NewCond(MessageTextLanguageCol, templateEvent.Language),
+			handler.NewCond(MessageTextLanguageCol, templateEvent.Language.String()),
 		},
 	), nil
 }
