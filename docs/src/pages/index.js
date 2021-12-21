@@ -41,7 +41,7 @@ const features = [
             <ListElement
               link="docs/guides/authorization/oauth-recommended-flows"
               type={ICONTYPE.LOGIN}
-              title="Authorzation"
+              title="Authorization"
               description=""
             />
             <ListElement
