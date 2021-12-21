@@ -96,7 +96,7 @@
                   matTooltip="{{'ACTIONS.REFRESH' | translate}}">
                   <mat-icon class="icon">refresh</mat-icon>
                 </button>
-                <cnsl-contact [disablePhoneCode]="true"
+                <cnsl-contact [disablePhoneCode]="true" [state]="user.state"
                   [canWrite]="(['user.write:' + user?.id, 'user.write$'] | hasRole | async)" *ngIf="user?.human"
                   [human]="user.human" (editType)="openEditDialog($event)" (deletedPhone)="deletePhone()"
                   (resendEmailVerification)="resendEmailVerification()"

@@ -12,26 +12,22 @@ import { GridPolicy, POLICIES } from './policies';
     trigger('policy', [
       transition(':enter', [
         style({
-          transform: 'scale(0.95)',
           opacity: 0.5,
         }),
         animate(
           '.15s ease-in-out',
           style({
-            transform: 'scale(1)',
             opacity: 1,
           }),
         ),
       ]),
       transition(':leave', [
         style({
-          transform: 'scale(1)',
           opacity: 1,
         }),
         animate(
           '.15s ease-in-out',
           style({
-            transform: 'scale(0.95)',
             opacity: 0.5,
           }),
         ),

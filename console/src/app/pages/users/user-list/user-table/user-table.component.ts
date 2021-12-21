@@ -191,8 +191,6 @@ export class UserTableComponent implements OnInit {
       }
     }
 
-    console.log([query.toObject(), queryT.toObject()]);
-
     this.userService
       .listUsers(limit, offset, searchValue && this.userSearchKey !== undefined ? [query, queryT] : [queryT])
       .then((resp) => {

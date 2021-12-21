@@ -24,7 +24,7 @@ export class ContactComponent {
   public UserState: any = UserState;
 
   public EditDialogType: any = EditDialogType;
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog) {}
 
   emitDeletePhone(): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -37,7 +37,7 @@ export class ContactComponent {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         this.deletedPhone.emit();
       }
@@ -61,7 +61,7 @@ export class ContactComponent {
         width: '400px',
       });
 
-      dialogRef.afterClosed().subscribe(code => {
+      dialogRef.afterClosed().subscribe((code) => {
         if (code) {
           this.enteredPhoneCode.emit(code);
         }

@@ -104,19 +104,19 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         this.routerLink = ['/grant-create'];
     }
 
-    this.loadGrantsPage();
+    this.loadGrantsPage(this.type);
   }
 
   public ngAfterViewInit(): void {
-    this.paginator.page.pipe(tap(() => this.loadGrantsPage())).subscribe();
+    this.paginator.page.pipe(tap(() => this.loadGrantsPage(this.type))).subscribe();
   }
 
   public setType(type: Type | undefined): void {
     this.type = type;
-    this.loadGrantsPage();
+    this.loadGrantsPage(type);
   }
 
-  private loadGrantsPage(filterValue?: string): void {
+  private loadGrantsPage(type: Type | undefined, filterValue?: string): void {
     let queries: UserGrantQuery[] = [];
     if (this.userGrantListSearchKey !== undefined && filterValue) {
       const query = new UserGrantQuery();
@@ -146,7 +146,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
           query.setRoleKeyQuery(ugRkQ);
           break;
       }
-      queries = [query];
+
+      // const typeQuery = new UserGrantQuery();
+      // typeQuery.set
+      queries = type ? [query] : [query];
     }
 
     this.dataSource.loadGrants(
@@ -253,7 +256,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.selection.clear();
     const filterValue = (event.target as HTMLInputElement).value;
 
-    this.loadGrantsPage(filterValue);
+    this.loadGrantsPage(this.type, filterValue);
   }
 
   public setFilter(key: UserGrantListSearchKey): void {
@@ -267,7 +270,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       this.userGrantListSearchKey = key;
     } else {
       this.userGrantListSearchKey = undefined;
-      this.loadGrantsPage();
+      this.loadGrantsPage(this.type);
     }
   }
 }
