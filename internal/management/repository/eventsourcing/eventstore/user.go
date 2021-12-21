@@ -14,8 +14,6 @@ import (
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -151,8 +149,8 @@ func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName st
 	return model.UserToModel(user, repo.PrefixAvatarURL), nil
 }
 
-func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email string) (bool, error) {
-	return repo.View.IsUserUnique(userName, email)
+func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email, orgID string) (bool, error) {
+	return repo.View.IsUserUnique(userName, email, orgID)
 }
 
 func (repo *UserRepo) GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error) {
@@ -267,38 +265,6 @@ func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Cont
 		return nil, err
 	}
 	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
-func (repo *UserRepo) GetMachineKey(ctx context.Context, userID, keyID string) (*key_model.AuthNKeyView, error) {
-	key, err := repo.View.AuthNKeyByIDs(userID, keyID)
-	if err != nil {
-		return nil, err
-	}
-	return key_view_model.AuthNKeyToModel(key), nil
-}
-
-func (repo *UserRepo) SearchMachineKeys(ctx context.Context, request *key_model.AuthNKeySearchRequest) (*key_model.AuthNKeySearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, seqErr := repo.View.GetLatestAuthNKeySequence()
-	logging.Log("EVENT-Sk8fs").OnError(seqErr).Warn("could not read latest authn key sequence")
-	keys, count, err := repo.View.SearchAuthNKeys(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &key_model.AuthNKeySearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      key_view_model.AuthNKeysToModel(keys),
-	}
-	if seqErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
 }
 
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {

@@ -212,8 +212,8 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
-	return &proj_view_model.ApplicationView{ProjectRoleCheck: m.roleCheck}, nil
+func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error) {
+	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
 func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*grant_view_model.UserGrantView, error) {
@@ -229,13 +229,24 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m *mockProject) ApplicationByClientID(ctx context.Context, s string) (*proj_view_model.ApplicationView, error) {
-	return &proj_view_model.ApplicationView{HasProjectCheck: m.projectCheck}, nil
+func (m *mockProject) ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error) {
+	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
 func (m *mockProject) OrgProjectMappingByIDs(orgID, projectID string) (*proj_view_model.OrgProjectMapping, error) {
 	if m.hasProject {
 		return &proj_view_model.OrgProjectMapping{OrgID: orgID, ProjectID: projectID}, nil
+	}
+	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
+}
+
+type mockApp struct {
+	app *query.App
+}
+
+func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App, error) {
+	if m.app != nil {
+		return m.app, nil
 	}
 	return nil, errors.ThrowNotFound(nil, "ERROR", "error")
 }
@@ -250,6 +261,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 		orgViewProvider            orgViewProvider
 		userGrantProvider          userGrantProvider
 		projectProvider            projectProvider
+		applicationProvider        applicationProvider
 		loginPolicyProvider        loginPolicyViewProvider
 		lockoutPolicyProvider      lockoutPolicyViewProvider
 		PasswordCheckLifeTime      time.Duration
@@ -705,10 +717,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider: &mockEventUser{},
-				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
-				userGrantProvider: &mockUserGrants{},
-				projectProvider:   &mockProject{},
+				userEventProvider:   &mockEventUser{},
+				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
+				userGrantProvider:   &mockUserGrants{},
+				projectProvider:     &mockProject{},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				loginPolicyProvider: &mockLoginPolicy{
 					policy: &query.LoginPolicy{},
 				},
@@ -763,10 +776,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider: &mockEventUser{},
-				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
-				userGrantProvider: &mockUserGrants{},
-				projectProvider:   &mockProject{},
+				userEventProvider:   &mockEventUser{},
+				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
+				userGrantProvider:   &mockUserGrants{},
+				projectProvider:     &mockProject{},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
@@ -994,10 +1008,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider: &mockEventUser{},
-				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
-				userGrantProvider: &mockUserGrants{},
-				projectProvider:   &mockProject{},
+				userEventProvider:   &mockEventUser{},
+				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
+				userGrantProvider:   &mockUserGrants{},
+				projectProvider:     &mockProject{},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
@@ -1028,10 +1043,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					IsEmailVerified: true,
 					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
 				},
-				userEventProvider: &mockEventUser{},
-				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
-				userGrantProvider: &mockUserGrants{},
-				projectProvider:   &mockProject{},
+				userEventProvider:   &mockEventUser{},
+				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
+				userGrantProvider:   &mockUserGrants{},
+				projectProvider:     &mockProject{},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
@@ -1049,6 +1065,42 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				},
 			}, true},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
+			nil,
+		},
+		{
+			"prompt none, checkLoggedIn true, authenticated and native, login succeeded step",
+			fields{
+				userSessionViewProvider: &mockViewUserSession{
+					PasswordVerification:     time.Now().UTC().Add(-5 * time.Minute),
+					SecondFactorVerification: time.Now().UTC().Add(-5 * time.Minute),
+				},
+				userViewProvider: &mockViewUser{
+					PasswordSet:     true,
+					IsEmailVerified: true,
+					MFAMaxSetUp:     int32(model.MFALevelSecondFactor),
+				},
+				userEventProvider:   &mockEventUser{},
+				orgViewProvider:     &mockViewOrg{State: domain.OrgStateActive},
+				userGrantProvider:   &mockUserGrants{},
+				projectProvider:     &mockProject{},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeNative}}},
+				lockoutPolicyProvider: &mockLockoutPolicy{
+					policy: &query.LockoutPolicy{
+						ShowFailures: true,
+					},
+				},
+				PasswordCheckLifeTime:     10 * 24 * time.Hour,
+				SecondFactorCheckLifeTime: 18 * time.Hour,
+			},
+			args{&domain.AuthRequest{
+				UserID:  "UserID",
+				Prompt:  []domain.Prompt{domain.PromptNone},
+				Request: &domain.AuthRequestOIDC{},
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				},
+			}, true},
+			[]domain.NextStep{&domain.LoginSucceededStep{}, &domain.RedirectToCallbackStep{}},
 			nil,
 		},
 		{
@@ -1107,7 +1159,8 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					roleCheck:  true,
 					userGrants: 2,
 				},
-				projectProvider: &mockProject{},
+				projectProvider:     &mockProject{},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
@@ -1184,6 +1237,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					projectCheck: true,
 					hasProject:   true,
 				},
+				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
@@ -1279,6 +1333,7 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				OrgViewProvider:            tt.fields.orgViewProvider,
 				UserGrantProvider:          tt.fields.userGrantProvider,
 				ProjectProvider:            tt.fields.projectProvider,
+				ApplicationProvider:        tt.fields.applicationProvider,
 				LoginPolicyViewProvider:    tt.fields.loginPolicyProvider,
 				LockoutPolicyViewProvider:  tt.fields.lockoutPolicyProvider,
 				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,

@@ -19,7 +19,7 @@
     <cnsl-card *ngIf="user && user.human && user.human.profile" class=" app-card"
       title="{{ 'USER.PROFILE.TITLE' | translate }}">
       <cnsl-detail-form [showEditImage]="true" [preferredLoginName]="user.preferredLoginName" [genders]="genders"
-        [languages]="languages" [username]="user.userName" [user]="user.human"
+        [languages]="languages" [username]="user.userName" [user]="user.human" [disabled]="false"
         (changedLanguage)="changedLanguage($event)" (changeUsernameClicked)="changeUsername()"
         (submitData)="saveProfile($event)">
       </cnsl-detail-form>
@@ -54,6 +54,17 @@
 
     <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
       <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
+    </ng-template>
+
+    <ng-template cnslHasRole [hasRole]="['user.self.delete']">
+      <cnsl-card title="{{'USER.PAGES.DELETEACCOUNT'| translate}}" [warn]="true">
+        <p>{{'USER.PAGES.DELETEACCOUNT_DESC'| translate}}</p>
+
+        <div class="delete-account-wrapper">
+          <button color="warn" mat-raised-button (click)="deleteAccount()">{{'USER.PAGES.DELETEACCOUNT_BTN' |
+            translate}}</button>
+        </div>
+      </cnsl-card>
     </ng-template>
   </div>
 

@@ -62,6 +62,17 @@ func (c *Commands) orgLoginPolicyWriteModelByID(ctx context.Context, orgID strin
 	return policyWriteModel, nil
 }
 
+func (c *Commands) getOrgLoginPolicy(ctx context.Context, orgID string) (*domain.LoginPolicy, error) {
+	policy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if policy.State == domain.PolicyStateActive {
+		return writeModelToLoginPolicy(&policy.LoginPolicyWriteModel), nil
+	}
+	return c.getDefaultLoginPolicy(ctx)
+}
+
 func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, policy *domain.LoginPolicy) (*domain.LoginPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-Mf9sf", "Errors.ResourceOwnerMissing")

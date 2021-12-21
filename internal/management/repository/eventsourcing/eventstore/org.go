@@ -3,7 +3,6 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 
@@ -165,70 +163,6 @@ func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_mo
 	return result, nil
 }
 
-func (repo *OrgRepository) GetLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, int32(domain.LabelPolicyStateActive))
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStateActive))
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.LabelPolicyViewToModel(policy), err
-}
-
-func (repo *OrgRepository) GetPreviewLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	policy, err := repo.View.LabelPolicyByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, int32(domain.LabelPolicyStatePreview))
-	if errors.IsNotFound(err) {
-		policy, err = repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(domain.LabelPolicyStatePreview))
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.LabelPolicyViewToModel(policy), err
-}
-
-func (repo *OrgRepository) GetDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	return repo.getDefaultLabelPolicy(ctx, domain.LabelPolicyStateActive)
-}
-
-func (repo *OrgRepository) GetPreviewDefaultLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	return repo.getDefaultLabelPolicy(ctx, domain.LabelPolicyStatePreview)
-}
-
-func (repo *OrgRepository) getDefaultLabelPolicy(ctx context.Context, state domain.LabelPolicyState) (*iam_model.LabelPolicyView, error) {
-	policy, viewErr := repo.View.LabelPolicyByAggregateIDAndState(repo.SystemDefaults.IamID, int32(state))
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		policy = new(iam_view_model.LabelPolicyView)
-	}
-	events, esErr := repo.getIAMEvents(ctx, policy.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-3Nf8sd", "Errors.IAM.LabelPolicy.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-28uLp").WithError(esErr).Debug("error retrieving new events")
-		return iam_view_model.LabelPolicyViewToModel(policy), nil
-	}
-	policyCopy := *policy
-	for _, event := range events {
-		if err := policyCopy.AppendEvent(event); err != nil {
-			return iam_view_model.LabelPolicyViewToModel(policy), nil
-		}
-	}
-	policy.Default = true
-	return iam_view_model.LabelPolicyViewToModel(policy), nil
-}
-
 func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
 	idpProviders, err := repo.View.IDPProvidersByIdpConfigID(aggregateID, idpConfigID)
 	if err != nil {
@@ -268,134 +202,6 @@ func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_
 		result.Timestamp = sequence.LastSuccessfulSpoolerRun
 	}
 	return result, nil
-}
-
-func (repo *OrgRepository) GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
-	template, err := repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
-	if err != nil {
-		return nil, err
-	}
-	template.Default = true
-	return iam_view_model.MailTemplateViewToModel(template), err
-}
-
-func (repo *OrgRepository) GetMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
-	template, err := repo.View.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		template, err = repo.View.MailTemplateByAggregateID(repo.SystemDefaults.IamID)
-		if err != nil {
-			return nil, err
-		}
-		template.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.MailTemplateViewToModel(template), err
-}
-
-func (repo *OrgRepository) GetDefaultMessageText(ctx context.Context, textType, lang string) (*domain.CustomMessageText, error) {
-	repo.mutex.Lock()
-	defer repo.mutex.Unlock()
-	var err error
-	contents, ok := repo.NotificationTranslationFileContents[lang]
-	if !ok {
-		contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if errors.IsNotFound(err) {
-			contents, err = repo.readTranslationFile(repo.NotificationDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		repo.NotificationTranslationFileContents[lang] = contents
-	}
-	notificationTextMap := make(map[string]interface{})
-	if err := yaml.Unmarshal(contents, &notificationTextMap); err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-093sd", "Errors.TranslationFile.ReadError")
-	}
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, textType, lang)
-	if err != nil {
-		return nil, err
-	}
-	for _, text := range texts {
-		messageTextMap, ok := notificationTextMap[textType].(map[string]interface{})
-		if !ok {
-			continue
-		}
-		messageTextMap[text.Key] = text.Text
-	}
-	jsonbody, err := json.Marshal(notificationTextMap)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-02m8f", "Errors.TranslationFile.MergeError")
-	}
-	notificationText := new(domain.MessageTexts)
-	if err := json.Unmarshal(jsonbody, &notificationText); err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-20ops", "Errors.TranslationFile.MergeError")
-	}
-	result := notificationText.GetMessageTextByType(textType)
-	result.Default = true
-	return result, nil
-}
-
-func (repo *OrgRepository) GetMessageText(ctx context.Context, orgID, textType, lang string) (*domain.CustomMessageText, error) {
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, textType, lang)
-	if err != nil {
-		return nil, err
-	}
-	if len(texts) == 0 {
-		return repo.GetDefaultMessageText(ctx, textType, lang)
-	}
-	return iam_view_model.CustomTextViewsToMessageDomain(repo.SystemDefaults.IamID, lang, texts), err
-}
-
-func (repo *OrgRepository) GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
-	repo.mutex.Lock()
-	defer repo.mutex.Unlock()
-	contents, ok := repo.LoginTranslationFileContents[lang]
-	var err error
-	if !ok {
-		contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
-		if errors.IsNotFound(err) {
-			contents, err = repo.readTranslationFile(repo.LoginDir, fmt.Sprintf("/i18n/%s.yaml", repo.SystemDefaults.DefaultLanguage.String()))
-		}
-		if err != nil {
-			return nil, err
-		}
-		repo.LoginTranslationFileContents[lang] = contents
-	}
-	loginTextMap := make(map[string]interface{})
-	if err := yaml.Unmarshal(contents, &loginTextMap); err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-l0fse", "Errors.TranslationFile.ReadError")
-	}
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(repo.SystemDefaults.IamID, domain.LoginCustomText, lang)
-	if err != nil {
-		return nil, err
-	}
-	for _, text := range texts {
-		keys := strings.Split(text.Key, ".")
-		screenTextMap, ok := loginTextMap[keys[0]].(map[string]interface{})
-		if !ok {
-			continue
-		}
-		screenTextMap[keys[1]] = text.Text
-	}
-	jsonbody, err := json.Marshal(loginTextMap)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-2n8fs", "Errors.TranslationFile.MergeError")
-	}
-	loginText := new(domain.CustomLoginText)
-	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-2n8fs", "Errors.TranslationFile.MergeError")
-	}
-	return loginText, nil
-}
-
-func (repo *OrgRepository) GetLoginTexts(ctx context.Context, orgID, lang string) (*domain.CustomLoginText, error) {
-	texts, err := repo.View.CustomTextsByAggregateIDAndTemplateAndLand(orgID, domain.LoginCustomText, lang)
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.CustomTextViewsToLoginDomain(repo.SystemDefaults.IamID, lang, texts), err
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {

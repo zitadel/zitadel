@@ -38,9 +38,19 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
     consumes: "application/json";
     consumes: "application/grpc";
+    consumes: "application/grpc-web+proto";
 
     produces: "application/json";
     produces: "application/grpc";
+    produces: "application/grpc-web+proto";
+
+    host: "api.zitadel.ch";
+    base_path: "/auth/v1";
+
+    external_docs: {
+        description: "Detailed information about ZITADEL",
+        url: "https://docs.zitadel.ch"
+    }
 };
 
 
@@ -70,6 +80,17 @@ service AuthService {
 
         option (zitadel.v1.auth_option) = {
             permission: "authenticated"
+        };
+    }
+
+    // Changes the user state to deleted
+    rpc RemoveMyUser(RemoveMyUserRequest) returns (RemoveMyUserResponse) {
+        option (google.api.http) = {
+            delete: "/users/me"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.self.delete"
         };
     }
 
@@ -602,6 +623,14 @@ message GetMyUserResponse {
             description: "The timestamp of the last successful login";
         }
     ];
+}
+
+//This is an empty request
+// the request parameters are read from the token-header
+message RemoveMyUserRequest {}
+
+message RemoveMyUserResponse{
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 message ListMyUserChangesRequest {

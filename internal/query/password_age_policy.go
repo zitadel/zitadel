@@ -31,31 +31,40 @@ var (
 		name: projection.PasswordAgeTable,
 	}
 	PasswordAgeColID = Column{
-		name: projection.AgePolicyIDCol,
+		name:  projection.AgePolicyIDCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColSequence = Column{
-		name: projection.AgePolicySequenceCol,
+		name:  projection.AgePolicySequenceCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColCreationDate = Column{
-		name: projection.AgePolicyCreationDateCol,
+		name:  projection.AgePolicyCreationDateCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColChangeDate = Column{
-		name: projection.AgePolicyChangeDateCol,
+		name:  projection.AgePolicyChangeDateCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColResourceOwner = Column{
-		name: projection.AgePolicyResourceOwnerCol,
+		name:  projection.AgePolicyResourceOwnerCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColWarnDays = Column{
-		name: projection.AgePolicyExpireWarnDaysCol,
+		name:  projection.AgePolicyExpireWarnDaysCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColMaxAge = Column{
-		name: projection.AgePolicyMaxAgeDaysCol,
+		name:  projection.AgePolicyMaxAgeDaysCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColIsDefault = Column{
-		name: projection.AgePolicyIsDefaultCol,
+		name:  projection.AgePolicyIsDefaultCol,
+		table: passwordAgeTable,
 	}
 	PasswordAgeColState = Column{
-		name: projection.AgePolicyStateCol,
+		name:  projection.AgePolicyStateCol,
+		table: passwordAgeTable,
 	}
 )
 

@@ -15,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -57,7 +58,7 @@ func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (
 
 func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChangesRequest) (*mgmt_pb.ListUserChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +72,15 @@ func (s *Server) ListUserChanges(ctx context.Context, req *mgmt_pb.ListUserChang
 }
 
 func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequest) (*mgmt_pb.IsUserUniqueResponse, error) {
-	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email)
+	orgID := authz.GetCtxData(ctx).OrgID
+	policy, err := s.query.OrgIAMPolicyByOrg(ctx, orgID)
+	if err != nil {
+		return nil, err
+	}
+	if !policy.UserLoginMustBeDomain {
+		orgID = ""
+	}
+	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -184,8 +193,9 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 	}
 	if code != nil {
 		resp.PasswordlessRegistration = &mgmt_pb.ImportHumanUserResponse_PasswordlessRegistration{
-			Link:     code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
-			Lifetime: durationpb.New(code.Expiration),
+			Link:       code.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+			Lifetime:   durationpb.New(code.Expiration),
+			Expiration: durationpb.New(code.Expiration),
 		}
 	}
 	return resp, nil
@@ -493,6 +503,19 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 	}, nil
 }
 
+func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.AddPasswordlessRegistrationRequest) (*mgmt_pb.AddPasswordlessRegistrationResponse, error) {
+	ctxData := authz.GetCtxData(ctx)
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddPasswordlessRegistrationResponse{
+		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
+		Expiration: durationpb.New(initCode.Expiration),
+	}, nil
+}
+
 func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
 	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
@@ -529,7 +552,15 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 }
 
 func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
-	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -539,14 +570,18 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	result, err := s.user.SearchMachineKeys(ctx, ListMachineKeysRequestToModel(req))
+	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchAuthNKeys(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
-		Result: authn.KeyViewsToPb(result.Result),
+		Result: authn.KeysToPb(result.AuthNKeys),
 		Details: obj_grpc.ToListDetails(
-			result.TotalResult,
+			result.Count,
 			result.Sequence,
 			result.Timestamp,
 		),
@@ -584,14 +619,18 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 }
 
 func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHumanLinkedIDPsRequest) (*mgmt_pb.ListHumanLinkedIDPsResponse, error) {
-	res, err := s.user.SearchExternalIDPs(ctx, ListHumanLinkedIDPsRequestToModel(req))
+	queries, err := ListHumanLinkedIDPsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IDPUserLinks(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanLinkedIDPsResponse{
-		Result: idp_grpc.IDPsToUserLinkPb(res.Result),
+		Result: idp_grpc.IDPUserLinksToPb(res.Links),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),
@@ -608,18 +647,18 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
-	request, err := ListUserMembershipsRequestToModel(req)
+	request, err := ListUserMembershipsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.user.SearchUserMemberships(ctx, request)
+	response, err := s.query.Memberships(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
+		Result: user_grpc.MembershipsToMembershipsPb(response.Memberships),
 		Details: obj_grpc.ToListDetails(
-			response.TotalResult,
+			response.Count,
 			response.Sequence,
 			response.Timestamp,
 		),

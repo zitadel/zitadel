@@ -3,11 +3,11 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
@@ -81,7 +81,7 @@ func NewHumanPhoneRemovedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 }
 
 func HumanPhoneRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
-	return &HumanPhoneChangedEvent{
+	return &HumanPhoneRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
 }

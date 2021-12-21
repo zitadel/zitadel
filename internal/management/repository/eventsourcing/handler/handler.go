@@ -35,7 +35,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 	return []query.Handler{
 		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
 		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
-		newApplication(handler{view, bulkLimit, configs.cycleDuration("Application"), errorCount, es}),
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			defaults.IamID),
 		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
@@ -43,27 +42,14 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
-		newAuthNKeys(
-			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newLabelPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es},
-			staticStorage),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
 			defaults),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults),
-		newMailTemplate(
-			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
-		newMessageText(
-			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
-		newFeatures(
-			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
-		newCustomText(
-			handler{view, bulkLimit, configs.cycleDuration("CustomText"), errorCount, es}),
 		newMetadata(
 			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}

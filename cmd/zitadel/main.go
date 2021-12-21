@@ -11,6 +11,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/getsentry/sentry-go"
+	"github.com/rs/cors"
 
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
@@ -192,7 +193,7 @@ func startZitadel(configPaths []string) {
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
 	if *notificationEnabled {
-		notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, store != nil)
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, queries, store != nil)
 	}
 
 	<-ctx.Done()
@@ -224,12 +225,12 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	apis := api.Create(conf.API, conf.InternalAuthZ, query, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain, conf.Admin.APIDomain+"/assets/v1/"))
 	}
 	managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query, static)
 	logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 	if *managementEnabled {
-		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
+		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults, conf.Mgmt.APIDomain+"/assets/v1/"))
 	}
 	if *authEnabled {
 		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
@@ -239,13 +240,13 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {
-		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo)
+		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo, query)
 		apis.RegisterHandler("/assets/v1", assetsHandler)
 	}
 
 	openAPIHandler, err := openapi.Start()
 	logging.Log("ZITAD-8pRk1").OnError(err).Fatal("Unable to start openapi handler")
-	apis.RegisterHandler("/openapi/v2/swagger", openAPIHandler)
+	apis.RegisterHandler("/openapi/v2/swagger", cors.AllowAll().Handler(openAPIHandler))
 
 	apis.Start(ctx)
 }

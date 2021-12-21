@@ -65,8 +65,9 @@
           <button pwdAction [disabled]="(canWrite$ | async) === false" (click)="sendSetPasswordNotification()"
             mat-stroked-button color="primary" *ngIf="user.state === UserState.USER_STATE_INITIAL">{{
             'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
-          <button emailAction class="resendemail" *ngIf="user.state === UserState.USER_STATE_INITIAL" mat-stroked-button
-            color="primary" (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' |
+          <button emailAction [disabled]="(canWrite$ | async) === false" class="resendemail"
+            *ngIf="user.state === UserState.USER_STATE_INITIAL" mat-stroked-button color="primary"
+            (click)="resendInitEmail()">{{'USER.RESENDINITIALEMAIL' |
             translate}}</button>
         </cnsl-contact>
       </cnsl-card>
@@ -86,7 +87,8 @@
       </cnsl-card>
     </ng-template>
 
-    <cnsl-passwordless *ngIf="user && user.human" [user]="user"></cnsl-passwordless>
+    <cnsl-passwordless *ngIf="user && user.human" [user]="user" [disabled]="(canWrite$ | async) === false">
+    </cnsl-passwordless>
 
     <cnsl-user-mfa *ngIf="user && user.human" [user]="user"></cnsl-user-mfa>
 

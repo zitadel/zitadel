@@ -28,16 +28,16 @@ type Server struct {
 	user           repository.UserRepository
 	usergrant      repository.UserGrantRepository
 	iam            repository.IamRepository
-	features       repository.FeaturesRepository
 	authZ          authz.Config
 	systemDefaults systemdefaults.SystemDefaults
+	assetAPIPrefix string
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, sd systemdefaults.SystemDefaults, assetAPIPrefix string) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
@@ -46,8 +46,8 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		user:           repo,
 		usergrant:      repo,
 		iam:            repo,
-		features:       repo,
 		systemDefaults: sd,
+		assetAPIPrefix: assetAPIPrefix,
 	}
 }
 

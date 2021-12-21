@@ -1,33 +1,36 @@
 package management
 
 import (
+	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	app_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	proj_model "github.com/caos/zitadel/internal/project/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
-func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*proj_model.ApplicationSearchRequest, error) {
+func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := app_grpc.AppQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	queries = append(queries, &proj_model.ApplicationSearchQuery{
-		Key:    proj_model.AppSearchKeyProjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.ProjectId,
-	})
-	return &proj_model.ApplicationSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
+	projectQuery, err := query.NewAppProjectIDSearchQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, projectQuery)
+	return &query.AppSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
 		//SortingColumn: //TODO: sorting
 		Queries: queries,
 	}, nil
@@ -121,19 +124,30 @@ func AddAPIClientKeyRequestToDomain(key *mgmt_pb.AddAppKeyRequest) *domain.Appli
 	}
 }
 
-func ListAPIClientKeysRequestToModel(req *mgmt_pb.ListAppKeysRequest) (*key_model.AuthNKeySearchRequest, error) {
+func ListAPIClientKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*query.AuthNKeySearchQueries, error) {
+	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	projectID, err := query.NewAuthNKeyAggregateIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	appID, err := query.NewAuthNKeyObjectIDQuery(req.AppId)
+	if err != nil {
+		return nil, err
+	}
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := make([]*key_model.AuthNKeySearchQuery, 0)
-	queries = append(queries, &key_model.AuthNKeySearchQuery{
-		Key:    key_model.AuthNKeyObjectID,
-		Method: domain.SearchMethodEquals,
-		Value:  req.AppId,
-	})
-	return &key_model.AuthNKeySearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
+	return &query.AuthNKeySearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{
+			resourcOwner,
+			projectID,
+			appID,
+		},
 	}, nil
 }

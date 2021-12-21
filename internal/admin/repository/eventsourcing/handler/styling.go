@@ -12,7 +12,7 @@ import (
 	"github.com/muesli/gamut"
 
 	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -30,7 +30,6 @@ type Styling struct {
 	handler
 	static       static.Storage
 	subscription *v1.Subscription
-	devMode      bool
 	resourceUrl  string
 }
 
@@ -141,11 +140,11 @@ func (m *Styling) processLabelPolicy(event *es_models.Event) (err error) {
 
 func (m *Styling) OnError(event *es_models.Event, err error) error {
 	logging.LogWithFields("SPOOL-2m9fs", "id", event.AggregateID).WithError(err).Warn("something went wrong in label policy handler")
-	return spooler.HandleError(event, err, m.view.GetLatestLabelPolicyFailedEvent, m.view.ProcessedLabelPolicyFailedEvent, m.view.ProcessedLabelPolicySequence, m.errorCountUntilSkip)
+	return spooler.HandleError(event, err, m.view.GetLatestStylingFailedEvent, m.view.ProcessedStylingFailedEvent, m.view.ProcessedStylingSequence, m.errorCountUntilSkip)
 }
 
 func (m *Styling) OnSuccess() error {
-	return spooler.HandleSuccess(m.view.UpdateLabelPolicySpoolerRunTimestamp)
+	return spooler.HandleSuccess(m.view.UpdateStylingSpoolerRunTimestamp)
 }
 
 func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
@@ -158,7 +157,7 @@ func (m *Styling) generateStylingFile(policy *iam_model.LabelPolicyView) error {
 
 func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64, error) {
 	cssContent := ""
-	cssContent += fmt.Sprint(":root {")
+	cssContent += ":root {"
 	if policy.PrimaryColor != "" {
 		palette := m.generateColorPaletteRGBA255(policy.PrimaryColor)
 		for i, color := range palette {
@@ -190,11 +189,11 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 		fontname = split[len(split)-1]
 		cssContent += fmt.Sprintf("--zitadel-font-family: %s;", fontname)
 	}
-	cssContent += fmt.Sprint("}")
+	cssContent += "}"
 	if policy.FontURL != "" {
 		cssContent += fmt.Sprintf(fontFaceTemplate, fontname, m.resourceUrl, policy.AggregateID, policy.FontURL)
 	}
-	cssContent += fmt.Sprint(".lgn-dark-theme {")
+	cssContent += ".lgn-dark-theme {"
 	if policy.PrimaryColorDark != "" {
 		palette := m.generateColorPaletteRGBA255(policy.PrimaryColorDark)
 		for i, color := range palette {
@@ -219,7 +218,7 @@ func (m *Styling) writeFile(policy *iam_model.LabelPolicyView) (io.Reader, int64
 			cssContent += fmt.Sprintf("--zitadel-color-text-%v: %s;", i, color)
 		}
 	}
-	cssContent += fmt.Sprint("}")
+	cssContent += "}"
 
 	data := []byte(cssContent)
 	buffer := bytes.NewBuffer(data)

@@ -27,7 +27,7 @@ type authNKey interface {
 type AuthNKeyType int32
 
 const (
-	AuthNKeyTypeNONE = iota
+	AuthNKeyTypeNONE AuthNKeyType = iota
 	AuthNKeyTypeJSON
 
 	keyCount

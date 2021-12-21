@@ -45,6 +45,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     };
 
     schemes: HTTPS;
+
     consumes: "application/json";
     produces: "application/json";
 
@@ -54,11 +55,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     consumes: "application/grpc-web+proto";
     produces: "application/grpc-web+proto";
 
+    host: "api.zitadel.ch";
+    base_path: "/management/v1";
 
     external_docs: {
         description: "Detailed information about ZITADEL",
         url: "https://docs.zitadel.ch"
     }
+
+    extensions: {
+		key: "x-zitadel-orgid";
+		value: {
+			string_value: "your-org-id";
+		}
+	}
 };
 
 
@@ -279,7 +289,7 @@ service ManagementService {
     // Changes the username
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/username"
+            put: "/users/{user_id}/username"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -574,6 +584,18 @@ service ManagementService {
         };
     }
 
+    // Adds a new passwordless authenticator link to the user and returns it directly
+    // This link enables the user to register a new device if current passwordless devices are all platform authenticators
+    // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
+    rpc AddPasswordlessRegistration(AddPasswordlessRegistrationRequest) returns (AddPasswordlessRegistrationResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/passwordless/_link"
+        };
+        option (zitadel.v1.auth_option) = {
+            permission: "user.credential.write"
+        };
+    }
+
     // Adds a new passwordless authenticator link to the user and sends it to the registered email address
     // This link enables the user to register a new device if current passwordless devices are all platform authenticators
     // e.g. User has already registered Windows Hello and wants to register FaceID on the iPhone
@@ -583,7 +605,7 @@ service ManagementService {
             body: "*"
         };
         option (zitadel.v1.auth_option) = {
-            permission: "authenticated"
+            permission: "user.write"
         };
     }
 
@@ -2988,7 +3010,9 @@ message ImportHumanUserRequest {
 message ImportHumanUserResponse {
     message PasswordlessRegistration {
         string link = 1;
+        //deprecated: use expiration instead
         google.protobuf.Duration lifetime = 2;
+        google.protobuf.Duration expiration = 3;
     }
 
     string user_id = 1;
@@ -3288,6 +3312,16 @@ message ListHumanPasswordlessRequest {
 
 message ListHumanPasswordlessResponse {
     repeated zitadel.user.v1.WebAuthNToken result = 1;
+}
+
+message AddPasswordlessRegistrationRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddPasswordlessRegistrationResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string link = 2;
+    google.protobuf.Duration expiration = 3;
 }
 
 message SendPasswordlessRegistrationRequest {

@@ -37,8 +37,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newLabelPolicy(
-			handler{view, bulkLimit, configs.cycleDuration("LabelPolicy"), errorCount, es}),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
 			defaults),
@@ -48,14 +46,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults),
-		newMailTemplate(
-			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
-		newMessageText(
-			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
-		newFeatures(
-			handler{view, bulkLimit, configs.cycleDuration("Features"), errorCount, es}),
-		newCustomText(
-			handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
 	}
 	if static != nil {
 		handlers = append(handlers, newStyling(

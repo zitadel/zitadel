@@ -1,58 +1,38 @@
 package authn
 
 import (
-	"github.com/caos/logging"
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	key_model "github.com/caos/zitadel/internal/key/model"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/authn"
 )
 
-func KeyViewsToPb(keys []*key_model.AuthNKeyView) []*authn.Key {
+func KeysToPb(keys []*query.AuthNKey) []*authn.Key {
 	k := make([]*authn.Key, len(keys))
 	for i, key := range keys {
-		k[i] = KeyViewToPb(key)
+		k[i] = KeyToPb(key)
 	}
 	return k
 }
 
-func KeyViewToPb(key *key_model.AuthNKeyView) *authn.Key {
-	expDate, err := ptypes.TimestampProto(key.ExpirationDate)
-	logging.Log("AUTHN-uhYmM").OnError(err).Debug("unable to parse expiry")
-
-	return &authn.Key{
-		Id:             key.ID,
-		Type:           authn.KeyType_KEY_TYPE_JSON,
-		ExpirationDate: expDate,
-		Details: object.ToViewDetailsPb(
-			key.Sequence,
-			key.CreationDate,
-			key.CreationDate,
-			"", //TODO: details
-		),
-	}
-}
-
-func KeyToPb(key *key_model.AuthNKeyView) *authn.Key {
-	expDate, err := ptypes.TimestampProto(key.ExpirationDate)
-	logging.Log("AUTHN-4n12g").OnError(err).Debug("unable to parse expiration date")
-
+func KeyToPb(key *query.AuthNKey) *authn.Key {
 	return &authn.Key{
 		Id:             key.ID,
 		Type:           KeyTypeToPb(key.Type),
-		ExpirationDate: expDate,
+		ExpirationDate: timestamppb.New(key.Expiration),
 		Details: object.ToViewDetailsPb(
 			key.Sequence,
 			key.CreationDate,
 			key.CreationDate,
-			"", //TODO: details
+			key.ResourceOwner,
 		),
 	}
 }
 
-func KeyTypeToPb(typ key_model.AuthNKeyType) authn.KeyType {
+func KeyTypeToPb(typ domain.AuthNKeyType) authn.KeyType {
 	switch typ {
 	case key_model.AuthNKeyTypeJSON:
 		return authn.KeyType_KEY_TYPE_JSON

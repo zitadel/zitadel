@@ -229,10 +229,10 @@ export class UserDetailComponent implements OnInit {
       });
   }
 
-  public saveEmail(email: string): void {
+  public saveEmail(email: string, isVerified: boolean): void {
     if (this.user.id && email) {
       this.mgmtUserService
-        .updateHumanEmail(this.user.id, email)
+        .updateHumanEmail(this.user.id, email, isVerified)
         .then(() => {
           this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
           if (this.user.state === UserState.USER_STATE_INITIAL) {
@@ -355,9 +355,9 @@ export class UserDetailComponent implements OnInit {
           width: '400px',
         });
 
-        dialogRefPhone.afterClosed().subscribe((resp) => {
-          if (resp) {
-            this.savePhone(resp);
+        dialogRefPhone.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.savePhone(resp.value);
           }
         });
         break;
@@ -369,15 +369,17 @@ export class UserDetailComponent implements OnInit {
             labelKey: 'ACTIONS.NEWVALUE',
             titleKey: 'USER.LOGINMETHODS.EMAIL.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.EMAIL.EDITDESC',
+            isVerifiedTextKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIED',
+            isVerifiedTextDescKey: 'USER.LOGINMETHODS.EMAIL.ISVERIFIEDDESC',
             value: this.user.human?.email?.email,
             type: EditDialogType.EMAIL,
           },
           width: '400px',
         });
 
-        dialogRefEmail.afterClosed().subscribe((resp) => {
-          if (resp) {
-            this.saveEmail(resp);
+        dialogRefEmail.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.saveEmail(resp.value, resp.isVerified);
           }
         });
         break;

@@ -4,7 +4,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -18,7 +20,7 @@ import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.c
 export class AuthUserDetailComponent implements OnDestroy {
   public user!: User.AsObject;
   public genders: Gender[] = [Gender.GENDER_MALE, Gender.GENDER_FEMALE, Gender.GENDER_DIVERSE];
-  public languages: string[] = ['de', 'en'];
+  public languages: string[] = ['de', 'en', 'it'];
 
   private subscription: Subscription = new Subscription();
 
@@ -36,22 +38,30 @@ export class AuthUserDetailComponent implements OnDestroy {
     private toast: ToastService,
     public userService: GrpcAuthService,
     private dialog: MatDialog,
+    private auth: AuthenticationService,
   ) {
     this.loading = true;
     this.refreshUser();
+
+    this.userService.getSupportedLanguages().then((lang) => {
+      this.languages = lang.languagesList;
+    });
   }
 
   refreshUser(): void {
     this.refreshChanges$.emit();
-    this.userService.getMyUser().then(resp => {
-      if (resp.user) {
-        this.user = resp.user;
-      }
-      this.loading = false;
-    }).catch(error => {
-      this.toast.showError(error);
-      this.loading = false;
-    });
+    this.userService
+      .getMyUser()
+      .then((resp) => {
+        if (resp.user) {
+          this.user = resp.user;
+        }
+        this.loading = false;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loading = false;
+      });
   }
 
   public ngOnDestroy(): void {
@@ -71,13 +81,15 @@ export class AuthUserDetailComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRefPhone.afterClosed().subscribe(resp => {
+    dialogRefPhone.afterClosed().subscribe((resp) => {
       if (resp && resp !== this.user.userName) {
-        this.userService.updateMyUserName(resp).then(() => {
+        this.userService
+          .updateMyUserName(resp)
+          .then(() => {
             this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
             this.refreshUser();
           })
-          .catch(error => {
+          .catch((error) => {
             this.toast.showError(error);
           });
       }
@@ -101,7 +113,7 @@ export class AuthUserDetailComponent implements OnDestroy {
           this.toast.showInfo('USER.TOAST.SAVED', true);
           this.refreshChanges$.emit();
         })
-        .catch(error => {
+        .catch((error) => {
           this.toast.showError(error);
         });
     }
@@ -109,7 +121,8 @@ export class AuthUserDetailComponent implements OnDestroy {
 
   public saveEmail(email: string): void {
     this.userService
-      .setMyEmail(email).then(() => {
+      .setMyEmail(email)
+      .then(() => {
         this.toast.showInfo('USER.TOAST.EMAILSAVED', true);
         if (this.user.human) {
           const mailToSet = new Email();
@@ -117,18 +130,22 @@ export class AuthUserDetailComponent implements OnDestroy {
           this.user.human.email = mailToSet.toObject();
           this.refreshUser();
         }
-      }).catch(error => {
+      })
+      .catch((error) => {
         this.toast.showError(error);
       });
   }
 
   public enteredPhoneCode(code: string): void {
-    this.userService.verifyMyPhone(code).then(() => {
-      this.toast.showInfo('USER.TOAST.PHONESAVED', true);
-      this.refreshUser();
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.userService
+      .verifyMyPhone(code)
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.PHONESAVED', true);
+        this.refreshUser();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public changedLanguage(language: string): void {
@@ -136,40 +153,50 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public resendPhoneVerification(): void {
-    this.userService.resendMyPhoneVerification().then(() => {
-      this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
-      this.refreshChanges$.emit();
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.userService
+      .resendMyPhoneVerification()
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.PHONEVERIFICATIONSENT', true);
+        this.refreshChanges$.emit();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public resendEmailVerification(): void {
-    this.userService.resendMyEmailVerification().then(() => {
-      this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
-      this.refreshChanges$.emit();
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.userService
+      .resendMyEmailVerification()
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.EMAILVERIFICATIONSENT', true);
+        this.refreshChanges$.emit();
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public deletePhone(): void {
-    this.userService.removeMyPhone().then(() => {
-      this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
-      if (this.user.human?.phone) {
-        const phone = new Phone();
-        this.user.human.phone = phone.toObject();
-        this.refreshUser();
-      }
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.userService
+      .removeMyPhone()
+      .then(() => {
+        this.toast.showInfo('USER.TOAST.PHONEREMOVED', true);
+        if (this.user.human?.phone) {
+          const phone = new Phone();
+          this.user.human.phone = phone.toObject();
+          this.refreshUser();
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public savePhone(phone: string): void {
     if (this.user.human) {
       this.userService
-        .setMyPhone(phone).then(() => {
+        .setMyPhone(phone)
+        .then(() => {
           this.toast.showInfo('USER.TOAST.PHONESAVED', true);
           if (this.user.human) {
             const phoneToSet = new Phone();
@@ -177,7 +204,8 @@ export class AuthUserDetailComponent implements OnDestroy {
             this.user.human.phone = phoneToSet.toObject();
             this.refreshUser();
           }
-        }).catch(error => {
+        })
+        .catch((error) => {
           this.toast.showError(error);
         });
     }
@@ -199,9 +227,9 @@ export class AuthUserDetailComponent implements OnDestroy {
           width: '400px',
         });
 
-        dialogRefPhone.afterClosed().subscribe(resp => {
-          if (resp) {
-            this.savePhone(resp);
+        dialogRefPhone.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.savePhone(resp.value);
           }
         });
         break;
@@ -219,12 +247,38 @@ export class AuthUserDetailComponent implements OnDestroy {
           width: '400px',
         });
 
-        dialogRefEmail.afterClosed().subscribe(resp => {
-          if (resp) {
-            this.saveEmail(resp);
+        dialogRefEmail.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.saveEmail(resp.value);
           }
         });
         break;
     }
+  }
+
+  public deleteAccount(): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'USER.DIALOG.DELETE_BTN',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'USER.DIALOG.DELETE_TITLE',
+        descriptionKey: 'USER.DIALOG.DELETE_AUTH_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.userService
+          .RemoveMyUser()
+          .then(() => {
+            this.toast.showInfo('USER.PAGES.DELETEACCOUNT_SUCCESS', true);
+            this.auth.signout();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 }

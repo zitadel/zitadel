@@ -110,7 +110,7 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
 	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
-	features, err := s.features.GetOrgFeatures(ctx, authz.GetCtxData(ctx).OrgID)
+	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -279,19 +279,18 @@ func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProj
 }
 
 func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*mgmt_pb.ListProjectMembersResponse, error) {
-	queries, err := ListProjectMembersRequestToModel(req)
+	queries, err := ListProjectMembersRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendProjectQuery(req.ProjectId)
-	members, err := s.project.SearchProjectMembers(ctx, queries)
+	members, err := s.query.ProjectMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
-		Result: member_grpc.ProjectMembersToPb(members.Result),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix, members.Members),
 		Details: object_grpc.ToListDetails(
-			members.TotalResult,
+			members.Count,
 			members.Sequence,
 			members.Timestamp,
 		),
