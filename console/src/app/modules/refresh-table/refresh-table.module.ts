@@ -13,21 +13,19 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { RefreshTableComponent } from './refresh-table.component';
 
 @NgModule({
-    declarations: [RefreshTableComponent],
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatIconModule,
-        TranslateModule,
-        FormsModule,
-        MatTooltipModule,
-        MatProgressSpinnerModule,
-        TimestampToDatePipeModule,
-        LocalizedDatePipeModule,
-        PaginatorModule,
-    ],
-    exports: [
-        RefreshTableComponent,
-    ],
+  declarations: [RefreshTableComponent],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    TranslateModule,
+    FormsModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    TimestampToDatePipeModule,
+    LocalizedDatePipeModule,
+    PaginatorModule,
+  ],
+  exports: [RefreshTableComponent],
 })
-export class RefreshTableModule { }
+export class RefreshTableModule {}

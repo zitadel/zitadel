@@ -155,6 +155,13 @@
             </cnsl-card>
           </ng-container>
 
+          <ng-container *ngIf="currentSetting.id === 'memberships'">
+            <cnsl-card *ngIf="user?.id" title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
+              description="{{'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
+              <cnsl-memberships-table [userId]="user.id"></cnsl-memberships-table>
+            </cnsl-card>
+          </ng-container>
+
           <ng-container *ngIf="currentSetting.id === 'metadata'">
             <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
               <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>

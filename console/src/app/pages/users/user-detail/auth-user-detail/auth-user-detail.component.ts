@@ -46,6 +46,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false },
     { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false },
     { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false },
+    { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false },
     { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
   ];
   public currentSetting: UserSetting = this.settingsList[0];

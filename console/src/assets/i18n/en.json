@@ -192,6 +192,7 @@
       "KEYS": "Keys",
       "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
+      "MEMBERSHIPS": "Memberships",
       "METADATA": "Metadata"
     },
     "TITLE": "Personal Information",

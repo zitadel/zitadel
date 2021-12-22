@@ -2,23 +2,15 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { IamMembersDataSource } from 'src/app/pages/iam/iam-members/iam-members-datasource';
-import { OrgMembersDataSource } from 'src/app/pages/orgs/org-members/org-members-datasource';
-import {
-  ProjectGrantMembersDataSource,
-} from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
-import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
-import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
-
-type MemberDatasource =
-  | OrgMembersDataSource
-  | ProjectMembersDataSource
-  | ProjectGrantMembersDataSource
-  | IamMembersDataSource;
+import { MembershipsDataSource } from './memberships-datasource';
 
 @Component({
   selector: 'cnsl-memberships-table',
@@ -27,37 +19,71 @@ type MemberDatasource =
 })
 export class MembershipsTableComponent implements OnInit, OnDestroy {
   public INITIALPAGESIZE: number = 25;
-  @Input() public canDelete: boolean | null = false;
-  @Input() public canWrite: boolean | null = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild(MatTable) public table!: MatTable<Member.AsObject>;
-  @Input() public dataSource!: MemberDatasource;
+  @ViewChild(MatTable) public table!: MatTable<Membership.AsObject>;
+  @Input() public userId: string = '';
+  public dataSource!: MembershipsDataSource;
   public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
-  @Input() public memberRoleOptions: string[] = [];
-  @Input() public factoryLoadFunc!: Function;
-  @Input() public refreshTrigger!: Observable<void>;
-  @Output() public updateRoles: EventEmitter<{ member: Member.AsObject; change: MatSelectChange }> = new EventEmitter();
+
+  @Output() public updateRoles: EventEmitter<{ member: Membership.AsObject; change: MatSelectChange }> = new EventEmitter();
   @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
-  @Output() public deleteMember: EventEmitter<Member.AsObject> = new EventEmitter();
+  @Output() public deleteMembership: EventEmitter<Membership.AsObject> = new EventEmitter();
 
   private destroyed: Subject<void> = new Subject();
+  public membershipRoleOptions: string[] = [];
 
-  /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  public displayedColumns: string[] = ['select', 'userId', 'firstname', 'lastname', 'loginname', 'email', 'roles'];
+  public displayedColumns: string[] = ['select', 'displayName', 'orgId', 'rolesList'];
+  public membershipToEdit: string = '';
 
-  constructor() {
+  constructor(
+    private authService: GrpcAuthService,
+    private toastService: ToastService,
+    private mgmtService: ManagementService,
+  ) {
+    this.dataSource = new MembershipsDataSource(this.authService, this.mgmtService);
+
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
     });
   }
 
   public ngOnInit(): void {
-    this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
-      this.changePage(this.paginator);
-    });
+    // this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
+    this.changePage(this.paginator);
+    // });
+  }
 
-    if (this.canDelete) {
-      this.displayedColumns.push('actions');
+  public loadRoles(membership: Membership.AsObject): void {
+    if (membership.orgId) {
+      this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+      this.mgmtService
+        .listOrgMemberRoles()
+        .then((resp) => {
+          this.membershipRoleOptions = resp.resultList;
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
+    } else if (membership.projectGrantId) {
+      this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+      this.mgmtService
+        .listProjectMemberRoles()
+        .then((resp) => {
+          this.membershipRoleOptions = resp.resultList;
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
+    } else if (membership.projectId) {
+      this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+      this.mgmtService
+        .listProjectGrantMemberRoles()
+        .then((resp) => {
+          this.membershipRoleOptions = resp.resultList;
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
     }
   }
 
@@ -67,22 +93,24 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
 
   public isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.membersSubject.value.length;
+    const numRows = this.dataSource.membershipsSubject.value.length;
     return numSelected === numRows;
   }
 
   public masterToggle(): void {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.dataSource.membersSubject.value.forEach((row) => this.selection.select(row));
+      : this.dataSource.membershipsSubject.value.forEach((row) => this.selection.select(row));
   }
 
   public changePage(event?: PageEvent): any {
     this.selection.clear();
-    return this.factoryLoadFunc(event ?? this.paginator);
+    return this.userId
+      ? this.dataSource.loadMemberships(this.userId, event?.pageIndex ?? 0, event?.pageSize ?? this.INITIALPAGESIZE)
+      : this.dataSource.loadMyMemberships(event?.pageIndex ?? 0, event?.pageSize ?? this.INITIALPAGESIZE);
   }
 
-  public triggerDeleteMember(member: any): void {
-    this.deleteMember.emit(member);
+  public isCurrentMembership(membership: Membership.AsObject): boolean {
+    return this.membershipToEdit === `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
   }
 }

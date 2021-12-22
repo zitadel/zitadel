@@ -23,6 +23,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
+import { MembershipsTableModule } from 'src/app/modules/memberships-table/memberships-table.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
@@ -37,7 +38,9 @@ import { HasFeatureModule } from '../../../directives/has-feature/has-feature.mo
 import { InfoRowModule } from '../../../modules/info-row/info-row.module';
 import { AuthFactorDialogComponent } from './auth-user-detail/auth-factor-dialog/auth-factor-dialog.component';
 import { AuthPasswordlessComponent } from './auth-user-detail/auth-passwordless/auth-passwordless.component';
-import { DialogPasswordlessComponent } from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
+import {
+  DialogPasswordlessComponent,
+} from './auth-user-detail/auth-passwordless/dialog-passwordless/dialog-passwordless.component';
 import { AuthUserDetailComponent } from './auth-user-detail/auth-user-detail.component';
 import { AuthUserMfaComponent } from './auth-user-detail/auth-user-mfa/auth-user-mfa.component';
 import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.component';
@@ -85,6 +88,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MatTabsModule,
     FormsModule,
     ReactiveFormsModule,
+    MembershipsTableModule,
     DetailFormModule,
     DetailFormMachineModule,
     WarnDialogModule,

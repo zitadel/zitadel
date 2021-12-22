@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AvatarModule } from '../avatar/avatar.module';
 import { PaginatorModule } from '../paginator/paginator.module';
@@ -25,16 +26,17 @@ import { MembershipsTableComponent } from './memberships-table.component';
     MatSelectModule,
     MatCheckboxModule,
     MatIconModule,
-    MatTableModule,
     PaginatorModule,
-    MatSortModule,
     MatTooltipModule,
     FormsModule,
     TranslateModule,
     RefreshTableModule,
     RouterModule,
     AvatarModule,
+    MatTableModule,
+    MatSortModule,
     MatButtonModule,
+    HasRolePipeModule,
   ],
   exports: [MembershipsTableComponent],
 })

@@ -1,5 +1,5 @@
 .icon-button {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .table-wrapper {
@@ -11,7 +11,7 @@
 
     td,
     th {
-      padding: .5rem;
+      padding: 0.5rem;
 
       &:first-child {
         padding-left: 0;
@@ -28,22 +28,10 @@
     }
   }
 
-  tr {
-    button {
-      visibility: hidden;
-    }
-
-    &:hover {
-      button {
-        visibility: visible;
-      }
-    }
-  }
-
   .sa-icon {
     display: block;
     width: 32px;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
 
     i {
       margin: auto;
