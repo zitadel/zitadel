@@ -18,3 +18,6 @@ Also check if "block all cookies" is active. If so please disable this setting.
 To make sure, that your new settings will trigger, please restart your mobile phone and try it again.
 
 Do you still face this issue? Please contact us, and we will try to find out what the problem is.
+
+
+![Same Site Strict Enforvement](/img/manuals/errors/same-site-strict.png)
