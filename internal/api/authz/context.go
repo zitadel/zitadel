@@ -2,7 +2,6 @@ package authz
 
 import (
 	"context"
-	"time"
 
 	"github.com/caos/zitadel/internal/api/grpc"
 	http_util "github.com/caos/zitadel/internal/api/http"
@@ -84,13 +83,9 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 
 	err = t.ExistsOrg(ctx, orgID)
 	if err != nil {
-		for i := 0; i < 3; i++ { //TODO: workaround if org projection is not yet up-to-date
-			time.Sleep(500 * time.Millisecond)
-			err := t.ExistsOrg(ctx, orgID)
-			if err == nil {
-				break
-			}
-		}
+		err = retry(func() error {
+			return t.ExistsOrg(ctx, orgID)
+		})
 		if err != nil {
 			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
 		}

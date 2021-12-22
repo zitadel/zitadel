@@ -18,13 +18,18 @@ func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMe
 }
 
 func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMembersRequest) (*admin_pb.ListIAMMembersResponse, error) {
-	res, err := s.iam.SearchIAMMembers(ctx, ListIAMMemberRequestToModel(req))
+	queries, err := ListIAMMembersRequestToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.IAMMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &admin_pb.ListIAMMembersResponse{
-		Details: object.ToListDetails(res.TotalResult, res.Sequence, res.Timestamp),
-		Result:  member.IAMMembersToPb(res.Result),
+		Details: object.ToListDetails(res.Count, res.Sequence, res.Timestamp),
+		//TODO: resource owner of user of the member instead of the membership resource owner
+		Result: member.MembersToPb("", res.Members),
 	}, nil
 }
 

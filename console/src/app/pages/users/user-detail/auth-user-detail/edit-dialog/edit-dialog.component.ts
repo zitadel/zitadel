@@ -15,16 +15,17 @@ export enum EditDialogType {
 })
 export class EditDialogComponent {
   public isPhone: boolean = false;
+  public isVerified: boolean = false;
   public phoneCountry: string = 'CH';
   public valueControl: FormControl = new FormControl(['', [Validators.required]]);
-  constructor(public dialogRef: MatDialogRef<EditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  public EditDialogType: any = EditDialogType;
+  constructor(public dialogRef: MatDialogRef<EditDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
     this.valueControl.setValue(data.value);
     if (data.type === EditDialogType.PHONE) {
       this.isPhone = true;
     }
 
-    this.valueControl.valueChanges.subscribe(value => {
+    this.valueControl.valueChanges.subscribe((value) => {
       if (value && value.length > 1) {
         this.changeValue(value);
       }
@@ -53,6 +54,6 @@ export class EditDialogComponent {
   }
 
   closeDialogWithValue(): void {
-    this.dialogRef.close(this.valueControl.value);
+    this.dialogRef.close({ value: this.valueControl.value, isVerified: this.isVerified });
   }
 }

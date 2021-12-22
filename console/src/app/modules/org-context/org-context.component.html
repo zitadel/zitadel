@@ -1,0 +1,28 @@
+<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+  <div class="spinner-w">
+    <mat-spinner diameter="20" *ngIf="orgLoading$ | async" color="accent">
+    </mat-spinner>
+  </div>
+
+  <div class="filter-wrapper">
+    <input cnslInput class="filter-input" [formControl]="filterControl" autocomplete="off"
+      (click)="$event.stopPropagation()" placeholder="{{'ORG.PAGES.FILTERPLACEHOLDER' | translate}}" #input>
+  </div>
+
+  <div class="org-wrapper">
+    <button mat-button [ngClass]="{'active': temporg.id === org?.id}" [disabled]="!temporg.id"
+      *ngFor="let temporg of orgs$ | async" (click)="setActiveOrg(temporg)">
+      {{temporg?.name ? temporg.name : 'NO NAME'}}
+    </button>
+  </div>
+
+  <button mat-button class="show-all" [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
+    translate}}</button>
+
+  <ng-template cnslHasRole [hasRole]="['org.create','iam.write']">
+    <button mat-button [routerLink]="[ '/org/create' ]">
+      <mat-icon class="avatar">add</mat-icon>
+      {{'MENU.NEWORG' | translate}}
+    </button>
+  </ng-template>
+</div>

@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -20,7 +21,19 @@ func getUserMethodPermissions(ctx context.Context, t *TokenVerifier, requiredPer
 		return nil, nil, err
 	}
 	if len(memberships) == 0 {
-		return requestedPermissions, nil, nil
+		err = retry(func() error {
+			memberships, err = t.SearchMyMemberships(ctx)
+			if err != nil {
+				return err
+			}
+			if len(memberships) == 0 {
+				return errors.ThrowNotFound(nil, "AUTHZ-cdgFk", "membership not found")
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, nil, nil
+		}
 	}
 	requestedPermissions, allPermissions = mapMembershipsToPermissions(requiredPerm, memberships, authConfig)
 	return requestedPermissions, allPermissions, nil
