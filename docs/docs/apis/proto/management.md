@@ -233,7 +233,7 @@ Changes the username
 
 
 
-    GET: /users/{user_id}/username
+    PUT: /users/{user_id}/username
 
 
 ### SetUserMetadata

@@ -147,7 +147,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-fm0ge", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	cols := []handler.Column{
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
@@ -186,16 +186,21 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 }
 
 func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	templateEvent, ok := event.(*org.CustomTextTemplateRemovedEvent)
-	if !ok {
+	var templateEvent policy.CustomTextTemplateRemovedEvent
+	switch e := event.(type) {
+	case *org.CustomTextTemplateRemovedEvent:
+		templateEvent = e.CustomTextTemplateRemovedEvent
+	case *iam.CustomTextTemplateRemovedEvent:
+		templateEvent = e.CustomTextTemplateRemovedEvent
+	default:
 		logging.LogWithFields("PROJE-m03ng", "seq", event.Sequence(), "expectedType", org.CustomTextTemplateRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n9rs", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	return crdb.NewDeleteStatement(
-		templateEvent,
+		event,
 		[]handler.Condition{
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
