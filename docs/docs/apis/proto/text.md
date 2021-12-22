@@ -343,6 +343,7 @@ title: zitadel/text.proto
 | text |  string | - |  |
 | button_text |  string | - |  |
 | footer_text |  string | - |  |
+| is_default |  bool | - |  |
 
 
 
