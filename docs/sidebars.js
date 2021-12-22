@@ -242,6 +242,7 @@ module.exports = {
             items: ['manuals/user-register', 'manuals/user-login', 'manuals/user-passwordless', 'manuals/user-password', 'manuals/user-factors', 'manuals/user-email', 'manuals/user-phone', 'manuals/user-social-login',],
             collapsed: false,
         },
+        'manuals/error-messages'
     ],
     legal: [
         'legal/introduction',
