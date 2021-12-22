@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"runtime/debug"
 	"sort"
 	"sync"
 	"time"
@@ -106,7 +107,7 @@ func (h *ProjectionHandler) Process(
 	//handle panic
 	defer func() {
 		cause := recover()
-		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause).Error("projection handler paniced")
+		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause, "stack", string(debug.Stack())).Error("projection handler paniced")
 	}()
 
 	execBulk := h.prepareExecuteBulk(query, reduce, update)
