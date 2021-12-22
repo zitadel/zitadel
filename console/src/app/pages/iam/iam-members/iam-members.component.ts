@@ -6,6 +6,7 @@ import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-m
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { IamMembersDataSource } from './iam-members-datasource';
@@ -24,59 +25,73 @@ export class IamMembersComponent {
   public changePage: EventEmitter<void> = new EventEmitter();
   public selection: Array<Member.AsObject> = [];
 
-  constructor(private adminService: AdminService,
+  constructor(
+    private adminService: AdminService,
     private dialog: MatDialog,
-    private toast: ToastService) {
+    private toast: ToastService,
+    breadcrumbService: BreadcrumbService,
+  ) {
+    breadcrumbService.setBreadcrumb([]);
 
     this.dataSource = new IamMembersDataSource(this.adminService);
     this.dataSource.loadMembers(0, 25);
     this.getRoleOptions();
 
     this.changePageFactory = (event?: PageEvent) => {
-      return this.dataSource.loadMembers(
-        event?.pageIndex ?? 0,
-        event?.pageSize ?? this.INITIALPAGESIZE,
-      );
+      return this.dataSource.loadMembers(event?.pageIndex ?? 0, event?.pageSize ?? this.INITIALPAGESIZE);
     };
   }
 
   public getRoleOptions(): void {
-    this.adminService.listIAMMemberRoles().then(resp => {
-      this.memberRoleOptions = resp.rolesList;
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.adminService
+      .listIAMMemberRoles()
+      .then((resp) => {
+        this.memberRoleOptions = resp.rolesList;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
-    this.adminService.updateIAMMember(member.userId, selectionChange.value)
+    this.adminService
+      .updateIAMMember(member.userId, selectionChange.value)
       .then(() => {
         this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
-      }).catch(error => {
+      })
+      .catch((error) => {
         this.toast.showError(error);
       });
   }
 
   public removeMemberSelection(): void {
-    Promise.all(this.selection.map(member => {
-      return this.adminService.removeIAMMember(member.userId).then(() => {
-        this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
-        this.changePage.emit();
-      }).catch(error => {
-        this.toast.showError(error);
-      });
-    }));
+    Promise.all(
+      this.selection.map((member) => {
+        return this.adminService
+          .removeIAMMember(member.userId)
+          .then(() => {
+            this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
+            this.changePage.emit();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }),
+    );
   }
 
   public removeMember(member: Member.AsObject): void {
-    this.adminService.removeIAMMember(member.userId).then(() => {
-      this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
-      setTimeout(() => {
-        this.changePage.emit();
-      }, 1000);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.adminService
+      .removeIAMMember(member.userId)
+      .then(() => {
+        this.toast.showInfo('IAM.TOAST.MEMBERREMOVED', true);
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public openAddMember(): void {
@@ -87,22 +102,26 @@ export class IamMembersComponent {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const users: User.AsObject[] = resp.users;
         const roles: string[] = resp.roles;
 
         if (users && users.length && roles && roles.length) {
-          Promise.all(users.map(user => {
-            return this.adminService.addIAMMember(user.id, roles);
-          })).then(() => {
-            this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
-            setTimeout(() => {
-              this.changePage.emit();
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          Promise.all(
+            users.map((user) => {
+              return this.adminService.addIAMMember(user.id, roles);
+            }),
+          )
+            .then(() => {
+              this.toast.showInfo('IAM.TOAST.MEMBERADDED', true);
+              setTimeout(() => {
+                this.changePage.emit();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });

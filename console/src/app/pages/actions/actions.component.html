@@ -1,66 +1,68 @@
-<div class="enlarged-container">
-  <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
-  <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
+<div class="max-width-container">
+  <div class="enlarged-container">
+    <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
+    <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
 
-  <cnsl-info-section *ngIf="(['actions'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info"
-    [type]="InfoSectionType.WARN">
-    <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'actions'})"></span>
-  </cnsl-info-section>
+    <cnsl-info-section *ngIf="(['actions'] | hasFeature | async) === false" [featureLink]="['/org/features']"
+      class="info" [type]="InfoSectionType.WARN">
+      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'actions'})"></span>
+    </cnsl-info-section>
 
-  <div class="title-section">
-    <h2>{{'FLOWS.ACTIONSTITLE' | translate}}</h2>
-    <i class="las la-code"></i>
-  </div>
+    <div class="title-section">
+      <h2>{{'FLOWS.ACTIONSTITLE' | translate}}</h2>
+      <i class="las la-code"></i>
+    </div>
 
-  <ng-template cnslHasRole [hasRole]="[ 'org.action.read']">
-    <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
-  </ng-template>
+    <ng-template cnslHasRole [hasRole]="[ 'org.action.read']">
+      <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
+    </ng-template>
 
-  <div class="title-section">
-    <h2>{{'FLOWS.FLOWSTITLE' | translate}}</h2>
-    <i class="las la-exchange-alt"></i>
-  </div>
+    <div class="title-section">
+      <h2>{{'FLOWS.FLOWSTITLE' | translate}}</h2>
+      <i class="las la-exchange-alt"></i>
+    </div>
 
-  <ng-template cnslHasRole [hasRole]="[ 'org.flow.read']">
-    <div *ngIf="flow" class="flow">
-      <cnsl-form-field class="formfield" appearance="outline">
-        <cnsl-label>{{ 'FLOWS.FLOWTYPE' | translate }}</cnsl-label>
-        <mat-select [formControl]="typeControl">
-          <mat-option *ngFor="let type of typesForSelection" [value]="type">
-            {{ 'FLOWS.TYPES.'+type | translate }}
-          </mat-option>
-        </mat-select>
-      </cnsl-form-field>
+    <ng-template cnslHasRole [hasRole]="[ 'org.flow.read']">
+      <div *ngIf="flow" class="flow">
+        <cnsl-form-field class="formfield" appearance="outline">
+          <cnsl-label>{{ 'FLOWS.FLOWTYPE' | translate }}</cnsl-label>
+          <mat-select [formControl]="typeControl">
+            <mat-option *ngFor="let type of typesForSelection" [value]="type">
+              {{ 'FLOWS.TYPES.'+type | translate }}
+            </mat-option>
+          </mat-select>
+        </cnsl-form-field>
 
-      <div class="topelements">
-        <div class="flow-type mat-elevation-z1">
-          <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
-          <button (click)="clearFlow()" color="warn" mat-raised-button>{{'ACTIONS.CLEAR' | translate}}</button>
-        </div>
-      </div>
-
-      <div class="trigger-wrapper">
-        <div *ngFor="let trigger of flow.triggerActionsList; index as i" class="trigger mat-elevation-z1">
-          <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
-          <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
-          <span class="fill-space"></span>
-          <div class="action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
-            <div cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".action-wrapper" class="action"
-              *ngFor="let action of trigger.actionsList">
-              <i class="las la-code"></i>
-              <span>{{action.name}}</span>
-            </div>
+        <div class="topelements">
+          <div class="flow-type mat-elevation-z1">
+            <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
+            <button (click)="clearFlow()" color="warn" mat-raised-button>{{'ACTIONS.CLEAR' | translate}}</button>
           </div>
         </div>
 
-        <div class="topbottomline"></div>
+        <div class="trigger-wrapper">
+          <div *ngFor="let trigger of flow.triggerActionsList; index as i" class="trigger mat-elevation-z1">
+            <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
+            <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
+            <span class="fill-space"></span>
+            <div class="action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
+              <div cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".action-wrapper" class="action"
+                *ngFor="let action of trigger.actionsList">
+                <i class="las la-code"></i>
+                <span>{{action.name}}</span>
+              </div>
+            </div>
+          </div>
 
-        <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
-          <span>{{'ACTIONS.NEW' | translate}}</span>
-          <span *ngIf="selection && selection.length">&nbsp;({{selection.length}})</span>
-          <mat-icon>add</mat-icon>
-        </button>
+          <div class="topbottomline"></div>
+
+          <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
+            <span>{{'ACTIONS.NEW' | translate}}</span>
+            <span *ngIf="selection && selection.length">&nbsp;({{selection.length}})</span>
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-  </ng-template>
+    </ng-template>
+  </div>
 </div>

@@ -102,7 +102,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     });
 
     dialogRefPhone.afterClosed().subscribe((resp) => {
-      if (resp && resp !== this.user.userName) {
+      if (resp && resp.value && resp.value !== this.user.userName) {
         this.userService
           .updateMyUserName(resp)
           .then(() => {

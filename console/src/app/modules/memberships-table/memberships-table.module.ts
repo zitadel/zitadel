@@ -1,0 +1,41 @@
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { InputModule } from 'src/app/modules/input/input.module';
+
+import { AvatarModule } from '../avatar/avatar.module';
+import { PaginatorModule } from '../paginator/paginator.module';
+import { RefreshTableModule } from '../refresh-table/refresh-table.module';
+import { MembershipsTableComponent } from './memberships-table.component';
+
+@NgModule({
+  declarations: [MembershipsTableComponent],
+  imports: [
+    CommonModule,
+    InputModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatTableModule,
+    PaginatorModule,
+    MatSortModule,
+    MatTooltipModule,
+    FormsModule,
+    TranslateModule,
+    RefreshTableModule,
+    RouterModule,
+    AvatarModule,
+    MatButtonModule,
+  ],
+  exports: [MembershipsTableComponent],
+})
+export class MembershipsTableModule {}

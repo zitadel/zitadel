@@ -6,6 +6,7 @@ import { InfoSectionType } from 'src/app/modules/info-section/info-section.compo
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -27,7 +28,17 @@ export class ActionsComponent {
   public selection: Action.AsObject[] = [];
   public InfoSectionType: any = InfoSectionType;
 
-  constructor(private mgmtService: ManagementService, private dialog: MatDialog, private toast: ToastService) {
+  constructor(
+    private mgmtService: ManagementService,
+    breadcrumbService: BreadcrumbService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+  ) {
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([bread]);
     this.loadFlow();
   }
 

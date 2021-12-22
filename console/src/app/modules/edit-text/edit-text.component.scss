@@ -16,32 +16,33 @@
       }
 
       .chips {
+        position: absolute;
         display: flex;
         flex-wrap: wrap;
         opacity: 0;
-        margin: 0 -.25rem;
-        transition: all .2s ease;
+        margin: 0 -0.25rem;
+        transition: all 0.2s ease;
 
         .chip {
           border-radius: 50vw;
-          padding: 4px .5rem;
+          padding: 4px 0.5rem;
           font-size: 12px;
           background: #5282c1;
           color: white;
-          margin: .25rem;
+          margin: 0.25rem;
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 10;
 
           * {
-            transition: all .2s ease;
+            transition: all 0.2s ease;
           }
 
           i {
-            opacity: .5;
+            opacity: 0.5;
             font-size: 1.1rem;
-            margin-left: .5rem;
+            margin-left: 0.5rem;
           }
 
           .key {

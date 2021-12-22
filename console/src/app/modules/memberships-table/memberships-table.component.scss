@@ -1,0 +1,61 @@
+.icon-button {
+  margin-right: .5rem;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+
+  .table,
+  .paginator {
+    width: 100%;
+
+    td,
+    th {
+      padding: .5rem;
+
+      &:first-child {
+        padding-left: 0;
+        padding-right: 1rem;
+      }
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    .action {
+      width: 40px;
+    }
+  }
+
+  tr {
+    button {
+      visibility: hidden;
+    }
+
+    &:hover {
+      button {
+        visibility: visible;
+      }
+    }
+  }
+
+  .sa-icon {
+    display: block;
+    width: 32px;
+    margin: 0 .5rem;
+
+    i {
+      margin: auto;
+    }
+  }
+}
+
+.pointer {
+  outline: none;
+  cursor: pointer;
+}
+
+.role-row {
+  min-width: 200px;
+}

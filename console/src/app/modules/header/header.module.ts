@@ -4,7 +4,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
@@ -25,7 +24,6 @@ import { HeaderComponent } from './header.component';
     ReactiveFormsModule,
     RouterModule,
     MatToolbarModule,
-    MatMenuModule,
     MatRippleModule,
     MatIconModule,
     MatButtonModule,

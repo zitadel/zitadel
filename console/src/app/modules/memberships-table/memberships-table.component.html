@@ -1,0 +1,97 @@
+<cnsl-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
+    [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
+
+    <ng-container actions *ngIf="selection.hasValue()">
+        <ng-content select="[selectactions]"></ng-content>
+    </ng-container>
+
+    <div actions>
+        <ng-content select="[writeactions]"></ng-content>
+    </div>
+
+    <div class="table-wrapper">
+        <table mat-table class="table" aria-label="Elements" [dataSource]="dataSource">
+            <ng-container matColumnDef="select">
+                <th class="selection" mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox [disabled]="!canWrite" color="primary" (change)="$event ? masterToggle() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </mat-checkbox>
+                </th>
+                <td class="selection" mat-cell *matCellDef="let row">
+                    <mat-checkbox [disabled]="!canWrite" color="primary" (click)="$event.stopPropagation()"
+                        (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                        <cnsl-avatar *ngIf="row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
+                            [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [avatarUrl]="row.avatarUrl|| ''" [forColor]="row?.preferredLoginName" [size]="32">
+                        </cnsl-avatar>
+                        <ng-template #cog>
+                            <div class="sa-icon">
+                                <i class="las la-user-cog"></i>
+                            </div>
+                        </ng-template>
+                    </mat-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="userId">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.USERID' | translate }} </th>
+                <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
+                    {{member.userId}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="firstname">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.FIRSTNAME' | translate }} </th>
+                <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
+                    {{member.firstName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="lastname">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LASTNAME' | translate }} </th>
+                <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
+                    {{member.lastName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="loginname">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.LOGINNAME' | translate }} </th>
+                <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
+                    {{member.preferredloginname}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.MEMBER.EMAIL' | translate }} </th>
+                <td class="pointer" [routerLink]="['/users', member.userId]" mat-cell *matCellDef="let member">
+                    {{member.email}}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let view">
+                    <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn"
+                        (click)="triggerDeleteMember(view)" mat-icon-button><i class="las la-trash"></i></button>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="roles">
+                <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'ROLESLABEL' | translate }} </th>
+                <td mat-cell *matCellDef="let member" class="role-row">
+                    <cnsl-form-field class="form-field" appearance="outline">
+                        <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="!canWrite"
+                            (selectionChange)="updateRoles.emit({member: member, change: $event})">
+                            <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
+                                {{ role }}
+                            </mat-option>
+                        </mat-select>
+                    </cnsl-form-field>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
+            </tr>
+        </table>
+    </div>
+    <cnsl-paginator *ngIf="dataSource" class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [pageSize]="INITIALPAGESIZE"
+        [length]="dataSource.totalResult" [pageSizeOptions]="[25, 50, 100, 250]" (page)="changePage($event)">
+    </cnsl-paginator>
+</cnsl-refresh-table>
