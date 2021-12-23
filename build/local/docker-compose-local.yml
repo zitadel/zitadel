@@ -165,6 +165,8 @@ services:
   grpc-web-gateway:
     profiles: ['frontend']
     restart: on-failure
+    logging:
+      driver: none
     depends_on:
       backend-run:
         condition: service_healthy
