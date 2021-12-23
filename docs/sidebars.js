@@ -46,16 +46,16 @@ module.exports = {
         "guides/basics/projects",
       ],
     },
-    // {
-    //   type: "category",
-    //   label: "Architecture Scenarios",
-    //   collapsed: false,
-    //   items: [
-    //     "guides/architecture-scenarios/introduction",
-    //     "guides/architecture-scenarios/b2c",
-    //     "guides/architecture-scenarios/b2b",
-    //   ],
-    // },
+    {
+      type: "category",
+      label: "Architecture Scenarios",
+      collapsed: false,
+      items: [
+        "guides/architecture-scenarios/introduction",
+        "guides/architecture-scenarios/b2c",
+        "guides/architecture-scenarios/b2b",
+      ],
+    },
     {
       type: "category",
       label: "Authentication",

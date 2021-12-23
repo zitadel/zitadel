@@ -23,7 +23,7 @@ export function B2B() {
       <svg className="arrowright" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
       
       <div className="b2borg">
-        <span>Hexagon</span>
+        <span>Pentagon</span>
         <div className="b2bproject">
           <span>Portal Project <small>(grant)</small></span>
 
