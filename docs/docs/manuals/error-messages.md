@@ -1,5 +1,5 @@
 ---
-title: Error Messages
+title: Troubleshoot
 ---
 
 You will find some possible error messages here, what the problem is and what some possible solutions can be.
