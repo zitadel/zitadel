@@ -2,15 +2,42 @@ version: '3.8'
 
 services:
   db:
-    profiles: ['database']
+    profiles: ['backend']
     restart: always
     networks:
       - zitadel
     image: cockroachdb/cockroach:v21.2.3
     command: start-single-node --insecure --listen-addr=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
     ports:
       - 8080:8080
       - 26257:26257
+
+  db-migrations:
+    profiles: ['backend']
+    restart: on-failure
+    networks:
+      - zitadel
+    depends_on:
+      db: 
+        condition: service_healthy
+    image: flyway/flyway:latest
+    volumes:
+      - ../../migrations/cockroach:/flyway/sql
+    environment:
+      - FLYWAY_PLACEHOLDERS_eventstorepassword=NULL
+      - FLYWAY_PLACEHOLDERS_managementpassword=NULL
+      - FLYWAY_PLACEHOLDERS_adminapipassword=NULL
+      - FLYWAY_PLACEHOLDERS_authpassword=NULL
+      - FLYWAY_PLACEHOLDERS_notificationpassword=NULL
+      - FLYWAY_PLACEHOLDERS_authzpassword=NULL
+      - FLYWAY_PLACEHOLDERS_queriespassword=NULL
+    command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=5 migrate
 
   minio:
     profiles: ['backend']
@@ -32,28 +59,8 @@ services:
       - nas
       - /export
 
-  db-migrations:
-    profiles: ['database']
-    restart: on-failure
-    networks:
-      - zitadel
-    depends_on:
-      - db
-    image: flyway/flyway:latest
-    volumes:
-      - ../../migrations/cockroach:/flyway/sql
-    environment:
-      - FLYWAY_PLACEHOLDERS_eventstorepassword=NULL
-      - FLYWAY_PLACEHOLDERS_managementpassword=NULL
-      - FLYWAY_PLACEHOLDERS_adminapipassword=NULL
-      - FLYWAY_PLACEHOLDERS_authpassword=NULL
-      - FLYWAY_PLACEHOLDERS_notificationpassword=NULL
-      - FLYWAY_PLACEHOLDERS_authzpassword=NULL
-      - FLYWAY_PLACEHOLDERS_queriespassword=NULL
-    command: -url=jdbc:postgresql://db:26257/defaultdb -user=root -password= -connectRetries=5 migrate
-
   keys:
-    profiles: ['init-backend']
+    profiles: ['backend']
     restart: on-failure
     networks:
       - zitadel
@@ -67,12 +74,15 @@ services:
       - ./local.env
 
   backend-setup:
-    profiles: ['init-backend']
+    profiles: ['backend']
     restart: on-failure
     networks:
       - zitadel
     depends_on:
-      - keys
+      db-migrations:
+        condition: service_completed_successfully
+      keys:
+        condition: service_completed_successfully
     build:
       context: ../..
       dockerfile: build/zitadel/Dockerfile
@@ -98,9 +108,19 @@ services:
     restart: on-failure
     networks:
       - zitadel
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:50002/management/v1/healthz"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
     depends_on:
-      - db
-      - minio
+      db:
+        condition: service_healthy
+      minio: 
+        condition: service_healthy
+      backend-setup:
+        condition: service_completed_successfully
     build:
       context: ../..
       dockerfile: build/zitadel/Dockerfile
@@ -114,6 +134,7 @@ services:
     environment:
       - ZITADEL_EVENTSTORE_HOST=db
     ports:
+      - 50001:50001
       - 50002:50002
       - 50003:50003
     command:
@@ -144,8 +165,9 @@ services:
   grpc-web-gateway:
     profiles: ['frontend']
     restart: on-failure
-    logging:
-      driver: none
+    depends_on:
+      backend-run:
+        condition: service_healthy
     networks:
       - zitadel
     build:
@@ -155,7 +177,7 @@ services:
     ports:
       - '50000:8080'
     environment:
-      - BKD_HOST=host.docker.internal
+      - BKD_HOST=backend-run
       - BKD_PORT=50001
 
   frontend-local-run:
@@ -163,7 +185,10 @@ services:
     networks:
       - zitadel
     depends_on:
-      - grpc-web-gateway
+      grpc-web-gateway:
+        condition: service_started
+      client-id:
+        condition: service_completed_successfully
     build:
       context: ../..
       dockerfile: build/console/Dockerfile
@@ -177,7 +202,10 @@ services:
       - 4200:4200
 
   client-id:
-    profiles: ['init-frontend']
+    profiles: ['frontend']
+    depends_on:
+      backend-run:
+        condition: service_healthy
     networks:
       - zitadel
     build:
