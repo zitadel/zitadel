@@ -30,7 +30,7 @@ func StartOperator(getRv GetRootValues) *cobra.Command {
 		version := rv.Version
 
 		if rv.Gitops {
-			k8sClient, err := kubernetes.NewK8sClientWithPath(monitor, rv.Kubeconfig)
+			k8sClient, err := kubernetes.NewK8sClientPathBeforeInCluster(monitor, rv.Kubeconfig)
 			if err != nil {
 				return err
 			}
@@ -70,7 +70,7 @@ func StartDatabase(getRv GetRootValues) *cobra.Command {
 		version := rv.Version
 
 		if rv.Gitops {
-			k8sClient, err := kubernetes.NewK8sClientWithPath(monitor, rv.Kubeconfig)
+			k8sClient, err := kubernetes.NewK8sClientPathBeforeInCluster(monitor, rv.Kubeconfig)
 			if err != nil {
 				return err
 			}
