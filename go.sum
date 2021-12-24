@@ -178,6 +178,14 @@ github.com/caos/orbos v1.5.14-0.20211118161349-de161601ff8b h1:GR5p1ala9qRz+dByY
 github.com/caos/orbos v1.5.14-0.20211118161349-de161601ff8b/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
 github.com/caos/orbos v1.5.14-0.20211223125151-69892b86b7dd h1:arxrgNZozkv9KVkWVJIOWwxkDanmg96mHHcXmallMk8=
 github.com/caos/orbos v1.5.14-0.20211223125151-69892b86b7dd/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
+github.com/caos/orbos v1.5.14-0.20211224032742-188482c33674 h1:RhN6VFJrYArl/VlMW41PZyF/J22dl7rEVboaVU9h6IU=
+github.com/caos/orbos v1.5.14-0.20211224032742-188482c33674/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
+github.com/caos/orbos v1.5.14-0.20211224085650-1074cfe6dbcf h1:H74zAhTXOaPhbAM1Hg7svmkLswJhfQIj2yCg8qhkCkM=
+github.com/caos/orbos v1.5.14-0.20211224085650-1074cfe6dbcf/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
+github.com/caos/orbos v1.5.14-0.20211224100111-556f67d91383 h1:wn3VHe8EM2QShTx0RmWblmJ3x0tV6/a+29XoxAFLHVo=
+github.com/caos/orbos v1.5.14-0.20211224100111-556f67d91383/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
+github.com/caos/orbos v1.5.14-0.20211224100439-3bbf00010f2c h1:7HiZJzBAsPOL2E3Zgu4TAljl2JjTZpLToMIDMk+nY+0=
+github.com/caos/orbos v1.5.14-0.20211224100439-3bbf00010f2c/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
 github.com/cenkalti/backoff v2.1.1+incompatible h1:tKJnvO2kl0zmb/jA5UKAt4VoEVw1qxKWjE/Bpp46npY=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff/v4 v4.1.1 h1:G2HAfAmvm/GcKan2oOQpBXOd2tT2G57ZnZGWa1PxPBQ=
