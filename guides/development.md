@@ -6,6 +6,11 @@ You should stay in the ZITADEL root directory to execute the statements in the f
 
 - Buildkit compatible docker installation
 
+Minimum resources:
+
+- CPU's: 2
+- Memory: 4Gb
+
 ### env variables
 
 You can use the default vars provided in [this .env-file](../build/local/local.env) or create your own and update the paths in the [docker compose file](../build/local/docker-compose-local.yml).
@@ -82,7 +87,7 @@ Used if you want to run the backend locally. It's recommended to [initialise the
 #### Run backend in docker compose
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile database --profile backend up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile storage --profile backend up
 ```
 
 #### Run backend locally
