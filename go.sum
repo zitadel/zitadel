@@ -130,8 +130,9 @@ github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0 h1:yVUAwvJC/0WNPbyl
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0/go.mod h1:Xn6sxgRuIDflLRJFj5Ev7UxABIkNbccFPV/p8itDReM=
 github.com/aws/aws-sdk-go-v2/config v1.11.0 h1:Czlld5zBB61A3/aoegA9/buZulwL9mHHfizh/Oq+Kqs=
 github.com/aws/aws-sdk-go-v2/config v1.11.0/go.mod h1:VrQDJGFBM5yZe+IOeenNZ/DWoErdny+k2MHEIpwDsEY=
-github.com/aws/aws-sdk-go-v2/credentials v1.6.4 h1:2hvbUoHufns0lDIsaK8FVCMukT1WngtZPavN+W2FkSw=
 github.com/aws/aws-sdk-go-v2/credentials v1.6.4/go.mod h1:tTrhvBPHyPde4pdIPSba4Nv7RYr4wP9jxXEDa1bKn/8=
+github.com/aws/aws-sdk-go-v2/credentials v1.6.5 h1:ZrsO2js2v4T95rsCIWoAb/ck5+U1kwkizGdZHY+ni3s=
+github.com/aws/aws-sdk-go-v2/credentials v1.6.5/go.mod h1:HWSOnsnqVMbLcWUmom6AN1cqhcLzLJ62AObW28CbYbU=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.2 h1:KiN5TPOLrEjbGCvdTQR4t0U4T87vVwALZ5Bg3jpMqPY=
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.2/go.mod h1:dF2F6tXEOgmW5X1ZFO/EPtWrcm7XkW07KNcJUGNtt4s=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.2 h1:XJLnluKuUxQG255zPNe+04izXl7GSyUVafIsgfv9aw4=
@@ -148,10 +149,12 @@ github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.2 h1:GnPGH1FGc4fkn0J
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.2/go.mod h1:eDUYjOYt4Uio7xfHi5jOsO393ZG8TSfZB92a3ZNadWM=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.21.0 h1:vUM2P60BI755i35Gyik4s/lXKcnpEbnvw2Vud+soqpI=
 github.com/aws/aws-sdk-go-v2/service/s3 v1.21.0/go.mod h1:lQ5AeEW2XWzu8hwQ3dCqZFWORQ3RntO0Kq135Xd9VCo=
-github.com/aws/aws-sdk-go-v2/service/sso v1.6.2 h1:2IDmvSb86KT44lSg1uU4ONpzgWLOuApRl6Tg54mZ6Dk=
 github.com/aws/aws-sdk-go-v2/service/sso v1.6.2/go.mod h1:KnIpszaIdwI33tmc/W/GGXyn22c1USYxA/2KyvoeDY0=
-github.com/aws/aws-sdk-go-v2/service/sts v1.11.1 h1:QKR7wy5e650q70PFKMfGF9sTo0rZgUevSSJ4wxmyWXk=
+github.com/aws/aws-sdk-go-v2/service/sso v1.7.0 h1:E4fxAg/UE8a6yiLZYv8/EP0uXKPPRImiMau4ift6S/g=
+github.com/aws/aws-sdk-go-v2/service/sso v1.7.0/go.mod h1:KnIpszaIdwI33tmc/W/GGXyn22c1USYxA/2KyvoeDY0=
 github.com/aws/aws-sdk-go-v2/service/sts v1.11.1/go.mod h1:UV2N5HaPfdbDpkgkz4sRzWCvQswZjdO1FfqCWl0t7RA=
+github.com/aws/aws-sdk-go-v2/service/sts v1.12.0 h1:7g0252k2TF3eA1DtfkTQB/tqI41YvbUPaolwTR0/ITc=
+github.com/aws/aws-sdk-go-v2/service/sts v1.12.0/go.mod h1:UV2N5HaPfdbDpkgkz4sRzWCvQswZjdO1FfqCWl0t7RA=
 github.com/aws/smithy-go v1.9.0 h1:c7FUdEqrQA1/UVKKCNDFQPNKGp4FQg3YW4Ck5SLTG58=
 github.com/aws/smithy-go v1.9.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
 github.com/aymerick/raymond v2.0.3-0.20180322193309-b565731e1464+incompatible/go.mod h1:osfaiScAUVup+UC9Nfq76eWqDhXlp+4UYaA8uhTBO6g=
