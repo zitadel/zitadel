@@ -12,7 +12,7 @@ type Server struct {
 	service management.ManagementServiceServer
 }
 
-func New(ctx context.Context) *Server {
+func New() *Server {
 	return &Server{
 		service: management.UnimplementedManagementServiceServer{},
 	}

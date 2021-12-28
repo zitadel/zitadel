@@ -85,6 +85,12 @@ require (
 )
 
 require (
+	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
+	github.com/improbable-eng/grpc-web v0.15.0 // indirect
+	nhooyr.io/websocket v1.8.6 // indirect
+)
+
+require (
 	cloud.google.com/go v0.97.0 // indirect
 	cloud.google.com/go/trace v1.0.0 // indirect
 	github.com/AlecAivazis/survey/v2 v2.3.2 // indirect

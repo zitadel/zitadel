@@ -12,7 +12,7 @@ type Server struct {
 	service auth.AuthServiceServer
 }
 
-func New(ctx context.Context) *Server {
+func New() *Server {
 	return &Server{
 		service: auth.UnimplementedAuthServiceServer{},
 	}
