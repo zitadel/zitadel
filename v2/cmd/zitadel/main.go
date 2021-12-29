@@ -11,6 +11,11 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+
 	"github.com/caos/zitadel/v2/api/admin"
 	"github.com/caos/zitadel/v2/api/auth"
 	"github.com/caos/zitadel/v2/api/mgmt"
@@ -20,7 +25,8 @@ import (
 
 func main() {
 	grpcServ := grpc.NewServer()
-	//	wrappedGrpc := grpcweb.WrapServer(grpcServ)
+	wrappedGrpc := grpcweb.WrapServer(grpcServ)
+	grpcMux := runtime.NewServeMux()
 	httpMux := http.NewServeMux()
 	httpMux.HandleFunc("/", home)
 
@@ -39,20 +45,20 @@ func main() {
 	authHandler.RegisterGRPC(grpcServ)
 
 	//REST
-	if err := mgmtHandler.RegisterRESTGateway(ctx, httpMux); err != nil {
+	if err := mgmtHandler.RegisterRESTGateway(ctx, httpMux, grpcMux); err != nil {
 		panic(err)
 	}
-	if err := adminHandler.RegisterRESTGateway(ctx, httpMux); err != nil {
+	if err := adminHandler.RegisterRESTGateway(ctx, httpMux, grpcMux); err != nil {
 		panic(err)
 	}
-	if err := authHandler.RegisterRESTGateway(ctx, httpMux); err != nil {
+	if err := authHandler.RegisterRESTGateway(ctx, httpMux, grpcMux); err != nil {
 		panic(err)
 	}
 
-	//	mixedHandler := newHTTPandGRPCMux(mux, grpcServ, wrappedGrpc)
-	//	http2Server := &http2.Server{}
+	mixedHandler := newHTTPandGRPCMux(httpMux, grpcServ, wrappedGrpc)
+	http2Server := &http2.Server{}
 
-	http1Server := &http.Server{ /*Handler: h2c.NewHandler(mixedHandler, http2Server)*/ }
+	http1Server := &http.Server{Handler: h2c.NewHandler(mixedHandler, http2Server)}
 	lis, err := net.Listen("tcp", ":50002")
 	if err != nil {
 		panic(err)
@@ -61,6 +67,7 @@ func main() {
 	go func() {
 		fmt.Println("listening on " + lis.Addr().String())
 		err = http1Server.Serve(lis)
+		fmt.Println("stopped serving")
 	}()
 
 	<-ctx.Done()

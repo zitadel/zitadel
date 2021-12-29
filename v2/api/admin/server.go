@@ -23,13 +23,12 @@ func (s *Server) RegisterGRPC(srv *grpc.Server) {
 	admin.RegisterAdminServiceServer(srv, s.service)
 }
 
-func (s *Server) RegisterRESTGateway(ctx context.Context, m *http.ServeMux) error {
+func (s *Server) RegisterRESTGateway(ctx context.Context, m *http.ServeMux, grpcMux *runtime.ServeMux) error {
 	conn, err := grpc.Dial(":50002", grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
 
-	grpcMux := runtime.NewServeMux()
 	m.Handle("/api/admin/v1", grpcMux)
 
 	return admin.RegisterAdminServiceHandler(ctx, grpcMux, conn)
