@@ -75,7 +75,7 @@ func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *LockoutPolicyProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LockoutPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -104,7 +104,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.EventReader) (*ha
 		}), nil
 }
 
-func (p *LockoutPolicyProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LockoutPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.LockoutPolicyChangedEvent:
@@ -133,7 +133,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-U5cys", "seq", event.Sequence(), "expectedType", org.LockoutPolicyRemovedEventType).Error("wrong event type")

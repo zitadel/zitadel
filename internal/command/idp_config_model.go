@@ -17,7 +17,7 @@ type IDPConfigWriteModel struct {
 	StylingType  domain.IDPConfigStylingType
 }
 
-func (rm *IDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IDPConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	rm.WriteModel.AppendEvents(events...)
 }
 

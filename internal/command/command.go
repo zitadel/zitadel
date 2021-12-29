@@ -158,9 +158,9 @@ func (c *Commands) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, err 
 }
 
 func AppendAndReduce(object interface {
-	AppendEvents(...eventstore.EventReader)
+	AppendEvents(...eventstore.Event)
 	Reduce() error
-}, events ...eventstore.EventReader) error {
+}, events ...eventstore.Event) error {
 	object.AppendEvents(events...)
 	return object.Reduce()
 }

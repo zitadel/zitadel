@@ -22,7 +22,7 @@ func NewIAMIdentityProviderWriteModel(idpConfigID string) *IAMIdentityProviderWr
 	}
 }
 
-func (wm *IAMIdentityProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMIdentityProviderWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IdentityProviderAddedEvent:

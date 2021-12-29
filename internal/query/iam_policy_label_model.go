@@ -8,7 +8,7 @@ import (
 
 type IAMLabelPolicyReadModel struct{ LabelPolicyReadModel }
 
-func (rm *IAMLabelPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMLabelPolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LabelPolicyAddedEvent:

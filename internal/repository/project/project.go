@@ -75,7 +75,7 @@ func NewProjectAddedEvent(
 	}
 }
 
-func ProjectAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ProjectAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -168,7 +168,7 @@ func ChangePrivateLabelingSetting(ChangePrivateLabelingSetting domain.PrivateLab
 	}
 }
 
-func ProjectChangeEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectChangeEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ProjectChangeEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -203,7 +203,7 @@ func NewProjectDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func ProjectDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -231,7 +231,7 @@ func NewProjectReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -266,7 +266,7 @@ func NewProjectRemovedEvent(
 	}
 }
 
-func ProjectRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ProjectRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

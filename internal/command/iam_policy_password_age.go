@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -17,7 +18,7 @@ func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, policy *doma
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +29,7 @@ func (c *Commands) AddDefaultPasswordAgePolicy(ctx context.Context, policy *doma
 	return writeModelToPasswordAgePolicy(&addedPolicy.PasswordAgePolicyWriteModel), nil
 }
 
-func (c *Commands) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPasswordAgePolicyWriteModel, policy *domain.PasswordAgePolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultPasswordAgePolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPasswordAgePolicyWriteModel, policy *domain.PasswordAgePolicy) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -56,7 +57,7 @@ func (c *Commands) ChangeDefaultPasswordAgePolicy(ctx context.Context, policy *d
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

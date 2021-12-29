@@ -17,7 +17,7 @@ func NewUserReadModel(id string) *UserReadModel {
 	}
 }
 
-func (rm *UserReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *UserReadModel) AppendEvents(events ...eventstore.Event) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch event.(type) {
@@ -43,7 +43,7 @@ func (rm *UserReadModel) Reduce() (err error) {
 	return nil
 }
 
-func (rm *UserReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
+func (rm *UserReadModel) AppendAndReduce(events ...eventstore.Event) error {
 	rm.AppendEvents(events...)
 	return rm.Reduce()
 }

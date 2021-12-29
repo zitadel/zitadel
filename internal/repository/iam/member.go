@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -39,7 +40,7 @@ func NewMemberAddedEvent(
 	}
 }
 
-func MemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MemberAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := member.MemberAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -71,7 +72,7 @@ func NewMemberChangedEvent(
 	}
 }
 
-func MemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MemberChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := member.ChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -101,7 +102,7 @@ func NewMemberRemovedEvent(
 	}
 }
 
-func MemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MemberRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := member.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -131,7 +132,7 @@ func NewMemberCascadeRemovedEvent(
 	}
 }
 
-func MemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := member.CascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

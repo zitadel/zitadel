@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -65,7 +66,7 @@ func NewApplicationAddedEvent(
 	}
 }
 
-func ApplicationAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -116,7 +117,7 @@ func NewApplicationChangedEvent(
 	}
 }
 
-func ApplicationChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -158,7 +159,7 @@ func NewApplicationDeactivatedEvent(
 	}
 }
 
-func ApplicationDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -200,7 +201,7 @@ func NewApplicationReactivatedEvent(
 	}
 }
 
-func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -245,7 +246,7 @@ func NewApplicationRemovedEvent(
 	}
 }
 
-func ApplicationRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

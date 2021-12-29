@@ -25,7 +25,7 @@ func NewOrgCustomMessageTextWriteModel(orgID, messageTextType string, lang langu
 	}
 }
 
-func (wm *OrgCustomMessageTextReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:
@@ -71,7 +71,7 @@ func NewOrgCustomMessageTextsWriteModel(orgID string) *OrgCustomMessageTemplates
 	}
 }
 
-func (wm *OrgCustomMessageTemplatesReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgCustomMessageTemplatesReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:

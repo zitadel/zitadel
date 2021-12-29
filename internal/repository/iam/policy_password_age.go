@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -34,7 +35,7 @@ func NewPasswordAgePolicyAddedEvent(
 	}
 }
 
-func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.PasswordAgePolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -65,7 +66,7 @@ func NewPasswordAgePolicyChangedEvent(
 	return &PasswordAgePolicyChangedEvent{PasswordAgePolicyChangedEvent: *changedEvent}, nil
 }
 
-func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.PasswordAgePolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

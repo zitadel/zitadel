@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -23,7 +24,7 @@ func (c *Commands) ChangeHumanAddress(ctx context.Context, address *domain.Addre
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M0cs", "Errors.User.Address.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -66,7 +67,7 @@ func NewRoleAddedEvent(
 	}
 }
 
-func RoleAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RoleAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &RoleAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -137,7 +138,7 @@ func ChangeGroup(group string) func(event *RoleChangedEvent) {
 		e.Group = &group
 	}
 }
-func RoleChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RoleChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &RoleChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -178,7 +179,7 @@ func NewRoleRemovedEvent(
 	}
 }
 
-func RoleRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RoleRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &RoleRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

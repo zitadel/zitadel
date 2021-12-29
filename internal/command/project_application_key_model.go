@@ -33,7 +33,7 @@ func NewApplicationKeyWriteModel(projectID, appID, keyID, resourceOwner string) 
 	}
 }
 
-func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ApplicationKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationRemovedEvent:
