@@ -25,7 +25,7 @@ func NewIAMCustomMessageTextWriteModel(messageTextType string, lang language.Tag
 	}
 }
 
-func (wm *IAMCustomMessageTextReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.CustomTextSetEvent:

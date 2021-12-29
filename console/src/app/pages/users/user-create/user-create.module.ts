@@ -11,29 +11,31 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
+import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 
 import { UserCreateRoutingModule } from './user-create-routing.module';
 import { UserCreateComponent } from './user-create.component';
 
 @NgModule({
-    declarations: [UserCreateComponent],
-    imports: [
-        UserCreateRoutingModule,
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatSelectModule,
-        MatButtonModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatProgressBarModule,
-        MatCheckboxModule,
-        MatTooltipModule,
-        TranslateModule,
-        DetailLayoutModule,
-        InputModule,
-        MatRippleModule,
-    ],
+  declarations: [UserCreateComponent],
+  imports: [
+    UserCreateRoutingModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    TranslateModule,
+    InfoSectionModule,
+    DetailLayoutModule,
+    InputModule,
+    MatRippleModule,
+  ],
 })
-export class UserCreateModule { }
+export class UserCreateModule {}

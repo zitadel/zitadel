@@ -85,7 +85,7 @@ const (
 	FeatureActionsCol                  = "actions"
 )
 
-func (p *FeatureProjection) reduceFeatureSet(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.Statement, error) {
 	var featureEvent features.FeaturesSetEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -180,7 +180,7 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.EventReader) (*han
 		cols), nil
 }
 
-func (p *FeatureProjection) reduceFeatureRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FeatureProjection) reduceFeatureRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FeaturesRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-fN903", "seq", event.Sequence(), "expectedType", org.FeaturesRemovedEventType).Error("wrong event type")

@@ -92,7 +92,7 @@ type API struct {
 }
 
 func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
-	var events []eventstore.EventPusher
+	var events []eventstore.Command
 	iamWriteModel := NewIAMWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
 	//create default login policy
@@ -198,14 +198,14 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 
 	events = append(events, iam_repo.NewSetupStepDoneEvent(ctx, iamAgg, domain.Step1))
 
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return caos_errs.ThrowPreconditionFailed(nil, "EVENT-Gr2hh", "Setup Step1 failed")
 	}
 	return nil
 }
 
-func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string) ([]eventstore.EventPusher, error) {
+func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string) ([]eventstore.Command, error) {
 	app := &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectWriteModel.AggregateID,
@@ -228,7 +228,7 @@ func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *P
 	return events, nil
 }
 
-func setUpAPI(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, apiApp API, resourceOwner string) ([]eventstore.EventPusher, error) {
+func setUpAPI(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, apiApp API, resourceOwner string) ([]eventstore.Command, error) {
 	app := &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectWriteModel.AggregateID,

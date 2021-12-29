@@ -21,7 +21,7 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 	actionModel := NewActionWriteModel(addAction.AggregateID, resourceOwner)
 	actionAgg := ActionAggregateFromWriteModel(&actionModel.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, action.NewAddedEvent(
+	pushedEvents, err := c.eventstore.Push(ctx, action.NewAddedEvent(
 		ctx,
 		actionAgg,
 		addAction.Name,
@@ -63,7 +63,7 @@ func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -90,10 +90,10 @@ func (c *Commands) DeactivateAction(ctx context.Context, actionID string, resour
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-Dgj92", "Errors.Action.NotActive")
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		action.NewDeactivatedEvent(ctx, actionAgg),
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -120,10 +120,10 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		action.NewReactivatedEvent(ctx, actionAgg),
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -147,14 +147,14 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner str
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Dgh4h", "Errors.Action.NotFound")
 	}
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		action.NewRemovedEvent(ctx, actionAgg, existingAction.Name),
 	}
 	orgAgg := org.NewAggregate(resourceOwner, resourceOwner).Aggregate
 	for _, flowType := range flowTypes {
 		events = append(events, org.NewTriggerActionsCascadeRemovedEvent(ctx, &orgAgg, flowType, actionID))
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (c *Commands) DeleteAction(ctx context.Context, actionID, resourceOwner str
 	return writeModelToObjectDetails(&existingAction.WriteModel), nil
 }
 
-func (c *Commands) removeActionsFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.EventPusher, error) {
+func (c *Commands) removeActionsFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.Command, error) {
 	existingActions, err := c.getActionsByOrgWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -173,7 +173,7 @@ func (c *Commands) removeActionsFromOrg(ctx context.Context, resourceOwner strin
 	if len(existingActions.Actions) == 0 {
 		return nil, nil
 	}
-	events := make([]eventstore.EventPusher, 0, len(existingActions.Actions))
+	events := make([]eventstore.Command, 0, len(existingActions.Actions))
 	for id, name := range existingActions.Actions {
 		actionAgg := NewActionAggregate(id, resourceOwner)
 		events = append(events, action.NewRemovedEvent(ctx, actionAgg, name))

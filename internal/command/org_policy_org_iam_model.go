@@ -24,7 +24,7 @@ func NewORGOrgIAMPolicyWriteModel(orgID string) *ORGOrgIAMPolicyWriteModel {
 	}
 }
 
-func (wm *ORGOrgIAMPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ORGOrgIAMPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.OrgIAMPolicyAddedEvent:

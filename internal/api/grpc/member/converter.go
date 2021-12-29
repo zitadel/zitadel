@@ -15,15 +15,15 @@ func MemberToDomain(member *member_pb.Member) *domain.Member {
 	}
 }
 
-func MembersToPb(members []*query.Member) []*member_pb.Member {
+func MembersToPb(assetAPIPrefix string, members []*query.Member) []*member_pb.Member {
 	m := make([]*member_pb.Member, len(members))
 	for i, member := range members {
-		m[i] = MemberToPb(member)
+		m[i] = MemberToPb(assetAPIPrefix, member)
 	}
 	return m
 }
 
-func MemberToPb(m *query.Member) *member_pb.Member {
+func MemberToPb(assetAPIPrefix string, m *query.Member) *member_pb.Member {
 	return &member_pb.Member{
 		UserId:             m.UserID,
 		Roles:              m.Roles,
@@ -32,7 +32,7 @@ func MemberToPb(m *query.Member) *member_pb.Member {
 		FirstName:          m.FirstName,
 		LastName:           m.LastName,
 		DisplayName:        m.DisplayName,
-		AvatarUrl:          m.AvatarURL,
+		AvatarUrl:          domain.AvatarURL(assetAPIPrefix, m.ResourceOwner, m.AvatarURL),
 		Details: object.ToViewDetailsPb(
 			m.Sequence,
 			m.CreationDate,

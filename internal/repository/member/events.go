@@ -3,6 +3,7 @@ package member
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -58,7 +59,7 @@ func NewMemberAddedEvent(
 	}
 }
 
-func MemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MemberAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MemberAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -98,7 +99,7 @@ func NewMemberChangedEvent(
 	}
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MemberChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -136,7 +137,7 @@ func NewRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -174,7 +175,7 @@ func NewCascadeRemovedEvent(
 	}
 }
 
-func CascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MemberCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

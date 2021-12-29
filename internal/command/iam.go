@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -18,7 +19,7 @@ func (c *Commands) GetIAM(ctx context.Context) (*domain.IAM, error) {
 	return writeModelToIAM(iamWriteModel), nil
 }
 
-func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, orgID string) (eventstore.EventPusher, error) {
+func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, orgID string) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err
@@ -29,7 +30,7 @@ func (c *Commands) setGlobalOrg(ctx context.Context, iamAgg *eventstore.Aggregat
 	return iam.NewGlobalOrgSetEventEvent(ctx, iamAgg, orgID), nil
 }
 
-func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, projectID string) (eventstore.EventPusher, error) {
+func (c *Commands) setIAMProject(ctx context.Context, iamAgg *eventstore.Aggregate, iamWriteModel *IAMWriteModel, projectID string) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, iamWriteModel)
 	if err != nil {
 		return nil, err

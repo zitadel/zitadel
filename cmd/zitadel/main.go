@@ -193,7 +193,7 @@ func startZitadel(configPaths []string) {
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
 	if *notificationEnabled {
-		notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, store != nil)
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, queries, store != nil)
 	}
 
 	<-ctx.Done()
@@ -225,12 +225,12 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	apis := api.Create(conf.API, conf.InternalAuthZ, query, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain, conf.Admin.APIDomain+"/assets/v1/"))
 	}
 	managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query, static)
 	logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 	if *managementEnabled {
-		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults))
+		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults, conf.Mgmt.APIDomain+"/assets/v1/"))
 	}
 	if *authEnabled {
 		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))

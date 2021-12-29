@@ -9,9 +9,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -36,6 +36,7 @@ import { OutsideClickModule } from './directives/outside-click/outside-click.mod
 import { AccountsCardModule } from './modules/accounts-card/accounts-card.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { InputModule } from './modules/input/input.module';
+import { OrgContextModule } from './modules/org-context/org-context.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
 import { HasFeaturePipeModule } from './pipes/has-feature-pipe/has-feature-pipe.module';
@@ -109,6 +110,7 @@ const authConfig: AuthConfig = {
     MatNativeDateModule,
     QuicklinkModule,
     AccountsCardModule,
+    OrgContextModule,
     HasRoleModule,
     BrowserAnimationsModule,
     HttpClientModule,
@@ -126,10 +128,10 @@ const authConfig: AuthConfig = {
     MatProgressSpinnerModule,
     MatToolbarModule,
     ReactiveFormsModule,
-    MatMenuModule,
     MatSnackBarModule,
     AvatarModule,
     WarnDialogModule,
+    MatSelectModule,
     MatDialogModule,
     RegExpPipeModule,
     OnboardingModule,

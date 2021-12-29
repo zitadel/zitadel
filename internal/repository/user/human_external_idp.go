@@ -70,7 +70,7 @@ func NewUserIDPLinkAddedEvent(
 	}
 }
 
-func UserIDPLinkAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserIDPLinkAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserIDPLinkAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -115,7 +115,7 @@ func NewUserIDPLinkRemovedEvent(
 	}
 }
 
-func UserIDPLinkRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserIDPLinkRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserIDPLinkRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -160,7 +160,7 @@ func NewUserIDPLinkCascadeRemovedEvent(
 	}
 }
 
-func UserIDPLinkCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserIDPLinkCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserIDPLinkCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -200,7 +200,7 @@ func NewUserIDPCheckSucceededEvent(
 	}
 }
 
-func UserIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserIDPCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserIDPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

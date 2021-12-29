@@ -35,7 +35,7 @@ func NewUniqueConstraintReadModel(ctx context.Context, provider commandProvider)
 	}
 }
 
-func (rm *UniqueConstraintReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *UniqueConstraintReadModel) AppendEvents(events ...eventstore.Event) {
 	rm.WriteModel.AppendEvents(events...)
 }
 

@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -42,7 +43,7 @@ func NewIAMProjectSetEvent(
 	}
 }
 
-func ProjectSetMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ProjectSetMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ProjectSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

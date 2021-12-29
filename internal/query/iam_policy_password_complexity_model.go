@@ -10,7 +10,7 @@ type IAMPasswordComplexityPolicyReadModel struct {
 	PasswordComplexityPolicyReadModel
 }
 
-func (rm *IAMPasswordComplexityPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMPasswordComplexityPolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.PasswordComplexityPolicyAddedEvent:

@@ -57,7 +57,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 	}
 	events = append(events, setEvent)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain
 	}
 
 	events = append(events, removedEvent)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain
 	return writeModelToObjectDetails(&existingFeatures.WriteModel), nil
 }
 
-func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
+func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
 	events, err := c.setAllowedLoginPolicy(ctx, orgID, features)
 	if err != nil {
 		return nil, err
@@ -189,8 +189,8 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 	return events, nil
 }
 
-func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -238,12 +238,12 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	return events, nil
 }
 
-func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.Command, error) {
 	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	for _, factor := range domain.SecondFactorTypes() {
 		state := orgAuthFactors.SecondFactors[factor]
 		if state == nil || state.IAM == state.Org {
@@ -296,8 +296,8 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 	return events, nil
 }
 
-func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err

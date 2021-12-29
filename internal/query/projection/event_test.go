@@ -31,12 +31,12 @@ func testEvent(
 	}
 }
 
-func baseEvent(*testing.T) eventstore.EventReader {
+func baseEvent(*testing.T) eventstore.Event {
 	return &eventstore.BaseEvent{}
 }
 
-func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstore.EventReader, error)) func(t *testing.T) eventstore.EventReader {
-	return func(t *testing.T) eventstore.EventReader {
+func getEvent(event *repository.Event, mapper func(*repository.Event) (eventstore.Event, error)) func(t *testing.T) eventstore.Event {
+	return func(t *testing.T) eventstore.Event {
 		e, err := mapper(event)
 		if err != nil {
 			t.Fatalf("mapper failed: %v", err)

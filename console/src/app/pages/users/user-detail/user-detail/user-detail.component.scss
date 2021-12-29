@@ -19,7 +19,7 @@
     }
 
     p {
-      margin: .5rem 0;
+      margin: 0.5rem 0;
       font-size: 14px;
       color: var(--grey);
     }
@@ -30,13 +30,13 @@
   }
 
   .actions-trigger {
-    margin-top: .25rem;
+    margin-top: 0.25rem;
     display: flex;
     align-items: center;
 
     .icon {
-      margin-left: .5rem;
-      margin-right: -.5rem;
+      margin-left: 0.5rem;
+      margin-right: -0.5rem;
     }
   }
 }
@@ -65,4 +65,8 @@
 
 .side-padding {
   padding-top: 1rem;
+}
+
+.resendemail {
+  margin-top: 0.5rem;
 }

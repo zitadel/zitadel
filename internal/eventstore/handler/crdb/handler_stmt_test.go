@@ -21,7 +21,7 @@ var (
 	errReduce = errors.New("reduce err")
 )
 
-var _ eventstore.EventReader = &testEvent{}
+var _ eventstore.Event = &testEvent{}
 
 type testEvent struct {
 	eventstore.BaseEvent
@@ -1560,13 +1560,13 @@ func TestStatementHandler_updateCurrentSequence(t *testing.T) {
 }
 
 func testReduce() handler.Reduce {
-	return func(event eventstore.EventReader) (*handler.Statement, error) {
+	return func(event eventstore.Event) (*handler.Statement, error) {
 		return NewNoOpStatement(event), nil
 	}
 }
 
 func testReduceErr(err error) handler.Reduce {
-	return func(event eventstore.EventReader) (*handler.Statement, error) {
+	return func(event eventstore.Event) (*handler.Statement, error) {
 		return nil, err
 	}
 }

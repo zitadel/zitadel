@@ -75,7 +75,7 @@ func (p *PrivacyPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PrivacyPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -104,7 +104,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.EventReader) (*ha
 		}), nil
 }
 
-func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PrivacyPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PrivacyPolicyChangedEvent:
@@ -133,7 +133,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PrivacyPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-hN5Ip", "seq", event.Sequence(), "expectedType", org.PrivacyPolicyRemovedEventType).Error("wrong event type")

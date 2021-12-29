@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -35,7 +36,7 @@ func NewLockoutPolicyAddedEvent(
 	}
 }
 
-func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LockoutPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func NewLockoutPolicyChangedEvent(
 	return &LockoutPolicyChangedEvent{LockoutPolicyChangedEvent: *changedEvent}, nil
 }
 
-func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LockoutPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -93,7 +94,7 @@ func NewLockoutPolicyRemovedEvent(
 	}
 }
 
-func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LockoutPolicyRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

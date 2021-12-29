@@ -41,7 +41,7 @@ func NewAPIApplicationWriteModel(projectID, resourceOwner string) *APIApplicatio
 		},
 	}
 }
-func (wm *APIApplicationWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *APIApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:

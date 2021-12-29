@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -33,7 +34,7 @@ func NewOrgIAMPolicyAddedEvent(
 	}
 }
 
-func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.OrgIAMPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func NewOrgIAMPolicyChangedEvent(
 	return &OrgIAMPolicyChangedEvent{OrgIAMPolicyChangedEvent: *changedEvent}, nil
 }
 
-func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.OrgIAMPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

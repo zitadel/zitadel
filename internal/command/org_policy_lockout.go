@@ -21,7 +21,7 @@ func (c *Commands) AddLockoutPolicy(ctx context.Context, resourceOwner string, p
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewLockoutPolicyAddedEvent(ctx, orgAgg, policy.MaxPasswordAttempts, policy.ShowLockOutFailures))
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (c *Commands) ChangeLockoutPolicy(ctx context.Context, resourceOwner string
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-4M9vs", "Errors.Org.LockoutPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Commands) RemoveLockoutPolicy(ctx context.Context, orgID string) (*doma
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLockoutPolicyRemovedEvent(ctx, orgAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewLockoutPolicyRemovedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}

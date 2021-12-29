@@ -3,6 +3,7 @@ package org
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -60,7 +61,7 @@ func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, d
 	}
 }
 
-func DomainAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgDomainAdded := &DomainAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -106,7 +107,7 @@ func NewDomainVerificationAddedEvent(
 	}
 }
 
-func DomainVerificationAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainVerificationAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgDomainVerificationAdded := &DomainVerificationAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -143,7 +144,7 @@ func NewDomainVerificationFailedEvent(ctx context.Context, aggregate *eventstore
 	}
 }
 
-func DomainVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainVerificationFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgDomainVerificationFailed := &DomainVerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -180,7 +181,7 @@ func NewDomainVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 	}
 }
 
-func DomainVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgDomainVerified := &DomainVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -217,7 +218,7 @@ func NewDomainPrimarySetEvent(ctx context.Context, aggregate *eventstore.Aggrega
 	}
 }
 
-func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainPrimarySetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgDomainPrimarySet := &DomainPrimarySetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -259,7 +260,7 @@ func NewDomainRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate,
 	}
 }
 
-func DomainRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgDomainRemoved := &DomainRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

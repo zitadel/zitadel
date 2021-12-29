@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -16,7 +17,7 @@ func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, policy *domain.L
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +29,7 @@ func (c *Commands) AddDefaultLockoutPolicy(ctx context.Context, policy *domain.L
 	return writeModelToLockoutPolicy(&addedPolicy.LockoutPolicyWriteModel), nil
 }
 
-func (c *Commands) addDefaultLockoutPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLockoutPolicyWriteModel, policy *domain.LockoutPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultLockoutPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLockoutPolicyWriteModel, policy *domain.LockoutPolicy) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -55,7 +56,7 @@ func (c *Commands) ChangeDefaultLockoutPolicy(ctx context.Context, policy *domai
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LockoutPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

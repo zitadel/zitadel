@@ -5,7 +5,6 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -24,11 +23,4 @@ type IAMRepository interface {
 
 	IDPProvidersByIDPConfigID(ctx context.Context, idpConfigID string) ([]*iam_model.IDPProviderView, error)
 	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error)
-
-	GetDefaultMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error)
-
-	GetDefaultMessageText(ctx context.Context, textType, language string) (*domain.CustomMessageText, error)
-	GetCustomMessageText(ctx context.Context, textType string, language string) (*domain.CustomMessageText, error)
-	GetDefaultLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
-	GetCustomLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error)
 }

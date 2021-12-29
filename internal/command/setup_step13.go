@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -20,13 +21,13 @@ func (s *Step13) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep13(ctx context.Context, step *Step13) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		_, mailTemplateEvent, err := c.changeDefaultMailTemplate(ctx, &step.DefaultMailTemplate)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-4insR").Info("default mail template/text set up")
-		return []eventstore.EventPusher{mailTemplateEvent}, nil
+		return []eventstore.Command{mailTemplateEvent}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

@@ -69,7 +69,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   }
 
   public changeUsername(): void {
-    const dialogRefPhone = this.dialog.open(EditDialogComponent, {
+    const dialogRef = this.dialog.open(EditDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CHANGE',
         cancelKey: 'ACTIONS.CANCEL',
@@ -81,10 +81,10 @@ export class AuthUserDetailComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRefPhone.afterClosed().subscribe((resp) => {
-      if (resp && resp !== this.user.userName) {
+    dialogRef.afterClosed().subscribe((resp: { value: string }) => {
+      if (resp && resp.value && resp.value !== this.user.userName) {
         this.userService
-          .updateMyUserName(resp)
+          .updateMyUserName(resp.value)
           .then(() => {
             this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
             this.refreshUser();
@@ -227,9 +227,9 @@ export class AuthUserDetailComponent implements OnDestroy {
           width: '400px',
         });
 
-        dialogRefPhone.afterClosed().subscribe((resp) => {
-          if (resp) {
-            this.savePhone(resp);
+        dialogRefPhone.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.savePhone(resp.value);
           }
         });
         break;
@@ -247,9 +247,9 @@ export class AuthUserDetailComponent implements OnDestroy {
           width: '400px',
         });
 
-        dialogRefEmail.afterClosed().subscribe((resp) => {
-          if (resp) {
-            this.saveEmail(resp);
+        dialogRefEmail.afterClosed().subscribe((resp: { value: string; isVerified: boolean }) => {
+          if (resp && resp.value) {
+            this.saveEmail(resp.value);
           }
         });
         break;

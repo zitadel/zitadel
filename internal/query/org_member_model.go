@@ -9,7 +9,7 @@ type OrgMembersReadModel struct {
 	MembersReadModel
 }
 
-func (rm *OrgMembersReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *OrgMembersReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.MemberAddedEvent:
@@ -26,7 +26,7 @@ func (rm *OrgMembersReadModel) AppendEvents(events ...eventstore.EventReader) {
 
 type OrgMemberReadModel MemberReadModel
 
-func (rm *OrgMemberReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *OrgMemberReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.MemberAddedEvent:

@@ -72,7 +72,7 @@ const (
 	KeyPublicColumnKey    = "key"
 )
 
-func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-GEdg3", "seq", event.Sequence(), "expectedType", keypair.AddedEventType).Error("wrong event type")
@@ -81,7 +81,7 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
 		return crdb.NewNoOpStatement(e), nil
 	}
-	creates := []func(eventstore.EventReader) crdb.Exec{
+	creates := []func(eventstore.Event) crdb.Exec{
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyColumnID, e.Aggregate().ID),

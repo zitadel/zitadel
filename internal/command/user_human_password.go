@@ -35,7 +35,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, passwordEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, passwordEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 	if err != nil {
 		return err
 	}
-	_, err = c.eventstore.PushEvents(ctx, passwordEvent)
+	_, err = c.eventstore.Push(ctx, passwordEvent)
 	return err
 }
 
@@ -113,11 +113,11 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	eventPusher, err := c.changePassword(ctx, userAgentID, password, userAgg, existingPassword)
+	command, err := c.changePassword(ctx, userAgentID, password, userAgg, existingPassword)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, eventPusher)
+	pushedEvents, err := c.eventstore.Push(ctx, command)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) ChangePassword(ctx context.Context, orgID, userID, oldPasswor
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.EventPusher, err error) {
+func (c *Commands) changePassword(ctx context.Context, userAgentID string, password *domain.Password, userAgg *eventstore.Aggregate, existingPassword *HumanPasswordWriteModel) (event eventstore.Command, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -168,7 +168,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPasswordCodeAddedEvent(ctx, userAgg, passwordCode.Code, passwordCode.Expiry, notifyType))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (c *Commands) PasswordCodeSent(ctx context.Context, orgID, userID string) (
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3n77z", "Errors.User.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingPassword.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCodeSentEvent(ctx, userAgg))
 	return err
 }
 
@@ -232,10 +232,10 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 	err = crypto.CompareHash(existingPassword.Secret, []byte(password), c.userPasswordAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.PushEvents(ctx, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		_, err = c.eventstore.Push(ctx, user.NewHumanPasswordCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	events = append(events, user.NewHumanPasswordCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	if lockoutPolicy != nil && lockoutPolicy.MaxPasswordAttempts > 0 {
 		if existingPassword.PasswordCheckFailedCount+1 >= lockoutPolicy.MaxPasswordAttempts {
@@ -243,7 +243,7 @@ func (c *Commands) HumanCheckPassword(ctx context.Context, orgID, userID, passwo
 		}
 
 	}
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	logging.Log("COMMAND-9fj7s").OnError(err).Error("error create password check failed event")
 	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-452ad", "Errors.User.Password.Invalid")
 }

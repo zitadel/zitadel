@@ -43,7 +43,7 @@ func NewIDPJWTConfigAddedEvent(
 	}
 }
 
-func IDPJWTConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPJWTConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idpconfig.JWTConfigAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func NewIDPJWTConfigChangedEvent(
 	return &IDPJWTConfigChangedEvent{JWTConfigChangedEvent: *changeEvent}, nil
 }
 
-func IDPJWTConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPJWTConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idpconfig.JWTConfigChangedEventMapper(event)
 	if err != nil {
 		return nil, err
