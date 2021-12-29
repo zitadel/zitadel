@@ -32,7 +32,7 @@ func (c *Commands) AddProjectGrantMember(ctx context.Context, member *domain.Pro
 		return nil, caos_errs.ThrowAlreadyExists(nil, "PROJECT-16dVN", "Errors.Project.Member.AlreadyExists")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&addedMember.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		project.NewProjectGrantMemberAddedEvent(ctx, projectAgg, member.UserID, member.GrantID, member.Roles...))
 	if err != nil {
@@ -64,7 +64,7 @@ func (c *Commands) ChangeProjectGrantMember(ctx context.Context, member *domain.
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-2n8vx", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		project.NewProjectGrantMemberChangedEvent(ctx, projectAgg, member.UserID, member.GrantID, member.Roles...))
 	if err != nil {
@@ -89,7 +89,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.WriteModel)
 	removeEvent := c.removeProjectGrantMember(ctx, projectAgg, userID, grantID, false)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Commands) RemoveProjectGrantMember(ctx context.Context, projectID, user
 	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
-func (c *Commands) removeProjectGrantMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID, grantID string, cascade bool) eventstore.EventPusher {
+func (c *Commands) removeProjectGrantMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID, grantID string, cascade bool) eventstore.Command {
 	if cascade {
 		return project.NewProjectGrantMemberCascadeRemovedEvent(
 			ctx,

@@ -10,8 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*domain.UserMembership, cascade bool) (_ []eventstore.EventPusher, err error) {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) removeUserMemberships(ctx context.Context, memberships []*domain.UserMembership, cascade bool) (_ []eventstore.Command, err error) {
+	events := make([]eventstore.Command, 0)
 	for _, membership := range memberships {
 		switch membership.MemberType {
 		case domain.MemberTypeIam:

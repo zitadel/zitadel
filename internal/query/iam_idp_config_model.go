@@ -19,7 +19,7 @@ func NewIAMIDPConfigReadModel(iamID, configID string) *IAMIDPConfigReadModel {
 	}
 }
 
-func (rm *IAMIDPConfigReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMIDPConfigReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPConfigAddedEvent:

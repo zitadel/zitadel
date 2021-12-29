@@ -55,7 +55,7 @@ func NewLoginPolicyAddedEvent(
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LoginPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -141,7 +141,7 @@ func ChangeHidePasswordReset(hidePasswordReset bool) func(*LoginPolicyChangedEve
 	}
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LoginPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -172,7 +172,7 @@ func NewLoginPolicyRemovedEvent(base *eventstore.BaseEvent) *LoginPolicyRemovedE
 	}
 }
 
-func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &LoginPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -2,6 +2,7 @@ package idpconfig
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -65,7 +66,7 @@ func NewOIDCConfigAddedEvent(
 	}
 }
 
-func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -170,7 +171,7 @@ func ChangeScopes(scopes []string) func(*OIDCConfigChangedEvent) {
 	}
 }
 
-func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

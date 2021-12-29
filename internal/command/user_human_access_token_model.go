@@ -33,7 +33,7 @@ func NewUserAccessTokenWriteModel(userID, resourceOwner, tokenID string) *UserAc
 	}
 }
 
-func (wm *UserAccessTokenWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserAccessTokenWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.UserTokenAddedEvent:

@@ -113,7 +113,7 @@ const (
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
 )
 
-func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LoginPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -143,7 +143,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.EventRea
 	}), nil
 }
 
-func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LoginPolicyChangedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyChangedEvent:
@@ -186,7 +186,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.EventR
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MultiFactorAddedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyMultiFactorAddedEvent:
@@ -211,7 +211,7 @@ func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.EventReader) (*h
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MultiFactorRemovedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicyMultiFactorRemovedEvent:
@@ -236,7 +236,7 @@ func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.EventReader) (
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.LoginPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-gF5q6", "seq", event.Sequence(), "expectedType", org.LoginPolicyRemovedEventType).Error("wrong event type")
@@ -250,7 +250,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.EventR
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicySecondFactorAddedEvent:
@@ -275,7 +275,7 @@ func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.EventReader) (*h
 	), nil
 }
 
-func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
 	case *iam.LoginPolicySecondFactorRemovedEvent:

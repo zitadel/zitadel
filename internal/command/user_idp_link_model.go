@@ -27,7 +27,7 @@ func NewUserIDPLinkWriteModel(userID, idpConfigID, externalUserID, resourceOwner
 	}
 }
 
-func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *UserIDPLinkWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.UserIDPLinkAddedEvent:

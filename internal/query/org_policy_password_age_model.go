@@ -10,7 +10,7 @@ type OrgPasswordAgePolicyReadModel struct {
 	PasswordAgePolicyReadModel
 }
 
-func (rm *OrgPasswordAgePolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *OrgPasswordAgePolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.PasswordAgePolicyAddedEvent:

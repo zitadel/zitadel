@@ -39,7 +39,7 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), passwordlessCode, nil
 }
 
-func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.Command, *HumanWriteModel, error) {
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-67Ms8", "Errors.User.Invalid")
 	}
@@ -98,7 +98,7 @@ func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Hum
 	return c.createHuman(ctx, orgID, human, nil, false, false, orgIAMPolicy, pwPolicy)
 }
 
-func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) (events []eventstore.EventPusher, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
+func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
 	}
@@ -107,7 +107,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 		return nil, nil, nil, "", err
 	}
 	if passwordless {
-		var codeEvent eventstore.EventPusher
+		var codeEvent eventstore.Command
 		codeEvent, passwordlessCodeWriteModel, code, err = c.humanAddPasswordlessInitCode(ctx, human.AggregateID, orgID, true)
 		if err != nil {
 			return nil, nil, nil, "", err
@@ -158,7 +158,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 		userEvents = append(userEvents, memberEvent)
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, userEvents...)
+	pushedEvents, err := c.eventstore.Push(ctx, userEvents...)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	return writeModelToHuman(registeredHuman), nil
 }
 
-func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.Command, *HumanWriteModel, error) {
 	if human != nil && human.Username == "" {
 		human.Username = human.EmailAddress
 	}
@@ -183,7 +183,7 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	return c.createHuman(ctx, orgID, human, link, true, false, orgIAMPolicy, pwPolicy)
 }
 
-func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.EventPusher, *HumanWriteModel, error) {
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.Command, *HumanWriteModel, error) {
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
@@ -215,7 +215,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	addedHuman := NewHumanWriteModel(human.AggregateID, orgID)
 	//TODO: adlerhurst maybe we could simplify the code below
 	userAgg := UserAggregateFromWriteModel(&addedHuman.WriteModel)
-	var events []eventstore.EventPusher
+	var events []eventstore.Command
 
 	if selfregister {
 		events = append(events, createRegisterHumanEvent(ctx, userAgg, human, orgIAMPolicy.UserLoginMustBeDomain))
@@ -269,7 +269,7 @@ func (c *Commands) HumanSkipMFAInit(ctx context.Context, userID, resourceowner s
 		return caos_errs.ThrowNotFound(nil, "COMMAND-m9cV8", "Errors.User.NotFound")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.Push(ctx,
 		user.NewHumanMFAInitSkippedEvent(ctx, UserAggregateFromWriteModel(&existingHuman.WriteModel)))
 	return err
 }
@@ -344,7 +344,7 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 	if len(userIDs) == 0 {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-M0od3", "Errors.User.UserIDMissing")
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	for _, userID := range userIDs {
 		existingUser, err := c.getHumanWriteModelByID(ctx, userID, "")
 		if err != nil {
@@ -361,7 +361,7 @@ func (c *Commands) HumansSignOut(ctx context.Context, agentID string, userIDs []
 	if len(events) == 0 {
 		return nil
 	}
-	_, err := c.eventstore.PushEvents(ctx, events...)
+	_, err := c.eventstore.Push(ctx, events...)
 	return err
 }
 

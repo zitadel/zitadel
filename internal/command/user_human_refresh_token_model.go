@@ -30,7 +30,7 @@ func NewHumanRefreshTokenWriteModel(userID, resourceOwner, tokenID string) *Huma
 	}
 }
 
-func (wm *HumanRefreshTokenWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *HumanRefreshTokenWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanRefreshTokenAddedEvent:

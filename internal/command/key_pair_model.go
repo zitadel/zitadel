@@ -25,7 +25,7 @@ func NewKeyPairWriteModel(aggregateID, resourceOwner string) *KeyPairWriteModel 
 	}
 }
 
-func (wm *KeyPairWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *KeyPairWriteModel) AppendEvents(events ...eventstore.Event) {
 	wm.WriteModel.AppendEvents(events...)
 }
 

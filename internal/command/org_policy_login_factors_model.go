@@ -23,7 +23,7 @@ func NewOrgSecondFactorWriteModel(orgID string, factorType domain.SecondFactorTy
 	}
 }
 
-func (wm *OrgSecondFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgSecondFactorWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicySecondFactorAddedEvent:
@@ -73,7 +73,7 @@ func NewOrgMultiFactorWriteModel(orgID string, factorType domain.MultiFactorType
 	}
 }
 
-func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgMultiFactorWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicyMultiFactorAddedEvent:

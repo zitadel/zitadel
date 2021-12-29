@@ -21,7 +21,7 @@ func NewOrgIdentityProviderWriteModel(orgID, idpConfigID string) *OrgIdentityPro
 	}
 }
 
-func (wm *OrgIdentityProviderWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgIdentityProviderWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.IdentityProviderAddedEvent:

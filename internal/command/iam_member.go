@@ -28,7 +28,7 @@ func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*do
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (c *Commands) AddIAMMember(ctx context.Context, member *domain.Member) (*do
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (c *Commands) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, addedMember *IAMMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
+func (c *Commands) addIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, addedMember *IAMMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
 	if !member.IsIAMValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-GR34U", "Errors.IAM.MemberInvalid")
 	}
@@ -75,7 +75,7 @@ func (c *Commands) ChangeIAMMember(ctx context.Context, member *domain.Member) (
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-LiaZi", "Errors.IAM.Member.RolesNotChanged")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewMemberChangedEvent(ctx, iamAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewMemberChangedEvent(ctx, iamAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) (*domain.
 
 	iamAgg := IAMAggregateFromWriteModel(&memberWriteModel.MemberWriteModel.WriteModel)
 	removeEvent := c.removeIAMMember(ctx, iamAgg, userID, false)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Commands) RemoveIAMMember(ctx context.Context, userID string) (*domain.
 	return writeModelToObjectDetails(&memberWriteModel.MemberWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+func (c *Commands) removeIAMMember(ctx context.Context, iamAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
 	if cascade {
 		return iam_repo.NewMemberCascadeRemovedEvent(
 			ctx,

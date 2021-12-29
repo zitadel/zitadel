@@ -20,7 +20,7 @@ func (rm *MembersReadModel) MemberByUserID(id string) (idx int, member *MemberRe
 	return -1, nil
 }
 
-func (rm *MembersReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *MembersReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *member.MemberAddedEvent:

@@ -26,7 +26,7 @@ func NewIAMMailTemplateWriteModel() *IAMMailTemplateWriteModel {
 	}
 }
 
-func (wm *IAMMailTemplateWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMMailTemplateWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.MailTemplateAddedEvent:

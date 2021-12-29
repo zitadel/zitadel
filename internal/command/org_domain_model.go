@@ -29,7 +29,7 @@ func NewOrgDomainWriteModel(orgID string, domain string) *OrgDomainWriteModel {
 	}
 }
 
-func (wm *OrgDomainWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgDomainWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.DomainAddedEvent:
@@ -185,7 +185,7 @@ func NewOrgDomainVerifiedWriteModel(domain string) *OrgDomainVerifiedWriteModel 
 	}
 }
 
-func (wm *OrgDomainVerifiedWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgDomainVerifiedWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.DomainVerifiedEvent:

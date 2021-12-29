@@ -49,7 +49,7 @@ func NewHumanOTPAddedEvent(
 	}
 }
 
-func HumanOTPAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanOTPAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	otpAdded := &HumanOTPAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -88,7 +88,7 @@ func NewHumanOTPVerifiedEvent(
 	}
 }
 
-func HumanOTPVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanOTPVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanOTPVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -119,7 +119,7 @@ func NewHumanOTPRemovedEvent(
 	}
 }
 
-func HumanOTPRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanOTPRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanOTPRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -153,7 +153,7 @@ func NewHumanOTPCheckSucceededEvent(
 	}
 }
 
-func HumanOTPCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanOTPCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	otpAdded := &HumanOTPCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -192,7 +192,7 @@ func NewHumanOTPCheckFailedEvent(
 	}
 }
 
-func HumanOTPCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanOTPCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	otpAdded := &HumanOTPCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

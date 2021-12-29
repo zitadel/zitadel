@@ -70,7 +70,7 @@ func NewUserLockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *U
 	}
 }
 
-func UserLockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserLockedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserLockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -98,7 +98,7 @@ func NewUserUnlockedEvent(ctx context.Context, aggregate *eventstore.Aggregate) 
 	}
 }
 
-func UserUnlockedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserUnlockedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserUnlockedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -126,7 +126,7 @@ func NewUserDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func UserDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -154,7 +154,7 @@ func NewUserReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregat
 	}
 }
 
-func UserReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -202,7 +202,7 @@ func NewUserRemovedEvent(
 	}
 }
 
-func UserRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -258,7 +258,7 @@ func NewUserTokenAddedEvent(
 	}
 }
 
-func UserTokenAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	tokenAdded := &UserTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -299,7 +299,7 @@ func NewUserTokenRemovedEvent(
 	}
 }
 
-func UserTokenRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserTokenRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	tokenRemoved := &UserTokenRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -349,7 +349,7 @@ func NewDomainClaimedEvent(
 	}
 }
 
-func DomainClaimedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainClaimedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	domainClaimed := &DomainClaimedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -386,7 +386,7 @@ func NewDomainClaimedSentEvent(
 	}
 }
 
-func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DomainClaimedSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &DomainClaimedSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -430,7 +430,7 @@ func NewUsernameChangedEvent(
 	}
 }
 
-func UsernameChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UsernameChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	domainClaimed := &UsernameChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

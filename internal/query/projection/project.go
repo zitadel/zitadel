@@ -73,7 +73,7 @@ const (
 	ProjectColumnSequence               = "sequence"
 )
 
-func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-MFOsd", "seq", event.Sequence(), "expectedType", project.ProjectAddedType).Error("wrong event type")
@@ -98,7 +98,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.EventReader) (*h
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectChangeEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-dk2iF", "seq", event.Sequence(), "expected", project.ProjectChangedType).Error("wrong event type")
@@ -135,7 +135,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.EventReader) (
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectDeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-8Nf2s", "seq", event.Sequence(), "expectedType", project.ProjectDeactivatedType).Error("wrong event type")
@@ -154,7 +154,7 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.EventReade
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-sm99f", "seq", event.Sequence(), "expectedType", project.ProjectReactivatedType).Error("wrong event type")
@@ -173,7 +173,7 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.EventReade
 	), nil
 }
 
-func (p *ProjectProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-mL0sf", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")

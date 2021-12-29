@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -36,7 +37,7 @@ func NewIdentityProviderAddedEvent(
 	}
 }
 
-func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.IdentityProviderAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func NewIdentityProviderRemovedEvent(
 	}
 }
 
-func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.IdentityProviderRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -93,7 +94,7 @@ func NewIdentityProviderCascadeRemovedEvent(
 	}
 }
 
-func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.IdentityProviderCascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
