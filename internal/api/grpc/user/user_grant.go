@@ -94,127 +94,67 @@ func UserGrantQueryToQuery(ctx context.Context, query *user_pb.UserGrantQuery) (
 
 func UserGrantDisplayNameQueryToModel(q *user_pb.UserGrantDisplayNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantDisplayNameQuery(q.DisplayName, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyDisplayName,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.DisplayName,
-	// }
 }
 
 func UserGrantEmailQueryToModel(q *user_pb.UserGrantEmailQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantEmailQuery(q.Email, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyEmail,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.Email,
-	// }
 }
 
 func UserGrantFirstNameQueryToModel(q *user_pb.UserGrantFirstNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantFirstNameQuery(q.FirstName, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyFirstName,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.FirstName,
-	// }
 }
 
 func UserGrantLastNameQueryToModel(q *user_pb.UserGrantLastNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantLastNameQuery(q.LastName, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyLastName,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.LastName,
-	// }
 }
 
 func UserGrantOrgDomainQueryToModel(q *user_pb.UserGrantOrgDomainQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantDomainQuery(q.OrgDomain, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyOrgDomain,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.OrgDomain,
-	// }
 }
 
 func UserGrantOrgNameQueryToModel(q *user_pb.UserGrantOrgNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantOrgNameQuery(q.OrgName, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyOrgName,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.OrgName,
-	// }
 }
 
 func UserGrantProjectIDQueryToModel(q *user_pb.UserGrantProjectIDQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantProjectIDSearchQuery(q.ProjectId)
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyProjectID,
-	// 	Method: domain.SearchMethodEquals,
-	// 	Value:  q.ProjectId,
-	// }
 }
 
 func UserGrantProjectGrantIDQueryToModel(q *user_pb.UserGrantProjectGrantIDQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantGrantIDSearchQuery(q.ProjectGrantId)
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyGrantID,
-	// 	Method: domain.SearchMethodEquals,
-	// 	Value:  q.ProjectGrantId,
-	// }
 }
 
 func UserGrantProjectNameQueryToModel(q *user_pb.UserGrantProjectNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantProjectNameSearchQuery(q.ProjectName, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyProjectName,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.ProjectName,
-	// }
 }
 
 func UserGrantRoleKeyQueryToModel(q *user_pb.UserGrantRoleKeyQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantRoleQuery(q.RoleKey)
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyRoleKey,
-	// 	Method: domain.SearchMethodListContains,
-	// 	Value:  q.RoleKey,
-	// }
 }
 
 func UserGrantUserIDQueryToModel(q *user_pb.UserGrantUserIDQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantUserIDSearchQuery(q.UserId)
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyUserID,
-	// 	Method: domain.SearchMethodEquals,
-	// 	Value:  q.UserId,
-	// }
 }
 
 func UserGrantUserNameQueryToModel(q *user_pb.UserGrantUserNameQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantUsernameQuery(q.UserName, object.TextMethodToQuery(q.Method))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyUserName,
-	// 	Method: object.TextMethodToModel(q.Method),
-	// 	Value:  q.UserName,
-	// }
 }
 
 func UserGrantWithGrantedQueryToModel(ctx context.Context, q *user_pb.UserGrantWithGrantedQuery) (query.SearchQuery, error) {
 	return query.NewUserGrantWithGrantedQuery(authz.GetCtxData(ctx).OrgID)
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyWithGranted,
-	// 	Method: domain.SearchMethodEquals,
-	// 	Value:  q.WithGranted,
-	// }
 }
 
 func UserGrantUserTypeQueryToModel(q *user_pb.UserGrantUserTypeQuery) (query.SearchQuery, error) {
-	//TODO:
-	return query.NewUserGrantUserTypeQuery(domain.UserType(q.Type))
-	// return &usr_grant_model.UserGrantSearchQuery{
-	// 	Key:    usr_grant_model.UserGrantSearchKeyUserType,
-	// 	Method: domain.SearchMethodEquals,
-	// 	Value:  q.UserType,
-	// }
+	return query.NewUserGrantUserTypeQuery(grantTypeToDomain(q.Type))
+}
+
+func grantTypeToDomain(typ user_pb.Type) domain.UserType {
+	switch typ {
+	case user_pb.Type_TYPE_HUMAN:
+		return domain.UserTypeHuman
+	case user_pb.Type_TYPE_MACHINE:
+		return domain.UserTypeMachine
+	default:
+		return domain.UserTypeUnspecified
+	}
 }
