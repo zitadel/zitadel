@@ -25,7 +25,7 @@ func NewIAMLockoutPolicyWriteModel() *IAMLockoutPolicyWriteModel {
 	}
 }
 
-func (wm *IAMLockoutPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMLockoutPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LockoutPolicyAddedEvent:

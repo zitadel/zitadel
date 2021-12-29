@@ -24,7 +24,7 @@ func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID, storageKey
 		return nil, caos_errs.ThrowNotFound(nil, "USER-vJ3fS", "Errors.Users.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, storageKey))
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (c *Commands) RemoveHumanAvatar(ctx context.Context, orgID, userID string) 
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanAvatarRemovedEvent(ctx, userAgg, existingUser.Avatar))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarRemovedEvent(ctx, userAgg, existingUser.Avatar))
 	if err != nil {
 		return nil, err
 	}

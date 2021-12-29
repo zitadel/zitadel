@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -21,18 +22,18 @@ func (s *Step7) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep7(ctx context.Context, step *Step7) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		secondFactorModel := NewIAMSecondFactorWriteModel(domain.SecondFactorTypeOTP)
 		iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 		if !step.OTP {
-			return []eventstore.EventPusher{}, nil
+			return []eventstore.Command{}, nil
 		}
 		event, err := c.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, domain.SecondFactorTypeOTP)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-Dggsg").Info("added OTP to 2FA login policy")
-		return []eventstore.EventPusher{event}, nil
+		return []eventstore.Command{event}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

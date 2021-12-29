@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -20,7 +21,7 @@ func (s *Step18) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep18(ctx context.Context, step *Step18) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		addedPolicy := NewIAMLockoutPolicyWriteModel()
 		events, err := c.addDefaultLockoutPolicy(ctx, iamAgg, addedPolicy, &step.LockoutPolicy)
@@ -29,7 +30,7 @@ func (c *Commands) SetupStep18(ctx context.Context, step *Step18) error {
 		}
 
 		logging.Log("SETUP-3m99ds").Info("default lockout policy set up")
-		return []eventstore.EventPusher{events}, nil
+		return []eventstore.Command{events}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

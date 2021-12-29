@@ -62,7 +62,7 @@ func NewApplicationKeyAddedEvent(
 	}
 }
 
-func ApplicationKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationKeyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ApplicationKeyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -104,7 +104,7 @@ func NewApplicationKeyRemovedEvent(
 	}
 }
 
-func ApplicationKeyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ApplicationKeyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	applicationKeyRemoved := &ApplicationKeyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

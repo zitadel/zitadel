@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -39,7 +40,7 @@ func NewMailTemplateAddedEvent(
 	}
 }
 
-func MailTemplateAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTemplateAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MailTemplateAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -90,7 +91,7 @@ func ChangeTemplate(template []byte) func(*MailTemplateChangedEvent) {
 	}
 }
 
-func MailTemplateChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTemplateChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MailTemplateChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -121,7 +122,7 @@ func NewMailTemplateRemovedEvent(base *eventstore.BaseEvent) *MailTemplateRemove
 	}
 }
 
-func MailTemplateRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &MailTemplateRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

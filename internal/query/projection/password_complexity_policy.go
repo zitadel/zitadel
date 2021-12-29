@@ -65,7 +65,7 @@ func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PasswordComplexityProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -97,7 +97,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.EventReader)
 		}), nil
 }
 
-func (p *PasswordComplexityProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordComplexityPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyChangedEvent:
@@ -135,7 +135,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.EventReade
 		}), nil
 }
 
-func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordComplexityPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-ibd0c", "seq", event.Sequence(), "expectedType", org.PasswordComplexityPolicyRemovedEventType).Error("wrong event type")

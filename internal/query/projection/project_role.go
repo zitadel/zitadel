@@ -63,7 +63,7 @@ const (
 	ProjectRoleColumnCreator       = "creator_id"
 )
 
-func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("wrong event type")
@@ -85,7 +85,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.EventRea
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
@@ -113,7 +113,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.EventR
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
@@ -128,7 +128,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.EventR
 	), nil
 }
 
-func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")

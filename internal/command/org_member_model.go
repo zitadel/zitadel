@@ -21,7 +21,7 @@ func NewOrgMemberWriteModel(orgID, userID string) *OrgMemberWriteModel {
 	}
 }
 
-func (wm *OrgMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgMemberWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.MemberAddedEvent:

@@ -24,7 +24,7 @@ func NewOrgCustomLoginTextReadModel(orgID string, lang language.Tag) *OrgCustomL
 	}
 }
 
-func (wm *OrgCustomLoginTextReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgCustomLoginTextReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:
@@ -79,7 +79,7 @@ func NewOrgCustomLoginTextsReadModel(orgID string) *OrgCustomLoginTextsReadModel
 	}
 }
 
-func (wm *OrgCustomLoginTextsReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgCustomLoginTextsReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.CustomTextSetEvent:

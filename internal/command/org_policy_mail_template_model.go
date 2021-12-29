@@ -25,7 +25,7 @@ func NewOrgMailTemplateWriteModel(orgID string) *OrgMailTemplateWriteModel {
 	}
 }
 
-func (wm *OrgMailTemplateWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgMailTemplateWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.MailTemplateAddedEvent:

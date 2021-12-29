@@ -87,7 +87,7 @@ func NewLabelPolicyAddedEvent(
 	}
 }
 
-func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LabelPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -208,7 +208,7 @@ func ChangeDisableWatermark(disableWatermark bool) func(*LabelPolicyChangedEvent
 	}
 }
 
-func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LabelPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -239,7 +239,7 @@ func NewLabelPolicyActivatedEvent(base *eventstore.BaseEvent) *LabelPolicyActiva
 	}
 }
 
-func LabelPolicyActivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &LabelPolicyActivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -263,7 +263,7 @@ func NewLabelPolicyRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyRemovedE
 	}
 }
 
-func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &LabelPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -287,7 +287,7 @@ func NewLabelPolicyLogoAddedEvent(base *eventstore.BaseEvent, storageKey string)
 	}
 }
 
-func LabelPolicyLogoAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyLogoAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -314,7 +314,7 @@ func NewLabelPolicyLogoRemovedEvent(base *eventstore.BaseEvent, storageKey strin
 	}
 }
 
-func LabelPolicyLogoRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyLogoRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -341,7 +341,7 @@ func NewLabelPolicyIconAddedEvent(base *eventstore.BaseEvent, storageKey string)
 	}
 }
 
-func LabelPolicyIconAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyIconAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -368,7 +368,7 @@ func NewLabelPolicyIconRemovedEvent(base *eventstore.BaseEvent, storageKey strin
 	}
 }
 
-func LabelPolicyIconRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyIconRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -395,7 +395,7 @@ func NewLabelPolicyLogoDarkAddedEvent(base *eventstore.BaseEvent, storageKey str
 	}
 }
 
-func LabelPolicyLogoDarkAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyLogoDarkAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -422,7 +422,7 @@ func NewLabelPolicyLogoDarkRemovedEvent(base *eventstore.BaseEvent, storageKey s
 	}
 }
 
-func LabelPolicyLogoDarkRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyLogoDarkRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -449,7 +449,7 @@ func NewLabelPolicyIconDarkAddedEvent(base *eventstore.BaseEvent, storageKey str
 	}
 }
 
-func LabelPolicyIconDarkAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyIconDarkAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -476,7 +476,7 @@ func NewLabelPolicyIconDarkRemovedEvent(base *eventstore.BaseEvent, storageKey s
 	}
 }
 
-func LabelPolicyIconDarkRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyIconDarkRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -503,7 +503,7 @@ func NewLabelPolicyFontAddedEvent(base *eventstore.BaseEvent, storageKey string)
 	}
 }
 
-func LabelPolicyFontAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyFontAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.AddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -530,7 +530,7 @@ func NewLabelPolicyFontRemovedEvent(base *eventstore.BaseEvent, storageKey strin
 	}
 }
 
-func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyFontRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := asset.RemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -557,7 +557,7 @@ func NewLabelPolicyAssetsRemovedEvent(base *eventstore.BaseEvent) *LabelPolicyAs
 	}
 }
 
-func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LabelPolicyAssetsRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &LabelPolicyAssetsRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

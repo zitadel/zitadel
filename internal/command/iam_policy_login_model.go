@@ -25,7 +25,7 @@ func NewIAMLoginPolicyWriteModel() *IAMLoginPolicyWriteModel {
 	}
 }
 
-func (wm *IAMLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMLoginPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LoginPolicyAddedEvent:

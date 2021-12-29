@@ -20,7 +20,7 @@ func (c *Commands) SetIAMCustomText(ctx context.Context, customText *domain.Cust
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (c *Commands) SetIAMCustomText(ctx context.Context, customText *domain.Cust
 	return writeModelToCustomText(&setText.CustomTextWriteModel), nil
 }
 
-func (c *Commands) setDefaultCustomText(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMCustomTextWriteModel, text *domain.CustomText) (eventstore.EventPusher, error) {
+func (c *Commands) setDefaultCustomText(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMCustomTextWriteModel, text *domain.CustomText) (eventstore.Command, error) {
 	if !text.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3MN0s", "Errors.CustomText.Invalid")
 	}

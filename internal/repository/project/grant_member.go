@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -68,7 +69,7 @@ func NewProjectGrantMemberAddedEvent(
 	}
 }
 
-func GrantMemberAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantMemberAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantMemberAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -116,7 +117,7 @@ func NewProjectGrantMemberChangedEvent(
 	}
 }
 
-func GrantMemberChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantMemberChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantMemberChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -161,7 +162,7 @@ func NewProjectGrantMemberRemovedEvent(
 	}
 }
 
-func GrantMemberRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantMemberRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantMemberRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -206,7 +207,7 @@ func NewProjectGrantMemberCascadeRemovedEvent(
 	}
 }
 
-func GrantMemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantMemberCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantMemberCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

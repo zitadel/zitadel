@@ -26,7 +26,7 @@ func NewProjectGrantWriteModel(grantID, projectID, resourceOwner string) *Projec
 	}
 }
 
-func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ProjectGrantWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantAddedEvent:

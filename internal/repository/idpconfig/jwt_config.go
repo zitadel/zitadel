@@ -50,7 +50,7 @@ func NewJWTConfigAddedEvent(
 	}
 }
 
-func JWTConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func JWTConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &JWTConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -126,7 +126,7 @@ func ChangeHeaderName(headerName string) func(*JWTConfigChangedEvent) {
 	}
 }
 
-func JWTConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func JWTConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &JWTConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

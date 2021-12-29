@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -30,7 +31,7 @@ func NewMailTemplateAddedEvent(
 	}
 }
 
-func MailTemplateAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTemplateAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.MailTemplateAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -58,7 +59,7 @@ func NewMailTemplateChangedEvent(
 	return &MailTemplateChangedEvent{MailTemplateChangedEvent: *changedEvent}, nil
 }
 
-func MailTemplateChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTemplateChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.MailTemplateChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -82,7 +83,7 @@ func NewMailTemplateRemovedEvent(
 	}
 }
 
-func MailTemplateRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.MailTemplateRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -34,7 +35,7 @@ func NewHumanMFAInitSkippedEvent(ctx context.Context, aggregate *eventstore.Aggr
 	}
 }
 
-func HumanMFAInitSkippedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanMFAInitSkippedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanMFAInitSkippedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

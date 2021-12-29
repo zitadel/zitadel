@@ -24,7 +24,7 @@ func NewOrgPasswordComplexityPolicyWriteModel(orgID string) *OrgPasswordComplexi
 	}
 }
 
-func (wm *OrgPasswordComplexityPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgPasswordComplexityPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.PasswordComplexityPolicyAddedEvent:
