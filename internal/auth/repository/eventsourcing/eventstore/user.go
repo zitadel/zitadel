@@ -15,8 +15,6 @@ import (
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	key_model "github.com/caos/zitadel/internal/key/model"
-	key_view_model "github.com/caos/zitadel/internal/key/repository/view/model"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
@@ -216,14 +214,6 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 		}
 	}
 	return changes, nil
-}
-
-func (repo *UserRepo) MachineKeyByID(ctx context.Context, keyID string) (*key_model.AuthNKeyView, error) {
-	key, err := repo.View.AuthNKeyByID(keyID)
-	if err != nil {
-		return nil, err
-	}
-	return key_view_model.AuthNKeyToModel(key), nil
 }
 
 func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error) {

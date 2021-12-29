@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -21,18 +22,18 @@ func (s *Step8) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep8(ctx context.Context, step *Step8) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		secondFactorModel := NewIAMSecondFactorWriteModel(domain.SecondFactorTypeU2F)
 		iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 		if !step.U2F {
-			return []eventstore.EventPusher{}, nil
+			return []eventstore.Command{}, nil
 		}
 		event, err := c.addSecondFactorToDefaultLoginPolicy(ctx, iamAgg, secondFactorModel, domain.SecondFactorTypeU2F)
 		if err != nil {
 			return nil, err
 		}
 		logging.Log("SETUP-BDhne").Info("added U2F to 2FA login policy")
-		return []eventstore.EventPusher{event}, nil
+		return []eventstore.Command{event}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

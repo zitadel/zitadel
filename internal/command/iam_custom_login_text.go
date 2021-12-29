@@ -17,7 +17,7 @@ func (c *Commands) SetCustomIAMLoginText(ctx context.Context, loginText *domain.
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) RemoveCustomIAMLoginTexts(ctx context.Context, lang language.
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-fru44", "Errors.CustomText.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&customText.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, domain.LoginCustomText, lang))
 	err = AppendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (c *Commands) RemoveCustomIAMLoginTexts(ctx context.Context, lang language.
 	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
-func (c *Commands) setCustomIAMLoginText(ctx context.Context, iamAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.EventPusher, *IAMCustomLoginTextReadModel, error) {
+func (c *Commands) setCustomIAMLoginText(ctx context.Context, iamAgg *eventstore.Aggregate, text *domain.CustomLoginText) ([]eventstore.Command, *IAMCustomLoginTextReadModel, error) {
 	if !text.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomText.Invalid")
 	}

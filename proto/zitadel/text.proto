@@ -45,6 +45,7 @@ message MessageCustomText {
             description: "custom text for email footer_text"
         }
     ];
+    bool is_default = 9;
 }
 
 message LoginCustomText {

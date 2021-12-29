@@ -10,9 +10,7 @@ import (
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
@@ -434,7 +432,7 @@ func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHuman
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanAvatarResponse{
-		Details: object.DomainToChangeDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -504,7 +502,7 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanPasswordlessResponse{
-		Result: user.WebAuthNTokensViewToPb(tokens),
+		Result: user_grpc.WebAuthNTokensViewToPb(tokens),
 	}, nil
 }
 
@@ -515,7 +513,7 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 		return nil, err
 	}
 	return &mgmt_pb.AddPasswordlessRegistrationResponse{
-		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
@@ -528,7 +526,7 @@ func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
-		Details: object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details: obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 
@@ -557,7 +555,15 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 }
 
 func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
-	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -567,14 +573,18 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	result, err := s.user.SearchMachineKeys(ctx, ListMachineKeysRequestToModel(req))
+	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchAuthNKeys(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
-		Result: authn.KeyViewsToPb(result.Result),
+		Result: authn.KeysToPb(result.AuthNKeys),
 		Details: obj_grpc.ToListDetails(
-			result.TotalResult,
+			result.Count,
 			result.Sequence,
 			result.Timestamp,
 		),
@@ -593,7 +603,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      key.KeyID,
 		KeyDetails: keyDetails,
-		Details: object.AddToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			key.Sequence,
 			key.ChangeDate,
 			key.ResourceOwner,

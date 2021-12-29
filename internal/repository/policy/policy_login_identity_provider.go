@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -43,7 +44,7 @@ func NewIdentityProviderAddedEvent(
 	}
 }
 
-func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IdentityProviderAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IdentityProviderAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -80,7 +81,7 @@ func NewIdentityProviderRemovedEvent(
 	}
 }
 
-func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IdentityProviderRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IdentityProviderRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -117,7 +118,7 @@ func NewIdentityProviderCascadeRemovedEvent(
 	}
 }
 
-func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IdentityProviderCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IdentityProviderCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

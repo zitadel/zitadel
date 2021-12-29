@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
 )
 
 type OrgMemberProjection struct {
@@ -51,6 +52,24 @@ func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
+			},
+		},
 	}
 }
 
@@ -60,7 +79,7 @@ const (
 	OrgMemberOrgIDCol = "org_id"
 )
 
-func (p *OrgMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-BoKBr", "seq", event.Sequence(), "expectedType", org.MemberAddedEventType).Error("wrong event type")
@@ -69,7 +88,7 @@ func (p *OrgMemberProjection) reduceAdded(event eventstore.EventReader) (*handle
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-bfqNl", "seq", event.Sequence(), "expected", org.MemberChangedEventType).Error("wrong event type")
@@ -78,7 +97,7 @@ func (p *OrgMemberProjection) reduceChanged(event eventstore.EventReader) (*hand
 	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zgb6w", "seq", event.Sequence(), "expected", org.MemberCascadeRemovedEventType).Error("wrong event type")
@@ -87,11 +106,36 @@ func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.EventReader)
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-KPyxE", "seq", event.Sequence(), "expected", org.MemberRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-avatH", "reduce.wrong.event.type")
 	}
-	return reduceMemberRemoved(e.MemberRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
+	return reduceMemberRemoved(e,
+		withMemberCond(MemberUserIDCol, e.UserID),
+		withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID),
+	)
+}
+
+func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.UserRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-f5pgn", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-eBMqH", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
+}
+
+func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
+	//TODO: as soon as org deletion is implemented:
+	// Case: The user has resource owner A and an org has resource owner B
+	// if org B deleted it works
+	// if org A is deleted, the membership wouldn't be deleted
+	e, ok := event.(*org.OrgRemovedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-E5lDs", "seq", event.Sequence(), "expected", org.OrgRemovedEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jnGAV", "reduce.wrong.event.type")
+	}
+	return reduceMemberRemoved(e, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }

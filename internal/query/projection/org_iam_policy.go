@@ -74,7 +74,7 @@ func (p *OrgIAMPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.OrgIAMPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -102,7 +102,7 @@ func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.EventReader) (*han
 		}), nil
 }
 
-func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.OrgIAMPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.OrgIAMPolicyChangedEvent:
@@ -128,7 +128,7 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.EventReader) (*h
 		}), nil
 }
 
-func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.OrgIAMPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-ovQya", "seq", event.Sequence(), "expectedType", org.OrgIAMPolicyRemovedEventType).Error("wrong event type")

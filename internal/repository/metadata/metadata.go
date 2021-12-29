@@ -41,7 +41,7 @@ func NewSetEvent(
 	}
 }
 
-func SetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -79,7 +79,7 @@ func NewRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -113,7 +113,7 @@ func NewRemovedAllEvent(
 	}
 }
 
-func RemovedAllEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedAllEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &RemovedAllEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

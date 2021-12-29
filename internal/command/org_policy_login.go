@@ -32,7 +32,7 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		org.NewLoginPolicyAddedEvent(
 			ctx,
@@ -106,7 +106,7 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 		return nil, caos_errs.ThrowNotFound(nil, "Org-GHB37", "Errors.Org.LoginPolicy.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.LoginPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewLoginPolicyRemovedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewIdentityProviderAddedEvent(ctx, orgAgg, idpProvider.IDPConfigID, idpProvider.Type))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewIdentityProviderAddedEvent(ctx, orgAgg, idpProvider.IDPConfigID, idpProvider.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	orgAgg := OrgAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	events := c.removeIDPProviderFromLoginPolicy(ctx, orgAgg, idpProvider.IDPConfigID, false, cascadeExternalIDPs...)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -250,8 +250,8 @@ func (c *Commands) RemoveIDPProviderFromLoginPolicy(ctx context.Context, resourc
 	return writeModelToObjectDetails(&idpModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.EventPusher {
-	var events []eventstore.EventPusher
+func (c *Commands) removeIDPProviderFromLoginPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, idpConfigID string, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.Command {
+	var events []eventstore.Command
 	if cascade {
 		events = append(events, org.NewIdentityProviderCascadeRemovedEvent(ctx, orgAgg, idpConfigID))
 	} else {
@@ -282,7 +282,7 @@ func (c *Commands) AddSecondFactorToLoginPolicy(ctx context.Context, secondFacto
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, addedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, addedEvent)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
@@ -321,7 +321,7 @@ func (c *Commands) RemoveSecondFactorFromLoginPolicy(ctx context.Context, second
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ func (c *Commands) AddMultiFactorToLoginPolicy(ctx context.Context, multiFactor 
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, addedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, addedEvent)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
@@ -394,7 +394,7 @@ func (c *Commands) RemoveMultiFactorFromLoginPolicy(ctx context.Context, multiFa
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removedEvent)
 	if err != nil {
 		return nil, err
 	}

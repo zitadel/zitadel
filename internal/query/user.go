@@ -118,7 +118,7 @@ var (
 	}
 )
 
-func (q *Queries) UserEvents(ctx context.Context, orgID, userID string, sequence uint64) ([]eventstore.EventReader, error) {
+func (q *Queries) UserEvents(ctx context.Context, orgID, userID string, sequence uint64) ([]eventstore.Event, error) {
 	query := NewUserEventSearchQuery(userID, orgID, sequence)
-	return q.eventstore.FilterEvents(ctx, query)
+	return q.eventstore.Filter(ctx, query)
 }

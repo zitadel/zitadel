@@ -26,7 +26,7 @@ func NewProjectGrantMemberWriteModel(projectID, userID, grantID string) *Project
 	}
 }
 
-func (wm *ProjectGrantMemberWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ProjectGrantMemberWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.GrantMemberAddedEvent:

@@ -8,7 +8,7 @@ import (
 
 type OrgLoginPolicyReadModel struct{ LoginPolicyReadModel }
 
-func (rm *OrgLoginPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *OrgLoginPolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicyAddedEvent:

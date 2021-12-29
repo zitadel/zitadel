@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -15,7 +14,6 @@ import (
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
@@ -187,32 +185,34 @@ func UpdateMachineRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateMachin
 	}
 }
 
-func ListMachineKeysRequestToModel(req *mgmt_pb.ListMachineKeysRequest) *key_model.AuthNKeySearchRequest {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &key_model.AuthNKeySearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		Queries: []*key_model.AuthNKeySearchQuery{
-			{
-				Key:    key_model.AuthNKeyObjectType,
-				Method: domain.SearchMethodEquals,
-				Value:  key_model.AuthNKeyObjectTypeUser,
-			}, {
-				Key:    key_model.AuthNKeyObjectID,
-				Method: domain.SearchMethodEquals,
-				Value:  req.UserId,
-			},
-		},
+func ListMachineKeysRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*query.AuthNKeySearchQueries, error) {
+	resourcOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
 	}
+	userID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	return &query.AuthNKeySearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{
+			resourcOwner,
+			userID,
+		},
+	}, nil
+
 }
 
 func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.MachineKey {
 	expDate := time.Time{}
 	if req.ExpirationDate != nil {
-		var err error
-		expDate, err = ptypes.Timestamp(req.ExpirationDate)
-		logging.Log("MANAG-iNshR").OnError(err).Debug("unable to parse expiration date")
+		expDate = req.ExpirationDate.AsTime()
 	}
 
 	return &domain.MachineKey{

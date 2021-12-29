@@ -306,7 +306,7 @@ func (s *Server) ListProjectMembers(ctx context.Context, req *mgmt_pb.ListProjec
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectMembersResponse{
-		Result: member_grpc.MembersToPb(members.Members),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix, members.Members),
 		Details: object_grpc.ToListDetails(
 			members.Count,
 			members.Sequence,

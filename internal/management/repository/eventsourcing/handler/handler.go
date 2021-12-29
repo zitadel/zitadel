@@ -41,8 +41,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
-		newAuthNKeys(
-			handler{view, bulkLimit, configs.cycleDuration("MachineKeys"), errorCount, es}),
 		newIDPConfig(
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(
@@ -51,12 +49,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
 			defaults),
-		newMailTemplate(
-			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
-		newMessageText(
-			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
-		newCustomText(
-			handler{view, bulkLimit, configs.cycleDuration("CustomText"), errorCount, es}),
 		newMetadata(
 			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}

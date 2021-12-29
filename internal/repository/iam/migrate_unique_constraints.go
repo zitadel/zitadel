@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -51,7 +52,7 @@ func NewMigrateUniqueConstraintEvent(
 	}
 }
 
-func MigrateUniqueConstraintEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MigrateUniqueConstraintEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &MigrateUniqueConstraintEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

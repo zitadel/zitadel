@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -69,7 +70,7 @@ func NewGrantAddedEvent(
 	}
 }
 
-func GrantAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -114,7 +115,7 @@ func NewGrantChangedEvent(
 	}
 }
 
-func GrantChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -159,7 +160,7 @@ func NewGrantCascadeChangedEvent(
 	}
 }
 
-func GrantCascadeChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantCascadeChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantCascadeChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -201,7 +202,7 @@ func NewGrantDeactivateEvent(
 	}
 }
 
-func GrantDeactivateEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantDeactivateEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantDeactivateEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -243,7 +244,7 @@ func NewGrantReactivatedEvent(
 	}
 }
 
-func GrantReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -288,7 +289,7 @@ func NewGrantRemovedEvent(
 	}
 }
 
-func GrantRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GrantRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GrantRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

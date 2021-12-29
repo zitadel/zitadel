@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -53,7 +54,7 @@ func NewIDPOIDCConfigAddedEvent(
 	}
 }
 
-func IDPOIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPOIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idpconfig.OIDCConfigAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -86,7 +87,7 @@ func NewIDPOIDCConfigChangedEvent(
 	return &IDPOIDCConfigChangedEvent{OIDCConfigChangedEvent: *changeEvent}, nil
 }
 
-func IDPOIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPOIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := idpconfig.OIDCConfigChangedEventMapper(event)
 	if err != nil {
 		return nil, err

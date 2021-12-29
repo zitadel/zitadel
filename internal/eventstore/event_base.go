@@ -27,17 +27,17 @@ type BaseEvent struct {
 	Data    []byte `json:"-"`
 }
 
-// EditorService implements EventPusher
+// EditorService implements Command
 func (e *BaseEvent) EditorService() string {
 	return e.Service
 }
 
-//EditorUser implements EventPusher
+//EditorUser implements Command
 func (e *BaseEvent) EditorUser() string {
 	return e.User
 }
 
-//Type implements EventPusher
+//Type implements Command
 func (e *BaseEvent) Type() EventType {
 	return e.EventType
 }

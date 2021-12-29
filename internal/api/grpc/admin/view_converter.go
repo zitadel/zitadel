@@ -1,10 +1,10 @@
 package admin
 
 import (
-	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/view/model"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ViewsToPb(views []*model.View) []*admin_pb.View {
@@ -16,17 +16,28 @@ func ViewsToPb(views []*model.View) []*admin_pb.View {
 }
 
 func ViewToPb(view *model.View) *admin_pb.View {
-	lastSuccessfulSpoolerRun, err := ptypes.TimestampProto(view.LastSuccessfulSpoolerRun)
-	logging.Log("ADMIN-4zs01").OnError(err).Debug("unable to parse last successful spooler run")
-
-	eventTs, err := ptypes.TimestampProto(view.EventTimestamp)
-	logging.Log("ADMIN-q2Wzj").OnError(err).Debug("unable to parse event timestamp")
-
 	return &admin_pb.View{
 		Database:                 view.Database,
 		ViewName:                 view.ViewName,
-		LastSuccessfulSpoolerRun: lastSuccessfulSpoolerRun,
+		LastSuccessfulSpoolerRun: timestamppb.New(view.LastSuccessfulSpoolerRun),
 		ProcessedSequence:        view.CurrentSequence,
-		EventTimestamp:           eventTs,
+		EventTimestamp:           timestamppb.New(view.EventTimestamp),
+	}
+}
+
+func CurrentSequencesToPb(currentSequences *query.CurrentSequences) []*admin_pb.View {
+	v := make([]*admin_pb.View, len(currentSequences.CurrentSequences))
+	for i, currentSequence := range currentSequences.CurrentSequences {
+		v[i] = CurrentSequenceToPb(currentSequence)
+	}
+	return v
+}
+
+func CurrentSequenceToPb(currentSequence *query.CurrentSequence) *admin_pb.View {
+	return &admin_pb.View{
+		Database:          "zitadel",
+		ViewName:          currentSequence.ProjectionName,
+		ProcessedSequence: currentSequence.CurrentSequence,
+		EventTimestamp:    timestamppb.New(currentSequence.Timestamp),
 	}
 }

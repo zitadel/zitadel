@@ -83,7 +83,7 @@ const (
 	UserGrantState         = "state"
 )
 
-func (p *UserGrantProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *UserGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*usergrant.UserGrantAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-WYOHD", "seq", event.Sequence(), "expectedType", usergrant.UserGrantAddedType).Error("wrong event type")
@@ -106,7 +106,7 @@ func (p *UserGrantProjection) reduceAdded(event eventstore.EventReader) (*handle
 	), nil
 }
 
-func (p *UserGrantProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *UserGrantProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var roles pq.StringArray
 
 	switch e := event.(type) {
@@ -132,7 +132,7 @@ func (p *UserGrantProjection) reduceChanged(event eventstore.EventReader) (*hand
 	), nil
 }
 
-func (p *UserGrantProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *UserGrantProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
 		// ok
@@ -149,7 +149,7 @@ func (p *UserGrantProjection) reduceRemoved(event eventstore.EventReader) (*hand
 	), nil
 }
 
-func (p *UserGrantProjection) reduceDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *UserGrantProjection) reduceDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
 		logging.LogWithFields("PROJE-V3txf", "seq", event.Sequence(), "expectedType", usergrant.UserGrantDeactivatedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-oP7Gm", "reduce.wrong.event.type")
@@ -168,7 +168,7 @@ func (p *UserGrantProjection) reduceDeactivated(event eventstore.EventReader) (*
 	), nil
 }
 
-func (p *UserGrantProjection) reduceReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *UserGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
 		logging.LogWithFields("PROJE-ly6oe", "seq", event.Sequence(), "expectedType", usergrant.UserGrantReactivatedType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-DGsKh", "reduce.wrong.event.type")

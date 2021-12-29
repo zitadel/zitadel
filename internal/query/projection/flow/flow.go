@@ -77,13 +77,13 @@ const (
 	actionScriptCol        = "script"
 )
 
-func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.TriggerActionsSetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("was not an trigger actions set event")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
 	}
-	stmts := make([]func(reader eventstore.EventReader) crdb.Exec, len(e.ActionIDs)+1)
+	stmts := make([]func(reader eventstore.Event) crdb.Exec, len(e.ActionIDs)+1)
 	stmts[0] = crdb.AddDeleteStatement(
 		[]handler.Condition{
 			handler.NewCond(flowTypeCol, e.FlowType),
@@ -106,7 +106,7 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 	return crdb.NewMultiStatement(e, stmts...), nil
 }
 
-func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FlowClearedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("was not an trigger actions set event")
@@ -121,7 +121,7 @@ func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.EventReader
 	), nil
 }
 
-func (p *FlowProjection) reduceFlowActionAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FlowProjection) reduceFlowActionAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.AddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("was not an flow action added event")
@@ -142,7 +142,7 @@ func (p *FlowProjection) reduceFlowActionAdded(event eventstore.EventReader) (*h
 	), nil
 }
 
-func (p *FlowProjection) reduceFlowActionChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FlowProjection) reduceFlowActionChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-q4oq8", "seq", event.Sequence, "expected", action.ChangedEventType).Error("wrong event type")
@@ -168,7 +168,7 @@ func (p *FlowProjection) reduceFlowActionChanged(event eventstore.EventReader) (
 	), nil
 }
 
-func (p *FlowProjection) reduceFlowActionRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *FlowProjection) reduceFlowActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-79OhB", "seq", event.Sequence, "expectedType", action.RemovedEventType).Error("wrong event type")

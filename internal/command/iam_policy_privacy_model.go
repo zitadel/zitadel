@@ -25,7 +25,7 @@ func NewIAMPrivacyPolicyWriteModel() *IAMPrivacyPolicyWriteModel {
 	}
 }
 
-func (wm *IAMPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.PrivacyPolicyAddedEvent:

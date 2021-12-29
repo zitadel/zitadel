@@ -20,8 +20,8 @@ func (s *Step21) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep21(ctx context.Context, step *Step21) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
-		events := make([]eventstore.EventPusher, 0)
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+		events := make([]eventstore.Command, 0)
 		globalMembers := newGlobalOrgMemberWriteModel(iam.GlobalOrgID, domain.RoleOrgProjectCreator)
 		orgAgg := OrgAggregateFromWriteModel(&globalMembers.WriteModel)
 		if err := c.eventstore.FilterToQueryReducer(ctx, globalMembers); err != nil {
@@ -43,14 +43,15 @@ func (c *Commands) SetupStep21(ctx context.Context, step *Step21) error {
 type globalOrgMembersWriteModel struct {
 	eventstore.WriteModel
 
-	orgID   string
 	role    string
 	members map[string][]string
 }
 
 func newGlobalOrgMemberWriteModel(orgID, role string) *globalOrgMembersWriteModel {
 	return &globalOrgMembersWriteModel{
-		orgID:   orgID,
+		WriteModel: eventstore.WriteModel{
+			ResourceOwner: orgID,
+		},
 		role:    role,
 		members: make(map[string][]string),
 	}
@@ -89,7 +90,7 @@ func (wm *globalOrgMembersWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(org.AggregateType).
-		AggregateIDs(wm.orgID).
+		AggregateIDs(wm.ResourceOwner).
 		EventTypes(
 			org.MemberAddedEventType,
 			org.MemberChangedEventType,
