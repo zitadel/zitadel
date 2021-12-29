@@ -89,9 +89,9 @@ func CreateGatewayHandler(config grpc_util.Config) *GatewayHandler {
 
 //RegisterGateway registers a handler (Gateway interface) on defined port
 //Gateway interface may be extended with optional implementation of interfaces (gatewayCustomServeMuxOptions, ...)
-func (g *GatewayHandler) RegisterGateway(ctx context.Context, gateway Gateway) {
+func (g *GatewayHandler) RegisterGateway(ctx context.Context, pathPrefix string, gateway Gateway) {
 	handler := createGateway(ctx, gateway, g.serverPort, g.customHeaders...)
-	prefix := gateway.GatewayPathPrefix()
+	prefix := pathPrefix + gateway.GatewayPathPrefix()
 	g.RegisterHandler(prefix, handler)
 }
 

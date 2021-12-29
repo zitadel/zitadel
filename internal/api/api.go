@@ -85,7 +85,7 @@ func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *auth
 
 func (a *API) RegisterServer(ctx context.Context, server server.Server) {
 	server.RegisterServer(a.grpcServer)
-	a.gatewayHandler.RegisterGateway(ctx, server)
+	a.gatewayHandler.RegisterGateway(ctx, "/api", server)
 	a.verifier.RegisterServer(server.AppName(), server.MethodPrefix(), server.AuthMethods())
 }
 
