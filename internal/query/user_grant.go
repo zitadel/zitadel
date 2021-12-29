@@ -22,13 +22,15 @@ type UserGrant struct {
 	GrantID      string
 	State        domain.UserGrantState
 
-	UserID      string
-	Username    string
-	FirstName   string
-	LastName    string
-	Email       string
-	DisplayName string
-	AvatarURL   string
+	UserID            string
+	Username          string
+	UserType          domain.UserType
+	UserResourceOwner string
+	FirstName         string
+	LastName          string
+	Email             string
+	DisplayName       string
+	AvatarURL         string
 
 	ResourceOwner    string
 	OrgName          string
@@ -64,12 +66,72 @@ func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantProjectID, id, TextEquals)
 }
 
+func NewUserGrantProjectNameSearchQuery(id string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(UserGrantProjectID, id, method)
+}
+
+func NewUserGrantProjectOwnerSearchQuery(id string) (SearchQuery, error) {
+	return NewTextQuery(ProjectColumnResourceOwner, id, TextEquals)
+}
+
 func NewUserGrantResourceOwnerSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantResourceOwner, id, TextEquals)
 }
 
 func NewUserGrantGrantIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantGrantID, id, TextEquals)
+}
+
+func NewUserGrantUserTypeQuery(typ domain.UserType) (SearchQuery, error) {
+	return NewNumberQuery(UserTypeCol, typ, NumberEquals)
+}
+
+func NewUserGrantDisplayNameQuery(displayName string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(HumanDisplayNameCol, displayName, method)
+}
+
+func NewUserGrantEmailQuery(email string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(HumanEmailCol, email, method)
+}
+
+func NewUserGrantFirstNameQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(HumanFirstNameCol, value, method)
+}
+
+func NewUserGrantLastNameQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(HumanLastNameCol, value, method)
+}
+
+func NewUserGrantUsernameQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(UserUsernameCol, value, method)
+}
+
+func NewUserGrantDomainQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(OrgColumnDomain, value, method)
+}
+
+func NewUserGrantOrgNameQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(OrgColumnName, value, method)
+}
+
+func NewUserGrantProjectNameQuery(value string, method TextComparison) (SearchQuery, error) {
+	return NewTextQuery(ProjectColumnName, value, method)
+}
+
+func NewUserGrantRoleQuery(value string) (SearchQuery, error) {
+	return NewListQuery(UserGrantRoles, []interface{}{value}, ListComparison(TextListContains))
+}
+
+func NewUserGrantWithGrantedQuery(owner string) (SearchQuery, error) {
+	orgQuery, err := NewUserGrantResourceOwnerSearchQuery(owner)
+	if err != nil {
+		return nil, err
+	}
+	projectQuery, err := NewUserGrantProjectOwnerSearchQuery(owner)
+	if err != nil {
+		return nil, err
+	}
+	return newOrQuery(orgQuery, projectQuery)
 }
 
 func NewUserGrantContainsRolesSearchQuery(roles ...string) (SearchQuery, error) {
@@ -174,9 +236,10 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			UserGrantRoles.identifier(),
 			UserGrantState.identifier(),
 
-			//TODO: human vs machine
 			UserGrantUserID.identifier(),
 			UserUsernameCol.identifier(),
+			UserTypeCol.identifier(),
+			UserResourceOwnerCol.identifier(),
 			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
@@ -203,13 +266,15 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				roles       = pq.StringArray{}
 				username    sql.NullString
 				firstName   sql.NullString
+				userType    sql.NullInt32
+				userOwner   sql.NullString
 				lastName    sql.NullString
 				email       sql.NullString
 				displayName sql.NullString
 				avatarURL   sql.NullString
 
-				orgName sql.NullString
-				domain  sql.NullString
+				orgName   sql.NullString
+				orgDomain sql.NullString
 
 				projectName sql.NullString
 			)
@@ -225,6 +290,8 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 
 				&g.UserID,
 				&username,
+				&userType,
+				&userOwner,
 				&firstName,
 				&lastName,
 				&email,
@@ -233,7 +300,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 
 				&g.ResourceOwner,
 				&orgName,
-				&domain,
+				&orgDomain,
 
 				&g.ProjectID,
 				&g.ProjectName,
@@ -247,13 +314,15 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 
 			g.Roles = roles
 			g.Username = username.String
+			g.UserType = domain.UserType(userType.Int32)
+			g.UserResourceOwner = userOwner.String
 			g.FirstName = firstName.String
 			g.LastName = lastName.String
 			g.Email = email.String
 			g.DisplayName = displayName.String
 			g.AvatarURL = avatarURL.String
 			g.OrgName = orgName.String
-			g.OrgPrimaryDomain = domain.String
+			g.OrgPrimaryDomain = orgDomain.String
 			g.ProjectName = projectName.String
 
 			return g, nil
@@ -270,9 +339,10 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			UserGrantRoles.identifier(),
 			UserGrantState.identifier(),
 
-			//TODO: human vs machine
 			UserGrantUserID.identifier(),
 			UserUsernameCol.identifier(),
+			UserTypeCol.identifier(),
+			UserResourceOwnerCol.identifier(),
 			HumanFirstNameCol.identifier(),
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
@@ -303,14 +373,16 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 				var (
 					roles       = pq.StringArray{}
 					username    sql.NullString
+					userType    sql.NullInt32
+					userOwner   sql.NullString
 					firstName   sql.NullString
 					lastName    sql.NullString
 					email       sql.NullString
 					displayName sql.NullString
 					avatarURL   sql.NullString
 
-					orgName sql.NullString
-					domain  sql.NullString
+					orgName   sql.NullString
+					orgDomain sql.NullString
 
 					projectName sql.NullString
 				)
@@ -326,6 +398,8 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 
 					&g.UserID,
 					&username,
+					&userType,
+					&userOwner,
 					&firstName,
 					&lastName,
 					&email,
@@ -334,7 +408,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 
 					&g.ResourceOwner,
 					&orgName,
-					&domain,
+					&orgDomain,
 
 					&g.ProjectID,
 					&projectName,
@@ -347,13 +421,15 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 
 				g.Roles = roles
 				g.Username = username.String
+				g.UserType = domain.UserType(userType.Int32)
+				g.UserResourceOwner = userOwner.String
 				g.FirstName = firstName.String
 				g.LastName = lastName.String
 				g.Email = email.String
 				g.DisplayName = displayName.String
 				g.AvatarURL = avatarURL.String
 				g.OrgName = orgName.String
-				g.OrgPrimaryDomain = domain.String
+				g.OrgPrimaryDomain = orgDomain.String
 				g.ProjectName = projectName.String
 
 				userGrants = append(userGrants, g)

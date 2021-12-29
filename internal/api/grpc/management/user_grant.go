@@ -6,8 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/query"
-
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -18,22 +16,21 @@ func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrant
 		return nil, err
 	}
 	return &mgmt_pb.GetUserGrantByIDResponse{
-		UserGrant: user.UserGrantToPb(grant),
+		UserGrant: user.UserGrantToPb(s.assetAPIPrefix, grant),
 	}, nil
 }
 
 func (s *Server) ListUserGrants(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*mgmt_pb.ListUserGrantResponse, error) {
-	r := ListUserGrantsRequestToModel(ctx, req)
-	r.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID)
-
-	//TODO: implement mapper
-	var queries *query.UserGrantsQueries
+	queries, err := ListUserGrantsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 	res, err := s.query.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserGrantResponse{
-		Result: user.UserGrantsToPb(res.UserGrants),
+		Result: user.UserGrantsToPb(s.assetAPIPrefix, res.UserGrants),
 		Details: obj_grpc.ToListDetails(
 			res.Count,
 			res.Sequence,
