@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/caos/zitadel/pkg/grpc/auth"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -23,13 +22,11 @@ func (s *Server) RegisterGRPC(srv *grpc.Server) {
 	auth.RegisterAuthServiceServer(srv, s.service)
 }
 
-func (s *Server) RegisterRESTGateway(ctx context.Context, m *http.ServeMux, grpcMux *runtime.ServeMux) error {
+func (s *Server) RegisterRESTGateway(ctx context.Context, grpcMux *runtime.ServeMux) error {
 	conn, err := grpc.Dial(":50002", grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
-
-	m.Handle("/api/auth/v1", grpcMux)
 
 	return auth.RegisterAuthServiceHandler(ctx, grpcMux, conn)
 }

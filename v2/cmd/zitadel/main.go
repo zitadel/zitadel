@@ -26,7 +26,6 @@ import (
 func main() {
 	grpcServ := grpc.NewServer()
 	wrappedGrpc := grpcweb.WrapServer(grpcServ)
-	grpcMux := runtime.NewServeMux()
 	httpMux := http.NewServeMux()
 	httpMux.HandleFunc("/", home)
 
@@ -45,17 +44,25 @@ func main() {
 	authHandler.RegisterGRPC(grpcServ)
 
 	//REST
-	if err := mgmtHandler.RegisterRESTGateway(ctx, httpMux, grpcMux); err != nil {
+	mgntMux := runtime.NewServeMux()
+	adminMux := runtime.NewServeMux()
+	authMux := runtime.NewServeMux()
+
+	if err := mgmtHandler.RegisterRESTGateway(ctx, mgntMux); err != nil {
 		panic(err)
 	}
-	if err := adminHandler.RegisterRESTGateway(ctx, httpMux, grpcMux); err != nil {
+	if err := adminHandler.RegisterRESTGateway(ctx, adminMux); err != nil {
 		panic(err)
 	}
-	if err := authHandler.RegisterRESTGateway(ctx, httpMux, grpcMux); err != nil {
+	if err := authHandler.RegisterRESTGateway(ctx, authMux); err != nil {
 		panic(err)
 	}
 
-	mixedHandler := newHTTPandGRPCMux(httpMux, grpcServ, wrappedGrpc)
+	mixedHandler := newHTTPandGRPCMux(grpcServ, wrappedGrpc, map[string]http.Handler{
+		"/api/management/v1": mgntMux,
+		"/api/admin/v1":      adminMux,
+		"/api/auth/v1":       authMux,
+	})
 	http2Server := &http2.Server{}
 
 	http1Server := &http.Server{Handler: h2c.NewHandler(mixedHandler, http2Server)}
@@ -87,7 +94,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "hello from http handler!\n")
 }
 
-func newHTTPandGRPCMux(httpHand, grpcHandler http.Handler, wrappedGrpc *grpcweb.WrappedGrpcServer) http.Handler {
+func newHTTPandGRPCMux(grpcHandler http.Handler, wrappedGrpc *grpcweb.WrappedGrpcServer, handlers map[string]http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if wrappedGrpc.IsGrpcWebRequest(r) {
 			wrappedGrpc.ServeHTTP(w, r)
@@ -97,7 +104,13 @@ func newHTTPandGRPCMux(httpHand, grpcHandler http.Handler, wrappedGrpc *grpcweb.
 			grpcHandler.ServeHTTP(w, r)
 			return
 		}
-		httpHand.ServeHTTP(w, r)
+		for prefix, handler := range handlers {
+			if strings.HasPrefix(r.URL.Path, prefix) {
+				r.URL.Path = strings.TrimPrefix(r.URL.Path, prefix)
+				handler.ServeHTTP(w, r)
+				return
+			}
+		}
 	})
 }
 
