@@ -119,7 +119,7 @@ func NewUserGrantProjectNameQuery(value string, method TextComparison) (SearchQu
 }
 
 func NewUserGrantRoleQuery(value string) (SearchQuery, error) {
-	return NewListQuery(UserGrantRoles, []interface{}{value}, ListComparison(TextListContains))
+	return NewTextQuery(UserGrantRoles, value, TextListContains)
 }
 
 func NewUserGrantWithGrantedQuery(owner string) (SearchQuery, error) {
