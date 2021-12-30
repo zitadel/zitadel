@@ -22,12 +22,13 @@ func (s *Server) RegisterGRPC(srv *grpc.Server) {
 	management.RegisterManagementServiceServer(srv, s.service)
 }
 
-func (s *Server) RegisterRESTGateway(ctx context.Context, m *runtime.ServeMux) error {
+func (s *Server) RegisterRESTGateway(ctx context.Context, grpcMux *runtime.ServeMux) error {
 	conn, err := grpc.Dial(":50002", grpc.WithInsecure())
 	if err != nil {
 		return err
 	}
-	return management.RegisterManagementServiceHandler(ctx, m, conn)
+
+	return management.RegisterManagementServiceHandler(ctx, grpcMux, conn)
 }
 
 func (s *Server) registerGRPCWebGateway() {}
