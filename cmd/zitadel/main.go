@@ -41,7 +41,6 @@ import (
 	tracing "github.com/caos/zitadel/internal/telemetry/tracing/config"
 	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/internal/ui/console"
-	"github.com/caos/zitadel/internal/ui/login"
 	"github.com/caos/zitadel/openapi"
 )
 
@@ -203,8 +202,8 @@ func startZitadel(configPaths []string) {
 func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, staticStorage static.Storage) {
 	uis := ui.Create(conf.UI)
 	if *loginEnabled {
-		login, prefix := login.Start(conf.UI.Login, command, query, authRepo, staticStorage, conf.SystemDefaults, *localDevMode)
-		uis.RegisterHandler(prefix, login.Handler())
+		// login, prefix := login.Start(conf.UI.Login, command, query, authRepo, staticStorage, conf.SystemDefaults, *localDevMode)
+		// uis.RegisterHandler(prefix, login.Handler())
 	}
 	if *consoleEnabled {
 		consoleHandler, prefix, err := console.Start(conf.UI.Console)

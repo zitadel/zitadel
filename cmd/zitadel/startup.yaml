@@ -344,30 +344,30 @@ API:
 UI:
   Port: 50003
   Login:
-    Handler:
-      BaseURL: '$ZITADEL_ACCOUNTS'
-      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
-      ZitadelURL: '$ZITADEL_CONSOLE'
-      LanguageCookieName: 'caos.zitadel.login.lang'
-      DefaultLanguage: 'de'
-      CSRF:
-        CookieName: 'caos.zitadel.login.csrf'
-        Key:
-          EncryptionKeyID: $ZITADEL_CSRF_KEY
-        Development: $ZITADEL_CSRF_DEV
-      UserAgentCookieConfig:
-        Name: caos.zitadel.useragent
-        Domain: $ZITADEL_COOKIE_DOMAIN
-        MaxAge: 8760h #365*24h (1 year)
-        Key:
-          EncryptionKeyID: $ZITADEL_COOKIE_KEY
-      Cache:
-        MaxAge: $ZITADEL_CACHE_MAXAGE
-        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-      StaticCache:
-        Type: bigcache
-        Config:
-          MaxCacheSizeInByte: 52428800 #50MB
+    # Handler:
+    BaseURL: 'http://localhost:50002/login'
+    OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
+    ZitadelURL: '$ZITADEL_CONSOLE'
+    LanguageCookieName: 'caos.zitadel.login.lang'
+    DefaultLanguage: 'de'
+    CSRF:
+      CookieName: 'caos.zitadel.login.csrf'
+      Key:
+        EncryptionKeyID: $ZITADEL_CSRF_KEY
+      Development: $ZITADEL_CSRF_DEV
+    UserAgentCookieConfig:
+      Name: caos.zitadel.useragent
+      Domain: $ZITADEL_COOKIE_DOMAIN
+      MaxAge: 8760h #365*24h (1 year)
+      Key:
+        EncryptionKeyID: $ZITADEL_COOKIE_KEY
+    Cache:
+      MaxAge: $ZITADEL_CACHE_MAXAGE
+      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+    StaticCache:
+      Type: bigcache
+      Config:
+        MaxCacheSizeInByte: 52428800 #50MB
   Console:
     ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
     ShortCache:

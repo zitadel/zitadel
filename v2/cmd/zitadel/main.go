@@ -3,69 +3,113 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"net"
 	"net/http"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-
+	"github.com/gorilla/mux"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/caos/zitadel/v2/api/admin"
-	"github.com/caos/zitadel/v2/api/auth"
-	"github.com/caos/zitadel/v2/api/mgmt"
-	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"google.golang.org/grpc"
+	"github.com/caos/logging"
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
+	api_v1 "github.com/caos/zitadel/internal/api"
+	internal_authz "github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/oidc"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/authz"
+	"github.com/caos/zitadel/internal/ui"
+
+	// authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/eventstore"
+	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/projection"
+	static_config "github.com/caos/zitadel/internal/static/config"
+	"github.com/caos/zitadel/v2/api"
+	"github.com/caos/zitadel/v2/api/ui/console"
+	"github.com/caos/zitadel/v2/api/ui/login"
 )
 
 func main() {
-	grpcServ := grpc.NewServer()
-	wrappedGrpc := grpcweb.WrapServer(grpcServ)
-	httpMux := http.NewServeMux()
-	httpMux.HandleFunc("/", home)
+	flag.Var(configPaths, "config-files", "paths to the config files")
+	flag.Var(setupPaths, "setup-files", "paths to the setup files")
+	flag.Parse()
+	conf := configure()
 
-	ctx := context.Background()
-	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
-	defer stop()
+	ctx := context.TODO()
 
-	// services
-	mgmtHandler := mgmt.New()
-	adminHandler := admin.New()
-	authHandler := auth.New()
-
-	//grpc
-	mgmtHandler.RegisterGRPC(grpcServ)
-	adminHandler.RegisterGRPC(grpcServ)
-	authHandler.RegisterGRPC(grpcServ)
-
-	//REST
-	mgntMux := runtime.NewServeMux()
-	adminMux := runtime.NewServeMux()
-	authMux := runtime.NewServeMux()
-
-	if err := mgmtHandler.RegisterRESTGateway(ctx, mgntMux); err != nil {
-		panic(err)
-	}
-	if err := adminHandler.RegisterRESTGateway(ctx, adminMux); err != nil {
-		panic(err)
-	}
-	if err := authHandler.RegisterRESTGateway(ctx, authMux); err != nil {
-		panic(err)
+	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
+	if err != nil {
+		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
 
-	mixedHandler := newHTTPandGRPCMux(grpcServ, wrappedGrpc, map[string]http.Handler{
-		"/api/management/v1": mgntMux,
-		"/api/admin/v1":      adminMux,
-		"/api/auth/v1":       authMux,
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
+	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
+
+	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
+	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+
+	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
+	logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
+
+	store, err := conf.AssetStorage.Config.NewStorage()
+	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
+
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
+	if err != nil {
+		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
+	}
+
+	authRepo, err := auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
+	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
+
+	// repo := struct {
+	// 	authz_repo.EsRepository
+	// 	query.Queries
+	// }{
+	// 	*authZRepo,
+	// 	*queries,
+	// }
+
+	// verifier := internal_authz.Start(&repo)
+
+	baseRouter := mux.NewRouter().StrictSlash(true)
+
+	l, loginPrefix := login.CreateLogin(baseRouter, login.Config(conf.UI.Login), commands, queries, authRepo, store, conf.SystemDefaults, true)
+	baseRouter.PathPrefix(loginPrefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.StripPrefix("/login", l.Handler()).ServeHTTP(w, r)
 	})
-	http2Server := &http2.Server{}
 
-	http1Server := &http.Server{Handler: h2c.NewHandler(mixedHandler, http2Server)}
+	oidcHandler := oidc.NewProvider(ctx, conf.API.OIDC, commands, queries, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, true)
+	baseRouter.PathPrefix("/oauth/v2").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.StripPrefix("/oauth/v2", oidcHandler.HttpHandler()).ServeHTTP(w, r)
+	})
+
+	listen(ctx, baseRouter)
+}
+
+func configure() *Config {
+	conf := new(Config)
+	err := config.Read(conf, configPaths.Values()...)
+	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
+	return conf
+}
+
+func listen(ctx context.Context, baseRouter *mux.Router) {
+	api.New(ctx, baseRouter)
+	uiRouter := baseRouter.PathPrefix("/ui").Subrouter()
+	console.New(uiRouter, console.Config{
+		ConsoleOverwriteDir: "/Users/adlerhurst/Downloads/zitadel-console/",
+	})
+
+	http2Server := &http2.Server{}
+	http1Server := &http.Server{Handler: h2c.NewHandler(baseRouter, http2Server)}
 	lis, err := net.Listen("tcp", ":50002")
 	if err != nil {
 		panic(err)
@@ -90,93 +134,35 @@ func main() {
 	}
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "hello from http handler!\n")
+var (
+	configPaths         = config.NewArrayFlags("authz.yaml", "startup.yaml", "system-defaults.yaml")
+	setupPaths          = config.NewArrayFlags("authz.yaml", "system-defaults.yaml", "setup.yaml")
+	adminEnabled        = flag.Bool("admin", true, "enable admin api")
+	managementEnabled   = flag.Bool("management", true, "enable management api")
+	authEnabled         = flag.Bool("auth", true, "enable auth api")
+	oidcEnabled         = flag.Bool("oidc", true, "enable oidc api")
+	assetsEnabled       = flag.Bool("assets", true, "enable assets api")
+	loginEnabled        = flag.Bool("login", true, "enable login ui")
+	consoleEnabled      = flag.Bool("console", true, "enable console ui")
+	notificationEnabled = flag.Bool("notification", true, "enable notification handler")
+	localDevMode        = flag.Bool("localDevMode", false, "enable local development specific configs")
+)
+
+type Config struct {
+	AssetStorage   static_config.AssetStorageConfig
+	InternalAuthZ  internal_authz.Config
+	SystemDefaults sd.SystemDefaults
+
+	EventstoreBase types.SQLBase
+	Commands       command.Config
+	Queries        query.Config
+	Projections    projection.Config
+
+	AuthZ authz.Config
+	Auth  auth_es.Config
+	Admin admin_es.Config
+	Mgmt  mgmt_es.Config
+
+	UI  ui.Config
+	API api_v1.Config
 }
-
-func newHTTPandGRPCMux(grpcHandler http.Handler, wrappedGrpc *grpcweb.WrappedGrpcServer, handlers map[string]http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if wrappedGrpc.IsGrpcWebRequest(r) {
-			wrappedGrpc.ServeHTTP(w, r)
-			return
-		}
-		if r.ProtoMajor == 2 && strings.HasPrefix(r.Header.Get("content-type"), "application/grpc") {
-			grpcHandler.ServeHTTP(w, r)
-			return
-		}
-
-		for prefix, handler := range handlers {
-			if strings.HasPrefix(r.URL.Path, prefix) {
-				r.URL.Path = strings.TrimPrefix(r.URL.Path, prefix)
-				handler.ServeHTTP(w, r)
-				return
-			}
-		}
-	})
-}
-
-// import (
-// 	"context"
-// 	"fmt"
-// 	"log"
-// 	"net"
-// 	"net/http"
-
-// 	"github.com/caos/zitadel/v2/api/admin"
-// 	"github.com/caos/zitadel/v2/api/auth"
-// 	"github.com/caos/zitadel/v2/api/mgmt"
-// 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-// 	"github.com/soheilhy/cmux"
-// 	"golang.org/x/net/http2"
-// 	"golang.org/x/net/http2/h2c"
-// 	"google.golang.org/grpc"
-// )
-
-// func main() {
-// 	httpMux := http.NewServeMux()
-// 	httpMux.HandleFunc("/", home)
-
-// 	l, err := net.Listen("tcp", ":50002")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	ctx := context.TODO()
-
-// 	m := cmux.New(l)
-// 	grpcL := m.Match(cmux.HTTP2())
-// 	httpL := m.Match(cmux.HTTP1Fast())
-
-// 	// services
-// 	mgmtHandler := mgmt.New()
-// 	adminHandler := admin.New()
-// 	authHandler := auth.New()
-
-// 	//grpc
-// 	grpcServer := grpc.NewServer()
-// 	mgmtHandler.RegisterGRPC(grpcServer)
-// 	adminHandler.RegisterGRPC(grpcServer)
-// 	authHandler.RegisterGRPC(grpcServer)
-
-// 	//REST
-// 	mux := runtime.NewServeMux()
-// 	mgmtHandler.RegisterRESTGateway(ctx, mux)
-// 	adminHandler.RegisterRESTGateway(ctx, mux)
-// 	authHandler.RegisterRESTGateway(ctx, mux)
-// 	httpS := &http.Server{Handler: h2c.NewHandler(mux, &http2.Server{})}
-
-// 	errs := make(chan error, 2)
-// 	go func() { errs <- httpS.Serve(httpL) }()
-// 	go func() { errs <- grpcServer.Serve(grpcL) }()
-
-// 	if err := m.Serve(); err != nil {
-// 		log.Panicf("serve failed: %v\n", err)
-// 	}
-
-// 	for err := range errs {
-// 		log.Fatal(err)
-// 	}
-// }
-
-// func home(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprintf(w, "hello from http handler!\n")
-// }

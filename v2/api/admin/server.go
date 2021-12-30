@@ -31,4 +31,6 @@ func (s *Server) RegisterRESTGateway(ctx context.Context, grpcMux *runtime.Serve
 	return admin.RegisterAdminServiceHandler(ctx, grpcMux, conn)
 }
 
-func (s *Server) registerGRPCWebGateway() {}
+func (s *Server) ServicePrefix() string {
+	return "/admin/v1"
+}

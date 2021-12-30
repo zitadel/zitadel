@@ -8,7 +8,7 @@ import (
 
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/ui/console"
-	"github.com/caos/zitadel/internal/ui/login"
+	"github.com/caos/zitadel/internal/ui/login/handler"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 
 type Config struct {
 	Port    string
-	Login   login.Config
+	Login   handler.Config
 	Console console.Config
 }
 

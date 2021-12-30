@@ -49,16 +49,16 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
 
-	statikNotificationFS, err := fs.NewWithNamespace("notification")
-	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
+	// statikNotificationFS, err := fs.NewWithNamespace("notification")
+	// logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
 
 	repo = &Queries{
-		iamID:                               defaults.IamID,
-		eventstore:                          es,
-		client:                              sqlClient,
-		DefaultLanguage:                     defaults.DefaultLanguage,
-		LoginDir:                            statikLoginFS,
-		NotificationDir:                     statikNotificationFS,
+		iamID:           defaults.IamID,
+		eventstore:      es,
+		client:          sqlClient,
+		DefaultLanguage: defaults.DefaultLanguage,
+		LoginDir:        statikLoginFS,
+		// NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 	}
