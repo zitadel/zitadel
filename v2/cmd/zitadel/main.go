@@ -110,9 +110,19 @@ func listen(ctx context.Context, baseRouter *mux.Router, config *Config) {
 	consoleDir := "./console/"
 	if config.UI.Console.ConsoleOverwriteDir != "" {
 		consoleDir = config.UI.Console.ConsoleOverwriteDir
+		// consoleDir = "/Users/adlerhurst/Downloads/zitadel-console"
 	}
 	console.New(uiRouter, console.Config{
 		ConsoleOverwriteDir: consoleDir,
+		Environment: console.Environment{
+			AuthServiceUrl:         config.Mgmt.APIDomain,
+			MgmtServiceUrl:         config.Mgmt.APIDomain,
+			AdminServiceUrl:        config.Mgmt.APIDomain,
+			SubscriptionServiceUrl: config.Mgmt.APIDomain,
+			AssetServiceUrl:        config.Mgmt.APIDomain,
+			Issuer:                 config.API.OIDC.OPConfig.Issuer,
+			Clientid:               "141602932889026980@zitadel",
+		},
 	})
 
 	http2Server := &http2.Server{}

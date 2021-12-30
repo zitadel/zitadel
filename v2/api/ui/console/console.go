@@ -1,12 +1,14 @@
 package console
 
 import (
+	"encoding/json"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/gorilla/mux"
 )
@@ -16,6 +18,17 @@ type Config struct {
 	ShortCache          middleware.CacheConfig
 	LongCache           middleware.CacheConfig
 	CSPDomain           string
+	Environment         Environment
+}
+
+type Environment struct {
+	AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
+	MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
+	AdminServiceUrl        string `json:"adminServiceUrl,omitempty"`
+	SubscriptionServiceUrl string `json:"subscriptionServiceUrl,omitempty"`
+	AssetServiceUrl        string `json:"assetServiceUrl,omitempty"`
+	Issuer                 string `json:"issuer,omitempty"`
+	Clientid               string `json:"clientid,omitempty"`
 }
 
 type spaHandler struct {
@@ -62,7 +75,11 @@ func New(uiRouter *mux.Router, config Config) {
 	)
 	security := middleware.SecurityHeaders(csp(config.CSPDomain), nil)
 	consoleRouter := uiRouter.PathPrefix("/console").Subrouter()
-	consoleRouter.PathPrefix(envRequestPath).Handler(cache(security(http.StripPrefix("/ui/console/assets", http.FileServer(consoleHTTPDir)))))
+	consoleRouter.PathPrefix(envRequestPath).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		environmentJSON, err := json.Marshal(config.Environment)
+		logging.Log("CONSO-tMAsY").OnError(err).Error("unable to marshal env")
+		w.Write(environmentJSON)
+	}))
 	consoleRouter.NewRoute().Handler(http.StripPrefix("/ui/console", cache(security(http.FileServer(&spaHandler{consoleHTTPDir})))))
 }
 
