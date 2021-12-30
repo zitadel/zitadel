@@ -1,7 +1,7 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'ZITADEL Docs',
-  trailingSlash: 
+  trailingSlash: true,
   url: 'https://docs.zitadel.ch',
   baseUrl: '/',
   onBrokenLinks: 'throw',
