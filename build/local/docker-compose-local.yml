@@ -198,7 +198,7 @@ services:
     volumes:
       - ./environment.json:/environment.json
     environment:
-      - HOST=host.docker.internal
+      - HOST=backend-run
       - PORT=50002
 
 # starts console in development mode
