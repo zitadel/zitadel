@@ -91,7 +91,7 @@ func main() {
 		http.StripPrefix("/oauth/v2", oidcHandler.HttpHandler()).ServeHTTP(w, r)
 	})
 
-	listen(ctx, baseRouter)
+	listen(ctx, baseRouter, conf)
 }
 
 func configure() *Config {
@@ -101,11 +101,15 @@ func configure() *Config {
 	return conf
 }
 
-func listen(ctx context.Context, baseRouter *mux.Router) {
+func listen(ctx context.Context, baseRouter *mux.Router, config *Config) {
 	api.New(ctx, baseRouter)
 	uiRouter := baseRouter.PathPrefix("/ui").Subrouter()
+	consoleDir := "./console/"
+	if config.UI.Console.ConsoleOverwriteDir != "" {
+		consoleDir = config.UI.Console.ConsoleOverwriteDir
+	}
 	console.New(uiRouter, console.Config{
-		ConsoleOverwriteDir: "/Users/adlerhurst/Downloads/zitadel-console/",
+		ConsoleOverwriteDir: consoleDir,
 	})
 
 	http2Server := &http2.Server{}
