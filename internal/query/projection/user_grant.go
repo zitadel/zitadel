@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/usergrant"
 	"github.com/lib/pq"
 )
@@ -33,7 +32,7 @@ func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: org.AggregateType,
+			Aggregate: usergrant.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
 					Event:  usergrant.UserGrantAddedType,
