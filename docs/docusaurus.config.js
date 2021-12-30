@@ -1,6 +1,7 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'ZITADEL Docs',
+  trailingSlash: 
   url: 'https://docs.zitadel.ch',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -117,7 +118,8 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} CAOS Ltd. Built with Docusaurus.`,
     },
     algolia: {
-      apiKey: 'bff480bce03126c2d348345647854e91',
+      appId: '8H6ZKXENLO',
+      apiKey: 'c3899716db098111f5e89c8987b9c427',
       indexName: 'zitadel',
     },
     prism: {
