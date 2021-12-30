@@ -87,6 +87,9 @@ func main() {
 	})
 
 	oidcHandler := oidc.NewProvider(ctx, conf.API.OIDC, commands, queries, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, true)
+	baseRouter.PathPrefix("/.well-known/openid-configuration").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		oidcHandler.HttpHandler().ServeHTTP(w, r)
+	})
 	baseRouter.PathPrefix("/oauth/v2").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/oauth/v2", oidcHandler.HttpHandler()).ServeHTTP(w, r)
 	})
