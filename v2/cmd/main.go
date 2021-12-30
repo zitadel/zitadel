@@ -26,7 +26,6 @@ func main() {
 	wrappedGrpc := grpcweb.WrapServer(grpcServ)
 	httpMux := http.NewServeMux()
 	httpMux.HandleFunc("/", home)
-	mux := runtime.NewServeMux()
 
 	ctx := context.Background()
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
@@ -43,11 +42,19 @@ func main() {
 	authHandler.RegisterGRPC(grpcServ)
 
 	//REST
-	mgmtHandler.RegisterRESTGateway(ctx, mux)
-	adminHandler.RegisterRESTGateway(ctx, mux)
-	authHandler.RegisterRESTGateway(ctx, mux)
+	mgmtMux := runtime.NewServeMux()
+	adminMux := runtime.NewServeMux()
+	authMux := runtime.NewServeMux()
 
-	mixedHandler := newHTTPandGRPCMux(mux, grpcServ, wrappedGrpc)
+	mgmtHandler.RegisterRESTGateway(ctx, mgmtMux)
+	adminHandler.RegisterRESTGateway(ctx, adminMux)
+	authHandler.RegisterRESTGateway(ctx, authMux)
+
+	mixedHandler := newHTTPandGRPCMux(grpcServ, wrappedGrpc, map[string]http.Handler{
+		"/mgnt":  mgmtMux,
+		"/admin": adminMux,
+		"/auth":  authMux,
+	})
 	http2Server := &http2.Server{}
 	http1Server := &http.Server{Handler: h2c.NewHandler(mixedHandler, http2Server)}
 	lis, err := net.Listen("tcp", ":50002")
@@ -67,7 +74,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "hello from http handler!\n")
 }
 
-func newHTTPandGRPCMux(httpHand, grpcHandler http.Handler, wrappedGrpc *grpcweb.WrappedGrpcServer) http.Handler {
+func newHTTPandGRPCMux(grpcHandler http.Handler, wrappedGrpc *grpcweb.WrappedGrpcServer, handlers map[string]http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if wrappedGrpc.IsGrpcWebRequest(r) {
 			wrappedGrpc.ServeHTTP(w, r)
@@ -77,7 +84,14 @@ func newHTTPandGRPCMux(httpHand, grpcHandler http.Handler, wrappedGrpc *grpcweb.
 			grpcHandler.ServeHTTP(w, r)
 			return
 		}
-		httpHand.ServeHTTP(w, r)
+
+		for prefix, handler := range handlers {
+			if strings.HasPrefix(r.URL.Path, prefix) {
+				r.URL.Path = strings.TrimPrefix(r.URL.Path, prefix)
+				handler.ServeHTTP(w, r)
+				return
+			}
+		}
 	})
 }
 
