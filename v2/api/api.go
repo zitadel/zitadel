@@ -4,8 +4,14 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
+	grpc_api "github.com/caos/zitadel/internal/api/grpc"
+	admin_grpc "github.com/caos/zitadel/internal/api/grpc/admin"
+	auth_grpc "github.com/caos/zitadel/internal/api/grpc/auth"
+	mgmt_grpc "github.com/caos/zitadel/internal/api/grpc/management"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/v2/api/admin"
 	"github.com/caos/zitadel/v2/api/auth"
 	"github.com/caos/zitadel/v2/api/mgmt"
@@ -13,11 +19,8 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"golang.org/x/text/language"
 	"google.golang.org/grpc"
-
-	admin_grpc "github.com/caos/zitadel/internal/api/grpc/admin"
-	auth_grpc "github.com/caos/zitadel/internal/api/grpc/auth"
-	mgmt_grpc "github.com/caos/zitadel/internal/api/grpc/management"
 )
 
 var (
@@ -26,8 +29,8 @@ var (
 
 type API struct{}
 
-func New(ctx context.Context, baseRouter *mux.Router, mgmtSrv *mgmt_grpc.Server, adminSrv *admin_grpc.Server, authSrv *auth_grpc.Server) *API {
-	grpcHandler := grpcServer()
+func New(ctx context.Context, baseRouter *mux.Router, mgmtSrv *mgmt_grpc.Server, adminSrv *admin_grpc.Server, authSrv *auth_grpc.Server, verifier *authz.TokenVerifier, authZConf authz.Config) *API {
+	grpcHandler := grpcServer(verifier, authZConf)
 	grpcWebHandler := grpcweb.WrapServer(grpcHandler)
 	apiRoute := baseRouter.PathPrefix("/api").Subrouter()
 
@@ -68,21 +71,21 @@ func routeGRPC(baseRouter *mux.Router, grpcHandler *grpc.Server, grpcWebHandler 
 	http2Route.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcWebHandler)
 }
 
-func grpcServer() *grpc.Server {
-	// metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
+func grpcServer(verifier *authz.TokenVerifier, authZConf authz.Config) *grpc.Server {
+	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	return grpc.NewServer(
 
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
-				// middleware.DefaultTracingServer(),
-				// middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
-				// middleware.SentryHandler(),
+				middleware.DefaultTracingServer(),
+				middleware.MetricsHandler(metricTypes, grpc_api.Probes...),
+				middleware.SentryHandler(),
 				middleware.NoCacheInterceptor(),
-				// middleware.ErrorHandler(),
-				// middleware.AuthorizationInterceptor(verifier, authConfig),
-				// middleware.TranslationHandler(lang),
+				middleware.ErrorHandler(),
+				middleware.AuthorizationInterceptor(verifier, authZConf),
+				middleware.TranslationHandler(language.German),
 				middleware.ValidationHandler(),
-				// middleware.ServiceHandler(),
+				middleware.ServiceHandler(),
 			),
 		),
 	)

@@ -136,7 +136,7 @@ func configure() *Config {
 func listen(ctx context.Context, config *Config) {
 	baseRouter := mux.NewRouter().StrictSlash(true)
 
-	api.New(ctx, baseRouter, mgmtSvc, adminSvc, authSvc)
+	api.New(ctx, baseRouter, mgmtSvc, adminSvc, authSvc, verifier, config.InternalAuthZ)
 
 	l, loginPrefix := login.CreateLogin(baseRouter, login.Config(config.UI.Login), commands, queries, authRepo, assets, config.SystemDefaults, true)
 	baseRouter.PathPrefix(loginPrefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
