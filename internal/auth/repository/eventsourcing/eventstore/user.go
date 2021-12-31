@@ -35,7 +35,7 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 
 func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
 	ctxData := authz.GetCtxData(ctx)
-	logging.LogWithFields("EVENT-9CUPM", "org", ctxData.OrgID, "project", ctxData.ProjectID, "user", ctxData.UserID)
+	logging.LogWithFields("EVENT-9CUPM", "org", ctxData.OrgID, "project", ctxData.ProjectID, "user", ctxData.UserID).Warn("ctxdata")
 	return repo.UserByID(ctx, ctxData.UserID)
 }
 
