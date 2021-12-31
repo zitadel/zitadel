@@ -34,7 +34,9 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 }
 
 func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
-	return repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+	ctxData := authz.GetCtxData(ctx)
+	logging.LogWithFields("EVENT-9CUPM", "org", ctxData.OrgID, "project", ctxData.ProjectID, "user", ctxData.UserID)
+	return repo.UserByID(ctx, ctxData.UserID)
 }
 
 func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
