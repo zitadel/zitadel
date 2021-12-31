@@ -4,6 +4,7 @@ export enum User {
     OrgProjectCreator = 'org_project_creator',
     LoginPolicyUser = 'login_policy_user',
     PasswordComplexityUser = 'password_complexity_user',
+    IAMAdminUser = "zitadel-admin"
 }
 
 export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?: () => void, onPasswordScreen?: () => void): void {
@@ -11,7 +12,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
     cy.session(creds.username, () => {
 
-        const accountsHost = `accounts.${Cypress.env('apiCallsDomain')}`
+        const accountsHost = (<string> Cypress.env('apiCallsDomain')).indexOf("localhost") > -1 ? 'localhost' : `accounts.${Cypress.env('apiCallsDomain')}`
 
         const cookies = new Map<string, string>()
 
@@ -93,7 +94,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
         cy.get('#loginName').type(creds.username)
         cy.get('#submit-button').click()
 
-        cy.wait('@loginName')
+//        cy.wait('@loginName')
         onPasswordScreen ? onPasswordScreen() : null
         cy.get('#password').type(creds.password) 
         cy.get('#submit-button').click()
@@ -116,13 +117,22 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 }
 
 function credentials(user: User, pw?: string) {
-    return {
-        username: `${user}_user_name@caos-demo.${Cypress.env('apiCallsDomain')}`,
+
+    const userDomain = stripPort(Cypress.env('apiCallsDomain'))
+
+    return user == User.IAMAdminUser ? {
+        username: `${User.IAMAdminUser}@caos-ag.${userDomain}`,
+        password: 'Password1!'
+    } : {
+        username: `${user}_user_name@caos-demo.${userDomain}`,
         password: pw ? pw : Cypress.env(`${user}_password`)
     }
 }
 
-function updateCookies(newCookies: string[], currentCookies: Map<string, string>) {
+function updateCookies(newCookies: string[] | undefined, currentCookies: Map<string, string>) {
+    if (newCookies === undefined) {
+        return
+    }
     newCookies.forEach(cs => {
         cs.split('; ').forEach(cookie => {
             const idx = cookie.indexOf('=')
@@ -137,4 +147,9 @@ function requestCookies(currentCookies: Map<string, string>): string[] {
         list.push(key+"="+val)
     })
     return list
+}
+
+function stripPort(s: string): string {
+    const idx = s.indexOf(":")
+    return idx === -1 ? s : s.substring(0,idx)
 }

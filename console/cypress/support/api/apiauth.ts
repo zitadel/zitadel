@@ -5,6 +5,12 @@ export interface apiCallProperties {
     mgntBaseURL: string
 }
 
+export function apiAuthAdmin(): Cypress.Chainable<apiCallProperties> {
+    const apiDomain = Cypress.env('apiCallsDomain')
+
+
+}
+
 export function apiAuth(): Cypress.Chainable<apiCallProperties> {
     const apiDomain = Cypress.env('apiCallsDomain')
     const apiBaseURL = `https://api.${apiDomain}`
