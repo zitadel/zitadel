@@ -7,99 +7,109 @@ export enum User {
     IAMAdminUser = "zitadel-admin"
 }
 
-export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?: () => void, onPasswordScreen?: () => void): void {
+export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?: () => void, onPasswordScreen?: () => void, onAuthenticated?: () => void): void {
     let creds = credentials(user, pw)
+
+    const apiCallsDomain: string = Cypress.env('apiCallsDomain')
+    const consoleUrl: string = Cypress.env('consoleUrl') 
+    const multipleDomains = consoleUrl.indexOf(stripPort(apiCallsDomain)) == -1
+
+    const accountsHost = apiCallsDomain.indexOf("localhost") > -1 ? stripPort(apiCallsDomain) : `accounts.${apiCallsDomain}`
 
     cy.session(creds.username, () => {
 
-        const accountsHost = (<string> Cypress.env('apiCallsDomain')).indexOf("localhost") > -1 ? 'localhost' : `accounts.${Cypress.env('apiCallsDomain')}`
+
 
         const cookies = new Map<string, string>()
 
-        cy.intercept({
-            method: 'GET',
-            hostname: accountsHost,
-            url: '/login*',
-            times: 1
-        }, (req) => {
-            req.headers['cookie'] = requestCookies(cookies)
-            req.continue((res) => {
-                updateCookies(res.headers['set-cookie'] as string[], cookies)
-            })
-        }).as('login')
+        if (multipleDomains) {
+            cy.intercept({
+                method: 'GET',
+                hostname: "localhost",
+                url: '/login/login*',
+                times: 1
+            }, (req) => {
+                req.headers['cookie'] = requestCookies(cookies)
+                req.continue((res) => {
+                    updateCookies(res.headers['set-cookie'] as string[], cookies)
+                })
+            }).as('login')
 
-        cy.intercept({
-            method: 'POST',
-            hostname: accountsHost,
-            url: '/loginname*',
-            times: 1
-        }, (req) => {
-            req.headers['cookie'] = requestCookies(cookies)
-            req.continue((res) => {
-                updateCookies(res.headers['set-cookie'] as string[], cookies)
-            })
-        }).as('loginName')
+            cy.intercept({
+                method: 'POST',
+                hostname: "localhost",
+                url: '/login/loginname*',
+                times: 1
+            }, (req) => {
+                req.headers['cookie'] = requestCookies(cookies)
+                req.continue((res) => {
+                    updateCookies(res.headers['set-cookie'] as string[], cookies)
+                })
+            }).as('loginName')
 
-        cy.intercept({
-            method: 'POST',
-            hostname: accountsHost,
-            url: '/password*',
-            times: 1
-        }, (req) => {
-            req.headers['cookie'] = requestCookies(cookies)
-            req.continue((res) => {
-                updateCookies(res.headers['set-cookie'] as string[], cookies)
-            })
-        }).as('password')
+            cy.intercept({
+                method: 'POST',
+                hostname: "localhost",
+                url: '/login/password*',
+                times: 1
+            }, (req) => {
+                req.headers['cookie'] = requestCookies(cookies)
+                req.continue((res) => {
+                    updateCookies(res.headers['set-cookie'] as string[], cookies)
+                })
+            }).as('password')
 
-        cy.intercept({
-            method: 'GET',
-            hostname: accountsHost,
-            url: '/login/success*',
-            times: 1
-        }, (req) => {
-            req.headers['cookie'] = requestCookies(cookies)
-            req.continue((res) => {
-                updateCookies(res.headers['set-cookie'] as string[], cookies)
-            })
-        }).as('success') 
+            cy.intercept({
+                method: 'GET',
+                hostname: "localhost",
+                url: '/login/success*',
+                times: 1
+            }, (req) => {
+                req.headers['cookie'] = requestCookies(cookies)
+                req.continue((res) => {
+                    updateCookies(res.headers['set-cookie'] as string[], cookies)
+                })
+            }).as('success') 
 
-        cy.intercept({
-            method: 'GET',
-            hostname: accountsHost,
-            url: '/oauth/v2/authorize/callback*',
-            times: 1
-        }, (req) => {
-            req.headers['cookie'] = requestCookies(cookies)
-            req.continue((res) => {
-                updateCookies(res.headers['set-cookie'] as string[], cookies)
+            cy.intercept({
+                method: 'GET',
+                hostname: "localhost",
+                url: '/oauth/v2/authorize/callback*',
+                times: 1
+            }, (req) => {
+                req.headers['cookie'] = requestCookies(cookies)
+                req.continue((res) => {
+                    updateCookies(res.headers['set-cookie'] as string[], cookies)
+                })
+            }).as('callback')    
+            
+            cy.intercept({
+                method: 'GET',
+                url: `https://${accountsHost}/oauth/v2/authorize*`,
+                hostname: "localhost",
+                times: 1,
+            }, (req) => {
+                req.continue((res) => {
+                    updateCookies(res.headers['set-cookie'] as string[], cookies)
+                })
             })
-        }).as('callback')    
-        
-        cy.intercept({
-            method: 'GET',
-            url: `https://${accountsHost}/oauth/v2/authorize*`,
-            hostname: accountsHost,
-            times: 1,
-        }, (req) => {
-            req.continue((res) => {
-                updateCookies(res.headers['set-cookie'] as string[], cookies)
-            })
-        })
+        }
 
-        cy.visit(`${Cypress.env('consoleUrl')}/loginname`);
+        cy.visit(`${consoleUrl}/loginname`);
 
-        cy.wait('@login')
+        multipleDomains && cy.wait('@login')
         onUsernameScreen ? onUsernameScreen() : null
         cy.get('#loginName').type(creds.username)
         cy.get('#submit-button').click()
 
-//        cy.wait('@loginName')
+        multipleDomains && cy.wait('@loginName')
         onPasswordScreen ? onPasswordScreen() : null
         cy.get('#password').type(creds.password) 
         cy.get('#submit-button').click()
 
-        cy.wait('@callback')
+        onAuthenticated ? onAuthenticated() : null
+
+        multipleDomains && cy.wait('@callback')
 
         cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
 
@@ -111,7 +121,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
                 throw new Error("clear session");
             }
 
-            cy.visit(`${Cypress.env('consoleUrl')}/users/me`)
+            cy.visit(`${consoleUrl}/users/me`)
         }
     })
 }
@@ -119,12 +129,10 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 function credentials(user: User, pw?: string) {
 
     const userDomain = stripPort(Cypress.env('apiCallsDomain'))
+    const username = user == User.IAMAdminUser ? `${User.IAMAdminUser}@caos-ag.${userDomain}` : `${user}_user_name@caos-demo.${userDomain}`
 
-    return user == User.IAMAdminUser ? {
-        username: `${User.IAMAdminUser}@caos-ag.${userDomain}`,
-        password: 'Password1!'
-    } : {
-        username: `${user}_user_name@caos-demo.${userDomain}`,
+    return {
+        username: username,
         password: pw ? pw : Cypress.env(`${user}_password`)
     }
 }
