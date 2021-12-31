@@ -342,7 +342,7 @@ API:
         URL: '$ZITADEL_OAUTH/keys'
 
 UI:
-  Port: 50003
+  Port: 50002
   Login:
     # Handler:
     BaseURL: 'http://localhost:50002/login'
