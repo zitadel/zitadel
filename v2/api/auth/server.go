@@ -12,9 +12,9 @@ type Server struct {
 	service auth.AuthServiceServer
 }
 
-func New() *Server {
+func New(authSvc auth.AuthServiceServer) *Server {
 	return &Server{
-		service: auth.UnimplementedAuthServiceServer{},
+		service: authSvc,
 	}
 }
 

@@ -12,9 +12,9 @@ type Server struct {
 	service management.ManagementServiceServer
 }
 
-func New() *Server {
+func New(svc management.ManagementServiceServer) *Server {
 	return &Server{
-		service: management.UnimplementedManagementServiceServer{},
+		service: svc,
 	}
 }
 

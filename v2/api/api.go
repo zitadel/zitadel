@@ -14,6 +14,10 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
+
+	admin_grpc "github.com/caos/zitadel/internal/api/grpc/admin"
+	auth_grpc "github.com/caos/zitadel/internal/api/grpc/auth"
+	mgmt_grpc "github.com/caos/zitadel/internal/api/grpc/management"
 )
 
 var (
@@ -22,17 +26,17 @@ var (
 
 type API struct{}
 
-func New(ctx context.Context, baseRouter *mux.Router) *API {
+func New(ctx context.Context, baseRouter *mux.Router, mgmtSrv *mgmt_grpc.Server, adminSrv *admin_grpc.Server, authSrv *auth_grpc.Server) *API {
 	grpcHandler := grpcServer()
 	grpcWebHandler := grpcweb.WrapServer(grpcHandler)
 	apiRoute := baseRouter.PathPrefix("/api").Subrouter()
 
 	// services
-	mgmtHandler := mgmt.New()
+	mgmtHandler := mgmt.New(mgmtSrv)
 	routeAPI(ctx, mgmtHandler, grpcHandler, apiRoute)
-	adminHandler := admin.New()
+	adminHandler := admin.New(adminSrv)
 	routeAPI(ctx, adminHandler, grpcHandler, apiRoute)
-	authHandler := auth.New()
+	authHandler := auth.New(authSrv)
 	routeAPI(ctx, authHandler, grpcHandler, apiRoute)
 
 	routeGRPC(baseRouter, grpcHandler, grpcWebHandler)
@@ -57,7 +61,7 @@ func routeAPI(ctx context.Context, h handler, grpcServ *grpc.Server, apiRouter *
 }
 
 func routeGRPC(baseRouter *mux.Router, grpcHandler *grpc.Server, grpcWebHandler *grpcweb.WrappedGrpcServer) {
-	http2Route := baseRouter.StrictSlash(true).Methods(http.MethodPost).MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
+	http2Route := baseRouter.Methods(http.MethodPost).MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
 		return r.ProtoMajor == 2
 	}).Subrouter()
 	http2Route.Headers("Content-Type", "application/grpc").Handler(grpcHandler)

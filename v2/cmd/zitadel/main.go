@@ -16,12 +16,13 @@ import (
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	api_v1 "github.com/caos/zitadel/internal/api"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
+	admin_grpc "github.com/caos/zitadel/internal/api/grpc/admin"
+	"github.com/caos/zitadel/internal/api/grpc/auth"
+	"github.com/caos/zitadel/internal/api/grpc/management"
 	"github.com/caos/zitadel/internal/api/oidc"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
-	"github.com/caos/zitadel/internal/ui"
-
-	// authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -30,10 +31,31 @@ import (
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
+	"github.com/caos/zitadel/internal/ui"
 	"github.com/caos/zitadel/v2/api"
 	"github.com/caos/zitadel/v2/api/ui/console"
 	"github.com/caos/zitadel/v2/api/ui/login"
+)
+
+var (
+	mgmtSvc  *management.Server
+	adminSvc *admin_grpc.Server
+	authSvc  *auth.Server
+
+	mgmtRepo  *mgmt_es.EsRepository
+	adminRepo *admin_es.EsRepository
+	authRepo  *auth_es.EsRepository
+	authZRepo *authz_es.EsRepository
+
+	queries  *query.Queries
+	commands *command.Commands
+	assets   static.Storage
+
+	esQueries *eventstore.Eventstore
+
+	verifier *internal_authz.TokenVerifier
 )
 
 func main() {
@@ -44,57 +66,64 @@ func main() {
 
 	ctx := context.TODO()
 
-	esQueries, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
-	if err != nil {
-		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
+	startCQRS(ctx, conf)
+	startRepos(ctx, conf)
+	startSvcs(ctx, conf)
+
+	listen(ctx, conf)
+}
+
+func startSvcs(ctx context.Context, conf *Config) {
+	mgmtSvc = management.CreateServer(commands, queries, mgmtRepo, conf.SystemDefaults, conf.Mgmt.APIDomain+"/assets/v1/")
+	authSvc = auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults)
+	adminSvc = admin_grpc.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, "/assets/v1")
+
+	repo := struct {
+		authz_es.EsRepository
+		*query.Queries
+	}{
+		*authZRepo,
+		queries,
 	}
 
-	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
-	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
+	verifier = internal_authz.Start(&repo)
+}
 
-	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
-	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+func startCQRS(ctx context.Context, conf *Config) {
+	var err error
+
+	esQueries, err = eventstore.StartWithUser(conf.EventstoreBase, conf.Queries.Eventstore)
+	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
+
+	queries, err = query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
+	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
 
-	store, err := conf.AssetStorage.Config.NewStorage()
+	assets, err = conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
-	if err != nil {
-		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
+	commands, err = command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, assets, authZRepo)
+	logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
+}
+
+func startRepos(ctx context.Context, conf *Config) {
+	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
+	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
+		roles[i] = role.Role
 	}
 
-	authRepo, err := auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
+	var err error
+
+	authZRepo, err = authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
+	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
+
+	mgmtRepo, err = mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, queries, assets)
+	logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
+
+	authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
 	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
-
-	// repo := struct {
-	// 	authz_repo.EsRepository
-	// 	query.Queries
-	// }{
-	// 	*authZRepo,
-	// 	*queries,
-	// }
-
-	// verifier := internal_authz.Start(&repo)
-
-	baseRouter := mux.NewRouter().StrictSlash(true)
-
-	l, loginPrefix := login.CreateLogin(baseRouter, login.Config(conf.UI.Login), commands, queries, authRepo, store, conf.SystemDefaults, true)
-	baseRouter.PathPrefix(loginPrefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.StripPrefix("/login", l.Handler()).ServeHTTP(w, r)
-	})
-
-	oidcHandler := oidc.NewProvider(ctx, conf.API.OIDC, commands, queries, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, true)
-	baseRouter.PathPrefix("/.well-known/openid-configuration").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		oidcHandler.HttpHandler().ServeHTTP(w, r)
-	})
-	baseRouter.PathPrefix("/oauth/v2").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.StripPrefix("/oauth/v2", oidcHandler.HttpHandler()).ServeHTTP(w, r)
-	})
-
-	listen(ctx, baseRouter, conf)
 }
 
 func configure() *Config {
@@ -104,8 +133,24 @@ func configure() *Config {
 	return conf
 }
 
-func listen(ctx context.Context, baseRouter *mux.Router, config *Config) {
-	api.New(ctx, baseRouter)
+func listen(ctx context.Context, config *Config) {
+	baseRouter := mux.NewRouter().StrictSlash(true)
+
+	api.New(ctx, baseRouter, mgmtSvc, adminSvc, authSvc)
+
+	l, loginPrefix := login.CreateLogin(baseRouter, login.Config(config.UI.Login), commands, queries, authRepo, assets, config.SystemDefaults, true)
+	baseRouter.PathPrefix(loginPrefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.StripPrefix(loginPrefix, l.Handler()).ServeHTTP(w, r)
+	})
+
+	oidcHandler := oidc.NewProvider(ctx, config.API.OIDC, commands, queries, authRepo, config.SystemDefaults.KeyConfig.EncryptionConfig, true)
+	baseRouter.PathPrefix("/.well-known/openid-configuration").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		oidcHandler.HttpHandler().ServeHTTP(w, r)
+	})
+	baseRouter.PathPrefix("/oauth/v2").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.StripPrefix("/oauth/v2", oidcHandler.HttpHandler()).ServeHTTP(w, r)
+	})
+
 	uiRouter := baseRouter.PathPrefix("/ui").Subrouter()
 	consoleDir := "./console/"
 	if config.UI.Console.ConsoleOverwriteDir != "" {
@@ -115,9 +160,9 @@ func listen(ctx context.Context, baseRouter *mux.Router, config *Config) {
 	console.New(uiRouter, console.Config{
 		ConsoleOverwriteDir: consoleDir,
 		Environment: console.Environment{
-			AuthServiceUrl:         config.Mgmt.APIDomain,
+			AuthServiceUrl:         config.Auth.APIDomain,
 			MgmtServiceUrl:         config.Mgmt.APIDomain,
-			AdminServiceUrl:        config.Mgmt.APIDomain,
+			AdminServiceUrl:        config.Admin.APIDomain,
 			SubscriptionServiceUrl: config.Mgmt.APIDomain,
 			AssetServiceUrl:        config.Mgmt.APIDomain,
 			Issuer:                 config.API.OIDC.OPConfig.Issuer,
