@@ -9,12 +9,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
 	"github.com/caos/logging"
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	api_v1 "github.com/caos/zitadel/internal/api"
+	"github.com/caos/zitadel/internal/api/assets"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	admin_grpc "github.com/caos/zitadel/internal/api/grpc/admin"
 	"github.com/caos/zitadel/internal/api/grpc/auth"
@@ -28,12 +30,14 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/id"
 	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
 	"github.com/caos/zitadel/internal/ui"
+	"github.com/caos/zitadel/openapi"
 	"github.com/caos/zitadel/v2/api"
 	"github.com/caos/zitadel/v2/api/ui/console"
 	"github.com/caos/zitadel/v2/api/ui/login"
@@ -49,9 +53,9 @@ var (
 	authRepo  *auth_es.EsRepository
 	authZRepo *authz_es.EsRepository
 
-	queries  *query.Queries
-	commands *command.Commands
-	assets   static.Storage
+	queries    *query.Queries
+	commands   *command.Commands
+	assetStore static.Storage
 
 	esQueries *eventstore.Eventstore
 
@@ -101,10 +105,10 @@ func startCQRS(ctx context.Context, conf *Config) {
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
 	logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
 
-	assets, err = conf.AssetStorage.Config.NewStorage()
+	assetStore, err = conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
-	commands, err = command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, assets, authZRepo)
+	commands, err = command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, assetStore, authZRepo)
 	logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
 }
 
@@ -119,7 +123,7 @@ func startRepos(ctx context.Context, conf *Config) {
 	authZRepo, err = authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 
-	mgmtRepo, err = mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, queries, assets)
+	mgmtRepo, err = mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, queries, assetStore)
 	logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 
 	authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
@@ -138,7 +142,7 @@ func listen(ctx context.Context, config *Config) {
 
 	api.New(ctx, baseRouter, mgmtSvc, adminSvc, authSvc, verifier, config.InternalAuthZ)
 
-	l, loginPrefix := login.CreateLogin(baseRouter, login.Config(config.UI.Login), commands, queries, authRepo, assets, config.SystemDefaults, true)
+	l, loginPrefix := login.CreateLogin(baseRouter, login.Config(config.UI.Login), commands, queries, authRepo, assetStore, config.SystemDefaults, true)
 	baseRouter.PathPrefix(loginPrefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix(loginPrefix, l.Handler()).ServeHTTP(w, r)
 	})
@@ -151,11 +155,21 @@ func listen(ctx context.Context, config *Config) {
 		http.StripPrefix("/oauth/v2", oidcHandler.HttpHandler()).ServeHTTP(w, r)
 	})
 
+	assetsHandler := assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, assetStore, mgmtRepo, queries)
+	baseRouter.PathPrefix("/assets/v1").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.StripPrefix("/assets/v1", assetsHandler).ServeHTTP(w, r)
+	})
+
+	openAPIHandler, err := openapi.Start()
+	logging.Log("ZITAD-qXpND").OnError(err).Fatal("unable to start openapi")
+	baseRouter.PathPrefix("/openapi/v2/swagger").
+		Handler(http.StripPrefix("/openapi/v2/swagger", cors.AllowAll().Handler(openAPIHandler)))
+
 	uiRouter := baseRouter.PathPrefix("/ui").Subrouter()
 	consoleDir := "./console/"
 	if config.UI.Console.ConsoleOverwriteDir != "" {
-		consoleDir = config.UI.Console.ConsoleOverwriteDir
-		// consoleDir = "/Users/adlerhurst/Downloads/zitadel-console"
+		// consoleDir = config.UI.Console.ConsoleOverwriteDir
+		consoleDir = "/Users/adlerhurst/Downloads/zitadel-console"
 	}
 	console.New(uiRouter, console.Config{
 		ConsoleOverwriteDir: consoleDir,
