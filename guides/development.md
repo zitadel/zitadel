@@ -27,7 +27,7 @@ This command generates the grpc stub for console into the folder console/src/app
 DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
 ```
 
-### Backend
+### Start the Backend
 
 With these commands you can generate the stub for the backend.
 
@@ -43,7 +43,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 
 ### Start storage
 
-Used if you only want to start and prepare the services ZITADEL needs for storing it's data. The services are started in background (detached).
+Use this if you only want to start the storage services needed by ZITADEL. These services are started in background (detached).
 
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
@@ -53,7 +53,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 **On apple silicon:**
 Restart the command (second terminal `docker restart zitadel_<SERVICE_NAME>_1`) if `db` logs `qemu: uncaught target signal 11 (Segmentation fault) - core dumped` or no logs are written from `db-migrations`.
 
-### Initialise frontend
+### Initialize the console
 
 Used to set the client id of the console. This step is for local development. If you don't work with a local backend you have to set the client id manually.
 
@@ -66,7 +66,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 
 The command exists as soon as the client id is set.
 
-### Run Console
+### Start the Console
 
 The console service is configured for hot reloading. You can also use docker compose for local development.
 

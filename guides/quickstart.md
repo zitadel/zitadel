@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-The only prerequisite you need to have installed is docker. The resource limit must at least be:
+The only prerequisite you need fullfill, is that you need to have docker installed with support for compose and buildkit. The resource limit must at least be:
 
 * CPU's: 2
 * Memory: 4Gb
@@ -26,13 +26,13 @@ For a more detailed guide take a look at the [development guide](./development.m
 
 ## FAQ
 
-### Mac M1
+### Mac M1 (Apple Silicon)
 
-Bellow are some error's we faced with apple silicon.
+Bellow are some errors we faced with apple silicon.
 
 #### database-migrations don't start or stop without exit code
 
-The problem is that the database has an error. You can simply restart the database with the following command:
+You can simply restart the database with the following command:
 
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
@@ -41,7 +41,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
 
 #### API call's block and don't return any response
 
-The problem is that the database has an error. You can simply restart the database with the following command:
+The problem is that the database has a connection issues. You can simply restart the database with the following command:
 
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
