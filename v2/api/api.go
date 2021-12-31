@@ -36,11 +36,11 @@ func New(ctx context.Context, baseRouter *mux.Router, mgmtSrv *mgmt_grpc.Server,
 
 	// services
 	mgmtHandler := mgmt.New(mgmtSrv)
-	routeAPI(ctx, mgmtHandler, grpcHandler, apiRoute)
+	routeAPI(ctx, mgmtHandler, grpcHandler, apiRoute, verifier)
 	adminHandler := admin.New(adminSrv)
-	routeAPI(ctx, adminHandler, grpcHandler, apiRoute)
+	routeAPI(ctx, adminHandler, grpcHandler, apiRoute, verifier)
 	authHandler := auth.New(authSrv)
-	routeAPI(ctx, authHandler, grpcHandler, apiRoute)
+	routeAPI(ctx, authHandler, grpcHandler, apiRoute, verifier)
 
 	routeGRPC(baseRouter, grpcHandler, grpcWebHandler)
 
@@ -51,15 +51,19 @@ type handler interface {
 	RegisterRESTGateway(context.Context, *runtime.ServeMux) error
 	RegisterGRPC(*grpc.Server)
 	ServicePrefix() string
+	AppName() string
+	MethodPrefix() string
+	AuthMethods() authz.MethodMapping
 }
 
-func routeAPI(ctx context.Context, h handler, grpcServ *grpc.Server, apiRouter *mux.Router) error {
+func routeAPI(ctx context.Context, h handler, grpcServ *grpc.Server, apiRouter *mux.Router, verifier *authz.TokenVerifier) error {
 	m := runtime.NewServeMux(gwOpts...)
 	h.RegisterGRPC(grpcServ)
 	if err := h.RegisterRESTGateway(ctx, m); err != nil {
 		panic(err)
 	}
 	apiRouter.PathPrefix(h.ServicePrefix()).Handler(http.StripPrefix("/api"+h.ServicePrefix(), m))
+	verifier.RegisterServer(h.AppName(), h.MethodPrefix(), h.AuthMethods())
 	return nil
 }
 

@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -33,4 +34,16 @@ func (s *Server) RegisterRESTGateway(ctx context.Context, grpcMux *runtime.Serve
 
 func (s *Server) ServicePrefix() string {
 	return "/admin/v1"
+}
+
+func (s *Server) AppName() string {
+	return "Admin-API"
+}
+
+func (s *Server) MethodPrefix() string {
+	return admin.AdminService_MethodPrefix
+}
+
+func (s *Server) AuthMethods() authz.MethodMapping {
+	return admin.AdminService_AuthMethods
 }

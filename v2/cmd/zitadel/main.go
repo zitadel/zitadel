@@ -168,8 +168,8 @@ func listen(ctx context.Context, config *Config) {
 	uiRouter := baseRouter.PathPrefix("/ui").Subrouter()
 	consoleDir := "./console/"
 	if config.UI.Console.ConsoleOverwriteDir != "" {
-		// consoleDir = config.UI.Console.ConsoleOverwriteDir
-		consoleDir = "/Users/adlerhurst/Downloads/zitadel-console"
+		consoleDir = config.UI.Console.ConsoleOverwriteDir
+		// consoleDir = "/Users/adlerhurst/Downloads/zitadel-console"
 	}
 	console.New(uiRouter, console.Config{
 		ConsoleOverwriteDir: consoleDir,

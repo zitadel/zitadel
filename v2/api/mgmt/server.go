@@ -3,6 +3,7 @@ package mgmt
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -33,4 +34,16 @@ func (s *Server) RegisterRESTGateway(ctx context.Context, grpcMux *runtime.Serve
 
 func (s *Server) ServicePrefix() string {
 	return "/management/v1"
+}
+
+func (s *Server) AppName() string {
+	return "Management-API"
+}
+
+func (s *Server) MethodPrefix() string {
+	return management.ManagementService_MethodPrefix
+}
+
+func (s *Server) AuthMethods() authz.MethodMapping {
+	return management.ManagementService_AuthMethods
 }

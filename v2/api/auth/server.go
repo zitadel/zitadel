@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -33,4 +34,16 @@ func (s *Server) RegisterRESTGateway(ctx context.Context, grpcMux *runtime.Serve
 
 func (s *Server) ServicePrefix() string {
 	return "/auth/v1"
+}
+
+func (s *Server) AppName() string {
+	return "Auth-API"
+}
+
+func (s *Server) MethodPrefix() string {
+	return auth.AuthService_MethodPrefix
+}
+
+func (s *Server) AuthMethods() authz.MethodMapping {
+	return auth.AuthService_AuthMethods
 }

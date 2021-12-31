@@ -2,9 +2,11 @@ package authz
 
 import (
 	"context"
+	"log"
 	"strings"
 	"sync"
 
+	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -108,6 +110,8 @@ func (v *TokenVerifier) ExistsOrg(ctx context.Context, orgID string) (err error)
 }
 
 func (v *TokenVerifier) CheckAuthMethod(method string) (Option, bool) {
+	logging.LogWithFields("MIDDL-qhMvG", "method", method).Warn("check for method")
+	log.Println("methods: ", v.authMethods)
 	authOpt, ok := v.authMethods[method]
 	return authOpt, ok
 }
