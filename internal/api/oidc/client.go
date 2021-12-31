@@ -65,19 +65,16 @@ func (o *OPStorage) GetKeyByIDAndUserID(ctx context.Context, keyID, userID strin
 func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer string) (_ *jose.JSONWebKey, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	key, err := o.repo.MachineKeyByID(ctx, keyID)
+	publicKeyData, err := o.query.GetAuthNKeyPublicKeyByIDAndIdentifier(ctx, keyID, issuer)
 	if err != nil {
 		return nil, err
 	}
-	if key.AuthIdentifier != issuer {
-		return nil, errors.ThrowPermissionDenied(nil, "OIDC-24jm3", "key from different user")
-	}
-	publicKey, err := crypto.BytesToPublicKey(key.PublicKey)
+	publicKey, err := crypto.BytesToPublicKey(publicKeyData)
 	if err != nil {
 		return nil, err
 	}
 	return &jose.JSONWebKey{
-		KeyID: key.ID,
+		KeyID: keyID,
 		Use:   "sig",
 		Key:   publicKey,
 	}, nil
@@ -132,10 +129,51 @@ func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.User
 			return errors.ThrowPermissionDenied(nil, "OIDC-da1f3", "origin is not allowed")
 		}
 	}
-	return o.SetUserinfoFromScopes(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes)
+	return o.setUserinfo(ctx, userInfo, token.UserID, token.ApplicationID, token.Scopes)
 }
 
 func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	if applicationID != "" {
+		app, err := o.query.AppByOIDCClientID(ctx, applicationID)
+		if err != nil {
+			return err
+		}
+		if app.OIDCConfig.AssertIDTokenRole {
+			scopes, err = o.assertProjectRoleScopes(ctx, applicationID, scopes)
+			if err != nil {
+				return errors.ThrowPreconditionFailed(err, "OIDC-Dfe2s", "Errors.Internal")
+			}
+		}
+	}
+	return o.setUserinfo(ctx, userInfo, userID, applicationID, scopes)
+}
+
+func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
+	token, err := o.repo.TokenByID(ctx, subject, tokenID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
+	}
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	if err != nil {
+		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
+	}
+	for _, aud := range token.Audience {
+		if aud == clientID || aud == projectID {
+			err := o.setUserinfo(ctx, introspection, token.UserID, clientID, token.Scopes)
+			if err != nil {
+				return err
+			}
+			introspection.SetScopes(token.Scopes)
+			introspection.SetClientID(token.ApplicationID)
+			return nil
+		}
+	}
+	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
+}
+
+func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	user, err := o.repo.UserByID(ctx, userID)
@@ -219,29 +257,6 @@ func (o *OPStorage) SetUserinfoFromScopes(ctx context.Context, userInfo oidc.Use
 	return nil
 }
 
-func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
-	token, err := o.repo.TokenByID(ctx, subject, tokenID)
-	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Dsfb2", "token is not valid or has expired")
-	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
-	if err != nil {
-		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
-	}
-	for _, aud := range token.Audience {
-		if aud == clientID || aud == projectID {
-			err := o.SetUserinfoFromScopes(ctx, introspection, token.UserID, clientID, token.Scopes)
-			if err != nil {
-				return err
-			}
-			introspection.SetScopes(token.Scopes)
-			introspection.SetClientID(token.ApplicationID)
-			return nil
-		}
-	}
-	return errors.ThrowPermissionDenied(nil, "OIDC-sdg3G", "token is not valid for this client")
-}
-
 func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (claims map[string]interface{}, err error) {
 	roles := make([]string, 0)
 	for _, scope := range scopes {
@@ -283,7 +298,7 @@ func (o *OPStorage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clie
 }
 
 func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID string, requestedRoles []string) (map[string]map[string]string, error) {
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, applicationID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, applicationID)
 	if err != nil {
 		return nil, err
 	}

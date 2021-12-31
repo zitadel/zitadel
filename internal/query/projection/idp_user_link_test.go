@@ -7,6 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
@@ -116,6 +118,120 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 								"idp-config-id",
 								"agg-id",
 								"external-user-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceOrgRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.OrgRemovedEventType),
+					org.AggregateType,
+					[]byte(`{}`),
+				), org.OrgRemovedEventMapper),
+			},
+			reduce: (&IDPUserLinkProjection{}).reduceOrgRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPUserLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_user_links WHERE (resource_owner = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserRemovedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&IDPUserLinkProjection{}).reduceUserRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPUserLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_user_links WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "org.IDPConfigRemovedEvent",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(org.IDPConfigRemovedEventType),
+					org.AggregateType,
+					[]byte(`{
+						"idpConfigId": "idp-config-id"
+					}`),
+				), org.IDPConfigRemovedEventMapper),
+			},
+			reduce: (&IDPUserLinkProjection{}).reduceIDPConfigRemoved,
+			want: wantReduce{
+				aggregateType:    org.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPUserLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_user_links WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"ro-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "iam.IDPConfigRemovedEvent",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(iam.IDPConfigRemovedEventType),
+					iam.AggregateType,
+					[]byte(`{
+						"idpConfigId": "idp-config-id"
+					}`),
+				), iam.IDPConfigRemovedEventMapper),
+			},
+			reduce: (&IDPUserLinkProjection{}).reduceIDPConfigRemoved,
+			want: wantReduce{
+				aggregateType:    iam.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       IDPUserLinkTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.idp_user_links WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedArgs: []interface{}{
+								"idp-config-id",
+								"ro-id",
 							},
 						},
 					},

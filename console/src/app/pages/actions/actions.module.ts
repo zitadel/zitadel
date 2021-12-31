@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
@@ -55,6 +56,7 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     DragDropModule,
     InfoSectionModule,
     HasFeaturePipeModule,
+    CodemirrorModule,
   ],
 })
 export class ActionsModule {}
