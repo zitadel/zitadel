@@ -9,13 +9,12 @@ describe('initialize organisation', () => {
 
         login(User.IAMAdminUser, false, adminPw, null, null, () => {
 // TODO: Not always
-//            cy.contains('button', 'skip').click()
-/*            cy.get('#change-old-password').type(adminPw)
+            cy.contains('button', 'skip').click()
+            cy.get('#change-old-password').type(adminPw)
             cy.get('#change-new-password').type(adminPw)
             cy.get('#change-password-confirmation').type(adminPw)
-            cy.pause()
             cy.contains('button', 'next').click()
-            cy.contains('button', 'next').click()*/
+            cy.contains('button', 'next').click()
         })
     })
 })
