@@ -23,9 +23,6 @@ RUN dep ensure && \
   go env -w GO111MODULE=auto && \
   go install ./go/grpcwebproxy
 
-# ADD ./etc/localhost.crt /etc
-# ADD ./etc/localhost.key /etc
-
 ENV BKD_HOST=backend-run
 ENV BKD_PORT=50001
 
