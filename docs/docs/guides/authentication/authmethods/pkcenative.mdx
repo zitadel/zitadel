@@ -1,0 +1,18 @@
+#### redirect_uri
+
+Native clients might have to register multiple redirect_uris as operating system have different requirements.
+Typically, you register a redirect_uri starting with a custom protocol, e.g. `ch.zitadel.app://callback`.
+You're also allowed to use http://localhost, http://127.0.0.1 and http:[::1] without specifying a port: `http://locahost/callback`.
+
+#### post creation actions
+
+After the application creation, you might want to set additional options like `refresh_token` and `additional origins`.
+
+If you want to request refresh_tokens and use them to renew the user's access_tokens without their interaction,
+enable them in the OIDC Configuration section by ticking the checkbox.
+
+When calling the userinfo_endpoint or any ZITADEL API, we will check if an origin header is sent. This is automatically done
+by the user agent. If one is sent we will check if the origin is allowed for your application. By default, all computed
+origins of the redirect_uri list are allowed.
+So if your native app is built with a JavaScript base framework like ReactNative and you only specified redirect_uris
+with a custom protocol, you will need to add the origin where the app is served from, e.g. `http://localhost:8100`.
