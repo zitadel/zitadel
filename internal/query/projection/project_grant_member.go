@@ -80,42 +80,6 @@ func (p *ProjectGrantMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.ProjectRemovedType,
-					Reduce: p.reduceProjectRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.GrantRemovedType,
-					Reduce: p.reduceProjectGrantRemoved,
-				},
-			},
-		},
 	}
 }
 

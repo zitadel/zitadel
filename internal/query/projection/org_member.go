@@ -65,24 +65,6 @@ func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
-		{
-			Aggregate: user.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  user.UserRemovedType,
-					Reduce: p.reduceUserRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: org.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  org.OrgRemovedEventType,
-					Reduce: p.reduceOrgRemoved,
-				},
-			},
-		},
 	}
 }
 
