@@ -6,6 +6,11 @@ You should stay in the ZITADEL root directory to execute the statements in the f
 
 - Buildkit compatible docker installation
 
+Minimum resources:
+
+- CPU's: 2
+- Memory: 4Gb
+
 ### env variables
 
 You can use the default vars provided in [this .env-file](../build/local/local.env) or create your own and update the paths in the [docker compose file](../build/local/docker-compose-local.yml).
@@ -22,53 +27,46 @@ This command generates the grpc stub for console into the folder console/src/app
 DOCKER_BUILDKIT=1 docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
 ```
 
-### Backend
+### Start the Backend
 
-With this command you can generate the stub for the backend.
+With these commands you can generate the stub for the backend.
 
 ```bash
 # generates grpc stub
 DOCKER_BUILDKIT=1 docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
 # generates keys for cryptography
-DOCKER_BUILDKIT=1 docker build --target copy-keys -f build/local/Dockerfile.keys . -o .keys
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
+&& docker compose -f ./build/local/docker-compose-local.yml --profile backend-stub up --exit-code-from keys
 ```
 
 ## Run
 
-### Initialise data
+### Start storage
 
-Used if you want to setup the database and load the initial data.
+Use this if you only want to start the storage services needed by ZITADEL. These services are started in background (detached).
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
+&& docker compose -f ./build/local/docker-compose-local.yml --profile storage up -d
 ```
 
-You can stop as soon as db-migrations AND backend-setup returned with exit code 0.
+**On apple silicon:**
+Restart the command (second terminal `docker restart zitadel_<SERVICE_NAME>_1`) if `db` logs `qemu: uncaught target signal 11 (Segmentation fault) - core dumped` or no logs are written from `db-migrations`.
 
-### Initialise frontend
+### Initialize the console
 
 Used to set the client id of the console. This step is for local development. If you don't work with a local backend you have to set the client id manually.
 
 You must [initialise the data](###-Initialise-data)) first.
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile backend --profile init-frontend -p zitadel up --exit-code-from client-id
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 \
+&& docker compose -f ./build/local/docker-compose-local.yml --profile console-stub up --exit-code-from client-id
 ```
 
 The command exists as soon as the client id is set.
 
-### Run database
-
-Used if you want to run the backend/console locally and only need the database. It's recommended to [initialise the data](###-Initialise-data) first.
-
-```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database -p zitadel up
-```
-
-**On apple silicon:**
-Restart the command (second terminal `docker restart zitadel_<SERVICE_NAME>_1`) if `db` logs `qemu: uncaught target signal 11 (Segmentation fault) - core dumped` or no logs are written from `db-migrations`.
-
-### Run Console
+### Start the Console
 
 The console service is configured for hot reloading. You can also use docker compose for local development.
 
@@ -79,7 +77,7 @@ If you use the local backend ensure that you have [set the correct client id](##
 #### Run console in docker compose
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile frontend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile frontend up
 ```
 
 ### Run backend
@@ -89,7 +87,7 @@ Used if you want to run the backend locally. It's recommended to [initialise the
 #### Run backend in docker compose
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -f ./build/local/docker-compose-local.yml --profile database --profile backend -p zitadel up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile storage --profile backend up
 ```
 
 #### Run backend locally
