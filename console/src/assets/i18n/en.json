@@ -420,7 +420,7 @@
         "TITLE": "E-mail",
         "VALID": "validated",
         "ISVERIFIED": "Email Verified",
-        "ISVERIFIEDDESC": "If the email is indicated as verified, no initialization email will be sent.",
+        "ISVERIFIEDDESC": "If the email is indicated as verified, no email verification request will be made.",
         "RESEND": "Resend Verification E-mail",
         "EDITTITLE": "Change Email",
         "EDITDESC": "Enter the new email in the field below."
