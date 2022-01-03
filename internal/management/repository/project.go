@@ -10,17 +10,12 @@ import (
 )
 
 type ProjectRepository interface {
-	ProjectMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectMemberView, error)
-	SearchProjectMembers(ctx context.Context, request *model.ProjectMemberSearchRequest) (*model.ProjectMemberSearchResponse, error)
 	GetProjectMemberRoles(ctx context.Context) ([]string, error)
 
 	ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.ProjectChanges, error)
 
 	ApplicationChanges(ctx context.Context, projectID string, appID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.ApplicationChanges, error)
 
-	SearchProjectGrantMembers(ctx context.Context, request *model.ProjectGrantMemberSearchRequest) (*model.ProjectGrantMemberSearchResponse, error)
-
-	ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*model.ProjectGrantMemberView, error)
 	GetProjectGrantMemberRoles() []string
 
 	GetIAMByID(ctx context.Context) (*iam_model.IAM, error)
