@@ -52,6 +52,28 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 					Event:  project.MemberRemovedType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: org.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  org.OrgRemovedEventType,
+					Reduce: p.reduceOrgRemoved,
+				},
 			},
 		},
 		{
