@@ -10,7 +10,7 @@ type IAMLockoutPolicyReadModel struct {
 	LockoutPolicyReadModel
 }
 
-func (rm *IAMLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMLockoutPolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LockoutPolicyAddedEvent:

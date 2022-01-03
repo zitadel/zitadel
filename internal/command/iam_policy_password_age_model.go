@@ -25,7 +25,7 @@ func NewIAMPasswordAgePolicyWriteModel() *IAMPasswordAgePolicyWriteModel {
 	}
 }
 
-func (wm *IAMPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.PasswordAgePolicyAddedEvent:

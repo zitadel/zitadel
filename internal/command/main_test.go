@@ -40,7 +40,7 @@ func eventstoreExpect(t *testing.T, expects ...expect) *eventstore.Eventstore {
 	return es
 }
 
-func eventPusherToEvents(eventsPushes ...eventstore.EventPusher) []*repository.Event {
+func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event {
 	events := make([]*repository.Event, len(eventsPushes))
 	for i, event := range eventsPushes {
 		data, err := eventstore.EventData(event)
@@ -137,7 +137,7 @@ func expectFilterOrgMemberNotFound() expect {
 	}
 }
 
-func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
+func eventFromEventPusher(event eventstore.Command) *repository.Event {
 	data, _ := eventstore.EventData(event)
 	return &repository.Event{
 		ID:                            "",
@@ -156,7 +156,7 @@ func eventFromEventPusher(event eventstore.EventPusher) *repository.Event {
 	}
 }
 
-func eventFromEventPusherWithCreationDateNow(event eventstore.EventPusher) *repository.Event {
+func eventFromEventPusherWithCreationDateNow(event eventstore.Command) *repository.Event {
 	e := eventFromEventPusher(event)
 	e.CreationDate = time.Now()
 	return e

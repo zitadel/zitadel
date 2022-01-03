@@ -72,7 +72,7 @@ const (
 	OrgColumnDomain        = "primary_domain"
 )
 
-func (p *OrgProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", org.OrgAddedEventType).Error("wrong event type")
@@ -92,7 +92,7 @@ func (p *OrgProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.S
 	), nil
 }
 
-func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgProjection) reduceOrgChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-q4oq8", "seq", event.Sequence(), "expected", org.OrgChangedEventType).Error("wrong event type")
@@ -114,7 +114,7 @@ func (p *OrgProjection) reduceOrgChanged(event eventstore.EventReader) (*handler
 	), nil
 }
 
-func (p *OrgProjection) reduceOrgDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-1gwdc", "seq", event.Sequence(), "expectedType", org.OrgDeactivatedEventType).Error("wrong event type")
@@ -133,7 +133,7 @@ func (p *OrgProjection) reduceOrgDeactivated(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *OrgProjection) reduceOrgReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Vjwiy", "seq", event.Sequence(), "expectedType", org.OrgReactivatedEventType).Error("wrong event type")
@@ -152,7 +152,7 @@ func (p *OrgProjection) reduceOrgReactivated(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-79OhB", "seq", event.Sequence(), "expectedType", org.OrgDomainPrimarySetEventType).Error("wrong event type")

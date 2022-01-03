@@ -78,7 +78,7 @@ const (
 	ProjectGrantColumnCreator       = "creator_id"
 )
 
-func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Mi4g9", "seq", event.Sequence(), "expectedType", project.GrantAddedType).Error("wrong event type")
@@ -101,7 +101,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.EventR
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-M00fH", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
@@ -121,7 +121,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-K0fwR", "seq", event.Sequence(), "expectedType", project.GrantCascadeChangedType).Error("wrong event type")
@@ -141,7 +141,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantDeactivateEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Ple9f", "seq", event.Sequence(), "expectedType", project.GrantDeactivatedType).Error("wrong event type")
@@ -161,7 +161,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Ip0hr", "seq", event.Sequence(), "expectedType", project.GrantReactivatedType).Error("wrong event type")
@@ -181,7 +181,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-M0pfs", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
@@ -196,7 +196,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 	), nil
 }
 
-func (p *ProjectGrantProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-Ms0fe", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")

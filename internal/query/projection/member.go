@@ -87,7 +87,7 @@ func reduceMemberCascadeRemoved(e member.MemberCascadeRemovedEvent, opts ...redu
 	return crdb.NewDeleteStatement(&e, config.conds), nil
 }
 
-func reduceMemberRemoved(e eventstore.EventReader, opts ...reduceMemberOpt) (*handler.Statement, error) {
+func reduceMemberRemoved(e eventstore.Event, opts ...reduceMemberOpt) (*handler.Statement, error) {
 	config := reduceMemberConfig{
 		conds: []handler.Condition{},
 	}

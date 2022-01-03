@@ -24,9 +24,9 @@ func (s *Step14) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep14(ctx context.Context, step *Step14) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		var events []eventstore.EventPusher
+		var events []eventstore.Command
 		if step.ActivateExistingLabelPolicies {
 			existingPolicies := NewExistingLabelPoliciesReadModel(ctx)
 			err := c.eventstore.FilterToQueryReducer(ctx, existingPolicies)

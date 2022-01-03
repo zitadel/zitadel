@@ -29,7 +29,7 @@ func NewMachineKeyWriteModel(userID, keyID, resourceOwner string) *MachineKeyWri
 	}
 }
 
-func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *MachineKeyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.MachineKeyAddedEvent:

@@ -28,7 +28,7 @@ func NewOrgIDPOIDCConfigWriteModel(idpConfigID, orgID string) *IDPOIDCConfigWrit
 	}
 }
 
-func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.IDPOIDCConfigAddedEvent:

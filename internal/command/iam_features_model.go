@@ -25,7 +25,7 @@ func NewIAMFeaturesWriteModel() *IAMFeaturesWriteModel {
 	}
 }
 
-func (wm *IAMFeaturesWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMFeaturesWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.FeaturesSetEvent:

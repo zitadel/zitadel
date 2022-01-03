@@ -61,7 +61,7 @@ func (c *Commands) AddNewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.PushEvents(ctx, accessTokenEvent, refreshTokenEvent)
+	_, err = c.eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
 	if err != nil {
 		return nil, "", err
 	}
@@ -89,7 +89,7 @@ func (c *Commands) RenewRefreshTokenAndAccessToken(
 	if err != nil {
 		return nil, "", err
 	}
-	_, err = c.eventstore.PushEvents(ctx, accessTokenEvent, refreshTokenEvent)
+	_, err = c.eventstore.Push(ctx, accessTokenEvent, refreshTokenEvent)
 	if err != nil {
 		return nil, "", err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RevokeRefreshToken(ctx context.Context, userID, orgID, tokenI
 	if err != nil {
 		return nil, err
 	}
-	events, err := c.eventstore.PushEvents(ctx, removeEvent)
+	events, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string
 	if len(tokenIDs) == 0 {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Gfj42", "Errors.IDMissing")
 	}
-	events := make([]eventstore.EventPusher, len(tokenIDs))
+	events := make([]eventstore.Command, len(tokenIDs))
 	for i, tokenID := range tokenIDs {
 		event, _, err := c.removeRefreshToken(ctx, userID, orgID, tokenID)
 		if err != nil {
@@ -124,7 +124,7 @@ func (c *Commands) RevokeRefreshTokens(ctx context.Context, userID, orgID string
 		}
 		events[i] = event
 	}
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	return err
 }
 

@@ -38,7 +38,7 @@ func NewTriggerActionsSetEvent(
 	}
 }
 
-func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TriggerActionsSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := flow.TriggerActionsSetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func NewTriggerActionsCascadeRemovedEvent(
 	}
 }
 
-func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func TriggerActionsCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := flow.TriggerActionsCascadeRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func NewFlowClearedEvent(
 	}
 }
 
-func FlowClearedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FlowClearedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := flow.FlowClearedEventMapper(event)
 	if err != nil {
 		return nil, err

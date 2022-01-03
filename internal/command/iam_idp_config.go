@@ -25,7 +25,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 	addedConfig := NewIAMIDPConfigWriteModel(idpConfigID)
 
 	iamAgg := IAMAggregateFromWriteModel(&addedConfig.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		iam_repo.NewIDPConfigAddedEvent(
 			ctx,
 			iamAgg,
@@ -66,7 +66,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 			config.JWTConfig.HeaderName,
 		))
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-2n0fs", "Errors.IAM.IDPConfig.NotActive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigDeactivatedEvent(ctx, iamAgg, idpID))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewIDPConfigDeactivatedEvent(ctx, iamAgg, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5Mo0d", "Errors.IAM.IDPConfig.NotInactive")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewIDPConfigReactivatedEvent(ctx, iamAgg, idpID))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewIDPConfigReactivatedEvent(ctx, iamAgg, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingIDP.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		iam_repo.NewIDPConfigRemovedEvent(ctx, iamAgg, idpID, existingIDP.Name),
 	}
 
@@ -169,7 +169,7 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 		events = append(events, orgEvents...)
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}

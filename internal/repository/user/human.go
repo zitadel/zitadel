@@ -3,8 +3,9 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -119,7 +120,7 @@ func NewHumanAddedEvent(
 	}
 }
 
-func HumanAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanAdded := &HumanAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -226,7 +227,7 @@ func NewHumanRegisteredEvent(
 	}
 }
 
-func HumanRegisteredEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanRegisteredEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanRegistered := &HumanRegisteredEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -269,7 +270,7 @@ func NewHumanInitialCodeAddedEvent(
 	}
 }
 
-func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitialCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanRegistered := &HumanInitialCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -303,7 +304,7 @@ func NewHumanInitialCodeSentEvent(ctx context.Context, aggregate *eventstore.Agg
 	}
 }
 
-func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitialCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanInitialCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -331,7 +332,7 @@ func NewHumanInitializedCheckSucceededEvent(ctx context.Context, aggregate *even
 	}
 }
 
-func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitializedCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanInitializedCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -359,7 +360,7 @@ func NewHumanInitializedCheckFailedEvent(ctx context.Context, aggregate *eventst
 	}
 }
 
-func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanInitializedCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanInitializedCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -394,7 +395,7 @@ func NewHumanSignedOutEvent(
 	}
 }
 
-func HumanSignedOutEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanSignedOutEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanSignedOutEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

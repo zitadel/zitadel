@@ -79,7 +79,7 @@ const (
 	OrgMemberOrgIDCol = "org_id"
 )
 
-func (p *OrgMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-BoKBr", "seq", event.Sequence(), "expectedType", org.MemberAddedEventType).Error("wrong event type")
@@ -88,7 +88,7 @@ func (p *OrgMemberProjection) reduceAdded(event eventstore.EventReader) (*handle
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-bfqNl", "seq", event.Sequence(), "expected", org.MemberChangedEventType).Error("wrong event type")
@@ -97,7 +97,7 @@ func (p *OrgMemberProjection) reduceChanged(event eventstore.EventReader) (*hand
 	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zgb6w", "seq", event.Sequence(), "expected", org.MemberCascadeRemovedEventType).Error("wrong event type")
@@ -106,7 +106,7 @@ func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.EventReader)
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-KPyxE", "seq", event.Sequence(), "expected", org.MemberRemovedEventType).Error("wrong event type")
@@ -118,7 +118,7 @@ func (p *OrgMemberProjection) reduceRemoved(event eventstore.EventReader) (*hand
 	)
 }
 
-func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-f5pgn", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
@@ -127,7 +127,7 @@ func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and an org has resource owner B
 	// if org B deleted it works

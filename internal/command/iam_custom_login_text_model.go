@@ -24,7 +24,7 @@ func NewIAMCustomLoginTextReadModel(lang language.Tag) *IAMCustomLoginTextReadMo
 	}
 }
 
-func (wm *IAMCustomLoginTextReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMCustomLoginTextReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.CustomTextSetEvent:

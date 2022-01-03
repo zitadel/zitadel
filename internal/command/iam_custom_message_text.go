@@ -16,7 +16,7 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, messageText *domai
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, messageText *domai
 	return writeModelToObjectDetails(&existingMessageText.WriteModel), nil
 }
 
-func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.EventPusher, *IAMCustomMessageTextReadModel, error) {
+func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.Command, *IAMCustomMessageTextReadModel, error) {
 	if !msg.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-kd9fs", "Errors.CustomMessageText.Invalid")
 	}
@@ -36,7 +36,7 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore
 	if err != nil {
 		return nil, nil, err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	if existingMessageText.Greeting != msg.Greeting {
 		if msg.Greeting != "" {
 			events = append(events, iam.NewCustomTextSetEvent(ctx, iamAgg, msg.MessageTextType, domain.MessageGreeting, msg.Greeting, msg.Language))

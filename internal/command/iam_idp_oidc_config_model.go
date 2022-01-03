@@ -28,7 +28,7 @@ func NewIAMIDPOIDCConfigWriteModel(idpConfigID string) *IAMIDPOIDCConfigWriteMod
 	}
 }
 
-func (wm *IAMIDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMIDPOIDCConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPOIDCConfigAddedEvent:
