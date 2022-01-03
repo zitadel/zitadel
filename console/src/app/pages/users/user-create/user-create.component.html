@@ -61,6 +61,44 @@
         </cnsl-info-section>
       </div>
 
+      <div class="use-password-block">
+        <mat-checkbox class="checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}">
+          {{'ORG.PAGES.USEPASSWORD' | translate}}
+        </mat-checkbox>
+        <cnsl-info-section class="full-width desc">
+          <span>{{'ORG.PAGES.USEPASSWORDDESC' | translate}}</span>
+        </cnsl-info-section>
+      </div>
+
+      <div class="pwd-section" *ngIf="usePassword && pwdForm">
+        <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy" [password]="password">
+        </cnsl-password-complexity-view>
+
+        <form [formGroup]="pwdForm" class="user-create-pwd-form">
+          <cnsl-form-field class="pwd-field" *ngIf="password" appearance="outline">
+            <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
+            <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
+
+            <span cnslError *ngIf="password?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+
+          </cnsl-form-field>
+          <cnsl-form-field class="pwd-field" *ngIf="confirmPassword" appearance="outline">
+            <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
+            <input cnslInput autocomplete="off" name="confirmPassword" formControlName="confirmPassword"
+              type="password" />
+
+            <span cnslError *ngIf="confirmPassword?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+            <span cnslError *ngIf="confirmPassword?.errors?.notequal">
+              {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+            </span>
+          </cnsl-form-field>
+        </form>
+      </div>
+
       <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 
       <cnsl-form-field class="formfield">
@@ -97,7 +135,8 @@
       </cnsl-form-field>
     </div>
     <div class="btn-container">
-      <button color="primary" [disabled]="userForm.invalid" type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+      <button color="primary" [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)" type="submit"
+        mat-raised-button>{{ 'ACTIONS.CREATE' |
         translate }}</button>
     </div>
   </form>

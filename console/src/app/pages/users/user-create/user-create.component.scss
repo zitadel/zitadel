@@ -33,9 +33,24 @@
     margin: 0 0.5rem;
   }
 
-  .email-is-verified {
+  .email-is-verified,
+  .use-password-block {
     margin: 0 0.5rem;
     flex-basis: 100%;
     margin-top: 1.5rem;
+  }
+}
+
+.pwd-section {
+  margin: 0 0.5rem;
+
+  .section {
+    padding: 0.5rem 0;
+  }
+
+  .user-create-pwd-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
   }
 }

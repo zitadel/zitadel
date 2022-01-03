@@ -399,6 +399,8 @@
       "OLD": "Password attuale",
       "NEW": "Nuova password",
       "CONFIRM": "Conferma la nuova password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Conferma password",
       "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
@@ -665,7 +667,8 @@
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
       "PRIMARYDOMAIN": "Dominio primario",
       "STATE": "Stato",
-      "USEPASSWORD": "Imposta la password iniziale"
+      "USEPASSWORD": "Imposta la password iniziale",
+      "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",

@@ -399,6 +399,8 @@
       "OLD": "Current Password",
       "NEW": "New Password",
       "CONFIRM": "Confirm New Password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Confirm Password",
       "RESET": "Reset Current Password",
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Resend Password Reset Link",
@@ -665,7 +667,8 @@
       "SELECTORGTOOLTIP": "Select this organisation.",
       "PRIMARYDOMAIN": "Primary Domain",
       "STATE": "State",
-      "USEPASSWORD": "Set Initial Password"
+      "USEPASSWORD": "Set Initial Password",
+      "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
     "DOMAINS": {
       "NEW": "Add Domain",
