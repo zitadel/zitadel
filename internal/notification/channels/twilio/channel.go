@@ -3,7 +3,8 @@ package twilio
 import (
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers"
+	"github.com/caos/zitadel/internal/notification/channels"
+	"github.com/caos/zitadel/internal/notification/messages"
 	twilio "github.com/kevinburke/twilio-go"
 )
 
@@ -17,18 +18,10 @@ func InitTwilioProvider(config TwilioConfig) *Twilio {
 	}
 }
 
-func (t *Twilio) CanHandleMessage(message providers.Message) bool {
-	twilioMsg, ok := message.(*TwilioMessage)
+func (t *Twilio) HandleMessage(message channels.Message) error {
+	twilioMsg, ok := message.(*messages.SMS)
 	if !ok {
-		return false
-	}
-	return twilioMsg.Content != "" && twilioMsg.RecipientPhoneNumber != "" && twilioMsg.SenderPhoneNumber != ""
-}
-
-func (t *Twilio) HandleMessage(message providers.Message) error {
-	twilioMsg, ok := message.(*TwilioMessage)
-	if !ok {
-		return caos_errs.ThrowInternal(nil, "TWILI-s0pLc", "message is not TwilioMessage")
+		return caos_errs.ThrowInternal(nil, "TWILI-s0pLc", "message is not SMS")
 	}
 	m, err := t.client.Messages.SendMessage(twilioMsg.SenderPhoneNumber, twilioMsg.RecipientPhoneNumber, twilioMsg.GetContent(), nil)
 	if err != nil {
