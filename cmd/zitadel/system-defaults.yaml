@@ -83,9 +83,6 @@ SystemDefaults:
       DomainClaimed: '$ZITADEL_ACCOUNTS/login'
       PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
     Providers:
-      Chat:
-        Url: $CHAT_URL
-        SplitCount: 4000
       Email:
         SMTP:
           Host: $SMTP_HOST
@@ -98,6 +95,15 @@ SystemDefaults:
         SID: $TWILIO_SERVICE_SID
         Token: $TWILIO_TOKEN
         From: $TWILIO_SENDER_NAME
+      FileSystem:
+        Enabled: $FS_NOTIFICATIONS_ENABLED
+        Path: $FS_NOTIFICATIONS_PATH
+      Log:
+        Enabled: $LOG_NOTIFICATIONS_ENABLED
+      Chat:
+        Enabled: $CHAT_ENABLED
+        Url: $CHAT_URL
+        SplitCount: 4000
     TemplateData:
       InitCode:
         Title: 'InitCode.Title'
