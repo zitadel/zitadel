@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -50,7 +51,7 @@ func eventPusherToEvents(eventsPushes ...eventstore.Command) []*repository.Event
 		events[i] = &repository.Event{
 			AggregateID:   event.Aggregate().ID,
 			AggregateType: repository.AggregateType(event.Aggregate().Type),
-			ResourceOwner: event.Aggregate().ResourceOwner,
+			ResourceOwner: sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 			EditorService: event.EditorService(),
 			EditorUser:    event.EditorUser(),
 			Type:          repository.EventType(event.Type()),
@@ -152,7 +153,7 @@ func eventFromEventPusher(event eventstore.Command) *repository.Event {
 		Version:                       repository.Version(event.Aggregate().Version),
 		AggregateID:                   event.Aggregate().ID,
 		AggregateType:                 repository.AggregateType(event.Aggregate().Type),
-		ResourceOwner:                 event.Aggregate().ResourceOwner,
+		ResourceOwner:                 sql.NullString{String: event.Aggregate().ResourceOwner, Valid: event.Aggregate().ResourceOwner != ""},
 	}
 }
 
