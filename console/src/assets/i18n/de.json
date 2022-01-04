@@ -325,7 +325,8 @@
       "GENDERLANGSECTION": "Geschlecht und Sprache",
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Setze ein initiales Passwort.",
-      "ADDRESSANDPHONESECTION": "Telefonnummer"
+      "ADDRESSANDPHONESECTION": "Telefonnummer",
+      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Aufforderung der Bereitstellung oder Verifikation der Daten gesendet."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonnummer verifizieren",

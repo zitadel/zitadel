@@ -325,7 +325,8 @@
       "GENDERLANGSECTION": "Gender and Language",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Initial Password",
-      "ADDRESSANDPHONESECTION": "Phonenumber"
+      "ADDRESSANDPHONESECTION": "Phonenumber",
+      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
