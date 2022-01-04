@@ -45,7 +45,7 @@ func (c *Commands) AddPasswordComplexityPolicy(ctx context.Context, resourceOwne
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		org.NewPasswordComplexityPolicyAddedEvent(
 			ctx,
@@ -88,7 +88,7 @@ func (c *Commands) ChangePasswordComplexityPolicy(ctx context.Context, resourceO
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-DAs21", "Errors.Org.PasswordComplexityPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Commands) RemovePasswordComplexityPolicy(ctx context.Context, orgID str
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}

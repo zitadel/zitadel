@@ -25,7 +25,7 @@ func (c *Commands) AddMailTemplate(ctx context.Context, resourceOwner string, po
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.MailTemplateWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewMailTemplateAddedEvent(ctx, orgAgg, policy.Template))
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *Commands) ChangeMailTemplate(ctx context.Context, resourceOwner string,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.MailTemplate.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +83,6 @@ func (c *Commands) RemoveMailTemplate(ctx context.Context, orgID string) error {
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.WriteModel)
 
-	_, err = c.eventstore.PushEvents(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.Push(ctx, org.NewMailTemplateRemovedEvent(ctx, orgAgg))
 	return err
 }

@@ -39,7 +39,7 @@ func NewCustomTextSetEvent(
 	}
 }
 
-func CustomTextSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CustomTextSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.CustomTextSetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func NewCustomTextRemovedEvent(
 	}
 }
 
-func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CustomTextRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.CustomTextRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func NewCustomTextTemplateRemovedEvent(
 	}
 }
 
-func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func CustomTextTemplateRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.CustomTextTemplateRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

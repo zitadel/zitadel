@@ -16,7 +16,7 @@ func NewOrgFlowWriteModel(flowType domain.FlowType, resourceOwner string) *OrgFl
 	}
 }
 
-func (wm *OrgFlowWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgFlowWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.TriggerActionsSetEvent:

@@ -70,7 +70,7 @@ const (
 	OrgDomainValidationTypeCol = "validation_type"
 )
 
-func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-6fXKf", "seq", event.Sequence(), "expectedType", org.OrgDomainAddedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
@@ -91,7 +91,7 @@ func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.EventReader) (*
 	), nil
 }
 
-func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerificationAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-2gGSs", "seq", event.Sequence(), "expectedType", org.OrgDomainVerificationAddedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
@@ -111,7 +111,7 @@ func (p *OrgDomainProjection) reduceDomainVerificationAdded(event eventstore.Eve
 	), nil
 }
 
-func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-aeGCA", "seq", event.Sequence(), "expectedType", org.OrgDomainVerifiedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
@@ -131,7 +131,7 @@ func (p *OrgDomainProjection) reduceDomainVerified(event eventstore.EventReader)
 	), nil
 }
 
-func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-6YjHo", "seq", event.Sequence(), "expectedType", org.OrgDomainPrimarySetEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")
@@ -164,7 +164,7 @@ func (p *OrgDomainProjection) reducePrimaryDomainSet(event eventstore.EventReade
 	), nil
 }
 
-func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgDomainProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-dDnps", "seq", event.Sequence(), "expectedType", org.OrgDomainRemovedEventType, "gottenType", fmt.Sprintf("%T", event)).Error("unexpected event type")

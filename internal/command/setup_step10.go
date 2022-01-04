@@ -22,13 +22,13 @@ func (s *Step10) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep10(ctx context.Context, step *Step10) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		mailTemplateEvent, err := c.addDefaultMailTemplate(ctx, iamAgg, NewIAMMailTemplateWriteModel(), &step.DefaultMailTemplate)
 		if err != nil {
 			return nil, err
 		}
-		events := []eventstore.EventPusher{
+		events := []eventstore.Command{
 			mailTemplateEvent,
 		}
 		logging.Log("SETUP-3N9fs").Info("default mail template/text set up")

@@ -161,7 +161,7 @@ func (p *LabelPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *LabelPolicyProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LabelPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -199,7 +199,7 @@ func (p *LabelPolicyProjection) reduceAdded(event eventstore.EventReader) (*hand
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LabelPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.LabelPolicyChangedEvent:
@@ -256,7 +256,7 @@ func (p *LabelPolicyProjection) reduceChanged(event eventstore.EventReader) (*ha
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LabelPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-izDbs", "seq", event.Sequence(), "expectedType", org.LabelPolicyRemovedEventType).Error("was not an  event")
@@ -269,7 +269,7 @@ func (p *LabelPolicyProjection) reduceRemoved(event eventstore.EventReader) (*ha
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceActivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceActivated(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *org.LabelPolicyActivatedEvent, *iam.LabelPolicyActivatedEvent:
 		// everything ok
@@ -310,7 +310,7 @@ func (p *LabelPolicyProjection) reduceActivated(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceLogoAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handler.Statement, error) {
 	var storeKey handler.Column
 	switch e := event.(type) {
 	case *org.LabelPolicyLogoAddedEvent:
@@ -339,7 +339,7 @@ func (p *LabelPolicyProjection) reduceLogoAdded(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceLogoRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceLogoRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var col string
 	switch event.(type) {
 	case *org.LabelPolicyLogoRemovedEvent:
@@ -368,7 +368,7 @@ func (p *LabelPolicyProjection) reduceLogoRemoved(event eventstore.EventReader) 
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceIconAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceIconAdded(event eventstore.Event) (*handler.Statement, error) {
 	var storeKey handler.Column
 	switch e := event.(type) {
 	case *org.LabelPolicyIconAddedEvent:
@@ -397,7 +397,7 @@ func (p *LabelPolicyProjection) reduceIconAdded(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceIconRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceIconRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var col string
 	switch event.(type) {
 	case *org.LabelPolicyIconRemovedEvent:
@@ -426,7 +426,7 @@ func (p *LabelPolicyProjection) reduceIconRemoved(event eventstore.EventReader) 
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceFontAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceFontAdded(event eventstore.Event) (*handler.Statement, error) {
 	var storeKey handler.Column
 	switch e := event.(type) {
 	case *org.LabelPolicyFontAddedEvent:
@@ -451,7 +451,7 @@ func (p *LabelPolicyProjection) reduceFontAdded(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceFontRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var col string
 	switch event.(type) {
 	case *org.LabelPolicyFontRemovedEvent:
@@ -476,7 +476,7 @@ func (p *LabelPolicyProjection) reduceFontRemoved(event eventstore.EventReader) 
 		}), nil
 }
 
-func (p *LabelPolicyProjection) reduceAssetsRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *LabelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
 	case *org.LabelPolicyAssetsRemovedEvent, *iam.LabelPolicyAssetsRemovedEvent:
 		//ok

@@ -24,7 +24,7 @@ func NewOrgLockoutPolicyWriteModel(orgID string) *OrgLockoutPolicyWriteModel {
 	}
 }
 
-func (wm *OrgLockoutPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLockoutPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LockoutPolicyAddedEvent:

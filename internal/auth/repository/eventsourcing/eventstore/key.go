@@ -170,6 +170,6 @@ func (k *KeyRepository) lockerID() string {
 	return k.lockID
 }
 
-func (k *KeyRepository) getKeyEvents(ctx context.Context, sequence uint64) ([]eventstore.EventReader, error) {
-	return k.Eventstore.FilterEvents(ctx, key_view.KeyPairQuery(sequence))
+func (k *KeyRepository) getKeyEvents(ctx context.Context, sequence uint64) ([]eventstore.Event, error) {
+	return k.Eventstore.Filter(ctx, key_view.KeyPairQuery(sequence))
 }

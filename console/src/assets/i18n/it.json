@@ -362,7 +362,8 @@
       "GENDERLANGSECTION": "Genere e linguaggio",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Password iniziale",
-      "ADDRESSANDPHONESECTION": "Numero di telefono"
+      "ADDRESSANDPHONESECTION": "Numero di telefono",
+      "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati."
     },
     "CODEDIALOG": {
       "TITLE": "Verificare il numero di telefono",
@@ -436,6 +437,8 @@
       "OLD": "Password attuale",
       "NEW": "Nuova password",
       "CONFIRM": "Conferma la nuova password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Conferma password",
       "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
@@ -458,7 +461,7 @@
         "TITLE": "E-mail",
         "VALID": "convalidato",
         "ISVERIFIED": "Email Verificato",
-        "ISVERIFIEDDESC": "Se l'email viene indicata come verificata, non verrà inviata alcuna email di inizializzazione.",
+        "ISVERIFIEDDESC": "Se l'email viene indicata come verificata, non verrà inviata alcuna email di verificazione.",
         "RESEND": "Invia di nuovo l'e-mail di verifica",
         "EDITTITLE": "Cambiare l'e-mail",
         "EDITDESC": "Inserisci la nuova email nel campo sottostante."
@@ -704,7 +707,8 @@
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
       "PRIMARYDOMAIN": "Dominio primario",
       "STATE": "Stato",
-      "USEPASSWORD": "Imposta la password iniziale"
+      "USEPASSWORD": "Imposta la password iniziale",
+      "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",

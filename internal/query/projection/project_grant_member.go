@@ -52,6 +52,14 @@ func (p *ProjectGrantMemberProjection) reducers() []handler.AggregateReducer {
 					Event:  project.GrantMemberRemovedType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
+				{
+					Event:  project.GrantRemovedType,
+					Reduce: p.reduceProjectGrantRemoved,
+				},
 			},
 		},
 		{
@@ -72,24 +80,6 @@ func (p *ProjectGrantMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.ProjectRemovedType,
-					Reduce: p.reduceProjectRemoved,
-				},
-			},
-		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.GrantRemovedType,
-					Reduce: p.reduceProjectGrantRemoved,
-				},
-			},
-		},
 	}
 }
 
@@ -100,7 +90,7 @@ const (
 	ProjectGrantMemberGrantIDCol   = "grant_id"
 )
 
-func (p *ProjectGrantMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-csr8B", "seq", event.Sequence(), "expectedType", project.GrantMemberAddedType).Error("wrong event type")
@@ -113,7 +103,7 @@ func (p *ProjectGrantMemberProjection) reduceAdded(event eventstore.EventReader)
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-ZubbI", "seq", event.Sequence(), "expectedType", project.GrantMemberChangedType).Error("wrong event type")
@@ -126,7 +116,7 @@ func (p *ProjectGrantMemberProjection) reduceChanged(event eventstore.EventReade
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-azx7K", "seq", event.Sequence(), "expectedType", project.GrantMemberCascadeRemovedType).Error("wrong event type")
@@ -139,7 +129,7 @@ func (p *ProjectGrantMemberProjection) reduceCascadeRemoved(event eventstore.Eve
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantMemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-6Z4dH", "seq", event.Sequence(), "expectedType", project.GrantMemberRemovedType).Error("wrong event type")
@@ -152,7 +142,7 @@ func (p *ProjectGrantMemberProjection) reduceRemoved(event eventstore.EventReade
 	)
 }
 
-func (p *ProjectGrantMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-UVMmT", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
@@ -161,7 +151,7 @@ func (p *ProjectGrantMemberProjection) reduceUserRemoved(event eventstore.EventR
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *ProjectGrantMemberProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and project has resource owner B
 	// if org B deleted it works
@@ -174,7 +164,7 @@ func (p *ProjectGrantMemberProjection) reduceOrgRemoved(event eventstore.EventRe
 	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
 }
 
-func (p *ProjectGrantMemberProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-sGmCA", "seq", event.Sequence(), "expected", project.ProjectRemovedType).Error("wrong event type")
@@ -183,7 +173,7 @@ func (p *ProjectGrantMemberProjection) reduceProjectRemoved(event eventstore.Eve
 	return reduceMemberRemoved(e, withMemberCond(ProjectGrantMemberProjectIDCol, e.Aggregate().ID))
 }
 
-func (p *ProjectGrantMemberProjection) reduceProjectGrantRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectGrantMemberProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-sHabO", "seq", event.Sequence(), "expected", project.GrantRemovedType).Error("wrong event type")

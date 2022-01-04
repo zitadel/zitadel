@@ -87,7 +87,7 @@ func (c *Commands) HumanAddU2FSetup(ctx context.Context, userID, resourceowner s
 		return nil, err
 	}
 
-	events, err := c.eventstore.PushEvents(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanU2FAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 		return nil, err
 	}
 
-	events, err := c.eventstore.PushEvents(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
+	events, err := c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessAddedEvent(ctx, userAgg, addWebAuthN.WebauthNTokenID, webAuthN.Challenge))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.Push(ctx,
 		usr_repo.NewHumanU2FVerifiedEvent(
 			ctx,
 			userAgg,
@@ -235,7 +235,7 @@ func (c *Commands) humanHumanPasswordlessSetup(ctx context.Context, userID, reso
 		return nil, err
 	}
 
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		usr_repo.NewHumanPasswordlessVerifiedEvent(
 			ctx,
 			userAgg,
@@ -252,7 +252,7 @@ func (c *Commands) humanHumanPasswordlessSetup(ctx context.Context, userID, reso
 	if codeCheckEvent != nil {
 		events = append(events, codeCheckEvent(userAgg))
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,7 +297,7 @@ func (c *Commands) HumanBeginU2FLogin(ctx context.Context, userID, resourceOwner
 		return nil, err
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.Push(ctx,
 		usr_repo.NewHumanU2FBeginLoginEvent(
 			ctx,
 			userAgg,
@@ -321,7 +321,7 @@ func (c *Commands) HumanBeginPasswordlessLogin(ctx context.Context, userID, reso
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.Push(ctx,
 		usr_repo.NewHumanPasswordlessBeginLoginEvent(
 			ctx,
 			userAgg,
@@ -373,7 +373,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 			logging.LogWithFields("EVENT-Addqd", "userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed u2f check event")
 			return err
 		}
-		_, pushErr := c.eventstore.PushEvents(ctx,
+		_, pushErr := c.eventstore.Push(ctx,
 			usr_repo.NewHumanU2FCheckFailedEvent(
 				ctx,
 				userAgg,
@@ -384,7 +384,7 @@ func (c *Commands) HumanFinishU2FLogin(ctx context.Context, userID, resourceOwne
 		return err
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.Push(ctx,
 		usr_repo.NewHumanU2FCheckSucceededEvent(
 			ctx,
 			userAgg,
@@ -418,7 +418,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 			logging.LogWithFields("EVENT-Dbbbw", "userID", userID, "resourceOwner", resourceOwner).WithError(err).Warn("missing userAggregate for pushing failed passwordless check event")
 			return err
 		}
-		_, pushErr := c.eventstore.PushEvents(ctx,
+		_, pushErr := c.eventstore.Push(ctx,
 			usr_repo.NewHumanPasswordlessCheckFailedEvent(
 				ctx,
 				userAgg,
@@ -429,7 +429,7 @@ func (c *Commands) HumanFinishPasswordlessLogin(ctx context.Context, userID, res
 		return err
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.Push(ctx,
 		usr_repo.NewHumanPasswordlessCheckSucceededEvent(
 			ctx,
 			userAgg,
@@ -485,7 +485,7 @@ func (c *Commands) HumanRemovePasswordless(ctx context.Context, userID, webAuthN
 
 func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
 	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, codeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, codeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +501,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, codeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, codeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -512,7 +512,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	return writeModelToPasswordlessInitCode(initCode, code), nil
 }
 
-func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool) (eventstore.EventPusher, *HumanPasswordlessInitCodeWriteModel, string, error) {
+func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool) (eventstore.Command, *HumanPasswordlessInitCodeWriteModel, string, error) {
 	if userID == "" {
 		return nil, nil, "", caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
@@ -531,11 +531,11 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 	if err != nil {
 		return nil, nil, "", err
 	}
-	codeEventCreator := func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
+	codeEventCreator := func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.Command {
 		return usr_repo.NewHumanPasswordlessInitCodeAddedEvent(ctx, agg, id, cryptoCode, exp)
 	}
 	if !direct {
-		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.EventPusher {
+		codeEventCreator = func(ctx context.Context, agg *eventstore.Aggregate, id string, cryptoCode *crypto.CryptoValue, exp time.Duration) eventstore.Command {
 			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp)
 		}
 	}
@@ -557,7 +557,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 		return caos_errs.ThrowNotFound(nil, "COMMAND-Gdfg3", "Errors.User.Code.NotFound")
 	}
 
-	_, err = c.eventstore.PushEvents(ctx,
+	_, err = c.eventstore.Push(ctx,
 		usr_repo.NewHumanPasswordlessInitCodeSentEvent(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID),
 	)
 	return err
@@ -575,14 +575,14 @@ func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, 
 	err = crypto.VerifyCode(initCode.ChangeDate, initCode.Expiration, initCode.CryptoCode, verificationCode, c.passwordlessInitCode)
 	if err != nil || initCode.State != domain.PasswordlessInitCodeStateActive {
 		userAgg := UserAggregateFromWriteModel(&initCode.WriteModel)
-		_, err = c.eventstore.PushEvents(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))
+		_, err = c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))
 		logging.LogWithFields("COMMAND-Gkuud", "userID", userAgg.ID).OnError(err).Error("NewHumanPasswordlessInitCodeCheckFailedEvent push failed")
 		return caos_errs.ThrowInvalidArgument(err, "COMMAND-Dhz8i", "Errors.User.Code.Invalid")
 	}
 	return nil
 }
 
-func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, resourceOwner string, preparedEvent func(*eventstore.Aggregate) eventstore.EventPusher) (*domain.ObjectDetails, error) {
+func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, resourceOwner string, preparedEvent func(*eventstore.Aggregate) eventstore.Command) (*domain.ObjectDetails, error) {
 	if userID == "" || webAuthNID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M9de", "Errors.IDMissing")
 	}
@@ -596,7 +596,7 @@ func (c *Commands) removeHumanWebAuthN(ctx context.Context, userID, webAuthNID, 
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingWebAuthN.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, preparedEvent(userAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, preparedEvent(userAgg))
 	if err != nil {
 		return nil, err
 	}

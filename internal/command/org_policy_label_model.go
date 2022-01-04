@@ -24,7 +24,7 @@ func NewOrgLabelPolicyWriteModel(orgID string) *OrgLabelPolicyWriteModel {
 	}
 }
 
-func (wm *OrgLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLabelPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LabelPolicyAddedEvent:

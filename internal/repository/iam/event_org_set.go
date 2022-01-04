@@ -3,6 +3,7 @@ package iam
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -42,7 +43,7 @@ func NewGlobalOrgSetEventEvent(
 	}
 }
 
-func GlobalOrgSetMapper(event *repository.Event) (eventstore.EventReader, error) {
+func GlobalOrgSetMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &GlobalOrgSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

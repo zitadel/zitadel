@@ -362,7 +362,8 @@
       "GENDERLANGSECTION": "Geschlecht und Sprache",
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Setze ein initiales Passwort.",
-      "ADDRESSANDPHONESECTION": "Telefonnummer"
+      "ADDRESSANDPHONESECTION": "Telefonnummer",
+      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Aufforderung der Bereitstellung oder Verifikation der Daten gesendet."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonnummer verifizieren",
@@ -432,12 +433,14 @@
     },
     "PASSWORD": {
       "TITLE": "Passwort",
-      "DESCRIPTION": "Gebe das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",
+      "DESCRIPTION": "Gebe das neue PassworT unter Einhaltung der Richtlinie für die Komplexität ein.",
       "OLD": "Aktuelles Passwort",
       "NEW": "Neues Passwort",
       "CONFIRM": "Neues Passwort wiederholen",
+      "NEWINITIAL": "Passwort",
+      "CONFIRMINITIAL": "PassworT wiederholen",
       "RESET": "Passwort zurücksetzen",
-      "SET": "Password neu setzen",
+      "SET": "PassworT neu setzen",
       "RESENDNOTIFICATION": "Link für das Zurücksetzen des Passworts senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
@@ -458,7 +461,7 @@
         "TITLE": "E-Mail",
         "VALID": "Validiert",
         "ISVERIFIED": "Email Verifiziert",
-        "ISVERIFIEDDESC": "Wenn die Email als verifiziert angegeben wird, wird keine Initialisierungsmail versendet.",
+        "ISVERIFIEDDESC": "Wenn die Email als verifiziert angegeben wird, wird keine Verifikationsmail an den Benutzer versendet.",
         "RESEND": "Verifikationsmail erneut senden",
         "EDITTITLE": "Email ändern",
         "EDITDESC": "Geben Sie die neue Email in dem darunterliegenden Feld ein!"
@@ -704,7 +707,8 @@
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
       "PRIMARYDOMAIN": "Primäre Domain",
       "STATE": "Status",
-      "USEPASSWORD": "Initiales Password setzen"
+      "USEPASSWORD": "Initiales Password setzen",
+      "USEPASSWORDDESC": "Der Nutzer muss das Password bei der Initalisierung nicht setzen."
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",

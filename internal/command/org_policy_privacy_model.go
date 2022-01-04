@@ -24,7 +24,7 @@ func NewOrgPrivacyPolicyWriteModel(orgID string) *OrgPrivacyPolicyWriteModel {
 	}
 }
 
-func (wm *OrgPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.PrivacyPolicyAddedEvent:

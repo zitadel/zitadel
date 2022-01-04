@@ -28,7 +28,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 	addedConfig := NewOrgIDPConfigWriteModel(idpConfigID, resourceOwner)
 
 	orgAgg := OrgAggregateFromWriteModel(&addedConfig.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		org_repo.NewIDPConfigAddedEvent(
 			ctx,
 			orgAgg,
@@ -67,7 +67,7 @@ func (c *Commands) AddIDPConfig(ctx context.Context, config *domain.IDPConfig, r
 			config.JWTConfig.HeaderName,
 		))
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (c *Commands) ChangeIDPConfig(ctx context.Context, config *domain.IDPConfig
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4M9vs", "Errors.Org.LabelPolicy.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (c *Commands) DeactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-BBmd0", "Errors.Org.IDPConfig.NotActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
+	pushedEvents, err := c.eventstore.Push(ctx, org_repo.NewIDPConfigDeactivatedEvent(ctx, orgAgg, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *Commands) ReactivateIDPConfig(ctx context.Context, idpID, orgID string)
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5Mo0d", "Errors.Org.IDPConfig.NotInactive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
+	pushedEvents, err := c.eventstore.Push(ctx, org_repo.NewIDPConfigReactivatedEvent(ctx, orgAgg, idpID))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -173,13 +173,13 @@ func (c *Commands) RemoveIDPConfig(ctx context.Context, idpID, orgID string, cas
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfigWriteModel, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.UserIDPLink) ([]eventstore.EventPusher, error) {
+func (c *Commands) removeIDPConfig(ctx context.Context, existingIDP *OrgIDPConfigWriteModel, cascadeRemoveProvider bool, cascadeExternalIDPs ...*domain.UserIDPLink) ([]eventstore.Command, error) {
 	if existingIDP.State == domain.IDPConfigStateRemoved || existingIDP.State == domain.IDPConfigStateUnspecified {
 		return nil, caos_errs.ThrowNotFound(nil, "Org-Yx9vd", "Errors.Org.IDPConfig.NotExisting")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingIDP.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		org_repo.NewIDPConfigRemovedEvent(ctx, orgAgg, existingIDP.ConfigID, existingIDP.Name),
 	}
 

@@ -44,7 +44,7 @@ func (rm *ReadModel) IDPByID(idpID string) *IAMIDPConfigReadModel {
 	return &IAMIDPConfigReadModel{IDPConfigReadModel: *config}
 }
 
-func (rm *ReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *ReadModel) AppendEvents(events ...eventstore.Event) {
 	rm.ReadModel.AppendEvents(events...)
 	for _, event := range events {
 		switch event.(type) {
@@ -122,7 +122,7 @@ func (rm *ReadModel) Reduce() (err error) {
 	return nil
 }
 
-func (rm *ReadModel) AppendAndReduce(events ...eventstore.EventReader) error {
+func (rm *ReadModel) AppendAndReduce(events ...eventstore.Event) error {
 	rm.AppendEvents(events...)
 	return rm.Reduce()
 }

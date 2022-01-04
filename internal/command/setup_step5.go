@@ -23,7 +23,7 @@ func (s *Step5) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep5(ctx context.Context, step *Step5) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		event, err := c.addDefaultOrgIAMPolicy(ctx, iamAgg, NewIAMOrgIAMPolicyWriteModel(), &domain.OrgIAMPolicy{
 			UserLoginMustBeDomain: step.DefaultOrgIAMPolicy.UserLoginMustBeDomain,
@@ -32,7 +32,7 @@ func (c *Commands) SetupStep5(ctx context.Context, step *Step5) error {
 			return nil, err
 		}
 		logging.Log("SETUP-ADgd2").Info("default org iam policy set up")
-		return []eventstore.EventPusher{event}, nil
+		return []eventstore.Command{event}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

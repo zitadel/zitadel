@@ -52,6 +52,10 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 					Event:  project.MemberRemovedType,
 					Reduce: p.reduceRemoved,
 				},
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
 			},
 		},
 		{
@@ -72,15 +76,6 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 				},
 			},
 		},
-		{
-			Aggregate: project.AggregateType,
-			EventRedusers: []handler.EventReducer{
-				{
-					Event:  project.ProjectRemovedType,
-					Reduce: p.reduceProjectRemoved,
-				},
-			},
-		},
 	}
 }
 
@@ -90,7 +85,7 @@ const (
 	ProjectMemberProjectIDCol = "project_id"
 )
 
-func (p *ProjectMemberProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-3FRys", "seq", event.Sequence(), "expectedType", project.MemberAddedType).Error("wrong event type")
@@ -102,7 +97,7 @@ func (p *ProjectMemberProjection) reduceAdded(event eventstore.EventReader) (*ha
 	)
 }
 
-func (p *ProjectMemberProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-9hgMR", "seq", event.Sequence(), "expectedType", project.MemberChangedType).Error("wrong event type")
@@ -114,7 +109,7 @@ func (p *ProjectMemberProjection) reduceChanged(event eventstore.EventReader) (*
 	)
 }
 
-func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-2kyYa", "seq", event.Sequence(), "expectedType", project.MemberCascadeRemovedType).Error("wrong event type")
@@ -126,7 +121,7 @@ func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.EventRea
 	)
 }
 
-func (p *ProjectMemberProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-X0yvM", "seq", event.Sequence(), "expectedType", project.MemberRemovedType).Error("wrong event type")
@@ -138,7 +133,7 @@ func (p *ProjectMemberProjection) reduceRemoved(event eventstore.EventReader) (*
 	)
 }
 
-func (p *ProjectMemberProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-g8eWd", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
@@ -147,7 +142,7 @@ func (p *ProjectMemberProjection) reduceUserRemoved(event eventstore.EventReader
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
 
-func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	//TODO: as soon as org deletion is implemented:
 	// Case: The user has resource owner A and project has resource owner B
 	// if org B deleted it works
@@ -160,7 +155,7 @@ func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.EventReader)
 	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
 }
 
-func (p *ProjectMemberProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *ProjectMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-q7H8D", "seq", event.Sequence(), "expected", project.ProjectRemovedType).Error("wrong event type")

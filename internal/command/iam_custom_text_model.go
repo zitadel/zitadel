@@ -25,7 +25,7 @@ func NewIAMCustomTextWriteModel(key string, language language.Tag) *IAMCustomTex
 	}
 }
 
-func (wm *IAMCustomTextWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMCustomTextWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.CustomTextSetEvent:

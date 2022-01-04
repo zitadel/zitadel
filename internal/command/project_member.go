@@ -21,7 +21,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (c *Commands) AddProjectMember(ctx context.Context, member *domain.Member, 
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
+func (c *Commands) addProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, addedMember *ProjectMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-W8m4l", "Errors.Project.Member.Invalid")
 	}
@@ -74,7 +74,7 @@ func (c *Commands) ChangeProjectMember(ctx context.Context, member *domain.Membe
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "PROJECT-LiaZi", "Errors.Project.Member.RolesNotChanged")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectMemberChangedEvent(ctx, projectAgg, member.UserID, member.Roles...))
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 
 	projectAgg := ProjectAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
 	removeEvent := c.removeProjectMember(ctx, projectAgg, userID, false)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Commands) RemoveProjectMember(ctx context.Context, projectID, userID, r
 	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
-func (c *Commands) removeProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+func (c *Commands) removeProjectMember(ctx context.Context, projectAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
 	if cascade {
 		return project.NewProjectMemberCascadeRemovedEvent(
 			ctx,
