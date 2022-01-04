@@ -26,6 +26,16 @@
     .action {
       width: 40px;
     }
+
+    .flex-role-row {
+      display: flex;
+      flex-direction: row;
+      max-width: 400px;
+      align-items: center;
+      .form-field {
+        flex: 1;
+      }
+    }
   }
 
   .sa-icon {

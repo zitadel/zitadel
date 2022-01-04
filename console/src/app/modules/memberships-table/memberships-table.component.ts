@@ -26,14 +26,13 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   public dataSource!: MembershipsDataSource;
   public selection: SelectionModel<any> = new SelectionModel<any>(true, []);
 
-  @Output() public updateRoles: EventEmitter<{ member: Membership.AsObject; change: MatSelectChange }> = new EventEmitter();
   @Output() public changedSelection: EventEmitter<any[]> = new EventEmitter();
   @Output() public deleteMembership: EventEmitter<Membership.AsObject> = new EventEmitter();
 
   private destroyed: Subject<void> = new Subject();
   public membershipRoleOptions: string[] = [];
 
-  public displayedColumns: string[] = ['select', 'displayName', 'orgId', 'rolesList'];
+  public displayedColumns: string[] = ['select', 'displayName', 'type', 'rolesList'];
   public membershipToEdit: string = '';
 
   constructor(
@@ -41,6 +40,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private mgmtService: ManagementService,
     private adminService: AdminService,
+    private toast: ToastService,
   ) {
     this.dataSource = new MembershipsDataSource(this.authService, this.mgmtService);
 
@@ -55,48 +55,64 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     // });
   }
 
-  public loadRoles(membership: Membership.AsObject): void {
+  public loadRoles(membership: Membership.AsObject, opened: boolean): void {
+    if (opened) {
+      if (membership.orgId) {
+        this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+        this.mgmtService
+          .listOrgMemberRoles()
+          .then((resp) => {
+            this.membershipRoleOptions = resp.resultList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      } else if (membership.projectGrantId) {
+        this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+        this.mgmtService
+          .listProjectGrantMemberRoles()
+          .then((resp) => {
+            this.membershipRoleOptions = resp.resultList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      } else if (membership.projectId) {
+        this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+        this.mgmtService
+          .listProjectMemberRoles()
+          .then((resp) => {
+            this.membershipRoleOptions = resp.resultList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      } else if (membership.iam) {
+        this.membershipToEdit = `IAM`;
+        this.adminService
+          .listIAMMemberRoles()
+          .then((resp) => {
+            console.log(resp);
+            this.membershipRoleOptions = resp.rolesList;
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      }
+    }
+  }
+
+  public getType(membership: Membership.AsObject): string {
     if (membership.orgId) {
-      this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
-      this.mgmtService
-        .listOrgMemberRoles()
-        .then((resp) => {
-          this.membershipRoleOptions = resp.resultList;
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
+      return 'Organization';
     } else if (membership.projectGrantId) {
-      this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
-      this.mgmtService
-        .listProjectMemberRoles()
-        .then((resp) => {
-          this.membershipRoleOptions = resp.resultList;
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
+      return 'Project Grant';
     } else if (membership.projectId) {
-      this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
-      this.mgmtService
-        .listProjectGrantMemberRoles()
-        .then((resp) => {
-          this.membershipRoleOptions = resp.resultList;
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
+      return 'Project';
     } else if (membership.iam) {
-      this.membershipToEdit = `IAM`;
-      this.adminService
-        .listIAMMemberRoles()
-        .then((resp) => {
-          console.log(resp);
-          this.membershipRoleOptions = resp.rolesList;
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
+      return 'IAM';
+    } else {
+      return '';
     }
   }
 
@@ -128,5 +144,51 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       this.membershipToEdit ===
       (membership.iam ? 'IAM' : `${membership.orgId}${membership.projectId}${membership.projectGrantId}`)
     );
+  }
+
+  public updateRoles(membership: Membership.AsObject, selectionChange: MatSelectChange): void {
+    console.log(membership, selectionChange);
+    if (membership.orgId) {
+      console.log('org member', membership.userId, selectionChange.value);
+      this.mgmtService
+        .updateOrgMember(membership.userId, selectionChange.value)
+        .then(() => {
+          // TODO toast
+          this.changePage(this.paginator);
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
+    } else if (membership.projectGrantId) {
+      this.mgmtService
+        .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
+        .then(() => {
+          // TODO toast
+          this.changePage(this.paginator);
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
+    } else if (membership.projectId) {
+      this.mgmtService
+        .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
+        .then(() => {
+          // TODO toast
+          this.changePage(this.paginator);
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
+    } else if (membership.iam) {
+      this.adminService
+        .updateIAMMember(membership.userId, selectionChange.value)
+        .then(() => {
+          // TODO toast
+          this.changePage(this.paginator);
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
+    }
   }
 }

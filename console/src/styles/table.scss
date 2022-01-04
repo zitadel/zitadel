@@ -78,6 +78,7 @@
     padding: 2px 0.5rem;
     letter-spacing: 0.05em;
     font-size: 12px;
+    white-space: nowrap;
     background-color: if($is-dark-theme, map-get($background, state), #e4e7e4);
     box-shadow: 0 0 3px #0000001a;
 

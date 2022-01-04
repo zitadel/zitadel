@@ -25,17 +25,18 @@
           </mat-checkbox>
         </td>
       </ng-container>
-      <!-- 
-      <ng-container matColumnDef="userId">
-        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.USERID' | translate }} </th>
-        <td class="pointer" [routerLink]="['/users', membership.userId]" mat-cell *matCellDef="let membership">
-          {{membership.userId}} </td>
-      </ng-container> -->
 
       <ng-container matColumnDef="displayName">
         <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.DISPLAYNAME' | translate }} </th>
         <td class="pointer" [routerLink]="['/users', membership.userId]" mat-cell *matCellDef="let membership">
           {{membership.displayName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MEMBERSHIPS.TYPE' | translate }} </th>
+        <td class="pointer" mat-cell *matCellDef="let membership">
+          <span class="state">{{getType(membership)}}</span>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="orgId">
@@ -59,17 +60,13 @@
 
       <ng-container matColumnDef="rolesList">
         <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'ROLESLABEL' | translate }} </th>
-        <td mat-cell *matCellDef="let membership" class="role-row">
-          <button mat-stroked-button *ngIf="!isCurrentMembership(membership)" [disabled]="false"
-            (click)="loadRoles(membership)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
-            <i class="las la-edit"></i>
-            {{'ACTIONS.EDIT' | translate}}
-          </button>
-          <cnsl-form-field *ngIf="membership && isCurrentMembership(membership)" class="form-field"
-            appearance="outline">
-            <mat-select [(ngModel)]="membership.rolesList" multiple [disabled]="false"
-              (selectionChange)="loadRoles(membership)">
-              <mat-option *ngFor="let role of membershipRoleOptions" [value]="role">
+        <td mat-cell *matCellDef="let membership" class="flex-role-row">
+          <cnsl-form-field *ngIf="membership" class="form-field" appearance="outline">
+            <mat-select [(ngModel)]="membership.rolesList" multiple (openedChange)="loadRoles(membership, $event)"
+              [disabled]="false" (selectionChange)="updateRoles(membership, $event)">
+              <mat-option
+                *ngFor="let role of ((isCurrentMembership(membership) && membershipRoleOptions.length) ? membershipRoleOptions : membership.rolesList)"
+                [value]="role">
                 {{ role }}
               </mat-option>
             </mat-select>

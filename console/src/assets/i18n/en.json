@@ -562,6 +562,7 @@
       "DISPLAYNAME": "Display Name",
       "REMOVE": "Remove",
       "TYPE": "Type",
+      "ORGID": "Organization ID",
       "TYPES": {
         "UNKNOWN": "Unknown",
         "ORG": "Organisation",
