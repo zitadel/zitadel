@@ -462,6 +462,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							),
 							"test.event",
 						),
+						data: func() interface{} {
+							return nil
+						},
 					},
 				},
 			},
@@ -484,6 +487,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							),
 							"test.event",
 						),
+						data: func() interface{} {
+							return nil
+						},
 					},
 				},
 			},
@@ -506,6 +512,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							),
 							"test.event",
 						),
+						data: func() interface{} {
+							return nil
+						},
 					},
 				},
 			},
@@ -528,6 +537,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							),
 							"",
 						),
+						data: func() interface{} {
+							return nil
+						},
 					},
 				},
 			},
@@ -550,6 +562,9 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							),
 							"test.event",
 						),
+						data: func() interface{} {
+							return nil
+						},
 					},
 				},
 			},
