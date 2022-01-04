@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -17,7 +18,7 @@ func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.Ma
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +29,7 @@ func (c *Commands) AddDefaultMailTemplate(ctx context.Context, policy *domain.Ma
 	return writeModelToMailTemplatePolicy(&addedPolicy.MailTemplateWriteModel), nil
 }
 
-func (c *Commands) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTemplateWriteModel, policy *domain.MailTemplate) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultMailTemplate(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMMailTemplateWriteModel, policy *domain.MailTemplate) (eventstore.Command, error) {
 	if !policy.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-fm9sd", "Errors.IAM.MailTemplate.Invalid")
 	}
@@ -48,7 +49,7 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +60,7 @@ func (c *Commands) ChangeDefaultMailTemplate(ctx context.Context, policy *domain
 	return writeModelToMailTemplatePolicy(&existingPolicy.MailTemplateWriteModel), nil
 }
 
-func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*IAMMailTemplateWriteModel, eventstore.EventPusher, error) {
+func (c *Commands) changeDefaultMailTemplate(ctx context.Context, policy *domain.MailTemplate) (*IAMMailTemplateWriteModel, eventstore.Command, error) {
 	if !policy.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4m9ds", "Errors.IAM.MailTemplate.Invalid")
 	}

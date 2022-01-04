@@ -20,8 +20,8 @@ func (s *Step21) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep21(ctx context.Context, step *Step21) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
-		events := make([]eventstore.EventPusher, 0)
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+		events := make([]eventstore.Command, 0)
 		globalMembers := newGlobalOrgMemberWriteModel(iam.GlobalOrgID, domain.RoleOrgProjectCreator)
 		orgAgg := OrgAggregateFromWriteModel(&globalMembers.WriteModel)
 		if err := c.eventstore.FilterToQueryReducer(ctx, globalMembers); err != nil {

@@ -65,7 +65,7 @@ func (p *PasswordAgeProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PasswordAgeProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -94,7 +94,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.EventReader) (*hand
 		}), nil
 }
 
-func (p *PasswordAgeProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PasswordAgePolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PasswordAgePolicyChangedEvent:
@@ -123,7 +123,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.EventReader) (*ha
 		}), nil
 }
 
-func (p *PasswordAgeProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PasswordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-iwqfN", "seq", event.Sequence(), "expectedType", org.PasswordAgePolicyRemovedEventType).Error("wrong event type")

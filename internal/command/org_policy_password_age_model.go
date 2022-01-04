@@ -24,7 +24,7 @@ func NewOrgPasswordAgePolicyWriteModel(orgID string) *OrgPasswordAgePolicyWriteM
 	}
 }
 
-func (wm *OrgPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgPasswordAgePolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.PasswordAgePolicyAddedEvent:

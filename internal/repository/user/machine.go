@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -54,7 +55,7 @@ func NewMachineAddedEvent(
 	}
 }
 
-func MachineAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MachineAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	machineAdded := &MachineAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -116,7 +117,7 @@ func ChangeDescription(description string) func(event *MachineChangedEvent) {
 	}
 }
 
-func MachineChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MachineChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	machineChanged := &MachineChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

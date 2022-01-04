@@ -43,7 +43,7 @@ func (wm *IAMIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMIDPConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPConfigAddedEvent:
@@ -89,7 +89,7 @@ func (wm *IAMIDPConfigWriteModel) Reduce() error {
 	return wm.IDPConfigWriteModel.Reduce()
 }
 
-func (wm *IAMIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventReader) error {
+func (wm *IAMIDPConfigWriteModel) AppendAndReduce(events ...eventstore.Event) error {
 	wm.AppendEvents(events...)
 	return wm.Reduce()
 }

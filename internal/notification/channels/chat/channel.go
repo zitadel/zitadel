@@ -3,14 +3,17 @@ package chat
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"unicode/utf8"
+
+	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/notification/channels"
 )
+
+var _ channels.NotificationChannel = (*Chat)(nil)
 
 type Chat struct {
 	URL        *url.URL
@@ -18,6 +21,7 @@ type Chat struct {
 }
 
 func InitChatProvider(config ChatConfig) (*Chat, error) {
+
 	url, err := url.Parse(config.Url)
 	if err != nil {
 		return nil, err
@@ -28,27 +32,18 @@ func InitChatProvider(config ChatConfig) (*Chat, error) {
 	}, nil
 }
 
-func (chat *Chat) CanHandleMessage(_ providers.Message) bool {
-	return true
-}
-
-func (chat *Chat) HandleMessage(message providers.Message) error {
+func (chat *Chat) HandleMessage(message channels.Message) error {
 	contentText := message.GetContent()
 	for _, splittedMsg := range splitMessage(contentText, chat.SplitCount) {
-		chatMsg := &ChatMessage{Text: splittedMsg}
-		if err := chat.SendMessage(chatMsg); err != nil {
+		if err := chat.sendMessage(splittedMsg); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (chat *Chat) SendMessage(message providers.Message) error {
-	chatMsg, ok := message.(*ChatMessage)
-	if !ok {
-		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not ChatMessage")
-	}
-	req, err := json.Marshal(chatMsg)
+func (chat *Chat) sendMessage(message string) error {
+	req, err := json.Marshal(message)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")
 	}

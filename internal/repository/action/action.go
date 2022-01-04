@@ -71,7 +71,7 @@ func NewAddedEvent(
 	}
 }
 
-func AddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func AddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &AddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -156,7 +156,7 @@ func ChangeAllowedToFail(allowedToFail bool) func(event *ChangedEvent) {
 	}
 }
 
-func ChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &ChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -191,7 +191,7 @@ func NewDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *
 	}
 }
 
-func DeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func DeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &DeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -219,7 +219,7 @@ func NewReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate) *
 	}
 }
 
-func ReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &ReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -254,7 +254,7 @@ func NewRemovedEvent(
 	}
 }
 
-func RemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func RemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &RemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -47,7 +47,7 @@ func (e *testEvent) Assets() []*Asset {
 	return nil
 }
 
-func testFilterMapper(event *repository.Event) (EventReader, error) {
+func testFilterMapper(event *repository.Event) (Event, error) {
 	if event == nil {
 		return newTestEvent("testID", "hodor", nil, false), nil
 	}
@@ -60,10 +60,10 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 	}
 	type args struct {
 		eventType EventType
-		mapper    func(*repository.Event) (EventReader, error)
+		mapper    func(*repository.Event) (Event, error)
 	}
 	type res struct {
-		event       EventReader
+		event       Event
 		mapperCount int
 	}
 
@@ -134,7 +134,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 			fields: fields{
 				eventMapper: map[EventType]eventTypeInterceptors{
 					"event.type": {
-						eventMapper: func(*repository.Event) (EventReader, error) {
+						eventMapper: func(*repository.Event) (Event, error) {
 							return nil, errors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
 						},
 					},
@@ -180,7 +180,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 
 func Test_eventData(t *testing.T) {
 	type args struct {
-		event EventPusher
+		event Command
 	}
 	type res struct {
 		jsonText []byte
@@ -343,7 +343,7 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		events []EventPusher
+		events []Command
 	}
 	type res struct {
 		wantErr bool
@@ -357,7 +357,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -386,7 +386,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -432,7 +432,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "invalid data",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -449,7 +449,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -516,7 +516,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			events, _, err := eventsToRepository(tt.args.events)
+			events, _, err := commandsToRepository(tt.args.events)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
@@ -584,11 +584,11 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 
 func TestEventstore_Push(t *testing.T) {
 	type args struct {
-		events []EventPusher
+		events []Command
 	}
 	type fields struct {
 		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -602,7 +602,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -628,8 +628,8 @@ func TestEventstore_Push(t *testing.T) {
 						},
 					},
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -638,7 +638,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -681,8 +681,8 @@ func TestEventstore_Push(t *testing.T) {
 						},
 					},
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -694,7 +694,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -758,8 +758,8 @@ func TestEventstore_Push(t *testing.T) {
 						},
 					),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -771,7 +771,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "push fails",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -794,7 +794,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "aggreagtes to events mapping fails",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -830,7 +830,7 @@ func TestEventstore_Push(t *testing.T) {
 				t.FailNow()
 			}
 
-			_, err := es.PushEvents(context.Background(), tt.args.events...)
+			_, err := es.Push(context.Background(), tt.args.events...)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -844,7 +844,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 	}
 	type fields struct {
 		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -882,8 +882,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					events: []*repository.Event{},
 					t:      t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -910,8 +910,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					t:   t,
 					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -943,8 +943,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -970,7 +970,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 				t.FailNow()
 			}
 
-			_, err := es.FilterEvents(context.Background(), tt.args.query)
+			_, err := es.Filter(context.Background(), tt.args.query)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -1089,7 +1089,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 
 type testReducer struct {
 	t              *testing.T
-	events         []EventReader
+	events         []Event
 	expectedLength int
 	err            error
 }
@@ -1105,7 +1105,7 @@ func (r *testReducer) Reduce() error {
 	return nil
 }
 
-func (r *testReducer) AppendEvents(e ...EventReader) {
+func (r *testReducer) AppendEvents(e ...Event) {
 	r.events = append(r.events, e...)
 }
 
@@ -1116,7 +1116,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 	}
 	type fields struct {
 		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -1158,8 +1158,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					events: []*repository.Event{},
 					t:      t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1190,8 +1190,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					t:   t,
 					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1227,8 +1227,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1262,8 +1262,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1338,13 +1338,13 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 
 func TestEventstore_mapEvents(t *testing.T) {
 	type fields struct {
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type args struct {
 		events []*repository.Event
 	}
 	type res struct {
-		events  []EventReader
+		events  []Event
 		wantErr bool
 	}
 	tests := []struct {
@@ -1381,8 +1381,8 @@ func TestEventstore_mapEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(*repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(*repository.Event) (Event, error) {
 						return nil, errors.ThrowInternal(nil, "V2-8FbQk", "test err")
 					},
 				},
@@ -1401,14 +1401,14 @@ func TestEventstore_mapEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(*repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(*repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
 			},
 			res: res{
-				events: []EventReader{
+				events: []Event{
 					&testEvent{},
 				},
 				wantErr: false,

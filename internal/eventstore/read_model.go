@@ -6,17 +6,17 @@ import "time"
 // It implements a basic reducer
 // it might be saved in a database or in memory
 type ReadModel struct {
-	AggregateID       string        `json:"-"`
-	ProcessedSequence uint64        `json:"-"`
-	CreationDate      time.Time     `json:"-"`
-	ChangeDate        time.Time     `json:"-"`
-	Events            []EventReader `json:"-"`
-	ResourceOwner     string        `json:"-"`
+	AggregateID       string    `json:"-"`
+	ProcessedSequence uint64    `json:"-"`
+	CreationDate      time.Time `json:"-"`
+	ChangeDate        time.Time `json:"-"`
+	Events            []Event   `json:"-"`
+	ResourceOwner     string    `json:"-"`
 }
 
 //AppendEvents adds all the events to the read model.
 // The function doesn't compute the new state of the read model
-func (rm *ReadModel) AppendEvents(events ...EventReader) *ReadModel {
+func (rm *ReadModel) AppendEvents(events ...Event) *ReadModel {
 	rm.Events = append(rm.Events, events...)
 	return rm
 }
@@ -42,6 +42,6 @@ func (rm *ReadModel) Reduce() error {
 	rm.ProcessedSequence = rm.Events[len(rm.Events)-1].Sequence()
 	// all events processed and not needed anymore
 	rm.Events = nil
-	rm.Events = []EventReader{}
+	rm.Events = []Event{}
 	return nil
 }

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -85,7 +86,7 @@ func ChangeStreetAddress(street string) func(event *HumanAddressChangedEvent) {
 	}
 }
 
-func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanAddressChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	addressChanged := &HumanAddressChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

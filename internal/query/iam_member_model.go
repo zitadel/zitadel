@@ -20,7 +20,7 @@ func NewIAMMemberReadModel(iamID, userID string) *IAMMemberReadModel {
 	}
 }
 
-func (rm *IAMMemberReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMMemberReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.MemberAddedEvent:

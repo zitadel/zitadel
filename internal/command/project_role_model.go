@@ -36,7 +36,7 @@ func NewProjectRoleWriteModel(projectID, resourceOwner string) *ProjectRoleWrite
 	}
 }
 
-func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ProjectRoleWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.RoleAddedEvent:
