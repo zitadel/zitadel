@@ -18,8 +18,6 @@ import (
 	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
 	"github.com/caos/zitadel/internal/query"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
@@ -29,10 +27,8 @@ import (
 )
 
 const (
-	notificationTable   = "notification.notifications"
-	NotifyUserID        = "NOTIFICATION"
-	labelPolicyTableOrg = "management.label_policies"
-	labelPolicyTableDef = "adminapi.label_policies"
+	notificationTable = "notification.notifications"
+	NotifyUserID      = "NOTIFICATION"
 )
 
 type Notification struct {
@@ -404,38 +400,13 @@ func getSetNotifyContextData(orgID string) context.Context {
 }
 
 // Read organization specific colors
-func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	// read from Org
-	policy, err := n.view.StylingByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg, int32(domain.LabelPolicyStateActive))
-	if errors.IsNotFound(err) {
-		// read from default
-		policy, err = n.view.StylingByAggregateIDAndState(n.systemDefaults.IamID, labelPolicyTableDef, int32(domain.LabelPolicyStateActive))
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+func (n *Notification) getLabelPolicy(ctx context.Context) (*query.LabelPolicy, error) {
+	return n.queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
 // Read organization specific template
 func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate, error) {
-	// read from Org
-	template, err := n.queries.MailTemplateByOrg(ctx, authz.GetCtxData(ctx).OrgID)
-	if errors.IsNotFound(err) {
-		// read from default
-		template, err = n.queries.DefaultMailTemplate(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-	if err != nil {
-		return nil, err
-	}
-	return template, err
+	return n.queries.MailTemplateByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
