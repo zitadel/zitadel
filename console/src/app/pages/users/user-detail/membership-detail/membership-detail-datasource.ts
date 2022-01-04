@@ -9,8 +9,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 export class MembershipDetailDataSource extends DataSource<Membership.AsObject> {
   public totalResult: number = 0;
   public viewTimestamp!: Timestamp.AsObject;
-  public membersSubject: BehaviorSubject<Membership.AsObject[]>
-    = new BehaviorSubject<Membership.AsObject[]>([]);
+  public membersSubject: BehaviorSubject<Membership.AsObject[]> = new BehaviorSubject<Membership.AsObject[]>([]);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -22,40 +21,43 @@ export class MembershipDetailDataSource extends DataSource<Membership.AsObject> 
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
-    from(this.mgmtUserService.listUserMemberships(userId, pageSize, offset)).pipe(
-      map(resp => {
-        this.totalResult = resp.details?.totalResult || 0;
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details.viewTimestamp;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+    from(this.mgmtUserService.listUserMemberships(userId, pageSize, offset))
+      .pipe(
+        map((resp) => {
+          this.totalResult = resp.details?.totalResult || 0;
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details.viewTimestamp;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
 
   public loadMyMemberships(pageIndex: number, pageSize: number): void {
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
-    from(this.authServce.listMyMemberships(pageSize, offset)).pipe(
-      map(resp => {
-        this.totalResult = resp.details?.totalResult || 0;
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details.viewTimestamp;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(members => {
-      this.membersSubject.next(members);
-    });
+    from(this.authServce.listMyMemberships(pageSize, offset))
+      .pipe(
+        map((resp) => {
+          this.totalResult = resp.details?.totalResult || 0;
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details.viewTimestamp;
+          }
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((members) => {
+        this.membersSubject.next(members);
+      });
   }
-
 
   /**
    * Connect this data source to the table. The table will only update when

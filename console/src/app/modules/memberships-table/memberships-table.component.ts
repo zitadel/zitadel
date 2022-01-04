@@ -5,6 +5,7 @@ import { MatTable } from '@angular/material/table';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
+import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -39,6 +40,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private authService: GrpcAuthService,
     private toastService: ToastService,
     private mgmtService: ManagementService,
+    private adminService: AdminService,
   ) {
     this.dataSource = new MembershipsDataSource(this.authService, this.mgmtService);
 
@@ -84,6 +86,17 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
         .catch((error) => {
           this.toastService.showError(error);
         });
+    } else if (membership.iam) {
+      this.membershipToEdit = `IAM`;
+      this.adminService
+        .listIAMMemberRoles()
+        .then((resp) => {
+          console.log(resp);
+          this.membershipRoleOptions = resp.rolesList;
+        })
+        .catch((error) => {
+          this.toastService.showError(error);
+        });
     }
   }
 
@@ -111,6 +124,9 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   }
 
   public isCurrentMembership(membership: Membership.AsObject): boolean {
-    return this.membershipToEdit === `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
+    return (
+      this.membershipToEdit ===
+      (membership.iam ? 'IAM' : `${membership.orgId}${membership.projectId}${membership.projectGrantId}`)
+    );
   }
 }
