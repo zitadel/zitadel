@@ -572,7 +572,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				wantErr: false,
 				events: []*repository.Event{
 					{
-						AggregateID:   "1",
+						AggregateID:   "id",
 						AggregateType: "test.aggregate",
 						Data:          []byte(nil),
 						EditorService: "editorService",
