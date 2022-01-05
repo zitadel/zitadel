@@ -39,6 +39,7 @@
       box-sizing: border-box;
 
       .slash {
+        flex-shrink: 0;
         color: map-get($foreground, divider);
         fill: map-get($foreground, divider);
       }
@@ -61,6 +62,14 @@
 
           &:hover {
             background-color: if($is-dark-theme, #ffffff10, #00000010);
+          }
+
+          @media only screen and (max-width: 700px) {
+            padding: 0.25rem;
+          }
+
+          @media only screen and (max-width: 500px) {
+            padding: 0;
           }
         }
 
@@ -136,8 +145,37 @@
           align-items: center;
           transition: all ease 0.1s;
 
+          span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
           &:hover {
             background-color: if($is-dark-theme, #ffffff10, #00000010);
+          }
+
+          .mob {
+            display: none;
+          }
+
+          @media only screen and (max-width: 700px) {
+            padding: 0.25rem;
+          }
+
+          @media only screen and (max-width: 500px) {
+            padding: 0;
+
+            span {
+              max-width: 50px;
+            }
+
+            .mob {
+              display: inline;
+            }
+
+            .desk {
+              display: none;
+            }
           }
         }
       }
@@ -167,23 +205,17 @@
       .doc-link {
         margin-right: 1rem;
 
-        @media only screen and (max-width: 500px) {
+        @media only screen and (max-width: 800px) {
           display: none;
         }
       }
 
       .iam-settings {
         margin-right: 1rem;
-
-        .iam-label {
-          margin-right: 0.25rem;
-          display: none;
-        }
+        display: none;
 
         @media only screen and (min-width: 600px) {
-          .iam-label {
-            display: inline;
-          }
+          display: inline;
 
           i {
             margin-right: -0.5rem;

@@ -22,30 +22,16 @@
         width: 100%;
         background-color: #2d2e30;
 
-        td,
-        th {
-          padding: 0 1rem;
-
-          &:first-child {
-            padding-left: 0;
-            padding-right: 1rem;
-          }
-
-          &:last-child {
-            padding-right: 0;
-          }
-
-          .role {
-            display: inline-block;
-            border-radius: 0.5rem;
-            border: 1px solid #ffffff30;
-            padding: 0.5rem 1rem;
-            margin-top: 0.25rem;
-            margin-bottom: 0.25rem;
-            margin-left: 0;
-            margin-right: 0.5rem;
-            cursor: pointer;
-          }
+        .role {
+          display: inline-block;
+          border-radius: 0.5rem;
+          border: 1px solid #ffffff30;
+          padding: 0.5rem 1rem;
+          margin-top: 0.25rem;
+          margin-bottom: 0.25rem;
+          margin-left: 0;
+          margin-right: 0.5rem;
+          cursor: pointer;
         }
 
         tr {

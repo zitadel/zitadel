@@ -28,21 +28,6 @@ h1 {
     .paginator {
       width: 100%;
       background-color: #2d2e30;
-
-      td,
-      th {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-
-        &:first-child {
-          padding-left: 0;
-          padding-right: 0.5rem;
-        }
-
-        &:last-child {
-          padding-right: 0;
-        }
-      }
     }
   }
 }

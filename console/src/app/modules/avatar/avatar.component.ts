@@ -8,13 +8,14 @@ import { Component, Input, OnInit } from '@angular/core';
 export class AvatarComponent implements OnInit {
   @Input() name: string = '';
   @Input() credentials: string = '';
-  @Input() size: number = 24;
+  @Input() size: number = 32;
   @Input() fontSize: number = 14;
   @Input() fontWeight: number = 500;
   @Input() active: boolean = false;
   @Input() color: string = '';
   @Input() forColor: string = '';
   @Input() avatarUrl: string = '';
+  @Input() isMachine: boolean = false;
   constructor() {}
 
   ngOnInit(): void {

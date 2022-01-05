@@ -9,39 +9,46 @@
   .paginator {
     width: 100%;
 
-    td,
-    th {
-      padding: 0.5rem;
-
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
-
     .action {
       width: 40px;
     }
 
-    .flex-role-row {
+    .form-field {
+      flex: 1;
+    }
+
+    .roles-sp-wrapper {
+      padding: 0.5rem;
+      display: flex;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    .membership-auth-line {
       display: flex;
       flex-direction: row;
-      max-width: 400px;
       align-items: center;
+      justify-content: space-between;
 
-      .form-field {
-        flex: 1;
+      .membership-role-list {
+        display: flex;
+        flex-direction: column;
+        margin: 0.25rem;
+        font-size: 14px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        justify-items: center;
+        align-self: center;
       }
 
-      .roles-sp-wrapper {
-        padding: 0.5rem;
-        display: flex;
-        justify-content: center;
-        box-sizing: border-box;
+      .goto-btn {
+        margin-left: 0.5rem;
+
+        i {
+          height: 1rem;
+          line-height: 1rem;
+          font-size: 1rem;
+        }
       }
     }
   }

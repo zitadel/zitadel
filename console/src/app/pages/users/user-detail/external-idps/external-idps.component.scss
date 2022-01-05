@@ -10,20 +10,6 @@
   .table,
   .paginator {
     width: 100%;
-
-    td,
-    th {
-      padding: 0 1rem;
-
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
   }
 }
 

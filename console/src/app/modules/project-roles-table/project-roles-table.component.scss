@@ -1,5 +1,5 @@
 .icon-button {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .table-wrapper {
@@ -9,18 +9,6 @@
   .paginator {
     width: 100%;
     background-color: #2d2e30;
-
-    td,
-    th {
-      &:first-child {
-        padding-left: 0;
-        padding-right: 1rem;
-      }
-
-      &:last-child {
-        padding-right: 0;
-      }
-    }
 
     .action {
       width: 40px;
@@ -32,7 +20,8 @@
 
     .role {
       display: inline-block;
-      margin: .25rem;
+      margin: 0.25rem;
+      cursor: pointer;
     }
   }
 }

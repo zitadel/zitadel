@@ -44,7 +44,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   @Output() public emitAddProject: EventEmitter<void> = new EventEmitter();
   @Input() public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
   public projectList: Project.AsObject[] | GrantedProject.AsObject[] = [];
-  public displayedColumns: string[] = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
+  public displayedColumns: string[] = ['name', 'state', 'creationDate', 'changeDate', 'actions'];
   public selection: SelectionModel<Project.AsObject | GrantedProject.AsObject> = new SelectionModel<
     Project.AsObject | GrantedProject.AsObject
   >(true, []);
@@ -70,10 +70,10 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.projectType$.pipe(takeUntil(this.destroy$)).subscribe((type) => {
       switch (type) {
         case ProjectType.PROJECTTYPE_OWNED:
-          this.displayedColumns = ['select', 'name', 'state', 'creationDate', 'changeDate', 'actions'];
+          this.displayedColumns = ['name', 'state', 'creationDate', 'changeDate', 'actions'];
           break;
         case ProjectType.PROJECTTYPE_GRANTED:
-          this.displayedColumns = ['select', 'name', 'projectOwnerName', 'state', 'creationDate', 'changeDate'];
+          this.displayedColumns = ['name', 'projectOwnerName', 'state', 'creationDate', 'changeDate'];
           break;
       }
 

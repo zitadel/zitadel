@@ -2,6 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
@@ -42,6 +43,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private mgmtService: ManagementService,
     private adminService: AdminService,
     private toast: ToastService,
+    private router: Router,
   ) {
     this.dataSource = new MembershipsDataSource(this.authService, this.mgmtService);
 
@@ -60,7 +62,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     if (opened) {
       this.loadingRoles = true;
 
-      if (membership.orgId) {
+      if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
         this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
         this.mgmtService
           .listOrgMemberRoles()
@@ -113,8 +115,28 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  public goto(membership: Membership.AsObject): void {
+    if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
+      this.authService.getActiveOrg(membership.orgId).then(() => {
+        this.router.navigate(['/org/members']);
+      });
+    } else if (membership.projectGrantId && membership.orgId) {
+      // TODO: orgId should be non emptystring
+      this.authService.getActiveOrg(membership.orgId).then(() => {
+        this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
+      });
+    } else if (membership.projectId && membership.orgId) {
+      // TODO: orgId should be non emptystring
+      this.authService.getActiveOrg(membership.orgId).then(() => {
+        this.router.navigate(['/projects', membership.projectId, 'members']);
+      });
+    } else if (membership.iam) {
+      this.router.navigate(['/iam/members']);
+    }
+  }
+
   public getType(membership: Membership.AsObject): string {
-    if (membership.orgId) {
+    if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
       return 'Organization';
     } else if (membership.projectGrantId) {
       return 'Project Grant';

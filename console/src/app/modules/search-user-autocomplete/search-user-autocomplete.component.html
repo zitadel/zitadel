@@ -62,9 +62,8 @@
           [forColor]="user.preferredLoginName ?? 'A'" [size]="32">
         </cnsl-avatar>
         <ng-template #cog>
-          <div class="sa-icon">
-            <i class="las la-user-cog"></i>
-          </div>
+          <cnsl-avatar class="avatar" [isMachine]="true" [size]="32">
+          </cnsl-avatar>
         </ng-template>
       </div>
 

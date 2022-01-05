@@ -44,6 +44,7 @@
       backdrop-filter: blur(10px) !important;
       border-bottom: 1px solid map-get($foreground, divider);
       z-index: 200;
+      transform: all 0.2s ease;
 
       &.shadow {
         box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);

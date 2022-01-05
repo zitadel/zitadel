@@ -39,10 +39,14 @@
             color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
             [checked]="selection.isSelected(row)">
             <cnsl-avatar
-              *ngIf="context !== UserGrantContext.USER && row && row?.displayName && row.firstName && row.lastName"
+              *ngIf="context !== UserGrantContext.USER && row && row?.displayName && row.firstName && row.lastName; else cog"
               class="avatar" [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''"
               [forColor]="row?.preferredLoginName" [size]="32">
             </cnsl-avatar>
+            <ng-template #cog>
+              <cnsl-avatar class="avatar" [isMachine]="true" [size]="32">
+              </cnsl-avatar>
+            </ng-template>
           </mat-checkbox>
         </td>
       </ng-container>

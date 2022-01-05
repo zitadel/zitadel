@@ -34,7 +34,9 @@
       <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
 
       <cnsl-card *ngIf="projectId">
-        <cnsl-project-roles-table (changedSelection)="selectRoles($event)" [projectId]="projectId">
+        <cnsl-project-roles-table
+          [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
+          (changedSelection)="selectRoles($event)" [projectId]="projectId">
         </cnsl-project-roles-table>
       </cnsl-card>
     </ng-container>

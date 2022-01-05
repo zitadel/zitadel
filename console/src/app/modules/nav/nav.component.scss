@@ -43,6 +43,10 @@
         overflow-x: auto;
         align-self: stretch;
 
+        @media only screen and (max-width: 450px) {
+          padding: 0 0 0 1rem;
+        }
+
         .fill-space {
           flex: 1;
         }
@@ -90,7 +94,7 @@
     }
 
     @media only screen and (max-width: 450px) {
-      padding: 0 0 0 1rem;
+      padding: 0;
 
       .nav-row {
         min-height: 55px;

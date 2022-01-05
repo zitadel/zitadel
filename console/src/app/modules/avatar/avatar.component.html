@@ -1,6 +1,11 @@
 <div class="avatar-circle dontcloseonclick" matRipple [matRippleColor]="'#ffffff20'" [matRippleUnbounded]="false"
   [ngStyle]="{'height': size+'px', 'width': size+'px', 'fontSize': (fontSize-1)+'px','fontWeight': fontWeight, 'background': color}"
   [ngClass]="{'active': active}">
-  <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl" />
-  <ng-template #creds><span>{{credentials}}</span></ng-template>
+  <ng-container *ngIf="isMachine; else human">
+    <i class="machine-icon las la-robot"></i>
+  </ng-container>
+  <ng-template #human>
+    <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl" />
+    <ng-template #creds><span>{{credentials}}</span></ng-template>
+  </ng-template>
 </div>

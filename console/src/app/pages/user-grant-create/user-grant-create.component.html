@@ -38,7 +38,9 @@
     <ng-container
       *ngIf="$any(project)?.id && (context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE)">
       <cnsl-card>
-        <cnsl-project-roles-table (changedSelection)="selectRoles($event)" [projectId]="projectId">
+        <cnsl-project-roles-table
+          [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
+          (changedSelection)="selectRoles($event)" [projectId]="projectId">
         </cnsl-project-roles-table>
       </cnsl-card>
     </ng-container>

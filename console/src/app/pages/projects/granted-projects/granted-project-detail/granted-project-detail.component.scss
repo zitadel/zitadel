@@ -12,6 +12,10 @@
     padding: 2rem 2rem 1rem 2rem;
     background: if($is-dark-theme, #00000020, #605f5f0f);
 
+    @media only screen and (max-width: 500px) {
+      margin: 0 -1.5rem;
+    }
+
     .granted-project-top-row {
       display: flex;
       align-items: center;

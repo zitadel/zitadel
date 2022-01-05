@@ -51,7 +51,7 @@
       </div>
     </div>
 
-    <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async">
+    <ng-container *ngFor="let bread of breadcrumbService.breadcrumbs$ | async as b; index as i">
       <ng-container *ngIf="bread.type !== BreadcrumbType.IAM && bread.type !== BreadcrumbType.ORG">
         <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
           stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
@@ -60,7 +60,13 @@
 
         <div class="breadcrumb-context">
           <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
-            {{bread.name}}
+            <ng-container *ngIf="i !== b.length - 1; else defLabel">
+              <span class="desk">{{bread.name}}</span>
+              <span class="mob">...</span>
+            </ng-container>
+            <ng-template #defLabel>
+              <span>{{bread.name}}</span>
+            </ng-template>
           </a>
         </div>
       </ng-container>

@@ -29,7 +29,7 @@ export class ProjectRolesTableComponent implements AfterViewInit, OnInit {
   @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  public displayedColumns: string[] = ['select', 'key', 'displayname', 'group', 'creationDate', 'actions'];
+  @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'actions'];
 
   constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
     this.dataSource = new ProjectRolesDataSource(this.mgmtService);

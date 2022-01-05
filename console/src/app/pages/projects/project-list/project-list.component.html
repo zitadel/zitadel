@@ -26,7 +26,7 @@
 
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.NAME' | translate }} </th>
-          <td
+          <td class="pointer"
             [routerLink]="type === ProjectType.PROJECTTYPE_OWNED ? ['/projects', project.id] : ['/granted-projects', project.projectId, 'grant', project.grantId]"
             mat-cell *matCellDef="let project">
             <span *ngIf="project.name">{{project.name}}</span>
@@ -42,7 +42,7 @@
 
         <ng-container matColumnDef="state">
           <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.STATE' | translate }} </th>
-          <td
+          <td class="pointer"
             [routerLink]="type === ProjectType.PROJECTTYPE_OWNED ? ['/projects', project.id] : ['/granted-projects', project.projectId, 'grant', project.grantId]"
             mat-cell *matCellDef="let project">
             <span class="state"
@@ -54,7 +54,7 @@
 
         <ng-container matColumnDef="creationDate">
           <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CREATIONDATE' | translate }} </th>
-          <td
+          <td class="pointer"
             [routerLink]="type === ProjectType.PROJECTTYPE_OWNED ? ['/projects', project.id] : ['/granted-projects', project.projectId, 'grant', project.grantId]"
             mat-cell *matCellDef="let project">
             <span *ngIf="project.details.creationDate">{{project.details.creationDate | timestampToDate |
@@ -65,7 +65,7 @@
 
         <ng-container matColumnDef="changeDate">
           <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.TABLE.CHANGEDATE' | translate }} </th>
-          <td
+          <td class="pointer"
             [routerLink]="type === ProjectType.PROJECTTYPE_OWNED ? ['/projects', project.id] : ['/granted-projects', project.projectId, 'grant', project.grantId]"
             mat-cell *matCellDef="let project">
             <span *ngIf="project.details.changeDate">{{project.details.changeDate | timestampToDate |

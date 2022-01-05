@@ -12,15 +12,15 @@
               [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)" [size]="32">
             </cnsl-avatar>
             <ng-template #cog>
-              <div class="sa-icon">
-                <i class="las la-user-cog"></i>
-              </div>
+              <cnsl-avatar [isMachine]="true">
+                <i class="las la-robot"></i>
+              </cnsl-avatar>
             </ng-template>
           </div>
         </ng-container>
       </ng-container>
       <ng-template #compact>
-        <div (click)="emitShowDetail()" class="avatar-circle" matTooltip="Click to show detail">
+        <div (click)="emitShowDetail()" class="contributor-avatar-circle" matTooltip="Click to show detail">
           <span>{{totalResult}}</span>
         </div>
       </ng-template>

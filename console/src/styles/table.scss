@@ -34,6 +34,10 @@
     }
   }
 
+  .pointer {
+    cursor: pointer;
+  }
+
   tr {
     &.mat-header-row {
       height: 40px;
@@ -41,14 +45,18 @@
     }
 
     &.highlight {
-      cursor: pointer;
-
       &:hover {
         td {
+          transition: background 0.1s ease;
           background: map-get($background, hover);
         }
       }
     }
+  }
+
+  th,
+  td {
+    padding: 0 0.5rem !important;
   }
 
   td .mat-checkbox,
@@ -71,6 +79,7 @@
   .selection {
     width: 65px;
     max-width: 65px;
+    padding-right: 1rem !important;
   }
 
   .state {

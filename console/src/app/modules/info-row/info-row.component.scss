@@ -55,6 +55,7 @@
           color: $button-text-color;
           text-overflow: ellipsis;
           overflow: hidden;
+          cursor: copy;
 
           &[disabled] {
             color: $button-disabled-text-color;
