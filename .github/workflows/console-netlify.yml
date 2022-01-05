@@ -28,8 +28,10 @@ jobs:
   deploy:
     name: "Deploy to Netlify"
     needs: build
+    runs-on: ubuntu-18.04
     steps:
       - uses: jsmrcaga/action-netlify-deploy@v1.1.0
         with:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.MY_TOKEN_SECRET }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_KEY }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_ID }}
           NETLIFY_DEPLOY_TO_PROD: true
