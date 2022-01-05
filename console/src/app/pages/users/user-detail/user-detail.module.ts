@@ -52,7 +52,6 @@ import { ContactComponent } from './contact/contact.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
 import { ExternalIdpsComponent } from './external-idps/external-idps.component';
-import { MembershipsComponent } from './memberships/memberships.component';
 import { MetadataDialogComponent } from './metadata-dialog/metadata-dialog.component';
 import { MetadataComponent } from './metadata/metadata.component';
 import { PasswordComponent } from './password/password.component';
@@ -72,7 +71,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     ThemeSettingComponent,
     PasswordComponent,
     CodeDialogComponent,
-    MembershipsComponent,
     ExternalIdpsComponent,
     ContactComponent,
     ResendEmailDialogComponent,

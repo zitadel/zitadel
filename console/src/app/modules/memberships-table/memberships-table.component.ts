@@ -172,7 +172,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
         });
     } else if (membership.projectGrantId) {
       this.mgmtService
-        .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
+        .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
         .then(() => {
           this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
           this.changePage(this.paginator);
@@ -182,7 +182,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
         });
     } else if (membership.projectId) {
       this.mgmtService
-        .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
+        .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
         .then(() => {
           this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
           this.changePage(this.paginator);
@@ -194,7 +194,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       this.adminService
         .updateIAMMember(membership.userId, selectionChange.value)
         .then(() => {
-          // TODO toast
+          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
           this.changePage(this.paginator);
         })
         .catch((error) => {

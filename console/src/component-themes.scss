@@ -16,7 +16,6 @@
 @import 'src/app/modules/footer/footer.component';
 @import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
 @import 'src/app/pages/orgs/org-detail/org-detail.component';
-@import 'src/app/pages/users/user-detail/memberships/memberships.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
@@ -60,7 +59,6 @@
   @include app-card-theme($theme);
   @include login-policy-idps-theme($theme);
   @include login-policy-mfas-theme($theme);
-  @include membership-theme($theme);
   @include changes-theme($theme);
   @include home-theme($theme);
   @include owned-project-detail-theme($theme);
