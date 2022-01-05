@@ -28,7 +28,7 @@ func debugChannels(config systemdefaults.Notifications) (channels.NotificationCh
 	}
 
 	if config.Providers.Log.Enabled {
-		providers = append(providers, log.InitStdoutChannel())
+		providers = append(providers, log.InitStdoutChannel(config.Providers.Log))
 	}
 
 	return chainChannels(providers...), nil

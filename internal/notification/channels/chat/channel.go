@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"unicode/utf8"
 
+	"github.com/k3a/html2text"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels"
@@ -18,6 +20,7 @@ var _ channels.NotificationChannel = (*Chat)(nil)
 type Chat struct {
 	URL        *url.URL
 	SplitCount int
+	Compact    bool
 }
 
 func InitChatProvider(config ChatConfig) (*Chat, error) {
@@ -34,6 +37,9 @@ func InitChatProvider(config ChatConfig) (*Chat, error) {
 
 func (chat *Chat) HandleMessage(message channels.Message) error {
 	contentText := message.GetContent()
+	if chat.Compact {
+		contentText = html2text.HTML2Text(contentText)
+	}
 	for _, splittedMsg := range splitMessage(contentText, chat.SplitCount) {
 		if err := chat.sendMessage(splittedMsg); err != nil {
 			return err

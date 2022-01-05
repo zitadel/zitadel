@@ -98,11 +98,14 @@ SystemDefaults:
       FileSystem:
         Enabled: $FS_NOTIFICATIONS_ENABLED
         Path: $FS_NOTIFICATIONS_PATH
+        Compact: $FS_NOTIFICATIONS_COMPACT
       Log:
         Enabled: $LOG_NOTIFICATIONS_ENABLED
+        Compact: $LOG_NOTIFICATIONS_COMPACT
       Chat:
         Enabled: $CHAT_ENABLED
         Url: $CHAT_URL
+        Compact: $CHAT_COMPACT
         SplitCount: 4000
     TemplateData:
       InitCode:
