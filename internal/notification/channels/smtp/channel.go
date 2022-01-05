@@ -38,7 +38,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	}
 
 	if emailMsg.Content == "" || emailMsg.Subject == "" || len(emailMsg.Recipients) == 0 {
-		err := fmt.Errorf("subject, recipients and content must be set but got subject %s, recipients length %d and content %s", emailMsg.Subject, len(emailMsg.Recipients), emailMsg.Content)
+		err := fmt.Errorf("subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
 		logging.Log("EMAIL-9df67").Panic(err)
 		return err
 	}
