@@ -24,6 +24,7 @@
     <div class="lgn-account-selection">
         {{ if .Users }}
         {{ $displayLoginNameSuffix := and .OrgID (not .DisplayLoginNameSuffix)}}
+        {{ $orgName := .OrgName }}
         {{ range $user := .Users }}
         {{ $sessionState := (printf "SelectAccount.SessionState%v" $user.UserSessionState) }}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
@@ -43,7 +44,7 @@
                 {{if $user.SelectionPossible}}
                     <p class="lgn-session-state i{{$user.UserSessionState}}">{{t $sessionState}}</p>
                 {{else}}
-                    <p></p>
+                    <p class="lgn-no-member" >{{t "SelectAccount.MustBeMemberOfOrg" "OrgName" $orgName}}</p>
                 {{end}}
             </div>
             <span class="fill-space"></span>
