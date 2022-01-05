@@ -20,10 +20,7 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel-console
-      - uses: "finnp/create-file-action@master"
-        env:
-          FILE_NAME: "/tmp/zitadel-console/_redirects"
-          FILE_DATA: "/*  /index.html 200"
+      - run: echo "/*  /index.html 200" > /tmp/zitadel-console/_redirects
       - uses: jsmrcaga/action-netlify-deploy@v1.1.0
         with:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_KEY }}
