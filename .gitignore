@@ -58,4 +58,4 @@ openapi/**/*.json
 # local
 build/local/cloud.env
 migrations/cockroach/migrate_cloud.go
-notifications
+.notifications

@@ -2,7 +2,6 @@ package smtp
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net"
 	"net/smtp"
 
@@ -25,6 +24,9 @@ func InitSMTPChannel(config EmailConfig) (*Email, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	logging.Log("NOTIF-4n4Ih").Debug("successfully initialized smtp email channel")
+
 	return &Email{
 		smtpClient: client,
 	}, nil
@@ -38,9 +40,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	}
 
 	if emailMsg.Content == "" || emailMsg.Subject == "" || len(emailMsg.Recipients) == 0 {
-		err := fmt.Errorf("subject, recipients and content must be set but got subject %s, recipients length %d and content %s", emailMsg.Subject, len(emailMsg.Recipients), emailMsg.Content)
-		logging.Log("EMAIL-9df67").Panic(err)
-		return err
+		return caos_errs.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
 	}
 
 	// To && From

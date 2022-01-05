@@ -18,7 +18,7 @@ func EmailChannels(config systemdefaults.Notifications) (channels.NotificationCh
 		if err != nil {
 			return nil, err
 		}
-		return chainChannels(p, debug), nil
+		return chainChannels(debug, p), nil
 	}
 
 	return debug, nil
