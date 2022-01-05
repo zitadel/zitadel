@@ -19,19 +19,14 @@ jobs:
           file: ./build/console/Dockerfile
           platforms: linux/amd64
           cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }},mode=max
-          outputs: type=local,dest=/build
-      - uses: actions/upload-artifact@v2
-        with:
-          name: zitadel-console
-          path: /build
-  deploy:
-    name: "Deploy to Netlify"
-    needs: build
-    runs-on: ubuntu-18.04
-    steps:
+          outputs: type=local,dest=/tmp/zitadel-console
+      - uses: "finnp/create-file-action@master"
+        env:
+          FILE_NAME: "/tmp/zitadel-console/_redirects"
+          FILE_DATA: "/*  /index.html 200"
       - uses: jsmrcaga/action-netlify-deploy@v1.1.0
         with:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_KEY }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_ID }}
           NETLIFY_DEPLOY_TO_PROD: true
+          build_directory: /tmp/zitadel-console
