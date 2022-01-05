@@ -40,10 +40,16 @@
             <div class="lgn-names">
                 <p class="lgn-displayname">{{$user.DisplayName}}</p>
                 <p class="lgn-loginname">{{if and $displayLoginNameSuffix $user.SelectionPossible}}{{$user.UserName}}{{else}}{{$user.LoginName}}{{end}}</p>
-                <p class="lgn-session-state i{{$user.UserSessionState}}">{{t $sessionState}}</p>
+                {{if $user.SelectionPossible}}
+                    <p class="lgn-session-state i{{$user.UserSessionState}}">{{t $sessionState}}</p>
+                {{else}}
+                    <p>{{t "Errors.User.NotAllowedOrg"}}</p>
+                {{end}}
             </div>
             <span class="fill-space"></span>
+        {{if $user.SelectionPossible}}
             <i class="lgn-icon-angle-right-solid"></i>
+        {{end}}
         </button>
         {{ end }}
         {{ end }}

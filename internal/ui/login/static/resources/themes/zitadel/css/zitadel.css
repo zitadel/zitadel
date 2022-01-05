@@ -159,6 +159,7 @@
   --zitadel-color-label: var(--zitadel-color-grey-600);
   --zitadel-color-account-selector-hover: rgba(255, 255, 255, 0.02);
   --zitadel-color-account-selector-active: rgba(255, 255, 255, 0.05);
+  --zitadel-color-account-selector-disabled: rgba(0, 0, 0, 0.1);
   --zitadel-color-success: #cbf4c9;
   --zitadel-color-success-background: #4f566b;
   --zitadel-color-divider: rgba(255, 255, 255, 0.12);
@@ -661,6 +662,7 @@ i {
   border: none;
   outline: none;
   cursor: pointer;
+  position: relative;
 }
 .lgn-account-selection .lgn-account:disabled {
   cursor: not-allowed;
@@ -1554,6 +1556,7 @@ i {
   border: none;
   outline: none;
   cursor: pointer;
+  position: relative;
 }
 .lgn-account-selection .lgn-account:disabled {
   cursor: not-allowed;
@@ -2775,7 +2778,7 @@ a:hover, a:active {
   background: transparent;
   box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
 }
-.lgn-account-selection .lgn-account:hover {
+.lgn-account-selection .lgn-account:hover:not([disabled]) {
   background-color: var(--zitadel-color-account-selector-hover);
 }
 .lgn-account-selection .lgn-account:focus {
@@ -2783,6 +2786,16 @@ a:hover, a:active {
 }
 .lgn-account-selection .lgn-account:active {
   background-color: var(--zitadel-color-account-selector-active);
+}
+.lgn-account-selection .lgn-account:disabled::before {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--zitadel-color-account-selector-disabled);
 }
 .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;

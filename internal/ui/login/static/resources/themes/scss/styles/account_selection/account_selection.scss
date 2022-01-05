@@ -13,6 +13,7 @@ $lgn-container-margin: 0px auto 50px auto;
         border: none;
         outline: none;
         cursor: pointer;
+        position: relative;
 
         &:disabled {
             cursor: not-allowed;

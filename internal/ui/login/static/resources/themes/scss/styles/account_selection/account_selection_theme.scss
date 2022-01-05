@@ -18,7 +18,7 @@
             background: transparent;
             box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
 
-            &:hover {
+            &:hover:not([disabled]) {
                 background-color: var(--zitadel-color-account-selector-hover);
             }
 
@@ -28,6 +28,18 @@
 
             &:active {
                 background-color: var(--zitadel-color-account-selector-active);
+            }
+
+            &:disabled::before {
+
+                content: '';
+                display: block;
+                height: 100%;
+                width: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                background-color: var(--zitadel-color-account-selector-disabled);
             }
 
             .lgn-loginname{
