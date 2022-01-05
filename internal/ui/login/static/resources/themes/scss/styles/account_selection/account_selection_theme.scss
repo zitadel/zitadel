@@ -31,7 +31,6 @@
             }
 
             &:disabled::before {
-
                 content: '';
                 display: block;
                 height: 100%;
@@ -39,7 +38,9 @@
                 position: absolute;
                 top: 0;
                 left: 0;
-                background-color: var(--zitadel-color-account-selector-disabled);
+                background-color: var(--zitadel-color-background);
+                opacity: 0.8;
+                box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
             }
 
             .lgn-loginname{
