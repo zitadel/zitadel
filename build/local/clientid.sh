@@ -15,4 +15,4 @@ while [ -z $clientid ]; do
     fi
 done
 
-echo "$(jq ".clientid = $clientid" /environment.json)" > environment.json
+echo "$(jq ".clientid = $clientid" ./environment.json)" > ./environment.json
