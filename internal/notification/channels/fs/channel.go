@@ -9,10 +9,8 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
+	"github.com/caos/zitadel/internal/notification/messages"
 )
 
 var _ channels.NotificationChannel = (*FS)(nil)
@@ -38,12 +36,12 @@ func (f *FS) HandleMessage(message channels.Message) error {
 		fileName string
 	)
 	switch msg := message.(type) {
-	case *smtp.EmailMessage:
+	case *messages.Email:
 		recipients := make([]string, len(msg.Recipients))
 		copy(recipients, msg.Recipients)
 		sort.Strings(recipients)
 		fileName = "mail_to_" + strings.Join(recipients, "_")
-	case *twilio.TwilioMessage:
+	case *messages.SMS:
 		fileName = "sms_to_" + msg.RecipientPhoneNumber
 	default:
 		logging.Log("NOTIF-6f9a1").Panic(fmt.Sprintf("filesystem provider doesn't support message type %T", message))
