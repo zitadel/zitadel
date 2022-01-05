@@ -1,0 +1,22 @@
+PKCE stands for Proof Key for Code Exchange. So other than "normal" code exchange, the does not authenticate using
+client_id and client_secret but an additional code. You will have to generate a random string, hash it and send this hash
+on the authorization_endpoint. On the token_endpoint you will then send the plain string for the authorization to compute
+the hash as well and to verify it's correct. In order to do so you're required to send the following two parameters as well:
+
+- `code_challenge`: the base64url representation of the (sha256) hash of your random string
+- `code_challenge_method`: must always be `S256` standing for sha256, this is the only algorithm we support
+
+For example for `random-string` the code_challenge would be `9az09PjcfuENS7oDK7jUd2xAWRb-B3N7Sr3kDoWECOY`
+
+The request would finally look like (linebreaks and whitespace for display reasons):
+
+```curl
+curl --request GET \
+  --url 'https://accounts.zitadel.ch/oauth/v2/authorize
+    ?client_id=${client_id}
+    &redirect_uri=${redirect_uri}
+    &response_type=code
+    &scope=openid%20email%20profile
+    &code_challenge=${code_challenge}
+    &code_challenge_method=S256'
+```
