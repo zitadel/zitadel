@@ -34,6 +34,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
 
   public displayedColumns: string[] = ['select', 'displayName', 'type', 'rolesList'];
   public membershipToEdit: string = '';
+  public loadingRoles: boolean = false;
 
   constructor(
     private authService: GrpcAuthService,
@@ -57,15 +58,19 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
 
   public loadRoles(membership: Membership.AsObject, opened: boolean): void {
     if (opened) {
+      this.loadingRoles = true;
+
       if (membership.orgId) {
         this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
         this.mgmtService
           .listOrgMemberRoles()
           .then((resp) => {
             this.membershipRoleOptions = resp.resultList;
+            this.loadingRoles = false;
           })
           .catch((error) => {
             this.toastService.showError(error);
+            this.loadingRoles = false;
           });
       } else if (membership.projectGrantId) {
         this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
@@ -73,9 +78,11 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           .listProjectGrantMemberRoles()
           .then((resp) => {
             this.membershipRoleOptions = resp.resultList;
+            this.loadingRoles = false;
           })
           .catch((error) => {
             this.toastService.showError(error);
+            this.loadingRoles = false;
           });
       } else if (membership.projectId) {
         this.membershipToEdit = `${membership.orgId}${membership.projectId}${membership.projectGrantId}`;
@@ -83,9 +90,11 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           .listProjectMemberRoles()
           .then((resp) => {
             this.membershipRoleOptions = resp.resultList;
+            this.loadingRoles = false;
           })
           .catch((error) => {
             this.toastService.showError(error);
+            this.loadingRoles = false;
           });
       } else if (membership.iam) {
         this.membershipToEdit = `IAM`;
@@ -94,9 +103,11 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
           .then((resp) => {
             console.log(resp);
             this.membershipRoleOptions = resp.rolesList;
+            this.loadingRoles = false;
           })
           .catch((error) => {
             this.toastService.showError(error);
+            this.loadingRoles = false;
           });
       }
     }
@@ -153,7 +164,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       this.mgmtService
         .updateOrgMember(membership.userId, selectionChange.value)
         .then(() => {
-          // TODO toast
+          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
           this.changePage(this.paginator);
         })
         .catch((error) => {
@@ -163,7 +174,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       this.mgmtService
         .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
         .then(() => {
-          // TODO toast
+          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
           this.changePage(this.paginator);
         })
         .catch((error) => {
@@ -173,7 +184,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       this.mgmtService
         .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
         .then(() => {
-          // TODO toast
+          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
           this.changePage(this.paginator);
         })
         .catch((error) => {

@@ -32,8 +32,16 @@
       flex-direction: row;
       max-width: 400px;
       align-items: center;
+
       .form-field {
         flex: 1;
+      }
+
+      .roles-sp-wrapper {
+        padding: 0.5rem;
+        display: flex;
+        justify-content: center;
+        box-sizing: border-box;
       }
     }
   }

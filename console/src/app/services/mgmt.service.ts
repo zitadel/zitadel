@@ -1068,6 +1068,7 @@ export class ManagementService {
     const req = new UpdateOrgMemberRequest();
     req.setUserId(userId);
     req.setRolesList(rolesList);
+    console.log(userId, rolesList);
     return this.grpcService.mgmt.updateOrgMember(req, null).then((resp) => resp.toObject());
   }
 

@@ -65,10 +65,13 @@
             <mat-select [(ngModel)]="membership.rolesList" multiple (openedChange)="loadRoles(membership, $event)"
               [disabled]="false" (selectionChange)="updateRoles(membership, $event)">
               <mat-option
-                *ngFor="let role of ((isCurrentMembership(membership) && membershipRoleOptions.length) ? membershipRoleOptions : membership.rolesList)"
+                *ngFor="let role of ((isCurrentMembership(membership) && membershipRoleOptions.length && !loadingRoles) ? membershipRoleOptions : membership.rolesList)"
                 [value]="role">
                 {{ role }}
               </mat-option>
+              <div class="roles-sp-wrapper">
+                <mat-spinner *ngIf="loadingRoles" diameter="25"></mat-spinner>
+              </div>
             </mat-select>
           </cnsl-form-field>
         </td>

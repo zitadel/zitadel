@@ -165,7 +165,10 @@
         right: 0;
         margin: 0;
         margin-bottom: 0.25rem;
-        color: var(--grey);
+
+        &:not(:hover) {
+          color: var(--grey);
+        }
 
         &.selected {
           opacity: 1;

@@ -563,6 +563,7 @@
       "REMOVE": "Remove",
       "TYPE": "Type",
       "ORGID": "Organization ID",
+      "UPDATED": "The membership was updated.",
       "TYPES": {
         "UNKNOWN": "Unknown",
         "ORG": "Organisation",
