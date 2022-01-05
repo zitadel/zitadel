@@ -142,7 +142,7 @@ services:
         ENV: dev
     volumes:
       - ../../.keys:/go/src/github.com/caos/zitadel/.keys
-      - ../../.notifications:/notifications
+      - ../../.notifications:/go/src/github.com/caos/zitadel/.notifications
     env_file:
       - ./local.env
     environment:

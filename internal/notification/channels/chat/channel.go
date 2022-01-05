@@ -15,46 +15,36 @@ import (
 	"github.com/caos/zitadel/internal/notification/channels"
 )
 
-var _ channels.NotificationChannel = (*Chat)(nil)
-
-type Chat struct {
-	URL        *url.URL
-	SplitCount int
-	Compact    bool
-}
-
-func InitChatProvider(config ChatConfig) (*Chat, error) {
+func InitChatChannel(config ChatConfig) (channels.NotificationChannel, error) {
 
 	url, err := url.Parse(config.Url)
 	if err != nil {
 		return nil, err
 	}
-	return &Chat{
-		URL:        url,
-		SplitCount: config.SplitCount,
-	}, nil
-}
 
-func (chat *Chat) HandleMessage(message channels.Message) error {
-	contentText := message.GetContent()
-	if chat.Compact {
-		contentText = html2text.HTML2Text(contentText)
-	}
-	for _, splittedMsg := range splitMessage(contentText, chat.SplitCount) {
-		if err := chat.sendMessage(splittedMsg); err != nil {
-			return err
+	logging.Log("NOTIF-kSvPp").Debug("successfully initialized chat email and sms channel")
+
+	return channels.HandleMessageFunc(func(message channels.Message) error {
+		contentText := message.GetContent()
+		if config.Compact {
+			contentText = html2text.HTML2Text(contentText)
 		}
-	}
-	return nil
+		for _, splittedMsg := range splitMessage(contentText, config.SplitCount) {
+			if err := sendMessage(splittedMsg, url); err != nil {
+				return err
+			}
+		}
+		return nil
+	}), nil
 }
 
-func (chat *Chat) sendMessage(message string) error {
+func sendMessage(message string, chatUrl *url.URL) error {
 	req, err := json.Marshal(message)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")
 	}
 
-	response, err := http.Post(chat.URL.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
+	response, err := http.Post(chatUrl.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-si93s", "unable to send message")
 	}

@@ -10,6 +10,9 @@ import (
 )
 
 func InitStdoutChannel(config LogConfig) channels.NotificationChannel {
+
+	logging.Log("NOTIF-D0164").Debug("successfully initialized stdout email and sms channel")
+
 	return channels.HandleMessageFunc(func(message channels.Message) error {
 
 		content := message.GetContent()

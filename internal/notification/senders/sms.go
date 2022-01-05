@@ -14,7 +14,7 @@ func SMSChannels(config systemdefaults.Notifications) (channels.NotificationChan
 	}
 
 	if !config.DebugMode {
-		return chainChannels(twilio.InitTwilioProvider(config.Providers.Twilio), debug), nil
+		return chainChannels(debug, twilio.InitTwilioChannel(config.Providers.Twilio)), nil
 	}
 
 	return debug, nil
