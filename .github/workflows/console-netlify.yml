@@ -21,9 +21,10 @@ jobs:
           cache-from: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel-console
       - run: echo "/*  /index.html 200" > /tmp/zitadel-console/_redirects
+      - run: ls -latr /tmp/zitadel-console/
       - uses: jsmrcaga/action-netlify-deploy@v1.1.0
         with:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_KEY }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_ID }}
           NETLIFY_DEPLOY_TO_PROD: true
-          build_directory: /tmp/zitadel-console
+          build_directory: /tmp/zitadel-console/
