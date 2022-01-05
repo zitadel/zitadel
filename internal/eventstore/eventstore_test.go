@@ -553,7 +553,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 				events: []Command{
 					&testEvent{
 						BaseEvent: *NewBaseEventForPush(
-							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							service.WithService(authz.NewMockContext("", "editorUser"), "editorService"),
 							NewAggregate(
 								authz.NewMockContext("", "adlerhurst"),
 								"id",
