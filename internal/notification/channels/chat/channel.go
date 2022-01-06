@@ -3,57 +3,48 @@ package chat
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"unicode/utf8"
+
+	"github.com/k3a/html2text"
+
+	"github.com/caos/logging"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/notification/channels"
 )
 
-type Chat struct {
-	URL        *url.URL
-	SplitCount int
-}
+func InitChatChannel(config ChatConfig) (channels.NotificationChannel, error) {
 
-func InitChatProvider(config ChatConfig) (*Chat, error) {
 	url, err := url.Parse(config.Url)
 	if err != nil {
 		return nil, err
 	}
-	return &Chat{
-		URL:        url,
-		SplitCount: config.SplitCount,
-	}, nil
-}
 
-func (chat *Chat) CanHandleMessage(_ providers.Message) bool {
-	return true
-}
+	logging.Log("NOTIF-kSvPp").Debug("successfully initialized chat email and sms channel")
 
-func (chat *Chat) HandleMessage(message providers.Message) error {
-	contentText := message.GetContent()
-	for _, splittedMsg := range splitMessage(contentText, chat.SplitCount) {
-		chatMsg := &ChatMessage{Text: splittedMsg}
-		if err := chat.SendMessage(chatMsg); err != nil {
-			return err
+	return channels.HandleMessageFunc(func(message channels.Message) error {
+		contentText := message.GetContent()
+		if config.Compact {
+			contentText = html2text.HTML2Text(contentText)
 		}
-	}
-	return nil
+		for _, splittedMsg := range splitMessage(contentText, config.SplitCount) {
+			if err := sendMessage(splittedMsg, url); err != nil {
+				return err
+			}
+		}
+		return nil
+	}), nil
 }
 
-func (chat *Chat) SendMessage(message providers.Message) error {
-	chatMsg, ok := message.(*ChatMessage)
-	if !ok {
-		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not ChatMessage")
-	}
-	req, err := json.Marshal(chatMsg)
+func sendMessage(message string, chatUrl *url.URL) error {
+	req, err := json.Marshal(message)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")
 	}
 
-	response, err := http.Post(chat.URL.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
+	response, err := http.Post(chatUrl.String(), "application/json; charset=UTF-8", bytes.NewReader(req))
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-si93s", "unable to send message")
 	}

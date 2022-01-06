@@ -18,7 +18,7 @@ func (s *Step20) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep20(ctx context.Context, step *Step20) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		err := c.eventstore.Step20(ctx, iam.Events[len(iam.Events)-1].Sequence())
 		return nil, err
 	}

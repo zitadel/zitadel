@@ -13,12 +13,12 @@ var (
 )
 
 type Subscription struct {
-	Events chan EventReader
+	Events chan Event
 	types  map[AggregateType][]EventType
 }
 
 //SubscribeAggregates subscribes for all events on the given aggregates
-func SubscribeAggregates(eventQueue chan EventReader, aggregates ...AggregateType) *Subscription {
+func SubscribeAggregates(eventQueue chan Event, aggregates ...AggregateType) *Subscription {
 	types := make(map[AggregateType][]EventType, len(aggregates))
 	for _, aggregate := range aggregates {
 		types[aggregate] = nil
@@ -40,7 +40,7 @@ func SubscribeAggregates(eventQueue chan EventReader, aggregates ...AggregateTyp
 
 //SubscribeEventTypes subscribes for the given event types
 // if no event types are provided the subscription is for all events of the aggregate
-func SubscribeEventTypes(eventQueue chan EventReader, types map[AggregateType][]EventType) *Subscription {
+func SubscribeEventTypes(eventQueue chan Event, types map[AggregateType][]EventType) *Subscription {
 	aggregates := make([]AggregateType, len(types))
 	sub := &Subscription{
 		Events: eventQueue,
@@ -57,7 +57,7 @@ func SubscribeEventTypes(eventQueue chan EventReader, types map[AggregateType][]
 	return sub
 }
 
-func notify(events []EventReader) {
+func notify(events []Event) {
 	go v1.Notify(MapEventsToV1Events(events))
 	subsMutext.Lock()
 	defer subsMutext.Unlock()
@@ -106,7 +106,7 @@ func (s *Subscription) Unsubscribe() {
 	}
 }
 
-func MapEventsToV1Events(events []EventReader) []*models.Event {
+func MapEventsToV1Events(events []Event) []*models.Event {
 	v1Events := make([]*models.Event, len(events))
 	for i, event := range events {
 		v1Events[i] = mapEventToV1Event(event)
@@ -114,7 +114,7 @@ func MapEventsToV1Events(events []EventReader) []*models.Event {
 	return v1Events
 }
 
-func mapEventToV1Event(event EventReader) *models.Event {
+func mapEventToV1Event(event Event) *models.Event {
 	return &models.Event{
 		Sequence:      event.Sequence(),
 		CreationDate:  event.CreationDate(),

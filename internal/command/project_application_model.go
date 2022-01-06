@@ -32,7 +32,7 @@ func NewApplicationWriteModel(projectID, resourceOwner string) *ApplicationWrite
 		},
 	}
 }
-func (wm *ApplicationWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *ApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:

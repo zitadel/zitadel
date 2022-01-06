@@ -16,7 +16,7 @@ func (c *Commands) SetDefaultFeatures(ctx context.Context, features *domain.Feat
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, setEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, setEvent)
 	if err != nil {
 		return nil, err
 	}

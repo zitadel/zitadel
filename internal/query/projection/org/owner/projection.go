@@ -110,7 +110,7 @@ func (p *OrgOwnerProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-kL530", "seq", event.Sequence, "expected", org.MemberAddedEventType).Error("wrong event type")
@@ -129,7 +129,7 @@ func (p *OrgOwnerProjection) reduceMemberAdded(event eventstore.EventReader) (*h
 	return stmt, nil
 }
 
-func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-kL530", "seq", event.Sequence, "expected", org.MemberAddedEventType).Error("wrong event type")
@@ -148,7 +148,7 @@ func (p *OrgOwnerProjection) reduceMemberChanged(event eventstore.EventReader) (
 	return stmt, nil
 }
 
-func (p *OrgOwnerProjection) reduceMemberRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceMemberRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-boIbP", "seq", event.Sequence, "expected", org.MemberRemovedEventType).Error("wrong event type")
@@ -158,7 +158,7 @@ func (p *OrgOwnerProjection) reduceMemberRemoved(event eventstore.EventReader) (
 	return p.deleteOwner(e, e.Aggregate().ID, e.UserID), nil
 }
 
-func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanEmailChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-IHFwh", "seq", event.Sequence, "expected", user.HumanEmailChangedType).Error("wrong event type")
@@ -177,7 +177,7 @@ func (p *OrgOwnerProjection) reduceHumanEmailChanged(event eventstore.EventReade
 	), nil
 }
 
-func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.HumanProfileChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-WqgUS", "seq", event.Sequence, "expected", user.HumanProfileChangedType).Error("wrong event type")
@@ -212,7 +212,7 @@ func (p *OrgOwnerProjection) reduceHumanProfileChanged(event eventstore.EventRea
 	), nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-wbOrL", "seq", event.Sequence, "expected", org.OrgAddedEventType).Error("wrong event type")
@@ -229,7 +229,7 @@ func (p *OrgOwnerProjection) reduceOrgAdded(event eventstore.EventReader) (*hand
 	), nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-piy2b", "seq", event.Sequence, "expected", org.OrgChangedEventType).Error("wrong event type")
@@ -255,7 +255,7 @@ func (p *OrgOwnerProjection) reduceOrgChanged(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *OrgOwnerProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-F1mHQ", "seq", event.Sequence, "expected", org.OrgRemovedEventType).Error("wrong event type")
@@ -289,7 +289,7 @@ func isOrgOwner(roles []string) bool {
 	return false
 }
 
-func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ownerID string) *handler.Statement {
+func (p *OrgOwnerProjection) deleteOwner(event eventstore.Event, orgID, ownerID string) *handler.Statement {
 	return crdb.NewDeleteStatement(
 		event,
 		[]handler.Condition{
@@ -300,8 +300,8 @@ func (p *OrgOwnerProjection) deleteOwner(event eventstore.EventReader, orgID, ow
 	)
 }
 
-func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userID string) (*handler.Statement, error) {
-	events, err := p.Eventstore.FilterEvents(context.Background(),
+func (p *OrgOwnerProjection) addOwner(event eventstore.Event, orgID, userID string) (*handler.Statement, error) {
+	events, err := p.Eventstore.Filter(context.Background(),
 		eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 			AddQuery().
 			AggregateTypes(user.AggregateType).
@@ -355,7 +355,7 @@ func (p *OrgOwnerProjection) addOwner(event eventstore.EventReader, orgID, userI
 	), nil
 }
 
-func (p *OrgOwnerProjection) reduce(owner *OrgOwner, events []eventstore.EventReader) {
+func (p *OrgOwnerProjection) reduce(owner *OrgOwner, events []eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:

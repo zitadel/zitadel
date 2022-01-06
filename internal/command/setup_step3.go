@@ -23,7 +23,7 @@ func (s *Step3) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep3(ctx context.Context, step *Step3) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		event, err := c.addDefaultPasswordAgePolicy(ctx, iamAgg, NewIAMPasswordAgePolicyWriteModel(), &domain.PasswordAgePolicy{
 			MaxAgeDays:     step.DefaultPasswordAgePolicy.MaxAgeDays,
@@ -33,7 +33,7 @@ func (c *Commands) SetupStep3(ctx context.Context, step *Step3) error {
 			return nil, err
 		}
 		logging.Log("SETUP-DBqgq").Info("default password age policy set up")
-		return []eventstore.EventPusher{event}, nil
+		return []eventstore.Command{event}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

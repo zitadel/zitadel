@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -19,7 +20,7 @@ func (c *Commands) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, po
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +31,7 @@ func (c *Commands) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, po
 	return orgWriteModelToOrgIAMPolicy(addedPolicy), nil
 }
 
-func (c *Commands) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -59,7 +60,7 @@ func (c *Commands) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +84,7 @@ func (c *Commands) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, org.NewOrgIAMPolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.Push(ctx, org.NewOrgIAMPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }
 

@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -26,7 +27,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 	if existingCode.UserState != domain.UserStateInitial {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.AlreadyInitialised")
 	}
-	var events []eventstore.EventPusher
+	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	if email != "" && existingCode.Email != email {
 		changedEvent, _ := existingCode.NewChangedEvent(ctx, userAgg, email)
@@ -37,7 +38,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 		return nil, err
 	}
 	events = append(events, user.NewHumanInitialCodeAddedEvent(ctx, userAgg, initCode.Code, initCode.Expiry))
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,11 +68,11 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
 	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.initializeUserCode)
 	if err != nil {
-		_, err = c.eventstore.PushEvents(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
+		_, err = c.eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
 		logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")
 		return caos_errs.ThrowInvalidArgument(err, "COMMAND-11v6G", "Errors.User.Code.Invalid")
 	}
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		user.NewHumanInitializedCheckSucceededEvent(ctx, userAgg),
 	}
 	if !existingCode.IsEmailVerified {
@@ -90,7 +91,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 		}
 		events = append(events, passwordEvent)
 	}
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	return err
 }
 
@@ -106,7 +107,7 @@ func (c *Commands) HumanInitCodeSent(ctx context.Context, orgID, userID string) 
 		return caos_errs.ThrowNotFound(nil, "COMMAND-556zg", "Errors.User.Code.NotFound")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingInitCode.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg))
+	_, err = c.eventstore.Push(ctx, user.NewHumanInitialCodeSentEvent(ctx, userAgg))
 	return err
 }
 

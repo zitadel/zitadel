@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -41,7 +42,7 @@ func NewPasswordAgePolicyAddedEvent(
 	}
 }
 
-func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordAgePolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PasswordAgePolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -99,7 +100,7 @@ func ChangeMaxAgeDays(maxAgeDays uint64) func(*PasswordAgePolicyChangedEvent) {
 	}
 }
 
-func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordAgePolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PasswordAgePolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -130,7 +131,7 @@ func NewPasswordAgePolicyRemovedEvent(base *eventstore.BaseEvent) *PasswordAgePo
 	}
 }
 
-func PasswordAgePolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PasswordAgePolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &PasswordAgePolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

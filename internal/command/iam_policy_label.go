@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -17,7 +18,7 @@ func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, policy *domain.Lab
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +29,7 @@ func (c *Commands) AddDefaultLabelPolicy(ctx context.Context, policy *domain.Lab
 	return writeModelToLabelPolicy(&addedPolicy.LabelPolicyWriteModel), nil
 }
 
-func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLabelPolicyWriteModel, policy *domain.LabelPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultLabelPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLabelPolicyWriteModel, policy *domain.LabelPolicy) (eventstore.Command, error) {
 	if err := policy.IsValid(); err != nil {
 		return nil, err
 	}
@@ -88,7 +89,7 @@ func (c *Commands) ChangeDefaultLabelPolicy(ctx context.Context, policy *domain.
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +111,7 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyActivatedEvent(ctx, iamAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyActivatedEvent(ctx, iamAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey str
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-Qw0pd", "Errors.IAM.LabelPolicy.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoAddedEvent(ctx, iamAgg, storageKey))
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +162,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 		return nil, err
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoRemovedEvent(ctx, iamAgg, existingPolicy.LogoKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoRemovedEvent(ctx, iamAgg, existingPolicy.LogoKey))
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +186,7 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey str
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-1yMx0", "Errors.IAM.LabelPolicy.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconAddedEvent(ctx, iamAgg, storageKey))
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +211,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 		return nil, err
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconRemovedEvent(ctx, iamAgg, existingPolicy.IconKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconRemovedEvent(ctx, iamAgg, existingPolicy.IconKey))
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +235,7 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-ZR9fs", "Errors.IAM.LabelPolicy.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoDarkAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoDarkAddedEvent(ctx, iamAgg, storageKey))
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +260,7 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 		return nil, err
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyLogoDarkRemovedEvent(ctx, iamAgg, existingPolicy.LogoDarkKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoDarkRemovedEvent(ctx, iamAgg, existingPolicy.LogoDarkKey))
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +284,7 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-vMsf9", "Errors.IAM.LabelPolicy.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconDarkAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconDarkAddedEvent(ctx, iamAgg, storageKey))
 	if err != nil {
 		return nil, err
 	}
@@ -308,7 +309,7 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 		return nil, err
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyIconDarkRemovedEvent(ctx, iamAgg, existingPolicy.IconDarkKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconDarkRemovedEvent(ctx, iamAgg, existingPolicy.IconDarkKey))
 	if err != nil {
 		return nil, err
 	}
@@ -332,7 +333,7 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey str
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-1N8fE", "Errors.IAM.LabelPolicy.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyFontAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyFontAddedEvent(ctx, iamAgg, storageKey))
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +358,7 @@ func (c *Commands) RemoveFontDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 		return nil, err
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLabelPolicyFontRemovedEvent(ctx, iamAgg, existingPolicy.FontKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyFontRemovedEvent(ctx, iamAgg, existingPolicy.FontKey))
 	if err != nil {
 		return nil, err
 	}

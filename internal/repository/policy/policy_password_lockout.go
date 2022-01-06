@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -42,7 +43,7 @@ func NewLockoutPolicyAddedEvent(
 	}
 }
 
-func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockoutPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LockoutPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -100,7 +101,7 @@ func ChangeShowLockOutFailures(showLockOutFailures bool) func(*LockoutPolicyChan
 	}
 }
 
-func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockoutPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &LockoutPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -131,7 +132,7 @@ func NewLockoutPolicyRemovedEvent(base *eventstore.BaseEvent) *LockoutPolicyRemo
 	}
 }
 
-func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LockoutPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &LockoutPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

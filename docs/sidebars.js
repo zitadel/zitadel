@@ -245,6 +245,7 @@ module.exports = {
       ],
       collapsed: false,
     },
+    "manuals/troubleshooting",
   ],
   legal: [
     "legal/introduction",

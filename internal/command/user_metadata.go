@@ -20,7 +20,7 @@ func (c *Commands) SetUserMetadata(ctx context.Context, metadata *domain.Metadat
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		return nil, err
 	}
 
-	events := make([]eventstore.EventPusher, len(metadatas))
+	events := make([]eventstore.Command, len(metadatas))
 	setMetadata := NewUserMetadataListWriteModel(userID, resourceOwner)
 	userAgg := UserAggregateFromWriteModel(&setMetadata.WriteModel)
 	for i, data := range metadatas {
@@ -52,7 +52,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 		events[i] = event
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Commands) BulkSetUserMetadata(ctx context.Context, userID, resourceOwne
 	return writeModelToObjectDetails(&setMetadata.WriteModel), nil
 }
 
-func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadata *domain.Metadata) (pusher eventstore.EventPusher, err error) {
+func (c *Commands) setUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadata *domain.Metadata) (command eventstore.Command, err error) {
 	if !metadata.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "META-2m00f", "Errors.Metadata.Invalid")
 	}
@@ -96,7 +96,7 @@ func (c *Commands) RemoveUserMetadata(ctx context.Context, metadataKey, userID, 
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 		return nil, err
 	}
 
-	events := make([]eventstore.EventPusher, len(metadataKeys))
+	events := make([]eventstore.Command, len(metadataKeys))
 	removeMetadata, err := c.getUserMetadataListModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 		events[i] = event
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (c *Commands) BulkRemoveUserMetadata(ctx context.Context, userID, resourceO
 	return writeModelToObjectDetails(&removeMetadata.WriteModel), nil
 }
 
-func (c *Commands) removeUserMetadataFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.EventPusher, error) {
+func (c *Commands) removeUserMetadataFromOrg(ctx context.Context, resourceOwner string) ([]eventstore.Command, error) {
 	existingUserMetadata, err := c.getUserMetadataByOrgListModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
@@ -157,7 +157,7 @@ func (c *Commands) removeUserMetadataFromOrg(ctx context.Context, resourceOwner 
 	if len(existingUserMetadata.UserMetadata) == 0 {
 		return nil, nil
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	for key, value := range existingUserMetadata.UserMetadata {
 		if len(value) == 0 {
 			continue
@@ -167,13 +167,13 @@ func (c *Commands) removeUserMetadataFromOrg(ctx context.Context, resourceOwner 
 	return events, nil
 }
 
-func (c *Commands) removeUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadataKey string) (pusher eventstore.EventPusher, err error) {
-	pusher = user.NewMetadataRemovedEvent(
+func (c *Commands) removeUserMetadata(ctx context.Context, userAgg *eventstore.Aggregate, metadataKey string) (command eventstore.Command, err error) {
+	command = user.NewMetadataRemovedEvent(
 		ctx,
 		userAgg,
 		metadataKey,
 	)
-	return pusher, nil
+	return command, nil
 }
 
 func (c *Commands) getUserMetadataModelByID(ctx context.Context, userID, resourceOwner, key string) (*UserMetadataWriteModel, error) {

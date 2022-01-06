@@ -22,24 +22,7 @@ func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomTe
 			msg.ChangeDate,
 			msg.AggregateID,
 		),
-	}
-}
-
-func DomainCustomMsgTextToPb(msg *domain.CustomMessageText) *text_pb.MessageCustomText {
-	return &text_pb.MessageCustomText{
-		Title:      msg.Title,
-		PreHeader:  msg.PreHeader,
-		Subject:    msg.Subject,
-		Greeting:   msg.Greeting,
-		Text:       msg.Text,
-		ButtonText: msg.ButtonText,
-		FooterText: msg.FooterText,
-		Details: object.ToViewDetailsPb(
-			msg.Sequence,
-			msg.CreationDate,
-			msg.ChangeDate,
-			"", //TODO: resourceowner
-		),
+		IsDefault: msg.AggregateID == domain.IAMID,
 	}
 }
 

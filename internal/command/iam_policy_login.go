@@ -29,7 +29,7 @@ func (c *Commands) AddDefaultLoginPolicy(ctx context.Context, policy *domain.Log
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (c *Commands) AddDefaultLoginPolicy(ctx context.Context, policy *domain.Log
 	return writeModelToLoginPolicy(&addedPolicy.LoginPolicyWriteModel), nil
 }
 
-func (c *Commands) addDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *Commands) ChangeDefaultLoginPolicy(ctx context.Context, policy *domain.
 	return writeModelToLoginPolicy(&existingPolicy.LoginPolicyWriteModel), nil
 }
 
-func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) changeDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, existingPolicy *IAMLoginPolicyWriteModel, policy *domain.LoginPolicy) (eventstore.Command, error) {
 	err := c.defaultLoginPolicyWriteModelByID(ctx, existingPolicy)
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, idpPr
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&idpModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewIdentityProviderAddedEvent(ctx, iamAgg, idpProvider.IDPConfigID))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewIdentityProviderAddedEvent(ctx, iamAgg, idpProvider.IDPConfigID))
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 
 	iamAgg := IAMAggregateFromWriteModel(&idpModel.IdentityProviderWriteModel.WriteModel)
 	events := c.removeIDPProviderFromDefaultLoginPolicy(ctx, iamAgg, idpProvider, false, cascadeExternalIDPs...)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -158,8 +158,8 @@ func (c *Commands) RemoveIDPProviderFromDefaultLoginPolicy(ctx context.Context, 
 	return writeModelToObjectDetails(&idpModel.IdentityProviderWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.EventPusher {
-	var events []eventstore.EventPusher
+func (c *Commands) removeIDPProviderFromDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, idpProvider *domain.IDPProvider, cascade bool, cascadeExternalIDPs ...*domain.UserIDPLink) []eventstore.Command {
+	var events []eventstore.Command
 	if cascade {
 		events = append(events, iam_repo.NewIdentityProviderCascadeRemovedEvent(ctx, iamAgg, idpProvider.IDPConfigID))
 	} else {
@@ -188,7 +188,7 @@ func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, seco
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return domain.SecondFactorTypeUnspecified, nil, err
 	}
@@ -199,7 +199,7 @@ func (c *Commands) AddSecondFactorToDefaultLoginPolicy(ctx context.Context, seco
 	return secondFactorModel.MFAType, writeModelToObjectDetails(&secondFactorModel.WriteModel), nil
 }
 
-func (c *Commands) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, secondFactorModel *IAMSecondFactorWriteModel, secondFactor domain.SecondFactorType) (eventstore.EventPusher, error) {
+func (c *Commands) addSecondFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, secondFactorModel *IAMSecondFactorWriteModel, secondFactor domain.SecondFactorType) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, secondFactorModel)
 	if err != nil {
 		return nil, err
@@ -224,7 +224,7 @@ func (c *Commands) RemoveSecondFactorFromDefaultLoginPolicy(ctx context.Context,
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-3M9od", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLoginPolicySecondFactorRemovedEvent(ctx, iamAgg, secondFactor))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLoginPolicySecondFactorRemovedEvent(ctx, iamAgg, secondFactor))
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +246,7 @@ func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multi
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return domain.MultiFactorTypeUnspecified, nil, err
 	}
@@ -257,7 +257,7 @@ func (c *Commands) AddMultiFactorToDefaultLoginPolicy(ctx context.Context, multi
 	return multiFactorModel.MultiFactorWriteModel.MFAType, writeModelToObjectDetails(&multiFactorModel.WriteModel), nil
 }
 
-func (c *Commands) addMultiFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, multiFactorModel *IAMMultiFactorWriteModel, multiFactor domain.MultiFactorType) (eventstore.EventPusher, error) {
+func (c *Commands) addMultiFactorToDefaultLoginPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, multiFactorModel *IAMMultiFactorWriteModel, multiFactor domain.MultiFactorType) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, multiFactorModel)
 	if err != nil {
 		return nil, err
@@ -282,7 +282,7 @@ func (c *Commands) RemoveMultiFactorFromDefaultLoginPolicy(ctx context.Context, 
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-3M9df", "Errors.IAM.LoginPolicy.MFA.NotExisting")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewLoginPolicyMultiFactorRemovedEvent(ctx, iamAgg, multiFactor))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLoginPolicyMultiFactorRemovedEvent(ctx, iamAgg, multiFactor))
 	if err != nil {
 		return nil, err
 	}

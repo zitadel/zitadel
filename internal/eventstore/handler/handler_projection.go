@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"runtime/debug"
 	"sort"
 	"sync"
 	"time"
@@ -22,7 +23,7 @@ type Update func(context.Context, []*Statement, Reduce) (unexecutedStmts []*Stat
 
 //Reduce reduces the given event to a statement
 //which is used to update the projection
-type Reduce func(eventstore.EventReader) (*Statement, error)
+type Reduce func(eventstore.Event) (*Statement, error)
 
 //Lock is used for mutex handling if needed on the projection
 type Lock func(context.Context, time.Duration) <-chan error
@@ -106,7 +107,7 @@ func (h *ProjectionHandler) Process(
 	//handle panic
 	defer func() {
 		cause := recover()
-		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause).Error("projection handler paniced")
+		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause, "stack", string(debug.Stack())).Error("projection handler paniced")
 	}()
 
 	execBulk := h.prepareExecuteBulk(query, reduce, update)
@@ -155,7 +156,7 @@ func (h *ProjectionHandler) Process(
 
 func (h *ProjectionHandler) processEvent(
 	ctx context.Context,
-	event eventstore.EventReader,
+	event eventstore.Event,
 	reduce Reduce,
 ) error {
 	stmt, err := reduce(event)
@@ -261,7 +262,7 @@ func (h *ProjectionHandler) fetchBulkStmts(
 		return false, err
 	}
 
-	events, err := h.Eventstore.FilterEvents(ctx, eventQuery)
+	events, err := h.Eventstore.Filter(ctx, eventQuery)
 	if err != nil {
 		logging.LogWithFields("HANDL-X8vlo", "projection", h.ProjectionName).WithError(err).Info("Unable to bulk fetch events")
 		return false, err

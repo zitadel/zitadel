@@ -9,7 +9,7 @@ type IAMMembersReadModel struct {
 	MembersReadModel
 }
 
-func (rm *IAMMembersReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMMembersReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.MemberAddedEvent:

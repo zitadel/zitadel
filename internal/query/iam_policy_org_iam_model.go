@@ -8,7 +8,7 @@ import (
 
 type IAMOrgIAMPolicyReadModel struct{ OrgIAMPolicyReadModel }
 
-func (rm *IAMOrgIAMPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMOrgIAMPolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.OrgIAMPolicyAddedEvent:
