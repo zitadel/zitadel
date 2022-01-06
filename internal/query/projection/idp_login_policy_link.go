@@ -91,7 +91,7 @@ const (
 	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
 )
 
-func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (
 		idp          policy.IdentityProviderAddedEvent
 		providerType domain.IdentityProviderType
@@ -122,7 +122,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.EventReader)
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idp policy.IdentityProviderRemovedEvent
 
 	switch e := event.(type) {
@@ -143,7 +143,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.EventReade
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idp policy.IdentityProviderCascadeRemovedEvent
 
 	switch e := event.(type) {
@@ -164,7 +164,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idpID string
 
 	switch e := event.(type) {
@@ -185,7 +185,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 	), nil
 }
 
-func (p *IDPLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPLoginPolicyLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-WTYC1", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")

@@ -26,7 +26,7 @@ func NewIAMIDPJWTConfigWriteModel(idpConfigID string) *IAMIDPJWTConfigWriteModel
 	}
 }
 
-func (wm *IAMIDPJWTConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMIDPJWTConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPJWTConfigAddedEvent:

@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -39,7 +40,7 @@ func NewOrgIAMPolicyAddedEvent(
 	}
 }
 
-func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgIAMPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OrgIAMPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -90,7 +91,7 @@ func ChangeUserLoginMustBeDomain(userLoginMustBeDomain bool) func(*OrgIAMPolicyC
 	}
 }
 
-func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgIAMPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OrgIAMPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -121,7 +122,7 @@ func NewOrgIAMPolicyRemovedEvent(base *eventstore.BaseEvent) *OrgIAMPolicyRemove
 	}
 }
 
-func OrgIAMPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgIAMPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &OrgIAMPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

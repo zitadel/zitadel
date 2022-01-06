@@ -85,7 +85,7 @@ func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextSetEvent
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
@@ -135,7 +135,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*hand
 		cols), nil
 }
 
-func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
@@ -185,7 +185,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextTemplateRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextTemplateRemovedEvent:

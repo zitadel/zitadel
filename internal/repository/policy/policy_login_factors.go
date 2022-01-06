@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -34,7 +35,7 @@ func NewSecondFactorAddedEvent(
 	}
 }
 
-func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SecondFactorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SecondFactorAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -70,7 +71,7 @@ func NewSecondFactorRemovedEvent(
 	}
 }
 
-func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SecondFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SecondFactorRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -107,7 +108,7 @@ func NewMultiFactorAddedEvent(
 	}
 }
 
-func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MultiFactorAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MultiFactorAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -143,7 +144,7 @@ func NewMultiFactorRemovedEvent(
 	}
 }
 
-func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MultiFactorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MultiFactorRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

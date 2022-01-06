@@ -85,7 +85,7 @@ const (
 	IDPUserLinkDisplayNameCol    = "display_name"
 )
 
-func (p *IDPUserLinkProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-v2qC3", "seq", event.Sequence(), "expectedType", user.UserIDPLinkAddedType).Error("wrong event type")
@@ -106,7 +106,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.EventReader) (*hand
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", user.UserIDPLinkRemovedType).Error("wrong event type")
@@ -122,7 +122,7 @@ func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-I0s2H", "seq", event.Sequence(), "expectedType", user.UserIDPLinkCascadeRemovedType).Error("wrong event type")
@@ -138,7 +138,7 @@ func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.EventReade
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")
@@ -152,7 +152,7 @@ func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.EventReader) (
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-yM6u6", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
@@ -166,7 +166,7 @@ func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.EventReader) 
 	), nil
 }
 
-func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idpID string
 
 	switch e := event.(type) {

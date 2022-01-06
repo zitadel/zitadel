@@ -52,7 +52,7 @@ func (e *SetupStepEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint
 	}
 }
 
-func SetupStepMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SetupStepMapper(event *repository.Event) (eventstore.Event, error) {
 	step := &SetupStepEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 		Done:      eventstore.EventType(event.Type) == SetupDoneEventType,

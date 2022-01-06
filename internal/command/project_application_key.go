@@ -43,7 +43,7 @@ func (c *Commands) AddApplicationKey(ctx context.Context, key *domain.Applicatio
 	}
 	key.ClientID = keyWriteModel.ClientID
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx,
+	pushedEvents, err := c.eventstore.Push(ctx,
 		project.NewApplicationKeyAddedEvent(
 			ctx,
 			ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel),
@@ -75,7 +75,7 @@ func (c *Commands) RemoveApplicationKey(ctx context.Context, projectID, applicat
 		return nil, errors.ThrowNotFound(nil, "COMMAND-4m77G", "Errors.Application.Key.NotFound")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewApplicationKeyRemovedEvent(ctx, ProjectAggregateFromWriteModel(&keyWriteModel.WriteModel), keyID))
 	if err != nil {
 		return nil, err
 	}

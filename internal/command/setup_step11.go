@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -21,7 +22,7 @@ func (s *Step11) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep11(ctx context.Context, step *Step11) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		var uniqueContraintMigrations []*domain.UniqueConstraintMigration
 		if step.MigrateV1EventstoreToV2 {
@@ -33,7 +34,7 @@ func (c *Commands) SetupStep11(ctx context.Context, step *Step11) error {
 			uniqueContraintMigrations = uniqueConstraints.UniqueConstraints
 		}
 		logging.Log("SETUP-M9fsd").Info("migrate v1 eventstore to v2")
-		return []eventstore.EventPusher{iam_repo.NewMigrateUniqueConstraintEvent(ctx, iamAgg, uniqueContraintMigrations)}, nil
+		return []eventstore.Command{iam_repo.NewMigrateUniqueConstraintEvent(ctx, iamAgg, uniqueContraintMigrations)}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

@@ -1,0 +1,10 @@
+:::caution Security Notice
+In contrast to the Code Flow, where you'll receive a code for token exchange, with the implicit flow you'll receive
+the tokens directly from the authorization endpoint. This is unsecure and might lead to token leakage and replay attacks.
+It will further be removed in OAuth 2.1 for the exact same reason.
+
+We therefore discourage the use of Implicit Flow and do not cover the flow in this guide.
+:::
+
+If you still need to rely on the implicit flow, simply keep in mind that the response on the authorization_endpoint is
+the same you would be given on the token_endpoint and check the [OAuth / OIDC endpoint documentation](../../../apis/openidoauth/endpoints.md) for more information.

@@ -19,7 +19,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ek9s", "Errors.User.ExternalIDP.MinimumExternalIDPNeeded")
 	}
 
-	events := make([]eventstore.EventPusher, len(links))
+	events := make([]eventstore.Command, len(links))
 	for i, link := range links {
 		linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
 		userAgg := UserAggregateFromWriteModel(&linkWriteModel.WriteModel)
@@ -30,11 +30,11 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		}
 	}
 
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	return err
 }
 
-func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggregate, link *domain.UserIDPLink) (eventstore.EventPusher, error) {
+func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggregate, link *domain.UserIDPLink) (eventstore.Command, error) {
 	if link.AggregateID != "" && human.ID != link.AggregateID {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-33M0g", "Errors.IDMissing")
 	}
@@ -56,7 +56,7 @@ func (c *Commands) RemoveUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (c *Commands) RemoveUserIDPLink(ctx context.Context, link *domain.UserIDPLi
 	return writeModelToObjectDetails(&linkWriteModel.WriteModel), nil
 }
 
-func (c *Commands) removeUserIDPLink(ctx context.Context, link *domain.UserIDPLink, cascade bool) (eventstore.EventPusher, *UserIDPLinkWriteModel, error) {
+func (c *Commands) removeUserIDPLink(ctx context.Context, link *domain.UserIDPLink, cascade bool) (eventstore.Command, *UserIDPLinkWriteModel, error) {
 	if !link.IsValid() || link.AggregateID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M9ds", "Errors.IDMissing")
 	}
@@ -100,7 +100,7 @@ func (c *Commands) UserIDPLoginChecked(ctx context.Context, orgID, userID string
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, user.NewUserIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	_, err = c.eventstore.Push(ctx, user.NewUserIDPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	return err
 }
 

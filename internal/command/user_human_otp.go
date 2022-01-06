@@ -46,7 +46,7 @@ func (c *Commands) AddHumanOTP(ctx context.Context, userID, resourceowner string
 	if err != nil {
 		return nil, err
 	}
-	_, err = c.eventstore.PushEvents(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
+	_, err = c.eventstore.Push(ctx, user.NewHumanOTPAddedEvent(ctx, userAgg, secret))
 
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (c *Commands) HumanCheckMFAOTPSetup(ctx context.Context, userID, code, user
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPVerifiedEvent(ctx, userAgg, userAgentID))
 	if err != nil {
 		return nil, err
 	}
@@ -105,10 +105,10 @@ func (c *Commands) HumanCheckMFAOTP(ctx context.Context, userID, code, resourceo
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
 	err = domain.VerifyMFAOTP(code, existingOTP.Secret, c.multifactors.OTP.CryptoMFA)
 	if err == nil {
-		_, err = c.eventstore.PushEvents(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+		_, err = c.eventstore.Push(ctx, user.NewHumanOTPCheckSucceededEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 		return err
 	}
-	_, pushErr := c.eventstore.PushEvents(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
+	_, pushErr := c.eventstore.Push(ctx, user.NewHumanOTPCheckFailedEvent(ctx, userAgg, authRequestDomainToAuthRequestInfo(authRequest)))
 	logging.Log("COMMAND-9fj7s").OnError(pushErr).Error("error create password check failed event")
 	return err
 }
@@ -126,7 +126,7 @@ func (c *Commands) HumanRemoveOTP(ctx context.Context, userID, resourceOwner str
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-Hd9sd", "Errors.User.MFA.OTP.NotExisting")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingOTP.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanOTPRemovedEvent(ctx, userAgg))
 	if err != nil {
 		return nil, err
 	}

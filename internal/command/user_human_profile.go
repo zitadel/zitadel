@@ -29,7 +29,7 @@ func (c *Commands) ChangeHumanProfile(ctx context.Context, profile *domain.Profi
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
 	}
 
-	events, err := c.eventstore.PushEvents(ctx, changedEvent)
+	events, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

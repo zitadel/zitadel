@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -21,11 +22,11 @@ func (s *Step9) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep9(ctx context.Context, step *Step9) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		multiFactorModel := NewIAMMultiFactorWriteModel(domain.MultiFactorTypeU2FWithPIN)
 		iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 		if !step.Passwordless {
-			return []eventstore.EventPusher{}, nil
+			return []eventstore.Command{}, nil
 		}
 		passwordlessEvent, err := setPasswordlessAllowedInPolicy(ctx, c, iamAgg)
 		if err != nil {
@@ -37,12 +38,12 @@ func (c *Commands) SetupStep9(ctx context.Context, step *Step9) error {
 			return nil, err
 		}
 		logging.Log("SETUP-ADfng").Info("added passwordless to MFA login policy")
-		return []eventstore.EventPusher{passwordlessEvent, multifactorEvent}, nil
+		return []eventstore.Command{passwordlessEvent, multifactorEvent}, nil
 	}
 	return c.setup(ctx, step, fn)
 }
 
-func setPasswordlessAllowedInPolicy(ctx context.Context, c *Commands, iamAgg *eventstore.Aggregate) (eventstore.EventPusher, error) {
+func setPasswordlessAllowedInPolicy(ctx context.Context, c *Commands, iamAgg *eventstore.Aggregate) (eventstore.Command, error) {
 	policy, err := c.getDefaultLoginPolicy(ctx)
 	if err != nil {
 		return nil, err

@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -94,7 +95,7 @@ func ChangeGender(gender domain.Gender) func(event *HumanProfileChangedEvent) {
 	}
 }
 
-func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanProfileChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	profileChanged := &HumanProfileChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

@@ -97,7 +97,7 @@ func NewOIDCConfigAddedEvent(
 	}
 }
 
-func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -248,7 +248,7 @@ func ChangeAdditionalOrigins(additionalOrigins []string) func(event *OIDCConfigC
 	}
 }
 
-func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -293,7 +293,7 @@ func NewOIDCConfigSecretChangedEvent(
 	}
 }
 
-func OIDCConfigSecretChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigSecretChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -335,7 +335,7 @@ func NewOIDCConfigSecretCheckSucceededEvent(
 	}
 }
 
-func OIDCConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigSecretCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -377,7 +377,7 @@ func NewOIDCConfigSecretCheckFailedEvent(
 	}
 }
 
-func OIDCConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OIDCConfigSecretCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &OIDCConfigSecretCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

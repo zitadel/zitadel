@@ -25,7 +25,7 @@ func NewOrgFeaturesWriteModel(orgID string) *OrgFeaturesWriteModel {
 	}
 }
 
-func (wm *OrgFeaturesWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgFeaturesWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.FeaturesSetEvent:

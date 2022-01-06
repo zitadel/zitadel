@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -65,7 +66,7 @@ func (c *Commands) StartSetup(ctx context.Context, step domain.Step) (*domain.IA
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-9so34", "setup error")
 	}
 	aggregate := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, iam_repo.NewSetupStepStartedEvent(ctx, aggregate, step))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewSetupStepStartedEvent(ctx, aggregate, step))
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Grgh1", "Setup start failed")
 	}
@@ -77,7 +78,7 @@ func (c *Commands) StartSetup(ctx context.Context, step domain.Step) (*domain.IA
 	return writeModelToIAM(iamWriteModel), nil
 }
 
-func (c *Commands) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) ([]eventstore.EventPusher, error)) error {
+func (c *Commands) setup(ctx context.Context, step Step, iamAggregateProvider func(*IAMWriteModel) ([]eventstore.Command, error)) error {
 	iam, err := c.getIAMWriteModel(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
@@ -92,7 +93,7 @@ func (c *Commands) setup(ctx context.Context, step Step, iamAggregateProvider fu
 	iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 	events = append(events, iam_repo.NewSetupStepDoneEvent(ctx, iamAgg, step.Step()))
 
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	if caos_errs.IsErrorAlreadyExists(err) {
 		logging.LogWithFields("SETUP-4M9gsf", "step", step.Step()).WithError(err).Info("setup step already done")
 	}

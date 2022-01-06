@@ -22,7 +22,7 @@ func NewIAMSecondFactorWriteModel(factorType domain.SecondFactorType) *IAMSecond
 	}
 }
 
-func (wm *IAMSecondFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMSecondFactorWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LoginPolicySecondFactorAddedEvent:
@@ -69,7 +69,7 @@ func NewIAMMultiFactorWriteModel(factorType domain.MultiFactorType) *IAMMultiFac
 	}
 }
 
-func (wm *IAMMultiFactorWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMMultiFactorWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LoginPolicyMultiFactorAddedEvent:

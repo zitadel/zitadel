@@ -56,7 +56,7 @@ func NewOrgAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, name
 	}
 }
 
-func OrgAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgAdded := &OrgAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -98,7 +98,7 @@ func NewOrgChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, ol
 	}
 }
 
-func OrgChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgChanged := &OrgChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -132,7 +132,7 @@ func NewOrgDeactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 	}
 }
 
-func OrgDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &OrgDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -160,7 +160,7 @@ func NewOrgReactivatedEvent(ctx context.Context, aggregate *eventstore.Aggregate
 	}
 }
 
-func OrgReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &OrgReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -190,7 +190,7 @@ func NewOrgRemovedEvent(ctx context.Context, aggregate *eventstore.Aggregate, na
 	}
 }
 
-func OrgRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func OrgRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	orgChanged := &OrgRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

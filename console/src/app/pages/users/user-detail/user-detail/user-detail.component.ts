@@ -85,7 +85,7 @@ export class UserDetailComponent implements OnInit {
   }
 
   public changeUsername(): void {
-    const dialogRefPhone = this.dialog.open(EditDialogComponent, {
+    const dialogRef = this.dialog.open(EditDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.CHANGE',
         cancelKey: 'ACTIONS.CANCEL',
@@ -97,10 +97,10 @@ export class UserDetailComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRefPhone.afterClosed().subscribe((resp) => {
-      if (resp && resp !== this.user.userName) {
+    dialogRef.afterClosed().subscribe((resp: { value: string }) => {
+      if (resp.value && resp.value !== this.user.userName) {
         this.mgmtUserService
-          .updateUserName(this.user.id, resp)
+          .updateUserName(this.user.id, resp.value)
           .then(() => {
             this.toast.showInfo('USER.TOAST.USERNAMECHANGED', true);
             this.refreshUser();

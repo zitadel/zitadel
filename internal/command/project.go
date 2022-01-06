@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -14,7 +15,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +26,7 @@ func (c *Commands) AddProject(ctx context.Context, project *domain.Project, reso
 	return projectWriteModelToProject(addedProject), nil
 }
 
-func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ []eventstore.EventPusher, _ *ProjectWriteModel, err error) {
+func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, resourceOwner, ownerUserID string) (_ []eventstore.Command, _ *ProjectWriteModel, err error) {
 	if !projectAdd.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-IOVCC", "Errors.Project.Invalid")
 	}
@@ -44,7 +45,7 @@ func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, r
 	if iam.GlobalOrgID == resourceOwner {
 		projectRole = domain.RoleProjectOwnerGlobal
 	}
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		project.NewProjectAddedEvent(
 			ctx,
 			projectAgg,
@@ -108,7 +109,7 @@ func (c *Commands) ChangeProject(ctx context.Context, projectChange *domain.Proj
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.NoChangesFound")
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +137,7 @@ func (c *Commands) DeactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectDeactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +165,7 @@ func (c *Commands) ReactivateProject(ctx context.Context, projectID string, reso
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewProjectReactivatedEvent(ctx, projectAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +189,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9sd", "Errors.Project.NotFound")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingProject.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		project.NewProjectRemovedEvent(ctx, projectAgg, existingProject.Name),
 	}
 
@@ -201,7 +202,7 @@ func (c *Commands) RemoveProject(ctx context.Context, projectID, resourceOwner s
 		events = append(events, event)
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}

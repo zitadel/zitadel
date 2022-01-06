@@ -27,7 +27,7 @@ func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain
 	machine.AggregateID = userID
 	addedMachine := NewMachineWriteModel(machine.AggregateID, orgID)
 	userAgg := UserAggregateFromWriteModel(&addedMachine.WriteModel)
-	events, err := c.eventstore.PushEvents(ctx, user.NewMachineAddedEvent(
+	events, err := c.eventstore.Push(ctx, user.NewMachineAddedEvent(
 		ctx,
 		userAgg,
 		machine.Username,
@@ -63,7 +63,7 @@ func (c *Commands) ChangeMachine(ctx context.Context, machine *domain.Machine) (
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2n8vs", "Errors.User.NotChanged")
 	}
 
-	events, err := c.eventstore.PushEvents(ctx, changedEvent)
+	events, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

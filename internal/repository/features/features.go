@@ -195,7 +195,7 @@ func ChangeActions(actions bool) func(event *FeaturesSetEvent) {
 	}
 }
 
-func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FeaturesSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -230,7 +230,7 @@ func NewFeaturesRemovedEvent(base *eventstore.BaseEvent) *FeaturesRemovedEvent {
 	}
 }
 
-func FeaturesRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FeaturesRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &FeaturesRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
