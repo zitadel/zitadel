@@ -661,7 +661,6 @@ i {
   border: none;
   outline: none;
   cursor: pointer;
-  position: relative;
 }
 .lgn-account-selection .lgn-account:disabled {
   cursor: not-allowed;
@@ -1555,7 +1554,6 @@ i {
   border: none;
   outline: none;
   cursor: pointer;
-  position: relative;
 }
 .lgn-account-selection .lgn-account:disabled {
   cursor: not-allowed;
@@ -2777,7 +2775,7 @@ a:hover, a:active {
   background: transparent;
   box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
 }
-.lgn-account-selection .lgn-account:hover:not([disabled]) {
+.lgn-account-selection .lgn-account:hover {
   background-color: var(--zitadel-color-account-selector-hover);
 }
 .lgn-account-selection .lgn-account:focus {
