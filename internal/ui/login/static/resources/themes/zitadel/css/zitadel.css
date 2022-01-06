@@ -2787,18 +2787,6 @@ a:hover, a:active {
 .lgn-account-selection .lgn-account:active {
   background-color: var(--zitadel-color-account-selector-active);
 }
-.lgn-account-selection .lgn-account:disabled::before {
-  content: "";
-  display: block;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: var(--zitadel-color-background);
-  opacity: 0.8;
-  box-shadow: inset 0 -1px var(--zitadel-color-footer-line);
-}
 .lgn-account-selection .lgn-account .lgn-loginname {
   font-size: 14px;
   color: var(--zitadel-color-label);
