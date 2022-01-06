@@ -1,14 +1,37 @@
 import { ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import parsePhoneNumber from 'libphonenumber-js';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { AddHumanUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain } from 'src/app/proto/generated/zitadel/org_pb';
+import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { Gender } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
+
+import { lowerCaseValidator, numberValidator, symbolValidator, upperCaseValidator } from '../../validators';
+
+function passwordConfirmValidator(c: AbstractControl): any {
+  if (!c.parent || !c) {
+    return;
+  }
+  const pwd = c.parent.get('password');
+  const cpwd = c.parent.get('confirmPassword');
+
+  if (!pwd || !cpwd) {
+    return;
+  }
+  if (pwd.value !== cpwd.value) {
+    return {
+      invalid: true,
+      notequal: {
+        valid: false,
+      },
+    };
+  }
+}
 
 @Component({
   selector: 'cnsl-user-create',
@@ -20,6 +43,8 @@ export class UserCreateComponent implements OnDestroy {
   public genders: Gender[] = [Gender.GENDER_FEMALE, Gender.GENDER_MALE, Gender.GENDER_UNSPECIFIED];
   public languages: string[] = ['de', 'en'];
   public userForm!: FormGroup;
+  public pwdForm!: FormGroup;
+
   public envSuffixLabel: string = '';
   private destroyed$: Subject<void> = new Subject();
 
@@ -28,6 +53,8 @@ export class UserCreateComponent implements OnDestroy {
 
   @ViewChild('suffix') public suffix!: any;
   private primaryDomain!: Domain.AsObject;
+  public usePassword: boolean = false;
+  public policy!: PasswordComplexityPolicy.AsObject;
 
   constructor(
     private router: Router,
@@ -79,6 +106,37 @@ export class UserCreateComponent implements OnDestroy {
       isVerified: [false, []],
     });
 
+    const validators: Validators[] = [Validators.required];
+
+    this.mgmtService.getPasswordComplexityPolicy().then((data) => {
+      if (data.policy) {
+        this.policy = data.policy;
+
+        if (this.policy.minLength) {
+          validators.push(Validators.minLength(this.policy.minLength));
+        }
+        if (this.policy.hasLowercase) {
+          validators.push(lowerCaseValidator);
+        }
+        if (this.policy.hasUppercase) {
+          validators.push(upperCaseValidator);
+        }
+        if (this.policy.hasNumber) {
+          validators.push(numberValidator);
+        }
+        if (this.policy.hasSymbol) {
+          validators.push(symbolValidator);
+        }
+        const pwdValidators = [...validators] as ValidatorFn[];
+        const confirmPwdValidators = [...validators, passwordConfirmValidator] as ValidatorFn[];
+
+        this.pwdForm = this.fb.group({
+          password: ['', pwdValidators],
+          confirmPassword: ['', confirmPwdValidators],
+        });
+      }
+    });
+
     this.userForm.controls['phone'].valueChanges.pipe(takeUntil(this.destroyed$), debounceTime(300)).subscribe((value) => {
       const phoneNumber = parsePhoneNumber(value ?? '', 'CH');
       if (phoneNumber) {
@@ -111,6 +169,10 @@ export class UserCreateComponent implements OnDestroy {
     emailreq.setEmail(this.email?.value);
     emailreq.setIsEmailVerified(this.isVerified?.value);
     humanReq.setEmail(emailreq);
+
+    if (this.usePassword && this.password?.value) {
+      humanReq.setInitialPassword(this.password.value);
+    }
 
     if (this.phone && this.phone.value) {
       humanReq.setPhone(new AddHumanUserRequest.Phone().setPhone(this.phone.value));
@@ -162,6 +224,12 @@ export class UserCreateComponent implements OnDestroy {
     return this.userForm.get('phone');
   }
 
+  public get password(): AbstractControl | null {
+    return this.pwdForm.get('password');
+  }
+  public get confirmPassword(): AbstractControl | null {
+    return this.pwdForm.get('confirmPassword');
+  }
   private envSuffix(): string {
     if (this.userLoginMustBeDomain && this.primaryDomain?.domainName) {
       return `@${this.primaryDomain.domainName}`;
