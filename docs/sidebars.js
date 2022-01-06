@@ -48,12 +48,12 @@ module.exports = {
     },
     {
       type: "category",
-      label: "Architecture Scenarios",
+      label: "Solution Scenarios",
       collapsed: false,
       items: [
-        "guides/architecture-scenarios/introduction",
-        "guides/architecture-scenarios/b2c",
-        "guides/architecture-scenarios/b2b",
+        "guides/solution-scenarios/introduction",
+        "guides/solution-scenarios/b2c",
+        "guides/solution-scenarios/b2b",
       ],
     },
     {

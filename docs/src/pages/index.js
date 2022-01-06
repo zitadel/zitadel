@@ -52,7 +52,14 @@ const features = [
             />
           </div>
           <div>
-            {/* <ListElement link="docs/guides/architecture-scenarios/introduction" iconClasses="las la-paragraph" roundClasses="rounded rounded-split" label="B2C" title="Architecture Scenarios" description="" /> */}
+            <ListElement
+              link="docs/guides/solution-scenarios/introduction"
+              iconClasses="las la-paragraph"
+              roundClasses="rounded rounded-split"
+              label="B2C"
+              title="Solution Scenarios"
+              description=""
+            />
             <ListElement
               link="docs/guides/customization/branding"
               type={ICONTYPE.PRIVATELABELING}
