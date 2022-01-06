@@ -51,6 +51,7 @@ func newGlobalOrgMemberWriteModel(orgID, role string) *globalOrgMembersWriteMode
 	return &globalOrgMembersWriteModel{
 		WriteModel: eventstore.WriteModel{
 			ResourceOwner: orgID,
+			AggregateID:   orgID,
 		},
 		role:    role,
 		members: make(map[string][]string),
@@ -90,7 +91,7 @@ func (wm *globalOrgMembersWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
 		AggregateTypes(org.AggregateType).
-		AggregateIDs(wm.ResourceOwner).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			org.MemberAddedEventType,
 			org.MemberChangedEventType,

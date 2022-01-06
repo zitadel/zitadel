@@ -78,7 +78,7 @@ func BaseEventFromRepo(event *repository.Event) *BaseEvent {
 		aggregate: Aggregate{
 			ID:            event.AggregateID,
 			Type:          AggregateType(event.AggregateType),
-			ResourceOwner: event.ResourceOwner,
+			ResourceOwner: event.ResourceOwner.String,
 			Version:       Version(event.Version),
 		},
 		EventType:                     EventType(event.Type),
