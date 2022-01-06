@@ -2,11 +2,11 @@
 title: B2C
 ---
 
-import Column from '../../../src/components/column';
+import Column from "../../../src/components/column";
 
 ## Business to Consumer
 
-Users in general come with different needs. You may have end users, employees, or even customers from other parties (B2B). 
+Users in general come with different needs. You may have end users, employees, or even customers from other parties (B2B).
 This groups of users usually don't share the same intentions and use applications differently.
 When planning your applications, investing time in researching your apps architecture is vital for later feature upgrades and enhancements as those changes come in with heftier price points if you have to make bigger changes.
 
@@ -17,11 +17,11 @@ Creation can be done from [ZITADEL Console](https://console.zitadel.ch/org/creat
 
 Depending on your Software Development Life Cycle (SDLC) you will have to create multiple organizations to keep your data from different environments separate.
 
-| Environment | Organization Name     | Description             |
-| :---------- | :-------------------- | ----------------------- |
-| Development | **acme-dev**          | The development environment and organization |
-| Testing     | **acme-test**         | An environment for testing and production preview |
-| Production  | **acme-prod**         | The production environment and organization |
+| Environment | Organization Name | Description                                       |
+| :---------- | :---------------- | ------------------------------------------------- |
+| Development | **acme-dev**      | The development environment and organization      |
+| Testing     | **acme-test**     | An environment for testing and production preview |
+| Production  | **acme-prod**     | The production environment and organization       |
 
 ### Custom domain
 
@@ -34,7 +34,7 @@ You can read more about how ZITADEL handles usernames [here](../basics/organizat
 ZITADEL gives you a basic storage for users and manages phone and email addresses. It also allows you to store your own application data such as preferences or external identifiers to the metadata of a user.
 
 If you are migrating an existing project and you already have an external identity store you can consider bulk importing your user datasets.
-Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info. If the users email is not verified or no password is set, a initialization mail will be send. 
+Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info. If the users email is not verified or no password is set, a initialization mail will be send.
 
 :::info
 Requests to the management API are rate limited. Read our [Rate limit Policy](../../legal/rate-limit-policy) for more info.
@@ -56,7 +56,7 @@ When planning your application consider the following questions about User Authe
 - Do you offer Login via Identity Provider?
 - Which languages do you have to provide?
 
-When looking at this questions, you may have to admit that building an Identity Management System is much more complex and complicated than you thought initially and implementing if yourself may be too much work. 
+When looking at this questions, you may have to admit that building an Identity Management System is much more complex and complicated than you thought initially and implementing if yourself may be too much work.
 Particularly because you should focus building your applications.
 
 ### Federation
@@ -66,9 +66,9 @@ ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Pro
 
 ### Hosted Login
 
-ZITADEL offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate. 
+ZITADEL offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate.
 It's safe and secure and comes with Multifactor, Federated Login and Passwordless capabilities.
-OIDC (OpenID Connect) opens the doors to Single Sign On (SSO). Especially if you have more than one application, you may want a central and familiar authentication experience. 
+OIDC (OpenID Connect) opens the doors to Single Sign On (SSO). Especially if you have more than one application, you may want a central and familiar authentication experience.
 With SSO, ZITADEL provides a seamless experience across all your apps.
 
 ### Branding
@@ -76,9 +76,9 @@ With SSO, ZITADEL provides a seamless experience across all your apps.
 <Column>
 <div>
 
-Branding and customization is a very important part of your application. 
+Branding and customization is a very important part of your application.
 With ZITADEL you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consistent design throughout your applications.
-In addition to visual modifications, you can edit notification texts for your users. 
+In addition to visual modifications, you can edit notification texts for your users.
 ZITADEL gives you handlebar similar templating for variables. Of course you can define texts for any language.
 We'd appreciate if you could contribute to our repo with translations of your language. Read on how to contribute [here](../../guides/customization/texts).
 
@@ -104,7 +104,7 @@ Take the following considerations:
 
 The data required to check if a user has access to a certain API is stored within a user grant. This information typically is stored within roles or custom claims and can be accessed with an `access` or OIDC `id` token.
 
-//TODO Link to AuhtZ guide
+Read more about Authorization in our [Guide](../authorization/oauth-recommended-flows).
 
 ## Learn more
 
