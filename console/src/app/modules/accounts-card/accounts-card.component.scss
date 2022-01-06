@@ -59,14 +59,30 @@
       font-size: 12px;
       line-height: 12px;
       font-weight: 600;
-      padding: 0.5rem 1rem;
+      padding: 0;
       background-color: $primary-color;
       color: mat.get-color-from-palette($primary, default-contrast);
       display: flex;
       flex-direction: row;
       align-items: center;
 
+      .label {
+        margin: 0.5rem 1rem;
+      }
+
       .iambtn {
+        display: none;
+        margin: 0;
+      }
+
+      @media only screen and (max-width: 600px) {
+        .label {
+          margin: 0.5rem 0 0.5rem 0.5rem;
+        }
+
+        .iambtn {
+          display: inline;
+        }
       }
     }
 
