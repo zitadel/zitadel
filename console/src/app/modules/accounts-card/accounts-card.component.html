@@ -9,7 +9,12 @@
 
   <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
   <span class="u-email" *ngIf="user.preferredLoginName">{{user.preferredLoginName}}</span>
-  <div class="iamuser" *ngIf="iamuser">IAM USER</div>
+  <div class="iamuser" *ngIf="iamuser">
+    <span>IAM USER</span>
+    <a [routerLink]="[ '/iam']" class="iambtn" mat-icon-button>
+      <i class="las la-cog"></i>
+    </a>
+  </div>
 
   <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
   <div class="l-accounts">

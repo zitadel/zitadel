@@ -62,6 +62,12 @@
       padding: 0.5rem 1rem;
       background-color: $primary-color;
       color: mat.get-color-from-palette($primary, default-contrast);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .iambtn {
+      }
     }
 
     button {
