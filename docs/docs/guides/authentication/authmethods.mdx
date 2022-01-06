@@ -6,13 +6,6 @@ import Basic from "./authmethods/basic.mdx";
 import Implicit from "./authmethods/implicit.mdx";
 import PKCENative from "./authmethods/pkcenative.mdx";
 import JWTPrivateKey from "./authmethods/jwtpk.mdx";
-import JWTAuthRequest from "./authrequest/jwtpk.mdx";
-import BasicAuthRequest from "./authrequest/basic.mdx";
-import PKCEAuthRequest from "./authrequest/pkce.mdx";
-import Callback from "./callback.mdx";
-import JWTTokenRequest from "./tokenrequest/jwtpk.mdx";
-import PKCETokenRequest from "./tokenrequest/pkce.mdx";
-import BasicTokenRequest from "./tokenrequest/basic.mdx";
 
 export default function AuthMethods(props) {
   return props.selected == "web" ? (
@@ -28,21 +21,12 @@ export default function AuthMethods(props) {
       >
         <TabItem value="pkce">
           <PKCE />
-          <PKCEAuthRequest />
-          <Callback />
-          <PKCETokenRequest />
         </TabItem>
         <TabItem value="basic">
           <Basic />
-          <BasicAuthRequest />
-          <Callback />
-          <BasicTokenRequest />
         </TabItem>
         <TabItem value="jwtpk">
           <JWTPrivateKey />
-          <JWTAuthRequest />
-          <Callback />
-          <JWTTokenRequest />
         </TabItem>
       </Tabs>
     </div>
@@ -54,9 +38,6 @@ export default function AuthMethods(props) {
     >
       <TabItem value="pkce">
         <PKCENative />
-        <PKCEAuthRequest />
-        <Callback />
-        <PKCETokenRequest />
       </TabItem>
     </Tabs>
   ) : props.selected == "spa" ? (
@@ -70,9 +51,6 @@ export default function AuthMethods(props) {
     >
       <TabItem value="pkce">
         <PKCE />
-        <PKCEAuthRequest />
-        <Callback />
-        <PKCETokenRequest />
       </TabItem>
       <TabItem value="implicit">
         <Implicit />
