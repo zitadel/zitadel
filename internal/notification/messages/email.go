@@ -1,9 +1,11 @@
-package email
+package messages
 
 import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/caos/zitadel/internal/notification/channels"
 )
 
 var (
@@ -11,7 +13,9 @@ var (
 	lineBreak = "\r\n"
 )
 
-type EmailMessage struct {
+var _ channels.Message = (*Email)(nil)
+
+type Email struct {
 	Recipients  []string
 	BCC         []string
 	CC          []string
@@ -20,7 +24,7 @@ type EmailMessage struct {
 	Content     string
 }
 
-func (msg *EmailMessage) GetContent() string {
+func (msg *Email) GetContent() string {
 	headers := make(map[string]string)
 	headers["From"] = msg.SenderEmail
 	headers["To"] = strings.Join(msg.Recipients, ", ")
