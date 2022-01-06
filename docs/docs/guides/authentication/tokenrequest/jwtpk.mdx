@@ -1,0 +1,23 @@
+## Token request
+
+Next you will have to exchange the given `code` for the tokens. For this HTTP POST request (form-urlencoded) you will need to provide the following:
+
+- code: the code that was issued from the authorization request
+- grant_type: must be `authorization_code`
+- redirect_uri: callback uri where the code was sent to. Must match exactly the redirect_uri of the authorization request
+
+Depending on your authentication method you'll need additional headers and parameters:
+
+Send a JWT in the `client_assertion` and set the `client_assertion_type` to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+for us to validate the signature against the registered public key:
+
+```curl
+curl --request POST \
+--url https://api.zitadel.ch/oauth/v2/token \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data grant_type=authorization_code \
+--data code=${code} \
+--data redirect_uri=${redirect_uri} \
+--data client_assertion=${client_assertion} \
+--data client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
+```

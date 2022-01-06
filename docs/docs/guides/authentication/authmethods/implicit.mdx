@@ -8,3 +8,11 @@ We therefore discourage the use of Implicit Flow and do not cover the flow in th
 
 If you still need to rely on the implicit flow, simply keep in mind that the response on the authorization_endpoint is
 the same you would be given on the token_endpoint and check the [OAuth / OIDC endpoint documentation](../../../apis/openidoauth/endpoints.md) for more information.
+
+#### redirect_uri
+
+After selecting the authentication method, you can register a redirect_uri and post_logout_redirect_uri.
+The redirect_uri will be called after user authentication for code exchange.
+
+You can even register multiple, but typically one will be enough. If you need to distinguish between different scenarios
+or environments we recommend using the `state` parameter for the former and multiple projects for the latter.
