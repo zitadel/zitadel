@@ -159,7 +159,6 @@
   --zitadel-color-label: var(--zitadel-color-grey-600);
   --zitadel-color-account-selector-hover: rgba(255, 255, 255, 0.02);
   --zitadel-color-account-selector-active: rgba(255, 255, 255, 0.05);
-  --zitadel-color-account-selector-disabled: var(0, 0, 0, 0.9);
   --zitadel-color-success: #cbf4c9;
   --zitadel-color-success-background: #4f566b;
   --zitadel-color-divider: rgba(255, 255, 255, 0.12);
@@ -2798,9 +2797,6 @@ a:hover, a:active {
   color: #85d996;
 }
 .lgn-account-selection .lgn-account .lgn-session-state.i1 {
-  color: var(--zitadel-color-warn);
-}
-.lgn-account-selection .lgn-account .lgn-no-member {
   color: var(--zitadel-color-warn);
 }
 
