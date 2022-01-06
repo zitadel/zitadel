@@ -5,9 +5,10 @@ title: Login Users into your Application
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import AuthMethods from "./authmethods.mdx";
-import PKCE2 from "./authmethods/pkce2.mdx";
+import PKCEAuthRequest from "./authrequest/pkce.mdx";
 import AuthRequest from "./authrequest.mdx";
-import Basic2 from "./authmethods/basic2.mdx";
+import BasicAuthRequest from "./authrequest/basic.mdx";
+import JWTPKAuthRequest from "./authrequest/jwtpk.mdx";
 
 ## Overview
 
@@ -74,7 +75,6 @@ recommend using POST and will not cover it in this guide.
 Please change the authentication method here as well, if you did so in the wizard, so we can better guide you through the process:
 
 <AuthMethods selected="web" />
-
 </TabItem>
 
 <TabItem value="native">
@@ -84,8 +84,8 @@ Please change the authentication method here as well, if you did so in the wizar
 When selecting Native the authentication method always needs to be PKCE.
 
 <AuthMethods selected="native" />
-
 </TabItem>
+
 <TabItem value="spa">
 
 #### Authentication method
@@ -96,31 +96,6 @@ are able to successfully authenticate with PKCE. Our Managament UI Console for i
 <AuthMethods selected="spa" />
 </TabItem>
 </Tabs>
-
-<AuthRequest />
-
-<PKCE2 />
-
-<TabItem value="basic">
-  <Basic2 />
-</TabItem>
-
-<TabItem value="jwt">
-
-You don't need any additional parameter for this request. We're identifying the app by the `client_id` parameter.
-
-So your request might look like this (linebreaks and whitespace for display reasons):
-
-```curl
-curl --request GET \
-  --url 'https://accounts.zitadel.ch/oauth/v2/authorize
-    ?client_id=${client_id}
-    &redirect_uri=${redirect_uri}
-    &response_type=code
-    &scope=openid%20email%20profile'
-```
-
-</TabItem>
 
 ### Additional parameters and customization
 

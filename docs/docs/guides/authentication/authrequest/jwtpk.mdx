@@ -1,0 +1,12 @@
+You don't need any additional parameter for this request. We're identifying the app by the `client_id` parameter.
+
+So your request might look like this (linebreaks and whitespace for display reasons):
+
+```curl
+curl --request GET \
+  --url 'https://accounts.zitadel.ch/oauth/v2/authorize
+    ?client_id=${client_id}
+    &redirect_uri=${redirect_uri}
+    &response_type=code
+    &scope=openid%20email%20profile'
+```

@@ -5,6 +5,10 @@ import PKCE from "./authmethods/pkce.mdx";
 import Basic from "./authmethods/basic.mdx";
 import Implicit from "./authmethods/implicit.mdx";
 import PKCENative from "./authmethods/pkcenative.mdx";
+import JWTPrivateKey from "./authmethods/jwtpk.mdx";
+import AuthRequest from "./authrequest.mdx";
+import JWTAuthRequest from "./authrequest/jwtpk.mdx";
+import BasicAuthRequest from "./authrequest/basic.mdx";
 
 export default function AuthMethods(props) {
   return props.selected == "web" ? (
@@ -15,7 +19,7 @@ export default function AuthMethods(props) {
         values={[
           { label: "PKCE", value: "pkce" },
           { label: "Basic Auth", value: "basic" },
-          { label: "JWT with Private Key", value: "jwt" },
+          { label: "JWT with Private Key", value: "jwtpk" },
         ]}
       >
         <TabItem value="pkce">
@@ -24,8 +28,9 @@ export default function AuthMethods(props) {
         <TabItem value="basic">
           <Basic />
         </TabItem>
-        <TabItem value="implicit">
-          <Implicit />
+        <TabItem value="jwtpk">
+          <JWTPrivateKey />
+          <JWTPKAuthRequest />
         </TabItem>
       </Tabs>
     </div>
