@@ -55,6 +55,7 @@ type Features struct {
 	MetadataUser             bool
 	LockoutPolicy            bool
 	Actions                  bool
+	MaxActions               int32
 }
 
 type FeaturesState int32

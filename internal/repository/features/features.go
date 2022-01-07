@@ -41,6 +41,7 @@ type FeaturesSetEvent struct {
 	CustomTextLogin          *bool                 `json:"customTextLogin,omitempty"`
 	LockoutPolicy            *bool                 `json:"lockoutPolicy,omitempty"`
 	Actions                  *bool                 `json:"actions,omitempty"`
+	MaxActions               *int                  `json:"maxActions,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -192,6 +193,12 @@ func ChangeLockoutPolicy(lockoutPolicy bool) func(event *FeaturesSetEvent) {
 func ChangeActions(actions bool) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
 		e.Actions = &actions
+	}
+}
+
+func ChangeMaxActions(maxActions int) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.MaxActions = &maxActions
 	}
 }
 

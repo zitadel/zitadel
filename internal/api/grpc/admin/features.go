@@ -80,6 +80,7 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		CustomTextMessage:        req.CustomTextMessage,
 		LockoutPolicy:            req.LockoutPolicy,
 		Actions:                  req.Actions,
+		MaxActions:               req.MaxActions,
 	}
 }
 
@@ -106,5 +107,6 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		CustomTextMessage:        req.CustomTextMessage,
 		LockoutPolicy:            req.LockoutPolicy,
 		Actions:                  req.Actions,
+		MaxActions:               req.MaxActions,
 	}
 }

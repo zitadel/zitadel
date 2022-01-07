@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"sort"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -174,9 +175,34 @@ func (c *Commands) removeActionsFromOrg(ctx context.Context, resourceOwner strin
 		return nil, nil
 	}
 	events := make([]eventstore.Command, 0, len(existingActions.Actions))
-	for id, name := range existingActions.Actions {
+	for id, existingAction := range existingActions.Actions {
 		actionAgg := NewActionAggregate(id, resourceOwner)
-		events = append(events, action.NewRemovedEvent(ctx, actionAgg, name))
+		events = append(events, action.NewRemovedEvent(ctx, actionAgg, existingAction.Name))
+	}
+	return events, nil
+}
+
+func (c *Commands) deactivateNotAllowedActionsFromOrg(ctx context.Context, resourceOwner string, maxAllowed int) ([]eventstore.Command, error) {
+	existingActions, err := c.getActionsByOrgWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	activeActions := make([]ActionWriteModel, len(existingActions.Actions))
+	for _, existingAction := range existingActions.Actions {
+		if existingAction.State == domain.ActionStateActive {
+			activeActions = append(activeActions, existingAction)
+		}
+	}
+	if len(activeActions) <= maxAllowed {
+		return nil, nil
+	}
+	sort.Slice(activeActions, func(i, j int) bool {
+		return activeActions[i].WriteModel.ChangeDate.Before(activeActions[j].WriteModel.ChangeDate)
+	})
+	events := make([]eventstore.Command, 0, len(existingActions.Actions))
+	for i := maxAllowed; i < len(activeActions); i++ {
+		actionAgg := NewActionAggregate(activeActions[i].AggregateID, resourceOwner)
+		events = append(events, action.NewRemovedEvent(ctx, actionAgg, activeActions[i].Name))
 	}
 	return events, nil
 }

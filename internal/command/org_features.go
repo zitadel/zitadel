@@ -46,6 +46,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.CustomTextLogin,
 		features.LockoutPolicy,
 		features.Actions,
+		features.MaxActions,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -185,6 +186,13 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 		if len(removeOrgActions) > 0 {
 			events = append(events, removeOrgActions...)
 		}
+	}
+	deactivateActions, err := c.deactivateNotAllowedActionsFromOrg(ctx, orgID, features.MaxActions)
+	if err != nil {
+		return nil, err
+	}
+	if len(deactivateActions) > 0 {
+		events = append(events, deactivateActions...)
 	}
 	return events, nil
 }

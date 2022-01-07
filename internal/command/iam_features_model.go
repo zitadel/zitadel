@@ -74,6 +74,7 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	customTextLogin,
 	lockoutPolicy,
 	actions bool,
+	maxActions int,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -140,6 +141,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	}
 	if wm.Actions != actions {
 		changes = append(changes, features.ChangeActions(actions))
+	}
+	if wm.MaxActions != maxActions {
+		changes = append(changes, features.ChangeMaxActions(maxActions))
 	}
 	if len(changes) == 0 {
 		return nil, false

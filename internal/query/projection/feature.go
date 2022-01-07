@@ -83,6 +83,7 @@ const (
 	FeatureCustomTextLoginCol          = "custom_text_login"
 	FeatureLockoutPolicyCol            = "lockout_policy"
 	FeatureActionsCol                  = "actions"
+	FeatureMaxActionsCol               = "max_actions"
 )
 
 func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.Statement, error) {
@@ -174,6 +175,9 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 	}
 	if featureEvent.Actions != nil {
 		cols = append(cols, handler.NewCol(FeatureActionsCol, *featureEvent.Actions))
+	}
+	if featureEvent.MaxActions != nil {
+		cols = append(cols, handler.NewCol(FeatureMaxActionsCol, *featureEvent.MaxActions))
 	}
 	return crdb.NewUpsertStatement(
 		&featureEvent,

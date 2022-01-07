@@ -2564,6 +2564,7 @@ This is an empty request
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
 | actions |  bool | - |  |
+| max_actions |  int32 | - |  |
 
 
 
@@ -2754,6 +2755,7 @@ This is an empty request
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
 | actions |  bool | - |  |
+| max_actions |  int32 | - |  |
 
 
 

@@ -196,5 +196,6 @@ func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
 		CustomTextLogin:          wm.CustomTextLogin,
 		LockoutPolicy:            wm.LockoutPolicy,
 		Actions:                  wm.Actions,
+		MaxActions:               wm.MaxActions,
 	}
 }

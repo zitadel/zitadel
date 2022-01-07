@@ -32,6 +32,7 @@ type FeaturesWriteModel struct {
 	CustomTextLogin          bool
 	LockoutPolicy            bool
 	Actions                  bool
+	MaxActions               int
 }
 
 func (wm *FeaturesWriteModel) Reduce() error {
@@ -104,6 +105,9 @@ func (wm *FeaturesWriteModel) Reduce() error {
 			}
 			if e.Actions != nil {
 				wm.Actions = *e.Actions
+			}
+			if e.MaxActions != nil {
+				wm.MaxActions = *e.MaxActions
 			}
 		case *features.FeaturesRemovedEvent:
 			wm.State = domain.FeaturesStateRemoved
