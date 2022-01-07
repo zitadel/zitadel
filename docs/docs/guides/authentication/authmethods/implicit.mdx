@@ -36,4 +36,14 @@ Please check the [authorization_endpoint reference](../../apis/openidoauth/endpo
 
 ## Callback
 
-TODO implicit token response
+Regardless of a successful or error response from the authorization_endpoint, the authorization server will call your callback endpoint you provided by the `redirect_uri`.
+
+:::note
+If the redirect_uri is not provided, was not registered or anything other prevents the auth server form returning the response to the client, the error will be display directly to the user on the auth server.
+:::
+
+Upon successful authentication you'll be given the `access_token`, `id_token`, `expires_in` and if provided the unmodified `state` parameter, as you would be given from the token_endpoint when using Authorization Code Flow.
+
+If a parameter was missing, malformed or any other error occurred, your answer will contain an `error` stating the error type,
+possibly an `error_description` providing some information about the error and its reason and the `state` parameter.
+Check the [error response section](../../apis/openidoauth/endpoints#error-response) in the authorization_endpoint reference.
