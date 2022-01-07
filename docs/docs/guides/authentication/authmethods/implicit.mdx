@@ -27,8 +27,7 @@ on /authorize with at least the following parameters:
 - `response_type`: if you want to have a code (authorization code flow) or directly a token (implicit flow), so when ever possible use `code`
 - `scope`: what scope you want to grant to the access_token / id_token, minimum is `openid`, if you're unsure what you need you might start with `openid profile email`
 
-We recommend always using two additional parameters `state` and `nonce`. The former enables you to transfer a state through
-the authentication process. The latter is used to bind the client session with the id_token and to mitigate replay attacks.
+When using the Implicit Flow you will also have to provide a `nonce` parameter to bind the client session to the id_token and to mitigate replay attacks. Furthermore, we recommend using a `state` parameter, which enables you to transfer a state through the authentication process.
 
 ### Additional parameters and customization
 
