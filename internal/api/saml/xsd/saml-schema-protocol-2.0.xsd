@@ -163,9 +163,9 @@
                 <attribute name="ForceAuthn" type="boolean" use="optional"/>
                 <attribute name="IsPassive" type="boolean" use="optional"/>
                 <attribute name="ProtocolBinding" type="anyURI" use="optional"/>
-                <attribute name="AssertionConsumerServiceIndex" type="unsignedShort" use="optional"/>
+                <attribute name="AssertionConsumerServiceIndex" type="int" use="optional"/>
                 <attribute name="AssertionConsumerServiceURL" type="anyURI" use="optional"/>
-                <attribute name="AttributeConsumingServiceIndex" type="unsignedShort" use="optional"/>
+                <attribute name="AttributeConsumingServiceIndex" type="int" use="optional"/>
                 <attribute name="ProviderName" type="string" use="optional"/>
             </extension>
         </complexContent>

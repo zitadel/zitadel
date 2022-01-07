@@ -5,6 +5,7 @@ package md
 import (
 	"encoding/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/saml"
+	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xenc"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xml_dsig"
 )
 
@@ -36,7 +37,7 @@ type EntitiesDescriptor struct {
 
 // Element
 type EntityDescriptor struct {
-	XMLName                      xml.Name                          `xml:"EntityDescriptor"`
+	XMLName                      xml.Name                          `xml:"urn:oasis:names:tc:SAML:2.0:metadata EntityDescriptor"`
 	EntityID                     EntityIDType                      `xml:"entityID,attr"`
 	ValidUntil                   string                            `xml:"validUntil,attr,omitempty"`
 	CacheDuration                string                            `xml:"cacheDuration,attr,omitempty"`
@@ -191,7 +192,7 @@ type KeyDescriptor struct {
 
 	KeyInfo xml_dsig.KeyInfoType `xml:"KeyInfo"`
 
-	EncryptionMethod []EncryptionMethodType `xml:"EncryptionMethod"`
+	EncryptionMethod []xenc.EncryptionMethodType `xml:"EncryptionMethod"`
 }
 
 // Element
@@ -200,7 +201,7 @@ type EncryptionMethod struct {
 
 	Algorithm string `xml:"Algorithm,attr"`
 
-	KeySize *KeySizeType `xml:"KeySize"`
+	KeySize *xenc.KeySizeType `xml:"KeySize"`
 
 	OAEPparams string `xml:"OAEPparams"`
 }
@@ -435,7 +436,7 @@ type RequestedAttribute struct {
 
 	FriendlyName string `xml:"FriendlyName,attr,omitempty"`
 
-	AttributeValue []saml.string `xml:",any"`
+	AttributeValue []string `xml:",any"`
 }
 
 // Element
@@ -774,7 +775,7 @@ type KeyDescriptorType struct {
 
 	KeyInfo xml_dsig.KeyInfoType `xml:"KeyInfo"`
 
-	EncryptionMethod []EncryptionMethodType `xml:"EncryptionMethod"`
+	EncryptionMethod []xenc.EncryptionMethodType `xml:"EncryptionMethod"`
 
 	InnerXml string `xml:",innerxml"`
 }
@@ -928,7 +929,7 @@ type RequestedAttributeType struct {
 
 	FriendlyName string `xml:"FriendlyName,attr,omitempty"`
 
-	AttributeValue []saml.string `xml:",any"`
+	AttributeValue []string `xml:",any"`
 
 	InnerXml string `xml:",innerxml"`
 }

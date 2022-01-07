@@ -37,6 +37,13 @@ func (a *AuthRequestOIDC) IsValid() bool {
 }
 
 type AuthRequestSAML struct {
+	ID          string
+	RequestID   string
+	BindingType string
+	Code        string
+	Issuer      string
+	IssuerName  string
+	Destination string
 }
 
 func (a *AuthRequestSAML) Type() AuthRequestType {
