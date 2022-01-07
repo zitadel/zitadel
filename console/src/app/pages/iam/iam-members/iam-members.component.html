@@ -1,26 +1,27 @@
-<div class="wrapp">
-    <cnsl-detail-layout [backRouterLink]="[ '/iam']" title="{{ 'IAM.MEMBER.TITLE' | translate }}"
-        description="{{ 'IAM.MEMBER.DESCRIPTION' | translate }}">
-        <p class="desc">{{'MEMBER.DOCSINFO' | translate}} <a href="https://docs.zitadel.ch/docs/manuals/admin-managers"
-                target="_blank">ZITADEL Managers</a>.</p>
-        <cnsl-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
-            (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
-            (changedSelection)="selection = $event" [refreshTrigger]="changePage"
-            [canWrite]="['iam.member.write$'] | hasRole | async" [canDelete]="['iam.member.delete$'] | hasRole | async"
-            (deleteMember)="removeMember($event)">
+<cnsl-detail-layout [backRouterLink]="[ '/iam']" title="{{ 'IAM.MEMBER.TITLE' | translate }}">
+  <p class="subinfo" sub>
+    <span class="label">{{ 'IAM.MEMBER.DESCRIPTION' | translate }}</span>
+    <a mat-icon-button href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">
+      <i class="las la-info-circle"></i>
+    </a>
+  </p>
+  <cnsl-members-table [dataSource]="dataSource" [memberRoleOptions]="memberRoleOptions"
+    (updateRoles)="updateRoles($event.member, $event.change)" [factoryLoadFunc]="changePageFactory"
+    (changedSelection)="selection = $event" [refreshTrigger]="changePage"
+    [canWrite]="['iam.member.write$'] | hasRole | async" [canDelete]="['iam.member.delete$'] | hasRole | async"
+    (deleteMember)="removeMember($event)">
 
-            <ng-template cnslHasRole selectactions [hasRole]="['iam.member.delete']">
-                <button color="warn" (click)="removeMemberSelection()"
-                    matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" mat-raised-button>
-                    <i class="las la-trash"></i>
-                    {{'ACTIONS.SELECTIONDELETE' | translate}}
-                </button>
-            </ng-template>
-            <ng-template cnslHasRole writeactions [hasRole]="['iam.member.write']">
-                <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
-                    <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-                </a>
-            </ng-template>
-        </cnsl-members-table>
-    </cnsl-detail-layout>
-</div>
+    <ng-template cnslHasRole selectactions [hasRole]="['iam.member.delete']">
+      <button color="warn" (click)="removeMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
+        class="del-button" mat-raised-button>
+        <i class="las la-trash"></i>
+        {{'ACTIONS.SELECTIONDELETE' | translate}}
+      </button>
+    </ng-template>
+    <ng-template cnslHasRole writeactions [hasRole]="['iam.member.write']">
+      <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
+        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+      </a>
+    </ng-template>
+  </cnsl-members-table>
+</cnsl-detail-layout>

@@ -115,8 +115,28 @@
         }
       }
 
-      .theme {
-        min-width: 250px;
+      .actions-trigger-desk {
+        margin-top: 0.25rem;
+        display: none;
+        align-items: center;
+        border-radius: 50vw !important;
+
+        @media only screen and (min-width: 700px) {
+          display: flex;
+        }
+
+        .icon {
+          margin-left: 0.5rem;
+          margin-right: -0.5rem;
+        }
+      }
+
+      .actions-trigger-mob {
+        display: inline;
+
+        @media only screen and (min-width: 700px) {
+          display: none;
+        }
       }
     }
   }

@@ -65,6 +65,7 @@
     }
   },
   "MENU": {
+    "SYSTEM": "System",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Personal Information",
     "DOCUMENTATION": "Documentation",
@@ -600,8 +601,8 @@
   },
   "IAM": {
     "POLICIES": {
-      "TITLE": "IAM Policies and Access Settings",
-      "DESCRIPTION": "Manage your ZITADEL Policies and Management Access Settings."
+      "TITLE": "System Policies and Access Settings",
+      "DESCRIPTION": "Manage your global Policies and Management Access Settings."
     },
     "EVENTSTORE": {
       "TITLE": "IAM Storage Administration",
@@ -609,7 +610,7 @@
     },
     "MEMBER": {
       "TITLE": "Managers",
-      "DESCRIPTION": "Managers can add and edit organisations and make changes to their corresponding projects and applications."
+      "DESCRIPTION": "These Managers are allowed to make changes in your system."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -1103,7 +1104,7 @@
     "MEMBER": {
       "TITLE": "Managers",
       "TITLEDESC": "Managers can make changes to this project based on their role.",
-      "DESCRIPTION": "Here you can find all managers of this project. You can add a new member and manage existing ones.",
+      "DESCRIPTION": "These managers may be able to edit your project.",
       "USERNAME": "User Name",
       "FIRSTNAME": "First Name",
       "LASTNAME": "Last Name",
@@ -1585,7 +1586,6 @@
   "MEMBER": {
     "ADD": "Add a Manager",
     "CREATIONTYPE": "Creation Type",
-    "DOCSINFO": "For more info consider reading our docs",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organisation",

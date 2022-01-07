@@ -29,10 +29,10 @@
         </p>
       </div>
       <span class="fill-space"></span>
-      <cnsl-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
-        [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-        (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
+      <cnsl-contributors class="project-contributors" *ngIf="project" [loading]="loading$ | async"
+        [totalResult]="totalMemberResult" [membersSubject]="membersSubject"
+        title="{{ 'PROJECT.MEMBER.TITLE' | translate }}" description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
+        (addClicked)="openAddMember()" (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
         [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) === false">
       </cnsl-contributors>
     </div>

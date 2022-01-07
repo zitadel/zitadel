@@ -2,7 +2,14 @@
   <ng-container *ngIf="(['org.write$'] | hasRole) as canwrite$">
     <div class="domain-top-view">
       <div>
-        <h1>{{ 'ORG.DOMAINS.TITLE' | translate }}</h1>
+        <div class="domain-title-row">
+          <h1>{{ 'ORG.DOMAINS.TITLE' | translate }}</h1>
+          <a mat-icon-button
+            href="https://docs.zitadel.ch/docs/guides/basics/organizations#how-zitadel-handles-usernames"
+            rel="noreferrer" target="_blank">
+            <i class="las la-info-circle"></i>
+          </a>
+        </div>
         <p class="desc">{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}</p>
       </div>
       <span class="fill-space"></span>

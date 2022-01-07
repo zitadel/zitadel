@@ -1,7 +1,20 @@
 .del-button {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
-:root {
-  width: 100%;
+.subinfo {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin: -10px 0 0 0;
+
+  .label {
+    color: var(--grey);
+  }
+
+  i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
 }

@@ -65,6 +65,7 @@
     }
   },
   "MENU": {
+    "SYSTEM": "System",
     "DASHBOARD": "Home",
     "PERSONAL_INFO": "Persönliche Informationen",
     "DOCUMENTATION": "Dokumentation",
@@ -600,8 +601,8 @@
   },
   "IAM": {
     "POLICIES": {
-      "TITLE": "IAM Administration",
-      "DESCRIPTION": "Verwalte Richtlinen und Zugangseinstellungen von ZITADEL."
+      "TITLE": "System Administration",
+      "DESCRIPTION": "Verwalte die globalen Richtlinen und Zugangseinstellungen."
     },
     "EVENTSTORE": {
       "TITLE": "IAM Speicher Administration",
@@ -609,7 +610,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "Manager können die Organisation bearbeiten und Projekte verwalten."
+      "DESCRIPTION": "Diese Manager können systemweite Einstellungen vornehmen."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -1103,7 +1104,7 @@
     "MEMBER": {
       "TITLE": "Manager",
       "TITLEDESC": "Manager können Änderungen an diesem Projekt vornehmen, wenn sie die nötigen Rollen haben.",
-      "DESCRIPTION": "Hier findest Du alle Manager dieses Projekts. Du kannst ein neues Mitglied hinzufügen und bestehende verwalten.",
+      "DESCRIPTION": "Diese Manager können unter Umständen Ihre Projekteinstellungen verändern.",
       "USERNAME": "Benutzername",
       "FIRSTNAME": "Vorname",
       "LASTNAME": "Nachname",
@@ -1585,7 +1586,6 @@
   "MEMBER": {
     "ADD": "Manager hinzufügen",
     "CREATIONTYPE": "Erstelltyp",
-    "DOCSINFO": "Weitere Informationen finden Sie in unserer Dokumentation",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organisation",

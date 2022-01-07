@@ -1,6 +1,6 @@
 <div class="max-width-container">
-  <h1 class="title">{{ 'IAM.FAILEDEVENTS.TITLE' | translate }}</h1>
-  <p class="desc">{{'IAM.FAILEDEVENTS.DESCRIPTION' | translate }}</p>
+  <h1 class="failed-events-title">{{ 'IAM.FAILEDEVENTS.TITLE' | translate }}</h1>
+  <p class="failed-events-desc">{{'IAM.FAILEDEVENTS.DESCRIPTION' | translate }}</p>
 
   <div class="table-wrapper">
     <cnsl-refresh-table *ngIf="eventDataSource" (refreshed)="loadEvents()" [dataSize]="eventDataSource.data.length"

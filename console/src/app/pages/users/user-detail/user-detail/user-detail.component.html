@@ -22,10 +22,15 @@
       </div>
 
       <ng-template cnslHasRole [hasRole]="['user.write$', 'user.write:'+user?.id]">
-        <button *ngIf="user" class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
+        <button *ngIf="user" class="actions-trigger-desk" mat-raised-button color="primary"
+          [matMenuTriggerFor]="actions">
           <span>{{'ACTIONS.ACTIONS' | translate}}</span>
           <mat-icon class="icon">keyboard_arrow_down</mat-icon>
         </button>
+        <button *ngIf="user" class="actions-trigger-mob" mat-icon-button [matMenuTriggerFor]="actions">
+          <i class="las la-ellipsis-v"></i>
+        </button>
+
         <mat-menu #actions="matMenu" xPosition="before">
           <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED"
             (click)="unlockUser()">{{'USER.PAGES.UNLOCK' |

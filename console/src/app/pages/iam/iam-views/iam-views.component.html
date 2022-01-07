@@ -1,6 +1,6 @@
 <div class="max-width-container">
-  <h1 class="title">{{ 'IAM.VIEWS.TITLE' | translate }}</h1>
-  <p class="desc">{{'IAM.VIEWS.DESCRIPTION' | translate }}</p>
+  <h1 class="views-title">{{ 'IAM.VIEWS.TITLE' | translate }}</h1>
+  <p class="views-desc">{{'IAM.VIEWS.DESCRIPTION' | translate }}</p>
 
   <cnsl-refresh-table *ngIf="dataSource" (refreshed)="loadViews()" [dataSize]="dataSource.data.length"
     [loading]="loading$ | async">

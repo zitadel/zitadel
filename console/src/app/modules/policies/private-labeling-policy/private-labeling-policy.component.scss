@@ -2,6 +2,11 @@
 
 @import './preview/preview.component.scss';
 
+.policy-applied-to {
+  margin: 0;
+  font-size: 14px;
+}
+
 @mixin private-label-theme($theme) {
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
@@ -215,12 +220,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+              (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+              (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);

@@ -13,9 +13,11 @@ import {
   GetPrivacyPolicyResponse,
   UpdateCustomPrivacyPolicyRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -41,44 +43,51 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public form!: FormGroup;
   public currentPolicy: GridPolicy = PRIVACY_POLICY;
   public InfoSectionType: any = InfoSectionType;
-
+  public orgName: string = '';
   constructor(
     private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
     private fb: FormBuilder,
+    private storageService: StorageService,
   ) {
-
     this.form = this.fb.group({
       tosLink: ['', []],
       privacyLink: ['', []],
     });
 
-    this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      switch (this.serviceType) {
-        case PolicyComponentServiceType.MGMT:
-          this.service = this.injector.get(ManagementService as Type<ManagementService>);
-          this.loadData();
-          break;
-        case PolicyComponentServiceType.ADMIN:
-          this.service = this.injector.get(AdminService as Type<AdminService>);
-          this.loadData();
-          break;
-      }
+    this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          switch (this.serviceType) {
+            case PolicyComponentServiceType.MGMT:
+              this.service = this.injector.get(ManagementService as Type<ManagementService>);
+              this.loadData();
+              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+              if (org && org.id) {
+                this.orgName = org.name;
+              }
+              break;
+            case PolicyComponentServiceType.ADMIN:
+              this.service = this.injector.get(AdminService as Type<AdminService>);
+              this.loadData();
+              break;
+          }
 
-      return this.route.params;
-    })).subscribe();
+          return this.route.params;
+        }),
+      )
+      .subscribe();
   }
 
   public async loadData(): Promise<any> {
-    const getData = ():
-      Promise<AdminGetPrivacyPolicyResponse.AsObject | GetPrivacyPolicyResponse.AsObject> => {
+    const getData = (): Promise<AdminGetPrivacyPolicyResponse.AsObject | GetPrivacyPolicyResponse.AsObject> => {
       return (this.service as AdminService).getPrivacyPolicy();
     };
 
-    getData().then(resp => {
+    getData().then((resp) => {
       if (resp.policy) {
         this.privacyPolicy = resp.policy;
         this.form.patchValue(this.privacyPolicy);
@@ -93,26 +102,34 @@ export class PrivacyPolicyComponent implements OnDestroy {
         const req = new AddCustomPrivacyPolicyRequest();
         req.setPrivacyLink(this.form.get('privacyLink')?.value);
         req.setTosLink(this.form.get('tosLink')?.value);
-        (this.service as ManagementService).addCustomPrivacyPolicy(req).then(() => {
-          this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
-        }).catch(error => this.toast.showError(error));
+        (this.service as ManagementService)
+          .addCustomPrivacyPolicy(req)
+          .then(() => {
+            this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+          })
+          .catch((error) => this.toast.showError(error));
       } else {
         const req = new UpdateCustomPrivacyPolicyRequest();
         req.setPrivacyLink(this.form.get('privacyLink')?.value);
         req.setTosLink(this.form.get('tosLink')?.value);
-        (this.service as ManagementService).updateCustomPrivacyPolicy(req).then(() => {
-          this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
-        }).catch(error => this.toast.showError(error));
+        (this.service as ManagementService)
+          .updateCustomPrivacyPolicy(req)
+          .then(() => {
+            this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+          })
+          .catch((error) => this.toast.showError(error));
       }
-
     } else if (this.serviceType === PolicyComponentServiceType.ADMIN) {
       const req = new UpdatePrivacyPolicyRequest();
       req.setPrivacyLink(this.form.get('privacyLink')?.value);
       req.setTosLink(this.form.get('tosLink')?.value);
 
-      (this.service as AdminService).updatePrivacyPolicy(req).then(() => {
-        this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
-      }).catch(error => this.toast.showError(error));
+      (this.service as AdminService)
+        .updatePrivacyPolicy(req)
+        .then(() => {
+          this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+        })
+        .catch((error) => this.toast.showError(error));
     }
   }
 
@@ -128,16 +145,19 @@ export class PrivacyPolicyComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         if (this.serviceType === PolicyComponentServiceType.MGMT) {
-          (this.service as ManagementService).resetPrivacyPolicyToDefault().then(() => {
-            setTimeout(() => {
-              this.loadData();
-            }, 1000);
-          }).catch(error => {
-            this.toast.showError(error);
-          });
+          (this.service as ManagementService)
+            .resetPrivacyPolicyToDefault()
+            .then(() => {
+              setTimeout(() => {
+                this.loadData();
+              }, 1000);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
         }
       }
     });

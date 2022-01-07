@@ -87,7 +87,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
   public loadingImages: boolean = false;
-  private org!: Org.AsObject;
+  public org!: Org.AsObject;
   public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   public InfoSectionType: any = InfoSectionType;
 
@@ -99,10 +99,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     private injector: Injector,
     private assetService: AssetService,
     private sanitizer: DomSanitizer,
-    private storage: StorageService,
+    private storageService: StorageService,
     private themeService: ThemeService,
   ) {
-    const org: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
+    const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
 
     if (org) {
       this.org = org;

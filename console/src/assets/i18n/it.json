@@ -65,6 +65,7 @@
     }
   },
   "MENU": {
+    "SYSTEM": "Sistema",
     "DASHBOARD": "Pagina iniziale",
     "PERSONAL_INFO": "Informazioni personali",
     "DOCUMENTATION": "Documentazione",
@@ -600,8 +601,8 @@
   },
   "IAM": {
     "POLICIES": {
-      "TITLE": "Impostazioni IAM e impostazioni di accesso",
-      "DESCRIPTION": "Gestisci le tue impostazioni ZITADEL e le impostazioni di accesso alla gestione."
+      "TITLE": "Impostazioni del Sistema e impostazioni d'accesso",
+      "DESCRIPTION": "Gestisci le impostazioni del sistema e le impostazioni d'accesso."
     },
     "EVENTSTORE": {
       "TITLE": "IAM Eventstore",
@@ -609,7 +610,7 @@
     },
     "MEMBER": {
       "TITLE": "Manager",
-      "DESCRIPTION": "I manager possono aggiungere e modificare le organizzazioni e apportare modifiche ai loro progetti e applicazioni corrispondenti."
+      "DESCRIPTION": "Questi manager possono modificare le impostazioni del sistema."
     },
     "VIEWS": {
       "TITLE": "Views",
@@ -1103,7 +1104,7 @@
     "MEMBER": {
       "TITLE": "Manager",
       "TITLEDESC": "I manager possono apportare modifiche a questo progetto in base al loro ruolo.",
-      "DESCRIPTION": "Qui puoi trovare tutti i manager di questo progetto. Puoi aggiungere un nuovo membro e gestire quelli esistenti.",
+      "DESCRIPTION": "Questi manager potrebbero apportare modifiche al tuo progetto.",
       "USERNAME": "Nome utente",
       "FIRSTNAME": "Nome",
       "LASTNAME": "Nome",
@@ -1585,7 +1586,6 @@
   "MEMBER": {
     "ADD": "Aggiungi un manager",
     "CREATIONTYPE": "Tipo di creazione",
-    "DOCSINFO": "Per maggiori informazioni, considera leggere la nostra documentazione.",
     "CREATIONTYPES": {
       "3": "IAM",
       "2": "Organizzazione",

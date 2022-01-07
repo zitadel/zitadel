@@ -33,6 +33,11 @@ tr {
   cursor: pointer;
 }
 
-.title {
+.views-title {
   margin-top: 2rem;
+}
+
+.views-desc {
+  color: var(--grey);
+  font-size: 14px;
 }

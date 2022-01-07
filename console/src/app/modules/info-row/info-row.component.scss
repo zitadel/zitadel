@@ -23,18 +23,22 @@
       align-items: flex-start;
       box-sizing: border-box;
 
+      .state {
+        margin: 0.25rem 0;
+      }
+
       &:not(.width) {
         min-width: 100px;
       }
 
       .info-row-title {
-        font-size: 14px;
+        font-size: 12px;
         color: var(--grey);
         margin: 0;
       }
 
       .info-row-desc {
-        margin: 0.5rem 0;
+        margin: 0;
         font-size: 14px;
         padding: 2px 0;
       }

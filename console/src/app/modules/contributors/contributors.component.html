@@ -1,5 +1,5 @@
 <div class="contributor-groups">
-  <div class="contributor-people" matTooltip="{{ description }} {{'MEMBER.DOCSINFO' | translate}}">
+  <div class="contributor-people" matTooltip="{{ description }}">
     <div class="contributor-img-list" [@cardAnimation]="totalResult">
       <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
       <ng-container *ngIf="totalResult < 10; else compact">

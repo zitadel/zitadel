@@ -78,15 +78,10 @@
         flex: 1;
       }
 
-      .actions-trigger {
-        margin-top: 0.25rem;
-        display: flex;
-        align-items: center;
-        margin-right: 2rem;
-
-        .icon {
-          margin-left: 0.5rem;
-          margin-right: -0.5rem;
+      .project-contributors {
+        flex-basis: 100%;
+        @media only screen and (min-width: 700px) {
+          flex-basis: auto;
         }
       }
     }

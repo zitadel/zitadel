@@ -21,22 +21,22 @@
           </div>
         </div>
 
-        <p *ngIf="isZitadel; else notZitadel" class="app-zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
+        <p *ngIf="isZitadel" class="app-zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
         </p>
-
-        <ng-template #notZitadel>
-          <p class="app-sub">{{ 'APP.PAGES.DESCRIPTION' | translate }}</p>
-        </ng-template>
       </div>
       <span class="fill-space"></span>
 
       <ng-container *ngIf="isZitadel === false">
         <span class="fill-space"></span>
         <ng-template cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
-          <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
+          <button class="actions-trigger-desk" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
             <span>{{'ACTIONS.ACTIONS' | translate}}</span>
             <mat-icon class="icon">keyboard_arrow_down</mat-icon>
           </button>
+          <button class="actions-trigger-mob" mat-icon-button [matMenuTriggerFor]="actions">
+            <i class="las la-ellipsis-v"></i>
+          </button>
+
           <mat-menu #actions="matMenu" xPosition="before">
             <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
               {{'ACTIONS.RENAME' | translate}}

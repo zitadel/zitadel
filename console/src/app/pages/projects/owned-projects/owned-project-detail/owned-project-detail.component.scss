@@ -94,15 +94,35 @@
         flex: 1;
       }
 
-      .actions-trigger {
+      .actions-trigger-desk {
         margin-top: 0.25rem;
-        display: flex;
+        display: none;
         align-items: center;
         margin-right: 2rem;
+        border-radius: 50vw !important;
+
+        @media only screen and (min-width: 700px) {
+          display: flex;
+        }
 
         .icon {
           margin-left: 0.5rem;
           margin-right: -0.5rem;
+        }
+      }
+
+      .actions-trigger-mob {
+        display: inline;
+
+        @media only screen and (min-width: 700px) {
+          display: none;
+        }
+      }
+
+      .project-contributors {
+        flex-basis: 100%;
+        @media only screen and (min-width: 700px) {
+          flex-basis: auto;
         }
       }
     }

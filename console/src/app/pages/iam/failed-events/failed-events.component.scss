@@ -29,6 +29,11 @@ tr {
   cursor: pointer;
 }
 
-.title {
+.failed-events-title {
   margin-top: 2rem;
+}
+
+.failed-events-desc {
+  color: var(--grey);
+  font-size: 14px;
 }

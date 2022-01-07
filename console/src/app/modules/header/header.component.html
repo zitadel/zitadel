@@ -80,7 +80,7 @@
 
     <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/iam']" class="iam-settings"
       mat-stroked-button>
-      <span class="iam-label">IAM</span>
+      <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>
       <i class="las la-cog"></i>
     </a>
 

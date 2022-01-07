@@ -3,8 +3,19 @@
   align-items: center;
   padding-top: 2rem;
 
-  h1 {
-    margin: 0;
+  .domain-title-row {
+    display: flex;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+    }
+
+    a i {
+      font-size: 1.2rem;
+      height: 1.2rem;
+      line-height: 1.2rem;
+    }
   }
 
   .fill-space {
