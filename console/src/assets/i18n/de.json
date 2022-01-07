@@ -38,30 +38,6 @@
       "PP": "Privacy Policy"
     }
   },
-  "ONBOARDING": {
-    "HEADER": "Erste Schritte",
-    "TITLE": "Lernen Sie unsere ZITADEL Console kennen.",
-    "LOGINDESC": "Melden Sie sich an um Zugriff auf Funktionen von Zitadel zu erhalten",
-    "LOGIN": "Anmelden",
-    "DESCRIPTION": "Führen Sie die folgenden Schritte aus und passen Sie ZITADEL optimal an Ihre Bedürfnisse an.",
-    "STEPS_TITLE": "Führen Sie die folgenden Schritte in gewünschter Reihenfolge aus:",
-    "STEPS": {
-      "1": {
-        "TITLE": "Projekt erstellen",
-        "DESC": "Erstellen Sie Ihr erstes Projekt und legen Sie Zugangsberechtigungen eventueller Mitarbeiter fest."
-      },
-      "2": {
-        "TITLE": "Applikation erstellen",
-        "DESC": "Erstellen Sie eine Applikation innerhalb Ihres Projektes und legen Sie dessen Eigenschaften fest."
-      },
-      "3": {
-        "TITLE": "Sicherheit verbessern",
-        "DESC": "Erweitern Sie die Zugangsrichtlinien und erhöhen Sie dadurch die Sicherheit ihrer Benutzer."
-      }
-    },
-    "START": "Start",
-    "DOCS": "Docs"
-  },
   "HOME": {
     "WELCOME": "Loslegen mit ZITADEL",
     "WELCOMESENTENCE": "Hier findest Du die empfohlenen Aktionen basierend auf Deinen zuletzt erworbenen Berechtigungen. Beachte bitte, dass Du möglicherweise Deine Organisation in der Kopfzeile wechseln musst.",
@@ -171,7 +147,8 @@
     "NEWVALUE": "Neuer Wert",
     "RESTORE": "Wiederherstellen",
     "CONTINUEWITHOUTSAVE": "Ohne speichern fortfahren",
-    "GOTOFEATURES": "Zu den Features"
+    "GOTOFEATURES": "Zu den Features",
+    "OF": "von"
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
@@ -808,6 +785,7 @@
   "POLICY": {
     "TITLE": "Richtlinen entdecken",
     "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
+    "APPLIEDTO": "Angewendet auf die Organisation",
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
@@ -1057,7 +1035,9 @@
       "ZITADELPROJECT": "Diese Einstellungen gehören zum ZITADEL-Projekt. Wenn Du diese änderst, verhält sich ZITADEL möglicherweise nicht wie beabsichtigt.",
       "TYPE": {
         "OWNED": "Eigene Projekte",
-        "GRANTED": "Berechtigte Projekte"
+        "GRANTED": "Berechtigte Projekte",
+        "OWNED_SINGULAR": "Eigenes Projekt",
+        "GRANTED_SINGULAR": "Berechtigtes Projekt"
       },
       "PRIVATELABEL": {
         "TITLE": "Private Labeling Verhalten",
@@ -1165,6 +1145,7 @@
         "1": "Aktiv",
         "2": "Inaktiv"
       },
+      "ALL": "Alle",
       "SHOWDETAIL": "Details anzeigen",
       "USER": "Benutzer",
       "MEMBERS": "Manager",
@@ -1178,6 +1159,7 @@
       "DATES": "Datum",
       "ROLENAMESLIST": "Rollen",
       "NOROLES": "Keine Rollen",
+      "TYPE": "Typ",
       "TOAST": {
         "PROJECTGRANTUSERGRANTADDED": "Projektberechtigung erstellt.",
         "PROJECTGRANTADDED": "Projektberechtigung erstellt.",
@@ -1615,7 +1597,7 @@
   "ROLESLABEL": "Rollen",
   "GRANTS": {
     "TITLE": "Berechtigungen",
-    "DESC": "Hier kannst Du die Berechtigungen Deiner Organisation verwalten.",
+    "DESC": "Hier werden alle Berechtigungen deiner Organisation angezeigt.",
     "DELETE": "Berechtigung löschen",
     "EMPTY": "Keine Berechtigungen gefunden",
     "ADD": "Berechtigung erstellen",

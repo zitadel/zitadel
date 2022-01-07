@@ -90,6 +90,22 @@
         }
       }
     }
+
+    .doc-row {
+      display: flex;
+      align-items: center;
+      margin-top: -10px;
+
+      i {
+        font-size: 1.2rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
+      }
+    }
+  }
+
+  .project-type {
+    font-size: 14px;
   }
 
   .project-detail-privatelabel-info {

@@ -53,9 +53,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    // this.refreshTrigger.pipe(takeUntil(this.destroyed)).subscribe(() => {
     this.changePage(this.paginator);
-    // });
   }
 
   public loadRoles(membership: Membership.AsObject, opened: boolean): void {

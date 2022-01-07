@@ -36,12 +36,22 @@ export class Breadcrumb {
 })
 export class BreadcrumbService {
   public readonly breadcrumbs$: BehaviorSubject<Breadcrumb[]> = new BehaviorSubject<Breadcrumb[]>([]);
-  public readonly breadcrumbsExtended$ = combineLatest([this.breadcrumbs$, this.mgmtService.ownedProjects]).pipe(
-    map(([breadcrumbs, projects]) => {
+  public readonly breadcrumbsExtended$ = combineLatest([
+    this.breadcrumbs$,
+    this.mgmtService.ownedProjects,
+    this.mgmtService.grantedProjects,
+  ]).pipe(
+    map(([breadcrumbs, projects, grantedProjects]) => {
       const newValues = breadcrumbs.map((b) => {
         if (!b.name && b.type === BreadcrumbType.PROJECT) {
           const project = projects.find((project) => b.param && project.id === b.param.value);
           b.name = project?.name ?? '';
+          return b;
+        } else if (!b.name && b.type === BreadcrumbType.GRANTEDPROJECT) {
+          const grantedproject = grantedProjects.find(
+            (grantedproject) => b.param && grantedproject.projectId === b.param.value,
+          );
+          b.name = grantedproject?.projectName ?? '';
           return b;
         } else {
           return b;

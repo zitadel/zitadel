@@ -38,30 +38,6 @@
       "PP": "Privacy Policy"
     }
   },
-  "ONBOARDING": {
-    "HEADER": "First Steps",
-    "TITLE": "Learn how to use ZITADEL",
-    "LOGINDESC": "You need to log in to control your ZITADEL settings.",
-    "LOGIN": "Login",
-    "DESCRIPTION": "We at ZITADEL care a lot about security and performance. Carry out the following steps and adapt ZITADEL optimally to your needs.",
-    "STEPS_TITLE": "Complete the following steps in the order you want:",
-    "STEPS": {
-      "1": {
-        "TITLE": "Create a project",
-        "DESC": "Create your first project and define access rights for any employees."
-      },
-      "2": {
-        "TITLE": "Create Application",
-        "DESC": "Create an application within your project and define its properties."
-      },
-      "3": {
-        "TITLE": "Improve security",
-        "DESC": "Extend the access policies and thereby increase the security of your users."
-      }
-    },
-    "START": "Start",
-    "DOCS": "Docs"
-  },
   "HOME": {
     "WELCOME": "Get started with ZITADEL",
     "WELCOMESENTENCE": "Here you can find recommended actions based on your last acquired permissions. Note that you may have to select your organisation in the header above.",
@@ -171,7 +147,8 @@
     "NEWVALUE": "New Value",
     "RESTORE": "Restore",
     "CONTINUEWITHOUTSAVE": "Continue without saving",
-    "GOTOFEATURES": "Go to features"
+    "GOTOFEATURES": "Go to features",
+    "OF": "of"
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
@@ -808,6 +785,7 @@
   "POLICY": {
     "TITLE": "Explore Settings",
     "DESCRIPTION": "Pre-packaged settings that enhance your security.",
+    "APPLIEDTO": "Applied to the organization",
     "PWD_COMPLEXITY": {
       "TITLE": "Password Complexity",
       "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",
@@ -1057,7 +1035,9 @@
       "ZITADELPROJECT": "This belongs to the ZITADEL project. Beware: If you make changes ZITADEL may not behave as intended.",
       "TYPE": {
         "OWNED": "Owned Projects",
-        "GRANTED": "Granted Projects"
+        "GRANTED": "Granted Projects",
+        "OWNED_SINGULAR": "Owned Project",
+        "GRANTED_SINGULAR": "Granted Project"
       },
       "PRIVATELABEL": {
         "TITLE": "Private Labeling Setting",
@@ -1165,6 +1145,7 @@
         "1": "Active",
         "2": "Inactive"
       },
+      "ALL": "All",
       "SHOWDETAIL": "Show Details",
       "USER": "User",
       "MEMBERS": "Managers",
@@ -1178,6 +1159,7 @@
       "DATES": "Dates",
       "ROLENAMESLIST": "Roles",
       "NOROLES": "No roles",
+      "TYPE": "Type",
       "TOAST": {
         "PROJECTGRANTUSERGRANTADDED": "Project grant created.",
         "PROJECTGRANTADDED": "Project grant created.",
@@ -1615,7 +1597,7 @@
   "ROLESLABEL": "Roles",
   "GRANTS": {
     "TITLE": "Authorizations",
-    "DESC": "Here you can manage authorizations of your organization users.",
+    "DESC": "These are all authorizations on your organization.",
     "DELETE": "Delete Authorization",
     "EMPTY": "No authorization found",
     "ADD": "Create Authorization",

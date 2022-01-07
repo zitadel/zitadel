@@ -4,7 +4,8 @@
     <ng-container
       *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc">
 
-      <ng-container *ngIf="breadc[0] && breadc.length < 2" [ngSwitch]="breadc[0].type">
+      <ng-container *ngIf="breadc[0] && breadc.length < 2 && breadc[0].type !== BreadcrumbType.GRANTEDPROJECT"
+        [ngSwitch]="breadc[0].type">
         <div class="nav-row" @navrow>
           <ng-container *ngSwitchCase="BreadcrumbType.IAM">
             <div class="nav-row-abs" @navroworg>

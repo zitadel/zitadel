@@ -38,30 +38,6 @@
       "PP": "Privacy Policy"
     }
   },
-  "ONBOARDING": {
-    "HEADER": "Primi passi",
-    "TITLE": "Imparare ad usare ZITADEL",
-    "LOGINDESC": "\u00c8 necessario effettuare il login per controllare le impostazioni di ZITADEL.",
-    "LOGIN": "Accedi",
-    "DESCRIPTION": "Noi di ZITADEL teniamo molto alla sicurezza e alle prestazioni. Eseguite i seguenti passi e adattate ZITADEL in modo ottimale alle vostre esigenze.",
-    "STEPS_TITLE": "Completa i seguenti passi nell'ordine che vuoi:",
-    "STEPS": {
-      "1": {
-        "TITLE": "Creare un progetto",
-        "DESC": "Crea il tuo primo progetto e definisci i diritti di accesso per tutti i dipendenti."
-      },
-      "2": {
-        "TITLE": "Creare un'applicazione",
-        "DESC": "Crea un'applicazione per il tuo progetto e definisci le sue propriet\u00e0."
-      },
-      "3": {
-        "TITLE": "Migliorare la sicurezza",
-        "DESC": "Estendete le politiche di accesso e aumentate la sicurezza dei vostri utenti."
-      }
-    },
-    "START": "Inizia",
-    "DOCS": "Docs"
-  },
   "HOME": {
     "WELCOME": "Iniziare con ZITADEL",
     "WELCOMESENTENCE": "Qui puoi trovare le azioni raccomandate in base alle tue ultime autorizzazioni acquisite.",
@@ -171,7 +147,8 @@
     "NEWVALUE": "Nuovo valore",
     "RESTORE": "Ripristina",
     "CONTINUEWITHOUTSAVE": "Continua senza salvare",
-    "GOTOFEATURES": "Vai alle caratteristiche"
+    "GOTOFEATURES": "Vai alle caratteristiche",
+    "OF": "di"
   },
   "RESOURCEID": "Resource ID",
   "TABLE": {
@@ -808,6 +785,7 @@
   "POLICY": {
     "TITLE": "Esplora le impostazioni",
     "DESCRIPTION": "Impostazioni che migliorano la tua sicurezza.",
+    "APPLIEDTO": "Applicato all'organizzazione",
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",
@@ -1056,8 +1034,10 @@
       "NOITEMS": "Nessun progetto",
       "ZITADELPROJECT": "Questo appartiene al progetto ZITADEL. Attenzione: se fai delle modifiche ZITADEL potrebbe non comportarsi come previsto.",
       "TYPE": {
-        "OWNED": "Progetti di propriet\u00e0",
-        "GRANTED": "Progetti concessi"
+        "OWNED": "Progetti proprietari",
+        "GRANTED": "Progetti concessi",
+        "OWNED_SINGULAR": "Progetto proprietario",
+        "GRANTED_SINGULAR": "Progetto concesso"
       },
       "PRIVATELABEL": {
         "TITLE": "Impostazione Private labelling",
@@ -1165,6 +1145,7 @@
         "1": "Attivo",
         "2": "Inattivo"
       },
+      "ALL": "Tutti",
       "SHOWDETAIL": "Mostra dettagli",
       "USER": "Utente",
       "MEMBERS": "Manager",
@@ -1178,6 +1159,7 @@
       "DATES": "Date",
       "ROLENAMESLIST": "Ruoli",
       "NOROLES": "Nessun ruolo",
+      "TYPE": "Tipo",
       "TOAST": {
         "PROJECTGRANTUSERGRANTADDED": "Project grant creato.",
         "PROJECTGRANTADDED": "Project grant creato.",
@@ -1615,7 +1597,7 @@
   "ROLESLABEL": "Ruoli",
   "GRANTS": {
     "TITLE": "Autorizzazioni",
-    "DESC": "Qui puoi gestire le autorizzazioni degli utenti della tua organizzazione.",
+    "DESC": "Qui puoi vedere tutte le autorizzazioni della tua organizzazione.",
     "DELETE": "Cancellare l'autorizzazione",
     "EMPTY": "Nessuna autorizzazione trovata",
     "ADD": "Creare autorizzazione",

@@ -104,7 +104,6 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.projectType$.pipe(takeUntil(this.destroy$)).subscribe((type) => {
       this.getData(type).then(() => {
-        console.log(this.projectList);
         this.notPinned = Object.assign([], this.projectList);
         this.reorganizeItems(type);
       });

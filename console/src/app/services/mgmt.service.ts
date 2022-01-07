@@ -422,7 +422,7 @@ import { MetadataQuery } from '../proto/generated/zitadel/metadata_pb';
 import { ListQuery } from '../proto/generated/zitadel/object_pb';
 import { DomainSearchQuery, DomainValidationType } from '../proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from '../proto/generated/zitadel/policy_pb';
-import { Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
+import { GrantedProject, Project, ProjectQuery, RoleQuery } from '../proto/generated/zitadel/project_pb';
 import {
   Gender,
   MembershipQuery,
@@ -440,6 +440,7 @@ export type ResponseMapper<TResp, TMappedResp> = (resp: TResp) => TMappedResp;
 export class ManagementService {
   public ownedProjects: BehaviorSubject<Project.AsObject[]> = new BehaviorSubject<Project.AsObject[]>([]);
   public ownedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
+  public grantedProjects: BehaviorSubject<GrantedProject.AsObject[]> = new BehaviorSubject<GrantedProject.AsObject[]>([]);
   public grantedProjectsCount: BehaviorSubject<number> = new BehaviorSubject(0);
 
   constructor(private readonly grpcService: GrpcService) {}
@@ -1782,6 +1783,7 @@ export class ManagementService {
     }
     return this.grpcService.mgmt.listGrantedProjects(req, null).then((value) => {
       const obj = value.toObject();
+      this.grantedProjects.next(obj.resultList);
       this.grantedProjectsCount.next(obj.resultList.length);
       return obj;
     });

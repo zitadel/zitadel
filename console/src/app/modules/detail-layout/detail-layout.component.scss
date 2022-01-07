@@ -13,6 +13,7 @@
     .detail-layout-top-view {
       display: flex;
       justify-content: space-between;
+      padding-bottom: 1rem;
 
       .back-row {
         display: flex;
@@ -20,10 +21,6 @@
         align-items: center;
 
         a {
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
           margin-right: 1rem;
         }
       }
@@ -31,7 +28,7 @@
 
     div {
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
       }
 
       .head-desc {

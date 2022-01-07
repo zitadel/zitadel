@@ -7,10 +7,12 @@ import { GetLockoutPolicyResponse as AdminGetPasswordLockoutPolicyResponse } fro
 import {
   GetLockoutPolicyResponse as MgmtGetPasswordLockoutPolicyResponse,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -32,12 +34,14 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public InfoSectionType: any = InfoSectionType;
   public currentPolicy: GridPolicy = LOCKOUT_POLICY;
+  public orgName: string = '';
 
   constructor(
     private route: ActivatedRoute,
     breadcrumbService: BreadcrumbService,
     private toast: ToastService,
     private injector: Injector,
+    private storageService: StorageService,
   ) {
     this.sub = this.route.data
       .pipe(
@@ -47,6 +51,10 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
+              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+              if (org && org.id) {
+                this.orgName = org.name;
+              }
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);

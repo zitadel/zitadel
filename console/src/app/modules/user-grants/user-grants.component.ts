@@ -74,6 +74,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     'user',
     'org',
     'projectId',
+    'type',
     'creationDate',
     'changeDate',
     'roleNamesList',
@@ -114,6 +115,16 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public setType(type: Type | undefined): void {
     this.type = type;
     this.loadGrantsPage(type);
+  }
+
+  public getType(grant: UserGrant.AsObject): string {
+    if (grant.projectGrantId) {
+      return 'Project Grant';
+    } else if (grant.projectId) {
+      return 'Project';
+    } else {
+      return '';
+    }
   }
 
   private loadGrantsPage(type: Type | undefined, filterValue?: string): void {

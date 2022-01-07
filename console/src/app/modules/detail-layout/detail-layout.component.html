@@ -7,7 +7,10 @@
             <a *ngIf="backRouterLink" [routerLink]="backRouterLink" mat-icon-button>
               <mat-icon class="icon">arrow_back</mat-icon>
             </a>
-            <h1>{{ title }}</h1>
+            <div>
+              <h1>{{ title }}</h1>
+              <ng-content select="[sub]"></ng-content>
+            </div>
           </div>
           <p class="head-desc max-width-description">{{ description }}</p>
         </div>

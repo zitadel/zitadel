@@ -7,9 +7,16 @@
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
           <div>
-            <h1 class="user-title" *ngIf="user"><span>{{user.human ? user.human?.profile?.displayName :
-                user.machine?.name}}</span></h1>
-            <span *ngIf="user?.preferredLoginName">{{user?.preferredLoginName}}</span>
+            <div *ngIf="user" class="user-title-row">
+              <h1 class="user-title">
+                {{user.human ? user.human?.profile?.displayName :
+                user.machine?.name}}
+              </h1>
+              <div class="user-state-dot" matTooltip="{{'USER.STATE.'+user?.state | translate}}"
+                [ngClass]="{'active': user?.state === UserState.USER_STATE_ACTIVE, 'inactive': user?.state === UserState.USER_STATE_INACTIVE }">
+              </div>
+            </div>
+            <span class="user-loginname" *ngIf="user?.preferredLoginName">{{user?.preferredLoginName}}</span>
           </div>
         </div>
       </div>

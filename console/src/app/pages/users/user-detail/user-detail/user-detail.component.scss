@@ -85,10 +85,32 @@
             margin-right: 1rem;
           }
 
-          .user-title {
-            margin: 0;
+          .user-title-row {
             display: flex;
             align-items: center;
+
+            .user-title {
+              margin: 0;
+              margin-right: 0.5rem;
+            }
+
+            .user-state-dot {
+              height: 8px;
+              width: 8px;
+              border-radius: 50%;
+
+              &.active {
+                background-color: var(--success);
+              }
+
+              &.inactive {
+                background-color: var(--warn);
+              }
+            }
+          }
+
+          .user-loginname {
+            font-size: 14px;
           }
         }
       }

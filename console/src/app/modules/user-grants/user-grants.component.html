@@ -3,7 +3,7 @@
   [dataSize]="dataSource?.totalResult ?? 0" [selection]="selection">
   <div leftActions class="user-grants-table-left-actions">
     <button class="user-grant-type-button" [ngClass]="{'active': type === undefined}"
-      (click)="setType(undefined)">ALL</button>
+      (click)="setType(undefined)">{{'PROJECT.GRANT.ALL' | translate}}</button>
     <button class="user-grant-type-button" [ngClass]="{'active': type === Type.TYPE_HUMAN}"
       (click)="setType(Type.TYPE_HUMAN)">{{'USER.TABLE.TYPES.HUMAN' | translate}}</button>
     <button class="user-grant-type-button" [ngClass]="{'active': type === Type.TYPE_MACHINE}"
@@ -77,6 +77,13 @@
         </th>
         <td mat-cell *matCellDef="let grant">
           {{grant.projectName}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.TYPE' | translate }} </th>
+        <td mat-cell *matCellDef="let grant">
+          <span class="state">{{getType(grant)}}</span>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="dates">

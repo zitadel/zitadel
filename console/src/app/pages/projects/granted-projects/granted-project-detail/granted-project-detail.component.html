@@ -6,21 +6,29 @@
           <a class="link" [routerLink]="[ '/projects' ]" mat-icon-button>
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
-          <div class="granted-project-title-row">
-            <h2 class="granted-project-title">{{project?.projectName}}</h2>
-            <div class="granted-project-state-dot" *ngIf="project && project.state !== undefined"
-              matTooltip="{{'ORG.STATE.'+project.state | translate}}"
-              [ngClass]="{'active': project.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': project.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE }">
+          <div>
+            <div class="granted-project-title-row">
+              <h2 class="granted-project-title">{{project?.projectName}}</h2>
+              <div class="granted-project-state-dot" *ngIf="project && project.state !== undefined"
+                matTooltip="{{'ORG.STATE.'+project.state | translate}}"
+                [ngClass]="{'active': project.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': project.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE }">
+              </div>
+            </div>
+            <div class="doc-row">
+              <span class="project-type">{{'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate}} {{'ACTIONS.OF' |
+                translate}}
+                <strong>{{project?.projectOwnerName}}</strong></span>
+              <a mat-icon-button href="https://docs.zitadel.ch/docs/guides/basics/projects#what-is-a-granted-project"
+                rel="noreferrer" target="_blank">
+                <i class="las la-info-circle"></i>
+              </a>
             </div>
           </div>
         </div>
-        <p class="granted-project-sub">{{'PROJECT.PAGES.DESCRIPTION' | translate}}</p>
         <p *ngIf="isZitadel" class="granted-project-sub zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
         </p>
-
       </div>
       <span class="fill-space"></span>
-
       <cnsl-contributors *ngIf="project" [loading]="loading$ | async" [totalResult]="totalMemberResult"
         [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
         description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"

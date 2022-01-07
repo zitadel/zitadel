@@ -6,17 +6,25 @@
           <a class="link" [routerLink]="[ '/projects' ]" mat-icon-button>
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
-          <div class="project-title-row">
-            <h2 class="project-title">{{project?.name}}</h2>
-            <div class="project-state-dot" *ngIf="project && project.state !== undefined"
-              matTooltip="{{'ORG.STATE.'+project.state | translate}}"
-              [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE }">
+          <div>
+            <div class="project-title-row">
+              <h2 class="project-title">{{project?.name}}</h2>
+              <div class="project-state-dot" *ngIf="project && project.state !== undefined"
+                matTooltip="{{'PROJECT.STATE.'+project.state | translate}}"
+                [ngClass]="{'active': project.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': project.state === ProjectState.PROJECT_STATE_INACTIVE }">
+              </div>
+            </div>
+            <div class="doc-row">
+              <span class="project-type">{{'PROJECT.PAGES.TYPE.OWNED_SINGULAR' | translate}}</span>
+              <a mat-icon-button href="https://docs.zitadel.ch/docs/guides/basics/projects" rel="noreferrer"
+                target="_blank">
+                <i class="las la-info-circle"></i>
+              </a>
             </div>
           </div>
         </div>
-        <p class="project-sub">{{'PROJECT.PAGES.DESCRIPTION' | translate}}</p>
-        <p *ngIf="isZitadel" class="project-sub zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
 
+        <p *ngIf="isZitadel" class="project-sub zitadel-warning">{{'PROJECT.PAGES.ZITADELPROJECT' | translate}}</p>
       </div>
       <span class="fill-space"></span>
       <ng-template cnslHasRole [hasRole]="['project.write:'+projectId, 'project.write']">

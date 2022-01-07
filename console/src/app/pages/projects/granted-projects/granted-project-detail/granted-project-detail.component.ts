@@ -11,7 +11,7 @@ import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-dataso
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -48,10 +48,8 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
     private _location: Location,
     private router: Router,
     private dialog: MatDialog,
-    breadcrumbService: BreadcrumbService,
-  ) {
-    breadcrumbService.setBreadcrumb([]);
-  }
+    private breadcrumbService: BreadcrumbService,
+  ) {}
 
   public ngOnInit(): void {
     this.subscription = this.route.params.subscribe((params) => this.getData(params));
@@ -64,6 +62,17 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
   private async getData({ id, grantId }: Params): Promise<void> {
     this.projectId = id;
     this.grantId = grantId;
+
+    const breadcrumbs = [
+      new Breadcrumb({
+        type: BreadcrumbType.GRANTEDPROJECT,
+        name: '',
+        param: { key: 'id', value: id },
+        routerLink: ['/granted-projects', id],
+        isZitadel: this.isZitadel,
+      }),
+    ];
+    this.breadcrumbService.setBreadcrumb(breadcrumbs);
 
     this.mgmtService.getIAM().then((iam) => {
       this.isZitadel = iam.iamProjectId === this.projectId;
