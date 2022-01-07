@@ -18,7 +18,7 @@
       </button>
     </ng-template>
     <ng-template cnslHasRole writeactions [hasRole]="['org.member.write:'+org?.id,'org.member.write']">
-      <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
+      <a (click)="openAddMember()" color="primary" mat-raised-button>
         <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
       </a>
     </ng-template>

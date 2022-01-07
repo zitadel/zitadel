@@ -35,10 +35,12 @@ import {
   SetCustomVerifyEmailMessageTextRequest,
   SetCustomVerifyPhoneMessageTextRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { MessageCustomText } from 'src/app/proto/generated/zitadel/text_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -390,12 +392,14 @@ export class MessageTextsComponent implements OnDestroy {
   public LOCALES: string[] = ['en', 'de', 'it'];
   private sub: Subscription = new Subscription();
   public currentPolicy: GridPolicy = MESSAGE_TEXTS_POLICY;
+  public orgName: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
     private injector: Injector,
     private dialog: MatDialog,
+    private storageService: StorageService,
     breadcrumbService: BreadcrumbService,
   ) {
     this.sub = this.route.data
@@ -409,6 +413,10 @@ export class MessageTextsComponent implements OnDestroy {
                 this.LOCALES = lang.languagesList;
               });
               this.loadData(this.currentType);
+              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+              if (org && org.id) {
+                this.orgName = org.name;
+              }
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);

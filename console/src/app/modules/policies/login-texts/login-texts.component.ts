@@ -15,9 +15,11 @@ import {
   GetDefaultLoginTextsRequest,
   SetCustomLoginTextsRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { InfoSectionType } from '../../info-section/info-section.component';
@@ -117,7 +119,7 @@ export class LoginTextsComponent implements OnDestroy {
 
   public destroy$: Subject<void> = new Subject();
   public InfoSectionType: any = InfoSectionType;
-
+  public orgName: string = '';
   public form: FormGroup = new FormGroup({
     currentSubMap: new FormControl('emailVerificationDoneText'),
     locale: new FormControl('en'),
@@ -127,6 +129,7 @@ export class LoginTextsComponent implements OnDestroy {
     private injector: Injector,
     private dialog: MatDialog,
     private toast: ToastService,
+    private storageService: StorageService,
     breadcrumbService: BreadcrumbService,
   ) {
     this.sub = this.route.data
@@ -142,6 +145,11 @@ export class LoginTextsComponent implements OnDestroy {
               });
 
               this.loadData();
+
+              const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+              if (org && org.id) {
+                this.orgName = org.name;
+              }
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);

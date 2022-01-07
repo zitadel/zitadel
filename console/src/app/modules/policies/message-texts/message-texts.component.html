@@ -1,5 +1,10 @@
 <cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
   [title]="'POLICY.MESSAGE_TEXTS.TITLE' | translate" [description]="'POLICY.MESSAGE_TEXTS.DESCRIPTION' | translate">
+  <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
+    <strong *ngIf="orgName; else iam">{{orgName}}</strong>
+    <ng-template #iam><strong>{{'MENU.SYSTEM' | translate}}</strong>
+    </ng-template>
+  </p>
 
   <div class="message-texts-top-actions">
     <div class="message-type">

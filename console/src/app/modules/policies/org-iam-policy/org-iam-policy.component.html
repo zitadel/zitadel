@@ -1,28 +1,33 @@
 <cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
-    [title]="'POLICY.IAM_POLICY.TITLE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
-    <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
-
-    <ng-template cnslHasRole [hasRole]="['iam.policy.delete']">
-        <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
-            matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
-            {{'POLICY.RESET' | translate}}
-        </button>
+  [title]="'POLICY.IAM_POLICY.TITLE' | translate" [description]="'POLICY.IAM_POLICY.DESCRIPTION' | translate">
+  <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
+    <strong *ngIf="orgName; else iam">{{orgName}}</strong>
+    <ng-template #iam><strong>{{'MENU.SYSTEM' | translate}}</strong>
     </ng-template>
+  </p>
 
-    <div class="content" *ngIf="iamData">
-        <div class="row">
-            <span class="left-desc">{{'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate}}</span>
-            <span class="fill-space"></span>
-            <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
-                [(ngModel)]="iamData.userLoginMustBeDomain">
-            </mat-slide-toggle>
-        </div>
+  <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
+
+  <ng-template cnslHasRole [hasRole]="['iam.policy.delete']">
+    <button *ngIf="serviceType === PolicyComponentServiceType.MGMT && !isDefault"
+      matTooltip="{{'POLICY.RESET' | translate}}" color="warn" (click)="removePolicy()" mat-stroked-button>
+      {{'POLICY.RESET' | translate}}
+    </button>
+  </ng-template>
+
+  <div class="content" *ngIf="iamData">
+    <div class="row">
+      <span class="left-desc">{{'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate}}</span>
+      <span class="fill-space"></span>
+      <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="iamData.userLoginMustBeDomain">
+      </mat-slide-toggle>
     </div>
+  </div>
 
-    <div class="btn-container">
-        <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
-            }}</button>
-    </div>
+  <div class="btn-container">
+    <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
+      }}</button>
+  </div>
 
-    <cnsl-policy-grid  [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="login"></cnsl-policy-grid>
+  <cnsl-policy-grid [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="login"></cnsl-policy-grid>
 </cnsl-detail-layout>

@@ -786,7 +786,7 @@
   "POLICY": {
     "TITLE": "Esplora le impostazioni",
     "DESCRIPTION": "Impostazioni che migliorano la tua sicurezza.",
-    "APPLIEDTO": "Applicato all'organizzazione",
+    "APPLIEDTO": "Applicato a",
     "PWD_COMPLEXITY": {
       "TITLE": "Complessit\u00e0 della password",
       "DESCRIPTION": "Assicura che tutte le password impostate corrispondano a un modello specifico",

@@ -31,6 +31,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
 
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public currentPolicy: GridPolicy = IAM_POLICY;
+  public orgName: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -38,6 +39,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
     private storage: StorageService,
     private injector: Injector,
     private adminService: AdminService,
+    private storageService: StorageService,
     breadcrumbService: BreadcrumbService,
   ) {
     const temporg = this.storage.getItem(StorageKey.organization, StorageLocation.session) as Org.AsObject;
@@ -49,6 +51,10 @@ export class OrgIamPolicyComponent implements OnDestroy {
         switchMap((data) => {
           this.serviceType = data.serviceType;
           if (this.serviceType === PolicyComponentServiceType.MGMT) {
+            const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+            if (org && org.id) {
+              this.orgName = org.name;
+            }
             this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
           }
           return this.route.params;

@@ -1,6 +1,12 @@
 <cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
   [title]="'POLICY.LOGIN_POLICY.TITLE' | translate"
   [description]="(serviceType === PolicyComponentServiceType.MGMT ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEMGMT' : PolicyComponentServiceType.ADMIN ? 'POLICY.LOGIN_POLICY.DESCRIPTIONCREATEADMIN' : '') | translate">
+  <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
+    <strong *ngIf="orgName; else iam">{{orgName}}</strong>
+    <ng-template #iam><strong>{{'MENU.SYSTEM' | translate}}</strong>
+    </ng-template>
+  </p>
+
   <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
   <div class="spinner-wr">

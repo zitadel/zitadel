@@ -786,7 +786,7 @@
   "POLICY": {
     "TITLE": "Explore Settings",
     "DESCRIPTION": "Pre-packaged settings that enhance your security.",
-    "APPLIEDTO": "Applied to the organization",
+    "APPLIEDTO": "Applied to",
     "PWD_COMPLEXITY": {
       "TITLE": "Password Complexity",
       "DESCRIPTION": "Ensures that all set passwords correspond to a specific pattern",
