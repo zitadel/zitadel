@@ -95,7 +95,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
             })
         }
 
-        cy.visit(`${consoleUrl}/loginname`);
+        cy.visit(`${consoleUrl}/loginname`, { retryOnNetworkFailure: true });
 
         multipleDomains && cy.wait('@login')
         onUsernameScreen ? onUsernameScreen() : null
@@ -113,11 +113,10 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
         cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
 
-    }, {
+    }, {        
         validate: () => {
 
-            if (force || user === User.LoginPolicyUser || user === User.PasswordComplexityUser) {
-                cy.pause()
+            if (force) {
                 throw new Error("clear session");
             }
 
