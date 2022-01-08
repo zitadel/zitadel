@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -54,7 +55,7 @@ type Event struct {
 	//ResourceOwner is the organisation which owns this aggregate
 	// an aggregate can only be managed by one organisation
 	// use the ID of the org
-	ResourceOwner string
+	ResourceOwner sql.NullString
 }
 
 //EventType is the description of the change

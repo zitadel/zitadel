@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"reflect"
 	"sync"
@@ -376,7 +377,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "caos",
+						ResourceOwner: sql.NullString{String: "caos", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -412,7 +413,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "caos",
+						ResourceOwner: sql.NullString{String: "caos", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -422,7 +423,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "caos",
+						ResourceOwner: sql.NullString{String: "caos", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -444,6 +445,143 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 			},
 			res: res{
 				wantErr: true,
+			},
+		},
+		{
+			name: "no aggregate id",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"",
+								"test.aggregate",
+								"v1",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no aggregate type",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"id",
+								"",
+								"v1",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no aggregate version",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"id",
+								"test.aggregate",
+								"",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no event type",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"id",
+								"test.aggregate",
+								"v1",
+							),
+							"",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no resourceowner",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("", "adlerhurst"),
+								"id",
+								"test.aggregate",
+								"v1",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: false,
+				events: []*repository.Event{
+					{
+						AggregateID:   "id",
+						AggregateType: "test.aggregate",
+						Data:          []byte(nil),
+						EditorService: "editorService",
+						EditorUser:    "editorUser",
+						ResourceOwner: sql.NullString{String: "", Valid: false},
+						Type:          "test.event",
+						Version:       "v1",
+					},
+				},
 			},
 		},
 		{
@@ -483,7 +621,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -493,7 +631,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -505,7 +643,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -622,7 +760,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -665,7 +803,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -675,7 +813,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -729,7 +867,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "caos",
+								ResourceOwner: sql.NullString{String: "caos", Valid: true},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -739,7 +877,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "caos",
+								ResourceOwner: sql.NullString{String: "caos", Valid: true},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -751,7 +889,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "caos",
+								ResourceOwner: sql.NullString{String: "caos", Valid: true},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -1323,7 +1461,7 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 		t.Errorf("wrong editor user got %q want %q", got.EditorUser, want.EditorUser)
 	}
 	if want.ResourceOwner != got.ResourceOwner {
-		t.Errorf("wrong resource owner got %q want %q", got.ResourceOwner, want.ResourceOwner)
+		t.Errorf("wrong resource owner got %q want %q", got.ResourceOwner.String, want.ResourceOwner.String)
 	}
 	if want.Type != got.Type {
 		t.Errorf("wrong event type got %q want %q", got.Type, want.Type)

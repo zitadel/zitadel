@@ -9,9 +9,10 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/lib/pq"
 )
 
 func Test_getCondition(t *testing.T) {
@@ -135,7 +136,7 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Sequence(0), Data(nil), "", "", "", repository.AggregateType("user"), "hodor", repository.Version("")},
+				dbRow: []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Sequence(0), Data(nil), "", "", sql.NullString{String: ""}, repository.AggregateType("user"), "hodor", repository.Version("")},
 			},
 		},
 		{
@@ -416,11 +417,11 @@ func Test_query_events_with_crdb(t *testing.T) {
 			fields: fields{
 				client: testCRDBClient,
 				existingEvents: []*repository.Event{
-					generateEvent(t, "306", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "307", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "308", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "309", func(e *repository.Event) { e.ResourceOwner = "orgID" }),
-					generateEvent(t, "309", func(e *repository.Event) { e.ResourceOwner = "orgID" }),
+					generateEvent(t, "306", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "307", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "308", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "309", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "orgID", Valid: true} }),
+					generateEvent(t, "309", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "orgID", Valid: true} }),
 				},
 			},
 			res: res{
