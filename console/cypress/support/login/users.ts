@@ -10,11 +10,10 @@ export enum User {
 export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?: () => void, onPasswordScreen?: () => void, onAuthenticated?: () => void): void {
     let creds = credentials(user, pw)
 
-    const apiCallsDomain: string = Cypress.env('apiCallsDomain')
+    const apiUrl: string = Cypress.env('apiUrl')
+    const accountsUrl: string = Cypress.env('accountsUrl')
     const consoleUrl: string = Cypress.env('consoleUrl') 
-    const multipleDomains = consoleUrl.indexOf(stripPort(apiCallsDomain)) == -1
-
-    const accountsHost = apiCallsDomain.indexOf("localhost") > -1 ? stripPort(apiCallsDomain) : `accounts.${apiCallsDomain}`
+    const multipleDomains = stripPort(apiUrl) != stripPort(accountsUrl)
 
     cy.session(creds.username, () => {
 
@@ -85,7 +84,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
             
             cy.intercept({
                 method: 'GET',
-                url: `https://${accountsHost}/oauth/v2/authorize*`,
+                url: `${accountsUrl}/oauth/v2/authorize*`,
                 hostname: "localhost",
                 times: 1,
             }, (req) => {
@@ -125,13 +124,15 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
     })
 }
 
+
+
+export function username(withoutDomain: string, project?: string): string {
+    return `${withoutDomain}@${project ? `${project}.` : ''}${stripPort(Cypress.env('apiUrl').replace('http://', '').replace('https://', '')).replace('api.', '')}`
+}
+
 function credentials(user: User, pw?: string) {
-
-    const userDomain = stripPort(Cypress.env('apiCallsDomain'))
-    const username = user == User.IAMAdminUser ? `${User.IAMAdminUser}@caos-ag.${userDomain}` : `${user}_user_name@caos-demo.${userDomain}`
-
     return {
-        username: username,
+        username: username(`${user}_user_name`, user == User.IAMAdminUser ? 'caos-ag' : 'caos-demo'),
         password: pw ? pw : Cypress.env(`${user}_password`)
     }
 }
@@ -149,7 +150,7 @@ function updateCookies(newCookies: string[] | undefined, currentCookies: Map<str
 }
 
 function requestCookies(currentCookies: Map<string, string>): string[] {
-    let list = []
+    let list: Array<string> = []
     currentCookies.forEach((val, key) => {
         list.push(key+"="+val)
     })

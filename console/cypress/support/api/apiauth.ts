@@ -5,28 +5,21 @@ export interface apiCallProperties {
     mgntBaseURL: string
 }
 
-export function apiAuthAdmin(): Cypress.Chainable<apiCallProperties> {
-    const apiDomain = Cypress.env('apiCallsDomain')
-
-
-}
-
 export function apiAuth(): Cypress.Chainable<apiCallProperties> {
-    const apiDomain = Cypress.env('apiCallsDomain')
-    const apiBaseURL = `https://api.${apiDomain}`
+    const apiUrl = Cypress.env('apiUrl')
+    const issuerUrl = Cypress.env('issuerUrl')
+    const zitadelProjectResourceID = (<string>Cypress.env('zitadelProjectResourceId')).replace('bignumber-', '')
 
-    // TODO: Why can't I just receive the correct value with Cypress.env('zitadelProjectResourceId')???
-    var zitadelProjectResourceID = apiDomain == 'zitadel.ch' ? '69234237810729019' : '70669147545070419'
+    debugger
+    const key = Cypress.env("serviceAccountKey")
 
-    var key = Cypress.env("serviceAccountKey")
-
-    var now = new Date().getTime()
-    var iat = Math.floor(now / 1000)
-    var exp = Math.floor(new Date(now + 1000 * 60 * 55).getTime() / 1000) // 55 minutes
-    var bearerToken = sign({
+    const now = new Date().getTime()
+    const iat = Math.floor(now / 1000)
+    const exp = Math.floor(new Date(now + 1000 * 60 * 55).getTime() / 1000) // 55 minutes
+    const bearerToken = sign({
         iss: key.userId,
         sub: key.userId,
-        aud: `https://issuer.${apiDomain}`,
+        aud: `${issuerUrl}/oauth/v2`,
         iat: iat,
         exp: exp
     }, key.key, {
@@ -38,7 +31,7 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
 
     return cy.request({
         method: 'POST',
-        url: `${apiBaseURL}/oauth/v2/token`,
+        url: `${apiUrl}/oauth/v2/token`,
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -48,9 +41,10 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
             assertion: bearerToken,
         }
     }).its('body.access_token').then(token => {
+
         return <apiCallProperties>{
             authHeader: `Bearer ${token}`,
-            mgntBaseURL: `${apiBaseURL}/management/v1/`,
+            mgntBaseURL: `${apiUrl}/management/v1/`,
         }
     })
 }

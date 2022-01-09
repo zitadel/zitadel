@@ -1,6 +1,6 @@
 import { apiAuth } from "../../support/api/apiauth";
 import { ensureHumanUserExists, ensureUserDoesntExist } from "../../support/api/users";
-import { login, User } from "../../support/login/users";
+import { login, User, username } from "../../support/login/users";
 
 describe('humans', () => {
 
@@ -27,7 +27,7 @@ describe('humans', () => {
                 it('should add a user', () => {
                     cy.contains('a', 'New').click()
                     cy.url().should('contain', 'users/create')
-                    cy.get('[formcontrolname^=email]').type(`e2ehuman@${Cypress.env('apiCallsDomain')}`)
+                    cy.get('[formcontrolname^=email]').type(username('e2ehuman'))
                     //force needed due to the prefilled username prefix
                     cy.get('[formcontrolname^=userName]').type(testHumanUserName, {force: true})
                     cy.get('[formcontrolname^=firstName]').type('e2ehumanfirstname')

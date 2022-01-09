@@ -54,7 +54,7 @@ describe("projects", ()=> {
                     cy.get(`[text*=${testProjectName}]`).should('not.exist');
                 })
 
-                it.skip('via list view', () => {
+                it('via list view', () => {
                     cy.get('[data-e2e=toggle-grid]').click()
                     cy.get('[data-cy=timestamp]')
                     cy.contains('h1', 'Projects')
