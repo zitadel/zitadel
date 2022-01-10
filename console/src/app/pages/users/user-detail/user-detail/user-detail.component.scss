@@ -29,9 +29,39 @@
           font-size: 15px;
           cursor: pointer;
           color: map-get($foreground, base);
+          display: flex;
+          align-items: center;
+
+          i {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+          }
 
           &:hover {
             opacity: 1;
+          }
+
+          &.mob-only {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
+          }
+
+          &.hide-on-mobile {
+            @media only screen and (max-width: 500px) {
+              display: none;
+            }
+          }
+
+          &.show {
+            display: none;
+
+            @media only screen and (max-width: 500px) {
+              display: flex;
+            }
           }
 
           &.active {

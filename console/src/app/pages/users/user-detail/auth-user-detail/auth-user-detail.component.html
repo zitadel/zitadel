@@ -32,17 +32,22 @@
     <div class="user-container">
       <div class="user-settings-list">
         <div class="user-sticky-rel">
+          <button *ngIf="currentSetting !== undefined" (click)="currentSetting = undefined"
+            class="setting-list-element mob-only" [ngClass]="{'active': true}">
+            <i class="las la-angle-left"></i>
+            <span>{{'USER.SETTINGS.TITLE' | translate}}</span>
+          </button>
           <ng-container *ngFor="let setting of settingsList">
             <ng-template *ngIf="setting.featureRequired, else btn" cnslHasFeature
               [hasFeature]="setting.featureRequired">
-              <button (click)="currentSetting = setting" class="setting-list-element"
-                [ngClass]="{'active': currentSetting === setting}">
+              <button (click)="currentSetting = setting" class="setting-list-element hide-on-mobile"
+                [ngClass]="{'active': currentSetting === setting, 'show': currentSetting === undefined}">
                 <span>{{setting.i18nKey | translate}}</span>
               </button>
             </ng-template>
             <ng-template #btn>
-              <button (click)="currentSetting = setting" class="setting-list-element"
-                [ngClass]="{'active': currentSetting === setting}">
+              <button (click)="currentSetting = setting" class="setting-list-element hide-on-mobile"
+                [ngClass]="{'active': currentSetting === setting, 'show': currentSetting === undefined}">
                 <span>{{setting.i18nKey | translate}}</span>
               </button>
             </ng-template>
@@ -51,7 +56,7 @@
       </div>
 
       <div class="user-settings">
-        <ng-container *ngIf="currentSetting.id === 'general'">
+        <ng-container *ngIf="currentSetting?.id === 'general'">
           <cnsl-card *ngIf="user && user.human && user.human.profile" class=" app-card"
             title="{{ 'USER.PROFILE.TITLE' | translate }}">
             <cnsl-detail-form [showEditImage]="true" [preferredLoginName]="user.preferredLoginName" [genders]="genders"
@@ -86,19 +91,19 @@
           </ng-template>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting.id === 'idp'">
+        <ng-container *ngIf="currentSetting?.id === 'idp'">
           <cnsl-external-idps *ngIf="user && user.id" [userId]="user.id" [service]="userService"></cnsl-external-idps>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting.id === 'passwordless'">
+        <ng-container *ngIf="currentSetting?.id === 'passwordless'">
           <cnsl-auth-passwordless *ngIf="user" #mfaComponent></cnsl-auth-passwordless>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting.id === 'mfa'">
+        <ng-container *ngIf="currentSetting?.id === 'mfa'">
           <cnsl-auth-user-mfa *ngIf="user" #mfaComponent></cnsl-auth-user-mfa>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting.id === 'grants'">
+        <ng-container *ngIf="currentSetting?.id === 'grants'">
           <cnsl-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <cnsl-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
@@ -109,7 +114,7 @@
           </cnsl-card>
         </ng-container>
 
-        <ng-container *ngIf="currentSetting.id === 'memberships'">
+        <ng-container *ngIf="currentSetting?.id === 'memberships'">
           <cnsl-card *ngIf="user?.id" title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
             description="{{'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
             <cnsl-memberships-table></cnsl-memberships-table>
@@ -117,7 +122,7 @@
         </ng-container>
 
         <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
-          <ng-container *ngIf="currentSetting.id === 'metadata'">
+          <ng-container *ngIf="currentSetting?.id === 'metadata'">
             <cnsl-metadata *ngIf="user?.id" [userId]="user.id"></cnsl-metadata>
           </ng-container>
         </ng-template>

@@ -61,17 +61,22 @@
     <div class="user-container">
       <div class="user-settings-list">
         <div class="user-sticky-rel">
+          <button *ngIf="currentSetting !== undefined" (click)="currentSetting = undefined"
+            class="setting-list-element mob-only" [ngClass]="{'active': true}">
+            <i class="las la-angle-left"></i>
+            <span>{{'USER.SETTINGS.TITLE' | translate}}</span>
+          </button>
           <ng-container *ngFor="let setting of settingsList">
             <ng-template *ngIf="setting.featureRequired, else btn" cnslHasFeature
               [hasFeature]="setting.featureRequired">
-              <button (click)="currentSetting = setting" class="setting-list-element"
-                [ngClass]="{'active': currentSetting === setting}">
+              <button (click)="currentSetting = setting" class="setting-list-element hide-on-mobile"
+                [ngClass]="{'active': currentSetting === setting, 'show': currentSetting === undefined}">
                 <span>{{setting.i18nKey | translate}}</span>
               </button>
             </ng-template>
             <ng-template #btn>
-              <button (click)="currentSetting = setting" class="setting-list-element"
-                [ngClass]="{'active': currentSetting === setting}">
+              <button (click)="currentSetting = setting" class="setting-list-element hide-on-mobile"
+                [ngClass]="{'active': currentSetting === setting, 'show': currentSetting === undefined}">
                 <span>{{setting.i18nKey | translate}}</span>
               </button>
             </ng-template>
@@ -92,7 +97,7 @@
             {{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>
           <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
 
-          <ng-container *ngIf="currentSetting.id === 'general'">
+          <ng-container *ngIf="currentSetting?.id === 'general'">
             <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:'+user?.id]">
               <cnsl-card *ngIf="user.human" title="{{ 'USER.PROFILE.TITLE' | translate }}">
                 <cnsl-detail-form [preferredLoginName]="user.preferredLoginName"
@@ -125,12 +130,12 @@
             </ng-template>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'idp'">
+          <ng-container *ngIf="currentSetting?.id === 'idp'">
             <cnsl-external-idps *ngIf="user && user.human && user.id" [userId]="user.id" [service]="mgmtUserService">
             </cnsl-external-idps>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'general'">
+          <ng-container *ngIf="currentSetting?.id === 'general'">
             <cnsl-card *ngIf="user.machine" title="{{ 'USER.MACHINE.TITLE' | translate }}">
               <cnsl-detail-form-machine [disabled]="(canWrite$ | async) === false" [username]="user.userName"
                 [user]="user.machine" (submitData)="saveMachine($event)">
@@ -138,7 +143,7 @@
             </cnsl-card>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'keys'">
+          <ng-container *ngIf="currentSetting?.id === 'keys'">
             <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:'+user?.id]">
               <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
                 description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
@@ -147,16 +152,16 @@
             </ng-template>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'passwordless'">
+          <ng-container *ngIf="currentSetting?.id === 'passwordless'">
             <cnsl-passwordless *ngIf="user && user.human" [user]="user" [disabled]="(canWrite$ | async) === false">
             </cnsl-passwordless>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'mfa'">
+          <ng-container *ngIf="currentSetting?.id === 'mfa'">
             <cnsl-user-mfa *ngIf="user && user.human" [user]="user"></cnsl-user-mfa>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'grants'">
+          <ng-container *ngIf="currentSetting?.id === 'grants'">
             <cnsl-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
               description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
               <cnsl-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
@@ -167,14 +172,14 @@
             </cnsl-card>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'memberships'">
+          <ng-container *ngIf="currentSetting?.id === 'memberships'">
             <cnsl-card *ngIf="user?.id" title="{{ 'USER.MEMBERSHIPS.TITLE' | translate }}"
               description="{{'USER.MEMBERSHIPS.DESCRIPTION' | translate }}">
               <cnsl-memberships-table [userId]="user.id"></cnsl-memberships-table>
             </cnsl-card>
           </ng-container>
 
-          <ng-container *ngIf="currentSetting.id === 'metadata'">
+          <ng-container *ngIf="currentSetting?.id === 'metadata'">
             <ng-template cnslHasFeature [hasFeature]="['metadata.user']">
               <cnsl-metadata *ngIf="user" [userId]="user.id"></cnsl-metadata>
             </ng-template>

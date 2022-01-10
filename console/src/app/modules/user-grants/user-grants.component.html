@@ -1,14 +1,14 @@
 <cnsl-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
   [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
   [dataSize]="dataSource?.totalResult ?? 0" [selection]="selection">
-  <div leftActions class="user-grants-table-left-actions">
+  <!-- <div leftActions class="user-grants-table-left-actions">
     <button class="user-grant-type-button" [ngClass]="{'active': type === undefined}"
       (click)="setType(undefined)">{{'PROJECT.GRANT.ALL' | translate}}</button>
     <button class="user-grant-type-button" [ngClass]="{'active': type === Type.TYPE_HUMAN}"
       (click)="setType(Type.TYPE_HUMAN)">{{'USER.TABLE.TYPES.HUMAN' | translate}}</button>
     <button class="user-grant-type-button" [ngClass]="{'active': type === Type.TYPE_MACHINE}"
       (click)="setType(Type.TYPE_MACHINE)">{{'USER.TABLE.TYPES.MACHINE' | translate}}</button>
-  </div>
+  </div> -->
 
   <cnsl-form-field @appearfade *ngIf="userGrantListSearchKey !== undefined" actions class="filtername">
     <input class="filterinput" cnslInput (keyup)="applyFilter($event)"

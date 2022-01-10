@@ -1,3 +1,4 @@
+import { MediaMatcher } from '@angular/cdk/layout';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
@@ -49,7 +50,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false },
     { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
   ];
-  public currentSetting: UserSetting = this.settingsList[0];
+  public currentSetting: UserSetting | undefined = this.settingsList[0];
 
   constructor(
     public translate: TranslateService,
@@ -58,7 +59,17 @@ export class AuthUserDetailComponent implements OnDestroy {
     private dialog: MatDialog,
     private auth: AuthenticationService,
     breadcrumbService: BreadcrumbService,
+    private mediaMatcher: MediaMatcher,
   ) {
+    const mediaq: string = '(max-width: 500px)';
+    const small = this.mediaMatcher.matchMedia(mediaq).matches;
+    if (small) {
+      this.changeSelection(small);
+    }
+    this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
+      this.changeSelection(small.matches);
+    };
+
     breadcrumbService.setBreadcrumb([]);
 
     this.loading = true;
@@ -67,6 +78,14 @@ export class AuthUserDetailComponent implements OnDestroy {
     this.userService.getSupportedLanguages().then((lang) => {
       this.languages = lang.languagesList;
     });
+  }
+
+  private changeSelection(small: boolean): void {
+    if (small) {
+      this.currentSetting = undefined;
+    } else {
+      this.currentSetting = this.currentSetting === undefined ? this.settingsList[0] : this.currentSetting;
+    }
   }
 
   refreshUser(): void {

@@ -1,3 +1,4 @@
+import { MediaMatcher } from '@angular/cdk/layout';
 import { Location } from '@angular/common';
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -57,7 +58,7 @@ export class UserDetailComponent implements OnInit {
   public error: string = '';
 
   public settingsList: UserSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
-  public currentSetting: UserSetting = this.settingsList[0];
+  public currentSetting: UserSetting | undefined = GENERAL;
 
   constructor(
     public translate: TranslateService,
@@ -67,7 +68,25 @@ export class UserDetailComponent implements OnInit {
     private _location: Location,
     private dialog: MatDialog,
     private router: Router,
-  ) {}
+    private mediaMatcher: MediaMatcher,
+  ) {
+    const mediaq: string = '(max-width: 500px)';
+    const small = this.mediaMatcher.matchMedia(mediaq).matches;
+    if (small) {
+      this.changeSelection(small);
+    }
+    this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
+      this.changeSelection(small.matches);
+    };
+  }
+
+  private changeSelection(small: boolean): void {
+    if (small) {
+      this.currentSetting = undefined;
+    } else {
+      this.currentSetting = this.currentSetting === undefined ? GENERAL : this.currentSetting;
+    }
+  }
 
   refreshUser(): void {
     this.refreshChanges$.emit();

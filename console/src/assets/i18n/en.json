@@ -164,6 +164,7 @@
   },
   "USER": {
     "SETTINGS": {
+      "TITLE": "Settings",
       "GENERAL": "General",
       "IDP": "Identity Providers",
       "MFA": "Multifactor Authentication",
