@@ -89,7 +89,9 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if !token.Expiration.After(time.Now().UTC()) {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
-
+	if token.IsPAT {
+		return token.UserID, "", "", "", token.ResourceOwner, nil
+	}
 	for _, aud := range token.Audience {
 		if verifierClientID == aud || projectID == aud {
 			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil

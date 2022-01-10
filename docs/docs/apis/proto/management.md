@@ -630,6 +630,55 @@ Removed a machine key
     DELETE: /users/{user_id}/keys/{key_id}
 
 
+### GetMachineTokenByIDs
+
+> **rpc** GetMachineTokenByIDs([GetMachineTokenByIDsRequest](#getmachinetokenbyidsrequest))
+[GetMachineTokenByIDsResponse](#getmachinetokenbyidsresponse)
+
+Returns a machine key of a (machine) user
+
+
+
+    GET: /users/{user_id}/tokens/{token_id}
+
+
+### ListMachineTokens
+
+> **rpc** ListMachineTokens([ListMachineTokensRequest](#listmachinetokensrequest))
+[ListMachineTokensResponse](#listmachinetokensresponse)
+
+Returns all machine keys of a (machine) user which match the query
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /users/{user_id}/tokens/_search
+
+
+### AddMachineToken
+
+> **rpc** AddMachineToken([AddMachineTokenRequest](#addmachinetokenrequest))
+[AddMachineTokenResponse](#addmachinetokenresponse)
+
+Generates a new machine key, details should be stored after return
+
+
+
+    POST: /users/{user_id}/tokens
+
+
+### RemoveMachineToken
+
+> **rpc** RemoveMachineToken([RemoveMachineTokenRequest](#removemachinetokenrequest))
+[RemoveMachineTokenResponse](#removemachinetokenresponse)
+
+Removed a machine key
+
+
+
+    DELETE: /users/{user_id}/tokens/{token_id}
+
+
 ### ListHumanLinkedIDPs
 
 > **rpc** ListHumanLinkedIDPs([ListHumanLinkedIDPsRequest](#listhumanlinkedidpsrequest))
@@ -3166,6 +3215,31 @@ This is an empty request
 
 
 
+### AddMachineTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### AddMachineTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token_id |  string | - |  |
+| token |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddMachineUserRequest
 
 
@@ -4660,6 +4734,29 @@ This is an empty request
 
 
 
+### GetMachineTokenByIDsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetMachineTokenByIDsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token |  zitadel.user.v1.MachineToken | - |  |
+
+
+
+
 ### GetMyOrgRequest
 This is an empty request
 
@@ -5432,6 +5529,30 @@ This is an empty response
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.authn.v1.Key | - |  |
+
+
+
+
+### ListMachineTokensRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListMachineTokensResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.MachineToken | - |  |
 
 
 
@@ -6412,6 +6533,29 @@ This is an empty request
 
 
 ### RemoveMachineKeyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveMachineTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemoveMachineTokenResponse
 
 
 

@@ -39,6 +39,7 @@ type TokenView struct {
 	Sequence          uint64         `json:"-" gorm:"column:sequence"`
 	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
 	RefreshTokenID    string         `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
+	IsPAT             bool           `json:"-" gorm:"is_pat"`
 	Deactivated       bool           `json:"-" gorm:"-"`
 }
 
@@ -57,6 +58,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 		Sequence:          token.Sequence,
 		PreferredLanguage: token.PreferredLanguage,
 		RefreshTokenID:    token.RefreshTokenID,
+		IsPAT:             token.IsPAT,
 	}
 }
 
@@ -107,13 +109,15 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 	t.ChangeDate = event.CreationDate
 	t.Sequence = event.Sequence
 	switch event.Type {
-	case usr_es_model.UserTokenAdded:
+	case usr_es_model.UserTokenAdded,
+		es_models.EventType(user_repo.MachineTokenAddedType):
 		t.setRootData(event)
 		err := t.setData(event)
 		if err != nil {
 			return err
 		}
 		t.CreationDate = event.CreationDate
+		t.IsPAT = event.Type == es_models.EventType(user_repo.MachineTokenAddedType)
 	}
 	return nil
 }

@@ -125,6 +125,20 @@ title: zitadel/user.proto
 
 
 
+### MachineToken
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+| scopes | repeated string | - |  |
+
+
+
+
 ### Membership
 
 

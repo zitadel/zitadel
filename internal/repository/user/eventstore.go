@@ -111,5 +111,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(MachineAddedEventType, MachineAddedEventMapper).
 		RegisterFilterEventMapper(MachineChangedEventType, MachineChangedEventMapper).
 		RegisterFilterEventMapper(MachineKeyAddedEventType, MachineKeyAddedEventMapper).
-		RegisterFilterEventMapper(MachineKeyRemovedEventType, MachineKeyRemovedEventMapper)
+		RegisterFilterEventMapper(MachineKeyRemovedEventType, MachineKeyRemovedEventMapper).
+		RegisterFilterEventMapper(MachineTokenAddedType, MachineTokenAddedEventMapper).
+		RegisterFilterEventMapper(MachineTokenRemovedType, MachineTokenRemovedEventMapper)
 }

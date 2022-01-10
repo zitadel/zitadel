@@ -15,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
@@ -237,4 +238,24 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil
+}
+
+func (o *OPStorage) assertScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
+	token.Audience = append(token.Audience, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	if err != nil {
+		return errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
+	if err != nil {
+		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+	}
+	roles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	if err != nil {
+		return err
+	}
+	for _, role := range roles.ProjectRoles {
+		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
+	}
+	return nil
 }

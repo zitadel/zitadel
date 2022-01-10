@@ -1,6 +1,9 @@
 package command
 
 import (
+	"encoding/base64"
+
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -95,6 +98,18 @@ func keyWriteModelToMachineKey(wm *MachineKeyWriteModel) *domain.MachineKey {
 		Type:           wm.KeyType,
 		ExpirationDate: wm.ExpirationDate,
 	}
+}
+
+func machineTokenWriteModelToToken(wm *MachineTokenWriteModel, algorithm crypto.EncryptionAlgorithm) (*domain.Token, string, error) {
+	encrypted, err := algorithm.Encrypt([]byte(wm.TokenID + ":" + wm.AggregateID))
+	if err != nil {
+		return nil, "", err
+	}
+	return &domain.Token{
+		ObjectRoot: writeModelToObjectRoot(wm.WriteModel),
+		TokenID:    wm.TokenID,
+		Expiration: wm.ExpirationDate,
+	}, base64.RawURLEncoding.EncodeToString(encrypted), nil
 }
 
 func readModelToU2FTokens(wm *HumanU2FTokensReadModel) []*domain.WebAuthNToken {

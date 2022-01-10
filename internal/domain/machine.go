@@ -22,3 +22,17 @@ func (m Machine) GetState() UserState {
 func (sa *Machine) IsValid() bool {
 	return sa.Name != "" && sa.Username != ""
 }
+
+type MachineTokenState int32
+
+const (
+	MachineTokenStateUnspecified MachineTokenState = iota
+	MachineTokenStateActive
+	MachineTokenStateRemoved
+
+	machineTokenStateCount
+)
+
+func (f MachineTokenState) Valid() bool {
+	return f >= 0 && f < machineTokenStateCount
+}

@@ -2,6 +2,7 @@ package management
 
 import (
 	"context"
+	"time"
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
@@ -614,6 +615,73 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 		return nil, err
 	}
 	return &mgmt_pb.RemoveMachineKeyResponse{
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
+	}, nil
+}
+
+func (s *Server) GetMachineTokenByIDs(ctx context.Context, req *mgmt_pb.GetMachineTokenByIDsRequest) (*mgmt_pb.GetMachineTokenByIDsResponse, error) {
+	resourceOwner, err := query.NewMachineTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewMachineTokenUserIDSearchQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	token, err := s.query.MachineTokenByID(ctx, req.TokenId, resourceOwner, aggregateID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetMachineTokenByIDsResponse{
+		Token: user.MachineTokenToPb(token),
+	}, nil
+}
+
+func (s *Server) ListMachineTokens(ctx context.Context, req *mgmt_pb.ListMachineTokensRequest) (*mgmt_pb.ListMachineTokensResponse, error) {
+	queries, err := ListMachineTokensRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchMachineTokens(ctx, queries)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.ListMachineTokensResponse{
+		Result: user.MachineTokensToPb(result.MachineTokens),
+		Details: obj_grpc.ToListDetails(
+			result.Count,
+			result.Sequence,
+			result.Timestamp,
+		),
+	}, nil
+}
+
+func (s *Server) AddMachineToken(ctx context.Context, req *mgmt_pb.AddMachineTokenRequest) (*mgmt_pb.AddMachineTokenResponse, error) {
+	expDate := time.Time{}
+	if req.ExpirationDate != nil {
+		expDate = req.ExpirationDate.AsTime()
+	}
+	machineToken, token, err := s.command.AddMachineToken(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, expDate)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddMachineTokenResponse{
+		TokenId: machineToken.TokenID,
+		Token:   token,
+		Details: object.AddToDetailsPb(
+			machineToken.Sequence,
+			machineToken.ChangeDate,
+			machineToken.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) RemoveMachineToken(ctx context.Context, req *mgmt_pb.RemoveMachineTokenRequest) (*mgmt_pb.RemoveMachineTokenResponse, error) {
+	objectDetails, err := s.command.RemoveMachineToken(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.RemoveMachineTokenResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

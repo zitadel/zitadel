@@ -678,6 +678,52 @@ service ManagementService {
             permission: "user.write"
         };
     }
+    // Returns a machine key of a (machine) user
+    rpc GetMachineTokenByIDs(GetMachineTokenByIDsRequest) returns (GetMachineTokenByIDsResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/tokens/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Returns all machine keys of a (machine) user which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListMachineTokens(ListMachineTokensRequest) returns (ListMachineTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/tokens/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Generates a new machine key, details should be stored after return
+    rpc AddMachineToken(AddMachineTokenRequest) returns (AddMachineTokenResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/tokens"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removed a machine key
+    rpc RemoveMachineToken(RemoveMachineTokenRequest) returns (RemoveMachineTokenResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/tokens/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
 
     // Lists all identity providers (social logins) which a human has configured (e.g Google, Microsoft, AD, etc..)
     // Limit should always be set, there is a default limit set by the service
@@ -3394,6 +3440,51 @@ message RemoveMachineKeyRequest {
 }
 
 message RemoveMachineKeyResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message GetMachineTokenByIDsRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetMachineTokenByIDsResponse {
+    zitadel.user.v1.MachineToken token = 1;
+}
+
+message ListMachineTokensRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 2;
+}
+
+message ListMachineTokensResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.MachineToken result = 2;
+}
+
+message AddMachineTokenRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp expiration_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the token will expire and no logins will be possible";
+        }
+    ];
+}
+
+message AddMachineTokenResponse {
+    string token_id = 1;
+    string token = 2;
+    zitadel.v1.ObjectDetails details = 3;
+}
+
+message RemoveMachineTokenRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemoveMachineTokenResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

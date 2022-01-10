@@ -159,6 +159,12 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 	if err != nil {
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
+	if token.IsPAT {
+		err = o.assertScopesForPAT(ctx, token, clientID)
+		if err != nil {
+			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
+		}
+	}
 	for _, aud := range token.Audience {
 		if aud == clientID || aud == projectID {
 			err := o.setUserinfo(ctx, introspection, token.UserID, clientID, token.Scopes)
