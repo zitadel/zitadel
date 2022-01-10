@@ -1,44 +1,48 @@
-package email
+package smtp
 
 import (
 	"crypto/tls"
 	"net"
 	"net/smtp"
 
+	"github.com/caos/zitadel/internal/notification/messages"
+
 	"github.com/caos/logging"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/notification/providers"
+	"github.com/caos/zitadel/internal/notification/channels"
 	"github.com/pkg/errors"
 )
+
+var _ channels.NotificationChannel = (*Email)(nil)
 
 type Email struct {
 	smtpClient *smtp.Client
 }
 
-func InitEmailProvider(config EmailConfig) (*Email, error) {
+func InitSMTPChannel(config EmailConfig) (*Email, error) {
 	client, err := config.SMTP.connectToSMTP(config.Tls)
 	if err != nil {
 		return nil, err
 	}
+
+	logging.Log("NOTIF-4n4Ih").Debug("successfully initialized smtp email channel")
+
 	return &Email{
 		smtpClient: client,
 	}, nil
 }
 
-func (email *Email) CanHandleMessage(message providers.Message) bool {
-	msg, ok := message.(*EmailMessage)
-	if !ok {
-		return false
-	}
-	return msg.Content != "" && msg.Subject != "" && len(msg.Recipients) > 0
-}
-
-func (email *Email) HandleMessage(message providers.Message) error {
+func (email *Email) HandleMessage(message channels.Message) error {
 	defer email.smtpClient.Close()
-	emailMsg, ok := message.(*EmailMessage)
+	emailMsg, ok := message.(*messages.Email)
 	if !ok {
 		return caos_errs.ThrowInternal(nil, "EMAIL-s8JLs", "message is not EmailMessage")
 	}
+
+	if emailMsg.Content == "" || emailMsg.Subject == "" || len(emailMsg.Recipients) == 0 {
+		return caos_errs.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
+	}
+
 	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)

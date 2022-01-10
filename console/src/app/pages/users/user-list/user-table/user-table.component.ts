@@ -23,6 +23,7 @@ import {
   UserNameQuery,
   UserState,
 } from 'src/app/proto/generated/zitadel/user_pb';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -64,6 +65,7 @@ export class UserTableComponent implements OnInit {
 
   constructor(
     public translate: TranslateService,
+    private authService: GrpcAuthService,
     private userService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
@@ -238,30 +240,57 @@ export class UserTableComponent implements OnInit {
   }
 
   public deleteUser(user: User.AsObject): void {
-    const dialogRef = this.dialog.open(WarnDialogComponent, {
-      data: {
-        confirmKey: 'ACTIONS.DELETE',
-        cancelKey: 'ACTIONS.CANCEL',
-        titleKey: 'USER.DIALOG.DELETE_TITLE',
-        descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
-      },
-      width: '400px',
-    });
+    const authUserData = {
+      confirmKey: 'ACTIONS.DELETE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'USER.DIALOG.DELETE_SELF_TITLE',
+      descriptionKey: 'USER.DIALOG.DELETE_SELF_DESCRIPTION',
+      confirmationKey: 'USER.DIALOG.TYPEUSERNAME',
+      confirmation: user.preferredLoginName,
+    };
 
-    dialogRef.afterClosed().subscribe((resp) => {
-      if (resp) {
-        this.userService
-          .removeUser(user.id)
-          .then(() => {
-            setTimeout(() => {
-              this.refreshPage();
-            }, 1000);
-            this.toast.showInfo('USER.TOAST.DELETED', true);
-          })
-          .catch((error) => {
-            this.toast.showError(error);
-          });
+    const mgmtUserData = {
+      confirmKey: 'ACTIONS.DELETE',
+      cancelKey: 'ACTIONS.CANCEL',
+      titleKey: 'USER.DIALOG.DELETE_TITLE',
+      descriptionKey: 'USER.DIALOG.DELETE_DESCRIPTION',
+      confirmationKey: 'USER.DIALOG.TYPEUSERNAME',
+      confirmation: user.preferredLoginName,
+    };
+
+    if (user && user.id) {
+      const authUser = this.authService.userSubject.getValue();
+      const isMe = authUser?.id === user.id;
+
+      let dialogRef;
+
+      if (isMe) {
+        dialogRef = this.dialog.open(WarnDialogComponent, {
+          data: authUserData,
+          width: '400px',
+        });
+      } else {
+        dialogRef = this.dialog.open(WarnDialogComponent, {
+          data: mgmtUserData,
+          width: '400px',
+        });
       }
-    });
+
+      dialogRef.afterClosed().subscribe((resp) => {
+        if (resp) {
+          this.userService
+            .removeUser(user.id)
+            .then(() => {
+              setTimeout(() => {
+                this.refreshPage();
+              }, 1000);
+              this.toast.showInfo('USER.TOAST.DELETED', true);
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
+      });
+    }
   }
 }

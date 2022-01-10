@@ -2,8 +2,8 @@
 title: Overview
 ---
 
-import {ApiCard} from '../../src/components/apicard';
-import Column from '../../src/components/column';
+import { ApiCard } from "../../src/components/apicard";
+import Column from "../../src/components/column";
 
 ## APIs
 
@@ -29,12 +29,14 @@ The easiest way to have a look at them is, to import them in the [Swagger Editor
 <div>
 
 ## Authentication
+
 The authentication API (aka Auth API) is used for all operations on the currently logged in user. The user id is taken from the sub claim in the token.
 
 </div>
 <div class="apicard-right">
 
 ### GRPC
+
 Endpoint:
 [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
 
@@ -42,6 +44,7 @@ Definition:
 [Auth Proto](/docs/apis/proto/auth)
 
 ### REST
+
 Endpoint:
 [https://api.zitadel.ch/auth/v1/](https://api.zitadel.ch/auth/v1/)
 
@@ -50,7 +53,6 @@ Swagger Editor:
 
 Definition:
 [Swagger Definition](https://api.zitadel.ch/openapi/v2/swagger/auth.swagger.json)
-
 
 </div>
 </Column>
@@ -70,6 +72,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 <div class="apicard-right">
 
 ### GRPC
+
 Endpoint:
 [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
 
@@ -77,6 +80,7 @@ Definition:
 [Management Proto](/docs/apis/proto/management)
 
 ### REST
+
 Endpoint:
 [https://api.zitadel.ch/management/v1/](https://api.zitadel.ch/management/v1/)
 
@@ -102,6 +106,7 @@ This API is intended to configure and manage the IAM itself.
 <div class="apicard-right">
 
 ### GRPC
+
 Endpoint:
 [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
 
@@ -109,6 +114,7 @@ Definition:
 [Admin Proto](/docs/apis/proto/auth)
 
 ### REST
+
 Endpoint:
 [https://api.zitadel.ch/admin/v1/](https://api.zitadel.ch/admin/v1/)
 
@@ -134,18 +140,18 @@ The Assets API allows you to up- and download all kinds of assets. This can be f
 <div>
 
 ### REST
+
 Endpoint:
 [https://api.zitadel.ch/assets/v1/](https://api.zitadel.ch/assets/v1/)
 
 Definition:
-[/docs/apis/assets/assets](/docs/apis/assets/assets)
-
+[Assets](./assets/assets.md)
 
 </div>
 </Column>
 </ApiCard>
 
-## Example 
+## Example
 
 See below for an example with the call **GetMyUser**.
 
@@ -167,15 +173,15 @@ As you can see the `GetMyUser` function is also available as a REST service unde
 In the table below you can see the URI of those calls.
 
 | Service | URI                                                                                                                                            |
-|:--------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
 | REST    | [https://api.zitadel.ch/auth/v1/users/me](https://api.zitadel.ch/auth/v1/users/me)                                                             |
 | GRPC    | [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser) |
 
 ## Domains
 
-| Domain Name | Example               | Description                                                                                                                          |
-| :---------- | :-------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](openidoauth/endpoints#openid-connect-10-discovery)                                                  |
-| api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain.                                        |
-| login       | `accounts.zitadel.ch` | The accounts.* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
-| console     | `console.zitadel.ch`  | With the console.* domain we serve the assets for the management gui                                                                 |
+| Domain Name | Example               | Description                                                                                                                           |
+| :---------- | :-------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| issuer      | `issuer.zitadel.ch`   | Provides the [OpenID Connect 1.0 Discovery Endpoint](openidoauth/endpoints#openid-connect-10-discovery)                               |
+| api         | `api.zitadel.ch`      | All ZITADEL API's are located under this domain.                                                                                      |
+| login       | `accounts.zitadel.ch` | The accounts.\* page provides server renderer pages like login and register and as well the authorization_endpoint for OpenID Connect |
+| console     | `console.zitadel.ch`  | With the console.\* domain we serve the assets for the management gui                                                                 |

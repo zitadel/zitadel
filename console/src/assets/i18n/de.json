@@ -206,8 +206,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
+      "DELETE_SELF_TITLE": "Eigenen User löschen",
       "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_SELF_DESCRIPTION": "Sie sind im Begriff Ihren eigenen Benutzer endgültig zu löschen. Dadurch werden Sie ausgeloggt und Ihr Account wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden!",
       "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "TYPEUSERNAME": "Wiederholen Sie '{{value}}', um den Benutzer zu löschen.",
       "DELETE_BTN": "Entgültig löschen"
     },
     "SENDEMAILDIALOG": {
