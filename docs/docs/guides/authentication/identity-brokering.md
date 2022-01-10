@@ -88,7 +88,12 @@ Google Example:
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 
 ### 4.Send the primary domain scope on the authorization request
-The default policy which will be shown on the login is always the ZITADEL default configruation. As soon as the user has entered the loginname and ZITADEL can identitfy to which organization he belongs, we will trigger the settings of the organization.
+ZITADEL will show a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.ch/docs/concepts/zitadel/objects/managers) `IAM_OWNER`.
+
+An organization's login settings will be shown 
+
+- as soon as the user has entered the loginname and ZITADEL can identitfy to which organization he belongs; or
+- by sending a primary domain scope.
 To get your own configuration you will have to send the [primary domain scope](https://docs.zitadel.ch/docs/apis/openidoauth/scopes#reserved-scopes) in your [authorization request](https://docs.zitadel.ch/docs/guides/authentication/login-users/#auth-request) .
 The primary domain scope will restrict the login to your organization, so only users of your own organization will be able to login, also your branding and policies will trigger.
 
