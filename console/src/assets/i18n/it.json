@@ -194,8 +194,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Elimina utente",
+      "DELETE_SELF_TITLE": "Elimina Account",
       "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un utente. Sei sicuro?",
+      "DELETE_SELF_DESCRIPTION": "Stai per eliminare definitivamente il tuo account. Questo ti disconnetterà ed eliminerà il tuo utente. Questa azione non può essere annullata!",
       "DELETE_AUTH_DESCRIPTION": "Stai per eleminare il tuo account personale in modo permanente. Vuoi continuare?",
+      "TYPEUSERNAME": "Ripeti '{{value}}' per confermare ed eliminare l'utente.",
       "DELETE_BTN": "Elimina"
     },
     "SENDEMAILDIALOG": {
