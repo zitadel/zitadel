@@ -1,6 +1,5 @@
 //import { apiAuth } from "../../support/api/apiauth";
 //import { ensureMachineUserExists, ensureUserDoesntExist } from "../../support/api/users";
-import cypress = require("cypress");
 import { login as commonLogin, User } from "../../support/login/users";
 
 describe('initialize organisation', () => {
@@ -19,14 +18,13 @@ describe('initialize organisation', () => {
         cy.contains('button', 'CREATE').click({ force: true })
         cy.contains('button', 'Global').click({ force: true })
         cy.contains('button', 'caos-demo').click({ force: true })
-  
+
         // Create sa
         cy.visit(`${consoleUrl}/users/create-machine`)
         cy.get('[formcontrolname="userName"]').type("e2e", { force: true })
         cy.get('[formcontrolname="name"]').type("e2e", { force: true })
         cy.get('[formcontrolname="description"]').type("User who calls the ZITADEL API for preparing end-to-end tests")
         cy.contains('button', 'Create').click({ force: true })
-
 
         addOrganisationRole('ORG_OWNER')
 
@@ -35,19 +33,10 @@ describe('initialize organisation', () => {
         cy.contains('button', 'Add').click({ force: true })
         cy.contains('button', 'Download').click({ force: true })
 
-/*        
-        // Create e2e users
-        // tmp
-        cy.visit(`${consoleUrl}/users/me`)
-        cy.contains('button', 'Global').click({ force: true })
-        cy.contains('button', 'caos-demo').click({ force: true })
-        
-
-        //tmp
-        cy.visit(`${consoleUrl}/users/list/machines`)
-        cy.contains('tr', 'e2e').click({ force: true })
-*/
-
+        // enable all features
+        cy.visit(`${consoleUrl}/org/features`)
+        cy.get('label.mat-slide-toggle-label').click({ force: true, multiple: true })
+        cy.contains('button', 'Save').click({ force: true })
 
         ;[{
             user: User.OrgOwner,

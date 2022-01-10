@@ -13,11 +13,9 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
     const apiUrl: string = Cypress.env('apiUrl')
     const accountsUrl: string = Cypress.env('accountsUrl')
     const consoleUrl: string = Cypress.env('consoleUrl') 
-    const multipleDomains = stripPort(apiUrl) != stripPort(accountsUrl)
+    const multipleDomains = host(apiUrl) != host(accountsUrl)
 
     cy.session(creds.username, () => {
-
-
 
         const cookies = new Map<string, string>()
 
@@ -127,12 +125,13 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
 
 export function username(withoutDomain: string, project?: string): string {
-    return `${withoutDomain}@${project ? `${project}.` : ''}${stripPort(Cypress.env('apiUrl').replace('http://', '').replace('https://', '')).replace('api.', '')}`
+    return `${withoutDomain}@${project ? `${project}.` : ''}${host(Cypress.env('apiUrl')).replace('api.', '')}`
 }
 
 function credentials(user: User, pw?: string) {
+    const isAdmin = user == User.IAMAdminUser
     return {
-        username: username(`${user}_user_name`, user == User.IAMAdminUser ? 'caos-ag' : 'caos-demo'),
+        username: username(isAdmin ? user : `${user}_user_name`, isAdmin ? 'caos-ag' : 'caos-demo'),
         password: pw ? pw : Cypress.env(`${user}_password`)
     }
 }
@@ -157,7 +156,16 @@ function requestCookies(currentCookies: Map<string, string>): string[] {
     return list
 }
 
+export function host(url: string): string {
+    return stripPort(stripProtocol(url))
+}
+
 function stripPort(s: string): string {
     const idx = s.indexOf(":")
     return idx === -1 ? s : s.substring(0,idx)
 }
+
+function stripProtocol(url: string): string {
+    return url.replace('http://', '').replace('https://', '')
+}
+
