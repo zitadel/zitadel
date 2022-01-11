@@ -31,11 +31,15 @@
   padding: .5rem 1rem .5rem .5rem;
 }
 
+.listlabel {
+  color: white;
+}
+
 .listWrapper {
   display: flex;
   flex-direction: column;
   background: var(--list-background);
-  border-radius: .5rem;
+  border-radius: 1rem;
   padding: 1rem;
 }
 
@@ -44,4 +48,18 @@
   font-size: 16px;
   margin-bottom: .5rem;
   display: block;
+}
+
+.homerow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.homecontent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1rem 0;
 }

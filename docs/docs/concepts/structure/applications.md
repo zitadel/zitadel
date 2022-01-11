@@ -18,4 +18,5 @@ As a fourth option there's the API (OAuth Resource Server), which generally has 
 
 Depending on the app type registered, there are small differences in the possible settings.
 
-Please read the following guide about the [different-client-profiles](../../../guides/authorization/oauth-recommended-flows#different-client-profiles).
+Please read the following guide about the
+[different-client-profiles](../../guides/authorization/oauth-recommended-flows#different-client-profiles).

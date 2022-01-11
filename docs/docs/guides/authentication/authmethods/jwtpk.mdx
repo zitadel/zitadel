@@ -64,15 +64,16 @@ Next you will have to exchange the given `code` for the tokens. For this HTTP PO
 
 Depending on your authentication method you'll need additional headers and parameters:
 
-Send your `client_id` and `client_secret` as Basic Auth Header. Note that OAuth2 requires client_id and client_secret to be form url encoded.
-So check [Client Secret Basic Auth Method](/docs/apis/openidoauth/authn-methods#client-secret-basic) on how to build it correctly.
+Send a JWT in the `client_assertion` and set the `client_assertion_type` to `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`
+for us to validate the signature against the registered public key:
 
 ```curl
 curl --request POST \
 --url https://api.zitadel.ch/oauth/v2/token \
---header 'Authorization: Basic ${basic}' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data grant_type=authorization_code \
 --data code=${code} \
---data redirect_uri=${redirect_uri}
+--data redirect_uri=${redirect_uri} \
+--data client_assertion=${client_assertion} \
+--data client_assertion_type=urn%3Aietf%3Aparams%3Aoauth%3Aclient-assertion-type%3Ajwt-bearer
 ```
