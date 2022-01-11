@@ -37,7 +37,7 @@ function customize(theme: string, user: User) {
             })
         })
 
-        describe('logo', () => {
+        describe.skip('logo', () => {
 
             beforeEach('expand logo category', () => {
                 cy.contains('[data-e2e=policy-category]', 'Logo').click()
@@ -61,7 +61,7 @@ function customize(theme: string, user: User) {
         })
         it('should update an icon')
         it('should delete an icon')
-        it.only('should update the background color', () => {
+        it.skip('should update the background color', () => {
             cy.contains('[data-e2e=color]', 'Background Color').find('button').click()
             cy.get('color-editable-input').find('input').clear().type('#ae44dc')
             cy.get('[data-e2e=save-colors-button]').click()

@@ -35,7 +35,7 @@ This also initializes data needed by Cypress end-to-end tests. Launch the Cypres
 
 ```bash
 cd ./console
-./cypress.sh open local.env
+./cypress.sh open local_local.env
 ```
 
 You can run any test files except init.ts, as this is already run by the docker compose command shown [above](#compose-e2e) and only passes once.

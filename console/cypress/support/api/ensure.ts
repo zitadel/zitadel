@@ -16,7 +16,6 @@ export function ensureSomethingExists(api: apiCallProperties, searchPath: string
             failOnStatusCode: false,
             followRedirect: false,
         }).then(res => {
-            debugger
             expect(res.status).to.equal(200)
             return res.body.id
         })
@@ -51,7 +50,6 @@ function searchSomething(api: apiCallProperties, searchPath: string, find: (reso
             Authorization: api.authHeader
         },
     }).then(res => {
-        debugger
         return res.body.result?.find(find) || null
     })    
 }

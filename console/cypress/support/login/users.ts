@@ -10,20 +10,18 @@ export enum User {
 export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?: () => void, onPasswordScreen?: () => void, onAuthenticated?: () => void): void {
     let creds = credentials(user, pw)
 
-    const apiUrl: string = Cypress.env('apiUrl')
     const accountsUrl: string = Cypress.env('accountsUrl')
     const consoleUrl: string = Cypress.env('consoleUrl') 
-    const multipleDomains = host(apiUrl) != host(accountsUrl)
+    const otherZitadelIdpInstance: boolean = Cypress.env('otherZitadelIdpInstance')
 
     cy.session(creds.username, () => {
 
         const cookies = new Map<string, string>()
 
-        if (multipleDomains) {
+        if (otherZitadelIdpInstance) {
             cy.intercept({
                 method: 'GET',
-                hostname: "localhost",
-                url: '/login/login*',
+                url: `${accountsUrl}/login*`,
                 times: 1
             }, (req) => {
                 req.headers['cookie'] = requestCookies(cookies)
@@ -34,8 +32,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
             cy.intercept({
                 method: 'POST',
-                hostname: "localhost",
-                url: '/login/loginname*',
+                url: `${accountsUrl}/loginname*`,
                 times: 1
             }, (req) => {
                 req.headers['cookie'] = requestCookies(cookies)
@@ -46,8 +43,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
             cy.intercept({
                 method: 'POST',
-                hostname: "localhost",
-                url: '/login/password*',
+                url: `${accountsUrl}/password*`,
                 times: 1
             }, (req) => {
                 req.headers['cookie'] = requestCookies(cookies)
@@ -58,8 +54,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
             cy.intercept({
                 method: 'GET',
-                hostname: "localhost",
-                url: '/login/success*',
+                url: `${accountsUrl}/success*`,
                 times: 1
             }, (req) => {
                 req.headers['cookie'] = requestCookies(cookies)
@@ -70,8 +65,7 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
             cy.intercept({
                 method: 'GET',
-                hostname: "localhost",
-                url: '/oauth/v2/authorize/callback*',
+                url: `${accountsUrl}/oauth/v2/authorize/callback*`,
                 times: 1
             }, (req) => {
                 req.headers['cookie'] = requestCookies(cookies)
@@ -83,7 +77,6 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
             cy.intercept({
                 method: 'GET',
                 url: `${accountsUrl}/oauth/v2/authorize*`,
-                hostname: "localhost",
                 times: 1,
             }, (req) => {
                 req.continue((res) => {
@@ -94,19 +87,19 @@ export function login(user:User, force?: boolean, pw?: string, onUsernameScreen?
 
         cy.visit(`${consoleUrl}/loginname`, { retryOnNetworkFailure: true });
 
-        multipleDomains && cy.wait('@login')
+        otherZitadelIdpInstance && cy.wait('@login')
         onUsernameScreen ? onUsernameScreen() : null
         cy.get('#loginName').type(creds.username)
         cy.get('#submit-button').click()
 
-        multipleDomains && cy.wait('@loginName')
+        otherZitadelIdpInstance && cy.wait('@loginName')
         onPasswordScreen ? onPasswordScreen() : null
         cy.get('#password').type(creds.password) 
         cy.get('#submit-button').click()
 
         onAuthenticated ? onAuthenticated() : null
 
-        multipleDomains && cy.wait('@callback')
+        otherZitadelIdpInstance && cy.wait('@callback')
 
         cy.location('pathname', {timeout: 5 * 1000}).should('eq', '/');
 

@@ -10,7 +10,6 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
     const issuerUrl = Cypress.env('issuerUrl')
     const zitadelProjectResourceID = (<string>Cypress.env('zitadelProjectResourceId')).replace('bignumber-', '')
 
-    debugger
     const key = Cypress.env("serviceAccountKey")
 
     const now = new Date().getTime()
@@ -19,7 +18,7 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
     const bearerToken = sign({
         iss: key.userId,
         sub: key.userId,
-        aud: `${issuerUrl}/oauth/v2`,
+        aud: `${issuerUrl}`,
         iat: iat,
         exp: exp
     }, key.key, {

@@ -1,6 +1,6 @@
 //import { apiAuth } from "../../support/api/apiauth";
 //import { ensureMachineUserExists, ensureUserDoesntExist } from "../../support/api/users";
-import { login as commonLogin, User } from "../../support/login/users";
+import { login as commonLogin, User } from "../support/login/users";
 
 describe('initialize organisation', () => {
     it('initializes', () => {
