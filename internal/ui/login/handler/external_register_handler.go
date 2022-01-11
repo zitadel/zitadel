@@ -117,6 +117,9 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
+	if authReq.RequestedOrgID != "" {
+		resourceOwner = authReq.RequestedOrgID
+	}
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
@@ -155,11 +158,12 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+
 	data := externalRegisterData{
 		baseData: l.getBaseData(r, authReq, "ExternalRegisterOverview", errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
 			Email:     human.EmailAddress,
-			Username:  human.PreferredLoginName,
+			Username:  human.Username,
 			Firstname: human.FirstName,
 			Lastname:  human.LastName,
 			Nickname:  human.NickName,
@@ -227,6 +231,9 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPol
 		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
 			username = tokens.IDTokenClaims.GetEmail()
 		}
+	}
+	if username == "" {
+		username = tokens.IDTokenClaims.GetEmail()
 	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {
