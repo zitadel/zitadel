@@ -47,14 +47,10 @@
         <div class="lgn-field double">
             <label class="lgn-label" for="username">{{t "ExternalRegistrationUserOverview.UsernameLabel"}}</label>
             <div class="lgn-suffix-wrapper">
-                {{if .ShowUsername}}
-                    <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
-                           {{if .ShowUsername}} autocomplete="email" value="{{ .Email }}"
-                           {{else}} value="{{ .Username }}" disabled {{end}}
-                           required>
-                {{else}}
-                {{end}}
-
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
+                       {{if .ShowUsername}} autocomplete="email" value="{{ .Email }}"
+                       {{else}} value="{{ .Username }}" disabled {{end}}
+                       required>
                 {{if .DisplayLoginNameSuffix}}
                 <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
