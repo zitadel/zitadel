@@ -20,7 +20,7 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (c *Commands) SetOrgMessageText(ctx context.Context, resourceOwner string, 
 	return writeModelToObjectDetails(&existingMessageText.WriteModel), nil
 }
 
-func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Aggregate, message *domain.CustomMessageText) ([]eventstore.EventPusher, *OrgCustomMessageTextReadModel, error) {
+func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Aggregate, message *domain.CustomMessageText) ([]eventstore.Command, *OrgCustomMessageTextReadModel, error) {
 	if !message.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-2jfsf", "Errors.CustomText.Invalid")
 	}
@@ -40,7 +40,7 @@ func (c *Commands) setOrgMessageText(ctx context.Context, orgAgg *eventstore.Agg
 	if err != nil {
 		return nil, nil, err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	if existingMessageText.Greeting != message.Greeting {
 		if message.Greeting != "" {
 			events = append(events, org.NewCustomTextSetEvent(ctx, orgAgg, message.MessageTextType, domain.MessageGreeting, message.Greeting, message.Language))
@@ -108,7 +108,7 @@ func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, mes
 		return nil, caos_errs.ThrowNotFound(nil, "Org-3b8Jf", "Errors.CustomMessageText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, messageTextType, lang))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, messageTextType, lang))
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (c *Commands) RemoveOrgMessageTexts(ctx context.Context, resourceOwner, mes
 	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
-func (c *Commands) removeOrgMessageTextsIfExists(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+func (c *Commands) removeOrgMessageTextsIfExists(ctx context.Context, orgID string) ([]eventstore.Command, error) {
 	msgTemplates := NewOrgCustomMessageTextsWriteModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, msgTemplates)
 	if err != nil {
@@ -127,7 +127,7 @@ func (c *Commands) removeOrgMessageTextsIfExists(ctx context.Context, orgID stri
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&msgTemplates.WriteModel)
-	events := make([]eventstore.EventPusher, 0, len(msgTemplates.CustomMessageTemplate))
+	events := make([]eventstore.Command, 0, len(msgTemplates.CustomMessageTemplate))
 	for _, tmpl := range msgTemplates.CustomMessageTemplate {
 		events = append(events, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, tmpl.Template, tmpl.Language))
 	}

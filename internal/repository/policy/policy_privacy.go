@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -41,7 +42,7 @@ func NewPrivacyPolicyAddedEvent(
 	}
 }
 
-func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PrivacyPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -98,7 +99,7 @@ func ChangePrivacyLink(privacyLink string) func(*PrivacyPolicyChangedEvent) {
 	}
 }
 
-func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PrivacyPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -129,7 +130,7 @@ func NewPrivacyPolicyRemovedEvent(base *eventstore.BaseEvent) *PrivacyPolicyRemo
 	}
 }
 
-func PrivacyPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &PrivacyPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

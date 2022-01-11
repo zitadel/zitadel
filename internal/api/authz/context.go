@@ -62,13 +62,6 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	if orgID != "" {
-		err = t.ExistsOrg(ctx, orgID)
-		if err != nil {
-			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
-		}
-	}
-
 	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return CtxData{}, err
@@ -87,6 +80,17 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	if orgID == "" {
 		orgID = resourceOwner
 	}
+
+	err = t.ExistsOrg(ctx, orgID)
+	if err != nil {
+		err = retry(func() error {
+			return t.ExistsOrg(ctx, orgID)
+		})
+		if err != nil {
+			return CtxData{}, errors.ThrowPermissionDenied(nil, "AUTH-Bs7Ds", "Organisation doesn't exist")
+		}
+	}
+
 	return CtxData{
 		UserID:            userID,
 		OrgID:             orgID,

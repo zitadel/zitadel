@@ -1,12 +1,14 @@
 package management
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
@@ -163,14 +165,27 @@ func listGrantedProjectRolesRequestToModel(req *mgmt_pb.ListGrantedProjectRolesR
 	}, nil
 }
 
-func ListProjectMembersRequestToModel(req *mgmt_pb.ListProjectMembersRequest) (*proj_model.ProjectMemberSearchRequest, error) {
+func ListProjectMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListProjectMembersRequest) (*query.ProjectMembersQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := member_grpc.MemberQueriesToProjectMember(req.Queries)
-	return &proj_model.ProjectMemberSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
+	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, ownerQuery)
+	return &query.ProjectMembersQuery{
+		MembersQuery: query.MembersQuery{
+			SearchRequest: query.SearchRequest{
+				Offset: offset,
+				Limit:  limit,
+				Asc:    asc,
+				//SortingColumn: //TODO: sorting
+			},
+			Queries: queries,
+		},
+		ProjectID: req.ProjectId,
 	}, nil
 }

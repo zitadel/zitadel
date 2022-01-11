@@ -187,7 +187,7 @@ func (h *StatementHandler) fetchPreviousStmts(
 		return nil, nil
 	}
 
-	events, err := h.Eventstore.FilterEvents(ctx, query)
+	events, err := h.Eventstore.Filter(ctx, query)
 	if err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ func (s *Step2) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep2(ctx context.Context, step *Step2) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
 		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
 		event, err := c.addDefaultPasswordComplexityPolicy(ctx, iamAgg, NewIAMPasswordComplexityPolicyWriteModel(), &domain.PasswordComplexityPolicy{
 			MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
@@ -36,7 +36,7 @@ func (c *Commands) SetupStep2(ctx context.Context, step *Step2) error {
 			return nil, err
 		}
 		logging.Log("SETUP-ADgd2").Info("default password complexity policy set up")
-		return []eventstore.EventPusher{event}, nil
+		return []eventstore.Command{event}, nil
 	}
 	return c.setup(ctx, step, fn)
 }

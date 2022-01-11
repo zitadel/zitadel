@@ -15,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -551,7 +552,15 @@ func (s *Server) UpdateMachine(ctx context.Context, req *mgmt_pb.UpdateMachineRe
 }
 
 func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachineKeyByIDsRequest) (*mgmt_pb.GetMachineKeyByIDsResponse, error) {
-	key, err := s.user.GetMachineKey(ctx, req.UserId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
@@ -561,14 +570,18 @@ func (s *Server) GetMachineKeyByIDs(ctx context.Context, req *mgmt_pb.GetMachine
 }
 
 func (s *Server) ListMachineKeys(ctx context.Context, req *mgmt_pb.ListMachineKeysRequest) (*mgmt_pb.ListMachineKeysResponse, error) {
-	result, err := s.user.SearchMachineKeys(ctx, ListMachineKeysRequestToModel(req))
+	query, err := ListMachineKeysRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	result, err := s.query.SearchAuthNKeys(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListMachineKeysResponse{
-		Result: authn.KeyViewsToPb(result.Result),
+		Result: authn.KeysToPb(result.AuthNKeys),
 		Details: obj_grpc.ToListDetails(
-			result.TotalResult,
+			result.Count,
 			result.Sequence,
 			result.Timestamp,
 		),
@@ -610,7 +623,7 @@ func (s *Server) ListHumanLinkedIDPs(ctx context.Context, req *mgmt_pb.ListHuman
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.query.UserIDPLinks(ctx, queries)
+	res, err := s.query.IDPUserLinks(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -634,18 +647,18 @@ func (s *Server) RemoveHumanLinkedIDP(ctx context.Context, req *mgmt_pb.RemoveHu
 }
 
 func (s *Server) ListUserMemberships(ctx context.Context, req *mgmt_pb.ListUserMembershipsRequest) (*mgmt_pb.ListUserMembershipsResponse, error) {
-	request, err := ListUserMembershipsRequestToModel(req)
+	request, err := ListUserMembershipsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.user.SearchUserMemberships(ctx, request)
+	response, err := s.query.Memberships(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
+		Result: user_grpc.MembershipsToMembershipsPb(response.Memberships),
 		Details: obj_grpc.ToListDetails(
-			response.TotalResult,
+			response.Count,
 			response.Sequence,
 			response.Timestamp,
 		),

@@ -43,7 +43,7 @@ func (wm *OrgIDPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgIDPConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.IDPConfigAddedEvent:
@@ -89,7 +89,7 @@ func (wm *OrgIDPConfigWriteModel) Reduce() error {
 	return wm.IDPConfigWriteModel.Reduce()
 }
 
-func (wm *OrgIDPConfigWriteModel) AppendAndReduce(events ...eventstore.EventReader) error {
+func (wm *OrgIDPConfigWriteModel) AppendAndReduce(events ...eventstore.Event) error {
 	wm.AppendEvents(events...)
 	return wm.Reduce()
 }

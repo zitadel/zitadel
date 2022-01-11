@@ -56,6 +56,8 @@ import {
   RemoveMyPasswordlessResponse,
   RemoveMyPhoneRequest,
   RemoveMyPhoneResponse,
+  RemoveMyUserRequest,
+  RemoveMyUserResponse,
   ResendMyEmailVerificationRequest,
   ResendMyEmailVerificationResponse,
   ResendMyPhoneVerificationRequest,
@@ -94,6 +96,7 @@ import { StorageKey, StorageLocation, StorageService } from './storage.service';
 export class GrpcAuthService {
   private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
   public user!: Observable<User.AsObject | undefined>;
+  public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
   private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
   private zitadelFeatures: BehaviorSubject<string[]> = new BehaviorSubject(['']);
 
@@ -134,6 +137,8 @@ export class GrpcAuthService {
         this.loadFeatures();
       }),
     );
+
+    this.user.subscribe(this.userSubject);
 
     this.activeOrgChanged.subscribe(() => {
       this.loadPermissions();
@@ -398,6 +403,11 @@ export class GrpcAuthService {
     }
     req.setQuery(metadata);
     return this.grpcService.auth.listMyMemberships(req, null).then((resp) => resp.toObject());
+  }
+
+  public RemoveMyUser(): Promise<RemoveMyUserResponse.AsObject> {
+    const req = new RemoveMyUserRequest();
+    return this.grpcService.auth.removeMyUser(req, null).then((resp) => resp.toObject());
   }
 
   public getMyEmail(): Promise<GetMyEmailResponse.AsObject> {

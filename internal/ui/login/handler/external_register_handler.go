@@ -136,7 +136,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 
 func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := iam.GlobalOrgID
-	memberRoles := []string{domain.RoleOrgProjectCreator}
+	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != resourceOwner {
 		memberRoles = nil
@@ -196,7 +196,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
-	memberRoles := []string{domain.RoleOrgProjectCreator}
+	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
 	if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
 		memberRoles = nil

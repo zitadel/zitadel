@@ -153,7 +153,7 @@ const (
 	JWTConfigEndpointCol     = "endpoint"
 )
 
-func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigAddedEvent
 	var idpOwnerType domain.IdentityProviderType
 	switch e := event.(type) {
@@ -185,7 +185,7 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.EventReader) (*handler.S
 	), nil
 }
 
-func (p *IDPProjection) reduceIDPChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceIDPChanged(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigChangedEvent:
@@ -225,7 +225,7 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.EventReader) (*handler
 	), nil
 }
 
-func (p *IDPProjection) reduceIDPDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigDeactivatedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigDeactivatedEvent:
@@ -250,7 +250,7 @@ func (p *IDPProjection) reduceIDPDeactivated(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *IDPProjection) reduceIDPReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceIDPReactivated(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigReactivatedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigReactivatedEvent:
@@ -275,7 +275,7 @@ func (p *IDPProjection) reduceIDPReactivated(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *IDPProjection) reduceIDPRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceIDPRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigRemovedEvent
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
@@ -295,7 +295,7 @@ func (p *IDPProjection) reduceIDPRemoved(event eventstore.EventReader) (*handler
 	), nil
 }
 
-func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.OIDCConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigAddedEvent:
@@ -335,7 +335,7 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.OIDCConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigChangedEvent:
@@ -398,7 +398,7 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 	), nil
 }
 
-func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.JWTConfigAddedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigAddedEvent:
@@ -435,7 +435,7 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.JWTConfigChangedEvent
 	switch e := event.(type) {
 	case *org.IDPJWTConfigChangedEvent:

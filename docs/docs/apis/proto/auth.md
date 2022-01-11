@@ -43,6 +43,18 @@ Returns my full blown user
     GET: /users/me
 
 
+### RemoveMyUser
+
+> **rpc** RemoveMyUser([RemoveMyUserRequest](#removemyuserrequest))
+[RemoveMyUserResponse](#removemyuserresponse)
+
+Changes the user state to deleted
+
+
+
+    DELETE: /users/me
+
+
 ### ListMyUserChanges
 
 > **rpc** ListMyUserChanges([ListMyUserChangesRequest](#listmyuserchangesrequest))
@@ -1240,6 +1252,24 @@ This is an empty request
 
 
 ### RemoveMyPhoneResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveMyUserRequest
+This is an empty request
+the request parameters are read from the token-header
+
+
+
+
+### RemoveMyUserResponse
 
 
 

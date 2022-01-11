@@ -62,7 +62,7 @@ func (e *IDPConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConst
 	return []*eventstore.EventUniqueConstraint{NewAddIDPConfigNameUniqueConstraint(e.Name, e.Aggregate().ResourceOwner)}
 }
 
-func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IDPConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -139,7 +139,7 @@ func ChangeAutoRegister(autoRegister bool) func(*IDPConfigChangedEvent) {
 	}
 }
 
-func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IDPConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -177,7 +177,7 @@ func (e *IDPConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IDPConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -215,7 +215,7 @@ func (e *IDPConfigReactivatedEvent) UniqueConstraints() []*eventstore.EventUniqu
 	return nil
 }
 
-func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPConfigReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IDPConfigReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -256,7 +256,7 @@ func (e *IDPConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueCon
 	return []*eventstore.EventUniqueConstraint{NewRemoveIDPConfigNameUniqueConstraint(e.name, e.Aggregate().ResourceOwner)}
 }
 
-func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func IDPConfigRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &IDPConfigRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

@@ -56,7 +56,7 @@ func NewOIDCApplicationWriteModel(projectID, resourceOwner string) *OIDCApplicat
 		},
 	}
 }
-func (wm *OIDCApplicationWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OIDCApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:

@@ -6,8 +6,8 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/notification/templates"
+	"github.com/caos/zitadel/internal/query"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
@@ -16,7 +16,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *iam_model.LabelPolicyView, apiDomain string) error {
+func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *query.LabelPolicy, apiDomain string) error {
 	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_
 	args["Domain"] = strings.Split(user.LastEmail, "@")[1]
 
 	domainClaimedData := &DomainClaimedData{
-		TemplateData: templates.GetTemplateData(translator, args, apiDomain, url, domain.DomainClaimedMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.DomainClaimedMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 	template, err := templates.GetParsedTemplate(mailhtml, domainClaimedData)

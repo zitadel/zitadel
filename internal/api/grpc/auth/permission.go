@@ -29,18 +29,18 @@ func (s *Server) ListMyProjectPermissions(ctx context.Context, _ *auth_pb.ListMy
 }
 
 func (s *Server) ListMyMemberships(ctx context.Context, req *auth_pb.ListMyMembershipsRequest) (*auth_pb.ListMyMembershipsResponse, error) {
-	request, err := ListMyMembershipsRequestToModel(req)
+	request, err := ListMyMembershipsRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.repo.SearchMyUserMemberships(ctx, request)
+	response, err := s.query.Memberships(ctx, request)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyMembershipsResponse{
-		Result: user_grpc.MembershipsToMembershipsPb(response.Result),
+		Result: user_grpc.MembershipsToMembershipsPb(response.Memberships),
 		Details: obj_grpc.ToListDetails(
-			response.TotalResult,
+			response.Count,
 			response.Sequence,
 			response.Timestamp,
 		),

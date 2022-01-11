@@ -10,7 +10,7 @@ type OrgPasswordLockoutPolicyReadModel struct {
 	LockoutPolicyReadModel
 }
 
-func (rm *OrgPasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *OrgPasswordLockoutPolicyReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LockoutPolicyAddedEvent:

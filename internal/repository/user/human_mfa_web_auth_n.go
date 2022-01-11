@@ -36,7 +36,7 @@ func NewHumanWebAuthNAddedEvent(
 	}
 }
 
-func HumanWebAuthNAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanWebAuthNAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -92,7 +92,7 @@ func NewHumanWebAuthNVerifiedEvent(
 	}
 }
 
-func HumanWebAuthNVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webauthNVerified := &HumanWebAuthNVerifiedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -130,7 +130,7 @@ func NewHumanWebAuthNSignCountChangedEvent(
 	}
 }
 
-func HumanWebAuthNSignCountChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNSignCountChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webauthNVerified := &HumanWebAuthNSignCountChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -166,7 +166,7 @@ func NewHumanWebAuthNRemovedEvent(
 	}
 }
 
-func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webauthNVerified := &HumanWebAuthNRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -204,7 +204,7 @@ func NewHumanWebAuthNBeginLoginEvent(base *eventstore.BaseEvent, challenge strin
 	}
 }
 
-func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNBeginLoginEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanWebAuthNBeginLoginEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -237,7 +237,7 @@ func NewHumanWebAuthNCheckSucceededEvent(
 	}
 }
 
-func HumanWebAuthNCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanWebAuthNCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -270,7 +270,7 @@ func NewHumanWebAuthNCheckFailedEvent(
 	}
 }
 
-func HumanWebAuthNCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanWebAuthNCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanWebAuthNCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

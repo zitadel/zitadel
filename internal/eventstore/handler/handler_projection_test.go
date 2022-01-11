@@ -46,7 +46,7 @@ func TestProjectionHandler_processEvent(t *testing.T) {
 	}
 	type args struct {
 		ctx    context.Context
-		event  eventstore.EventReader
+		event  eventstore.Event
 		reduce Reduce
 	}
 	type want struct {
@@ -849,13 +849,13 @@ func testUpdate(t *testing.T, expectedStmtCount int, returnedErr error) Update {
 }
 
 func testReduce(stmts *Statement) Reduce {
-	return func(event eventstore.EventReader) (*Statement, error) {
+	return func(event eventstore.Event) (*Statement, error) {
 		return stmts, nil
 	}
 }
 
 func testReduceErr(err error) Reduce {
-	return func(event eventstore.EventReader) (*Statement, error) {
+	return func(event eventstore.Event) (*Statement, error) {
 		return nil, err
 	}
 }

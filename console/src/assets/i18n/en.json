@@ -108,7 +108,7 @@
     }
   },
   "ACTIONS": {
-    "ACTIONS": "Aktionen",
+    "ACTIONS": "Actions",
     "RENAME": "Rename",
     "SET": "Set",
     "COPY": "Copy to Clipboard",
@@ -182,7 +182,11 @@
       "STATE": "Status",
       "DELETE": "Delete User",
       "UNLOCK": "Unlock User",
-      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again."
+      "LOCKEDDESCRIPTION": "This user has been locked out due to exceeding the maximum login attempts and must be unlocked to be used again.",
+      "DELETEACCOUNT": "Delete Account",
+      "DELETEACCOUNT_DESC": "If you perform this action, you will be logged out and will no longer have access to your account. This action is not reversible, so please continue with caution.",
+      "DELETEACCOUNT_BTN": "Delete Account",
+      "DELETEACCOUNT_SUCCESS": "Account deleted successfully!"
     },
     "DETAILS": {
       "DATECREATED": "Created",
@@ -190,7 +194,12 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
-      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?"
+      "DELETE_SELF_TITLE": "Delete Account",
+      "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?",
+      "DELETE_SELF_DESCRIPTION": "You are about to permanently delete your personal account. This will log you out and delete your user. This action cannot be undone!",
+      "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
+      "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the user.",
+      "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Send Email Notification",
@@ -319,7 +328,8 @@
       "GENDERLANGSECTION": "Gender and Language",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Initial Password",
-      "ADDRESSANDPHONESECTION": "Phonenumber"
+      "ADDRESSANDPHONESECTION": "Phonenumber",
+      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
@@ -393,6 +403,8 @@
       "OLD": "Current Password",
       "NEW": "New Password",
       "CONFIRM": "Confirm New Password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Confirm Password",
       "RESET": "Reset Current Password",
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Resend Password Reset Link",
@@ -413,6 +425,8 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "validated",
+        "ISVERIFIED": "Email Verified",
+        "ISVERIFIEDDESC": "If the email is indicated as verified, no email verification request will be made.",
         "RESEND": "Resend Verification E-mail",
         "EDITTITLE": "Change Email",
         "EDITDESC": "Enter the new email in the field below."
@@ -633,6 +647,7 @@
       "LISTDESCRIPTION": "Choose an organisation.",
       "ACTIVE": "Active",
       "CREATE": "Create Organisation",
+      "USERSELFACCOUNT": "Use your personal account as organisation owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
@@ -656,7 +671,8 @@
       "SELECTORGTOOLTIP": "Select this organisation.",
       "PRIMARYDOMAIN": "Primary Domain",
       "STATE": "State",
-      "USEPASSWORD": "Set Initial Password"
+      "USEPASSWORD": "Set Initial Password",
+      "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
     "DOMAINS": {
       "NEW": "Add Domain",
@@ -1045,7 +1061,7 @@
       }
     },
     "STATE": {
-      "TITLE": "State",
+      "TITLE": "Status",
       "0": "Not defined",
       "1": "Active",
       "2": "Inactive"
@@ -1102,7 +1118,7 @@
         "GRANTEDORG": "Granted Organisation",
         "RESOURCEOWNER": "Resource Owner"
       },
-      "STATE": "State",
+      "STATE": "Status",
       "STATES": {
         "1": "Active",
         "2": "Inactive"
@@ -1241,7 +1257,7 @@
     "ID": "ID",
     "NAME": "Name",
     "CONFIG": "Configuration",
-    "STATE": "State",
+    "STATE": "Status",
     "ISSUER": "Issuer",
     "SCOPESLIST": "Scopes List",
     "CLIENTID": "Client ID",
@@ -1335,7 +1351,7 @@
       "CREATE_OIDC": "OIDC Application",
       "CREATE_OIDC_DESC_TITLE": "Enter Your Application Details Step by Step",
       "CREATE_OIDC_DESC_SUB": "A recommended configuration will be automatically generated.",
-      "STATE": "State",
+      "STATE": "Status",
       "DATECREATED": "Created",
       "DATECHANGED": "Changed",
       "URLS": "Urls",

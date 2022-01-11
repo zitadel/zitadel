@@ -55,7 +55,7 @@ func NewMachineKeyAddedEvent(
 	}
 }
 
-func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MachineKeyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	machineKeyAdded := &MachineKeyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -101,7 +101,7 @@ func NewMachineKeyRemovedEvent(
 	}
 }
 
-func MachineKeyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MachineKeyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	machineRemoved := &MachineKeyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

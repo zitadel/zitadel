@@ -31,6 +31,7 @@ func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsReques
 		Details: object_pb.ToListDetails(resp.Count, resp.Sequence, resp.Timestamp),
 	}, nil
 }
+
 func (s *Server) AddOrgOIDCIDP(ctx context.Context, req *mgmt_pb.AddOrgOIDCIDPRequest) (*mgmt_pb.AddOrgOIDCIDPResponse, error) {
 	config, err := s.command.AddIDPConfig(ctx, addOIDCIDPRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -68,6 +69,7 @@ func (s *Server) DeactivateOrgIDP(ctx context.Context, req *mgmt_pb.DeactivateOr
 	}
 	return &mgmt_pb.DeactivateOrgIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
+
 func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOrgIDPRequest) (*mgmt_pb.ReactivateOrgIDPResponse, error) {
 	objectDetails, err := s.command.ReactivateIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -75,8 +77,9 @@ func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOr
 	}
 	return &mgmt_pb.ReactivateOrgIDPResponse{Details: object_pb.DomainToChangeDetailsPb(objectDetails)}, nil
 }
+
 func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequest) (*mgmt_pb.RemoveOrgIDPResponse, error) {
-	idpProviders, err := s.org.GetIDPProvidersByIDPConfigID(ctx, authz.GetCtxData(ctx).OrgID, req.IdpId)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
@@ -84,12 +87,13 @@ func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequ
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, len(idpProviders) > 0, externalIDPViewsToDomain(externalIDPs)...)
+	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, idp != nil, externalIDPViewsToDomain(externalIDPs)...)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.RemoveOrgIDPResponse{}, nil
 }
+
 func (s *Server) UpdateOrgIDP(ctx context.Context, req *mgmt_pb.UpdateOrgIDPRequest) (*mgmt_pb.UpdateOrgIDPResponse, error) {
 	config, err := s.command.ChangeIDPConfig(ctx, updateIDPToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {

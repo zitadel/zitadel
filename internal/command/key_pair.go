@@ -30,7 +30,7 @@ func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string)
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSigning,

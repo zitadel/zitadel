@@ -10,10 +10,10 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/caos/logging"
-	"github.com/ghodss/yaml"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"golang.org/x/text/language"
+	"sigs.k8s.io/yaml"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
@@ -55,7 +55,7 @@ func NewTranslator(dir http.FileSystem, config TranslatorConfig) (*Translator, e
 
 func newBundle(dir http.FileSystem, defaultLanguage language.Tag) (*i18n.Bundle, error) {
 	bundle := i18n.NewBundle(defaultLanguage)
-	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+	bundle.RegisterUnmarshalFunc("yaml", func(data []byte, v interface{}) error { return yaml.Unmarshal(data, v) })
 	bundle.RegisterUnmarshalFunc("json", json.Unmarshal)
 	bundle.RegisterUnmarshalFunc("toml", toml.Unmarshal)
 	i18nDir, err := dir.Open(i18nPath)

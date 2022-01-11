@@ -182,7 +182,11 @@
       "STATE": "Status",
       "DELETE": "Benutzer löschen",
       "UNLOCK": "Benutzer entsperren",
-      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden."
+      "LOCKEDDESCRIPTION": "Dieser Benutzer wurde aufgrund der Überschreitung der maximalen Anmeldeversuche gesperrt und muss zur erneuten Verwendung entsperrt werden.",
+      "DELETEACCOUNT": "Account löschen",
+      "DELETEACCOUNT_DESC": "Wenn du diese Aktion ausführst, wirst du abgemeldet und danach keinen Zugriff mehr auf dein Konto haben. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "DELETEACCOUNT_BTN": "Account löschen",
+      "DELETEACCOUNT_SUCCESS": "Account erfolgreich gelöscht!"
     },
     "DETAILS": {
       "DATECREATED": "Erstellt",
@@ -190,7 +194,12 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
-      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?"
+      "DELETE_SELF_TITLE": "Eigenen User löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_SELF_DESCRIPTION": "Sie sind im Begriff Ihren eigenen Benutzer endgültig zu löschen. Dadurch werden Sie ausgeloggt und Ihr Account wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden!",
+      "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "TYPEUSERNAME": "Wiederholen Sie '{{value}}', um den Benutzer zu löschen.",
+      "DELETE_BTN": "Entgültig löschen"
     },
     "SENDEMAILDIALOG": {
       "TITLE": "Email Benachrichtigung senden",
@@ -319,7 +328,8 @@
       "GENDERLANGSECTION": "Geschlecht und Sprache",
       "PHONESECTION": "Telefonnummer",
       "PASSWORDSECTION": "Setze ein initiales Passwort.",
-      "ADDRESSANDPHONESECTION": "Telefonnummer"
+      "ADDRESSANDPHONESECTION": "Telefonnummer",
+      "INITMAILDESCRIPTION": "Wenn beide Optionen ausgewählt sind, wird keine E-Mail zur Initialisierung gesendet. Wenn nur eine der Optionen ausgewählt ist, wird eine E-Mail zur Aufforderung der Bereitstellung oder Verifikation der Daten gesendet."
     },
     "CODEDIALOG": {
       "TITLE": "Telefonnummer verifizieren",
@@ -389,12 +399,14 @@
     },
     "PASSWORD": {
       "TITLE": "Passwort",
-      "DESCRIPTION": "Gebe das neue Password unter Einhaltung der Richtlinie für die Komplexität ein.",
+      "DESCRIPTION": "Gebe das neue PassworT unter Einhaltung der Richtlinie für die Komplexität ein.",
       "OLD": "Aktuelles Passwort",
       "NEW": "Neues Passwort",
       "CONFIRM": "Neues Passwort wiederholen",
+      "NEWINITIAL": "Passwort",
+      "CONFIRMINITIAL": "PassworT wiederholen",
       "RESET": "Passwort zurücksetzen",
-      "SET": "Password neu setzen",
+      "SET": "PassworT neu setzen",
       "RESENDNOTIFICATION": "Link für das Zurücksetzen des Passworts senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
@@ -413,6 +425,8 @@
       "EMAIL": {
         "TITLE": "E-Mail",
         "VALID": "Validiert",
+        "ISVERIFIED": "Email Verifiziert",
+        "ISVERIFIEDDESC": "Wenn die Email als verifiziert angegeben wird, wird keine Verifikationsmail an den Benutzer versendet.",
         "RESEND": "Verifikationsmail erneut senden",
         "EDITTITLE": "Email ändern",
         "EDITDESC": "Geben Sie die neue Email in dem darunterliegenden Feld ein!"
@@ -633,6 +647,7 @@
       "LISTDESCRIPTION": "Wähle eine Organisation aus.",
       "ACTIVE": "Aktiv",
       "CREATE": "Organisation erstellen",
+      "USERSELFACCOUNT": "Verwenden Sie Ihr persönliches Konto als Organisationsinhaber",
       "ORGDETAIL_TITLE": "Gebe den Namen und die Domain für die neue Organisation ein.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Geben Sie den Namen der neuen Organisation ein.",
       "ORGDETAILUSER_TITLE": "Organisationsbesitzer hinzufügen",
@@ -656,7 +671,8 @@
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
       "PRIMARYDOMAIN": "Primäre Domain",
       "STATE": "Status",
-      "USEPASSWORD": "Initiales Password setzen"
+      "USEPASSWORD": "Initiales Password setzen",
+      "USEPASSWORDDESC": "Der Nutzer muss das Password bei der Initalisierung nicht setzen."
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
@@ -807,9 +823,9 @@
     },
     "PRIVATELABELING_POLICY": {
       "TITLE": "Private Labeling",
-      "BTN":"Datei auswählen",
+      "BTN": "Datei auswählen",
       "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
-      "ACTIVATEPREVIEW":"Preview aktivieren"
+      "ACTIVATEPREVIEW": "Preview aktivieren"
     },
     "LOGIN_POLICY": {
       "TITLE": "Login Richtlinien",

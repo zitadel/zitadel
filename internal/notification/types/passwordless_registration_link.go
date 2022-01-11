@@ -5,8 +5,8 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/notification/templates"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/user"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -16,7 +16,7 @@ type PasswordlessRegistrationLinkData struct {
 	URL string
 }
 
-func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *user.HumanPasswordlessInitCodeRequestedEvent, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *iam_model.LabelPolicyView, apiDomain string) error {
+func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *user.HumanPasswordlessInitCodeRequestedEvent, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translat
 	var args = mapNotifyUserToArgs(user)
 
 	emailCodeData := &PasswordlessRegistrationLinkData{
-		TemplateData: templates.GetTemplateData(translator, args, apiDomain, url, domain.PasswordlessRegistrationMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.PasswordlessRegistrationMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 

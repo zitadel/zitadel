@@ -53,7 +53,7 @@ func NewHumanPasswordlessAddedEvent(
 	}
 }
 
-func HumanPasswordlessAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func NewHumanPasswordlessVerifiedEvent(
 	}
 }
 
-func HumanPasswordlessVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNVerifiedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func NewHumanPasswordlessSignCountChangedEvent(
 	}
 }
 
-func HumanPasswordlessSignCountChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessSignCountChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNSignCountChangedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -142,8 +142,8 @@ type HumanPasswordlessRemovedEvent struct {
 	HumanWebAuthNRemovedEvent
 }
 
-func PrepareHumanPasswordlessRemovedEvent(ctx context.Context, webAuthNTokenID string) func(*eventstore.Aggregate) eventstore.EventPusher {
-	return func(a *eventstore.Aggregate) eventstore.EventPusher {
+func PrepareHumanPasswordlessRemovedEvent(ctx context.Context, webAuthNTokenID string) func(*eventstore.Aggregate) eventstore.Command {
+	return func(a *eventstore.Aggregate) eventstore.Command {
 		return NewHumanPasswordlessRemovedEvent(ctx, a, webAuthNTokenID)
 	}
 }
@@ -165,7 +165,7 @@ func NewHumanPasswordlessRemovedEvent(
 	}
 }
 
-func HumanPasswordlessRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNRemovedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -199,7 +199,7 @@ func NewHumanPasswordlessBeginLoginEvent(
 	}
 }
 
-func HumanPasswordlessBeginLoginEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessBeginLoginEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNBeginLoginEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -228,7 +228,7 @@ func NewHumanPasswordlessCheckSucceededEvent(
 	}
 }
 
-func HumanPasswordlessCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNCheckSucceededEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -257,7 +257,7 @@ func NewHumanPasswordlessCheckFailedEvent(
 	}
 }
 
-func HumanPasswordlessCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := HumanWebAuthNCheckFailedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -301,7 +301,7 @@ func NewHumanPasswordlessInitCodeAddedEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessInitCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -347,7 +347,7 @@ func NewHumanPasswordlessInitCodeRequestedEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeRequestedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessInitCodeRequestedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeRequestedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -387,7 +387,7 @@ func NewHumanPasswordlessInitCodeSentEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessInitCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -427,7 +427,7 @@ func NewHumanPasswordlessInitCodeCheckFailedEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeCodeCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessInitCodeCodeCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -467,7 +467,7 @@ func NewHumanPasswordlessInitCodeCheckSucceededEvent(
 	}
 }
 
-func HumanPasswordlessInitCodeCodeCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordlessInitCodeCodeCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	webAuthNAdded := &HumanPasswordlessInitCodeCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

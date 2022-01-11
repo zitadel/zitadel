@@ -24,17 +24,9 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, req.ClientID)
+	req.Scopes, err = o.assertProjectRoleScopes(ctx, req.ClientID, req.Scopes)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
-	}
-	project, err := o.query.ProjectByID(ctx, projectID)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
-	}
-	req.Scopes, err = o.assertProjectRoleScopes(project, req.Scopes)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-Gqrfg", "Errors.Internal")
+		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	//TODO: ensure splitting of command and query side durring auth request and login refactoring
@@ -116,8 +108,15 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
+	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
+	if err != nil {
+		return "", "", time.Time{}, errors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
+	}
+	if request, ok := req.(op.RefreshTokenRequest); ok {
+		request.SetCurrentScopes(scopes)
+	}
 	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
-		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
+		refreshToken, req.GetAudience(), scopes, authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
 		if errors.IsErrorInvalidArgument(err) {
@@ -198,14 +197,22 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 	return oidc.ErrServerError().WithParent(err)
 }
 
-func (o *OPStorage) assertProjectRoleScopes(project *query.Project, scopes []string) ([]string, error) {
-	if !project.ProjectRoleAssertion {
-		return scopes, nil
-	}
+func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			return scopes, nil
 		}
+	}
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	project, err := o.query.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
+	}
+	if !project.ProjectRoleAssertion {
+		return scopes, nil
 	}
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
 	if err != nil {

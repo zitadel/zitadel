@@ -27,7 +27,7 @@ func (c *Commands) AddOrgMember(ctx context.Context, member *domain.Member) (*do
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -38,11 +38,11 @@ func (c *Commands) AddOrgMember(ctx context.Context, member *domain.Member) (*do
 	return memberWriteModelToMember(&addedMember.MemberWriteModel), nil
 }
 
-func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, addedMember *OrgMemberWriteModel, member *domain.Member) (eventstore.EventPusher, error) {
+func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, addedMember *OrgMemberWriteModel, member *domain.Member) (eventstore.Command, error) {
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
 	}
-	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 {
+	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(member.Roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)
@@ -74,7 +74,7 @@ func (c *Commands) ChangeOrgMember(ctx context.Context, member *domain.Member) (
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-LiaZi", "Errors.Org.Member.RolesNotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&existingMember.MemberWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewMemberChangedEvent(ctx, orgAgg, member.UserID, member.Roles...))
 	err = AppendAndReduce(existingMember, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 
 	orgAgg := OrgAggregateFromWriteModel(&m.MemberWriteModel.WriteModel)
 	removeEvent := c.removeOrgMember(ctx, orgAgg, userID, false)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, removeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, removeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (c *Commands) RemoveOrgMember(ctx context.Context, orgID, userID string) (*
 	return writeModelToObjectDetails(&m.WriteModel), nil
 }
 
-func (c *Commands) removeOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.EventPusher {
+func (c *Commands) removeOrgMember(ctx context.Context, orgAgg *eventstore.Aggregate, userID string, cascade bool) eventstore.Command {
 	if cascade {
 		return org.NewMemberCascadeRemovedEvent(
 			ctx,

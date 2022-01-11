@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -84,7 +85,7 @@ func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextSetEvent
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
@@ -96,7 +97,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*hand
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n90r", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 
 	cols := []handler.Column{
@@ -134,7 +135,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.EventReader) (*hand
 		cols), nil
 }
 
-func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var templateEvent policy.CustomTextRemovedEvent
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
@@ -146,7 +147,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-fm0ge", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	cols := []handler.Column{
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
@@ -184,21 +185,26 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.EventReader) (*handler.Statement, error) {
-	templateEvent, ok := event.(*org.CustomTextTemplateRemovedEvent)
-	if !ok {
+func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*handler.Statement, error) {
+	var templateEvent policy.CustomTextTemplateRemovedEvent
+	switch e := event.(type) {
+	case *org.CustomTextTemplateRemovedEvent:
+		templateEvent = e.CustomTextTemplateRemovedEvent
+	case *iam.CustomTextTemplateRemovedEvent:
+		templateEvent = e.CustomTextTemplateRemovedEvent
+	default:
 		logging.LogWithFields("PROJE-m03ng", "seq", event.Sequence(), "expectedType", org.CustomTextTemplateRemovedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n9rs", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
-		return nil, nil
+		return crdb.NewNoOpStatement(event), nil
 	}
 	return crdb.NewDeleteStatement(
-		templateEvent,
+		event,
 		[]handler.Condition{
 			handler.NewCond(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
 			handler.NewCond(MessageTextTypeCol, templateEvent.Template),
-			handler.NewCond(MessageTextLanguageCol, templateEvent.Language),
+			handler.NewCond(MessageTextLanguageCol, templateEvent.Language.String()),
 		},
 	), nil
 }
