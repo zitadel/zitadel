@@ -155,6 +155,7 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+
 	data := externalRegisterData{
 		baseData: l.getBaseData(r, authReq, "ExternalRegisterOverview", errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
@@ -227,6 +228,9 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPol
 		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
 			username = tokens.IDTokenClaims.GetEmail()
 		}
+	}
+	if username == "" {
+		username = tokens.IDTokenClaims.GetEmail()
 	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {

@@ -44,17 +44,18 @@
             <input class="lgn-input" type="text" id="phone" name="phone" autocomplete="tel" value="{{ .Phone }}">
         </div>
 
-        {{if .ShowUsername}}
         <div class="lgn-field double">
             <label class="lgn-label" for="username">{{t "ExternalRegistrationUserOverview.UsernameLabel"}}</label>
             <div class="lgn-suffix-wrapper">
-                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username" autocomplete="email" value="{{ .Email }}" required>
+                <input class="lgn-input lgn-suffix-input"
+                       type="text" id="username" name="username"
+                       autocomplete="email" value="{{ .Email }}" required
+                       {{if .ShowUsername}} disabled {{end}}>
                 {{if .DisplayLoginNameSuffix}}
                 <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
                 {{end}}
             </div>
         </div>
-        {{end}}
 
         <div class="double-col">
             <div class="lgn-field">

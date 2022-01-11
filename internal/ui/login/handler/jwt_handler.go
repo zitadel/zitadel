@@ -126,6 +126,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		l.renderError(w, r, authReq, err)
 		return
 	}
+
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, authReq.LinkingUsers[len(authReq.LinkingUsers)-1], idpConfig)
 	user, metadata, err = l.customExternalUserToLoginUserMapping(user, tokens, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
