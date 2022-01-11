@@ -9,6 +9,7 @@
     },
     "chromeWebSecurity": false,
     "experimentalSessionSupport": true,
-    "integrationFolder": "cypress/setup"
+    "integrationFolder": "cypress/setup",
+    "trashAssetsBeforeRuns": false
   }
   

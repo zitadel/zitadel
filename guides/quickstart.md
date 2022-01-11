@@ -19,16 +19,16 @@ You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the 
 
 <a name="compose-services"></a>
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --build. Setting everything up takes about 5 minutes.
 ```
 
 ## Developing ZITADEL
 
-Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers.
+Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers. Setting everything up takes about 15 minutes.
 
 <a name="compose-e2e"></a>
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d --build
 ```
 
 This also initializes data needed by Cypress end-to-end tests. Launch the Cypress test suite from the console directory:
