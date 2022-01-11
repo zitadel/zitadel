@@ -105,7 +105,9 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
 		))
-		p.keyChan <- true
+		if p.keyChan != nil {
+			p.keyChan <- true
+		}
 	}
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
