@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -48,7 +50,7 @@ func TestMachineTokenProjection_reduces(t *testing.T) {
 								uint64(15),
 								"agg-id",
 								time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-								[]string{"openid"},
+								pq.StringArray{"openid"},
 							},
 						},
 					},
