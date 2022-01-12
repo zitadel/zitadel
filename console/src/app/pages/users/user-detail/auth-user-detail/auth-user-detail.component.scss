@@ -134,12 +134,9 @@
         .sub {
           color: var(--grey);
           max-width: 500px;
+          margin-bottom: 0;
           font-size: 14px;
         }
-      }
-
-      .theme {
-        min-width: 250px;
       }
     }
   }

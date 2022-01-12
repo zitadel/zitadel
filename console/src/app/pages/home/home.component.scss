@@ -16,7 +16,7 @@
   $list-background-color: mat.get-color-from-palette($background, 300);
   $card-background-color: mat.get-color-from-palette($background, card);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #ffffff, #000000);
+  $border-selected-color: if($is-dark-theme, #fff, #000);
 
   .home-wrapper {
     position: relative;
@@ -66,7 +66,6 @@
         border-radius: 1rem;
         margin: 0;
         text-decoration: none;
-        color: white;
         box-shadow: 0 0 15px #0000001a;
 
         &.edit-state {

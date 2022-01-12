@@ -47,7 +47,6 @@ import { CodeDialogComponent } from './auth-user-detail/code-dialog/code-dialog.
 import { DialogU2FComponent } from './auth-user-detail/dialog-u2f/dialog-u2f.component';
 import { EditDialogComponent } from './auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from './auth-user-detail/resend-email-dialog/resend-email-dialog.component';
-import { ThemeSettingComponent } from './auth-user-detail/theme-setting/theme-setting.component';
 import { ContactComponent } from './contact/contact.component';
 import { DetailFormMachineModule } from './detail-form-machine/detail-form-machine.module';
 import { DetailFormModule } from './detail-form/detail-form.module';
@@ -68,7 +67,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     AuthPasswordlessComponent,
     UserMfaComponent,
     PasswordlessComponent,
-    ThemeSettingComponent,
     PasswordComponent,
     CodeDialogComponent,
     ExternalIdpsComponent,

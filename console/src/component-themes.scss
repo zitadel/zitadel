@@ -14,7 +14,7 @@
 @import 'src/app/modules/nav/nav.component';
 @import 'src/app/modules/header/header.component';
 @import 'src/app/modules/footer/footer.component';
-@import 'src/app/pages/users/user-detail/auth-user-detail/theme-setting/theme-card';
+@import 'src/app/modules/theme-setting/theme-setting.component.scss';
 @import 'src/app/pages/orgs/org-detail/org-detail.component';
 @import 'src/app/pages/projects/owned-projects/owned-project-detail/owned-project-detail.component';
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
@@ -63,7 +63,7 @@
   @include changes-theme($theme);
   @include home-theme($theme);
   @include owned-project-detail-theme($theme);
-  @include theme-card($theme);
+  @include theme-setting($theme);
   @include input-theme($theme);
   @include cnsl-form-field-theme($theme);
   @include contributors-theme($theme);

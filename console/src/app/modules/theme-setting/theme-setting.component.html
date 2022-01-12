@@ -1,0 +1,4 @@
+<button class="theme-setting-button">
+  <i class="las la-moon" *ngIf="themeService.isDarkTheme | async"></i>
+  <i class="lar la-sun" *ngIf="(themeService.isDarkTheme | async) === false"></i>
+</button>

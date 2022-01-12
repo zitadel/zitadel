@@ -1,6 +1,6 @@
 @use '@angular/material' as mat;
 
-@mixin theme-card($theme) {
+@mixin theme-setting($theme) {
   /* stylelint-disable */
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
@@ -11,6 +11,6 @@
   .theme-conent,
   .crescent {
     background-color: $back;
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1); // cubic-bezier(.645, .045, .355, 1);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1); // cubic-bezier(.645, .045, .355, 1);
   }
 }

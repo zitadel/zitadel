@@ -13,40 +13,65 @@
   $back: map-get($background, background);
 
   .footer-wrapper {
-    padding: 2rem 2rem 1rem 2rem;
+    padding: 2rem;
     background-color: map-get($background, footer) !important;
     border-top: 1px solid map-get($foreground, divider);
-    padding-bottom: 50px;
     margin-top: 50px;
     display: flex;
-    flex-direction: column;
 
-    .footer-links {
+    .footer-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
       width: 100%;
-      display: grid;
-      grid-gap: 2rem;
       max-width: 80rem;
       margin: 0 auto;
-      grid-template-columns: 1fr;
 
-      @media only screen and (min-width: 699px) {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      @media only screen and (min-width: 1000px) {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-      }
-
-      .footer-link-wrapper {
+      .footer-socials {
         display: flex;
-        flex-direction: column;
+        flex: 1;
+        align-self: center;
+        justify-content: center;
+        margin: 1rem 0;
 
-        .footer-section-title {
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: uppercase;
+        a {
           color: var(--grey);
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+          margin: 0 0.25rem;
+
+          i {
+            font-size: 1.875rem;
+          }
+
+          &:hover {
+            color: $primary-color;
+          }
         }
+      }
+
+      .swiss-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex: 1;
+
+        .swisssvg {
+          width: 14rem;
+          margin: 1rem 0;
+          color: if($is-dark-theme, #ffffff60, #00000060);
+
+          .cross {
+            fill: white;
+          }
+        }
+      }
+
+      .footer-links {
+        display: flex;
+        align-items: center;
+        flex: 1;
 
         a {
           color: map-get($foreground, base);
@@ -56,10 +81,14 @@
           font-size: 14px;
           margin: 0.25rem 0;
           transition: all 0.1s ease;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
 
           i {
-            margin-left: 0.5rem;
+            margin-left: 0.25rem;
             visibility: hidden;
+            margin-right: 1rem;
           }
 
           &:hover {
@@ -71,23 +100,20 @@
           }
         }
       }
-    }
 
-    .swiss-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      width: 100%;
-      max-width: 80rem;
-      margin: 0 auto;
+      @media only screen and (max-width: 800px) {
+        flex-direction: column;
 
-      .swisssvg {
-        width: 14rem;
-        margin: 1rem 0;
-        color: if($is-dark-theme, #ffffff60, #00000060);
+        .footer-links {
+          order: 2;
+        }
 
-        .cross {
-          fill: white;
+        .swiss-wrapper {
+          order: 1;
+        }
+
+        .footer-socials {
+          order: 3;
         }
       }
     }
