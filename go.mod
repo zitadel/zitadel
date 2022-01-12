@@ -19,7 +19,7 @@ require (
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v1.0.0
-	github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2
+	github.com/caos/orbos v1.5.14-0.20220112135423-7aa96cd76961
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
 	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51
 	github.com/dop251/goja_nodejs v0.0.0-20211022123610-8dd9abb0616d
