@@ -6,9 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --configuration production",
-    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
-    "test:e2e": "playwright test tests",
-    "test:e2e:watch": "chokidar 'tests/e2e/**/*.test.ts' -c 'npm run test:e2e -- --retries=0 {path}'"
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
   },
   "private": true,
   "dependencies": {
@@ -67,13 +65,10 @@
     "@types/node-fetch": "^2.5.12",
     "@typescript-eslint/eslint-plugin": "5.8.0",
     "@typescript-eslint/parser": "5.8.0",
-    "chokidar-cli": "^3.0.0",
     "codelyzer": "^6.0.0",
     "cypress": "^9.2.1",
     "cypress-terminal-report": "^3.4.1",
-    "cypress-wait-until": "^1.7.1",
     "eslint": "^8.5.0",
-    "form-data": "^4.0.0",
     "jasmine-core": "~3.9.0",
     "jasmine-spec-reporter": "~7.0.0",
     "jsonwebtoken": "^8.5.1",
@@ -83,13 +78,11 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.7.0",
     "mochawesome": "^6.2.2",
-    "node-fetch": "^2.6.5",
     "prettier": "^2.4.1",
     "protractor": "~7.0.0",
     "stylelint": "^13.10.0",
     "stylelint-config-standard": "^22.0.0",
     "stylelint-scss": "^3.21.0",
-    "ts-node": "~10.2.1",
     "typescript": "^4.4.4"
   }
 }
