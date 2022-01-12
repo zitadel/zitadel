@@ -46,6 +46,7 @@ type AuthRequestRepo struct {
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
+	ApplicationProvider       applicationProvider
 
 	IdGenerator id.Generator
 
@@ -109,6 +110,10 @@ type userGrantProvider interface {
 type projectProvider interface {
 	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
+}
+
+type applicationProvider interface {
+	AppByOIDCClientID(context.Context, string) (*query.App, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -798,6 +803,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, &domain.GrantRequiredStep{}), nil
 	}
 
+	ok, err = repo.hasSucceededPage(ctx, request, repo.ApplicationProvider)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		steps = append(steps, &domain.LoginSucceededStep{})
+	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
 }
 
@@ -806,17 +818,19 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 	if err != nil {
 		return nil, err
 	}
-	users := make([]domain.UserSelection, len(userSessions))
-	for i, session := range userSessions {
-		users[i] = domain.UserSelection{
-			UserID:            session.UserID,
-			DisplayName:       session.DisplayName,
-			UserName:          session.UserName,
-			LoginName:         session.LoginName,
-			ResourceOwner:     session.ResourceOwner,
-			AvatarKey:         session.AvatarKey,
-			UserSessionState:  model.UserSessionStateToDomain(session.State),
-			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+	users := make([]domain.UserSelection, 0)
+	for _, session := range userSessions {
+		if request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner {
+			users = append(users, domain.UserSelection{
+				UserID:            session.UserID,
+				DisplayName:       session.DisplayName,
+				UserName:          session.UserName,
+				LoginName:         session.LoginName,
+				ResourceOwner:     session.ResourceOwner,
+				AvatarKey:         session.AvatarKey,
+				UserSessionState:  model.UserSessionStateToDomain(session.State),
+				SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+			})
 		}
 	}
 	return users, nil
@@ -979,11 +993,19 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(aggregateID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.CustomTextViewsToDomain(loginTexts), err
+	return query.CustomTextsToDomain(loginTexts), err
+}
+
+func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *domain.AuthRequest, provider applicationProvider) (bool, error) {
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+	if err != nil {
+		return false, err
+	}
+	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {

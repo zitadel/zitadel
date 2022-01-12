@@ -28,7 +28,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 	return result, nil
 }
 
-func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string) (events []eventstore.EventPusher, stringPW string, err error) {
+func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string) (events []eventstore.Command, stringPW string, err error) {
 	if !apiAppApp.IsValid() {
 		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
@@ -50,7 +50,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 		return nil, "", err
 	}
 
-	events = []eventstore.EventPusher{
+	events = []eventstore.Command{
 		project.NewApplicationAddedEvent(ctx, projectAgg, apiAppApp.AppID, apiAppApp.AppName),
 	}
 
@@ -101,7 +101,7 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 
 	projectAgg := ProjectAggregateFromWriteModel(&existingAPI.WriteModel)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, project.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
+	pushedEvents, err := c.eventstore.Push(ctx, project.NewAPIConfigSecretChangedEvent(ctx, projectAgg, appID, cryptoSecret))
 	if err != nil {
 		return nil, err
 	}
@@ -172,10 +172,10 @@ func (c *Commands) VerifyAPIClientSecret(ctx context.Context, projectID, appID, 
 	err = crypto.CompareHash(app.ClientSecret, []byte(secret), c.userPasswordAlg)
 	spanPasswordComparison.EndWithError(err)
 	if err == nil {
-		_, err = c.eventstore.PushEvents(ctx, project.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
+		_, err = c.eventstore.Push(ctx, project.NewAPIConfigSecretCheckSucceededEvent(ctx, projectAgg, app.AppID))
 		return err
 	}
-	_, err = c.eventstore.PushEvents(ctx, project.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
+	_, err = c.eventstore.Push(ctx, project.NewAPIConfigSecretCheckFailedEvent(ctx, projectAgg, app.AppID))
 	logging.Log("COMMAND-g3f12").OnError(err).Error("could not push event APIClientSecretCheckFailed")
 	return caos_errs.ThrowInvalidArgument(nil, "COMMAND-SADfg", "Errors.Project.App.ClientSecretInvalid")
 }

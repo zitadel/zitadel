@@ -3,8 +3,9 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -56,7 +57,7 @@ func NewHumanPasswordChangedEvent(
 	}
 }
 
-func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -103,7 +104,7 @@ func NewHumanPasswordCodeAddedEvent(
 	}
 }
 
-func HumanPasswordCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -137,7 +138,7 @@ func NewHumanPasswordCodeSentEvent(ctx context.Context, aggregate *eventstore.Ag
 	}
 }
 
-func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanPasswordCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -171,7 +172,7 @@ func NewHumanPasswordCheckSucceededEvent(
 	}
 }
 
-func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordCheckSucceededEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordCheckSucceededEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -211,7 +212,7 @@ func NewHumanPasswordCheckFailedEvent(
 	}
 }
 
-func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanPasswordCheckFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	humanAdded := &HumanPasswordCheckFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

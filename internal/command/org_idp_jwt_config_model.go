@@ -25,7 +25,7 @@ func NewOrgIDPJWTConfigWriteModel(idpConfigID, orgID string) *IDPJWTConfigWriteM
 	}
 }
 
-func (wm *IDPJWTConfigWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IDPJWTConfigWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.IDPJWTConfigAddedEvent:

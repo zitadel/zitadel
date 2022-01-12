@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"reflect"
 	"sync"
@@ -47,7 +48,7 @@ func (e *testEvent) Assets() []*Asset {
 	return nil
 }
 
-func testFilterMapper(event *repository.Event) (EventReader, error) {
+func testFilterMapper(event *repository.Event) (Event, error) {
 	if event == nil {
 		return newTestEvent("testID", "hodor", nil, false), nil
 	}
@@ -60,10 +61,10 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 	}
 	type args struct {
 		eventType EventType
-		mapper    func(*repository.Event) (EventReader, error)
+		mapper    func(*repository.Event) (Event, error)
 	}
 	type res struct {
-		event       EventReader
+		event       Event
 		mapperCount int
 	}
 
@@ -134,7 +135,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 			fields: fields{
 				eventMapper: map[EventType]eventTypeInterceptors{
 					"event.type": {
-						eventMapper: func(*repository.Event) (EventReader, error) {
+						eventMapper: func(*repository.Event) (Event, error) {
 							return nil, errors.ThrowUnimplemented(nil, "V2-1qPvn", "unimplemented")
 						},
 					},
@@ -180,7 +181,7 @@ func Test_eventstore_RegisterFilterEventMapper(t *testing.T) {
 
 func Test_eventData(t *testing.T) {
 	type args struct {
-		event EventPusher
+		event Command
 	}
 	type res struct {
 		jsonText []byte
@@ -343,7 +344,7 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		events []EventPusher
+		events []Command
 	}
 	type res struct {
 		wantErr bool
@@ -357,7 +358,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -376,7 +377,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "caos",
+						ResourceOwner: sql.NullString{String: "caos", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -386,7 +387,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -412,7 +413,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "caos",
+						ResourceOwner: sql.NullString{String: "caos", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -422,7 +423,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						Data:          []byte(nil),
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
-						ResourceOwner: "caos",
+						ResourceOwner: sql.NullString{String: "caos", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -432,7 +433,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "invalid data",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -447,9 +448,146 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 			},
 		},
 		{
+			name: "no aggregate id",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"",
+								"test.aggregate",
+								"v1",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no aggregate type",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"id",
+								"",
+								"v1",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no aggregate version",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"id",
+								"test.aggregate",
+								"",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no event type",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("resourceOwner", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("caos", "adlerhurst"),
+								"id",
+								"test.aggregate",
+								"v1",
+							),
+							"",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: true,
+			},
+		},
+		{
+			name: "no resourceowner",
+			args: args{
+				events: []Command{
+					&testEvent{
+						BaseEvent: *NewBaseEventForPush(
+							service.WithService(authz.NewMockContext("", "editorUser"), "editorService"),
+							NewAggregate(
+								authz.NewMockContext("", "adlerhurst"),
+								"id",
+								"test.aggregate",
+								"v1",
+							),
+							"test.event",
+						),
+						data: func() interface{} {
+							return nil
+						},
+					},
+				},
+			},
+			res: res{
+				wantErr: false,
+				events: []*repository.Event{
+					{
+						AggregateID:   "id",
+						AggregateType: "test.aggregate",
+						Data:          []byte(nil),
+						EditorService: "editorService",
+						EditorUser:    "editorUser",
+						ResourceOwner: sql.NullString{String: "", Valid: false},
+						Type:          "test.event",
+						Version:       "v1",
+					},
+				},
+			},
+		},
+		{
 			name: "multiple aggregates",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -483,7 +621,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -493,7 +631,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -505,7 +643,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -516,7 +654,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			events, _, err := eventsToRepository(tt.args.events)
+			events, _, err := commandsToRepository(tt.args.events)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 				return
@@ -584,11 +722,11 @@ func (repo *testRepo) LatestSequence(ctx context.Context, queryFactory *reposito
 
 func TestEventstore_Push(t *testing.T) {
 	type args struct {
-		events []EventPusher
+		events []Command
 	}
 	type fields struct {
 		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -602,7 +740,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -622,14 +760,14 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
 					},
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -638,7 +776,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -665,7 +803,7 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
@@ -675,14 +813,14 @@ func TestEventstore_Push(t *testing.T) {
 							Data:          []byte(nil),
 							EditorService: "editorService",
 							EditorUser:    "editorUser",
-							ResourceOwner: "caos",
+							ResourceOwner: sql.NullString{String: "caos", Valid: true},
 							Type:          "test.event",
 							Version:       "v1",
 						},
 					},
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -694,7 +832,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "multiple aggregates",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -729,7 +867,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "caos",
+								ResourceOwner: sql.NullString{String: "caos", Valid: true},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -739,7 +877,7 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "caos",
+								ResourceOwner: sql.NullString{String: "caos", Valid: true},
 								Type:          "test.event",
 								Version:       "v1",
 							},
@@ -751,15 +889,15 @@ func TestEventstore_Push(t *testing.T) {
 								Data:          []byte(nil),
 								EditorService: "editorService",
 								EditorUser:    "editorUser",
-								ResourceOwner: "caos",
+								ResourceOwner: sql.NullString{String: "caos", Valid: true},
 								Type:          "test.event",
 								Version:       "v1",
 							},
 						},
 					),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -771,7 +909,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "push fails",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -794,7 +932,7 @@ func TestEventstore_Push(t *testing.T) {
 		{
 			name: "aggreagtes to events mapping fails",
 			args: args{
-				events: []EventPusher{
+				events: []Command{
 					newTestEvent(
 						"1",
 						"",
@@ -830,7 +968,7 @@ func TestEventstore_Push(t *testing.T) {
 				t.FailNow()
 			}
 
-			_, err := es.PushEvents(context.Background(), tt.args.events...)
+			_, err := es.Push(context.Background(), tt.args.events...)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -844,7 +982,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 	}
 	type fields struct {
 		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -882,8 +1020,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					events: []*repository.Event{},
 					t:      t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -910,8 +1048,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					t:   t,
 					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -943,8 +1081,8 @@ func TestEventstore_FilterEvents(t *testing.T) {
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -970,7 +1108,7 @@ func TestEventstore_FilterEvents(t *testing.T) {
 				t.FailNow()
 			}
 
-			_, err := es.FilterEvents(context.Background(), tt.args.query)
+			_, err := es.Filter(context.Background(), tt.args.query)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 			}
@@ -1089,7 +1227,7 @@ func TestEventstore_LatestSequence(t *testing.T) {
 
 type testReducer struct {
 	t              *testing.T
-	events         []EventReader
+	events         []Event
 	expectedLength int
 	err            error
 }
@@ -1105,7 +1243,7 @@ func (r *testReducer) Reduce() error {
 	return nil
 }
 
-func (r *testReducer) AppendEvents(e ...EventReader) {
+func (r *testReducer) AppendEvents(e ...Event) {
 	r.events = append(r.events, e...)
 }
 
@@ -1116,7 +1254,7 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 	}
 	type fields struct {
 		repo        *testRepo
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type res struct {
 		wantErr bool
@@ -1158,8 +1296,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					events: []*repository.Event{},
 					t:      t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1190,8 +1328,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					t:   t,
 					err: errors.ThrowInternal(nil, "V2-RfkBa", "test err"),
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1227,8 +1365,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1262,8 +1400,8 @@ func TestEventstore_FilterToReducer(t *testing.T) {
 					},
 					t: t,
 				},
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(e *repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(e *repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
@@ -1323,7 +1461,7 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 		t.Errorf("wrong editor user got %q want %q", got.EditorUser, want.EditorUser)
 	}
 	if want.ResourceOwner != got.ResourceOwner {
-		t.Errorf("wrong resource owner got %q want %q", got.ResourceOwner, want.ResourceOwner)
+		t.Errorf("wrong resource owner got %q want %q", got.ResourceOwner.String, want.ResourceOwner.String)
 	}
 	if want.Type != got.Type {
 		t.Errorf("wrong event type got %q want %q", got.Type, want.Type)
@@ -1338,13 +1476,13 @@ func compareEvents(t *testing.T, want, got *repository.Event) {
 
 func TestEventstore_mapEvents(t *testing.T) {
 	type fields struct {
-		eventMapper map[EventType]func(*repository.Event) (EventReader, error)
+		eventMapper map[EventType]func(*repository.Event) (Event, error)
 	}
 	type args struct {
 		events []*repository.Event
 	}
 	type res struct {
-		events  []EventReader
+		events  []Event
 		wantErr bool
 	}
 	tests := []struct {
@@ -1381,8 +1519,8 @@ func TestEventstore_mapEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(*repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(*repository.Event) (Event, error) {
 						return nil, errors.ThrowInternal(nil, "V2-8FbQk", "test err")
 					},
 				},
@@ -1401,14 +1539,14 @@ func TestEventstore_mapEvents(t *testing.T) {
 				},
 			},
 			fields: fields{
-				eventMapper: map[EventType]func(*repository.Event) (EventReader, error){
-					"test.event": func(*repository.Event) (EventReader, error) {
+				eventMapper: map[EventType]func(*repository.Event) (Event, error){
+					"test.event": func(*repository.Event) (Event, error) {
 						return &testEvent{}, nil
 					},
 				},
 			},
 			res: res{
-				events: []EventReader{
+				events: []Event{
 					&testEvent{},
 				},
 				wantErr: false,

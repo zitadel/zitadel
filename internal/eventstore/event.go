@@ -4,7 +4,8 @@ import (
 	"time"
 )
 
-type EventPusher interface {
+// Command is the intend to store an event into the eventstore
+type Command interface {
 	//Aggregate is the metadata of an aggregate
 	Aggregate() Aggregate
 	// EditorService is the service who wants to push the event
@@ -24,7 +25,8 @@ type EventPusher interface {
 	UniqueConstraints() []*EventUniqueConstraint
 }
 
-type EventReader interface {
+// Event is a stored activity
+type Event interface {
 	// EditorService is the service who pushed the event
 	EditorService() string
 	//EditorUser is the user who pushed the event

@@ -93,7 +93,7 @@ func (p *AuthNKeyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var authNKeyEvent struct {
 		eventstore.BaseEvent
 		keyID      string
@@ -143,7 +143,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.EventReader) (
 	), nil
 }
 
-func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event) (*handler.Statement, error) {
 	var appID string
 	var enabled bool
 	switch e := event.(type) {
@@ -170,7 +170,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 	), nil
 }
 
-func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	var condition handler.Condition
 	switch e := event.(type) {
 	case *project.ApplicationKeyRemovedEvent:

@@ -124,7 +124,7 @@ func TextMethodToQuery(method object_pb.TextQueryMethod) query.TextComparison {
 
 func ListQueryToModel(query *object_pb.ListQuery) (offset, limit uint64, asc bool) {
 	if query == nil {
-		return
+		return 0, 0, false
 	}
 	return query.Offset, uint64(query.Limit), query.Asc
 }

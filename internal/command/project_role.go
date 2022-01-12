@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -21,7 +22,7 @@ func (c *Commands) AddProjectRole(ctx context.Context, projectRole *domain.Proje
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +46,7 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 		return details, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +57,8 @@ func (c *Commands) BulkAddProjectRole(ctx context.Context, projectID, resourceOw
 	return writeModelToObjectDetails(&roleWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectRoles ...*domain.ProjectRole) ([]eventstore.EventPusher, error) {
-	var events []eventstore.EventPusher
+func (c *Commands) addProjectRoles(ctx context.Context, projectAgg *eventstore.Aggregate, projectRoles ...*domain.ProjectRole) ([]eventstore.Command, error) {
+	var events []eventstore.Command
 	for _, projectRole := range projectRoles {
 		projectRole.AggregateID = projectAgg.ID
 		if !projectRole.IsValid() {
@@ -102,7 +103,7 @@ func (c *Commands) ChangeProjectRole(ctx context.Context, projectRole *domain.Pr
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0cs", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changeEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changeEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +126,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 		return details, caos_errs.ThrowNotFound(nil, "COMMAND-m9vMf", "Errors.Project.Role.NotExisting")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingRole.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		project.NewRoleRemovedEvent(ctx, projectAgg, key),
 	}
 
@@ -147,7 +148,7 @@ func (c *Commands) RemoveProjectRole(ctx context.Context, projectID, key, resour
 		events = append(events, event)
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}

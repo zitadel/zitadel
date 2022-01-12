@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -43,7 +44,7 @@ func NewLoginPolicyAddedEvent(
 	}
 }
 
-func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -74,7 +75,7 @@ func NewLoginPolicyChangedEvent(
 	return &LoginPolicyChangedEvent{LoginPolicyChangedEvent: *changedEvent}, nil
 }
 
-func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func LoginPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.LoginPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

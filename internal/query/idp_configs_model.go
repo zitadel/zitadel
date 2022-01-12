@@ -20,7 +20,7 @@ func (rm *IDPConfigsReadModel) ConfigByID(id string) (idx int, config *IDPConfig
 	return -1, nil
 }
 
-func (rm *IDPConfigsReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IDPConfigsReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *idpconfig.IDPConfigAddedEvent:

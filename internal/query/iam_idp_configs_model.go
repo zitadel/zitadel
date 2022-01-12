@@ -9,7 +9,7 @@ type IAMIDPConfigsReadModel struct {
 	IDPConfigsReadModel
 }
 
-func (rm *IAMIDPConfigsReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *IAMIDPConfigsReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.IDPConfigAddedEvent:

@@ -3,6 +3,7 @@ package policy
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -74,7 +75,7 @@ func NewMailTextAddedEvent(
 	}
 }
 
-func MailTextAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTextAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MailTextAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -166,7 +167,7 @@ func ChangeButtonText(buttonText string) func(*MailTextChangedEvent) {
 	}
 }
 
-func MailTextChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTextChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &MailTextChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -202,7 +203,7 @@ func NewMailTextRemovedEvent(base *eventstore.BaseEvent, mailTextType, language 
 	}
 }
 
-func MailTextRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTextRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &MailTextRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

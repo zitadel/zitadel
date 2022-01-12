@@ -194,8 +194,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
+      "DELETE_SELF_TITLE": "Delete Account",
       "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?",
+      "DELETE_SELF_DESCRIPTION": "You are about to permanently delete your personal account. This will log you out and delete your user. This action cannot be undone!",
       "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
+      "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the user.",
       "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
@@ -325,7 +328,8 @@
       "GENDERLANGSECTION": "Gender and Language",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Initial Password",
-      "ADDRESSANDPHONESECTION": "Phonenumber"
+      "ADDRESSANDPHONESECTION": "Phonenumber",
+      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
@@ -399,6 +403,8 @@
       "OLD": "Current Password",
       "NEW": "New Password",
       "CONFIRM": "Confirm New Password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Confirm Password",
       "RESET": "Reset Current Password",
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Resend Password Reset Link",
@@ -419,6 +425,8 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "validated",
+        "ISVERIFIED": "Email Verified",
+        "ISVERIFIEDDESC": "If the email is indicated as verified, no email verification request will be made.",
         "RESEND": "Resend Verification E-mail",
         "EDITTITLE": "Change Email",
         "EDITDESC": "Enter the new email in the field below."
@@ -639,6 +647,7 @@
       "LISTDESCRIPTION": "Choose an organisation.",
       "ACTIVE": "Active",
       "CREATE": "Create Organisation",
+      "USERSELFACCOUNT": "Use your personal account as organisation owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
@@ -662,7 +671,8 @@
       "SELECTORGTOOLTIP": "Select this organisation.",
       "PRIMARYDOMAIN": "Primary Domain",
       "STATE": "State",
-      "USEPASSWORD": "Set Initial Password"
+      "USEPASSWORD": "Set Initial Password",
+      "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
     "DOMAINS": {
       "NEW": "Add Domain",

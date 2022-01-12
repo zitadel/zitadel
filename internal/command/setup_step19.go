@@ -23,8 +23,8 @@ func (s *Step19) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep19(ctx context.Context, step *Step19) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.EventPusher, error) {
-		events := make([]eventstore.EventPusher, 0)
+	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+		events := make([]eventstore.Command, 0)
 		orgs := newOrgsWithUsernameNotDomain()
 		if err := c.eventstore.FilterToQueryReducer(ctx, orgs); err != nil {
 			return nil, err
@@ -71,7 +71,7 @@ func (c *Commands) SetupStep19(ctx context.Context, step *Step19) error {
 
 func newOrgsWithUsernameNotDomain() *orgsWithUsernameNotDomain {
 	return &orgsWithUsernameNotDomain{
-		orgEvents: make(map[string][]eventstore.EventReader),
+		orgEvents: make(map[string][]eventstore.Event),
 		orgs:      make(map[string]bool),
 	}
 }
@@ -79,11 +79,11 @@ func newOrgsWithUsernameNotDomain() *orgsWithUsernameNotDomain {
 type orgsWithUsernameNotDomain struct {
 	eventstore.WriteModel
 
-	orgEvents map[string][]eventstore.EventReader
+	orgEvents map[string][]eventstore.Event
 	orgs      map[string]bool
 }
 
-func (wm *orgsWithUsernameNotDomain) AppendEvents(events ...eventstore.EventReader) {
+func (wm *orgsWithUsernameNotDomain) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.OrgAddedEvent:
@@ -140,7 +140,7 @@ func newDomainClaimedUsernames(orgID string) *domainClaimedUsernames {
 		WriteModel: eventstore.WriteModel{
 			ResourceOwner: orgID,
 		},
-		userEvents: make(map[string][]eventstore.EventReader),
+		userEvents: make(map[string][]eventstore.Event),
 		users:      make(map[string]string),
 	}
 }
@@ -148,11 +148,11 @@ func newDomainClaimedUsernames(orgID string) *domainClaimedUsernames {
 type domainClaimedUsernames struct {
 	eventstore.WriteModel
 
-	userEvents map[string][]eventstore.EventReader
+	userEvents map[string][]eventstore.Event
 	users      map[string]string
 }
 
-func (wm *domainClaimedUsernames) AppendEvents(events ...eventstore.EventReader) {
+func (wm *domainClaimedUsernames) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *user.HumanAddedEvent:

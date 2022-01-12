@@ -11,6 +11,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -130,6 +131,7 @@ const authConfig: AuthConfig = {
     MatSnackBarModule,
     AvatarModule,
     WarnDialogModule,
+    MatSelectModule,
     MatDialogModule,
     RegExpPipeModule,
     OnboardingModule,

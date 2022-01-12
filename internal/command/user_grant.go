@@ -17,7 +17,7 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (c *Commands) AddUserGrant(ctx context.Context, usergrant *domain.UserGrant
 	return userGrantWriteModelToUserGrant(addedUserGrant), nil
 }
 
-func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (pusher eventstore.EventPusher, _ *UserGrantWriteModel, err error) {
+func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (command eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if !userGrant.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0fs", "Errors.UserGrant.Invalid")
 	}
@@ -44,7 +44,7 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 
 	addedUserGrant := NewUserGrantWriteModel(userGrant.AggregateID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&addedUserGrant.WriteModel)
-	pusher = usergrant.NewUserGrantAddedEvent(
+	command = usergrant.NewUserGrantAddedEvent(
 		ctx,
 		userGrantAgg,
 		userGrant.UserID,
@@ -52,7 +52,7 @@ func (c *Commands) addUserGrant(ctx context.Context, userGrant *domain.UserGrant
 		userGrant.ProjectGrantID,
 		userGrant.RoleKeys,
 	)
-	return pusher, addedUserGrant, nil
+	return command, addedUserGrant, nil
 }
 
 func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string) (_ *domain.UserGrant, err error) {
@@ -60,7 +60,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (c *Commands) ChangeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	return userGrantWriteModelToUserGrant(changedUserGrant), nil
 }
 
-func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool) (_ eventstore.EventPusher, _ *UserGrantWriteModel, err error) {
+func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGrant, resourceOwner string, cascade bool) (_ eventstore.Command, _ *UserGrantWriteModel, err error) {
 	if userGrant.AggregateID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-3M0sd", "Errors.UserGrant.Invalid")
 	}
@@ -105,7 +105,7 @@ func (c *Commands) changeUserGrant(ctx context.Context, userGrant *domain.UserGr
 	return usergrant.NewUserGrantChangedEvent(ctx, userGrantAgg, userGrant.RoleKeys), existingUserGrant, nil
 }
 
-func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeys []string, cascade bool) (_ eventstore.EventPusher, err error) {
+func (c *Commands) removeRoleFromUserGrant(ctx context.Context, userGrantID string, roleKeys []string, cascade bool) (_ eventstore.Command, err error) {
 	existingUserGrant, err := c.userGrantWriteModelByID(ctx, userGrantID, "")
 	if err != nil {
 		return nil, err
@@ -160,7 +160,7 @@ func (c *Commands) DeactivateUserGrant(ctx context.Context, grantID, resourceOwn
 
 	deactivateUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&deactivateUserGrant.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, usergrant.NewUserGrantDeactivatedEvent(ctx, userGrantAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, usergrant.NewUserGrantDeactivatedEvent(ctx, userGrantAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (c *Commands) ReactivateUserGrant(ctx context.Context, grantID, resourceOwn
 	}
 	deactivateUserGrant := NewUserGrantWriteModel(grantID, resourceOwner)
 	userGrantAgg := UserGrantAggregateFromWriteModel(&deactivateUserGrant.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, usergrant.NewUserGrantReactivatedEvent(ctx, userGrantAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, usergrant.NewUserGrantReactivatedEvent(ctx, userGrantAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (c *Commands) RemoveUserGrant(ctx context.Context, grantID, resourceOwner s
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (c *Commands) BulkRemoveUserGrant(ctx context.Context, grantIDs []string, r
 	if len(grantIDs) == 0 {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-5M0sd", "Errors.UserGrant.IDMissing")
 	}
-	events := make([]eventstore.EventPusher, len(grantIDs))
+	events := make([]eventstore.Command, len(grantIDs))
 	for i, grantID := range grantIDs {
 		event, _, err := c.removeUserGrant(ctx, grantID, resourceOwner, false)
 		if err != nil {
@@ -232,11 +232,11 @@ func (c *Commands) BulkRemoveUserGrant(ctx context.Context, grantIDs []string, r
 		}
 		events[i] = event
 	}
-	_, err = c.eventstore.PushEvents(ctx, events...)
+	_, err = c.eventstore.Push(ctx, events...)
 	return err
 }
 
-func (c *Commands) removeUserGrant(ctx context.Context, grantID, resourceOwner string, cascade bool) (_ eventstore.EventPusher, writeModel *UserGrantWriteModel, err error) {
+func (c *Commands) removeUserGrant(ctx context.Context, grantID, resourceOwner string, cascade bool) (_ eventstore.Command, writeModel *UserGrantWriteModel, err error) {
 	if grantID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-J9sc5", "Errors.UserGrant.IDMissing")
 	}
