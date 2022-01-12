@@ -54,7 +54,7 @@ const (
 	HumanDisplayNameCol       = "display_name"
 	HumanPreferredLanguageCol = "preferred_language"
 	HumanGenderCol            = "gender"
-	HumanAvaterURLCol         = "avater_key"
+	HumanAvaterURLCol         = "avatar_key"
 
 	// email
 	HumanEmailCol           = "email"

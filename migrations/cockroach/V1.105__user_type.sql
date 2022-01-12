@@ -11,3 +11,5 @@ WITH doa AS (
         ON m.user_id = u.id 
 )
 UPDATE zitadel.projections.users SET type = doa.type FROM doa WHERE doa.id = zitadel.projections.users.id;
+
+ALTER TABLE zitadel.projections.users_humans RENAME COLUMN avater_key to avatar_key;
