@@ -97,7 +97,6 @@ func (repo *ProjectRepo) GetProjectMemberRoles(ctx context.Context) ([]string, e
 }
 
 func (repo *ProjectRepo) GetProjectGrantMemberRoles() []string {
-	//TODO: check global?
 	roles := make([]string, 0)
 	for _, roleMap := range repo.Roles {
 		if strings.HasPrefix(roleMap, "PROJECT_GRANT") {

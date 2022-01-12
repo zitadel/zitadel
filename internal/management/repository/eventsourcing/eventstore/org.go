@@ -13,6 +13,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -78,13 +79,15 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	return changes, nil
 }
 
-func (repo *OrgRepository) GetOrgMemberRoles() []string {
-	//TOOD: global org check?
+func (repo *OrgRepository) GetOrgMemberRoles(isGlobal bool) []string {
 	roles := make([]string, 0)
 	for _, roleMap := range repo.Roles {
 		if strings.HasPrefix(roleMap, "ORG") {
 			roles = append(roles, roleMap)
 		}
+	}
+	if isGlobal {
+		roles = append(roles, domain.RoleSelfManagementGlobal)
 	}
 	return roles
 }
