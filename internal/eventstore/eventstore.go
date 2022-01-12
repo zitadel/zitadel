@@ -2,6 +2,7 @@ package eventstore
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"reflect"
 	"sync"
@@ -79,7 +80,7 @@ func commandsToRepository(cmds []Command) (events []*repository.Event, constrain
 		events[i] = &repository.Event{
 			AggregateID:   cmd.Aggregate().ID,
 			AggregateType: repository.AggregateType(cmd.Aggregate().Type),
-			ResourceOwner: cmd.Aggregate().ResourceOwner,
+			ResourceOwner: sql.NullString{String: cmd.Aggregate().ResourceOwner, Valid: cmd.Aggregate().ResourceOwner != ""},
 			EditorService: cmd.EditorService(),
 			EditorUser:    cmd.EditorUser(),
 			Type:          repository.EventType(cmd.Type()),

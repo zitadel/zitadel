@@ -818,17 +818,19 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 	if err != nil {
 		return nil, err
 	}
-	users := make([]domain.UserSelection, len(userSessions))
-	for i, session := range userSessions {
-		users[i] = domain.UserSelection{
-			UserID:            session.UserID,
-			DisplayName:       session.DisplayName,
-			UserName:          session.UserName,
-			LoginName:         session.LoginName,
-			ResourceOwner:     session.ResourceOwner,
-			AvatarKey:         session.AvatarKey,
-			UserSessionState:  model.UserSessionStateToDomain(session.State),
-			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+	users := make([]domain.UserSelection, 0)
+	for _, session := range userSessions {
+		if request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner {
+			users = append(users, domain.UserSelection{
+				UserID:            session.UserID,
+				DisplayName:       session.DisplayName,
+				UserName:          session.UserName,
+				LoginName:         session.LoginName,
+				ResourceOwner:     session.ResourceOwner,
+				AvatarKey:         session.AvatarKey,
+				UserSessionState:  model.UserSessionStateToDomain(session.State),
+				SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+			})
 		}
 	}
 	return users, nil

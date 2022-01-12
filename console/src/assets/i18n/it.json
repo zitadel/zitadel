@@ -194,8 +194,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Elimina utente",
+      "DELETE_SELF_TITLE": "Elimina Account",
       "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un utente. Sei sicuro?",
+      "DELETE_SELF_DESCRIPTION": "Stai per eliminare definitivamente il tuo account. Questo ti disconnetterà ed eliminerà il tuo utente. Questa azione non può essere annullata!",
       "DELETE_AUTH_DESCRIPTION": "Stai per eleminare il tuo account personale in modo permanente. Vuoi continuare?",
+      "TYPEUSERNAME": "Ripeti '{{value}}' per confermare ed eliminare l'utente.",
       "DELETE_BTN": "Elimina"
     },
     "SENDEMAILDIALOG": {
@@ -325,7 +328,8 @@
       "GENDERLANGSECTION": "Genere e linguaggio",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Password iniziale",
-      "ADDRESSANDPHONESECTION": "Numero di telefono"
+      "ADDRESSANDPHONESECTION": "Numero di telefono",
+      "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati."
     },
     "CODEDIALOG": {
       "TITLE": "Verificare il numero di telefono",
@@ -399,6 +403,8 @@
       "OLD": "Password attuale",
       "NEW": "Nuova password",
       "CONFIRM": "Conferma la nuova password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Conferma password",
       "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
@@ -420,7 +426,7 @@
         "TITLE": "E-mail",
         "VALID": "convalidato",
         "ISVERIFIED": "Email Verificato",
-        "ISVERIFIEDDESC": "Se l'email viene indicata come verificata, non verrà inviata alcuna email di inizializzazione.",
+        "ISVERIFIEDDESC": "Se l'email viene indicata come verificata, non verrà inviata alcuna email di verificazione.",
         "RESEND": "Invia di nuovo l'e-mail di verifica",
         "EDITTITLE": "Cambiare l'e-mail",
         "EDITDESC": "Inserisci la nuova email nel campo sottostante."
@@ -665,7 +671,8 @@
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
       "PRIMARYDOMAIN": "Dominio primario",
       "STATE": "Stato",
-      "USEPASSWORD": "Imposta la password iniziale"
+      "USEPASSWORD": "Imposta la password iniziale",
+      "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
