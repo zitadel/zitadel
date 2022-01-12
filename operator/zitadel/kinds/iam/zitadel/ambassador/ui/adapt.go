@@ -43,15 +43,17 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			crdName := "mappings.getambassador.io"
+			_, ok, err := k8sClient.CheckCRD(crdName)
+			if err != nil || !ok {
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, err
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 
 			queryConsole, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, ConsoleName),
 				false,
@@ -68,6 +70,7 @@ func AdaptFunc(
 			}
 
 			queryAcc, err := mapping.AdaptFuncToEnsure(
+				monitor,
 				namespace,
 				labels.MustForName(componentLabels, AccountsName),
 				false,
