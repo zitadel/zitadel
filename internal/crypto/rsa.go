@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 )
 
 func GenerateKeyPair(bits int) (*rsa.PrivateKey, *rsa.PublicKey, error) {
@@ -64,18 +65,17 @@ func BytesToPrivateKey(priv []byte) (*rsa.PrivateKey, error) {
 	return key, nil
 }
 
+var ErrEmpty = errors.New("cannot decode, empty data")
+
 func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
-	block, _ := pem.Decode(pub)
-	enc := x509.IsEncryptedPEMBlock(block)
-	b := block.Bytes
-	var err error
-	if enc {
-		b, err = x509.DecryptPEMBlock(block, nil)
-		if err != nil {
-			return nil, err
-		}
+	if pub == nil {
+		return nil, ErrEmpty
 	}
-	ifc, err := x509.ParsePKIXPublicKey(b)
+	block, _ := pem.Decode(pub)
+	if block == nil {
+		return nil, ErrEmpty
+	}
+	ifc, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, err
 	}

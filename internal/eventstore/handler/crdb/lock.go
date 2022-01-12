@@ -2,9 +2,15 @@ package crdb
 
 import (
 	"context"
+	"database/sql"
+	"fmt"
+	"os"
 	"time"
 
+	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/id"
 )
 
 const (
@@ -15,13 +21,39 @@ const (
 		" WHERE %[1]s.projection_name = $3 AND (%[1]s.locker_id = $1 OR %[1]s.locked_until < now())"
 )
 
-func (h *StatementHandler) Lock(ctx context.Context, lockDuration time.Duration) <-chan error {
+type Locker interface {
+	Lock(ctx context.Context, lockDuration time.Duration) <-chan error
+	Unlock() error
+}
+
+type locker struct {
+	client         *sql.DB
+	lockStmt       string
+	workerName     string
+	projectionName string
+}
+
+func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
+	workerName, err := os.Hostname()
+	if err != nil || workerName == "" {
+		workerName, err = id.SonyFlakeGenerator.Next()
+		logging.Log("CRDB-bdO56").OnError(err).Panic("unable to generate lockID")
+	}
+	return &locker{
+		client:         client,
+		lockStmt:       fmt.Sprintf(lockStmtFormat, lockTable),
+		workerName:     workerName,
+		projectionName: projectionName,
+	}
+}
+
+func (h *locker) Lock(ctx context.Context, lockDuration time.Duration) <-chan error {
 	errs := make(chan error)
 	go h.handleLock(ctx, errs, lockDuration)
 	return errs
 }
 
-func (h *StatementHandler) handleLock(ctx context.Context, errs chan error, lockDuration time.Duration) {
+func (h *locker) handleLock(ctx context.Context, errs chan error, lockDuration time.Duration) {
 	renewLock := time.NewTimer(0)
 	for {
 		select {
@@ -37,9 +69,9 @@ func (h *StatementHandler) handleLock(ctx context.Context, errs chan error, lock
 	}
 }
 
-func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Duration) error {
+func (h *locker) renewLock(ctx context.Context, lockDuration time.Duration) error {
 	//the unit of crdb interval is seconds (https://www.cockroachlabs.com/docs/stable/interval.html).
-	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Seconds(), h.ProjectionName)
+	res, err := h.client.Exec(h.lockStmt, h.workerName, lockDuration.Seconds(), h.projectionName)
 	if err != nil {
 		return errors.ThrowInternal(err, "CRDB-uaDoR", "unable to execute lock")
 	}
@@ -51,8 +83,8 @@ func (h *StatementHandler) renewLock(ctx context.Context, lockDuration time.Dura
 	return nil
 }
 
-func (h *StatementHandler) Unlock() error {
-	_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.ProjectionName)
+func (h *locker) Unlock() error {
+	_, err := h.client.Exec(h.lockStmt, h.workerName, float64(0), h.projectionName)
 	if err != nil {
 		return errors.ThrowUnknown(err, "CRDB-JjfwO", "unlock failed")
 	}

@@ -44,7 +44,6 @@ require (
 	github.com/minio/minio-go/v7 v7.0.20
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
-	github.com/nsf/jsondiff v0.0.0-20210926074059-1e845ec5d249
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.3.0
 	github.com/rakyll/statik v0.1.7
