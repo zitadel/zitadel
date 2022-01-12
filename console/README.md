@@ -20,14 +20,7 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 ## Running end-to-end tests
 
-```bash
-# Usage:
-./cypress.sh <action> <environment>
-
-# Examples:
-./cypress.sh open ./local.env
-./cypress.sh run ./dev.env
-```
+Please refer to [guides](../guides/quickstart.md#developing-zitadel)
 
 ## Further help
 

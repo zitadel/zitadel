@@ -69,7 +69,7 @@
     "@typescript-eslint/parser": "5.8.0",
     "chokidar-cli": "^3.0.0",
     "codelyzer": "^6.0.0",
-    "cypress": "^9.2.0",
+    "cypress": "^9.2.1",
     "cypress-terminal-report": "^3.4.1",
     "cypress-wait-until": "^1.7.1",
     "eslint": "^8.5.0",

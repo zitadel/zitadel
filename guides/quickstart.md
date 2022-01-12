@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-The only prerequisite you need fullfill, is that you need to have docker installed with support for compose and buildkit. The resource limit must at least be:
+The only prerequisite you need fullfill for running the services, is that you need to have docker installed with support for compose and buildkit. The resource limit must at least be:
 
 * CPU's: 2
 * Memory: 4Gb
@@ -19,30 +19,49 @@ You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the 
 
 <a name="compose-services"></a>
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --build. Setting everything up takes about 5 minutes.
+$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --build. Setting everything up takes about 5 minutes.
 ```
 
 ## Developing ZITADEL
 
-Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers. Setting everything up takes about 15 minutes.
+Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers. Setting everything up takes about 15 minutes. This also initializes data needed by Cypress end-to-end tests. 
 
 <a name="compose-e2e"></a>
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d --build
+$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d --build
 ```
 
-This also initializes data needed by Cypress end-to-end tests. Launch the Cypress test suite from the console directory:
+In the meantime, ensure that you have installed the node and npm versions that are known to work for the test suite:
 
 ```bash
-cd ./console
-./cypress.sh open local_local.env
+$ node --version
+v14.17.6
+
+$ npm --version
+6.14.15
+```
+
+Ater the *e2e-setup* container exited successfully, you are finally ready to launch the Cypress test suite:
+
+```bash
+$ # Change directory to ./console
+$ cd ./console
+
+$ # Install dev dependencies if you haven't done so already
+$ npm install --only development
+
+$ # Run all end-to-end tests
+$ ./cypress.sh open local_local.env
+
+$ # Or open the end-to-end test suite interactively
+$ ./cypress.sh open local_local.env
 ```
 
 You can run any test files except init.ts, as this is already run by the docker compose command shown [above](#compose-e2e) and only passes once.
 
 Make changes to a service as you wish and rebuild and deploy the service using the following command from the project root directory:
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build <compose service>
+$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build <compose service>
 ```
 
 ## FAQ
@@ -62,7 +81,7 @@ Bellow are some errors we faced with apple silicon.
 You can simply restart the database with the following command:
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml restart db
+$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml restart db
 ```
 
 #### API call's block and don't return any response
@@ -70,7 +89,7 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/doc
 The problem is that the database has a connection issues. You can simply restart the database with the following command:
 
 ```bash
-COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml restart db
+$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml restart db
 ```
 
 ### Build Errors
@@ -81,16 +100,16 @@ Make sure to enable `"features": { "buildkit": true }` in your docker settings!
 
 ### Remove the quickstart
 
-```Bash
-docker compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend rm
+```bash
+$ docker compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend rm
 ```
 
 If you are **confident** that you don't need to run the same ZITADEL instance again, go ahead and delete the `.keys` folder and reset the `environment.json` as well.
 
-```Bash
-rm -rf .keys
+```bash
+$ rm -rf .keys
 ```
 
-```Bash
-git reset build/local/environment.json
+```bash
+$ git reset build/local/environment.json
 ```
