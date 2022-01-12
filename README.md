@@ -48,6 +48,7 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 * [Go](https://github.com/caos/zitadel-go) client library
 * [.NET](https://github.com/caos/zitadel-net) client library
 * [Dart](https://github.com/caos/zitadel-dart) client library
+* [Elixir](https://github.com/jshmrtn/zitadel_api) client library (maintained by [jshmrtn]([jshmrtn](https://github.com/jshmrtn)))
 
 ## Help and Documentation
 
