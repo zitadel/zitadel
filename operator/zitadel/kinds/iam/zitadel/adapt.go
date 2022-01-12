@@ -3,6 +3,9 @@ package zitadel
 import (
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/helper"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -11,7 +14,6 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"gopkg.in/yaml.v3"
 	core "k8s.io/api/core/v1"
-	"strconv"
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
@@ -52,17 +54,15 @@ func AdaptFunc(
 
 		desiredKind, err := parseDesiredV0(desired)
 
-		/*
-			_, _, sendAnalytics := mntr.Environment()
-			if sendAnalytics &&
-				desiredKind != nil &&
-				desiredKind.Spec != nil &&
-				desiredKind.Spec.Configuration != nil &&
-				desiredKind.Spec.Configuration.DNS != nil &&
-				desiredKind.Spec.Configuration.DNS.Domain != "" {
-				monitor.SwitchEnvironment(strings.ToLower(strings.ReplaceAll(desiredKind.Spec.Configuration.DNS.Domain, ".", "-")))
-			}
-		*/
+		_, _, sendAnalytics := mntr.Environment()
+		if sendAnalytics &&
+			desiredKind != nil &&
+			desiredKind.Spec != nil &&
+			desiredKind.Spec.Configuration != nil &&
+			desiredKind.Spec.Configuration.DNS != nil &&
+			desiredKind.Spec.Configuration.DNS.Domain != "" {
+			monitor.SwitchEnvironment(strings.ToLower(strings.ReplaceAll(desiredKind.Spec.Configuration.DNS.Domain, ".", "-")))
+		}
 
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
