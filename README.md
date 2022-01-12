@@ -54,7 +54,7 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 
 * [Documentation](https://docs.zitadel.ch)
 * [Say hello](https://zitadel.ch/contact/)
-* [Join our Discord channel](https://discord.gg/Mqprc23v)
+* [Join our Discord channel](https://discord.gg/erh5Brh7jE)
 
 ## How To Contribute
 
