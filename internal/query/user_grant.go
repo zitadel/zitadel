@@ -7,10 +7,11 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type UserGrant struct {
@@ -303,7 +304,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 				&orgDomain,
 
 				&g.ProjectID,
-				&g.ProjectName,
+				&projectName,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
