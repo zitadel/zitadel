@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { ThemeService } from 'src/app/services/theme.service';
 
 @Component({
@@ -6,10 +7,16 @@ import { ThemeService } from 'src/app/services/theme.service';
   templateUrl: './theme-setting.component.html',
   styleUrls: ['./theme-setting.component.scss'],
 })
-export class ThemeSettingComponent {
+export class ThemeSettingComponent implements OnDestroy {
+  public darkTheme: boolean = true;
+  private destroy$: Subject<void> = new Subject();
   constructor(public themeService: ThemeService) {
-    // const theme = localStorage.getItem('theme');
-    // this.isDarkTheme = theme === 'dark-theme' ? true : theme === 'light-theme' ? false : true;
+    themeService.isDarkTheme.pipe(takeUntil(this.destroy$)).subscribe((isDark) => (this.darkTheme = isDark));
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   public change(event: any): void {
@@ -17,5 +24,9 @@ export class ThemeSettingComponent {
       const checked = event.target.checked;
       this.themeService.setDarkTheme(checked);
     }
+  }
+
+  public setTheme(): void {
+    this.themeService.setDarkTheme(!this.darkTheme);
   }
 }

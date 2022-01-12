@@ -55,7 +55,6 @@
 
       .grid-item {
         padding: 1rem;
-        color: map-get($foreground, text);
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -66,6 +65,7 @@
         border-radius: 1rem;
         margin: 0;
         text-decoration: none;
+        color: white;
         box-shadow: 0 0 15px #0000001a;
 
         &.edit-state {

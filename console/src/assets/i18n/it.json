@@ -6,41 +6,19 @@
     "COUNT": "Risultati totali"
   },
   "FOOTER": {
-    "FEATURES": {
-      "TITLE": "Features",
-      "HOSTEDLOGIN": "Hosted Login",
-      "MFA": "Multifactor Authentication",
-      "PASSWORDLESS": "Passwordless",
-      "AUDITTRAIL": "Audit Trail",
-      "IDENTITYBROKERING": "Identity Brokering",
-      "PLATFORM": "Platform APIs",
-      "MACHINE": "Machine Users"
-    },
-    "USECASES": {
-      "TITLE": "Use Cases",
-      "EASY": "Easy Integration",
-      "SELF": "Self service",
-      "EXISTING": "Existing Identities",
-      "SECURE": "Secure Authentication"
-    },
-    "ZITADEL": {
-      "TITLE": "ZITADEL",
-      "PRICING": "Pricing",
-      "TRUST": "Trust",
-      "OPENSOURCE": "Open Source",
-      "QUICKSTARTS": "Quickstarts",
-      "DISCUSSIONS": "Github Discussions"
-    },
     "LINKS": {
-      "TITLE": "Links",
       "CONTACT": "Kontakt",
       "TOS": "Terms of Service",
       "PP": "Privacy Policy"
+    },
+    "THEME": {
+      "DARK": "Scuro",
+      "LIGHT": "Luminoso"
     }
   },
   "HOME": {
     "WELCOME": "Iniziare con ZITADEL",
-    "DISCLAIMER": "Puoi vedere solo le impostazioni della tua attuale organizzazione specificata nel navbar. ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
+    "DISCLAIMER": "ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
     "DISCLAIMERLINK": "Ulteriori informazioni",
     "DOCUMENTATION": {
       "TITLE": "Documentazione",
