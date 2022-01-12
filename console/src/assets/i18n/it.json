@@ -1030,7 +1030,7 @@
       "DESCRIPTION": "Qui puoi definire le applicazioni, gestire i ruoli e concedere ad altre organizzazioni di usare il tuo progetto.",
       "DELETE": "Rimuovi progetto",
       "LIST": "Progetti",
-      "LISTDESCRIPTION": "Qui trovi tutti i progetti che hai il permesso di visualizzare o eseguire azioni. Se non riesci a trovare un progetto, contatta il proprietario del progetto o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
+      "LISTDESCRIPTION": "Se non riesci a trovare il tuo progetto, contatta il proprietario o qualcuno con i diritti corrispondenti per ottenere l'accesso.",
       "DETAIL": "Dettagli",
       "CREATE": "Crea un progetto",
       "CREATE_DESC": "Inserisci il nome del tuo progetto.",

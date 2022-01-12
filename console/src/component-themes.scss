@@ -26,6 +26,7 @@
 @import 'src/app/pages/projects/project-grid/project-grid.component';
 @import 'src/app/app.component.scss';
 @import 'src/app/pages/iam/iam.component.scss';
+@import 'src/app/modules/refresh-table/refresh-table.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
 @import 'src/app/modules/label/label.component.scss';
 @import 'src/app/modules/meta-layout/meta.scss';
@@ -78,6 +79,7 @@
   @include org-detail-theme($theme);
   @include iam-detail-theme($theme);
   @include meta-theme($theme);
+  @include refresh-table-theme($theme);
   @include accounts-card-theme($theme);
   @include info-section-theme($theme);
   @include tier-theme($theme);

@@ -1,48 +1,59 @@
+@use '@angular/material' as mat;
 
-.table-header-row {
-  display: flex;
-  align-items: center;
+@mixin refresh-table-theme($theme) {
+  $foreground: map-get($theme, foreground);
 
-  .row {
+  .refresh-table-header-row {
     display: flex;
+    align-items: center;
 
-    .count {
-      margin-right: .5rem;
-      color: var(--grey);
+    &.border-bottom {
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid map-get($foreground, divider);
     }
 
-    .desc {
-      font-size: 14px;
-      color: var(--grey);
+    .refresh-table-row {
+      display: flex;
+
+      .count {
+        margin-right: 0.5rem;
+        color: var(--grey);
+      }
+
+      .desc {
+        font-size: 14px;
+        color: var(--grey);
+      }
+
+      .slash {
+        margin: 0 0.5rem;
+        color: var(--grey);
+      }
+
+      a {
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 2px;
+      }
     }
 
-    .slash {
-      margin: 0 .5rem;
-      color: var(--grey);
-    }
-
-    a {
-      cursor: pointer;
-      font-size: 14px;
+    .refresh-table-spinner {
       margin-top: 2px;
+      margin-bottom: 1px;
+      margin-right: 1rem;
     }
-  }
 
-  .spinner {
-    margin-top: 2px;
-    margin-bottom: 1px;
-    margin-right: 1rem;
-  }
+    .fill-space {
+      flex: 1;
+    }
 
-  .fill-space {
-    flex: 1;
-  }
+    .refresh-table-icon-button {
+      margin-right: 0.5rem;
 
-  .icon-button {
-    margin-right: .5rem;
-
-    .icon {
-      font-size: 1.2rem;
+      .icon {
+        font-size: 1.2rem;
+      }
     }
   }
 }

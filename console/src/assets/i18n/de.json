@@ -1030,7 +1030,7 @@
       "DESCRIPTION": "Hier kannst Du wichtige Einstellungen prüfen und die Daten einsehen, mit denen das Projekt konfiguriert worden ist.",
       "DELETE": "Projekt löschen",
       "LIST": "Projekte",
-      "LISTDESCRIPTION": "Hier findest Du alle Projekte, für die Du Aktionen anzeigen oder ausführen darfst. Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
+      "LISTDESCRIPTION": "Wenn Du Dein Projekt nicht finden kannst, wende Dich an einen Projektbesitzer oder an jemanden mit den entsprechenden Rechten, um Projektzugriff zu erhalten.",
       "DETAIL": "Details",
       "CREATE": "Projekt erstellen",
       "CREATE_DESC": "Gebe den Namen ein.",

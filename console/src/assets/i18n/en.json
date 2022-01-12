@@ -1030,7 +1030,7 @@
       "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
       "DELETE": "Delete Project",
       "LIST": "Projects",
-      "LISTDESCRIPTION": "Here you can find all projects you are allowed to view or perform actions on. If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
+      "LISTDESCRIPTION": "If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
       "DETAIL": "Detail",
       "CREATE": "Create Project",
       "CREATE_DESC": "Insert your project's name.",

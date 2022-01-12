@@ -1,5 +1,5 @@
-<div class="table-header-row">
-  <div class="row" *ngIf="selection.hasValue(); else leftActions">
+<div class="refresh-table-header-row" [ngClass]="{'border-bottom': showBorder}">
+  <div class="refresh-table-row" *ngIf="selection.hasValue(); else leftActions">
     <div>
       <span class="count">{{selection?.selected?.length}}</span>
       <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
@@ -12,9 +12,9 @@
     <ng-content select="[leftActions]"></ng-content>
   </ng-template>
   <span class="fill-space"></span>
-  <mat-spinner class="spinner" *ngIf="loading" diameter="20"></mat-spinner>
+  <mat-spinner class="refresh-table-spinner" *ngIf="loading" diameter="20"></mat-spinner>
 
-  <button *ngIf="!hideRefresh" mat-icon-button (click)="emitRefresh()" class="icon-button"
+  <button *ngIf="!hideRefresh" mat-icon-button (click)="emitRefresh()" class="refresh-table-icon-button"
     matTooltip="{{'ACTIONS.REFRESH' | translate}}">
     <mat-icon class="icon">refresh</mat-icon>
   </button>
