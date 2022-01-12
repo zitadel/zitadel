@@ -40,7 +40,6 @@
   },
   "HOME": {
     "WELCOME": "Iniziare con ZITADEL",
-    "WELCOMESENTENCE": "Qui puoi trovare le azioni raccomandate in base alle tue ultime autorizzazioni acquisite.",
     "DISCLAIMER": "Puoi vedere solo le impostazioni della tua attuale organizzazione specificata nel navbar. ZITADEL tratta i tuoi dati in modo confidenziale e sicuro.",
     "DISCLAIMERLINK": "Ulteriori informazioni",
     "DOCUMENTATION": {

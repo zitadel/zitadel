@@ -14,12 +14,11 @@
 
     <div class="shortcut-list-row">
       <div cdkDropList [cdkDropListData]="main" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
-        <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
         <ng-container *ngFor="let shortcut of main">
-          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <a [routerLink]="shortcut.routerLink" class="shortcut-box"
-              [ngClass]="{'edit-state': editState && !shortcut.disabled}" cdkDrag [cdkDragDisabled]="shortcut.disabled">
+              [ngClass]="{'edit-state': editState && !shortcut.disabled, 'disabled': editState && shortcut.disabled}"
+              cdkDrag [cdkDragDisabled]="shortcut.disabled">
               <div class="shortcuts-avatar {{shortcut.color}}">
                 <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
                 <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
@@ -35,7 +34,6 @@
         (cdkDropListDropped)="drop($event, 'secondary')">
         <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
         <ng-container *ngFor="let shortcut of secondary">
-          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <a [routerLink]="shortcut.routerLink" class="shortcut-box"
               [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
@@ -54,7 +52,6 @@
       <div cdkDropList [cdkDropListData]="third" class="shortcut-list" (cdkDropListDropped)="drop($event, 'third')">
         <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
         <ng-container *ngFor="let shortcut of third">
-          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <a [routerLink]="shortcut.routerLink" class="shortcut-box"
               [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
@@ -80,7 +77,6 @@
 
       <div cdkDropList [cdkDropListData]="all" class="shortcut-grid" (cdkDropListDropped)="drop($event, '')">
         <ng-container *ngFor="let shortcut of all">
-          <!-- <template [ngTemplateOutlet]="shortcutRef" [ngTemplateOutletContext]="{shortcut: item}"></template> -->
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
             <div class="shortcut-box no-margin edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
               <div class="shortcuts-avatar {{shortcut.color}}">

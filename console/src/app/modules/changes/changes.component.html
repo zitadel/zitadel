@@ -1,8 +1,8 @@
 <div class="change-header">
   <span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
-  <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" (click)="init()" mat-icon-button>
+  <!-- <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" (click)="init()" mat-icon-button>
     <mat-icon class="icon">refresh</mat-icon>
-  </button>
+  </button> -->
 </div>
 
 <div class="scroll-container" [ngClass]="{'maxheight': limitHeight}">
@@ -41,12 +41,11 @@
     <mat-spinner *ngIf="loading | async" diameter="25"></mat-spinner>
   </div>
 
-  <button (click)="more()" class="load-more-button" *ngIf="!bottom" mat-stroked-button color="primary">
+  <button (click)="more()" class="load-more-button" *ngIf="!bottom" mat-stroked-button>
     {{'CHANGES.LOADMORE' | translate}}
   </button>
 
   <div *ngIf="bottom" class="end-container">
     <span>{{'CHANGES.BOTTOM' | translate}}</span>
-    <!-- <button mat-stroked-button color="primary">{{'CHANGES.BOTTOM.LOADMORE' | translate}}</button> -->
   </div>
 </div>

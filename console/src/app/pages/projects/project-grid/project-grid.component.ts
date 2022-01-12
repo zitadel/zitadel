@@ -53,7 +53,7 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
   @Input() public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
   @Output() public emitAddProject: EventEmitter<void> = new EventEmitter();
 
-  public notPinned: Array<Project.AsObject> = [];
+  public notPinned: Array<Project.AsObject | GrantedProject.AsObject> = [];
 
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
@@ -73,15 +73,19 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
     private storage: StorageService,
     private mgmtService: ManagementService,
     private toast: ToastService,
-  ) {
-    this.selection.changed.subscribe((selection) => {
+  ) {}
+
+  public listenForSelectionChanges(): void {
+    this.selection.changed.pipe(takeUntil(this.destroy$)).subscribe((selection) => {
       if (this.projectType$.value === ProjectType.PROJECTTYPE_OWNED) {
         this.setPrefixedItem(
           'pinned-projects',
           JSON.stringify(this.selection.selected.map((item) => (item as Project.AsObject).id)),
         ).then(() => {
           selection.added.forEach((item) => {
-            const index = this.notPinned.findIndex((i) => i.id === (item as Project.AsObject).id);
+            const index = (this.notPinned as Array<Project.AsObject>).findIndex(
+              (i) => i.id === (item as Project.AsObject).id,
+            );
             this.notPinned.splice(index, 1);
           });
           this.notPinned.push(...(selection.removed as Project.AsObject[]));
@@ -89,13 +93,15 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
       } else if (this.projectType$.value === ProjectType.PROJECTTYPE_GRANTED) {
         this.setPrefixedItem(
           'pinned-granted-projects',
-          JSON.stringify(this.selection.selected.map((item) => (item as Project.AsObject).id)),
+          JSON.stringify(this.selection.selected.map((item) => (item as GrantedProject.AsObject).projectId)),
         ).then(() => {
           selection.added.forEach((item) => {
-            const index = this.notPinned.findIndex((i) => i.id === (item as Project.AsObject).id);
+            const index = (this.notPinned as Array<GrantedProject.AsObject>).findIndex(
+              (i) => i.projectId === (item as GrantedProject.AsObject).projectId,
+            );
             this.notPinned.splice(index, 1);
           });
-          this.notPinned.push(...(selection.removed as Project.AsObject[]));
+          this.notPinned.push(...(selection.removed as GrantedProject.AsObject[]));
         });
       }
     });
@@ -170,19 +176,14 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
     }
   }
 
-  public selectItem(item: Project.AsObject, event?: any): void {
-    if (event && !event.target.classList.contains('mat-icon')) {
-      this.router.navigate(['/projects', item.id]);
-    } else if (!event) {
-      this.router.navigate(['/projects', item.id]);
-    }
-  }
-
   public addItem(): void {
     this.emitAddProject.emit();
   }
 
   public reorganizeItems(type: ProjectType): void {
+    this.selection = new SelectionModel<Project.AsObject | GrantedProject.AsObject>(true, []);
+    this.listenForSelectionChanges();
+
     switch (type) {
       case ProjectType.PROJECTTYPE_OWNED:
         this.getPrefixedItem('pinned-projects').then((storageEntry) => {
@@ -195,7 +196,14 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
                 return false;
               }
             });
+
             this.selection.select(...toSelect);
+            // this.selection.clear();
+            // toSelect.forEach((toSel) => {
+            //   if ((this.selection.selected as Project.AsObject[]).findIndex((isSel) => isSel.id === toSel.id) === -1) {
+            //     this.selection.select(toSel);
+            //   }
+            // });
           }
         });
         break;
@@ -210,7 +218,18 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
                 return false;
               }
             });
+
             this.selection.select(...toSelect);
+            // this.selection.clear();
+            // toSelect.forEach((toSel) => {
+            //   if (
+            //     (this.selection.selected as GrantedProject.AsObject[]).findIndex(
+            //       (isSel) => isSel.projectId === toSel.projectId,
+            //     ) === -1
+            //   ) {
+            //     this.selection.select(toSel);
+            //   }
+            // });
           }
         });
         break;
@@ -275,7 +294,7 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
               this.selection.selected.splice(indexSelection, 1);
             }
 
-            const indexPinned = this.notPinned.findIndex((iter) => iter.id === item.id);
+            const indexPinned = (this.notPinned as Array<Project.AsObject>).findIndex((iter) => iter.id === item.id);
             if (indexPinned > -1) {
               this.notPinned.splice(indexPinned, 1);
             }

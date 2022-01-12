@@ -57,15 +57,15 @@
       overflow: hidden;
       display: block;
       padding: 1rem;
-
-      .shortcut-desc {
-        align-self: center;
-        font-size: 14px;
-        color: var(--grey);
-        margin-top: 0;
-        text-align: center;
-      }
     }
+  }
+
+  .shortcut-desc {
+    align-self: center;
+    font-size: 14px;
+    color: var(--grey);
+    margin-top: 0;
+    text-align: center;
   }
 
   .shortcut-grid {
@@ -112,6 +112,10 @@
 
     &.edit-state {
       cursor: move;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
     }
 
     &:first-child {

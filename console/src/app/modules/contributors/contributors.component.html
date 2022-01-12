@@ -1,6 +1,6 @@
 <div class="contributor-groups">
-  <div class="contributor-people" matTooltip="{{ description }}">
-    <div class="contributor-img-list" [@cardAnimation]="totalResult">
+  <div class="contributor-people">
+    <div class="contributor-img-list" [ngClass]="{'padd-left': totalResult > 0}" [@cardAnimation]="totalResult">
       <mat-spinner class="spinner" diameter="20" *ngIf="loading"></mat-spinner>
       <ng-container *ngIf="totalResult < 10; else compact">
         <ng-container *ngFor="let member of membersSubject | async; index as i">
@@ -24,14 +24,9 @@
           <span>{{totalResult}}</span>
         </div>
       </ng-template>
-      <button class="add-img" (click)="emitAddMember()" [disabled]="disabled" mat-icon-button
-        matTooltip="{{'ACTIONS.ADD' | translate}}" aria-label="Edit contributors">
+      <button class="add-img" [ngClass]="{'no-margin': totalResult === 0}" (click)="emitAddMember()"
+        [disabled]="disabled" mat-icon-button aria-label="Add member">
         <mat-icon>add</mat-icon>
-      </button>
-      <span class="fill-space"></span>
-      <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" class="refresh-img" (click)="emitRefresh()" mat-icon-button
-        aria-label="refresh contributors">
-        <mat-icon class="icon">refresh</mat-icon>
       </button>
     </div>
   </div>

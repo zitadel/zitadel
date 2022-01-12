@@ -20,9 +20,12 @@
 
       .contributor-img-list {
         width: 100%;
-        margin-left: 1rem;
         display: flex;
         align-items: center;
+
+        &.padd-left {
+          padding-left: 1rem;
+        }
 
         .spinner {
           margin: -10px 20px -10px -15px;
@@ -30,19 +33,10 @@
 
         .add-img {
           float: left;
-          margin: 0 8px 0 -15px;
-        }
+          margin: 0 0 0 -8px;
 
-        .fill-space {
-          flex: 1;
-        }
-
-        .refresh-img {
-          float: left;
-          margin: 0 0 0 -15px;
-
-          .icon {
-            font-size: 1.2rem;
+          &.no-margin {
+            margin: 0;
           }
         }
 
