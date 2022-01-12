@@ -1,5 +1,5 @@
 ---
-title: Saas Product with Authentication and Authorization
+title: SaaS Product with Authentication and Authorization
 ---
 
 This is an example architecture for a typical SaaS product. 

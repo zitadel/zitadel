@@ -42,7 +42,7 @@ func (c *Commands) addOrgMember(ctx context.Context, orgAgg *eventstore.Aggregat
 	if !member.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-W8m4l", "Errors.Org.MemberInvalid")
 	}
-	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 {
+	if len(domain.CheckForInvalidRoles(member.Roles, domain.OrgRolePrefix, c.zitadelRoles)) > 0 && len(domain.CheckForInvalidRoles(member.Roles, domain.RoleSelfManagementGlobal, c.zitadelRoles)) > 0 {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4N8es", "Errors.Org.MemberInvalid")
 	}
 	err := c.eventstore.FilterToQueryReducer(ctx, addedMember)

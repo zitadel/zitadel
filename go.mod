@@ -37,6 +37,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
 	github.com/jinzhu/gorm v1.9.16
+	github.com/k3a/html2text v1.0.8
 	github.com/kevinburke/twilio-go v0.0.0-20210327194925-1623146bcf73
 	github.com/lib/pq v1.10.4
 	github.com/lucasb-eyer/go-colorful v1.2.0
@@ -44,7 +45,6 @@ require (
 	github.com/minio/minio-go/v7 v7.0.20
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
-	github.com/nsf/jsondiff v0.0.0-20210926074059-1e845ec5d249
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/otp v1.3.0
 	github.com/rakyll/statik v0.1.7

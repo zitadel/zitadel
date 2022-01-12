@@ -157,7 +157,8 @@ func startZitadel(configPaths []string) {
 		logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	}
 
-	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults)
+	keyChan := make(chan interface{})
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
 	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
@@ -189,7 +190,7 @@ func startZitadel(configPaths []string) {
 	}
 
 	verifier := internal_authz.Start(&repo)
-	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store)
+	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store, esQueries, conf.Projections.CRDB, keyChan)
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
 	if *notificationEnabled {
@@ -214,7 +215,7 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage) {
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) {
 	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
 	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
 		roles[i] = role.Role
@@ -236,7 +237,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, es, projections, keyChan)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {
