@@ -18,6 +18,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
+	"github.com/caos/zitadel/internal/repository/usergrant"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
@@ -68,6 +69,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	project.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
 	keypair.RegisterEventMappers(repo.eventstore)
+	usergrant.RegisterEventMappers(repo.eventstore)
 
 	err = projection.Start(ctx, sqlClient, es, projections, defaults, keyChan)
 	if err != nil {
