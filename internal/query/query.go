@@ -41,7 +41,7 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}) (repo *Queries, err error) {
 	sqlClient, err := projections.CRDB.Start()
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
 
-	err = projection.Start(ctx, sqlClient, es, projections, defaults)
+	err = projection.Start(ctx, sqlClient, es, projections, defaults, keyChan)
 	if err != nil {
 		return nil, err
 	}

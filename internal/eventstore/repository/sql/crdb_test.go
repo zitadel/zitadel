@@ -2,11 +2,13 @@ package sql
 
 import (
 	"context"
+	"database/sql"
 	"sync"
 	"testing"
 
-	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 func TestCRDB_placeholder(t *testing.T) {
@@ -928,8 +930,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of same aggregate same resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "500", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -944,8 +946,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate same resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "501", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "502", func(e *repository.Event) { e.ResourceOwner = "caos" }),
+					generateEvent(t, "501", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "502", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -960,8 +962,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "two events of different aggregate different resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "503", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "504", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "503", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "504", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -976,10 +978,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of different aggregate different resource owner",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
+					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "505", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+					generateEvent(t, "506", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -994,10 +996,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of different aggregate different resource owner per event",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = "zitadel" }),
-					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "507", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "zitadel", Valid: true} }),
+					generateEvent(t, "508", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1012,10 +1014,10 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			name: "events of one aggregate different resource owner per event",
 			args: args{
 				events: []*repository.Event{
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "caos" }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
-					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = "ignored" }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "caos", Valid: true} }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
+					generateEvent(t, "509", func(e *repository.Event) { e.ResourceOwner = sql.NullString{String: "ignored", Valid: true} }),
 				},
 			},
 			fields: fields{
@@ -1042,8 +1044,8 @@ func TestCRDB_Push_ResourceOwner(t *testing.T) {
 			}
 
 			for i, event := range tt.args.events {
-				if event.ResourceOwner != tt.res.resourceOwners[i] {
-					t.Errorf("resource owner not expected want: %q got: %q", tt.res.resourceOwners[i], event.ResourceOwner)
+				if event.ResourceOwner.String != tt.res.resourceOwners[i] {
+					t.Errorf("resource owner not expected want: %q got: %q", tt.res.resourceOwners[i], event.ResourceOwner.String)
 				}
 			}
 
@@ -1087,7 +1089,7 @@ func generateEvent(t *testing.T, aggregateID string, opts ...func(*repository.Ev
 		AggregateType: repository.AggregateType(t.Name()),
 		EditorService: "svc",
 		EditorUser:    "user",
-		ResourceOwner: "ro",
+		ResourceOwner: sql.NullString{String: "ro", Valid: true},
 		Type:          "test.created",
 		Version:       "v1",
 	}

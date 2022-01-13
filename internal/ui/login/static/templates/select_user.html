@@ -24,8 +24,10 @@
     <div class="lgn-account-selection">
         {{ if .Users }}
         {{ $displayLoginNameSuffix := and .OrgID (not .DisplayLoginNameSuffix)}}
+        {{ $orgName := .OrgName }}
         {{ range $user := .Users }}
         {{ $sessionState := (printf "SelectAccount.SessionState%v" $user.UserSessionState) }}
+        {{if $user.SelectionPossible}}
         <button type="submit" name="userID" value="{{$user.UserID}}" class="lgn-account" 
         {{if not $user.SelectionPossible}}disabled title="{{t "Errors.User.NotAllowedOrg"}}"{{end}}>
             <div class="left">
@@ -45,6 +47,7 @@
             <span class="fill-space"></span>
             <i class="lgn-icon-angle-right-solid"></i>
         </button>
+        {{ end }}
         {{ end }}
         {{ end }}
         <button type="submit" name="userID" value="0" class="lgn-account">

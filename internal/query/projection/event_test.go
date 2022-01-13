@@ -1,6 +1,7 @@
 package projection
 
 import (
+	"database/sql"
 	"testing"
 	"time"
 
@@ -24,7 +25,7 @@ func testEvent(
 		Data:                          data,
 		Version:                       "v1",
 		AggregateID:                   "agg-id",
-		ResourceOwner:                 "ro-id",
+		ResourceOwner:                 sql.NullString{String: "ro-id", Valid: true},
 		ID:                            "event-id",
 		EditorService:                 "editor-svc",
 		EditorUser:                    "editor-user",

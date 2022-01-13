@@ -1,4 +1,5 @@
-<img src="./docs/static/logos/zitadel-logo-dark@2x.png" alt="Zitadel Logo" height="100px" width="auto" />
+<img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
+<img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Release](https://github.com/caos/zitadel/actions/workflows/zitadel.yml/badge.svg)](https://github.com/caos/zitadel/actions)
@@ -6,7 +7,7 @@
 [![release](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![codecov](https://codecov.io/gh/caos/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
-
+[![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)  
 [![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
 
 ## What Is ZITADEL
@@ -21,27 +22,9 @@ We built **ZITADEL** around the idea that the IAM should be easy to deploy and s
 For example, **ZITADEL** is event sourced but it does not rely on a pub/sub system to function. Instead we built all the functionality right into one binary.
 **ZITADEL** only needs [**Kubernetes**](https://kubernetes.io/) for orchestration and [**CockroachDB**](https://www.cockroachlabs.com/) as storage.
 
-## Features of ZITADEL platform
-
-* Authentication
-  * OpenID Connect 1.0 Protocol (OP)
-  * Username / Password
-  * Machine-to-machine (JWT profile)
-  * Passwordless with FIDO2
-* Multifactor authentication with OTP, U2F
-* Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
-* Authorization via Role Based Access Control (RBAC)
-* Identity Brokering
-* Delegation of roles to other organizations for self-management
-* Strong audit trail for all IAM resources
-* User interface for administration
-* APIs for Management, Administration, and Authentication
-* Policy configuration and enforcement
-* Private Labeling
-
 ## Run ZITADEL anywhere
 
-### Self-Managed
+### Self-hosted
 
 You can run an automatically operated **ZITADEL** instance on a CNCF compliant Kubernetes cluster of your choice:
 
@@ -49,10 +32,10 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 * [GitOps Mode on an existing k8s cluster](https://docs.zitadel.ch/docs/guides/installation/gitops)
 * [GitOps Mode on VM/bare-metal](https://docs.zitadel.ch/docs/guides/installation/managed-dedicated-instance)  using [ORBOS](https://docs.zitadel.ch/docs/guides/installation/orbos)
 
-### CAOS-Managed
+### Software-as-a-Service
 
 * **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
-* **ZITADEL Enterprise:** We operate and support a private instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
+* **ZITADEL Dedicated:** We operate and support a dedicated instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
 ## Start using ZITADEL
 
@@ -65,12 +48,48 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 * [Go](https://github.com/caos/zitadel-go) client library
 * [.NET](https://github.com/caos/zitadel-net) client library
 * [Dart](https://github.com/caos/zitadel-dart) client library
+* [Elixir](https://github.com/jshmrtn/zitadel_api) client library (maintained by [jshmrtn]([jshmrtn](https://github.com/jshmrtn)))
 
 ## Help and Documentation
 
 * [Documentation](https://docs.zitadel.ch)
-* [Ask a question or share ideas](https://github.com/caos/zitadel/discussions)
 * [Say hello](https://zitadel.ch/contact/)
+* [Join our Discord channel](https://discord.gg/erh5Brh7jE)
+
+## How To Contribute
+
+Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
+
+## Security
+
+See the policy [here](./SECURITY.md)
+
+## Features of ZITADEL platform
+
+* Authentication
+  * OpenID Connect 1.0 Protocol (OP)
+  * Username / Password
+  * Machine-to-machine (JWT profile)
+  * Passwordless with FIDO2
+  * Multifactor authentication with OTP, U2F
+  * Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
+  * Identity Brokering
+* Identity & Access Management
+  * B2C, B2B, B2E, M2M identities
+  * Authorization via Role Based Access Control (RBAC)
+  * Delegation of roles to other organizations for self-management
+  * Management roles
+  * User self-service workflows
+  * User register workflow
+* Strong audit trail for all IAM resources
+* Privatelabeling
+  * Custom branding
+  * Custom texts
+  * Hosted login
+  * Personal profile
+* Integration
+  * API-first
+  * Actions for custom code execution
 
 ## Showcase
 
@@ -84,7 +103,6 @@ Use our login widget to allow easy and sucure access to your applications and en
 * easy [enrollment](https://docs.zitadel.ch/docs/manuals/user-factors) of the device during registration
 
 ![passwordless-windows-hello](https://user-images.githubusercontent.com/1366906/118765435-5d419780-b87b-11eb-95bf-55140119c0d8.gif)
-![passwordless-iphone](https://user-images.githubusercontent.com/1366906/118765439-5fa3f180-b87b-11eb-937b-b4acb7854086.gif)
 
 ### Admin Console
 
@@ -99,13 +117,6 @@ Delegate the right to assign roles to another organization
 Customize login and console with your design  
 ![private_labeling](https://user-images.githubusercontent.com/1366906/123089110-d148ff80-d426-11eb-9598-32b506f6d4fd.gif)
 
-## How To Contribute
-
-Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
-
-## Security
-
-See the policy [here](./SECURITY.md)
 
 ## Other CAOS Projects
 
@@ -122,6 +133,7 @@ We try to distinguishing the environments from which events come from. As enviro
 Besides from errors that don't clearly come from misconfiguration or cli misuage, we send an inital event when any binary is started. This is a "<component> invoked" event along with the flags that are passed to it, except secret values of course.
 
 We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
+
 ## License
 
 See the exact licensing terms [here](./LICENSE)
