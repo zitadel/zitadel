@@ -155,6 +155,7 @@ func (o *OPStorage) lockAndGenerateSigningKeyPair(ctx context.Context, algorithm
 	err, ok := <-errs
 	if err != nil || !ok {
 		if errors.IsErrorAlreadyExists(err) {
+			logging.Log("OIDC-dfb42").Info("already locked")
 			return nil
 		}
 		logging.Log("OIDC-Dfg32").OnError(err).Warn("initial lock failed")
