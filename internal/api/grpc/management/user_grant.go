@@ -6,12 +6,16 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
 func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrantByIDRequest) (*mgmt_pb.GetUserGrantByIDResponse, error) {
-	//TODO: resource owner
-	grant, err := s.query.UserGrantByID(ctx, req.GrantId)
+	ownerQuery, err := query.NewUserGrantResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	grant, err := s.query.UserGrantByID(ctx, req.GrantId, ownerQuery)
 	if err != nil {
 		return nil, err
 	}

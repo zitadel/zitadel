@@ -189,16 +189,19 @@ var (
 	}
 )
 
-func (q *Queries) UserGrantByID(ctx context.Context, id string) (*UserGrant, error) {
-	stmt, scan := prepareUserGrantQuery()
-	query, args, err := stmt.Where(sq.Eq{
+func (q *Queries) UserGrantByID(ctx context.Context, id string, queries ...SearchQuery) (*UserGrant, error) {
+	query, scan := prepareUserGrantQuery()
+	for _, q := range queries {
+		query = q.toQuery(query)
+	}
+	stmt, args, err := query.Where(sq.Eq{
 		UserGrantID.identifier(): id,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
 
-	row := q.client.QueryRowContext(ctx, query, args...)
+	row := q.client.QueryRowContext(ctx, stmt, args...)
 	return scan(row)
 }
 
