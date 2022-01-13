@@ -5,7 +5,7 @@
 
 .desc {
   color: var(--grey);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .script {
@@ -14,10 +14,10 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 1rem;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

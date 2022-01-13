@@ -11,7 +11,7 @@
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">
-  <button *ngIf="data.cancelKey" mat-button (click)="closeDialog()">
+  <button *ngIf="data.cancelKey" mat-stroked-button (click)="closeDialog()">
     {{data.cancelKey | translate}}
   </button>
   <span class="fill-space"></span>

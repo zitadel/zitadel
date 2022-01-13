@@ -14,14 +14,14 @@ h1 {
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   button {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }
 
@@ -38,7 +38,7 @@ img {
 .lighter {
   font-size: 12px;
   color: var(--grey);
-  padding: 0 .5rem;
+  padding: 0 0.5rem;
 }
 
 .center {

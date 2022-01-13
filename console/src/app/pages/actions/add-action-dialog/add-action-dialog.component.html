@@ -20,14 +20,14 @@
 
   <mat-checkbox [(ngModel)]="allowedToFail">{{'FLOWS.ALLOWEDTOFAIL' | translate}}</mat-checkbox>
 </div>
-<div mat-dialog-actions class=" action">
+<div mat-dialog-actions class="action">
   <button *ngIf="id" mat-stroked-button color="warn" (click)="deleteAndCloseDialog()">
     {{'ACTIONS.DELETE' | translate}}
   </button>
 
   <span class="fill-space"></span>
 
-  <button mat-button (click)="closeDialog()">
+  <button mat-stroked-button (click)="closeDialog()">
     {{'ACTIONS.CANCEL' | translate}}
   </button>
 

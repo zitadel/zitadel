@@ -1,64 +1,60 @@
-.container {
-  padding: 4rem 4rem 2rem 4rem;
+.abort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
   }
+}
+
+.user-grant-create-content {
+  padding-left: 4.5rem;
 
   .desc {
     color: var(--grey);
   }
-}
 
-.block {
-  display: block;
-}
-
-.btn-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 3rem;
-
-  .small-button {
+  .block {
     display: block;
   }
 
-  .big-button {
+  .btn-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+
+    .small-button {
+      display: block;
+    }
+
+    .big-button {
+      display: block;
+      padding: 0.5rem 4rem;
+    }
+  }
+
+  .sa-icon {
     display: block;
-    padding: .5rem 4rem;
+    width: 32px;
+    margin: 0 0.5rem;
+
+    i {
+      margin: auto;
+    }
   }
-}
 
-.sa-icon {
-  display: block;
-  width: 32px;
-  margin: 0 .5rem;
-
-  i {
-    margin: auto;
+  h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 2rem;
   }
-}
-
-h2 {
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  font-size: 2rem;
 }

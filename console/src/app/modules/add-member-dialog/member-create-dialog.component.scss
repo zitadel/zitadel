@@ -4,7 +4,7 @@
 
 .desc {
   color: var(--grey);
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .full-width {
@@ -13,9 +13,9 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

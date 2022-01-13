@@ -49,7 +49,7 @@
       </ng-container>
 
       <ng-container *ngIf="currentCreateStep === STEPS">
-        <button (click)="previous()" color="primary" mat-button class="small-button">
+        <button (click)="previous()" mat-stroked-button class="small-button">
           {{ 'ACTIONS.BACK' | translate }}
         </button>
         <button color="primary" [disabled]="!org" (click)="addGrant()" mat-raised-button class="big-button"
