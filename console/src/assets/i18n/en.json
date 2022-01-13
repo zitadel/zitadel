@@ -1036,7 +1036,7 @@
           "DESC": "The branding of the organization of the project will be shown, but as soon as the user is identified, the setting of the organization of the identified user, will be shown."
         },
         "DIALOG": {
-          "TITLE": "Privatelabeling Setting",
+          "TITLE": "Branding Setting",
           "DESCRIPTION": "Select the behaviour of the login, when using the project."
         }
       },
