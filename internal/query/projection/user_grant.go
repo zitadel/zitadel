@@ -83,6 +83,10 @@ func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 					Event:  project.ProjectRemovedType,
 					Reduce: p.reduceProjectRemoved,
 				},
+				{
+					Event:  project.GrantRemovedType,
+					Reduce: p.reduceProjectGrantRemoved,
+				},
 			},
 		},
 	}
@@ -224,13 +228,28 @@ func (p *UserGrantProjection) reduceUserRemoved(event eventstore.Event) (*handle
 func (p *UserGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*project.ProjectRemovedEvent); !ok {
 		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bner2a", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bne2a", "reduce.wrong.event.type")
 	}
 
 	return crdb.NewDeleteStatement(
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantProjectID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.GrantRemovedEvent)
+	if !ok {
+		logging.LogWithFields("PROJE-DGfe2", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-dGr2a", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(UserGrantGrantID, e.GrantID),
 		},
 	), nil
 }

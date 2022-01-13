@@ -297,6 +297,33 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "reduceProjectGrantRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.GrantRemovedType),
+					project.AggregateType,
+					[]byte(`{"grantId": "grantID"}`),
+				), project.GrantRemovedEventMapper),
+			},
+			reduce: (&UserGrantProjection{}).reduceProjectGrantRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserGrantProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.user_grants WHERE (grant_id = $1)",
+							expectedArgs: []interface{}{
+								"grantID",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
