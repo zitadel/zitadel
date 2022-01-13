@@ -281,7 +281,7 @@ ExternalNotFoundOption:
   Title: External User
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
-  AutoRegisterButtonText: Auto register
+  AutoRegisterButtonText: register
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS

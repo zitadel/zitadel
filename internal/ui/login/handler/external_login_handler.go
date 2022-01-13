@@ -35,6 +35,7 @@ type externalIDPCallbackData struct {
 }
 
 type externalNotFoundOptionFormData struct {
+	externalRegisterFormData
 	Link         bool `schema:"linkbutton"`
 	AutoRegister bool `schema:"autoregisterbutton"`
 	ResetLinking bool `schema:"resetlinking"`
@@ -43,6 +44,16 @@ type externalNotFoundOptionFormData struct {
 
 type externalNotFoundOptionData struct {
 	baseData
+	externalNotFoundOptionFormData
+	ExternalIDPID              string
+	ExternalIDPUserID          string
+	ExternalIDPUserDisplayName string
+	ShowUsername               bool
+	OrgRegister                bool
+	ExternalEmail              string
+	ExternalEmailVerified      bool
+	ExternalPhone              string
+	ExternalPhoneVerified      bool
 }
 
 func (l *Login) handleExternalLoginStep(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, selectedIDPConfigID string) {
@@ -186,18 +197,38 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		l.renderError(w, r, authReq, err)
 		return
 	}
+
 	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil
 		}
+		iam, err := l.authRepo.GetIAM(r.Context())
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+			return
+		}
+
+		resourceOwner := iam.GlobalOrgID
+
+		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
+			resourceOwner = authReq.RequestedOrgID
+		}
+
+		orgIAMPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+			return
+		}
+
+		human, idpLinking, _ := l.mapExternalUserToLoginUser(orgIAMPolicy, externalUser, idpConfig)
 		if !idpConfig.AutoRegister {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderExternalNotFoundOption(w, r, authReq, iam, orgIAMPolicy, human, idpLinking, err)
 			return
 		}
 		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderExternalNotFoundOption(w, r, authReq, iam, orgIAMPolicy, human, idpLinking, err)
 			return
 		}
 		l.handleAutoRegister(w, r, authReq)
@@ -217,13 +248,65 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
+func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+	if orgIAMPolicy == nil {
+		iam, err = l.authRepo.GetIAM(r.Context())
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+			return
+		}
+		resourceOwner := iam.GlobalOrgID
+
+		if authReq.RequestedOrgID != "" && authReq.RequestedOrgID != iam.GlobalOrgID {
+			resourceOwner = authReq.RequestedOrgID
+		}
+
+		orgIAMPolicy, err = l.getOrgIamPolicy(r, resourceOwner)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+			return
+		}
+
+	}
+
+	if human == nil || externalIDP == nil {
+		idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
+		if err != nil {
+			l.renderExternalNotFoundOption(w, r, authReq, iam, orgIAMPolicy, nil, nil, err)
+			return
+		}
+		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
+		human, externalIDP, _ = l.mapExternalUserToLoginUser(orgIAMPolicy, linkingUser, idpConfig)
+	}
+
 	data := externalNotFoundOptionData{
 		baseData: l.getBaseData(r, authReq, "ExternalNotFoundOption", errID, errMessage),
+		externalNotFoundOptionFormData: externalNotFoundOptionFormData{
+			externalRegisterFormData: externalRegisterFormData{
+				Email:     human.EmailAddress,
+				Username:  human.Username,
+				Firstname: human.FirstName,
+				Lastname:  human.LastName,
+				Nickname:  human.NickName,
+				Language:  human.PreferredLanguage.String(),
+			},
+		},
+		ExternalIDPID:              externalIDP.IDPConfigID,
+		ExternalIDPUserID:          externalIDP.ExternalUserID,
+		ExternalIDPUserDisplayName: externalIDP.DisplayName,
+		ExternalEmail:              human.EmailAddress,
+		ExternalEmailVerified:      human.IsEmailVerified,
+		ShowUsername:               orgIAMPolicy.UserLoginMustBeDomain,
+		OrgRegister:                orgIAMPolicy.UserLoginMustBeDomain,
+	}
+	if human.Phone != nil {
+		data.Phone = human.PhoneNumber
+		data.ExternalPhone = human.PhoneNumber
+		data.ExternalPhoneVerified = human.IsPhoneVerified
 	}
 	translator := l.getTranslator(authReq)
 	l.renderer.RenderTemplate(w, r, translator, l.renderer.Templates[tmplExternalNotFoundOption], data, nil)
@@ -233,7 +316,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 	data := new(externalNotFoundOptionFormData)
 	authReq, err := l.getAuthRequestAndParseData(r, data)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return
 	}
 	if data.Link {
@@ -243,7 +326,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
 		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, err)
+			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		}
 		l.handleLogin(w, r)
 		return
@@ -254,7 +337,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
 	iam, err := l.authRepo.GetIAM(r.Context())
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return
 	}
 
@@ -268,13 +351,13 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return
 	}
 
 	idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, iam, orgIamPolicy, nil, nil, err)
 		return
 	}
 
@@ -287,12 +370,12 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	user, externalIDP, metadata := l.mapExternalUserToLoginUser(orgIamPolicy, linkingUser, idpConfig)
 	user, metadata, err = l.customExternalUserToLoginUserMapping(user, nil, authReq, idpConfig, metadata, resourceOwner)
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, iam, orgIamPolicy, nil, nil, err)
 		return
 	}
 	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
 	if err != nil {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, iam, orgIamPolicy, user, externalIDP, err)
 		return
 	}
 	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
