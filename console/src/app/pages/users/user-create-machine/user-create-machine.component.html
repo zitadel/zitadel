@@ -1,34 +1,44 @@
-<cnsl-detail-layout [backRouterLink]="[ '/users/list/machines']" title="{{ 'USER.CREATE.TITLE' | translate }}"
-  description="{{ 'USER.CREATE.DESCRIPTION' | translate }}">
-  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+<div class="max-width-container">
+  <div class="enlarged-container">
+    <div class="abort-container">
+      <a [routerLink]="[ '/users']" mat-icon-button>
+        <mat-icon>close</mat-icon>
+      </a>
+      <h1 class="abort">{{ 'USER.CREATE.TITLE' | translate }}</h1><span class="abort-2">Step
+        1 of 1</span>
+    </div>
+    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-  <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
-    <div class="content">
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}*</cnsl-label>
-        <input cnslInput formControlName="userName" required />
-        <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-        <span cnslError *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
-          {{ 'USER.VALIDATION.NOEMAIL' | translate }}
-        </span>
-      </cnsl-form-field>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}*</cnsl-label>
-        <input cnslInput formControlName="name" required />
-        <span cnslError *ngIf="name?.invalid && name?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</cnsl-label>
-        <input cnslInput formControlName="description" />
-      </cnsl-form-field>
+    <div class="machine-create-main-content">
+      <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="machine-create-form">
+        <div class="machine-create-content">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.USERNAME' | translate }}*</cnsl-label>
+            <input cnslInput formControlName="userName" required />
+            <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+            <span cnslError *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
+              {{ 'USER.VALIDATION.NOEMAIL' | translate }}
+            </span>
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.NAME' | translate }}*</cnsl-label>
+            <input cnslInput formControlName="name" required />
+            <span cnslError *ngIf="name?.invalid && name?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.MACHINE.DESCRIPTION' | translate }}</cnsl-label>
+            <input cnslInput formControlName="description" />
+          </cnsl-form-field>
+        </div>
+        <div class="machine-btn-container">
+          <button color="primary" [disabled]="userForm.invalid" type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+            translate }}</button>
+        </div>
+      </form>
     </div>
-    <div class="btn-container">
-      <button color="primary" [disabled]="userForm.invalid" type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
-        translate }}</button>
-    </div>
-  </form>
-</cnsl-detail-layout>
+  </div>
+</div>

@@ -2,170 +2,167 @@ h1 {
   font-weight: 500;
 }
 
-.container {
-  padding: 4rem 4rem 2rem 4rem;
+.abort-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
 
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
+  .abort {
+    font-size: 1.2rem;
+    margin-left: 2rem;
   }
 
-  .abort-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    .abort {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-    }
-
-    .abort-2 {
-      font-size: 1.2rem;
-      margin-left: 2rem;
-      white-space: nowrap;
-    }
+  .abort-2 {
+    font-size: 1.2rem;
+    margin-left: 2rem;
+    white-space: nowrap;
   }
+}
+
+.org-create-main-content {
+  padding-left: 4.5rem;
+  max-width: 35rem;
 
   .content {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    margin: 0 -.5rem;
+    margin: 0 -0.5rem;
 
     .formfield {
       flex: 1 1 33%;
-      margin: 0 .5rem;
+      margin: 0 0.5rem;
     }
   }
 
   .desc {
     color: var(--grey);
-    font-size: .9rem;
+    font-size: 0.9rem;
     margin: 1rem 0;
   }
-}
 
-.margin-right {
-  margin-right: .5rem;
-}
+  .margin-right {
+    margin-right: 0.5rem;
+  }
 
-.user {
-  flex: 1;
+  .user {
+    flex: 1;
 
-  .head {
+    .head {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #ffffff20;
+      flex-wrap: wrap;
+
+      a {
+        display: block;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .desc {
+        width: 100%;
+        display: block;
+        font-size: 0.9rem;
+        color: var(--grey);
+      }
+    }
+
+    .form {
+      padding-top: 1rem;
+
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+
+        .continue-button {
+          margin-top: 3rem;
+          display: block;
+          padding: 0.5rem 4rem;
+        }
+      }
+
+      .content {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin: 0 -0.5rem;
+
+        .section {
+          padding: 0.5rem;
+          flex-basis: 100%;
+          color: var(--grey);
+          font-size: 0.9rem;
+        }
+
+        &.nowrap {
+          flex-wrap: nowrap;
+        }
+
+        .formfield {
+          flex: 1 0 33%;
+          margin: 0 0.5rem;
+        }
+      }
+
+      .pwd-form {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        .pwd {
+          flex: 1;
+          margin: 0 0.5rem;
+        }
+      }
+    }
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+
+    .formfield {
+      width: 400px;
+
+      input {
+        font-size: 1.5rem;
+      }
+
+      &.autocomplete {
+        margin-top: 1rem;
+      }
+    }
+  }
+
+  .btn-container {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #ffffff20;
-    flex-wrap: wrap;
+    margin-top: 3rem;
 
-    a {
+    .small-button {
       display: block;
     }
 
-    h1 {
-      font-size: 2rem;
+    .fill-space {
+      flex: 1;
     }
 
-    .desc {
-      width: 100%;
+    .big-button {
       display: block;
-      font-size: .9rem;
-      color: var(--grey);
+      padding: 0.5rem 4rem;
     }
   }
 
-  .form {
-    padding-top: 1rem;
-
-    .btn-container {
-      display: flex;
-      justify-content: flex-end;
-
-      .continue-button {
-        margin-top: 3rem;
-        display: block;
-        padding: .5rem 4rem;
-      }
-    }
-
-    .content {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      margin: 0 -.5rem;
-
-      .section {
-        padding: .5rem;
-        flex-basis: 100%;
-        color: var(--grey);
-        font-size: .9rem;
-      }
-
-      &.nowrap {
-        flex-wrap: nowrap;
-      }
-
-      .formfield {
-        flex: 1 0 33%;
-        margin: 0 .5rem;
-      }
-    }
-
-    .pwd-form {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-
-      .pwd {
-        flex: 1;
-        margin: 0 .5rem;
-      }
-    }
-  }
-}
-
-.column {
-  display: flex;
-  flex-direction: column;
-
-  .formfield {
-    width: 400px;
-
-    input {
-      font-size: 1.5rem;
-    }
-
-    &.autocomplete {
-      margin-top: 1rem;
-    }
-  }
-}
-
-.btn-container {
-  display: flex;
-  align-items: center;
-  margin-top: 3rem;
-
-  .small-button {
-    display: block;
+  .checkbox {
+    flex-basis: 100%;
+    margin: 0.5rem;
   }
 
-  .fill-space {
-    flex: 1;
+  .complexity-view {
+    width: 100%;
+    margin: 0 0.5rem;
   }
-
-  .big-button {
-    display: block;
-    padding: .5rem 4rem;
-  }
-}
-
-.checkbox {
-  flex-basis: 100%;
-  margin: .5rem;
-}
-
-.complexity-view {
-  width: 100%;
-  margin: 0 .5rem;
 }

@@ -16,11 +16,11 @@
     </button>
   </div>
 
-  <button mat-button class="show-all" [routerLink]="[ '/org/overview' ]">{{'MENU.SHOWORGS' |
+  <button mat-button class="show-all" [routerLink]="[ '/org/overview' ]" (click)="closedCard.emit()">{{'MENU.SHOWORGS' |
     translate}}</button>
 
   <ng-template cnslHasRole [hasRole]="['org.create','iam.write']">
-    <button mat-button [routerLink]="[ '/org/create' ]">
+    <button mat-button [routerLink]="[ '/org/create' ]" (click)="closedCard.emit()">
       <mat-icon class="avatar">add</mat-icon>
       {{'MENU.NEWORG' | translate}}
     </button>

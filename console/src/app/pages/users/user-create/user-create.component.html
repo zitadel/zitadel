@@ -1,137 +1,148 @@
-<cnsl-detail-layout [backRouterLink]="[ '/users']" title="{{ 'USER.CREATE.TITLE' | translate }}"
-  description="{{ 'USER.CREATE.DESCRIPTION' | translate }}">
-  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
-
-  <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="form">
-    <div class="content">
-      <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}*</cnsl-label>
-        <input cnslInput matRipple formControlName="email" required />
-        <span cnslError *ngIf="email?.invalid && !email?.errors?.required">
-          {{ 'USER.VALIDATION.NOTANEMAIL' | translate }}
-        </span>
-        <span cnslError *ngIf="email?.invalid && email?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}*</cnsl-label>
-        <input cnslInput formControlName="userName" required
-          [ngStyle]="{'padding-right': suffixPadding ? suffixPadding : '10px'}" />
-        <span #suffix *ngIf="envSuffixLabel" cnslSuffix>{{envSuffixLabel}}</span>
-
-        <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-        <span cnslError *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
-          {{ 'USER.VALIDATION.NOEMAIL' | translate }}
-        </span>
-      </cnsl-form-field>
+<div class="max-width-container">
+  <div class="enlarged-container">
+    <div class="abort-container">
+      <a [routerLink]="[ '/users']" mat-icon-button>
+        <mat-icon>close</mat-icon>
+      </a>
+      <h1 class="abort">{{ 'USER.CREATE.TITLE' | translate }}</h1><span class="abort-2">Step
+        1 of 1</span>
     </div>
-    <div class="content">
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}*</cnsl-label>
-        <input cnslInput formControlName="firstName" required />
-        <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}*</cnsl-label>
-        <input cnslInput formControlName="lastName" required />
-        <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
-        <input cnslInput formControlName="nickName" />
-        <span cnslError *ngIf="nickName?.invalid && nickName?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
 
-      <div class="email-is-verified">
-        <mat-checkbox class="block-checkbox" formControlName="isVerified">
-          {{'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate}}
-        </mat-checkbox>
-        <mat-checkbox class="block-checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}">
-          {{'ORG.PAGES.USEPASSWORD' | translate}}
-        </mat-checkbox>
-        <cnsl-info-section class="full-width desc">
-          <span>{{'USER.CREATE.INITMAILDESCRIPTION' | translate}}</span>
-        </cnsl-info-section>
-      </div>
+    <div class="user-create-main-content">
+      <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
 
-      <div class="pwd-section" *ngIf="usePassword && pwdForm">
-        <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy" [password]="password">
-        </cnsl-password-complexity-view>
-
-        <form [formGroup]="pwdForm" class="user-create-pwd-form">
-          <cnsl-form-field class="pwd-field" *ngIf="password" appearance="outline">
-            <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
-            <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
-
-            <span cnslError *ngIf="password?.errors?.required">
+      <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="user-create-form">
+        <div class="user-create-content">
+          <p class="user-create-section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}*</cnsl-label>
+            <input cnslInput matRipple formControlName="email" required />
+            <span cnslError *ngIf="email?.invalid && !email?.errors?.required">
+              {{ 'USER.VALIDATION.NOTANEMAIL' | translate }}
+            </span>
+            <span cnslError *ngIf="email?.invalid && email?.errors?.required">
               {{ 'USER.VALIDATION.REQUIRED' | translate }}
             </span>
-
           </cnsl-form-field>
-          <cnsl-form-field class="pwd-field" *ngIf="confirmPassword" appearance="outline">
-            <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
-            <input cnslInput autocomplete="off" name="confirmPassword" formControlName="confirmPassword"
-              type="password" />
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}*</cnsl-label>
+            <input cnslInput formControlName="userName" required
+              [ngStyle]="{'padding-right': suffixPadding ? suffixPadding : '10px'}" />
+            <span #suffix *ngIf="envSuffixLabel" cnslSuffix>{{envSuffixLabel}}</span>
 
-            <span cnslError *ngIf="confirmPassword?.errors?.required">
+            <span cnslError *ngIf="userName?.invalid && userName?.errors?.required">
               {{ 'USER.VALIDATION.REQUIRED' | translate }}
             </span>
-            <span cnslError *ngIf="confirmPassword?.errors?.notequal">
-              {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+            <span cnslError *ngIf="userName?.invalid && userName?.errors?.noEmailValidator">
+              {{ 'USER.VALIDATION.NOEMAIL' | translate }}
             </span>
           </cnsl-form-field>
-        </form>
-      </div>
+        </div>
+        <div class="user-create-content">
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.FIRSTNAME' | translate }}*</cnsl-label>
+            <input cnslInput formControlName="firstName" required />
+            <span cnslError *ngIf="firstName?.invalid && firstName?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.LASTNAME' | translate }}*</cnsl-label>
+            <input cnslInput formControlName="lastName" required />
+            <span cnslError *ngIf="lastName?.invalid && lastName?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.NICKNAME' | translate }}</cnsl-label>
+            <input cnslInput formControlName="nickName" />
+            <span cnslError *ngIf="nickName?.invalid && nickName?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+          </cnsl-form-field>
 
-      <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
+          <div class="email-is-verified">
+            <mat-checkbox class="block-checkbox" formControlName="isVerified">
+              {{'USER.LOGINMETHODS.EMAIL.ISVERIFIED' | translate}}
+            </mat-checkbox>
+            <mat-checkbox class="block-checkbox" [(ngModel)]="usePassword" [ngModelOptions]="{standalone: true}">
+              {{'ORG.PAGES.USEPASSWORD' | translate}}
+            </mat-checkbox>
+            <cnsl-info-section class="full-width desc">
+              <span>{{'USER.CREATE.INITMAILDESCRIPTION' | translate}}</span>
+            </cnsl-info-section>
+          </div>
 
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.GENDER' | translate }}</cnsl-label>
-        <mat-select formControlName="gender">
-          <mat-option *ngFor="let gender of genders" [value]="gender">
-            {{ 'GENDERS.'+gender | translate }}
-          </mat-option>
-        </mat-select>
-        <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
-        <mat-select formControlName="preferredLanguage">
-          <mat-option *ngFor="let language of languages" [value]="language">
-            {{ 'LANGUAGES.'+language | translate }}
-          </mat-option>
-          <span cnslError *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
-            {{ 'USER.VALIDATION.REQUIRED' | translate }}
-          </span>
-        </mat-select>
-      </cnsl-form-field>
+          <div class="pwd-section" *ngIf="usePassword && pwdForm">
+            <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy" [password]="password">
+            </cnsl-password-complexity-view>
 
-      <p class="section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
+            <form [formGroup]="pwdForm" class="user-create-pwd-form">
+              <cnsl-form-field class="pwd-field" *ngIf="password" appearance="outline">
+                <cnsl-label>{{ 'USER.PASSWORD.NEWINITIAL' | translate }}</cnsl-label>
+                <input cnslInput autocomplete="off" name="firstpassword" formControlName="password" type="password" />
 
-      <cnsl-form-field class="formfield">
-        <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
-        <input cnslInput formControlName="phone" />
-        <span cnslError *ngIf="phone?.invalid && phone?.errors?.required">
-          {{ 'USER.VALIDATION.REQUIRED' | translate }}
-        </span>
-      </cnsl-form-field>
+                <span cnslError *ngIf="password?.errors?.required">
+                  {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </span>
+
+              </cnsl-form-field>
+              <cnsl-form-field class="pwd-field" *ngIf="confirmPassword" appearance="outline">
+                <cnsl-label>{{ 'USER.PASSWORD.CONFIRMINITIAL' | translate }}</cnsl-label>
+                <input cnslInput autocomplete="off" name="confirmPassword" formControlName="confirmPassword"
+                  type="password" />
+
+                <span cnslError *ngIf="confirmPassword?.errors?.required">
+                  {{ 'USER.VALIDATION.REQUIRED' | translate }}
+                </span>
+                <span cnslError *ngIf="confirmPassword?.errors?.notequal">
+                  {{ 'USER.PASSWORD.NOTEQUAL' | translate }}
+                </span>
+              </cnsl-form-field>
+            </form>
+          </div>
+
+          <p class="user-create-section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.GENDER' | translate }}</cnsl-label>
+            <mat-select formControlName="gender">
+              <mat-option *ngFor="let gender of genders" [value]="gender">
+                {{ 'GENDERS.'+gender | translate }}
+              </mat-option>
+            </mat-select>
+            <span cnslError *ngIf="gender?.invalid && gender?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+          </cnsl-form-field>
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.PREFERRED_LANGUAGE' | translate }}</cnsl-label>
+            <mat-select formControlName="preferredLanguage">
+              <mat-option *ngFor="let language of languages" [value]="language">
+                {{ 'LANGUAGES.'+language | translate }}
+              </mat-option>
+              <span cnslError *ngIf="preferredLanguage?.invalid && preferredLanguage?.errors?.required">
+                {{ 'USER.VALIDATION.REQUIRED' | translate }}
+              </span>
+            </mat-select>
+          </cnsl-form-field>
+
+          <p class="user-create-section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
+
+          <cnsl-form-field class="formfield">
+            <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>
+            <input cnslInput formControlName="phone" />
+            <span cnslError *ngIf="phone?.invalid && phone?.errors?.required">
+              {{ 'USER.VALIDATION.REQUIRED' | translate }}
+            </span>
+          </cnsl-form-field>
+        </div>
+        <div class="user-create-btn-container">
+          <button color="primary" [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)"
+            type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+            translate }}</button>
+        </div>
+      </form>
     </div>
-    <div class="btn-container">
-      <button color="primary" [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)" type="submit"
-        mat-raised-button>{{ 'ACTIONS.CREATE' |
-        translate }}</button>
-    </div>
-  </form>
-</cnsl-detail-layout>
+  </div>
+</div>

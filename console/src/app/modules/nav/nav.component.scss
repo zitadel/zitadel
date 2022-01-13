@@ -56,13 +56,13 @@
           align-items: center;
           font-size: 14px;
           line-height: 14px;
-          padding: 0.4rem 1rem;
+          padding: 0.4rem 12px;
           color: mat.get-color-from-palette($foreground, text) !important;
           transition: all 0.2s ease;
           text-decoration: none;
           border-radius: 50vw;
           font-weight: 500;
-          margin: 0.25rem 0;
+          margin: 0.25rem 2px;
 
           .c_label {
             display: flex;
