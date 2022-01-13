@@ -18,6 +18,7 @@ import (
 type KeyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
+	keyChan             chan<- interface{}
 }
 
 const (
@@ -26,11 +27,12 @@ const (
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 )
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig) (_ *KeyProjection, err error) {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
 	p := &KeyProjection{}
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	p.keyChan = keyChan
 	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig.EncryptionConfig)
 	if err != nil {
 		return nil, err
@@ -103,6 +105,9 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
 		))
+		if p.keyChan != nil {
+			p.keyChan <- true
+		}
 	}
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
