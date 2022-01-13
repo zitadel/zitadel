@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin table-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
@@ -13,7 +12,15 @@
     background-color: inherit !important;
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
-  /* stylelint-enable */
+
+  .table-wrapper {
+    overflow: auto;
+
+    .table,
+    .paginator {
+      width: 100%;
+    }
+  }
 
   th {
     text-transform: uppercase;

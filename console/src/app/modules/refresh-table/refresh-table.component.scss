@@ -18,17 +18,15 @@
 
       .count {
         margin-right: 0.5rem;
-        color: var(--grey);
       }
 
-      .desc {
+      .count-desc {
         font-size: 14px;
-        color: var(--grey);
       }
 
-      .slash {
+      .count-slash {
         margin: 0 0.5rem;
-        color: var(--grey);
+        opacity: 0.8;
       }
 
       a {

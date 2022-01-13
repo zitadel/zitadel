@@ -34,46 +34,37 @@
   }
 }
 
-.table-wrapper {
-  overflow: auto;
+th {
+  .search-button {
+    visibility: hidden;
+    width: 30px;
 
-  .table,
-  .paginator {
-    width: 100%;
-
-    th {
-      .search-button {
-        visibility: hidden;
-        width: 30px;
-
-        .icon {
-          font-size: 1.2rem;
-        }
-      }
-
-      &:hover,
-      &.search-active {
-        .search-button {
-          visibility: visible;
-        }
-      }
+    .icon {
+      font-size: 1.2rem;
     }
+  }
 
-    tr {
-      .dlt-button {
-        visibility: hidden;
-        transition: color 0.2s ease;
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
+    }
+  }
+}
 
-        &:not(:hover) {
-          color: var(--grey);
-        }
-      }
+tr {
+  .dlt-button {
+    visibility: hidden;
+    transition: color 0.2s ease;
 
-      &:hover {
-        .dlt-button {
-          visibility: visible;
-        }
-      }
+    &:not(:hover) {
+      color: var(--grey);
+    }
+  }
+
+  &:hover {
+    .dlt-button {
+      visibility: visible;
     }
   }
 }

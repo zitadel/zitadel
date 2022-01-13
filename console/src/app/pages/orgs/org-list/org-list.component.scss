@@ -6,13 +6,8 @@ h1 {
   color: var(--grey);
 }
 
-.table,
-.paginator {
-  width: 100%;
-
-  td {
-    cursor: pointer;
-  }
+td {
+  cursor: pointer;
 }
 
 .pointer {

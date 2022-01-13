@@ -1,13 +1,9 @@
-.paginator {
+.paginator-wrapper {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  flex-direction: column;
-  padding-top: .5rem;
+  padding-top: 0.5rem;
   padding-bottom: 1rem;
-
-  @media only screen and (min-width: 500px) {
-    flex-direction: row;
-  }
 
   .col {
     p {
@@ -16,6 +12,7 @@
 
     .length {
       font-size: 14px;
+      white-space: nowrap;
     }
 
     .ts {
@@ -30,17 +27,18 @@
 
   .pos {
     font-size: 12px;
-    margin: .5rem 1rem .5rem 1rem;
+    margin: 0.5rem 1rem 0.5rem 1rem;
     color: var(--grey);
+    white-space: nowrap;
   }
 
   .size {
     transform: translateY(1px);
-    margin-right: .5rem;
+    margin-right: 0.5rem;
   }
 
   button {
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
   }
 
   :last-child {

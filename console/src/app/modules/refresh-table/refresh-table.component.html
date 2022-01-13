@@ -2,10 +2,10 @@
   <div class="refresh-table-row" *ngIf="selection.hasValue(); else leftActions">
     <div>
       <span class="count">{{selection?.selected?.length}}</span>
-      <span class="desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
+      <span class="count-desc">{{'ORG_DETAIL.TABLE.SELECTION' | translate}}</span>
     </div>
 
-    <span class="slash">|</span>
+    <span class="count-slash">|</span>
     <a (click)="selection.clear()">{{'ORG_DETAIL.TABLE.CLEAR' | translate}}</a>
   </div>
   <ng-template #leftActions>

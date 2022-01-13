@@ -14,34 +14,24 @@
   .project-grants {
     padding-top: 2rem;
 
-    .table-wrapper {
-      overflow: auto;
+    .role {
+      display: inline-block;
+      border-radius: 0.5rem;
+      border: 1px solid #ffffff30;
+      padding: 0.5rem 1rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+      margin-left: 0;
+      margin-right: 0.5rem;
+      cursor: pointer;
+    }
 
-      .table,
-      .paginator {
-        width: 100%;
-        background-color: #2d2e30;
+    tr {
+      outline: none;
+    }
 
-        .role {
-          display: inline-block;
-          border-radius: 0.5rem;
-          border: 1px solid #ffffff30;
-          padding: 0.5rem 1rem;
-          margin-top: 0.25rem;
-          margin-bottom: 0.25rem;
-          margin-left: 0;
-          margin-right: 0.5rem;
-          cursor: pointer;
-        }
-
-        tr {
-          outline: none;
-        }
-
-        tr.detail-row {
-          height: 0;
-        }
-      }
+    tr.detail-row {
+      height: 0;
     }
 
     .pointer {

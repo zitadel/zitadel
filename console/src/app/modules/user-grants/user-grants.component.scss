@@ -34,35 +34,25 @@
   }
 }
 
-.table-wrapper {
-  overflow: auto;
+.user {
+  text-decoration: none;
+  color: inherit;
+}
 
-  .table,
-  .paginator {
-    width: 100%;
-    overflow-x: auto;
+th {
+  .search-button {
+    visibility: hidden;
+    width: 30px;
 
-    .user {
-      text-decoration: none;
-      color: inherit;
+    .icon {
+      font-size: 1.2rem;
     }
+  }
 
-    th {
-      .search-button {
-        visibility: hidden;
-        width: 30px;
-
-        .icon {
-          font-size: 1.2rem;
-        }
-      }
-
-      &:hover,
-      &.search-active {
-        .search-button {
-          visibility: visible;
-        }
-      }
+  &:hover,
+  &.search-active {
+    .search-button {
+      visibility: visible;
     }
   }
 }

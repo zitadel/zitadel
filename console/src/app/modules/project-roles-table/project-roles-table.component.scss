@@ -2,28 +2,18 @@
   margin-right: 0.5rem;
 }
 
-.table-wrapper {
-  overflow: auto;
+.action {
+  width: 40px;
+}
 
-  .table,
-  .paginator {
-    width: 100%;
-    background-color: #2d2e30;
+.margin-neg {
+  margin-left: -1rem;
+}
 
-    .action {
-      width: 40px;
-    }
-
-    .margin-neg {
-      margin-left: -1rem;
-    }
-
-    .role {
-      display: inline-block;
-      margin: 0.25rem;
-      cursor: pointer;
-    }
-  }
+.role {
+  display: inline-block;
+  margin: 0.25rem;
+  cursor: pointer;
 }
 
 .pointer {
