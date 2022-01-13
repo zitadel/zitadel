@@ -10,6 +10,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
+	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
 )
 
@@ -235,6 +237,60 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 								domain.UserGrantStateActive,
 								uint64(15),
 								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserRemovedType),
+					user.AggregateType,
+					nil,
+				), user.UserRemovedEventMapper),
+			},
+			reduce: (&UserGrantProjection{}).reduceUserRemoved,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserGrantProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.user_grants WHERE (user_id = $1)",
+							expectedArgs: []interface{}{
+								anyArg{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceProjectRemoved",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(project.ProjectRemovedType),
+					project.AggregateType,
+					nil,
+				), project.ProjectRemovedEventMapper),
+			},
+			reduce: (&UserGrantProjection{}).reduceProjectRemoved,
+			want: wantReduce{
+				aggregateType:    project.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserGrantProjectionTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "DELETE FROM zitadel.projections.user_grants WHERE (project_id = $1)",
+							expectedArgs: []interface{}{
+								anyArg{},
 							},
 						},
 					},
