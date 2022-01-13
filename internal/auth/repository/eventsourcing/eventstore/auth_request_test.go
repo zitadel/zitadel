@@ -401,12 +401,6 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 							SelectionPossible: true,
 							ResourceOwner:     "orgID1",
 						},
-						{
-							UserID:            "id2",
-							LoginName:         "loginname2",
-							SelectionPossible: false,
-							ResourceOwner:     "orgID2",
-						},
 					},
 				}},
 			nil,

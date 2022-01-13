@@ -74,4 +74,4 @@ Performance SLO | up to [rate limits](https://docs.zitadel.ch/docs/legal/rate-li
 
 ### Backup
 
-ZITADEL Cloud creates hourly backups. We do not guarantee recovery time objective. Recovery point objective is in the context of our [event-sourcing pattern](/docs/concepts/general/eventstore) not meaningful.
+ZITADEL Cloud creates hourly backups. We do not guarantee recovery time objective. Recovery point objective is in the context of our [event-sourcing pattern](../concepts/eventstore) not meaningful.

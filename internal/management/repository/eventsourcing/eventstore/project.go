@@ -10,18 +10,13 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
-	"github.com/caos/zitadel/internal/project/repository/view/model"
+	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
 	usr_es_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -34,38 +29,7 @@ type ProjectRepo struct {
 	Roles           []string
 	IAMID           string
 	PrefixAvatarURL string
-}
-
-func (repo *ProjectRepo) ProjectMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectMemberView, error) {
-	member, err := repo.View.ProjectMemberByIDs(projectID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ProjectMemberToModel(member, repo.PrefixAvatarURL), nil
-}
-
-func (repo *ProjectRepo) SearchProjectMembers(ctx context.Context, request *proj_model.ProjectMemberSearchRequest) (*proj_model.ProjectMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestProjectMemberSequence()
-	logging.Log("EVENT-3dgt6").OnError(sequenceErr).Warn("could not read latest project member sequence")
-	members, count, err := repo.View.SearchProjectMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &proj_model.ProjectMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: uint64(count),
-		Result:      model.ProjectMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
+	Query           *query.Queries
 }
 
 func (repo *ProjectRepo) ProjectChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*proj_model.ProjectChanges, error) {
@@ -114,40 +78,8 @@ func (repo *ProjectRepo) ApplicationChanges(ctx context.Context, projectID strin
 	return changes, nil
 }
 
-func (repo *ProjectRepo) ProjectGrantMemberByID(ctx context.Context, projectID, userID string) (*proj_model.ProjectGrantMemberView, error) {
-	member, err := repo.View.ProjectGrantMemberByIDs(projectID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ProjectGrantMemberToModel(member, repo.PrefixAvatarURL), nil
-}
-
-func (repo *ProjectRepo) SearchProjectGrantMembers(ctx context.Context, request *proj_model.ProjectGrantMemberSearchRequest) (*proj_model.ProjectGrantMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestProjectGrantMemberSequence()
-	logging.Log("EVENT-Du8sk").OnError(sequenceErr).Warn("could not read latest project grant sequence")
-	members, count, err := repo.View.SearchProjectGrantMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &proj_model.ProjectGrantMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: uint64(count),
-		Result:      model.ProjectGrantMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
 func (repo *ProjectRepo) GetProjectMemberRoles(ctx context.Context) ([]string, error) {
-	iam, err := repo.GetIAMByID(ctx)
+	iam, err := repo.Query.IAMByID(ctx, repo.IAMID)
 	if err != nil {
 		return nil, err
 	}
@@ -310,21 +242,4 @@ func (repo *ProjectRepo) getApplicationChanges(ctx context.Context, projectID st
 		Changes:      result,
 		LastSequence: lastSequence,
 	}, nil
-}
-
-func (u *ProjectRepo) GetIAMByID(ctx context.Context) (*iam_model.IAM, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
-	if err != nil {
-		return nil, err
-	}
-	iam := &iam_es_model.IAM{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: domain.IAMID,
-		},
-	}
-	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
-	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
-		return nil, err
-	}
-	return iam_es_model.IAMToModel(iam), nil
 }

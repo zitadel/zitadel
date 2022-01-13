@@ -48,6 +48,10 @@ func NewOrgDomainOrgIDSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(OrgDomainOrgIDCol, value, TextEquals)
 }
 
+func NewOrgDomainVerifiedSearchQuery(verified bool) (SearchQuery, error) {
+	return NewBoolQuery(OrgDomainIsVerifiedCol, verified)
+}
+
 func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries) (domains *Domains, err error) {
 	query, scan := prepareDomainsQuery()
 	stmt, args, err := queries.toQuery(query).ToSql()

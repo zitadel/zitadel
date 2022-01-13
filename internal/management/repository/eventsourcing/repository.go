@@ -73,7 +73,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 			NotificationTranslationFileContents: make(map[string][]byte),
 			Query:                               queries,
 		},
-		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI},
+		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI, queries},
 		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},
 		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
 		view:          view,

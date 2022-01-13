@@ -78,6 +78,10 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 			wm.Primary = e.Domain == wm.Domain
 		case *org.DomainRemovedEvent:
 			wm.State = domain.OrgDomainStateRemoved
+			wm.Verified = false
+			wm.Primary = false
+			wm.ValidationType = domain.OrgDomainValidationTypeUnspecified
+			wm.ValidationCode = nil
 		}
 	}
 	return nil

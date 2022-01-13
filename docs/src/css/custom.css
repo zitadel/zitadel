@@ -58,6 +58,12 @@
   --apimgmtbackground: linear-gradient(40deg, #c6d7f3 30%, #c7c6e3);
   --apiadminbackground: linear-gradient(40deg, #c192c790, #c192c790);
   --apiassetbackground: linear-gradient(40deg, #e4eaf1, #eef2f9);
+  --overlaycolor: #6c90b420;
+  --ifm-hero-text-color: #ffffff;
+}
+
+.get-started {
+  border-radius: 50vw;
 }
 
 .apicard-right {
@@ -211,6 +217,12 @@ h2 {
   --apimgmtbackground: linear-gradient(40deg, #595d8090 30%, #595d8090);
   --apiadminbackground: linear-gradient(40deg, #6a506e90, #6a506e90);
   --apiassetbackground: linear-gradient(40deg, #3c4257, #3c4257);
+  --overlaycolor: #ffffff15;
+  --ifm-hero-text-color: #023c2a;
+}
+
+.get-started:hover {
+  color: #ffffff !important;
 }
 
 .menu li li a {
@@ -234,6 +246,8 @@ main .container img {
   padding: .5rem;
   margin-right: 1rem;
   border-radius: 50%;
+  width: 40px;
+  height: 40px;
 }
 
 .rounded svg {
@@ -262,12 +276,18 @@ main .container img {
 .rounded-privatelabel,
 .rounded-phone,
 .rounded-email,
+.rounded-storage,
 .rounded-service {
   background: linear-gradient(40deg, #3b82f6 30%, #4f46e5);
 }
 
+.rounded-split {
+  background: linear-gradient(40deg, #3b82f6, #4f46e5);
+}
+
 .rounded-texts,
-.rounded-help {
+.rounded-help,
+.rounded-architecture {
   background: linear-gradient(40deg, #dc2626 30%, #db2777);
 }
 
@@ -284,6 +304,10 @@ main .container img {
   padding: 0 var(--ifm-pre-padding);
 }
 
+.hero__title {
+  color: white;
+}
+
 .get-started {
   border: 2px solid var(--get-started);
   background-color: var(--get-started);
@@ -293,6 +317,10 @@ main .container img {
 .get-started:hover {
   background-color: var(--get-started-bg-hover);
   color: var(--ifm-hero-text-color);
+}
+
+.docs-link {
+  margin-bottom: 2rem;
 }
 
 .docs-link a {
@@ -306,4 +334,51 @@ main .container img {
 
 .docs-link img {
   margin: 40px;
+}
+
+.b2borg,
+.b2bproject,
+.b2bapp,
+.b2buser {
+  border-radius: 1rem;
+  background: var(--overlaycolor);
+  padding: 1rem;
+}
+
+.b2buser {
+  margin-top: 1rem;
+}
+
+.b2borg span,
+.b2bproject span,
+.b2bapp span,
+.b2buser span {
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.flexrowbetween {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+
+.arrowright {
+  height: 2rem;
+  width: auto;
+  align-self: center;
+  min-width: 2rem;
+}
+
+.b2bprojectrole {
+  margin: 1rem 0 0 1rem !important;
+}
+
+.footer__link-item {
+  font-size: 14px;
+}
+
+.footer__link-item svg {
+  margin-left: .5rem;
 }

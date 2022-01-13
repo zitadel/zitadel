@@ -254,21 +254,27 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	userQuery, err := query.NewUserGrantUserIDSearchQuery(req.Id)
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(req.Id)
 	if err != nil {
 		return nil, err
 	}
 	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
-		Queries: []query.SearchQuery{userQuery},
+		Queries: []query.SearchQuery{userGrantUserQuery},
 	})
 	if err != nil {
 		return nil, err
 	}
-	membersShips, err := s.user.UserMembershipsByUserID(ctx, req.Id)
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants.UserGrants)...)
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}

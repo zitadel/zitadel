@@ -4,13 +4,16 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
+	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
-	"github.com/lib/pq"
 )
 
 type UserGrantProjection struct {
@@ -61,6 +64,28 @@ func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 				{
 					Event:  usergrant.UserGrantReactivatedType,
 					Reduce: p.reduceReactivated,
+				},
+			},
+		},
+		{
+			Aggregate: user.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  user.UserRemovedType,
+					Reduce: p.reduceUserRemoved,
+				},
+			},
+		},
+		{
+			Aggregate: project.AggregateType,
+			EventRedusers: []handler.EventReducer{
+				{
+					Event:  project.ProjectRemovedType,
+					Reduce: p.reduceProjectRemoved,
+				},
+				{
+					Event:  project.GrantRemovedType,
+					Reduce: p.reduceProjectGrantRemoved,
 				},
 			},
 		},
@@ -182,6 +207,49 @@ func (p *UserGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 		},
 		[]handler.Condition{
 			handler.NewCond(UserGrantID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+	if _, ok := event.(*user.UserRemovedEvent); !ok {
+		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bner2a", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(UserGrantUserID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
+	if _, ok := event.(*project.ProjectRemovedEvent); !ok {
+		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bne2a", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(UserGrantProjectID, event.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.GrantRemovedEvent)
+	if !ok {
+		logging.LogWithFields("PROJE-DGfe2", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-dGr2a", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewDeleteStatement(
+		event,
+		[]handler.Condition{
+			handler.NewCond(UserGrantGrantID, e.GrantID),
 		},
 	), nil
 }

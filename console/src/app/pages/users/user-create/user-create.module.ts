@@ -13,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 
 import { UserCreateRoutingModule } from './user-create-routing.module';
 import { UserCreateComponent } from './user-create.component';
@@ -29,6 +30,7 @@ import { UserCreateComponent } from './user-create.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    PasswordComplexityViewModule,
     MatCheckboxModule,
     MatTooltipModule,
     TranslateModule,
