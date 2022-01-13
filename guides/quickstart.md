@@ -2,12 +2,28 @@
 
 ## Prerequisites
 
-The only prerequisite you need fullfill for running the services, is that you need to have docker installed with support for compose and buildkit. The resource limit must at least be:
+The commands in this guide are known to work with the following prerequisites: 
+
+### Resources
 
 * CPU's: 2
 * Memory: 4Gb
 
-## Start ZITADEL
+### Dependencies
+* Ubuntu, Version 18.04
+* Docker Community Editition, Version 20.10.12
+* [Compose V2]((https://docs.docker.com/compose/cli-command/), Version 2.2.2
+
+### Environment Variables
+
+In order to use Docker and Compose with buildkit enabled, export two environment variables for your current shell:
+
+```bash
+$ export DOCKER_BUILDKIT=1 
+$ export COMPOSE_DOCKER_CLI_BUILD=1
+```
+
+## Starting ZITADEL
 
 You can start ZITADEL with a simple docker compose up.
 
@@ -15,31 +31,34 @@ The services are configured to restart if an error occurs.
 
 In the following script the basic setup of the database is executed before ZITADEL starts. Execute the statement from the root of ZITADEL.
 
-You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the frontend compiled  successfully. Initially it takes several minutes to start all containers.
+You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the frontend compiled successfully. Initially it takes several minutes to start all containers.
 
 <a name="compose-services"></a>
 ```bash
-$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --build. Setting everything up takes about 5 minutes.
+$ docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up
 ```
 
 ## Developing ZITADEL
 
-Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers. Setting everything up takes about 15 minutes. This also initializes data needed by Cypress end-to-end tests. 
+If you want to make changes to ZITADEL, we recommend running the end-to-end tests against it. 
+
+### Test Prerequisites
+
+Additionally to the prerequsites described [above](#prerequisites), the end-to-end tests are know to work with the following dependencies:
+
+* NodeJS, Version 14.17.6
+* NPM, Version 6.14.15
+
+### Preparing For End-to-End Tests
+
+Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers. The e2e profile includes the backend and frontend profiles plus adds the e2e-setup service which prepares the environment for end-to-end tests. Setting everything up takes about 15 minutes.
 
 <a name="compose-e2e"></a>
 ```bash
-$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d --build
+$ docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d
 ```
 
-In the meantime, ensure that you have installed the node and npm versions that are known to work for the test suite:
-
-```bash
-$ node --version
-v14.17.6
-
-$ npm --version
-6.14.15
-```
+### Running End-to-End Tests
 
 Ater the *e2e-setup* container exited successfully, you are finally ready to launch the Cypress test suite:
 
@@ -57,11 +76,12 @@ $ # Or open the end-to-end test suite interactively
 $ ./cypress.sh open local_local.env
 ```
 
-You can run any test files except init.ts, as this is already run by the docker compose command shown [above](#compose-e2e) and only passes once.
+### Redeploying a Service
 
-Make changes to a service as you wish and rebuild and deploy the service using the following command from the project root directory:
+Make changes to a service as you wish and rebuild and deploy it using the following command from the project root directory:
+
 ```bash
-$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build <compose service>
+$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build <compose service>
 ```
 
 ## FAQ
@@ -81,7 +101,7 @@ Bellow are some errors we faced with apple silicon.
 You can simply restart the database with the following command:
 
 ```bash
-$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml restart db
+$ docker compose -f ./build/local/docker-compose-local.yml restart db
 ```
 
 #### API call's block and don't return any response
@@ -89,14 +109,8 @@ $ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/d
 The problem is that the database has a connection issues. You can simply restart the database with the following command:
 
 ```bash
-$ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose-local.yml restart db
+$ docker compose -f ./build/local/docker-compose-local.yml restart db
 ```
-
-### Build Errors
-
-If you experience strange docker error you might need to check that `buildkit` is enabled.
-
-Make sure to enable `"features": { "buildkit": true }` in your docker settings!
 
 ### Remove the quickstart
 
