@@ -13,7 +13,6 @@ import (
 	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
@@ -64,6 +63,7 @@ func (repo *UserGrantRepo) SearchMyProjectOrgs(ctx context.Context, request *gra
 	if ctxData.ProjectID == "" {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "APP-7lqva", "Could not get ProjectID")
 	}
+
 	err = repo.AuthZRepo.FillIamProjectID(ctx)
 	if err != nil {
 		return nil, err
@@ -107,32 +107,6 @@ func (repo *UserGrantRepo) membershipsToOrgResp(memberships *query.Memberships) 
 		TotalResult: memberships.Count,
 		Result:      orgs,
 	}
-}
-
-func (repo *UserGrantRepo) SearchMyUserMemberships(ctx context.Context, request *user_model.UserMembershipSearchRequest) (*user_model.UserMembershipSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
-	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
-	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
-
-	memberships, count, err := repo.View.SearchUserMemberships(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &user_model.UserMembershipSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      user_view_model.UserMembershipsToModel(memberships),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
 }
 
 func (repo *UserGrantRepo) SearchMyZitadelPermissions(ctx context.Context) ([]string, error) {

@@ -36,8 +36,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			systemDefaults.IamID),
 		newUserSession(
 			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
-		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
 		newToken(
 			handler{view, bulkLimit, configs.cycleDuration("Token"), errorCount, es}),
 		newUserGrant(
