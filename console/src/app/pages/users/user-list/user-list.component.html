@@ -1,7 +1,13 @@
 <div class="max-width-container">
   <div class="enlarged-container" [ngSwitch]="type">
     <ng-container *ngSwitchCase="Type.TYPE_HUMAN">
-      <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
+      <div class="users-title-row">
+        <h1>{{ 'USER.PAGES.LIST' | translate }}</h1>
+        <a mat-icon-button href="https://docs.zitadel.ch/docs/concepts/structure/users" rel="noreferrer"
+          target="_blank">
+          <i class="las la-info-circle"></i>
+        </a>
+      </div>
       <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
       <cnsl-user-table [type]="Type.TYPE_HUMAN" [disabled]="(['user.write$'] | hasRole | async) === false">

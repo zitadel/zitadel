@@ -45,7 +45,7 @@ export const IAM_POLICY = {
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['iam.policy.read'],
   tags: ['login'],
-  icon: 'las la-gem',
+  icon: 'las la-sign-in-alt',
   color: 'purple',
 };
 
@@ -69,7 +69,7 @@ export const PRIVATELABEL_POLICY = {
   iamWithRole: ['iam.policy.read'],
   orgWithRole: ['policy.read'],
   tags: ['login', 'appearance'],
-  icon: 'las la-sign-in-alt',
+  icon: 'las la-swatchbook',
   color: 'blue',
 };
 

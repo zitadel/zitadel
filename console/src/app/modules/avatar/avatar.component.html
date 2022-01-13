@@ -5,7 +5,8 @@
     <i class="machine-icon las la-robot"></i>
   </ng-container>
   <ng-template #human>
-    <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl" />
+    <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl"
+      onerror="this.src='/assets/images/transparent.png';this.onerror='';" />
     <ng-template #creds><span>{{credentials}}</span></ng-template>
   </ng-template>
 </div>

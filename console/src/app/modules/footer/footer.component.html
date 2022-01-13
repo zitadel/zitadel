@@ -5,17 +5,17 @@
         <span>{{'FOOTER.LINKS.CONTACT' | translate}}</span>
         <i class="las la-external-link-alt"></i>
       </a>
-      <a target="_blank" rel="noreferrer" href="" external>
+      <a target="_blank" *ngIf="policy?.tosLink" rel="noreferrer" [href]="policy.tosLink" external>
         <span>{{'FOOTER.LINKS.TOS' | translate}}</span>
         <i class="las la-external-link-alt"></i>
       </a>
-      <a target="_blank" rel="noreferrer" href="" external>
+      <a target="_blank" *ngIf="policy?.privacyLink" rel="noreferrer" [href]="policy.privacyLink" external>
         <span>{{'FOOTER.LINKS.PP' | translate}}</span>
         <i class="las la-external-link-alt"></i>
       </a>
     </div>
 
-    <div class="footer-socials">
+    <div class="footer-socials" *ngIf="privateLabelPolicy && privateLabelPolicy.disableWatermark === false">
       <a target="_blank" rel="noreferrer" href="https://github.com/caos">
         <i class="text-3xl lab la-github"></i>
       </a>

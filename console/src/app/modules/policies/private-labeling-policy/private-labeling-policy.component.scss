@@ -1,9 +1,7 @@
 @use '@angular/material' as mat;
 
-@import './preview/preview.component.scss';
-
 .policy-applied-to {
-  margin: 0;
+  margin: -1rem 0 0 0;
   font-size: 14px;
 }
 
@@ -220,12 +218,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+              (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+              (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);

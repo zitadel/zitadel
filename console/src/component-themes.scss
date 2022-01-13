@@ -34,6 +34,7 @@
 @import 'src/app/modules/zitadel-tier/zitadel-tier.component.scss';
 @import 'src/app/modules/policies/message-texts/message-texts.component.scss';
 @import 'src/app/modules/policies/private-labeling-policy/private-labeling-policy.component.scss';
+@import 'src/app/modules/policies/private-labeling-policy/preview/preview.component.scss';
 @import 'src/app/modules/info-row/info-row.component.scss';
 @import 'src/app/modules/user-grants/user-grants.component.scss';
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
@@ -83,6 +84,7 @@
   @include accounts-card-theme($theme);
   @include info-section-theme($theme);
   @include tier-theme($theme);
+  @include preview-theme($theme);
   @include private-label-theme($theme);
   @include project-grid-theme($theme);
   @include granted-project-detail-theme($theme);

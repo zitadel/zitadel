@@ -195,12 +195,6 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
 
-    // const theme = localStorage.getItem('theme');
-    // if (theme) {
-    //   this.overlayContainer.getContainerElement().classList.add(theme);
-    //   this.componentCssClass = theme;
-    // }
-
     this.isDarkTheme = this.themeService.isDarkTheme;
     this.isDarkTheme.subscribe((dark) => this.onSetTheme(dark ? 'dark-theme' : 'light-theme'));
 
@@ -208,8 +202,6 @@ export class AppComponent implements OnInit, OnDestroy {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
-
-    this.loadPolicies();
   }
 
   public ngOnInit(): void {
@@ -247,6 +239,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mgmtService.getLabelPolicy().then((labelpolicy) => {
       if (labelpolicy.policy) {
         this.labelpolicy = labelpolicy.policy;
+        console.log(this.labelpolicy);
 
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
@@ -265,14 +258,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
         this.themeService.saveBackgroundColor(darkBackground, true);
         this.themeService.saveBackgroundColor(lightBackground, false);
-      }
-    });
-  }
-
-  public loadPolicies(): void {
-    this.mgmtService.getPrivacyPolicy().then((privacypolicy) => {
-      if (privacypolicy.policy) {
-        this.privacyPolicy = privacypolicy.policy;
       }
     });
   }

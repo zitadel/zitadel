@@ -777,7 +777,7 @@
       "PATTERNERROR": "La password non corrisponde al modello richiesto."
     },
     "PRIVATELABELING": {
-      "TITLE": "Private Labelling",
+      "TITLE": "Branding",
       "DESCRIPTION": "Dai al login il tuo stile personalizzato e modifica il suo comportamento.",
       "PREVIEW_DESCRIPTION": "Le impostazioni saranno automaticamente disponibili al preview environment.",
       "BTN": "Seleziona File",
@@ -820,7 +820,7 @@
       "DESCRIPTION": "Definisci le propriet\u00e0 di accesso dei tuoi utenti."
     },
     "PRIVATELABELING_POLICY": {
-      "TITLE": "Private labelling",
+      "TITLE": "Branding",
       "BTN": "Seleziona File",
       "DESCRIPTION": "Personalizza l'aspetto del Login",
       "ACTIVATEPREVIEW": "Attiva la configurazione"
@@ -1022,21 +1022,21 @@
         "GRANTED_SINGULAR": "Progetto concesso"
       },
       "PRIVATELABEL": {
-        "TITLE": "Impostazione Private labelling",
+        "TITLE": "Impostazione Branding",
         "0": {
           "TITLE": "Non specificato",
-          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Private labelling dell'organizzazione, prima che venga mostrato il default del sistema."
+          "DESC": "Non appena l'utente viene identificato, viene mostrata l'impostazione Branding dell'organizzazione, prima che venga mostrato il default del sistema."
         },
         "1": {
-          "TITLE": "Applica l'impostazione Private labelling delle risorse del progetto",
-          "DESC": "Private labelling dell'organizzazione del progetto sar\u00e0 mostrata"
+          "TITLE": "Applica l'impostazione Branding delle risorse del progetto",
+          "DESC": "Branding dell'organizzazione del progetto sar\u00e0 mostrata"
         },
         "2": {
-          "TITLE": "Consentire l'accesso all'impostazione Private labelling dell'utente",
-          "DESC": "Verr\u00e0 mostrata l'impostazione Private labelling dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
+          "TITLE": "Consentire l'accesso all'impostazione Branding dell'utente",
+          "DESC": "Verr\u00e0 mostrata l'impostazione Branding dell'organizzazione del progetto, ma non appena l'utente viene identificato, verr\u00e0 mostrata l'impostazione dell'organizzazione dell'utente identificato."
         },
         "DIALOG": {
-          "TITLE": "Impostazione Private labelling",
+          "TITLE": "Impostazione Branding",
           "DESCRIPTION": "Seleziona il comportamento del login, quando usi il progetto."
         }
       },

@@ -777,7 +777,7 @@
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
-      "TITLE": "Private Labeling",
+      "TITLE": "Branding",
       "DESCRIPTION": "Verleihe dem Login deinen benutzerdefinierten Style und passe das Verhalten an.",
       "PREVIEW_DESCRIPTION": "Änderungen dieser Richtlinie werden automatisch in der Preview Umgebung verfügbar.",
       "BTN": "Datei auswählen",
@@ -820,7 +820,7 @@
       "DESCRIPTION": "Definiere die Zugangseistellungen für Benutzer."
     },
     "PRIVATELABELING_POLICY": {
-      "TITLE": "Private Labeling",
+      "TITLE": "Branding",
       "BTN": "Datei auswählen",
       "DESCRIPTION": "Definiere das Erscheinungsbild des Logins.",
       "ACTIVATEPREVIEW": "Preview aktivieren"
@@ -1022,22 +1022,22 @@
         "GRANTED_SINGULAR": "Berechtigtes Projekt"
       },
       "PRIVATELABEL": {
-        "TITLE": "Private Labeling Verhalten",
+        "TITLE": "Branding Verhalten",
         "0": {
           "TITLE": "Unspezifiziert",
-          "DESC": "Sobald der Nutzer identifiziert ist, wird das Privatelabeling der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
+          "DESC": "Sobald der Nutzer identifiziert ist, wird das Branding der von ihm gewählten Organisation angezeigt, davor wird der Default des Systems angezeigt."
         },
         "1": {
           "TITLE": "Durchsetzung der Richtlinie des Projekteigentümers",
-          "DESC": "Das Privatelabeling der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
+          "DESC": "Das Branding der Organisation, die Eigentümerin des Projekts ist, wird angezeigt"
         },
         "2": {
           "TITLE": "Durchsetzung der Richtlinie des Benutzereigentümers",
-          "DESC": "Das Privatelabeling der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
+          "DESC": "Das Branding der Organisation des Projekts wird angezeigt, sobald der Benutzer identifiziert ist, wird jedoch auf die Einstellung der Organisation des identifizierten Benutzers, gewechselt."
         },
         "DIALOG": {
-          "TITLE": "Privatelabeling Verhalten",
-          "DESCRIPTION": "Bestimmen Sie das Verhalten des Projektes im Bezug auf das Privatelabeling."
+          "TITLE": "Branding Verhalten",
+          "DESCRIPTION": "Bestimmen Sie das Verhalten des Projektes im Bezug auf das Branding."
         }
       },
       "PINNED": "Angepinnt",

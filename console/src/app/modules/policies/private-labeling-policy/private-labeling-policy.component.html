@@ -1,5 +1,5 @@
 <cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
-  [title]="'POLICY.PRIVATELABELING.TITLE' | translate" [description]="'POLICY.PRIVATELABELING.DESCRIPTION' | translate">
+  [title]="'POLICY.PRIVATELABELING.TITLE' | translate">
   <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
     <strong *ngIf="org; else iam">{{org.name}}</strong>
     <ng-template #iam><strong>{{'MENU.SYSTEM' | translate}}</strong>
@@ -7,7 +7,7 @@
   </p>
 
   <div class="privatelabeling-policy">
-    <p class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</p>
+    <cnsl-info-section class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</cnsl-info-section>
 
     <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
@@ -77,7 +77,6 @@
           <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
           </cnsl-info-section>
 
-          <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
