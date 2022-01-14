@@ -3,9 +3,7 @@ package eventstore
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -14,21 +12,16 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
-	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	"github.com/caos/zitadel/internal/org/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -86,122 +79,17 @@ func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequen
 	return changes, nil
 }
 
-func (repo *OrgRepository) OrgMemberByID(ctx context.Context, orgID, userID string) (*org_model.OrgMemberView, error) {
-	member, err := repo.View.OrgMemberByIDs(orgID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.OrgMemberToModel(member, repo.PrefixAvatarURL), nil
-}
-
-func (repo *OrgRepository) SearchMyOrgMembers(ctx context.Context, request *org_model.OrgMemberSearchRequest) (*org_model.OrgMemberSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.Queries = append(request.Queries, &org_model.OrgMemberSearchQuery{Key: org_model.OrgMemberSearchKeyOrgID, Method: domain.SearchMethodEquals, Value: authz.GetCtxData(ctx).OrgID})
-	sequence, sequenceErr := repo.View.GetLatestOrgMemberSequence()
-	logging.Log("EVENT-Smu3d").OnError(sequenceErr).Warn("could not read latest org member sequence")
-	members, count, err := repo.View.SearchOrgMembers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &org_model.OrgMemberSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.OrgMembersToModel(members, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *OrgRepository) GetOrgMemberRoles() []string {
+func (repo *OrgRepository) GetOrgMemberRoles(isGlobal bool) []string {
 	roles := make([]string, 0)
 	for _, roleMap := range repo.Roles {
 		if strings.HasPrefix(roleMap, "ORG") {
 			roles = append(roles, roleMap)
 		}
 	}
+	if isGlobal {
+		roles = append(roles, domain.RoleSelfManagementGlobal)
+	}
 	return roles
-}
-
-func (repo *OrgRepository) IDPConfigByID(ctx context.Context, idpConfigID string) (*iam_model.IDPConfigView, error) {
-	idp, err := repo.View.IDPConfigByID(idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.IDPConfigViewToModel(idp), nil
-}
-
-func (repo *OrgRepository) SearchIDPConfigs(ctx context.Context, request *iam_model.IDPConfigSearchRequest) (*iam_model.IDPConfigSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	request.AppendMyOrgQuery(authz.GetCtxData(ctx).OrgID, repo.SystemDefaults.IamID)
-
-	sequence, sequenceErr := repo.View.GetLatestIDPConfigSequence()
-	logging.Log("EVENT-Dk8si").OnError(sequenceErr).Warn("could not read latest idp config sequence")
-	idps, count, err := repo.View.SearchIDPConfigs(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &iam_model.IDPConfigSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      iam_view_model.IdpConfigViewsToModel(idps),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *OrgRepository) GetIDPProvidersByIDPConfigID(ctx context.Context, aggregateID, idpConfigID string) ([]*iam_model.IDPProviderView, error) {
-	idpProviders, err := repo.View.IDPProvidersByIdpConfigID(aggregateID, idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return iam_view_model.IDPProviderViewsToModel(idpProviders), err
-}
-
-func (repo *OrgRepository) SearchIDPProviders(ctx context.Context, request *iam_model.IDPProviderSearchRequest) (*iam_model.IDPProviderSearchResponse, error) {
-	policy, err := repo.Query.LoginPolicyByID(ctx, authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	if policy.IsDefault {
-		request.AppendAggregateIDQuery(domain.IAMID)
-	} else {
-		request.AppendAggregateIDQuery(authz.GetCtxData(ctx).OrgID)
-	}
-	err = request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestIDPProviderSequence()
-	logging.Log("EVENT-Tuiks").OnError(sequenceErr).Warn("could not read latest iam sequence")
-	providers, count, err := repo.View.SearchIDPProviders(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &iam_model.IDPProviderSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      iam_view_model.IDPProviderViewsToModel(providers),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
 }
 
 func (repo *OrgRepository) getOrgChanges(ctx context.Context, orgID string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
@@ -282,35 +170,4 @@ func (r *OrgRepository) getUserEvents(ctx context.Context, userID string, sequen
 	}
 
 	return r.Eventstore.FilterEvents(ctx, query)
-}
-
-func (es *OrgRepository) getOrgEvents(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
-	query, err := org_view.OrgByIDQuery(id, sequence)
-	if err != nil {
-		return nil, err
-	}
-	return es.Eventstore.FilterEvents(ctx, query)
-}
-
-func (repo *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, sequence)
-	if err != nil {
-		return nil, err
-	}
-	return repo.Eventstore.FilterEvents(ctx, query)
-}
-
-func (repo *OrgRepository) readTranslationFile(dir http.FileSystem, filename string) ([]byte, error) {
-	r, err := dir.Open(filename)
-	if os.IsNotExist(err) {
-		return nil, errors.ThrowNotFound(err, "TEXT-93nfl", "Errors.TranslationFile.NotFound")
-	}
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-3n8fs", "Errors.TranslationFile.ReadError")
-	}
-	contents, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, errors.ThrowInternal(err, "TEXT-322fs", "Errors.TranslationFile.ReadError")
-	}
-	return contents, nil
 }

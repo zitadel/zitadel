@@ -8,6 +8,7 @@ import (
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -78,11 +79,21 @@ func (s *Server) AddProjectGrant(ctx context.Context, req *mgmt_pb.AddProjectGra
 }
 
 func (s *Server) UpdateProjectGrant(ctx context.Context, req *mgmt_pb.UpdateProjectGrantRequest) (*mgmt_pb.UpdateProjectGrantResponse, error) {
-	grants, err := s.usergrant.UserGrantsByProjectAndGrantID(ctx, req.ProjectId, req.GrantId)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.ProjectId)
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants)...)
+	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, grantQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	grant, err := s.command.ChangeProjectGrant(ctx, UpdateProjectGrantRequestToDomain(req), authz.GetCtxData(ctx).OrgID, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}

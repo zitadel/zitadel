@@ -227,46 +227,6 @@ func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_mode
 	return user.GetProfile()
 }
 
-func (repo *UserRepo) SearchExternalIDPs(ctx context.Context, request *usr_model.ExternalIDPSearchRequest) (*usr_model.ExternalIDPSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
-	logging.Log("EVENT-Qs7uf").OnError(seqErr).Warn("could not read latest external idp sequence")
-	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &usr_model.ExternalIDPSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.ExternalIDPViewsToModel(externalIDPS),
-	}
-	if seqErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*usr_model.ExternalIDPView, error) {
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigID(idpConfigID)
-	if err != nil {
-		return nil, err
-	}
-	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
-func (repo *UserRepo) ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*usr_model.ExternalIDPView, error) {
-	externalIDPs, err := repo.View.ExternalIDPsByIDPConfigIDAndResourceOwner(idpConfigID, resourceOwner)
-	if err != nil {
-		return nil, err
-	}
-	return model.ExternalIDPViewsToModel(externalIDPs), nil
-}
-
 func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
@@ -298,44 +258,6 @@ func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_mode
 		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
 	}
 	return user.GetAddress()
-}
-
-func (repo *UserRepo) SearchUserMemberships(ctx context.Context, request *usr_model.UserMembershipSearchRequest) (*usr_model.UserMembershipSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestUserMembershipSequence()
-	logging.Log("EVENT-Dn7sf").OnError(sequenceErr).Warn("could not read latest user sequence")
-
-	result := handleSearchUserMembershipsPermissions(ctx, request, sequence)
-	if result != nil {
-		return result, nil
-	}
-
-	memberships, count, err := repo.View.SearchUserMemberships(request)
-	if err != nil {
-		return nil, err
-	}
-	result = &usr_model.UserMembershipSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.UserMembershipsToModel(memberships),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) UserMembershipsByUserID(ctx context.Context, userID string) ([]*usr_model.UserMembershipView, error) {
-	memberships, err := repo.View.UserMembershipsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserMembershipsToModel(memberships), nil
 }
 
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {

@@ -28,16 +28,9 @@ type UserRepository interface {
 
 	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNView, error)
 
-	SearchExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
-	ExternalIDPsByIDPConfigID(ctx context.Context, idpConfigID string) ([]*model.ExternalIDPView, error)
-	ExternalIDPsByIDPConfigIDAndResourceOwner(ctx context.Context, idpConfigID, resourceOwner string) ([]*model.ExternalIDPView, error)
-
 	EmailByID(ctx context.Context, userID string) (*model.Email, error)
 
 	PhoneByID(ctx context.Context, userID string) (*model.Phone, error)
 
 	AddressByID(ctx context.Context, userID string) (*model.Address, error)
-
-	SearchUserMemberships(ctx context.Context, request *model.UserMembershipSearchRequest) (*model.UserMembershipSearchResponse, error)
-	UserMembershipsByUserID(ctx context.Context, userID string) ([]*model.UserMembershipView, error)
 }

@@ -18,6 +18,7 @@ var (
 		` zitadel.projections.idp_user_links.external_user_id,` +
 		` zitadel.projections.idp_user_links.display_name,` +
 		` zitadel.projections.idps.type,` +
+		` zitadel.projections.idp_user_links.resource_owner,` +
 		` COUNT(*) OVER ()` +
 		` FROM zitadel.projections.idp_user_links` +
 		` LEFT JOIN zitadel.projections.idps ON zitadel.projections.idp_user_links.idp_id = zitadel.projections.idps.id`)
@@ -28,6 +29,7 @@ var (
 		"external_user_id",
 		"display_name",
 		"type",
+		"resource_owner",
 		"count",
 	}
 )
@@ -58,6 +60,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 							"external-user-id",
 							"display-name",
 							domain.IDPConfigTypeJWT,
+							"ro",
 						},
 					},
 				),
@@ -74,6 +77,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 						ProvidedUserID:   "external-user-id",
 						ProvidedUsername: "display-name",
 						IDPType:          domain.IDPConfigTypeJWT,
+						ResourceOwner:    "ro",
 					},
 				},
 			},
@@ -93,6 +97,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 							"external-user-id",
 							"display-name",
 							nil,
+							"ro",
 						},
 					},
 				),
@@ -109,6 +114,7 @@ func Test_IDPUserLinkPrepares(t *testing.T) {
 						ProvidedUserID:   "external-user-id",
 						ProvidedUsername: "display-name",
 						IDPType:          domain.IDPConfigTypeUnspecified,
+						ResourceOwner:    "ro",
 					},
 				},
 			},
