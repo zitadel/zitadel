@@ -67,10 +67,6 @@ func NewUserGrantProjectIDSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(UserGrantProjectID, id, TextEquals)
 }
 
-func NewUserGrantProjectNameSearchQuery(id string, method TextComparison) (SearchQuery, error) {
-	return NewTextQuery(UserGrantProjectID, id, method)
-}
-
 func NewUserGrantProjectOwnerSearchQuery(id string) (SearchQuery, error) {
 	return NewTextQuery(ProjectColumnResourceOwner, id, TextEquals)
 }

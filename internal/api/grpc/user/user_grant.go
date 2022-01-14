@@ -125,7 +125,7 @@ func UserGrantProjectGrantIDQueryToModel(q *user_pb.UserGrantProjectGrantIDQuery
 }
 
 func UserGrantProjectNameQueryToModel(q *user_pb.UserGrantProjectNameQuery) (query.SearchQuery, error) {
-	return query.NewUserGrantProjectNameSearchQuery(q.ProjectName, object.TextMethodToQuery(q.Method))
+	return query.NewUserGrantProjectNameQuery(q.ProjectName, object.TextMethodToQuery(q.Method))
 }
 
 func UserGrantRoleKeyQueryToModel(q *user_pb.UserGrantRoleKeyQuery) (query.SearchQuery, error) {
