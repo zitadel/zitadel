@@ -39,7 +39,10 @@ func InitChatChannel(config ChatConfig) (channels.NotificationChannel, error) {
 }
 
 func sendMessage(message string, chatUrl *url.URL) error {
-	req, err := json.Marshal(message)
+	chatMsg := &struct {
+		Text string `json:"text"`
+	}{Text: message}
+	req, err := json.Marshal(chatMsg)
 	if err != nil {
 		return caos_errs.ThrowInternal(err, "PROVI-s8uie", "Could not unmarshal content")
 	}
