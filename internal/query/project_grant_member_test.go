@@ -25,7 +25,7 @@ var (
 		", zitadel.projections.users_humans.last_name" +
 		", zitadel.projections.users_humans.display_name" +
 		", zitadel.projections.users_machines.name" +
-		", zitadel.projections.users_humans.avater_key" +
+		", zitadel.projections.users_humans.avatar_key" +
 		", COUNT(*) OVER () " +
 		"FROM zitadel.projections.project_grant_members as members " +
 		"LEFT JOIN zitadel.projections.users_humans " +
@@ -48,7 +48,7 @@ var (
 		"last_name",
 		"display_name",
 		"name",
-		"avater_key",
+		"avatar_key",
 		"count",
 	}
 )

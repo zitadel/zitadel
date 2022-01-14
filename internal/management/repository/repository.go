@@ -5,6 +5,5 @@ type Repository interface {
 	ProjectRepository
 	OrgRepository
 	UserRepository
-	UserGrantRepository
 	IamRepository
 }

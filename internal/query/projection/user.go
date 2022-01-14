@@ -40,6 +40,7 @@ const (
 	UserStateCol         = "state"
 	UserSequenceCol      = "sequence"
 	UserUsernameCol      = "username"
+	UserTypeCol          = "type"
 )
 
 const (
@@ -53,7 +54,7 @@ const (
 	HumanDisplayNameCol       = "display_name"
 	HumanPreferredLanguageCol = "preferred_language"
 	HumanGenderCol            = "gender"
-	HumanAvaterURLCol         = "avater_key"
+	HumanAvaterURLCol         = "avatar_key"
 
 	// email
 	HumanEmailCol           = "email"
@@ -203,6 +204,7 @@ func (p *UserProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(UserStateCol, domain.UserStateInitial),
 				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
+				handler.NewCol(UserTypeCol, domain.UserTypeHuman),
 			},
 		),
 		crdb.AddCreateStatement(
@@ -239,6 +241,7 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(UserStateCol, domain.UserStateInitial),
 				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
+				handler.NewCol(UserTypeCol, domain.UserTypeHuman),
 			},
 		),
 		crdb.AddCreateStatement(
@@ -656,6 +659,7 @@ func (p *UserProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 				handler.NewCol(UserStateCol, domain.UserStateInitial),
 				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
+				handler.NewCol(UserTypeCol, domain.UserTypeMachine),
 			},
 		),
 		crdb.AddCreateStatement(

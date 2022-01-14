@@ -39,6 +39,10 @@ var (
 		name:  projection.UserUsernameCol,
 		table: userTable,
 	}
+	UserTypeCol = Column{
+		name:  projection.UserTypeCol,
+		table: userTable,
+	}
 )
 
 var (
