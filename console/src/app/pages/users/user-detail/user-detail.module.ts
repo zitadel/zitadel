@@ -22,6 +22,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.module';
+import { MachineTokensModule } from 'src/app/modules/machine-tokens/machine-tokens.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
@@ -121,6 +122,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     LocalizedDatePipeModule,
     InputModule,
     MachineKeysModule,
+    MachineTokensModule,
     InfoSectionModule,
   ],
 })

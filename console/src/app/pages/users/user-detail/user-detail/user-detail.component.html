@@ -85,6 +85,11 @@
         description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
         <cnsl-machine-keys [userId]="user.id"></cnsl-machine-keys>
       </cnsl-card>
+
+      <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.TOKENSTITLE' | translate }}"
+        description="{{ 'USER.MACHINE.TOKENSDESC' | translate }}">
+        <cnsl-machine-tokens [userId]="user.id"></cnsl-machine-tokens>
+      </cnsl-card>
     </ng-template>
 
     <cnsl-passwordless *ngIf="user && user.human" [user]="user" [disabled]="(canWrite$ | async) === false">

@@ -34,6 +34,8 @@ import {
   AddIDPToLoginPolicyResponse,
   AddMachineKeyRequest,
   AddMachineKeyResponse,
+  AddMachineTokenRequest,
+  AddMachineTokenResponse,
   AddMachineUserRequest,
   AddMachineUserResponse,
   AddMultiFactorToLoginPolicyRequest,
@@ -202,6 +204,8 @@ import {
   ListLoginPolicySecondFactorsResponse,
   ListMachineKeysRequest,
   ListMachineKeysResponse,
+  ListMachineTokensRequest,
+  ListMachineTokensResponse,
   ListOrgChangesRequest,
   ListOrgChangesResponse,
   ListOrgDomainsRequest,
@@ -282,6 +286,8 @@ import {
   RemoveIDPFromLoginPolicyResponse,
   RemoveMachineKeyRequest,
   RemoveMachineKeyResponse,
+  RemoveMachineTokenRequest,
+  RemoveMachineTokenResponse,
   RemoveMultiFactorFromLoginPolicyRequest,
   RemoveMultiFactorFromLoginPolicyResponse,
   RemoveOrgDomainRequest,
@@ -867,6 +873,44 @@ export class ManagementService {
     }
     req.setQuery(metadata);
     return this.grpcService.mgmt.listMachineKeys(req, null).then((resp) => resp.toObject());
+  }
+
+  public addMachineToken(userId: string, date?: Timestamp): Promise<AddMachineTokenResponse.AsObject> {
+    const req = new AddMachineTokenRequest();
+    req.setUserId(userId);
+    if (date) {
+      req.setExpirationDate(date);
+    }
+    return this.grpcService.mgmt.addMachineToken(req, null).then((resp) => resp.toObject());
+  }
+
+  public removeMachineToken(tokenId: string, userId: string): Promise<RemoveMachineTokenResponse.AsObject> {
+    const req = new RemoveMachineTokenRequest();
+    req.setTokenId(tokenId);
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removeMachineToken(req, null).then((resp) => resp.toObject());
+  }
+
+  public listMachineTokens(
+    userId: string,
+    limit?: number,
+    offset?: number,
+    asc?: boolean,
+  ): Promise<ListMachineTokensResponse.AsObject> {
+    const req = new ListMachineTokensRequest();
+    const metadata = new ListQuery();
+    req.setUserId(userId);
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (asc) {
+      metadata.setAsc(asc);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.mgmt.listMachineTokens(req, null).then((resp) => resp.toObject());
   }
 
   public removeHumanLinkedIDP(
