@@ -122,6 +122,10 @@ export class OwnedProjectDetailComponent implements OnInit {
 
             const breadcrumbs = [
               new Breadcrumb({
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              }),
+              new Breadcrumb({
                 type: BreadcrumbType.PROJECT,
                 name: this.project.name,
                 param: { key: ROUTEPARAM, value: projectId },

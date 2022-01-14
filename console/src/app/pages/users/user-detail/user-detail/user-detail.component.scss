@@ -102,7 +102,7 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      padding: 2rem 0;
+      padding: 2rem 0 1rem 0;
 
       .text {
         flex: 1;
@@ -155,7 +155,7 @@
         }
 
         .icon {
-          margin-left: 0.5rem;
+          margin-left: 0.25rem;
           margin-right: -0.5rem;
         }
       }

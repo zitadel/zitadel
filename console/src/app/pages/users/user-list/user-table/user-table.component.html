@@ -137,8 +137,8 @@
       <i class="las la-exclamation"></i>
       <span>{{'USER.TABLE.EMPTY' | translate}}</span>
     </div>
-    <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0" [pageSize]="10"
-      [timestamp]="viewTimestamp" [pageSizeOptions]="[5, 10, 20]" (page)="changePage($event)"></cnsl-paginator>
+    <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0" [pageSize]="20"
+      [timestamp]="viewTimestamp" [pageSizeOptions]="[10, 20, 50, 100]" (page)="changePage($event)"></cnsl-paginator>
   </div>
 </cnsl-refresh-table>
 

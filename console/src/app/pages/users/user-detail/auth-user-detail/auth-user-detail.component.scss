@@ -86,60 +86,6 @@
       }
     }
   }
-
-  .user-top {
-    border-bottom: 1px solid map-get($foreground, divider);
-    margin: 0 -2rem;
-    padding: 0 2rem 1rem 2rem;
-    background-color: if($is-dark-theme, #00000020, #605f5f0f);
-
-    @media only screen and (max-width: 500px) {
-      margin: 0 -1.5rem;
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      padding: 2rem 0;
-
-      .text {
-        flex: 1;
-
-        .user-title-row {
-          display: flex;
-          align-items: center;
-
-          .user-title {
-            margin: 0;
-            margin-right: 0.5rem;
-          }
-
-          .user-state-dot {
-            height: 8px;
-            width: 8px;
-            border-radius: 50%;
-
-            &.active {
-              background-color: var(--success);
-            }
-
-            &.inactive {
-              background-color: var(--warn);
-            }
-          }
-        }
-
-        .sub {
-          color: var(--grey);
-          max-width: 500px;
-          margin-bottom: 0;
-          font-size: 14px;
-        }
-      }
-    }
-  }
 }
 
 .icon-button {

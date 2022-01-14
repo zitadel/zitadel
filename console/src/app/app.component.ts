@@ -239,7 +239,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mgmtService.getLabelPolicy().then((labelpolicy) => {
       if (labelpolicy.policy) {
         this.labelpolicy = labelpolicy.policy;
-        console.log(this.labelpolicy);
 
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';

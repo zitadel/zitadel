@@ -91,8 +91,8 @@
         <i class="las la-exclamation"></i>
         <span>{{'PROJECT.TABLE.EMPTY' | translate}}</span>
       </div>
-      <cnsl-paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="10"
-        [pageSizeOptions]="[5, 10, 20]" (page)="changePage(type)"></cnsl-paginator>
+      <cnsl-paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult" [pageSize]="20"
+        [pageSizeOptions]="[10, 20, 50, 100]" (page)="changePage(type)"></cnsl-paginator>
     </div>
   </cnsl-refresh-table>
 </div>

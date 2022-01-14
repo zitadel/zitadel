@@ -2,17 +2,24 @@
   <div class="max-width-container">
     <div class="header-row">
       <div class="text">
-        <div *ngIf="user" class="user-title-row">
-          <h1 class="user-title">
-            <span
-              *ngIf="user && user.human?.profile?.displayName; else defTitle">{{user.human?.profile?.displayName}}</span>
-            <ng-template #defTitle>{{ 'USER.TITLE' | translate }}</ng-template>
-          </h1>
-          <div class="user-state-dot" matTooltip="{{'USER.STATE.'+user?.state | translate}}"
-            [ngClass]="{'active': user?.state === UserState.USER_STATE_ACTIVE, 'inactive': user?.state === UserState.USER_STATE_INACTIVE }">
+        <div class="user-title-wrapper">
+          <a (click)="navigateBack()" mat-icon-button>
+            <mat-icon class="icon">arrow_back</mat-icon>
+          </a>
+          <div>
+            <div *ngIf="user" class="user-title-row">
+              <h1 class="user-title">
+                {{user.human ? user.human?.profile?.displayName :
+                user.machine?.name}}
+              </h1>
+              <div class="user-state-dot" matTooltip="{{'USER.STATE.'+user?.state | translate}}"
+                [ngClass]="{'active': user?.state === UserState.USER_STATE_ACTIVE, 'inactive': user?.state === UserState.USER_STATE_INACTIVE }">
+              </div>
+            </div>
+            <span class="user-loginname" *ngIf="user?.preferredLoginName">{{user?.preferredLoginName}}</span>
           </div>
         </div>
-        <p class="sub">{{'USER.DESCRIPTION' | translate}}</p>
+        <!-- <p class="sub">{{'USER.DESCRIPTION' | translate}}</p> -->
       </div>
     </div>
 

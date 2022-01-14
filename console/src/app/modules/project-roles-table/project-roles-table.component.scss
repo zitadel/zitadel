@@ -14,6 +14,10 @@
   display: inline-block;
   margin: 0.25rem;
   cursor: pointer;
+
+  &.no-selection {
+    cursor: default;
+  }
 }
 
 .pointer {

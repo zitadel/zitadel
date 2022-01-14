@@ -1,53 +1,54 @@
 <cnsl-card title="{{'USER.MFA.TITLE' | translate}}" description="{{'USER.MFA.DESCRIPTION' | translate}}">
-  <button card-actions mat-icon-button (click)="getMFAs()" class="icon-button" matTooltip="{{'ACTIONS.REFRESH' | translate}}">
+  <button card-actions mat-icon-button (click)="getMFAs()" class="icon-button"
+    matTooltip="{{'ACTIONS.REFRESH' | translate}}">
     <mat-icon class="icon">refresh</mat-icon>
   </button>
-  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()" [dataSize]="dataSource?.data?.length ?? 0">
-        <table class="table" mat-table [dataSource]="dataSource">
-            <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa">
-                    <span *ngIf="mfa.otp !== undefined">OTP (One-Time Password)</span>
-                    <span *ngIf="mfa.u2f !== undefined">U2F (Universal 2nd Factor)</span>
-                </td>
-            </ng-container>
+  <cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="getMFAs()"
+    [dataSize]="dataSource?.data?.length ?? 0">
+    <table class="table" mat-table [dataSource]="dataSource">
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLETYPE' | translate }} </th>
+        <td mat-cell *matCellDef="let mfa">
+          <span *ngIf="mfa.otp !== undefined">OTP (One-Time Password)</span>
+          <span *ngIf="mfa.u2f !== undefined">U2F (Universal 2nd Factor)</span>
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.NAME' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa">
-                    <span *ngIf="mfa?.u2f?.name" class="centered">
-                        {{ mfa.u2f.name }}
-                    </span>
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.NAME' | translate }} </th>
+        <td mat-cell *matCellDef="let mfa">
+          <span *ngIf="mfa?.u2f?.name" class="centered">
+            {{ mfa.u2f.name }}
+          </span>
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="state">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLESTATE' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa">
-                    <span class="centered">
-                        {{'USER.MFA.STATE.'+ mfa.state | translate}}
-                    </span>
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLESTATE' | translate }} </th>
+        <td mat-cell *matCellDef="let mfa">
+          <span class="centered">
+            {{'USER.MFA.STATE.'+ mfa.state | translate}}
+          </span>
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLEACTIONS' | translate }} </th>
-                <td mat-cell *matCellDef="let mfa">
-                    <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" mat-icon-button
-                        (click)="deleteMFA(mfa)">
-                        <i class="las la-trash"></i>
-                    </button>
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MFA.TABLEACTIONS' | translate }} </th>
+        <td mat-cell *matCellDef="let mfa">
+          <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" mat-icon-button (click)="deleteMFA(mfa)">
+            <i class="las la-trash"></i>
+          </button>
+        </td>
+      </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
-            </tr>
-        </table>
-    </cnsl-refresh-table>
-    <div class="table-wrapper">
-        <div class="spinner-container" *ngIf="loading$ | async">
-            <mat-spinner diameter="50"></mat-spinner>
-        </div>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;">
+      </tr>
+    </table>
+  </cnsl-refresh-table>
+  <div class="table-wrapper">
+    <div class="spinner-container" *ngIf="loading$ | async">
+      <mat-spinner diameter="50"></mat-spinner>
     </div>
+  </div>
 </cnsl-card>

@@ -65,6 +65,10 @@ export class GrantedProjectDetailComponent implements OnInit, OnDestroy {
 
     const breadcrumbs = [
       new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+      new Breadcrumb({
         type: BreadcrumbType.GRANTEDPROJECT,
         name: '',
         param: { key: 'id', value: id },

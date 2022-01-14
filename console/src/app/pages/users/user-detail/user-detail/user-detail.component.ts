@@ -12,6 +12,7 @@ import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.com
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { Metadata } from 'src/app/proto/generated/zitadel/metadata_pb';
 import { Email, Gender, Machine, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -58,7 +59,7 @@ export class UserDetailComponent implements OnInit {
   public error: string = '';
 
   public settingsList: UserSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
-  public currentSetting: UserSetting | undefined = GENERAL;
+  public currentSetting: string | undefined = 'general';
 
   constructor(
     public translate: TranslateService,
@@ -69,7 +70,14 @@ export class UserDetailComponent implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private mediaMatcher: MediaMatcher,
+    breadcrumbService: BreadcrumbService,
   ) {
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([bread]);
+
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;
     if (small) {
@@ -84,7 +92,7 @@ export class UserDetailComponent implements OnInit {
     if (small) {
       this.currentSetting = undefined;
     } else {
-      this.currentSetting = this.currentSetting === undefined ? GENERAL : this.currentSetting;
+      this.currentSetting = this.currentSetting === undefined ? 'general' : this.currentSetting;
     }
   }
 

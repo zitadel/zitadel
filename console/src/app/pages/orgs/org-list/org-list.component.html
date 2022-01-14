@@ -53,7 +53,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
-      <mat-paginator class="paginator" [pageSize]="10" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
+      <mat-paginator class="paginator" [pageSize]="20" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
       </mat-paginator>
     </cnsl-refresh-table>
   </div>

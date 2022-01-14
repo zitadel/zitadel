@@ -1,8 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
-import { tap } from 'rxjs/operators';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -18,7 +17,7 @@ import { ProjectRolesDataSource } from './project-roles-table-datasource';
   templateUrl: './project-roles-table.component.html',
   styleUrls: ['./project-roles-table.component.scss'],
 })
-export class ProjectRolesTableComponent implements AfterViewInit, OnInit {
+export class ProjectRolesTableComponent implements OnInit {
   @Input() public projectId: string = '';
   @Input() public disabled: boolean = false;
   @Input() public actionsVisible: boolean = false;
@@ -27,8 +26,6 @@ export class ProjectRolesTableComponent implements AfterViewInit, OnInit {
   public dataSource!: ProjectRolesDataSource;
   public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
   @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
-
-  /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'actions'];
 
   constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
@@ -41,10 +38,6 @@ export class ProjectRolesTableComponent implements AfterViewInit, OnInit {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
-  }
-
-  public ngAfterViewInit(): void {
-    this.paginator.page.pipe(tap(() => this.loadRolesPage())).subscribe();
   }
 
   public selectAllOfGroup(group: string): void {
@@ -111,5 +104,9 @@ export class ProjectRolesTableComponent implements AfterViewInit, OnInit {
 
   public refreshPage(): void {
     this.dataSource.loadRoles(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
+  }
+
+  public get selectionAllowed(): boolean {
+    return this.displayedColumns.includes('select');
   }
 }

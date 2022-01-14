@@ -1,4 +1,5 @@
 import { MediaMatcher } from '@angular/cdk/layout';
+import { Location } from '@angular/common';
 import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
@@ -8,7 +9,7 @@ import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-dataso
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -58,8 +59,9 @@ export class AuthUserDetailComponent implements OnDestroy {
     public userService: GrpcAuthService,
     private dialog: MatDialog,
     private auth: AuthenticationService,
-    breadcrumbService: BreadcrumbService,
+    private breadcrumbService: BreadcrumbService,
     private mediaMatcher: MediaMatcher,
+    private _location: Location,
   ) {
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;
@@ -69,8 +71,6 @@ export class AuthUserDetailComponent implements OnDestroy {
     this.mediaMatcher.matchMedia(mediaq).onchange = (small) => {
       this.changeSelection(small.matches);
     };
-
-    breadcrumbService.setBreadcrumb([]);
 
     this.loading = true;
     this.refreshUser();
@@ -88,6 +88,10 @@ export class AuthUserDetailComponent implements OnDestroy {
     }
   }
 
+  public navigateBack(): void {
+    this._location.back();
+  }
+
   refreshUser(): void {
     this.refreshChanges$.emit();
     this.userService
@@ -95,6 +99,14 @@ export class AuthUserDetailComponent implements OnDestroy {
       .then((resp) => {
         if (resp.user) {
           this.user = resp.user;
+
+          this.breadcrumbService.setBreadcrumb([
+            new Breadcrumb({
+              type: BreadcrumbType.AUTHUSER,
+              name: this.user.human?.profile?.displayName,
+              routerLink: ['/users', 'me'],
+            }),
+          ]);
         }
         this.loading = false;
       })

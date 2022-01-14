@@ -11,6 +11,7 @@ export enum BreadcrumbType {
   PROJECTGRANT,
   APP,
   IDP,
+  AUTHUSER,
 }
 
 export class Breadcrumb {

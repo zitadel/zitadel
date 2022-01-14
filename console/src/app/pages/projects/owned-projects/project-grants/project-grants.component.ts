@@ -50,6 +50,10 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
 
       const breadcrumbs = [
         new Breadcrumb({
+          type: BreadcrumbType.ORG,
+          routerLink: ['/org'],
+        }),
+        new Breadcrumb({
           type: BreadcrumbType.PROJECT,
           name: '',
           param: { key: ROUTEPARAM, value: projectId },
