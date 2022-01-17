@@ -17,7 +17,7 @@ type UserAuthMethodProjection struct {
 }
 
 const (
-	UserAuthMethodTable = "zitadel.projections.user_auth_method"
+	UserAuthMethodTable = "zitadel.projections.user_auth_methods"
 )
 
 func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserAuthMethodProjection {
@@ -37,7 +37,7 @@ const (
 	UserAuthMethodSequenceCol      = "sequence"
 	UserAuthMethodNameCol          = "name"
 	UserAuthMethodStateCol         = "state"
-	UserAuthMethodTypeCol          = "type"
+	UserAuthMethodTypeCol          = "method_type"
 )
 
 func (p *UserAuthMethodProjection) reducers() []handler.AggregateReducer {
@@ -74,11 +74,11 @@ func (p *UserAuthMethodProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceRemoveAuthMethod,
 				},
 				{
-					Event:  user.HumanU2FTokenVerifiedType,
+					Event:  user.HumanU2FTokenRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},
 				{
-					Event:  user.HumanMFAOTPVerifiedType,
+					Event:  user.HumanMFAOTPRemovedType,
 					Reduce: p.reduceRemoveAuthMethod,
 				},
 			},
@@ -87,7 +87,7 @@ func (p *UserAuthMethodProjection) reducers() []handler.AggregateReducer {
 }
 
 func (p *UserAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) (*handler.Statement, error) {
-	var tokenID string
+	tokenID := ""
 	var methodType domain.UserAuthMethodType
 	switch e := event.(type) {
 	case *user.HumanPasswordlessAddedEvent:
@@ -98,13 +98,12 @@ func (p *UserAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		tokenID = e.WebAuthNTokenID
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeOTP
-
 	default:
 		logging.LogWithFields("PROJE-9j3f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-f92f", "reduce.wrong.event.type")
 	}
 
-	return crdb.NewCreateStatement(
+	return crdb.NewUpsertStatement(
 		event,
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
@@ -134,21 +133,14 @@ func (p *UserAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 		methodType = domain.UserAuthMethodTypeU2F
 		tokenID = e.WebAuthNTokenID
 		name = e.WebAuthNTokenName
-	case *user.HumanOTPAddedEvent:
+	case *user.HumanOTPVerifiedEvent:
 		methodType = domain.UserAuthMethodTypeOTP
 
 	default:
 		logging.LogWithFields("PROJE-9j3f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-f92f", "reduce.wrong.event.type")
 	}
-	conditions := []handler.Condition{
-		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
-		handler.NewCond(UserAuthMethodTypeCol, methodType),
-		handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
-	}
-	if tokenID != "" {
-		conditions = append(conditions, handler.NewCond(UserAuthMethodTokenIDCol, tokenID))
-	}
+
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
@@ -157,7 +149,12 @@ func (p *UserAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 			handler.NewCol(UserAuthMethodNameCol, name),
 			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),
 		},
-		conditions,
+		[]handler.Condition{
+			handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),
+			handler.NewCond(UserAuthMethodTypeCol, methodType),
+			handler.NewCond(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCond(UserAuthMethodTokenIDCol, tokenID),
+		},
 	), nil
 }
 

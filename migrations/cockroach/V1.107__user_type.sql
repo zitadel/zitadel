@@ -8,6 +8,7 @@ CREATE TABLE zitadel.projections.user_auth_methods (
     , user_id STRING NOT NULL
     , state INT2 NOT NULL
     , method_type INT2 NOT NULL
+    , name STRING NOT NULL
 
     , PRIMARY KEY (user_id, method_type, token_id)
     , INDEX idx_ro (resource_owner)
