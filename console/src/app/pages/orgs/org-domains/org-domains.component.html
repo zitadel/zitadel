@@ -20,8 +20,12 @@
         matTooltip="Add domain" mat-raised-button color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' |
         translate}}
       </button>
-
     </div>
+
+    <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) === false" [featureLink]="['/org/features']"
+      class="info" [type]="InfoSectionType.WARN">
+      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
+    </cnsl-info-section>
 
     <cnsl-card *ngFor="let domain of domains" class="domain-card">
       <div class="domain">
@@ -43,10 +47,5 @@
           color="warn" mat-icon-button (click)="removeDomain(domain.domainName)"><i class="las la-trash"></i></button>
       </div>
     </cnsl-card>
-
-    <cnsl-info-section *ngIf="(['custom_domain'] | hasFeature | async) === false" [featureLink]="['/org/features']"
-      class="info" [type]="InfoSectionType.WARN">
-      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'custom_domain'})"></span>
-    </cnsl-info-section>
   </ng-container>
 </div>

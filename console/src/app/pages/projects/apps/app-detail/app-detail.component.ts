@@ -1,5 +1,6 @@
 import { COMMA, ENTER, SPACE } from '@angular/cdk/keycodes';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
@@ -67,6 +68,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public showAdditionalOrigins: boolean = false;
   public showRedirects: boolean = false;
+  public showUrls: boolean = false;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -74,6 +76,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   private subscription?: Subscription;
   public projectId: string = '';
   public app!: App.AsObject;
+
+  public environmentMap: { [key: string]: string } = {};
+
   public oidcResponseTypes: OIDCResponseType[] = [
     OIDCResponseType.OIDC_RESPONSE_TYPE_CODE,
     OIDCResponseType.OIDC_RESPONSE_TYPE_ID_TOKEN,
@@ -122,6 +127,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public copiedKey: any = '';
   public nextLinks: Array<CnslLinks> = [];
   public InfoSectionType: any = InfoSectionType;
+  public copied: string = '';
 
   constructor(
     public translate: TranslateService,
@@ -135,6 +141,7 @@ export class AppDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private snackbar: MatSnackBar,
     private breadcrumbService: BreadcrumbService,
+    private http: HttpClient,
   ) {
     this.oidcForm = this.fb.group({
       devMode: [{ value: false, disabled: true }, []],
@@ -152,6 +159,15 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
     this.apiForm = this.fb.group({
       authMethodType: [{ value: '', disabled: true }],
+    });
+
+    this.http.get('./assets/environment.json').subscribe((env: any) => {
+      this.environmentMap = {
+        issuer: env.issuer,
+        adminServiceUrl: env.adminServiceUrl,
+        mgmtServiceUrl: env.mgmtServiceUrl,
+        authServiceUrl: env.adminServiceUrl,
+      };
     });
   }
 

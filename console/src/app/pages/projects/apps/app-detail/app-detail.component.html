@@ -135,11 +135,37 @@
             </button>
           </h2>
           <ng-container *ngIf="showAdditionalOrigins">
-            <h2 class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</h2>
+            <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
             <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
               [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $any($event)"
               [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
             </cnsl-additional-origins>
+          </ng-container>
+        </div>
+
+        <div class="app-expandable">
+          <h2 class="title">{{'APP.URLS' | translate}}
+            <button mat-icon-button (click)="showUrls = !showUrls"
+              matTooltip="{{(showUrls ? 'ACTIONS.HIDE' : 'ACTIONS.SHOW') | translate}}">
+              <mat-icon *ngIf="!showUrls">expand_more</mat-icon>
+              <mat-icon *ngIf="showUrls">expand_less</mat-icon>
+            </button>
+          </h2>
+          <ng-container *ngIf="showUrls">
+            <div class="app-info-row">
+              <div class="app-info-wrapper" *ngFor="let environmentV of (environmentMap | keyvalue)">
+                <p class="app-info-row-title">{{environmentV.key}}</p>
+                <div class="app-copy-row">
+                  <div *ngIf="environmentV.value" class="environment">
+                    <button [disabled]="copied === environmentV.value"
+                      [matTooltip]="(copied !== environmentV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
+                      cnslCopyToClipboard [valueToCopy]="environmentV.value" (copiedValue)="copied = environmentV.key">
+                      {{environmentV.value}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </ng-container>
         </div>
 

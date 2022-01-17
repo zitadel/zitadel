@@ -11,7 +11,7 @@ import {
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PasswordComplexityPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -58,6 +58,12 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
               if (org && org.id) {
                 this.orgName = org.name;
               }
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([bread]);
+
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -70,8 +76,6 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
       .subscribe(() => {
         this.fetchData();
       });
-
-    breadcrumbService.setBreadcrumb([]);
   }
 
   public fetchData(): void {

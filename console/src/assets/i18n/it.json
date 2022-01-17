@@ -1353,6 +1353,7 @@
   "APP": {
     "LIST": "Applicazioni",
     "COMPLIANCE": "Conformità con OIDC",
+    "URLS": "Urls",
     "PAGES": {
       "TITLE": "Applicazione",
       "ID": "ID",

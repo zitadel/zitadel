@@ -7,7 +7,7 @@ import { GetOrgIAMPolicyResponse } from 'src/app/proto/generated/zitadel/managem
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { OrgIAMPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -56,6 +56,11 @@ export class OrgIamPolicyComponent implements OnDestroy {
               this.orgName = org.name;
             }
             this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
+            const bread: Breadcrumb = {
+              type: BreadcrumbType.ORG,
+              routerLink: ['/org'],
+            };
+            breadcrumbService.setBreadcrumb([bread]);
           }
           return this.route.params;
         }),
@@ -63,8 +68,6 @@ export class OrgIamPolicyComponent implements OnDestroy {
       .subscribe((_) => {
         this.fetchData();
       });
-
-    breadcrumbService.setBreadcrumb([]);
   }
 
   public ngOnDestroy(): void {

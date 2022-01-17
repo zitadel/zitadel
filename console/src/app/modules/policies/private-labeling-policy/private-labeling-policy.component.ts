@@ -19,6 +19,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { AssetEndpoint, AssetService, AssetType } from 'src/app/services/asset.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
@@ -101,6 +102,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private storageService: StorageService,
     private themeService: ThemeService,
+    breadcrumbService: BreadcrumbService,
   ) {
     const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
 
@@ -117,9 +119,22 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
+
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/iam'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
               break;
           }
 

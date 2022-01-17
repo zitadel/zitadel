@@ -10,7 +10,7 @@ import {
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LockoutPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -55,9 +55,24 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
               if (org && org.id) {
                 this.orgName = org.name;
               }
+
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([bread]);
+
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
+
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/iam'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
+
               break;
           }
 
@@ -67,8 +82,6 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
       .subscribe(() => {
         this.fetchData();
       });
-
-    breadcrumbService.setBreadcrumb([]);
   }
 
   public ngOnDestroy(): void {

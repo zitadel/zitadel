@@ -8,7 +8,7 @@ import {
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { PasswordAgePolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -41,9 +41,22 @@ export class PasswordAgePolicyComponent implements OnDestroy {
           switch (this.serviceType) {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
+
+              const bread: Breadcrumb = {
+                type: BreadcrumbType.ORG,
+                routerLink: ['/org'],
+              };
+              breadcrumbService.setBreadcrumb([bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
+
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/iam'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
               break;
           }
 
@@ -57,8 +70,6 @@ export class PasswordAgePolicyComponent implements OnDestroy {
           }
         });
       });
-
-    breadcrumbService.setBreadcrumb([]);
   }
 
   public ngOnDestroy(): void {

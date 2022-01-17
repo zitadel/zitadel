@@ -184,20 +184,7 @@
       </div>
     </div>
   </div>
-  <div class="info-row">
-    <div class="info-wrapper" *ngFor="let environmentV of (environmentMap | keyvalue)">
-      <p class="info-row-title">{{environmentV.key}}</p>
-      <div class="copy-row">
-        <div *ngIf="environmentV.value" class="environment">
-          <button [disabled]="copied === environmentV.value"
-            [matTooltip]="(copied !== environmentV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
-            cnslCopyToClipboard [valueToCopy]="environmentV.value" (copiedValue)="copied = environmentV.key">
-            {{environmentV.value}}
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+
 </ng-container>
 
 <div class="info-row" *ngIf="idp">
