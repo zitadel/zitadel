@@ -6,14 +6,15 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AddKeyDialogComponent, AddKeyDialogType } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
-import { ShowKeyDialogComponent } from 'src/app/modules/show-key-dialog/show-key-dialog.component';
 import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
-import { ListMachineKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { ListMachineTokensResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { MachineToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { AddTokenDialogComponent } from '../add-token-dialog/add-token-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
+import { ShowTokenDialogComponent } from '../show-token-dialog/show-token-dialog.component';
 
 @Component({
   selector: 'cnsl-machine-keys',
@@ -24,17 +25,21 @@ export class MachineKeysComponent implements OnInit {
   @Input() userId!: string;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
-  public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
-  public keyResult!: ListMachineKeysResponse.AsObject;
+  public dataSource: MatTableDataSource<MachineToken.AsObject> = new MatTableDataSource<MachineToken.AsObject>();
+  public selection: SelectionModel<MachineToken.AsObject> = new SelectionModel<MachineToken.AsObject>(true, []);
+  public tokenResult!: ListMachineTokensResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate', 'actions'];
 
-  @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
+  @Output() public changedSelection: EventEmitter<Array<MachineToken.AsObject>> = new EventEmitter();
 
-  constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
-    private toast: ToastService) {
+  constructor(
+    public translate: TranslateService,
+    private mgmtService: ManagementService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+  ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
@@ -44,7 +49,6 @@ export class MachineKeysComponent implements OnInit {
     this.getData(10, 0);
   }
 
-
   public isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
@@ -52,33 +56,33 @@ export class MachineKeysComponent implements OnInit {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
-
 
   public changePage(event: PageEvent): void {
     this.getData(event.pageSize, event.pageIndex * event.pageSize);
   }
 
   public deleteKey(key: Key.AsObject): void {
-    this.mgmtService.removeMachineKey(key.id, this.userId).then(() => {
-      this.selection.clear();
-      this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
-      this.getData(10, 0);
-    }).catch(error => {
-      this.toast.showError(error);
-    });
+    this.mgmtService
+      .removeMachineKey(key.id, this.userId)
+      .then(() => {
+        this.selection.clear();
+        this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
+        this.getData(10, 0);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public openAddKey(): void {
-    const dialogRef = this.dialog.open(AddKeyDialogComponent, {
+    const dialogRef = this.dialog.open(AddTokenDialogComponent, {
       data: {},
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const type: KeyType = resp.type;
 
@@ -95,23 +99,25 @@ export class MachineKeysComponent implements OnInit {
         }
 
         if (type) {
-          this.mgmtService.addMachineKey(this.userId, type, date).then((response) => {
-            if (response) {
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
+          this.mgmtService
+            .addMachineKey(this.userId, type, date)
+            .then((response) => {
+              if (response) {
+                setTimeout(() => {
+                  this.refreshPage();
+                }, 1000);
 
-              this.dialog.open(ShowKeyDialogComponent, {
-                data: {
-                  key: response,
-                  type: AddKeyDialogType.MACHINE,
-                },
-                width: '400px',
-              });
-            }
-          }).catch((error: any) => {
-            this.toast.showError(error);
-          });
+                this.dialog.open(ShowTokenDialogComponent, {
+                  data: {
+                    key: response,
+                  },
+                  width: '400px',
+                });
+              }
+            })
+            .catch((error: any) => {
+              this.toast.showError(error);
+            });
         }
       }
     });
@@ -121,16 +127,19 @@ export class MachineKeysComponent implements OnInit {
     this.loadingSubject.next(true);
 
     if (this.userId) {
-      this.mgmtService.listMachineKeys(this.userId, limit, offset).then(resp => {
-        this.keyResult = resp;
-        if (resp.resultList) {
-          this.dataSource.data = resp.resultList;
-        }
-        this.loadingSubject.next(false);
-      }).catch((error: any) => {
-        this.toast.showError(error);
-        this.loadingSubject.next(false);
-      });
+      this.mgmtService
+        .listMachineTokens(this.userId, limit, offset)
+        .then((resp) => {
+          this.tokenResult = resp;
+          if (resp.resultList) {
+            this.dataSource.data = resp.resultList;
+          }
+          this.loadingSubject.next(false);
+        })
+        .catch((error: any) => {
+          this.toast.showError(error);
+          this.loadingSubject.next(false);
+        });
     }
   }
 

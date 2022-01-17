@@ -375,6 +375,8 @@
       "DESCRIPTION": "Description",
       "KEYSTITLE": "Keys",
       "KEYSDESC": "Define your keys and add an optional expiration date.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Personal access tokens function like ordinary OAuth access tokens.",
       "ID": "Key ID",
       "TYPE": "Type",
       "EXPIRATIONDATE": "Expiration date",

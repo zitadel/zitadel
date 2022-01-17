@@ -11,48 +11,43 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { AddKeyDialogModule } from 'src/app/modules/add-key-dialog/add-key-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { AddTokenDialogModule } from '../add-token-dialog/add-token-dialog.module';
 import { CardModule } from '../card/card.module';
 import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
-import { ShowKeyDialogModule } from '../show-key-dialog/show-key-dialog.module';
+import { ShowTokenDialogModule } from '../show-token-dialog/show-token-dialog.module';
 import { MachineKeysComponent } from './machine-keys.component';
 
-
 @NgModule({
-    declarations: [
-        MachineKeysComponent,
-    ],
-    imports: [
-        CommonModule,
-        RouterModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogModule,
-        HasRoleModule,
-        CardModule,
-        MatTableModule,
-        PaginatorModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
-        MatTooltipModule,
-        HasRolePipeModule,
-        TimestampToDatePipeModule,
-        LocalizedDatePipeModule,
-        TranslateModule,
-        RefreshTableModule,
-        InputModule,
-        ShowKeyDialogModule,
-        AddKeyDialogModule,
-    ],
-    exports: [
-        MachineKeysComponent,
-    ],
+  declarations: [MachineKeysComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    HasRoleModule,
+    CardModule,
+    MatTableModule,
+    PaginatorModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    HasRolePipeModule,
+    TimestampToDatePipeModule,
+    LocalizedDatePipeModule,
+    TranslateModule,
+    RefreshTableModule,
+    InputModule,
+    ShowTokenDialogModule,
+    AddTokenDialogModule,
+  ],
+  exports: [MachineKeysComponent],
 })
-export class MachineKeysModule { }
+export class MachineKeysModule {}

@@ -6,13 +6,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AddKeyDialogComponent, AddKeyDialogType } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
-import { ShowKeyDialogComponent } from 'src/app/modules/show-key-dialog/show-key-dialog.component';
+import { AddKeyDialogComponent } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
 import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 import { ListMachineKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { AddTokenDialogComponent } from '../add-token-dialog/add-token-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 
 @Component({
@@ -64,7 +64,7 @@ export class MachineTokensComponent implements OnInit {
 
   public deleteKey(key: Key.AsObject): void {
     this.mgmtService
-      .removeMachineKey(key.id, this.userId)
+      .removeMachineToken(key.id, this.userId)
       .then(() => {
         this.selection.clear();
         this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
@@ -99,17 +99,16 @@ export class MachineTokensComponent implements OnInit {
 
         if (type) {
           this.mgmtService
-            .addMachineKey(this.userId, type, date)
+            .addMachineToken(this.userId, date)
             .then((response) => {
               if (response) {
                 setTimeout(() => {
                   this.refreshPage();
                 }, 1000);
 
-                this.dialog.open(ShowKeyDialogComponent, {
+                this.dialog.open(AddTokenDialogComponent, {
                   data: {
                     key: response,
-                    type: AddKeyDialogType.MACHINE,
                   },
                   width: '400px',
                 });

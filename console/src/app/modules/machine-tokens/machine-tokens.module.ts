@@ -11,11 +11,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { AddKeyDialogModule } from 'src/app/modules/add-key-dialog/add-key-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { AddTokenDialogModule } from '../add-token-dialog/add-token-dialog.module';
 import { CardModule } from '../card/card.module';
 import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
@@ -46,7 +46,7 @@ import { MachineTokensComponent } from './machine-tokens.component';
     RefreshTableModule,
     InputModule,
     ShowKeyDialogModule,
-    AddKeyDialogModule,
+    AddTokenDialogModule,
   ],
   exports: [MachineTokensComponent],
 })

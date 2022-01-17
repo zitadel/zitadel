@@ -1,17 +1,16 @@
 <span class="title" mat-dialog-title>{{'USER.MACHINE.ADDED.TITLE' | translate}}</span>
 <div mat-dialog-content>
   <p class="desc"> {{'USER.MACHINE.ADDED.DESCRIPTION' | translate}}</p>
-  <ng-container *ngIf="keyResponse">
+  <ng-container *ngIf="tokenResponse">
     <div class="row">
       <p class="left">{{'USER.MACHINE.ID' | translate}}</p>
-      <p class="right">{{$any(keyResponse)?.id}}</p>
-      <p class="right">{{$any(keyResponse)?.keyId}}</p>
+      <p class="right">{{$any(tokenResponse)?.tokenId}}</p>
     </div>
 
     <div class="row">
       <p class="left">{{'USER.MACHINE.CREATIONDATE' | translate}}</p>
-      <p *ngIf="keyResponse.details && keyResponse.details.creationDate" class="right">
-        {{ keyResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
+      <p *ngIf="tokenResponse.details && tokenResponse.details.creationDate" class="right">
+        {{ tokenResponse.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm' }}
       </p>
     </div>
     <button class="download-button" mat-stroked-button color="primary" (click)="saveFile()">Download</button>
