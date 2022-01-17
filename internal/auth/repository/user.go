@@ -13,26 +13,26 @@ type UserRepository interface {
 
 	UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error)
 
-	UserByID(ctx context.Context, userID string) (*model.UserView, error)
-	UserByLoginName(ctx context.Context, loginName string) (*model.UserView, error)
+	//UserByID(ctx context.Context, userID string) (*model.UserView, error)
+	//UserByLoginName(ctx context.Context, loginName string) (*model.UserView, error)
 
-	SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
+	//SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error)
 
 	SearchUserMetadata(ctx context.Context, userID string) (*domain.MetadataSearchResponse, error)
 }
 
 type myUserRepo interface {
-	MyUser(ctx context.Context) (*model.UserView, error)
+	//MyUser(ctx context.Context) (*model.UserView, error)
 
-	MyProfile(ctx context.Context) (*model.Profile, error)
+	//MyProfile(ctx context.Context) (*model.Profile, error)
 
-	MyEmail(ctx context.Context) (*model.Email, error)
+	//MyEmail(ctx context.Context) (*model.Email, error)
 
-	MyPhone(ctx context.Context) (*model.Phone, error)
+	//MyPhone(ctx context.Context) (*model.Phone, error)
 
-	MyAddress(ctx context.Context) (*model.Address, error)
+	//MyAddress(ctx context.Context) (*model.Address, error)
 
-	SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
+	//SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error)
 
 	MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error)
 

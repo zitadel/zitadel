@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
-	"golang.org/x/text/language"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -81,7 +80,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.repo.UserByID(ctx, subject)
+	user, err := o.query.GetUserByID(ctx, subject)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +175,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.repo.UserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -186,38 +185,31 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		case oidc.ScopeOpenID:
 			userInfo.SetSubject(user.ID)
 		case oidc.ScopeEmail:
-			if user.HumanView == nil {
+			if user.Human == nil {
 				continue
 			}
-			userInfo.SetEmail(user.Email, user.IsEmailVerified)
+			userInfo.SetEmail(user.Human.Email, user.Human.IsEmailVerified)
 		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)
-			if user.HumanView != nil {
-				userInfo.SetName(user.DisplayName)
-				userInfo.SetFamilyName(user.LastName)
-				userInfo.SetGivenName(user.FirstName)
-				userInfo.SetNickname(user.NickName)
-				userInfo.SetGender(oidc.Gender(getGender(user.Gender)))
-				locale, _ := language.Parse(user.PreferredLanguage)
-				userInfo.SetLocale(locale)
-				userInfo.SetPicture(user.AvatarURL)
+			if user.Human != nil {
+				userInfo.SetName(user.Human.DisplayName)
+				userInfo.SetFamilyName(user.Human.LastName)
+				userInfo.SetGivenName(user.Human.FirstName)
+				userInfo.SetNickname(user.Human.NickName)
+				userInfo.SetGender(oidc.Gender(user.Human.Gender))
+				userInfo.SetLocale(user.Human.PreferredLanguage)
+				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix, user.ResourceOwner, user.Human.AvatarKey))
 			} else {
-				userInfo.SetName(user.MachineView.Name)
+				userInfo.SetName(user.Machine.Name)
 			}
 		case oidc.ScopePhone:
-			if user.HumanView == nil {
+			if user.Human == nil {
 				continue
 			}
-			userInfo.SetPhone(user.Phone, user.IsPhoneVerified)
+			userInfo.SetPhone(user.Human.Phone, user.Human.IsPhoneVerified)
 		case oidc.ScopeAddress:
-			if user.HumanView == nil {
-				continue
-			}
-			if user.StreetAddress == "" && user.Locality == "" && user.Region == "" && user.PostalCode == "" && user.Country == "" {
-				continue
-			}
-			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
+			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
 			userMetaData, err := o.assertUserMetaData(ctx, userID)
 			if err != nil {
@@ -329,7 +321,7 @@ func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.repo.UserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

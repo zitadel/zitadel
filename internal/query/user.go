@@ -236,15 +236,12 @@ func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...Sea
 	return scan(rows)
 }
 
-func (q *Queries) GetUserByLoginNameGlobal(ctx context.Context, loginName string, queries ...SearchQuery) (*User, error) {
+func (q *Queries) GetUser(ctx context.Context, queries ...SearchQuery) (*User, error) {
 	query, scan := prepareUserQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			userLoginNamesCol.identifier(): loginName,
-		}).ToSql()
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
 	}
@@ -425,6 +422,10 @@ func NewUserTypeSearchQuery(value int32) (SearchQuery, error) {
 
 func NewUserPreferredLoginNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	return NewTextQuery(userPreferredLoginNameCol, value, comparison)
+}
+
+func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(userLoginNamesCol, value, TextListContains)
 }
 
 func prepareUserQuery() (sq.SelectBuilder, func(*sql.Rows) (*User, error)) {

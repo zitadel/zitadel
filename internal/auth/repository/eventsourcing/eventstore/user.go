@@ -33,78 +33,78 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.Eventstore.Health(ctx)
 }
 
-func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
-	return repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-}
+//func (repo *UserRepo) MyUser(ctx context.Context) (*model.UserView, error) {
+//	return repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+//}
 
-func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-H2JIT", "Errors.User.NotHuman")
-	}
-	return user.GetProfile()
-}
+//func (repo *UserRepo) MyProfile(ctx context.Context) (*model.Profile, error) {
+//	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if user.HumanView == nil {
+//		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-H2JIT", "Errors.User.NotHuman")
+//	}
+//	return user.GetProfile()
+//}
 
-func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
-	err := request.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
-	logging.Log("EVENT-5Jsi8").OnError(seqErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user sequence")
-	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)
-	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &model.ExternalIDPSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      usr_view_model.ExternalIDPViewsToModel(externalIDPS),
-	}
-	if seqErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oGRpc", "Errors.User.NotHuman")
-	}
-	return user.GetEmail()
-}
-
-func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DTWJb", "Errors.User.NotHuman")
-	}
-	return user.GetPhone()
-}
-
-func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ok9nI", "Errors.User.NotHuman")
-	}
-	return user.GetAddress()
-}
+//func (repo *UserRepo) SearchMyExternalIDPs(ctx context.Context, request *model.ExternalIDPSearchRequest) (*model.ExternalIDPSearchResponse, error) {
+//	err := request.EnsureLimit(repo.SearchLimit)
+//	if err != nil {
+//		return nil, err
+//	}
+//	sequence, seqErr := repo.View.GetLatestExternalIDPSequence()
+//	logging.Log("EVENT-5Jsi8").OnError(seqErr).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Warn("could not read latest user sequence")
+//	request.AppendUserQuery(authz.GetCtxData(ctx).UserID)
+//	externalIDPS, count, err := repo.View.SearchExternalIDPs(request)
+//	if err != nil {
+//		return nil, err
+//	}
+//	result := &model.ExternalIDPSearchResponse{
+//		Offset:      request.Offset,
+//		Limit:       request.Limit,
+//		TotalResult: count,
+//		Result:      usr_view_model.ExternalIDPViewsToModel(externalIDPS),
+//	}
+//	if seqErr == nil {
+//		result.Sequence = sequence.CurrentSequence
+//		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+//	}
+//	return result, nil
+//}
+//
+//func (repo *UserRepo) MyEmail(ctx context.Context) (*model.Email, error) {
+//	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if user.HumanView == nil {
+//		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-oGRpc", "Errors.User.NotHuman")
+//	}
+//	return user.GetEmail()
+//}
+//
+//func (repo *UserRepo) MyPhone(ctx context.Context) (*model.Phone, error) {
+//	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if user.HumanView == nil {
+//		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-DTWJb", "Errors.User.NotHuman")
+//	}
+//	return user.GetPhone()
+//}
+//
+//func (repo *UserRepo) MyAddress(ctx context.Context) (*model.Address, error) {
+//	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	if user.HumanView == nil {
+//		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-Ok9nI", "Errors.User.NotHuman")
+//	}
+//	return user.GetAddress()
+//}
 
 func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error) {
 	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
@@ -172,27 +172,28 @@ func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence ui
 	return repo.getUserEvents(ctx, id, sequence)
 }
 
-func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*model.UserView, error) {
-	user, err := repo.View.UserByLoginName(loginname)
-	if err != nil {
-		return nil, err
-	}
-	events, err := repo.getUserEvents(ctx, user.ID, user.Sequence)
-	if err != nil {
-		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
-		}
-	}
-	if userCopy.State == int32(model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
-	}
-	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
-}
+//
+//func (repo *UserRepo) UserByLoginName(ctx context.Context, loginname string) (*model.UserView, error) {
+//	user, err := repo.View.UserByLoginName(loginname)
+//	if err != nil {
+//		return nil, err
+//	}
+//	events, err := repo.getUserEvents(ctx, user.ID, user.Sequence)
+//	if err != nil {
+//		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
+//		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
+//	}
+//	userCopy := *user
+//	for _, event := range events {
+//		if err := userCopy.AppendEvent(event); err != nil {
+//			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
+//		}
+//	}
+//	if userCopy.State == int32(model.UserStateDeleted) {
+//		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
+//	}
+//	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
+//}
 func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
 	changes, err := repo.getUserChanges(ctx, authz.GetCtxData(ctx).UserID, lastSequence, limit, sortAscending, retention)
 	if err != nil {
@@ -216,25 +217,26 @@ func (repo *UserRepo) MyUserChanges(ctx context.Context, lastSequence uint64, li
 	return changes, nil
 }
 
-func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error) {
-	sequence, sequenceErr := repo.View.GetLatestUserSequence()
-	logging.Log("EVENT-Gdgsw").OnError(sequenceErr).Warn("could not read latest user sequence")
-	users, count, err := repo.View.SearchUsers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &model.UserSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      usr_view_model.UsersToModel(users, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
+//
+//func (repo *UserRepo) SearchUsers(ctx context.Context, request *model.UserSearchRequest) (*model.UserSearchResponse, error) {
+//	sequence, sequenceErr := repo.View.GetLatestUserSequence()
+//	logging.Log("EVENT-Gdgsw").OnError(sequenceErr).Warn("could not read latest user sequence")
+//	users, count, err := repo.View.SearchUsers(request)
+//	if err != nil {
+//		return nil, err
+//	}
+//	result := &model.UserSearchResponse{
+//		Offset:      request.Offset,
+//		Limit:       request.Limit,
+//		TotalResult: count,
+//		Result:      usr_view_model.UsersToModel(users, repo.PrefixAvatarURL),
+//	}
+//	if sequenceErr == nil {
+//		result.Sequence = sequence.CurrentSequence
+//		result.Timestamp = sequence.LastSuccessfulSpoolerRun
+//	}
+//	return result, nil
+//}
 
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error) {
 	query := usr_view.ChangesQuery(userID, lastSequence, limit, sortAscending, retention)

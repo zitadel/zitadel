@@ -32,5 +32,5 @@ type UserRepository interface {
 
 	//PhoneByID(ctx context.Context, userID string) (*model.Phone, error)
 
-	AddressByID(ctx context.Context, userID string) (*model.Address, error)
+	//AddressByID(ctx context.Context, userID string) (*model.Address, error)
 }
