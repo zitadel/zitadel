@@ -5,9 +5,10 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 var (
@@ -92,7 +93,7 @@ func prepareIAMMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 			HumanLastNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
 		).From(iamMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, IAMMemberUserID)).

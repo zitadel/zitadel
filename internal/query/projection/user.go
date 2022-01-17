@@ -54,7 +54,7 @@ const (
 	HumanDisplayNameCol       = "display_name"
 	HumanPreferredLanguageCol = "preferred_language"
 	HumanGenderCol            = "gender"
-	HumanAvaterURLCol         = "avatar_key"
+	HumanAvatarURLCol         = "avatar_key"
 
 	// email
 	HumanEmailCol           = "email"
@@ -601,7 +601,7 @@ func (p *UserProjection) reduceHumanAvatarAdded(event eventstore.Event) (*handle
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(HumanAvaterURLCol, e.StoreKey),
+				handler.NewCol(HumanAvatarURLCol, e.StoreKey),
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),
@@ -631,7 +631,7 @@ func (p *UserProjection) reduceHumanAvatarRemoved(event eventstore.Event) (*hand
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{
-				handler.NewCol(HumanAvaterURLCol, nil),
+				handler.NewCol(HumanAvatarURLCol, nil),
 			},
 			[]handler.Condition{
 				handler.NewCond(HumanUserIDCol, e.Aggregate().ID),

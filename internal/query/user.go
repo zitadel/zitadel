@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -28,6 +29,7 @@ type User struct {
 	ResourceOwner      string
 	Sequence           uint64
 	State              domain.UserState
+	Type               domain.UserType
 	Username           string
 	LoginNames         []string
 	PreferredLoginName string
@@ -172,8 +174,8 @@ var (
 		name:  projection.HumanGenderCol,
 		table: humanTable,
 	}
-	HumanAvaterURLCol = Column{
-		name:  projection.HumanAvaterURLCol,
+	HumanAvatarURLCol = Column{
+		name:  projection.HumanAvatarURLCol,
 		table: humanTable,
 	}
 
@@ -229,11 +231,8 @@ func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...Sea
 		return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, err
-	}
-	return scan(rows)
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
 }
 
 func (q *Queries) GetUser(ctx context.Context, queries ...SearchQuery) (*User, error) {
@@ -246,11 +245,8 @@ func (q *Queries) GetUser(ctx context.Context, queries ...SearchQuery) (*User, e
 		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
 	}
 
-	rows, err := q.client.QueryContext(ctx, stmt, args...)
-	if err != nil {
-		return nil, err
-	}
-	return scan(rows)
+	row := q.client.QueryRowContext(ctx, stmt, args...)
+	return scan(row)
 }
 
 func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ...SearchQuery) (*Profile, error) {
@@ -319,7 +315,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (
 	if err != nil {
 		return nil, err
 	}
-	users.LatestSequence, err = q.latestSequence(ctx, projectRolesTable)
+	users.LatestSequence, err = q.latestSequence(ctx, userTable)
 	return users, err
 }
 
@@ -380,10 +376,6 @@ func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
 	return nil
 }
 
-//func NewUserIDSearchQuery(value string) (SearchQuery, error) {
-//	return NewTextQuery(UserIDCol, value, TextEquals)
-//}
-
 func NewUserResourceOwnerSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
 	return NewTextQuery(UserResourceOwnerCol, value, comparison)
 }
@@ -417,7 +409,7 @@ func NewUserStateSearchQuery(value int32) (SearchQuery, error) {
 }
 
 func NewUserTypeSearchQuery(value int32) (SearchQuery, error) {
-	return NewNumberQuery(UserStateCol, value, NumberEquals) //TODO: type
+	return NewNumberQuery(UserTypeCol, value, NumberEquals)
 }
 
 func NewUserPreferredLoginNameSearchQuery(value string, comparison TextComparison) (SearchQuery, error) {
@@ -428,7 +420,7 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(userLoginNamesCol, value, TextListContains)
 }
 
-func prepareUserQuery() (sq.SelectBuilder, func(*sql.Rows) (*User, error)) {
+func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 	loginNamesQuery, _, err := sq.Select(
 		userLoginNamesUserIDCol.identifier(),
 		"ARRAY_AGG("+userLoginNamesCol.identifier()+") as login_names").
@@ -456,6 +448,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Rows) (*User, error)) {
 			UserResourceOwnerCol.identifier(),
 			UserSequenceCol.identifier(),
 			UserStateCol.identifier(),
+			UserTypeCol.identifier(),
 			UserUsernameCol.identifier(),
 			"login_names.login_names",
 			userPreferredLoginNameCol.identifier(),
@@ -466,7 +459,7 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Rows) (*User, error)) {
 			HumanDisplayNameCol.identifier(),
 			HumanPreferredLanguageCol.identifier(),
 			HumanGenderCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier(),
 			HumanPhoneCol.identifier(),
@@ -481,8 +474,9 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Rows) (*User, error)) {
 			LeftJoin("("+loginNamesQuery+") as login_names on "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()).
 			LeftJoin("("+preferredLoginNameQuery+") as preferred_login_name on "+userPreferredLoginNameUserIDCol.identifier()+" = "+UserIDCol.identifier(), preferredLoginNameArgs...).
 			PlaceholderFormat(sq.Dollar),
-		func(rows *sql.Rows) (*User, error) {
+		func(row *sql.Row) (*User, error) {
 			u := new(User)
+			loginNames := pq.StringArray{}
 			preferredLoginName := sql.NullString{}
 
 			humanID := sql.NullString{}
@@ -502,75 +496,65 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Rows) (*User, error)) {
 			name := sql.NullString{}
 			description := sql.NullString{}
 
-			for rows.Next() {
-				loginName := &sql.NullString{}
-				isPrimary := sql.NullBool{}
+			err := row.Scan(
+				&u.ID,
+				&u.CreationDate,
+				&u.ChangeDate,
+				&u.ResourceOwner,
+				&u.Sequence,
+				&u.State,
+				&u.Type,
+				&u.Username,
+				&loginNames,
+				&preferredLoginName,
+				&humanID,
+				&firstName,
+				&lastName,
+				&nickName,
+				&displayName,
+				&preferredLanguage,
+				&gender,
+				&avatarKey,
+				&email,
+				&isEmailVerified,
+				&phone,
+				&isPhoneVerified,
+				&machineID,
+				&name,
+				&description,
+			)
 
-				err := rows.Scan(
-					&u.ID,
-					&u.CreationDate,
-					&u.ChangeDate,
-					&u.ResourceOwner,
-					&u.Sequence,
-					&u.State,
-					&u.Username,
-					&u.LoginNames,
-					&preferredLoginName,
-					&humanID,
-					&firstName,
-					&lastName,
-					&nickName,
-					&displayName,
-					&preferredLanguage,
-					&gender,
-					&avatarKey,
-					&email,
-					&isEmailVerified,
-					&phone,
-					&isPhoneVerified,
-					&machineID,
-					&name,
-					&description,
-				)
-				if err != nil {
-					return nil, err
+			if err != nil {
+				if errs.Is(err, sql.ErrNoRows) {
+					return nil, errors.ThrowNotFound(err, "QUERY-Dfbg2", "Errors.User.NotFound")
 				}
-				if preferredLoginName.Valid {
-					u.PreferredLoginName = preferredLoginName.String
-				}
-				if humanID.Valid {
-					u.Human = &Human{
-						FirstName:         firstName.String,
-						LastName:          lastName.String,
-						NickName:          nickName.String,
-						DisplayName:       displayName.String,
-						AvatarKey:         avatarKey.String,
-						PreferredLanguage: language.Make(preferredLanguage.String),
-						Gender:            domain.Gender(gender.Int32),
-						Email:             email.String,
-						IsEmailVerified:   isEmailVerified.Bool,
-						Phone:             phone.String,
-						IsPhoneVerified:   isPhoneVerified.Bool,
-					}
-				} else if machineID.Valid {
-					u.Machine = &Machine{
-						Name:        name.String,
-						Description: description.String,
-					}
-				}
-
-				if loginName.Valid {
-					u.LoginNames = append(u.LoginNames, loginName.String)
-				}
-				if isPrimary.Valid && isPrimary.Bool {
-					u.PreferredLoginName = loginName.String
-				}
+				return nil, errors.ThrowInternal(err, "QUERY-Bgah2", "Errors.Internal")
 			}
 
-			if err := rows.Close(); err != nil {
-				return nil, errors.ThrowInternal(err, "QUERY-Dgfe2", "Errors.Query.CloseRows")
+			u.LoginNames = loginNames
+			if preferredLoginName.Valid {
+				u.PreferredLoginName = preferredLoginName.String
 			}
-
+			if humanID.Valid {
+				u.Human = &Human{
+					FirstName:         firstName.String,
+					LastName:          lastName.String,
+					NickName:          nickName.String,
+					DisplayName:       displayName.String,
+					AvatarKey:         avatarKey.String,
+					PreferredLanguage: language.Make(preferredLanguage.String),
+					Gender:            domain.Gender(gender.Int32),
+					Email:             email.String,
+					IsEmailVerified:   isEmailVerified.Bool,
+					Phone:             phone.String,
+					IsPhoneVerified:   isPhoneVerified.Bool,
+				}
+			} else if machineID.Valid {
+				u.Machine = &Machine{
+					Name:        name.String,
+					Description: description.String,
+				}
+			}
 			return u, nil
 		}
 }
@@ -589,8 +573,8 @@ func prepareProfileQuery() (sq.SelectBuilder, func(*sql.Row) (*Profile, error)) 
 			HumanDisplayNameCol.identifier(),
 			HumanPreferredLanguageCol.identifier(),
 			HumanGenderCol.identifier(),
-			HumanAvaterURLCol.identifier()).
-			From(projectRolesTable.identifier()).
+			HumanAvatarURLCol.identifier()).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Profile, error) {
@@ -651,7 +635,7 @@ func prepareEmailQuery() (sq.SelectBuilder, func(*sql.Row) (*Email, error)) {
 			HumanUserIDCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
-			From(projectRolesTable.identifier()).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Email, error) {
@@ -698,7 +682,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 			HumanUserIDCol.identifier(),
 			HumanPhoneCol.identifier(),
 			HumanIsPhoneVerifiedCol.identifier()).
-			From(projectRolesTable.identifier()).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Phone, error) {
@@ -743,7 +727,7 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 			HumanUserIDCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier()).
-			From(projectRolesTable.identifier()).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (bool, error) {
@@ -764,11 +748,11 @@ func prepareUserUniqueQuery() (sq.SelectBuilder, func(*sql.Row) (bool, error)) {
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
-					return false, errors.ThrowNotFound(err, "QUERY-Rbnaq", "Errors.User.NotFound")
+					return true, nil
 				}
 				return false, errors.ThrowInternal(err, "QUERY-Cxces", "Errors.Internal")
 			}
-			return userID.Valid, nil
+			return !userID.Valid, nil
 		}
 }
 
@@ -800,6 +784,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			UserResourceOwnerCol.identifier(),
 			UserSequenceCol.identifier(),
 			UserStateCol.identifier(),
+			UserTypeCol.identifier(),
 			UserUsernameCol.identifier(),
 			"login_names.login_names",
 			userPreferredLoginNameCol.identifier(),
@@ -810,7 +795,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			HumanDisplayNameCol.identifier(),
 			HumanPreferredLanguageCol.identifier(),
 			HumanGenderCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanIsEmailVerifiedCol.identifier(),
 			HumanPhoneCol.identifier(),
@@ -819,7 +804,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			MachineNameCol.identifier(),
 			MachineDescriptionCol.identifier(),
 			countColumn.identifier()).
-			From(projectRolesTable.identifier()).
+			From(userTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			LeftJoin(join(MachineUserIDCol, UserIDCol)).
 			LeftJoin("("+loginNamesQuery+") as login_names on "+userLoginNamesUserIDCol.identifier()+" = "+UserIDCol.identifier()).
@@ -830,6 +815,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 			var count uint64
 			for rows.Next() {
 				u := new(User)
+				loginNames := pq.StringArray{}
 				preferredLoginName := sql.NullString{}
 
 				humanID := sql.NullString{}
@@ -856,8 +842,9 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					&u.ResourceOwner,
 					&u.Sequence,
 					&u.State,
+					&u.Type,
 					&u.Username,
-					&u.LoginNames,
+					&loginNames,
 					&preferredLoginName,
 					&humanID,
 					&firstName,
@@ -880,6 +867,7 @@ func prepareUsersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Users, error)) {
 					return nil, err
 				}
 
+				u.LoginNames = loginNames
 				if preferredLoginName.Valid {
 					u.PreferredLoginName = preferredLoginName.String
 				}
