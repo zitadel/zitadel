@@ -256,7 +256,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	if orgIAMPolicy == nil {
 		iam, err = l.authRepo.GetIAM(r.Context())
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		resourceOwner := iam.GlobalOrgID
@@ -267,7 +267,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 
 		orgIAMPolicy, err = l.getOrgIamPolicy(r, resourceOwner)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 
@@ -276,7 +276,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 	if human == nil || externalIDP == nil {
 		idpConfig, err := l.authRepo.GetIDPConfigByID(r.Context(), authReq.SelectedIDPConfigID)
 		if err != nil {
-			l.renderExternalNotFoundOption(w, r, authReq, iam, orgIAMPolicy, nil, nil, err)
+			l.renderError(w, r, authReq, err)
 			return
 		}
 		linkingUser := authReq.LinkingUsers[len(authReq.LinkingUsers)-1]
