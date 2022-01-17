@@ -17,11 +17,11 @@ import (
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.repo.MyUser(ctx)
+	user, err := s.query.GetUserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user)}, nil
+	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, "prefix")}, nil //TODO: prefix
 }
 
 func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {

@@ -10,21 +10,21 @@ import (
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func UsersToPb(users []*model.UserView) []*user_pb.User {
+func UsersToPb(users []*query.User, assetPrefix string) []*user_pb.User {
 	u := make([]*user_pb.User, len(users))
 	for i, user := range users {
-		u[i] = UserToPb(user)
+		u[i] = UserToPb(user, assetPrefix)
 	}
 	return u
 }
-func UserToPb(user *model.UserView) *user_pb.User {
+func UserToPb(user *query.User, assetPrefix string) *user_pb.User {
 	return &user_pb.User{
 		Id:                 user.ID,
-		State:              ModelUserStateToPb(user.State),
-		UserName:           user.UserName,
+		State:              UserStateToPb(user.State),
+		UserName:           user.Username,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
-		Type:               UserTypeToPb(user),
+		Type:               UserTypeToPb(user, assetPrefix),
 		Details: object.ToViewDetailsPb(
 			user.Sequence,
 			user.CreationDate,
@@ -34,30 +34,30 @@ func UserToPb(user *model.UserView) *user_pb.User {
 	}
 }
 
-func UserTypeToPb(user *model.UserView) user_pb.UserType {
-	if user.HumanView != nil {
+func UserTypeToPb(user *query.User, assetPrefix string) user_pb.UserType {
+	if user.Human != nil {
 		return &user_pb.User_Human{
-			Human: HumanToPb(user.HumanView),
+			Human: HumanToPb(user.Human, assetPrefix, user.ResourceOwner),
 		}
 	}
-	if user.MachineView != nil {
+	if user.Machine != nil {
 		return &user_pb.User_Machine{
-			Machine: MachineToPb(user.MachineView),
+			Machine: MachineToPb(user.Machine),
 		}
 	}
 	return nil
 }
 
-func HumanToPb(view *model.HumanView) *user_pb.Human {
+func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 	return &user_pb.Human{
 		Profile: &user_pb.Profile{
 			FirstName:         view.FirstName,
 			LastName:          view.LastName,
 			NickName:          view.NickName,
 			DisplayName:       view.DisplayName,
-			PreferredLanguage: view.PreferredLanguage,
+			PreferredLanguage: view.PreferredLanguage.String(),
 			Gender:            GenderToPb(view.Gender),
-			AvatarUrl:         view.AvatarURL,
+			AvatarUrl:         domain.AvatarURL(assetPrefix, owner, view.AvatarKey),
 		},
 		Email: &user_pb.Email{
 			Email:           view.Email,
@@ -70,14 +70,14 @@ func HumanToPb(view *model.HumanView) *user_pb.Human {
 	}
 }
 
-func MachineToPb(view *model.MachineView) *user_pb.Machine {
+func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
 		Name:        view.Name,
 		Description: view.Description,
 	}
 }
 
-func ProfileToPb(profile *model.Profile) *user_pb.Profile {
+func ProfileToPb(profile *query.Profile, assetPrefix string) *user_pb.Profile {
 	return &user_pb.Profile{
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
@@ -85,35 +85,35 @@ func ProfileToPb(profile *model.Profile) *user_pb.Profile {
 		DisplayName:       profile.DisplayName,
 		PreferredLanguage: profile.PreferredLanguage.String(),
 		Gender:            GenderToPb(profile.Gender),
-		AvatarUrl:         profile.AvatarURL,
+		AvatarUrl:         domain.AvatarURL(assetPrefix, profile.ResourceOwner, profile.AvatarKey),
 	}
 }
 
-func EmailToPb(email *model.Email) *user_pb.Email {
+func EmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.EmailAddress,
-		IsEmailVerified: email.IsEmailVerified,
+		Email:           email.Email,
+		IsEmailVerified: email.IsVerified,
 	}
 }
 
-func PhoneToPb(phone *model.Phone) *user_pb.Phone {
+func PhoneToPb(phone *query.Phone) *user_pb.Phone {
 	return &user_pb.Phone{
-		Phone:           phone.PhoneNumber,
-		IsPhoneVerified: phone.IsPhoneVerified,
+		Phone:           phone.Phone,
+		IsPhoneVerified: phone.IsVerified,
 	}
 }
 
-func ModelEmailToPb(email *model.Email) *user_pb.Email {
+func ModelEmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.EmailAddress,
-		IsEmailVerified: email.IsEmailVerified,
+		Email:           email.Email,
+		IsEmailVerified: email.IsVerified,
 	}
 }
 
-func ModelPhoneToPb(phone *model.Phone) *user_pb.Phone {
+func ModelPhoneToPb(phone *query.Phone) *user_pb.Phone {
 	return &user_pb.Phone{
-		Phone:           phone.PhoneNumber,
-		IsPhoneVerified: phone.IsPhoneVerified,
+		Phone:           phone.Phone,
+		IsPhoneVerified: phone.IsVerified,
 	}
 }
 
@@ -130,19 +130,19 @@ func GenderToDomain(gender user_pb.Gender) domain.Gender {
 	}
 }
 
-func ModelUserStateToPb(state model.UserState) user_pb.UserState {
+func UserStateToPb(state domain.UserState) user_pb.UserState {
 	switch state {
-	case model.UserStateActive:
+	case domain.UserStateActive:
 		return user_pb.UserState_USER_STATE_ACTIVE
-	case model.UserStateInactive:
+	case domain.UserStateInactive:
 		return user_pb.UserState_USER_STATE_INACTIVE
-	case model.UserStateDeleted:
+	case domain.UserStateDeleted:
 		return user_pb.UserState_USER_STATE_DELETED
-	case model.UserStateInitial:
+	case domain.UserStateInitial:
 		return user_pb.UserState_USER_STATE_INITIAL
-	case model.UserStateLocked:
+	case domain.UserStateLocked:
 		return user_pb.UserState_USER_STATE_LOCKED
-	case model.UserStateSuspend:
+	case domain.UserStateSuspend:
 		return user_pb.UserState_USER_STATE_SUSPEND
 	default:
 		return user_pb.UserState_USER_STATE_UNSPECIFIED
@@ -160,13 +160,13 @@ func ModelUserGrantStateToPb(state usr_grant_model.UserGrantState) user_pb.UserG
 	}
 }
 
-func GenderToPb(gender model.Gender) user_pb.Gender {
+func GenderToPb(gender domain.Gender) user_pb.Gender {
 	switch gender {
-	case model.GenderDiverse:
+	case domain.GenderDiverse:
 		return user_pb.Gender_GENDER_DIVERSE
-	case model.GenderFemale:
+	case domain.GenderFemale:
 		return user_pb.Gender_GENDER_FEMALE
-	case model.GenderMale:
+	case domain.GenderMale:
 		return user_pb.Gender_GENDER_MALE
 	default:
 		return user_pb.Gender_GENDER_UNSPECIFIED

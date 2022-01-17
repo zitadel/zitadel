@@ -5,8 +5,9 @@ import (
 	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type SearchResponse struct {
@@ -157,6 +158,7 @@ const (
 	TextContains
 	TextContainsIgnoreCase
 	TextListContains
+	TextNotEquals
 
 	textCompareMax
 )

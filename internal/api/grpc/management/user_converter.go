@@ -17,25 +17,22 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
-	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func ListUsersRequestToModel(ctx context.Context, req *mgmt_pb.ListUsersRequest) *user_model.UserSearchRequest {
+func ListUsersRequestToModel(req *mgmt_pb.ListUsersRequest) (*query.UserSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	req.Queries = append(req.Queries, &user_pb.SearchQuery{
-		Query: &user_pb.SearchQuery_ResourceOwner{
-			ResourceOwner: &user_pb.ResourceOwnerQuery{
-				OrgID: authz.GetCtxData(ctx).OrgID,
-			},
-		},
-	})
-
-	return &user_model.UserSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: user_grpc.UserQueriesToModel(req.Queries),
+	queries, err := user_grpc.UserQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	return &query.UserSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
 }
 
 func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.Metadata {

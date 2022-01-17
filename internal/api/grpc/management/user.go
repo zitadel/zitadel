@@ -18,35 +18,47 @@ import (
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {
-	user, err := s.user.UserByIDAndResourceOwner(ctx, req.Id, authz.GetCtxData(ctx).OrgID)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	user, err := s.query.GetUserByID(ctx, req.Id, owner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByIDResponse{
-		User: user_grpc.UserToPb(user),
+		User: user_grpc.UserToPb(user, s.assetAPIPrefix),
 	}, nil
 }
 
 func (s *Server) GetUserByLoginNameGlobal(ctx context.Context, req *mgmt_pb.GetUserByLoginNameGlobalRequest) (*mgmt_pb.GetUserByLoginNameGlobalResponse, error) {
-	user, err := s.user.GetUserByLoginNameGlobal(ctx, req.LoginName)
+	user, err := s.query.GetUserByLoginNameGlobal(ctx, req.LoginName)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetUserByLoginNameGlobalResponse{
-		User: user_grpc.UserToPb(user),
+		User: user_grpc.UserToPb(user, s.assetAPIPrefix),
 	}, nil
 }
 
 func (s *Server) ListUsers(ctx context.Context, req *mgmt_pb.ListUsersRequest) (*mgmt_pb.ListUsersResponse, error) {
-	r := ListUsersRequestToModel(ctx, req)
-	res, err := s.user.SearchUsers(ctx, r, true)
+	queries, err := ListUsersRequestToModel(req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchUsers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUsersResponse{
-		Result: user_grpc.UsersToPb(res.Result),
+		Result: user_grpc.UsersToPb(res.Users, s.assetAPIPrefix),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),
@@ -77,7 +89,7 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 	if !policy.UserLoginMustBeDomain {
 		orgID = ""
 	}
-	unique, err := s.user.IsUserUnique(ctx, req.UserName, req.Email, orgID)
+	unique, err := s.query.IsUserUnique(ctx, req.UserName, req.Email, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -302,12 +314,16 @@ func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserName
 }
 
 func (s *Server) GetHumanProfile(ctx context.Context, req *mgmt_pb.GetHumanProfileRequest) (*mgmt_pb.GetHumanProfileResponse, error) {
-	profile, err := s.user.ProfileByID(ctx, req.UserId)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	profile, err := s.query.GetHumanProfile(ctx, req.UserId, owner)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.GetHumanProfileResponse{
-		Profile: user_grpc.ProfileToPb(profile),
+		Profile: user_grpc.ProfileToPb(profile, s.assetAPIPrefix),
 		Details: obj_grpc.ToViewDetailsPb(
 			profile.Sequence,
 			profile.CreationDate,
@@ -332,7 +348,11 @@ func (s *Server) UpdateHumanProfile(ctx context.Context, req *mgmt_pb.UpdateHuma
 }
 
 func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRequest) (*mgmt_pb.GetHumanEmailResponse, error) {
-	email, err := s.user.EmailByID(ctx, req.UserId)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	email, err := s.query.GetHumanEmail(ctx, req.UserId, owner)
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +402,11 @@ func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.
 }
 
 func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRequest) (*mgmt_pb.GetHumanPhoneResponse, error) {
-	phone, err := s.user.PhoneByID(ctx, req.UserId)
+	owner, err := query.NewUserResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID, query.TextEquals)
+	if err != nil {
+		return nil, err
+	}
+	phone, err := s.query.GetHumanPhone(ctx, req.UserId, owner)
 	if err != nil {
 		return nil, err
 	}

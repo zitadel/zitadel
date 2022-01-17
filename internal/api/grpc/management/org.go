@@ -12,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -276,29 +275,25 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
-	queries := []*usr_model.UserSearchQuery{
-		{
-			Key:    usr_model.UserSearchKeyPreferredLoginName,
-			Method: domain.SearchMethodEndsWithIgnoreCase,
-			Value:  "@" + orgDomain,
-		},
-	}
-	if orgID != "" {
-		queries = append(queries,
-			&usr_model.UserSearchQuery{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  orgID,
-			})
-	}
-	users, err := s.user.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: queries,
-	}, false)
+	queries := make([]query.SearchQuery, 0, 2)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(users.Result))
-	for i, user := range users.Result {
+	queries = append(queries, loginName)
+	if orgID != "" {
+		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, owner)
+	}
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries})
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil
