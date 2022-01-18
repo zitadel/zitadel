@@ -9,6 +9,7 @@ module.exports = {
   favicon: 'img/favicon.ico',
   organizationName: 'caos',
   projectName: 'zitadel',
+  scripts: [{src: 'https://docs.zitadel.ch/proxy/js/plausible.js', async: true, defer: true, 'data-domain': 'docs.zitadel.ch'}],
   themeConfig: {
     zoomSelector: '.markdown :not(em) > img',
     navbar: {
