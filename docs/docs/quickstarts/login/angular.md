@@ -47,11 +47,12 @@ This library helps integrating ZITADEL Authentication in your Angular Applicatio
 
 ### Create and configure Auth Module
 
-Add the Auth module to your Angular imports in AppModule and setup the AuthConfig in a constant above.
+Add the Auth module to your Angular imports in AppModule and provide the AuthConfig the providers section. Also ensure you have importe the HTTPClientModule.
 
 ```ts
 ...
 import { AuthConfig, OAuthModule } from 'angular-oauth2-oidc';
+import { HttpClientModule } from '@angular/common/http';
 
 const authConfig: AuthConfig = {
     scope: 'openid profile email',
@@ -65,13 +66,17 @@ const authConfig: AuthConfig = {
 };
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        SignedoutComponent,
-    ],
-    imports: [
-        OAuthModule..forRoot(),
 ...
+    imports: [
+        OAuthModule.forRoot(),
+        HttpClientModule,        
+...
+    providers: [
+        {
+            provide: AuthConfig,
+            useValue: authConfig
+        }
+...        
 ```
 
 Set **openid**, **profile** and **email** as scope, **code** as responseType, and oidc to **true**.
@@ -80,7 +85,7 @@ Then create a Authentication Service to provide the functions to authenticate yo
 You can use Angulars schematics to do so:
 
 ```bash
-ng g component services/authentication
+ng g service services/authentication
 ```
 
 This will create an AuthenticationService automatically for you.
@@ -88,8 +93,15 @@ This will create an AuthenticationService automatically for you.
 Copy the following code to your service. This code provides a function `authenticate()` which redirects the user to ZITADEL. After the user has logged in it will be redirected back to your redirectURI set in Auth Module and Console. Make sure both correspond, otherwise ZITADEL will throw an error.
 
 ```ts
+import { Injectable } from '@angular/core';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 
+import { StatehandlerService } from './statehandler.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthenticationService {
     private _authenticated: boolean = false;
     private readonly _authenticationChanged: BehaviorSubject<
@@ -150,7 +162,7 @@ const newState = setState ? await this.statehandler.createState().toPromise() : 
 ...
 ```
 
-If you decide to use it provide the service in the `app.module` and make sure it gets initialized first using angulars `APP_INITIALIZER`.
+If you decide to use it provide the service in the `app.module` and make sure it gets initialized first using angulars `APP_INITIALIZER`. See the reference implementation in the [example](https://github.com/caos/zitadel-examples/tree/main/angular).
 
 ```ts
 
@@ -180,7 +192,7 @@ providers: [
 ...
 ```
 
-### Add Login in your application
+### Add Login to your application
 
 To login a user, a component or a guard is needed.
 
@@ -208,23 +220,26 @@ ng g guard guards/auth
 This code shows the AuthGuard used in our Console.
 
 ```ts
-import { AuthService } from 'src/app/services/auth.service';
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthenticationService } from '../services/authentication.service';
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-    constructor(private auth: AuthService) { }
 
-    public canActivate(
-        _: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot,
-    ): Observable<boolean> | Promise<boolean> | boolean {
+  constructor(private auth: AuthenticationService) { }
+  
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
         if (!this.auth.authenticated) {
             return this.auth.authenticate();
         }
         return this.auth.authenticated;
-    }
+    }  
 }
 ```
 
@@ -241,14 +256,15 @@ const routes: Routes = [
 ...
 ```
 
-> Note: To complete the code flow, `authenticate()` needs to be called twice. You may have to add a guard to your callback url to make sure it will complete the flow.
+> Note: Make sure you redirect the user from your callback url to a guarded page, so `authenticate()` is called again.
 
 ```ts
+...
     {
         path: 'auth/callback',
-        canActivate: [AuthGuard],
         redirectTo: 'user',
     },
+....
 ```
 
 ### Add Logout in your application
@@ -256,10 +272,10 @@ const routes: Routes = [
 The authService and Library also provides a useful function for logging out your users. Just call `auth.signout()` to log out your user. Note that you can also configure your Logout Redirect URL if you want your Users to be redirected after logout.
 
 ```ts
-import { AuthService } from 'src/app/services/auth.service.ts';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 export class SomeComponentWithLogout {
-    constructor(private authService: AuthService){}
+    constructor(private authService: AuthenticationService){}
 
     public signout(): Promise<void> {
         return this.authService.signout();
@@ -273,7 +289,7 @@ To fetch user data, ZITADELS user info endpoint has to be called. This data cont
 Our AuthService already includes a function called getOIDCUser(). You can call it whereever you need this information.
 
 ```ts
-import { AuthenticationService } from 'src/app/services/auth.service.ts';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 public user$: Observable<any>;
 
