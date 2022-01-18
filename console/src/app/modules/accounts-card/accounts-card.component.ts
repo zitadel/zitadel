@@ -49,6 +49,10 @@ export class AccountsCardComponent implements OnInit {
     }
   }
 
+  public close(): void {
+    this.closedCard.emit();
+  }
+
   public selectAccount(loginHint?: string): void {
     const configWithPrompt: Partial<AuthConfig> = {
       customQueryParams: {
@@ -73,5 +77,9 @@ export class AccountsCardComponent implements OnInit {
   public logout(): void {
     this.authService.signout();
     this.closedCard.emit();
+  }
+
+  public get isOnSystem(): boolean {
+    return this.router.url.includes('/iam');
   }
 }

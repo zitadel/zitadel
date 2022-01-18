@@ -65,23 +65,24 @@
       display: flex;
       flex-direction: row;
       align-items: center;
+      text-decoration: none;
+      padding: 0 4px;
+      display: none;
 
       .label {
         margin: 0.5rem 1rem;
       }
 
       .iambtn {
-        display: none;
-        margin: 0;
+        margin: 0 0 0 4px;
+        color: mat.get-color-from-palette($primary, default-contrast);
       }
 
       @media only screen and (max-width: 600px) {
+        display: flex;
+
         .label {
           margin: 0.5rem 0 0.5rem 0.5rem;
-        }
-
-        .iambtn {
-          display: inline;
         }
       }
     }

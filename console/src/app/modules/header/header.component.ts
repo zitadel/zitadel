@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, debounceTime, finalize, from, map, Observable, of, Subject } from 'rxjs';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
@@ -38,6 +39,7 @@ export class HeaderComponent implements OnDestroy {
     private authService: GrpcAuthService,
     public mgmtService: ManagementService,
     public breadcrumbService: BreadcrumbService,
+    public router: Router,
   ) {
     this.filterControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
       this.loadOrgs(value.trim().toLowerCase());
@@ -90,5 +92,9 @@ export class HeaderComponent implements OnDestroy {
     this.org = org;
     this.authService.setActiveOrg(org);
     this.changedActiveOrg.emit(org);
+  }
+
+  public get isOnSystem(): boolean {
+    return this.router.url.includes('/iam');
   }
 }

@@ -38,7 +38,7 @@ export class FailedEventsComponent implements AfterViewInit {
     const breadcrumbs = [
       new Breadcrumb({
         type: BreadcrumbType.IAM,
-        name: 'IAM',
+        name: 'System',
         routerLink: ['/iam'],
       }),
     ];
