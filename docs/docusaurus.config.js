@@ -9,6 +9,7 @@ module.exports = {
   favicon: 'img/favicon.ico',
   organizationName: 'caos',
   projectName: 'zitadel',
+  scripts: [{src: '/proxy/js/script.js', async: true, defer: true, 'data-domain': 'docs.zitadel.ch', 'data-api': '/proxy/api/event'}],
   themeConfig: {
     zoomSelector: '.markdown :not(em) > img',
     navbar: {
@@ -142,12 +143,6 @@ module.exports = {
     ],
   ],
   plugins: [
-    [
-      'docusaurus-plugin-plausible',
-      {
-        domain: 'docs.zitadel.ch',
-      },
-    ],
     require.resolve('plugin-image-zoom'),
   ],
   stylesheets: [
