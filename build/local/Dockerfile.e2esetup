@@ -4,9 +4,10 @@ WORKDIR /console
 COPY console/package.json console/package-lock.json ./
 RUN npm install --loglevel verbose
 
-COPY console/cypress-setup.json console/cypress.sh console/*.env console/tsconfig.json ./
+COPY console/cypress-setup.json console/cypress.sh console/tsconfig.json ./
 COPY console/cypress/ cypress/
+COPY ./build/local/e2e-setup.env .
 
 ENV NODE_OPTIONS=--openssl-legacy-provider
 
-CMD ./cypress.sh run setup.env --config-file cypress-setup.json
+CMD ./cypress.sh run e2e-setup.env --config-file cypress-setup.json

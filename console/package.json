@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --configuration production",
-    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
+    "e2e": "./cypress.sh run dev.env",
+    "e2e:open": "./cypress.sh open dev.env"
   },
   "private": true,
   "dependencies": {
