@@ -32,18 +32,18 @@
 
   <div class="content">
     <cnsl-edit-text [chips]="chips[currentType]"
-      [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+      [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
       label="one" [default$]="getDefaultInitMessageTextMap$" [current$]="getCustomInitMessageTextMap$" (changedValues)="updateCurrentValues(
         $event)"></cnsl-edit-text>
   </div>
 
   <div class="actions">
     <button class="reset-button"
-      [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+      [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
       (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
       'ACTIONS.RESETDEFAULT' | translate }}</button>
     <button class="save-button"
-      [disabled]="!updateRequest || serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false"
+      [disabled]="!updateRequest || (serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
       (click)="saveCurrentMessage()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
       }}</button>
   </div>

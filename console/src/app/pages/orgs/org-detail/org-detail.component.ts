@@ -58,7 +58,6 @@ export class OrgDetailComponent implements OnInit {
       .then((resp) => {
         if (resp.org) {
           this.org = resp.org;
-          console.log(resp.org);
         }
       })
       .catch((error) => {

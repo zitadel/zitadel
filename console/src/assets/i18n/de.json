@@ -762,7 +762,7 @@
   "POLICY": {
     "TITLE": "Richtlinen entdecken",
     "DESCRIPTION": "Vorgefertigte Richtlinien, die Dir Zeit sparen und die Sicherheit erhöhen.",
-    "APPLIEDTO": "Angewendet auf:",
+    "APPLIEDTO": "Angewendet auf",
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",

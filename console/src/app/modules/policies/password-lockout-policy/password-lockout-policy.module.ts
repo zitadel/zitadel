@@ -10,6 +10,7 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
@@ -25,6 +26,7 @@ import { PasswordLockoutPolicyComponent } from './password-lockout-policy.compon
     InputModule,
     MatButtonModule,
     MatSlideToggleModule,
+    HasRolePipeModule,
     MatIconModule,
     HasRoleModule,
     MatTooltipModule,

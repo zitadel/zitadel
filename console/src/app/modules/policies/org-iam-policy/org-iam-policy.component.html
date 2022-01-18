@@ -19,13 +19,15 @@
     <div class="row">
       <span class="left-desc">{{'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate}}</span>
       <span class="fill-space"></span>
-      <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="iamData.userLoginMustBeDomain">
+      <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
+        [disabled]="(['iam.policy.write'] | hasRole | async) === false" [(ngModel)]="iamData.userLoginMustBeDomain">
       </mat-slide-toggle>
     </div>
   </div>
 
   <div class="btn-container">
-    <button (click)="savePolicy()" color="primary" type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
+    <button (click)="savePolicy()" [disabled]="(['iam.policy.write'] | hasRole | async) === false" color="primary"
+      type="submit" mat-raised-button>{{ 'ACTIONS.SAVE' | translate
       }}</button>
   </div>
 

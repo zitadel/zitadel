@@ -213,6 +213,7 @@ export class GrpcAuthService {
         }),
       )
       .subscribe((roles) => {
+        console.log(roles);
         this.zitadelPermissions.next(roles);
       });
   }

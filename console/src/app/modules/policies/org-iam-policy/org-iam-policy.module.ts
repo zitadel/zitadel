@@ -9,6 +9,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
@@ -23,6 +24,7 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
     FormsModule,
     InputModule,
     MatButtonModule,
+    HasRolePipeModule,
     MatSlideToggleModule,
     MatIconModule,
     HasRoleModule,
@@ -33,4 +35,4 @@ import { OrgIamPolicyComponent } from './org-iam-policy.component';
     PolicyGridModule,
   ],
 })
-export class OrgIamPolicyModule { }
+export class OrgIamPolicyModule {}

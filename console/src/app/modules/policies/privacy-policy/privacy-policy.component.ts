@@ -2,8 +2,8 @@ import { Component, Injector, OnDestroy, Type } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 import {
   GetPrivacyPolicyResponse as AdminGetPrivacyPolicyResponse,
   UpdatePrivacyPolicyRequest,
@@ -17,6 +17,7 @@ import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { PrivacyPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -45,7 +46,17 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public currentPolicy: GridPolicy = PRIVACY_POLICY;
   public InfoSectionType: any = InfoSectionType;
   public orgName: string = '';
+
+  public canWrite$: Observable<boolean> = this.authService.isAllowed([
+    this.serviceType === PolicyComponentServiceType.ADMIN
+      ? 'iam.policy.write'
+      : this.serviceType === PolicyComponentServiceType.MGMT
+      ? 'policy.write'
+      : '',
+  ]);
+
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,
@@ -57,6 +68,14 @@ export class PrivacyPolicyComponent implements OnDestroy {
     this.form = this.fb.group({
       tosLink: ['', []],
       privacyLink: ['', []],
+    });
+
+    this.canWrite$.pipe(take(1)).subscribe((canWrite) => {
+      if (canWrite) {
+        this.form.enable();
+      } else {
+        this.form.disable();
+      }
     });
 
     this.route.data
