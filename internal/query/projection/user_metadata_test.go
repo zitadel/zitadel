@@ -41,7 +41,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.user_metadatas (user_id, resource_owner, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "UPSERT INTO zitadel.projections.user_metadata (user_id, resource_owner, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -76,7 +76,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.user_metadatas WHERE (user_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM zitadel.projections.user_metadata WHERE (user_id = $1) AND (key = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
@@ -104,7 +104,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.user_metadatas WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM zitadel.projections.user_metadata WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -131,7 +131,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.user_metadatas WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM zitadel.projections.user_metadata WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -140,87 +140,6 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				},
 			},
 		},
-		//{
-		//	name: "reduceUserRemoved",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(user.UserRemovedType),
-		//			user.AggregateType,
-		//			nil,
-		//		), user.UserRemovedEventMapper),
-		//	},
-		//	reduce: (&UserMetadataProjection{}).reduceUserRemoved,
-		//	want: wantReduce{
-		//		aggregateType:    user.AggregateType,
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		projection:       UserMetadataProjectionTable,
-		//		executer: &testExecuter{
-		//			executions: []execution{
-		//				{
-		//					expectedStmt: "DELETE FROM zitadel.projections.user_grants WHERE (user_id = $1)",
-		//					expectedArgs: []interface{}{
-		//						anyArg{},
-		//					},
-		//				},
-		//			},
-		//		},
-		//	},
-		//},
-		//{
-		//	name: "reduceProjectRemoved",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.ProjectRemovedType),
-		//			project.AggregateType,
-		//			nil,
-		//		), project.ProjectRemovedEventMapper),
-		//	},
-		//	reduce: (&UserMetadataProjection{}).reduceProjectRemoved,
-		//	want: wantReduce{
-		//		aggregateType:    project.AggregateType,
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		projection:       UserMetadataProjectionTable,
-		//		executer: &testExecuter{
-		//			executions: []execution{
-		//				{
-		//					expectedStmt: "DELETE FROM zitadel.projections.user_grants WHERE (project_id = $1)",
-		//					expectedArgs: []interface{}{
-		//						anyArg{},
-		//					},
-		//				},
-		//			},
-		//		},
-		//	},
-		//},
-		//{
-		//	name: "reduceProjectMetadataRemoved",
-		//	args: args{
-		//		event: getEvent(testEvent(
-		//			repository.EventType(project.MetadataRemovedType),
-		//			project.AggregateType,
-		//			[]byte(`{"grantId": "grantID"}`),
-		//		), project.MetadataRemovedEventMapper),
-		//	},
-		//	reduce: (&UserMetadataProjection{}).reduceProjectMetadataRemoved,
-		//	want: wantReduce{
-		//		aggregateType:    project.AggregateType,
-		//		sequence:         15,
-		//		previousSequence: 10,
-		//		projection:       UserMetadataProjectionTable,
-		//		executer: &testExecuter{
-		//			executions: []execution{
-		//				{
-		//					expectedStmt: "DELETE FROM zitadel.projections.user_grants WHERE (grant_id = $1)",
-		//					expectedArgs: []interface{}{
-		//						"grantID",
-		//					},
-		//				},
-		//			},
-		//		},
-		//	},
-		//},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

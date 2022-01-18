@@ -16,7 +16,7 @@ type UserMetadataProjection struct {
 	crdb.StatementHandler
 }
 
-const UserMetadataProjectionTable = "zitadel.projections.user_metadatas"
+const UserMetadataProjectionTable = "zitadel.projections.user_metadata"
 
 func NewUserMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserMetadataProjection {
 	p := &UserMetadataProjection{}
