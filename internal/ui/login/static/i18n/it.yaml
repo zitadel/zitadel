@@ -281,7 +281,7 @@ ExternalNotFoundOption:
   Title: Utente esterno
   Description: Utente esterno non trovato. Vuoi collegare il tuo utente o registrarne uno nuovo automaticamente.
   LinkButtonText: Link
-  AutoRegisterButtonText: Registra automaticamente
+  AutoRegisterButtonText: Registra
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio

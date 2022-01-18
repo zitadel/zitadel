@@ -294,7 +294,7 @@ func (l *Login) chooseNextStep(w http.ResponseWriter, r *http.Request, authReq *
 	case *domain.LinkUsersStep:
 		l.linkUsers(w, r, authReq, err)
 	case *domain.ExternalNotFoundOptionStep:
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 	case *domain.ExternalLoginStep:
 		l.handleExternalLoginStep(w, r, authReq, step.SelectedIDPConfigID)
 	case *domain.GrantRequiredStep:

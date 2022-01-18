@@ -12,8 +12,62 @@
     {{ .CSRF }}
 
     <input type="hidden" name="authRequestID" value="{{ .AuthReqID }}" />
+    <input type="hidden" id="external-idp-config-id" name="external-idp-config-id" value="{{ .ExternalIDPID }}" />
+    <input type="hidden" id="external-idp-ext-user-id" name="external-idp-ext-user-id" value="{{ .ExternalIDPUserID }}" />
+    <input type="hidden" id="external-idp-display-name" name="external-idp-display-name" value="{{ .ExternalIDPUserDisplayName }}" />
+    <input type="hidden" id="external-email" name="external-email" value="{{ .ExternalEmail }}" />
+    <input type="hidden" id="external-email-verified" name="external-email-verified" value="{{ .ExternalEmailVerified }}" />
+    <input type="hidden" id="external-phone" name="external-phone" value="{{ .ExternalPhone }}" />
+    <input type="hidden" id="external-phone-verified" name="external-phone-verified" value="{{ .ExternalPhoneVerified }}" />
 
     <div class="lgn-register">
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="firstname">{{t "ExternalRegistrationUserOverview.FirstnameLabel"}}</label>
+                <input class="lgn-input" type="text" id="firstname" name="firstname" autocomplete="given-name"
+                       value="{{ .Firstname }}" autofocus required>
+            </div>
+            <div class="lgn-field">
+                <label class="lgn-label" for="lastname">{{t "ExternalRegistrationUserOverview.LastnameLabel"}}</label>
+                <input class="lgn-input" type="text" id="lastname" name="lastname" autocomplete="family-name"
+                       value="{{ .Lastname }}" required>
+            </div>
+        </div>
+
+        <div class="lgn-field double">
+            <label class="lgn-label" for="username">{{t "ExternalRegistrationUserOverview.UsernameLabel"}}</label>
+            <div class="lgn-suffix-wrapper">
+                <input class="lgn-input lgn-suffix-input" type="text" id="username" name="username"
+                       value="{{ .Username }}" required>
+                {{if .DisplayLoginNameSuffix}}
+                <span id="default-login-suffix" lgnsuffix class="loginname-suffix">@{{.PrimaryDomain}}</span>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="lgn-field double">
+            <label class="lgn-label" for="email">{{t "ExternalRegistrationUserOverview.EmailLabel"}}</label>
+            <input class="lgn-input" type="text" id="email" name="email" autocomplete="email" value="{{ .Email }}" required>
+        </div>
+
+        <div class="lgn-field double">
+            <label class="lgn-label" for="phone">{{t "ExternalRegistrationUserOverview.PhoneLabel"}}</label>
+            <input class="lgn-input" type="text" id="phone" name="phone" autocomplete="tel" value="{{ .Phone }}">
+        </div>
+
+        <div class="double-col">
+            <div class="lgn-field">
+                <label class="lgn-label" for="languages">{{t "ExternalRegistrationUserOverview.LanguageLabel"}}</label>
+                <select id="languages" name="language">
+                    <option value=""></option>
+                    <option value="de" id="de" {{if (selectedLanguage "de")}} selected {{end}}>{{t "ExternalNotFoundOption.German"}}
+                    </option>
+                    <option value="en" id="en" {{if (selectedLanguage "en")}} selected {{end}}>{{t "ExternalNotFoundOption.English"}}
+                    </option>
+                </select>
+            </div>
+        </div>
+
         {{ if or .TOSLink .PrivacyLink }}
         <div class="lgn-field">
             <label class="lgn-label">{{t "ExternalNotFoundOption.TosAndPrivacyLabel"}}</label>
