@@ -308,13 +308,13 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.repo.SearchUserMetadata(ctx, userID)
+	metaData, err := o.query.SearchUserMetadata(ctx, userID, &query.UserMetadataSearchQueries{})
 	if err != nil {
 		return nil, err
 	}
 
 	userMetaData := make(map[string]string)
-	for _, md := range metaData.Result {
+	for _, md := range metaData.Metadata {
 		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
 	}
 	return userMetaData, nil

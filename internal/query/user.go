@@ -368,7 +368,7 @@ func (q *UserSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 }
 
 func (r *UserSearchQueries) AppendMyResourceOwnerQuery(orgID string) error {
-	query, err := NewProjectResourceOwnerSearchQuery(orgID)
+	query, err := NewUserResourceOwnerSearchQuery(orgID, TextEquals)
 	if err != nil {
 		return err
 	}

@@ -103,14 +103,22 @@ func (s *Server) IsUserUnique(ctx context.Context, req *mgmt_pb.IsUserUniqueRequ
 }
 
 func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMetadataRequest) (*mgmt_pb.ListUserMetadataResponse, error) {
-	res, err := s.user.SearchMetadata(ctx, req.Id, authz.GetCtxData(ctx).OrgID, ListUserMetadataToDomain(req))
+	metadataQueries, err := ListUserMetadataToDomain(req)
+	if err != nil {
+		return nil, err
+	}
+	err = metadataQueries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchUserMetadata(ctx, req.Id, metadataQueries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListUserMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Result),
+		Result: metadata.MetadataListToPb(res.Metadata),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),
@@ -118,7 +126,11 @@ func (s *Server) ListUserMetadata(ctx context.Context, req *mgmt_pb.ListUserMeta
 }
 
 func (s *Server) GetUserMetadata(ctx context.Context, req *mgmt_pb.GetUserMetadataRequest) (*mgmt_pb.GetUserMetadataResponse, error) {
-	data, err := s.user.GetMetadataByKey(ctx, req.Id, authz.GetCtxData(ctx).OrgID, req.Key)
+	owner, err := query.NewUserMetadataResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	data, err := s.query.GetUserMetadataByKey(ctx, req.Id, req.Key, owner)
 	if err != nil {
 		return nil, err
 	}

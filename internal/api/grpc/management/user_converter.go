@@ -46,14 +46,20 @@ func BulkSetMetadataToDomain(req *mgmt_pb.BulkSetUserMetadataRequest) []*domain.
 	return metadata
 }
 
-func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) *domain.MetadataSearchRequest {
+func ListUserMetadataToDomain(req *mgmt_pb.ListUserMetadataRequest) (*query.UserMetadataSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &domain.MetadataSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: metadata.MetadataQueriesToModel(req.Queries),
+	queries, err := metadata.MetadataQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	return &query.UserMetadataSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}, nil
 }
 
 func AddHumanUserRequestToDomain(req *mgmt_pb.AddHumanUserRequest) *domain.Human {

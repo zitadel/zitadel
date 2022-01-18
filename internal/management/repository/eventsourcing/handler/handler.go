@@ -35,8 +35,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 	return []query.Handler{
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			defaults.IamID),
-		newMetadata(
-			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}
 }
 

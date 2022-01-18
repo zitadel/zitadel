@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/user/model"
 )
 
@@ -17,8 +16,8 @@ type UserRepository interface {
 	//GetUserByLoginNameGlobal(ctx context.Context, email string) (*model.UserView, error)
 	//IsUserUnique(ctx context.Context, userName, email, orgID string) (bool, error)
 
-	GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error)
-	SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error)
+	//GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error)
+	//SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error)
 
 	UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*model.UserChanges, error)
 
