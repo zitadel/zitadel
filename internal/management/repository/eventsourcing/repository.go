@@ -74,7 +74,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 			Query:                               queries,
 		},
 		ProjectRepo:   eventstore.ProjectRepo{es, conf.SearchLimit, view, roles, systemDefaults.IamID, assetsAPI, queries},
-		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, systemDefaults, assetsAPI},
+		UserRepo:      eventstore.UserRepo{es, conf.SearchLimit, view, queries, systemDefaults, assetsAPI},
 		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
 		view:          view,
 	}, nil
