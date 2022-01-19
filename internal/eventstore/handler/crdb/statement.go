@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -197,6 +199,25 @@ func NewArrayRemoveCol(column string, value interface{}) handler.Column {
 		Value: value,
 		ParameterOpt: func(placeholder string) string {
 			return "array_remove(" + column + ", " + placeholder + ")"
+		},
+	}
+}
+
+func NewArrayIntersectCol(column string, value interface{}) handler.Column {
+	var arrayType string
+	switch value.(type) {
+	case pq.StringArray:
+		arrayType = "STRING"
+	case pq.Int32Array,
+		pq.Int64Array:
+		arrayType = "INT"
+		//TODO: handle more types if necessary
+	}
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "SELECT ARRAY( SELECT UNNEST(" + column + ") INTERSECT SELECT UNNEST (" + placeholder + "::" + arrayType + "[]))"
 		},
 	}
 }
