@@ -20,6 +20,7 @@
 @import 'src/app/pages/projects/granted-projects/granted-project-detail/granted-project-detail.component';
 @import 'src/app/pages/projects/apps/app-detail/app-detail.component';
 @import 'src/app/pages/projects/projects.component';
+@import 'src/app/modules/edit-text/edit-text.component.scss';
 @import 'src/app/pages/users/user-detail/auth-user-detail/auth-user-detail.component';
 @import 'src/app/pages/users/user-detail/user-detail/user-detail.component';
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
@@ -76,6 +77,7 @@
   @include cnsl-error-theme($theme);
   @include link-theme($theme);
   @include auth-user-detail-theme($theme);
+  @include edit-text-theme($theme);
   @include user-detail-theme($theme);
   @include org-detail-theme($theme);
   @include iam-detail-theme($theme);

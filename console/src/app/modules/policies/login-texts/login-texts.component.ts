@@ -18,6 +18,7 @@ import {
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
+import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -124,7 +125,16 @@ export class LoginTextsComponent implements OnDestroy {
     currentSubMap: new FormControl('emailVerificationDoneText'),
     locale: new FormControl('en'),
   });
+
+  public canWrite$: Observable<boolean> = this.authService.isAllowed([
+    this.serviceType === PolicyComponentServiceType.ADMIN
+      ? 'iam.policy.write'
+      : this.serviceType === PolicyComponentServiceType.MGMT
+      ? 'policy.write'
+      : '',
+  ]);
   constructor(
+    private authService: GrpcAuthService,
     private route: ActivatedRoute,
     private injector: Injector,
     private dialog: MatDialog,

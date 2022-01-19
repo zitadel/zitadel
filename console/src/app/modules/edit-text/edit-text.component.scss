@@ -1,97 +1,112 @@
-.block {
-  display: block;
+@mixin edit-text-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
 
-  .flex {
-    display: flex;
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
 
-    .formfield {
-      flex: 1;
+  .edit-text-block {
+    display: block;
 
-      .text {
-        min-height: 80px;
-      }
+    .edit-text-flex {
+      display: flex;
 
-      &.hovering {
-        background-color: red;
-      }
+      .edit-text-formfield {
+        flex: 1;
 
-      .chips {
-        position: absolute;
-        display: flex;
-        flex-wrap: wrap;
-        opacity: 0;
-        margin: 0 -0.25rem;
-        transition: all 0.2s ease;
+        .edit-text-area {
+          min-height: 80px;
+        }
 
-        .chip {
-          border-radius: 50vw;
-          padding: 4px 0.5rem;
-          font-size: 12px;
-          background: #5282c1;
-          color: white;
-          margin: 0.25rem;
+        &.hovering {
+          background-color: red;
+        }
+
+        .edit-text-chips {
+          position: absolute;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10;
+          flex-wrap: wrap;
+          opacity: 0;
+          margin: 0 -0.25rem;
+          transition: all 0.2s ease;
 
-          * {
-            transition: all 0.2s ease;
-          }
+          .chip {
+            border-radius: 50vw;
+            padding: 4px 0.5rem;
+            font-size: 12px;
+            background: $primary-color;
+            color: mat.get-color-from-palette($primary, default-contrast);
+            margin: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
 
-          i {
-            opacity: 0.5;
-            font-size: 1.1rem;
-            margin-left: 0.5rem;
-          }
+            * {
+              transition: all 0.2s ease;
+            }
 
-          .key {
-            display: inline-block;
-          }
-
-          .value {
-            display: none;
-          }
-
-          &:hover {
             i {
-              opacity: 1;
+              opacity: 0.5;
+              font-size: 1.1rem;
+              margin-left: 0.5rem;
             }
 
             .key {
-              display: none;
+              display: inline-block;
             }
 
             .value {
-              display: inline-block;
+              display: none;
+            }
+
+            &:hover {
+              i {
+                opacity: 1;
+              }
+
+              .key {
+                display: none;
+              }
+
+              .value {
+                display: inline-block;
+              }
             }
           }
         }
-      }
 
-      &.cnsl-focused {
-        .chips {
-          opacity: 1;
-          cursor: copy;
+        &.cnsl-focused {
+          .chips {
+            opacity: 1;
+            cursor: copy;
+          }
+        }
+
+        .chips:hover {
+          visibility: visible;
         }
       }
 
-      .chips:hover {
-        visibility: visible;
+      .edit-text-actions {
+        display: flex;
+        flex-direction: column;
+        align-self: flex-start;
+        margin-top: 30px;
       }
     }
-
-    .actions {
-      display: flex;
-      flex-direction: column;
-      align-self: flex-start;
-      margin-top: 30px;
-    }
   }
-}
 
-.info {
-  display: block;
-  margin-right: 40px;
-  margin-bottom: 1.5rem;
+  .edit-text-info {
+    display: block;
+    margin-right: 40px;
+    margin-bottom: 1.5rem;
+  }
 }
