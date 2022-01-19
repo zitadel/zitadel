@@ -31,7 +31,7 @@ func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 const (
 	UserAuthMethodTokenIDCol       = "token_id"
 	UserAuthMethodCreationDateCol  = "creation_date"
-	UserAuthMethodChangeUseCol     = "change_date"
+	UserAuthMethodChangeDateCol    = "change_date"
 	UserAuthMethodResourceOwnerCol = "resource_owner"
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodSequenceCol      = "sequence"
@@ -108,7 +108,7 @@ func (p *UserAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 		[]handler.Column{
 			handler.NewCol(UserAuthMethodTokenIDCol, tokenID),
 			handler.NewCol(UserAuthMethodCreationDateCol, event.CreationDate()),
-			handler.NewCol(UserAuthMethodChangeUseCol, event.CreationDate()),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreationDate()),
 			handler.NewCol(UserAuthMethodResourceOwnerCol, event.Aggregate().ResourceOwner),
 			handler.NewCol(UserAuthMethodUserIDCol, event.Aggregate().ID),
 			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
@@ -144,7 +144,7 @@ func (p *UserAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 	return crdb.NewUpdateStatement(
 		event,
 		[]handler.Column{
-			handler.NewCol(UserAuthMethodChangeUseCol, event.CreationDate()),
+			handler.NewCol(UserAuthMethodChangeDateCol, event.CreationDate()),
 			handler.NewCol(UserAuthMethodSequenceCol, event.Sequence()),
 			handler.NewCol(UserAuthMethodNameCol, name),
 			handler.NewCol(UserAuthMethodStateCol, domain.MFAStateReady),

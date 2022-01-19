@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/query"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -14,12 +15,15 @@ import (
 )
 
 func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswordlessRequest) (*auth_pb.ListMyPasswordlessResponse, error) {
-	tokens, err := s.repo.GetMyPasswordless(ctx)
+	query := new(query.UserAuthMethodSearchQueries)
+	query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
+	query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyPasswordlessResponse{
-		Result: user_grpc.WebAuthNTokensViewToPb(tokens),
+		Result: user_grpc.UserAuthMethodsToWebAuthNTokenPb(authMethods),
 	}, nil
 }
 
