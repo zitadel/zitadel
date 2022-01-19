@@ -84,13 +84,13 @@
         }
 
         &.cnsl-focused {
-          .chips {
+          .edit-text-chips {
             opacity: 1;
             cursor: copy;
           }
         }
 
-        .chips:hover {
+        .edit-text-chips:hover {
           visibility: visible;
         }
       }

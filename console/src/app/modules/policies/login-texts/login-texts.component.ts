@@ -101,10 +101,10 @@ export class LoginTextsComponent implements OnDestroy {
   public currentPolicyChangeDate!: Timestamp.AsObject | undefined;
   public newerPolicyChangeDate!: Timestamp.AsObject | undefined;
 
-  public totalCustomPolicy: { [key: string]: { [key: string]: string } } = {};
+  public totalCustomPolicy?: { [key: string]: { [key: string]: string } } = {}; // LoginCustomText.AsObject
 
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
-  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string }> = new BehaviorSubject({});
+  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({});
 
   public service!: ManagementService | AdminService;
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
@@ -249,14 +249,23 @@ export class LoginTextsComponent implements OnDestroy {
     this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(reqDefaultInit)).pipe(map((m) => m[this.currentSubMap]));
 
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
-    this.totalCustomPolicy = await this.getCurrentValues(reqCustomInit);
-    this.getCustomInitMessageTextMap$.next(this.totalCustomPolicy[this.currentSubMap]);
+    return this.getCurrentValues(reqCustomInit)
+      .then((policy) => {
+        if (policy) {
+          this.totalCustomPolicy = policy;
+          this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
+        }
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   private async patchSingleCurrentMap(): Promise<any> {
     const reqCustomInit = REQUESTMAP[this.serviceType].get.setLanguage(this.locale);
-    const pol = await this.getCurrentValues(reqCustomInit);
-    this.getCustomInitMessageTextMap$.next(pol[this.currentSubMap]);
+    this.getCurrentValues(reqCustomInit).then((policy) => {
+      this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
+    });
   }
 
   public checkForChanges(): void {
@@ -274,7 +283,7 @@ export class LoginTextsComponent implements OnDestroy {
    */
   public checkForUnsaved(oldkey: string): Promise<boolean> {
     const old = this.getCustomInitMessageTextMap$.getValue();
-    const unsaved = this.totalCustomPolicy[oldkey];
+    const unsaved = this.totalCustomPolicy ? this.totalCustomPolicy[oldkey] : undefined;
 
     if (old && unsaved && JSON.stringify(old) !== JSON.stringify(unsaved)) {
       const dialogRef = this.dialog.open(WarnDialogComponent, {
@@ -294,11 +303,13 @@ export class LoginTextsComponent implements OnDestroy {
   }
 
   public updateCurrentValues(values: { [key: string]: string }): void {
-    const setFcn = REQUESTMAP[this.serviceType].setFcn;
-    this.totalCustomPolicy[this.currentSubMap] = values;
+    if (this.totalCustomPolicy) {
+      const setFcn = REQUESTMAP[this.serviceType].setFcn;
+      this.totalCustomPolicy[this.currentSubMap] = values;
 
-    this.updateRequest = setFcn(this.totalCustomPolicy);
-    this.updateRequest.setLanguage(this.locale);
+      this.updateRequest = setFcn(this.totalCustomPolicy);
+      this.updateRequest.setLanguage(this.locale);
+    }
   }
 
   public saveCurrentMessage(): Promise<any> {

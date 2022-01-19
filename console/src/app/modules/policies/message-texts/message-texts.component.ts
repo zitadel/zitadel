@@ -281,7 +281,7 @@ const REQUESTMAP = {
 })
 export class MessageTextsComponent implements OnDestroy {
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
-  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string }> = new BehaviorSubject({});
+  public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({}); // boolean because of isDefault
 
   public currentType: MESSAGETYPES = MESSAGETYPES.INIT;
 
@@ -523,12 +523,17 @@ export class MessageTextsComponent implements OnDestroy {
       const reqDefaultInit = REQUESTMAP[this.serviceType][type].getDefault;
 
       reqDefaultInit.setLanguage(this.locale);
-      console.log(this.locale);
       this.getDefaultInitMessageTextMap$ = from(this.getDefaultValues(type, reqDefaultInit));
     }
 
     const reqCustomInit = REQUESTMAP[this.serviceType][type].get.setLanguage(this.locale);
-    this.getCustomInitMessageTextMap$.next(await this.getCurrentValues(type, reqCustomInit));
+    return this.getCurrentValues(type, reqCustomInit)
+      ?.then((data) => {
+        this.getCustomInitMessageTextMap$.next(data);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public updateCurrentValues(values: { [key: string]: string }): void {

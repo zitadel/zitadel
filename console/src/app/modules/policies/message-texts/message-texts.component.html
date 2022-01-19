@@ -39,6 +39,7 @@
 
   <div class="actions">
     <button class="reset-button"
+      *ngIf="(getCustomInitMessageTextMap$ | async) && ((getCustomInitMessageTextMap$ | async)?.isDefault === false)"
       [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.message'] | hasFeature | async) === false) || (canWrite$ | async) === false"
       (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
       'ACTIONS.RESETDEFAULT' | translate }}</button>

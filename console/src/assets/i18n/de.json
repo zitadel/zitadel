@@ -723,7 +723,7 @@
       "BTN": "Preisstufe ändern"
     },
     "HEADERS": {
-      "LOGINPOLICY": "Login Richtlinie",
+      "LOGINPOLICY": "Login Einstellungen",
       "PASSWORD": "Passwort",
       "LABELPOLICY": "Privatelabelling",
       "DOMAIN": "Organisations Domänen",
@@ -821,7 +821,7 @@
       "ACTIVATEPREVIEW": "Preview aktivieren"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Login Richtlinien",
+      "TITLE": "Login Einstellungen",
       "DESCRIPTION": "Definiere die Loginmethoden für Benutzer",
       "DESCRIPTIONCREATEADMIN": "Nutzer können sich mit den verfügbaren Idps authentifizieren.",
       "DESCRIPTIONCREATEMGMT": "Nutzer können sich mit den verfügbaren Idps authentifizieren. Achtung: Es kann zwischen System- und organisationsspezifischen Providern gewählt werden.",
