@@ -168,13 +168,8 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 			sq.Eq{
 				MessageTextColType.identifier(): messageType,
 			},
-			sq.Or{
-				sq.Eq{
-					MessageTextColAggregateID.identifier(): aggregateID,
-				},
-				sq.Eq{
-					MessageTextColAggregateID.identifier(): domain.IAMID,
-				},
+			sq.Eq{
+				MessageTextColAggregateID.identifier(): aggregateID,
 			},
 		},
 	).
@@ -185,7 +180,11 @@ func (q *Queries) CustomMessageTextByTypeAndLanguage(ctx context.Context, aggreg
 	}
 
 	row := q.client.QueryRowContext(ctx, query, args...)
-	return scan(row)
+	msg, err := scan(row)
+	if errors.IsNotFound(err) {
+		return q.IAMMessageTextByTypeAndLanguage(ctx, messageType, language)
+	}
+	return msg, err
 }
 
 func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageType, language string) (*MessageText, error) {
@@ -219,6 +218,7 @@ func (q *Queries) IAMMessageTextByTypeAndLanguage(ctx context.Context, messageTy
 	}
 	result := notificationText.GetMessageTextByType(messageType)
 	result.IsDefault = true
+	result.AggregateID = domain.IAMID
 	return result, nil
 }
 
