@@ -1,4 +1,4 @@
-<cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam/policies' : '/org']"
+<cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/iam' : '/org']"
   [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate" [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
 
   <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
@@ -56,8 +56,8 @@
   </div>
 
   <div class="actions">
-    <!-- TODO: add check for isDefault totalCustomPolicy.isDefault === false -->
-    <button class="reset-button"
+    <!-- *ngIf="totalCustomPolicy && totalCustomPolicy.isDefault === false" -->
+    <button class="reset-button" *ngIf="totalCustomPolicy && totalCustomPolicy.isDefault === false"
       [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) === false)  || (canWrite$ | async) === false"
       (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
       'ACTIONS.RESETDEFAULT' | translate }}</button>

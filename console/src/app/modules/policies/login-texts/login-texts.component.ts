@@ -101,7 +101,7 @@ export class LoginTextsComponent implements OnDestroy {
   public currentPolicyChangeDate!: Timestamp.AsObject | undefined;
   public newerPolicyChangeDate!: Timestamp.AsObject | undefined;
 
-  public totalCustomPolicy?: { [key: string]: { [key: string]: string } } = {}; // LoginCustomText.AsObject
+  public totalCustomPolicy?: { [key: string]: { [key: string]: string } | boolean } = {}; // LoginCustomText.AsObject
 
   public getDefaultInitMessageTextMap$: Observable<{ [key: string]: string }> = of({});
   public getCustomInitMessageTextMap$: BehaviorSubject<{ [key: string]: string | boolean }> = new BehaviorSubject({});
@@ -252,6 +252,7 @@ export class LoginTextsComponent implements OnDestroy {
     return this.getCurrentValues(reqCustomInit)
       .then((policy) => {
         if (policy) {
+          console.log(policy);
           this.totalCustomPolicy = policy;
           this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
         }

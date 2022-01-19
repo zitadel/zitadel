@@ -5,30 +5,12 @@ import { RoleGuard } from 'src/app/guards/role.guard';
 import { FeatureServiceType } from 'src/app/modules/features/features.component';
 import { PolicyComponentServiceType, PolicyComponentType } from 'src/app/modules/policies/policy-component-types.enum';
 
-import { FailedEventsComponent } from './failed-events/failed-events.component';
-import { IamViewsComponent } from './iam-views/iam-views.component';
 import { IamComponent } from './iam.component';
 
 const routes: Routes = [
   {
     path: '',
     component: IamComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read'],
-    },
-  },
-  {
-    path: 'failed-events',
-    component: FailedEventsComponent,
-    canActivate: [AuthGuard, RoleGuard],
-    data: {
-      roles: ['iam.read'],
-    },
-  },
-  {
-    path: 'views',
-    component: IamViewsComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: {
       roles: ['iam.read'],
@@ -45,7 +27,6 @@ const routes: Routes = [
   {
     path: 'features',
     loadChildren: () => import('src/app/modules/features/features.module').then((m) => m.FeaturesModule),
-    // canActivate: [RoleGuard],
     data: {
       roles: ['iam.features.read'],
       serviceType: FeatureServiceType.ADMIN,

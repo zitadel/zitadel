@@ -7,15 +7,15 @@ import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { AddDomainDialogComponent } from '../org-detail/add-domain-dialog/add-domain-dialog.component';
-import { DomainVerificationComponent } from '../org-detail/domain-verification/domain-verification.component';
+import { AddDomainDialogComponent } from './add-domain-dialog/add-domain-dialog.component';
+import { DomainVerificationComponent } from './domain-verification/domain-verification.component';
 
 @Component({
-  selector: 'cnsl-org-domains',
-  templateUrl: './org-domains.component.html',
-  styleUrls: ['./org-domains.component.scss'],
+  selector: 'cnsl-domains',
+  templateUrl: './domains.component.html',
+  styleUrls: ['./domains.component.scss'],
 })
-export class OrgDomainsComponent implements OnInit {
+export class DomainsComponent implements OnInit {
   public domains: Domain.AsObject[] = [];
   public primaryDomain: string = '';
   public InfoSectionType: any = InfoSectionType;

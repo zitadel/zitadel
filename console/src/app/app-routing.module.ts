@@ -125,6 +125,30 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'failed-events',
+    loadChildren: () => import('./pages/failed-events/failed-events.module').then((m) => m.FailedEventsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
+    path: 'views',
+    loadChildren: () => import('./pages/iam-views/iam-views.module').then((m) => m.IamViewsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['iam.read'],
+    },
+  },
+  {
+    path: 'domains',
+    loadChildren: () => import('./pages/domains/domains.module').then((m) => m.DomainsModule),
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: ['org.read'],
+    },
+  },
+  {
     path: 'signedout',
     loadChildren: () => import('./pages/signedout/signedout.module').then((m) => m.SignedoutModule),
   },

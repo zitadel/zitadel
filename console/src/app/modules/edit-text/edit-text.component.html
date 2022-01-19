@@ -1,4 +1,4 @@
-<div *ngIf="currentMap && form">
+<div *ngIf="currentMap">
   <form [formGroup]="form">
     <ng-container *ngFor="let key of (current$ | async) | keyvalue">
       <div *ngIf="key.key !== 'isDefault'" class="edit-text-block">

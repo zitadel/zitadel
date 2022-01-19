@@ -28,14 +28,11 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { ChangesModule } from '../../modules/changes/changes.module';
 import { ZitadelTierModule } from '../../modules/zitadel-tier/zitadel-tier.module';
-import { AddDomainDialogModule } from './org-detail/add-domain-dialog/add-domain-dialog.module';
-import { DomainVerificationComponent } from './org-detail/domain-verification/domain-verification.component';
 import { OrgDetailComponent } from './org-detail/org-detail.component';
 import { OrgsRoutingModule } from './orgs-routing.module';
-import { OrgDomainsComponent } from './org-domains/org-domains.component';
 
 @NgModule({
-  declarations: [OrgDetailComponent, DomainVerificationComponent, OrgDomainsComponent],
+  declarations: [OrgDetailComponent],
   imports: [
     CommonModule,
     HasRolePipeModule,
@@ -60,7 +57,6 @@ import { OrgDomainsComponent } from './org-domains/org-domains.component';
     MatMenuModule,
     ChangesModule,
     MatProgressSpinnerModule,
-    AddDomainDialogModule,
     TranslateModule,
     SharedModule,
     ContributorsModule,
