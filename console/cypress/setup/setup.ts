@@ -2,58 +2,67 @@
 //import { ensureMachineUserExists, ensureUserDoesntExist } from "../../support/api/users";
 import { login as commonLogin, User } from "../support/login/users";
 
-describe('initialize organisation', () => {
-    it('initializes', () => {
-        const consoleUrl: string = Cypress.env('consoleUrl') 
-
-        // Wait until ng serve is really ready
+describe('setup e2e test data in ZITADEL', () => {
+    const consoleUrl: string = Cypress.env('consoleUrl') 
+    it('wait for 30 seconds until ng serve is REALLY ready', () => {
         cy.wait(30_000)
+    })
 
+    it('logs the admin user in', () => {
         login(User.IAMAdminUser, 'Password1!')
+    })
 
-        // Create org
+    it('creates the caos-demo org', () => {
         cy.visit(`${consoleUrl}/org/create`)
         cy.contains('Use your personal account as organisation owner').click({ force: true })
         cy.get('[formcontrolname="name"]').type('caos-demo', { force: true, })
         cy.contains('button', 'CREATE').click({ force: true })
         cy.contains('button', 'Global').click({ force: true })
         cy.contains('button', 'caos-demo').click({ force: true })
+    })
 
-        // Create sa
+    it('creates the service account used by the test suite to call the ZITADEL API', () => {
         cy.visit(`${consoleUrl}/users/create-machine`)
         cy.get('[formcontrolname="userName"]').type("e2e", { force: true })
         cy.get('[formcontrolname="name"]').type("e2e", { force: true })
         cy.get('[formcontrolname="description"]').type("User who calls the ZITADEL API for preparing end-to-end tests")
         cy.contains('button', 'Create').click({ force: true })
+    })
 
+    it('gives the service account to the ORG_OWNER role', () => {
         addOrganisationRole('ORG_OWNER')
+    })
 
-        // Create and download sa key
+    it('creates and downloads the service account key', () => {
         cy.contains('div .card', 'Keys').contains('a', 'New').click({ force: true })     
         cy.contains('button', 'Add').click({ force: true })
         cy.contains('button', 'Download').click({ force: true })
+    })
 
-        // enable all features
+    it('enables all features for the demo-org', () => {
         cy.visit(`${consoleUrl}/org/features`)
         cy.get('label.mat-slide-toggle-label').click({ force: true, multiple: true })
         cy.contains('button', 'Save').click({ force: true })
+    })
 
-        ;[{
-            user: User.OrgOwner,
-            role: 'ORG_OWNER'
-        }, {
-            user: User.OrgOwnerViewer,
-            role: 'ORG_OWNER_VIEWER'
-        }, {
-            user: User.OrgProjectCreator,
-            role: 'ORG_PROJECT_CREATOR'
-        }, {
-            user: User.LoginPolicyUser,
-            role: null
-        }, { 
-            user: User.PasswordComplexityUser,
-            role: null
-        }].forEach(user => {
+    ;[{
+        user: User.OrgOwner,
+        role: 'ORG_OWNER'
+    }, {
+        user: User.OrgOwnerViewer,
+        role: 'ORG_OWNER_VIEWER'
+    }, {
+        user: User.OrgProjectCreator,
+        role: 'ORG_PROJECT_CREATOR'
+    }, {
+        user: User.LoginPolicyUser,
+        role: null
+    }, { 
+        user: User.PasswordComplexityUser,
+        role: null
+    }].forEach(user => {
+
+        it(`creates the test user ${user.user} and gives it the role ${user.role}`, () => {
             login(User.IAMAdminUser, 'Password1!', true)
             cy.visit(`${consoleUrl}/users/create`)
             cy.contains('button', 'Global').click({ force: true })
