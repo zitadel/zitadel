@@ -245,5 +245,12 @@ services:
     - ../../console/cypress/snapshots:/console/cypress/snapshots
     - ../../console/cypress/downloads:/console/cypress/downloads
 
+  await-e2e-setup:
+    profiles: ['e2e']
+    depends_on:
+      e2e-setup:
+        condition: service_completed_successfully
+    image: alpine:latest
+
 networks:
   zitadel: {}
