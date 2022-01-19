@@ -18,6 +18,9 @@ jobs:
       CI: 1
       # avoid warnings like "tput: No value for $TERM and no -T specified"
       TERM: xterm
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
+
     steps:
 
     - name: Checkout
