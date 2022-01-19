@@ -370,7 +370,7 @@ func TestUserGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.user_grants SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1))) WHERE (grant_id = $2)",
+							expectedStmt: "UPDATE zitadel.projections.user_grants SET (roles) = (SELECT ARRAY( SELECT UNNEST(roles) INTERSECT SELECT UNNEST ($1::STRING[]))) WHERE (grant_id = $2)",
 							expectedArgs: []interface{}{
 								pq.StringArray{"key"},
 								"grantID",
