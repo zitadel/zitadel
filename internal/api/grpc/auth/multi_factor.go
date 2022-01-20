@@ -14,9 +14,14 @@ import (
 
 func (s *Server) ListMyAuthFactors(ctx context.Context, _ *auth_pb.ListMyAuthFactorsRequest) (*auth_pb.ListMyAuthFactorsResponse, error) {
 	query := new(query.UserAuthMethodSearchQueries)
-	query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
-	types := []domain.UserAuthMethodType{domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP}
-	query.AppendAuthMethodsQuery(types...)
+	err := query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	if err != nil {
+		return nil, err
+	}
 	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
