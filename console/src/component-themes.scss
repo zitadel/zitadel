@@ -12,6 +12,7 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/contributors/contributors.component';
 @import 'src/app/modules/nav/nav.component';
+@import 'src/app/modules/action-keys/action-keys.component.scss';
 @import 'src/app/modules/header/header.component';
 @import 'src/app/modules/footer/footer.component';
 @import 'src/app/modules/theme-setting/theme-setting.component.scss';
@@ -93,5 +94,6 @@
   @include user-grants-theme($theme);
   @include info-row-theme($theme);
   @include action-dialog-theme($theme);
+  @include action-keys-theme($theme);
   @include codemirror-theme($theme);
 }

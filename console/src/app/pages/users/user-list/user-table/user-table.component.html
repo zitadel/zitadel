@@ -14,19 +14,27 @@
   </div>
 
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
-    <button (click)="deactivateSelectedUsers()" class="icon-button cnsl-action-button" mat-raised-button
-      *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
-      <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
-      <span>{{'USER.TABLE.DEACTIVATE' | translate}}</span>
+    <button (click)="deactivateSelectedUsers()" class="icon-button cnsl-action-button margin-right bg-state inactive"
+      mat-raised-button *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
+      <!-- <mat-icon svgIcon="mdi_account_cancel"></mat-icon> -->
+      <span class="">{{'USER.TABLE.DEACTIVATE' | translate}}</span>
+      <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE">
+      </cnsl-action-keys>
     </button>
-    <button (click)="reactivateSelectedUsers()" class="icon-button cnsl-action-button" mat-raised-button
+    <button (click)="reactivateSelectedUsers()" class="icon-button cnsl-action-button bg-state active" mat-raised-button
       *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
-      <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
-      <span>{{'USER.TABLE.ACTIVATE' | translate}}</span>
+      <!-- <mat-icon svgIcon="mdi_account_check_outline"></mat-icon> -->
+      <span class="">{{'USER.TABLE.ACTIVATE' | translate}}</span>
+      <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE">
+      </cnsl-action-keys>
     </button>
     <a *ngIf="!selection.hasValue()" [routerLink]="[ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
       color="primary" mat-raised-button [disabled]="disabled" class="cnsl-action-button">
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{ 'ACTIONS.NEW' | translate }}</span>
+      <cnsl-action-keys
+        (actionTriggered)="gotoRouterLink([ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine'])">
+      </cnsl-action-keys>
     </a>
   </ng-template>
 

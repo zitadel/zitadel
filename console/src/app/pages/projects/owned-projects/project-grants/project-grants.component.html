@@ -17,9 +17,12 @@
         </ng-template>
         <div actions>
           <a [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
-            color="primary" color="primary" mat-raised-button
+            color="primary" class="cnsl-action-button" mat-raised-button
             [routerLink]="[ '/projects', projectId, 'projectgrants', 'create']">
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+            <mat-icon class="icon">add</mat-icon>
+            <span>{{ 'ACTIONS.NEW' | translate }}</span>
+            <cnsl-action-keys (actionTriggered)="gotoRouterLink([ '/projects', projectId, 'projectgrants', 'create'])">
+            </cnsl-action-keys>
           </a>
         </div>
 

@@ -30,7 +30,6 @@
       <template [ngTemplateOutlet]="deleteButton" [ngTemplateOutletContext]="{key: item}"></template>
       <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
-
   </div>
   <div class="owned-project-grid-container">
     <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
@@ -48,6 +47,7 @@
           </div>
         </div>
 
+        <span class="owning-org" *ngIf="$any(item).projectOwnerName">{{$any(item).projectOwnerName}}</span>
         <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' |
           translate}}
           {{
@@ -70,6 +70,8 @@
         <div class="add-project-button card" matRipple (click)="addItem()">
           <mat-icon class="icon">add</mat-icon>
           <span>{{'PROJECT.PAGES.ADDNEW' | translate}}</span>
+          <cnsl-action-keys [doNotUseContrast]="true" [withoutMargin]="true" (actionTriggered)="addItem()">
+          </cnsl-action-keys>
         </div>
       </ng-template>
     </ng-container>

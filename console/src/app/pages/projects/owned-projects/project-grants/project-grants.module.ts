@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { TranslateModule } from '@ngx-translate/core';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -33,6 +34,7 @@ import { ProjectGrantsComponent } from './project-grants.component';
     InputModule,
     MatTableModule,
     TranslateModule,
+    ActionKeysModule,
     MatSelectModule,
     PaginatorModule,
   ],

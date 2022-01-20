@@ -36,7 +36,11 @@
         <div class="topelements">
           <div class="flow-type mat-elevation-z1">
             <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
-            <button (click)="clearFlow()" color="warn" mat-raised-button>{{'ACTIONS.CLEAR' | translate}}</button>
+            <button (click)="clearFlow()" color="warn" class="cnsl-action-button" mat-raised-button>
+              <span>{{'ACTIONS.CLEAR' | translate}}</span>
+              <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="clearFlow()">
+              </cnsl-action-keys>
+            </button>
           </div>
         </div>
 
@@ -56,10 +60,10 @@
 
           <div class="topbottomline"></div>
 
-          <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
+          <button class="add-btn cnsl-action-button" mat-raised-button color="primary" (click)="openAddTrigger()">
+            <mat-icon>add</mat-icon>
             <span>{{'ACTIONS.NEW' | translate}}</span>
             <span *ngIf="selection && selection.length">&nbsp;({{selection.length}})</span>
-            <mat-icon>add</mat-icon>
           </button>
         </div>
       </div>

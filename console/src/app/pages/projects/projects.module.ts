@@ -11,6 +11,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
@@ -43,6 +44,7 @@ import { ProjectsComponent } from './projects.component';
     MatCheckboxModule,
     CardModule,
     MatTooltipModule,
+    ActionKeysModule,
     MatSortModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,

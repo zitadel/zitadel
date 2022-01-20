@@ -2,6 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -28,8 +29,17 @@ export class ProjectRolesTableComponent implements OnInit {
   @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
   @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'actions'];
 
-  constructor(private mgmtService: ManagementService, private toast: ToastService, private dialog: MatDialog) {
+  constructor(
+    private mgmtService: ManagementService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+    private router: Router,
+  ) {
     this.dataSource = new ProjectRolesDataSource(this.mgmtService);
+  }
+
+  public gotoRouterLink(rL: any) {
+    this.router.navigate(rL);
   }
 
   public ngOnInit(): void {

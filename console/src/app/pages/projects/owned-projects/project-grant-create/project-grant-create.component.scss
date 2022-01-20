@@ -21,12 +21,15 @@
 
   .create-content {
     padding-left: 4.5rem;
-  }
-}
 
-.org-domain {
-  width: 400px;
-  margin-right: 1rem;
+    form {
+      max-width: 35rem;
+
+      .org-domain {
+        margin-right: 1rem;
+      }
+    }
+  }
 }
 
 .domain-button {

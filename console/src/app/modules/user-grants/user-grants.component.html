@@ -19,11 +19,13 @@
     (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete === false">
     <i class="las la-trash"></i>
     <span>{{'ACTIONS.DELETE' | translate}}</span>
+    <cnsl-action-keys (actionTriggered)="deleteGrantSelection()" [type]="ActionKeysType.DELETE"></cnsl-action-keys>
   </button>
   <a *ngIf="disableWrite === false && (selection.hasValue() === false)" matTooltip="{{'GRANTS.ADD' | translate}}"
     actions color="primary" class="cnsl-action-button" mat-raised-button [routerLink]="routerLink">
     <mat-icon class="icon">add</mat-icon>
     <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
+    <cnsl-action-keys (actionTriggered)="gotoCreateLink(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
   </a>
 
   <div class="table-wrapper">

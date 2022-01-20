@@ -1,5 +1,6 @@
 <cnsl-refresh-table *ngIf="dataSource" (refreshed)="changePage()" [dataSize]="dataSource.totalResult"
-  [timestamp]="dataSource.viewTimestamp" [selection]="selection" [loading]="dataSource?.loading$ | async">
+  [timestamp]="dataSource.viewTimestamp" [hideRefresh]="true" [selection]="selection"
+  [loading]="dataSource?.loading$ | async">
 
   <ng-container actions *ngIf="selection.hasValue()">
     <ng-content select="[selectactions]"></ng-content>

@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { AvatarModule } from 'src/app/modules/avatar/avatar.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -40,6 +41,7 @@ import { UserTableComponent } from './user-table/user-table.component';
     TranslateModule,
     RouterModule,
     RefreshTableModule,
+    ActionKeysModule,
     InputModule,
     PaginatorModule,
   ],

@@ -1,8 +1,11 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource?.data?.length ?? 0"
   [timestamp]="actionsResult?.details?.viewTimestamp" [selection]="selection">
   <div actions>
-    <a color="primary" mat-raised-button (click)="openAddAction()">
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+    <a class="cnsl-action-button" color="primary" mat-raised-button (click)="openAddAction()">
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{ 'ACTIONS.NEW' | translate }}</span>
+      <cnsl-action-keys (actionTriggered)="openAddAction()">
+      </cnsl-action-keys>
     </a>
   </div>
 

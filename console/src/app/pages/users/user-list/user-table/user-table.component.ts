@@ -2,11 +2,12 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
+import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
@@ -63,7 +64,9 @@ export class UserTableComponent implements OnInit {
   public UserState: any = UserState;
   public UserListSearchKey: any = UserListSearchKey;
 
+  public ActionKeysType: any = ActionKeysType;
   constructor(
+    private router: Router,
     public translate: TranslateService,
     private authService: GrpcAuthService,
     private userService: ManagementService,
@@ -141,6 +144,10 @@ export class UserTableComponent implements OnInit {
       .catch((error) => {
         this.toast.showError(error);
       });
+  }
+
+  public gotoRouterLink(rL: any): void {
+    this.router.navigate(rL);
   }
 
   private async getData(limit: number, offset: number, type: Type, searchValue?: string): Promise<void> {

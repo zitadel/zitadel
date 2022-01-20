@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
@@ -20,6 +21,7 @@ import {
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { ActionKeysType } from '../action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
@@ -67,6 +69,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
   public UserGrantContext: any = UserGrantContext;
   public Type: any = Type;
+  public ActionKeysType: any = ActionKeysType;
   @Input() public type: Type | undefined = undefined;
 
   constructor(
@@ -74,6 +77,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     private mgmtService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
+    private router: Router,
   ) {}
 
   @Input() public displayedColumns: string[] = [
@@ -132,6 +136,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     } else {
       return '';
     }
+  }
+
+  public gotoCreateLink(rL: any): void {
+    this.router.navigate(rL);
   }
 
   private loadGrantsPage(type: Type | undefined, filterValue?: string): void {

@@ -19,6 +19,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { ProjectRolesTableComponent } from './project-roles-table.component';
 
 @NgModule({
@@ -33,6 +34,7 @@ import { ProjectRolesTableComponent } from './project-roles-table.component';
     InputModule,
     RouterModule,
     FormsModule,
+    ActionKeysModule,
     ReactiveFormsModule,
     MatIconModule,
     MatProgressSpinnerModule,

@@ -3,6 +3,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
@@ -64,7 +65,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     private mgmtService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
+    private router: Router,
   ) {}
+
+  public gotoRouterLink(rL: any) {
+    this.router.navigate(rL);
+  }
 
   public ngOnInit(): void {
     this.projectType$.pipe(takeUntil(this.destroy$)).subscribe((type) => {

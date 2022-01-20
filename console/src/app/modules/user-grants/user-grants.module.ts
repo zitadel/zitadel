@@ -16,6 +16,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { InputModule } from '../../modules/input/input.module';
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
@@ -39,6 +40,7 @@ import { UserGrantsComponent } from './user-grants.component';
     MatTooltipModule,
     MatSelectModule,
     TranslateModule,
+    ActionKeysModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,
     RefreshTableModule,

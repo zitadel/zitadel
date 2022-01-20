@@ -13,12 +13,15 @@
         <p class="desc">{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}</p>
       </div>
       <span class="fill-space"></span>
-      <button class="icon-button" (click)="loadDomains()" card-actions mat-icon-button>
+      <!-- <button class="icon-button" (click)="loadDomains()" card-actions mat-icon-button>
         <mat-icon class="icon">refresh</mat-icon>
-      </button>
+      </button> -->
       <button [disabled]="(canwrite$ | async) === false || (['custom_domain'] | hasFeature | async) === false"
-        matTooltip="Add domain" mat-raised-button color="primary" (click)="addNewDomain()">{{'ORG.DOMAINS.NEW' |
-        translate}}
+        matTooltip="Add domain" mat-raised-button color="primary" class="cnsl-action-button" (click)="addNewDomain()">
+        <mat-icon>add</mat-icon>
+        <span>{{'ACTIONS.NEW' | translate}}</span>
+        <cnsl-action-keys (actionTriggered)="addNewDomain()">
+        </cnsl-action-keys>
       </button>
     </div>
 

@@ -1,11 +1,14 @@
 <div class="projects-table-wrapper" *ngIf="projectType$ | async as type">
-  <cnsl-refresh-table (refreshed)="refreshPage(type)" [dataSize]="totalResult" [timestamp]="viewTimestamp"
-    [selection]="selection" [loading]="loading$ | async">
+  <cnsl-refresh-table [hideRefresh]="true" (refreshed)="refreshPage(type)" [dataSize]="totalResult"
+    [timestamp]="viewTimestamp" [selection]="selection" [loading]="loading$ | async">
 
     <ng-template actions cnslHasRole [hasRole]="['project.create']">
       <a *ngIf="type === ProjectType.PROJECTTYPE_OWNED" [routerLink]="[ '/projects', 'create']" color="primary"
-        mat-raised-button>
-        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+        mat-raised-button class="cnsl-action-button">
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="gotoRouterLink([ '/projects', 'create'])">
+        </cnsl-action-keys>
       </a>
     </ng-template>
     <div class="table-wrapper">

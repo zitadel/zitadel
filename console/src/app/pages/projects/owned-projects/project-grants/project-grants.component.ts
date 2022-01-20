@@ -3,7 +3,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
@@ -43,6 +43,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     private toast: ToastService,
     private route: ActivatedRoute,
     private breadcrumbService: BreadcrumbService,
+    private router: Router,
   ) {
     const projectId = this.route.snapshot.paramMap.get(ROUTEPARAM);
     if (projectId) {
@@ -62,6 +63,10 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
       ];
       this.breadcrumbService.setBreadcrumb(breadcrumbs);
     }
+  }
+
+  public gotoRouterLink(rL: any) {
+    this.router.navigate(rL);
   }
 
   public ngOnInit(): void {

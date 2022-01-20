@@ -4,6 +4,10 @@
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
 
+  .margin-right {
+    margin-right: 0.5rem;
+  }
+
   .user-table-left-actions {
     display: flex;
     align-items: center;

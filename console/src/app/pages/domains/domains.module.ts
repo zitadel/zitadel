@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -28,6 +29,7 @@ import { DomainsComponent } from './domains.component';
     CardModule,
     HasFeaturePipeModule,
     HasRolePipeModule,
+    ActionKeysModule,
     MatButtonModule,
     CopyToClipboardModule,
     InputModule,

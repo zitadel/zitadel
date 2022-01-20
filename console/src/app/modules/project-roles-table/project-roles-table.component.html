@@ -4,8 +4,11 @@
 
   <ng-template cnslHasRole [hasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
     <a *ngIf="actionsVisible" [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'roles', 'create']"
-      color="primary" mat-raised-button>
-      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+      color="primary" class="cnsl-action-button" mat-raised-button>
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{ 'ACTIONS.NEW' | translate }}</span>
+      <cnsl-action-keys (actionTriggered)="gotoRouterLink([ '/projects', projectId, 'roles', 'create'])">
+      </cnsl-action-keys>
     </a>
   </ng-template>
 
