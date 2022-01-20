@@ -115,25 +115,27 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
   }
 
   private loadResponse(promise: Promise<ListUserGrantResponse.AsObject>): void {
-    from(promise).pipe(
-      map(resp => {
-        if (resp.details?.totalResult) {
-          this.totalResult = resp.details.totalResult;
-        } else {
-          this.totalResult = 0;
-        }
-        if (resp.details?.viewTimestamp) {
-          this.viewTimestamp = resp.details.viewTimestamp;
-        }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(grants => {
-      this.grantsSubject.next(grants);
-    });
+    from(promise)
+      .pipe(
+        map((resp) => {
+          if (resp.details?.totalResult) {
+            this.totalResult = resp.details.totalResult;
+          } else {
+            this.totalResult = 0;
+          }
+          if (resp.details?.viewTimestamp) {
+            this.viewTimestamp = resp.details.viewTimestamp;
+          }
+          console.log(resp.resultList);
+          return resp.resultList;
+        }),
+        catchError(() => of([])),
+        finalize(() => this.loadingSubject.next(false)),
+      )
+      .subscribe((grants) => {
+        this.grantsSubject.next(grants);
+      });
   }
-
 
   /**
    * Connect this data source to the table. The table will only update when

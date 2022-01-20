@@ -1126,6 +1126,7 @@
       "SHOWDETAIL": "Details anzeigen",
       "USER": "Benutzer",
       "MEMBERS": "Manager",
+      "ORG": "Organisation",
       "PROJECTNAME": "Projektname",
       "GRANTEDORG": "Berechtigte Organisation",
       "GRANTEDORGDOMAIN": "Domain",
@@ -1598,6 +1599,10 @@
     "TOAST": {
       "UPDATED": "Berechtigung geändert.",
       "BULKREMOVED": "Berechtigungen entfernt."
+    },
+    "DIALOG": {
+      "BULK_DELETE_TITLE": "Autorisierungen löschen",
+      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff eine mehrere Autorisierungen zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "CHANGES": {

@@ -1,6 +1,6 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
-  [timestamp]="viewTimestamp" [selection]="selection" [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes"
-  [showBorder]="true">
+  [hideRefresh]="true" [timestamp]="viewTimestamp" [selection]="selection"
+  [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [showBorder]="true">
   <cnsl-form-field @appearfade *ngIf="userSearchKey !== undefined" actions class="filtername">
     <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
       [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
@@ -14,16 +14,18 @@
   </div>
 
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
-    <button (click)="deactivateSelectedUsers()" matTooltip="{{'USER.TABLE.DEACTIVATE' | translate}}" class="icon-button"
-      mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
+    <button (click)="deactivateSelectedUsers()" class="icon-button cnsl-action-button" mat-raised-button
+      *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
       <mat-icon svgIcon="mdi_account_cancel"></mat-icon>
+      <span>{{'USER.TABLE.DEACTIVATE' | translate}}</span>
     </button>
-    <button (click)="reactivateSelectedUsers()" matTooltip="{{'USER.TABLE.ACTIVATE' | translate}}" class="icon-button"
-      mat-icon-button *ngIf="selection.hasValue()" [disabled]="disabled">
+    <button (click)="reactivateSelectedUsers()" class="icon-button cnsl-action-button" mat-raised-button
+      *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
       <mat-icon svgIcon="mdi_account_check_outline"></mat-icon>
+      <span>{{'USER.TABLE.ACTIVATE' | translate}}</span>
     </button>
-    <a [routerLink]="[ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine']" color="primary"
-      mat-raised-button [disabled]="disabled">
+    <a *ngIf="!selection.hasValue()" [routerLink]="[ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
+      color="primary" mat-raised-button [disabled]="disabled" class="cnsl-action-button">
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
   </ng-template>

@@ -57,7 +57,7 @@
 
   <div class="actions">
     <!-- *ngIf="totalCustomPolicy && totalCustomPolicy.isDefault === false" -->
-    <button class="reset-button" *ngIf="totalCustomPolicy && totalCustomPolicy.isDefault === false"
+    <button class="reset-button"
       [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['custom_text.login'] | hasFeature | async) === false)  || (canWrite$ | async) === false"
       (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
       'ACTIONS.RESETDEFAULT' | translate }}</button>

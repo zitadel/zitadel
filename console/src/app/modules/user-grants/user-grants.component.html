@@ -1,4 +1,4 @@
-<cnsl-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()"
+<cnsl-refresh-table [loading]="dataSource?.loading$ | async" (refreshed)="changePage()" [hideRefresh]="true"
   [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [timestamp]="dataSource?.viewTimestamp"
   [dataSize]="dataSource?.totalResult ?? 0" [selection]="selection">
   <!-- <div leftActions class="user-grants-table-left-actions">
@@ -15,13 +15,15 @@
       [placeholder]="('USER.GRANTS.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>
   </cnsl-form-field>
 
-  <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="icon-button" mat-icon-button actions
+  <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="cnsl-action-button" mat-raised-button actions
     (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete === false">
     <i class="las la-trash"></i>
+    <span>{{'ACTIONS.DELETE' | translate}}</span>
   </button>
-  <a *ngIf="disableWrite === false" matTooltip="{{'GRANTS.ADD' | translate}}" actions color="primary" color="primary"
-    mat-raised-button [routerLink]="routerLink">
-    <mat-icon class="icon">add</mat-icon>{{ 'GRANTS.ADD_BTN' | translate }}
+  <a *ngIf="disableWrite === false && (selection.hasValue() === false)" matTooltip="{{'GRANTS.ADD' | translate}}"
+    actions color="primary" class="cnsl-action-button" mat-raised-button [routerLink]="routerLink">
+    <mat-icon class="icon">add</mat-icon>
+    <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
   </a>
 
   <div class="table-wrapper">
@@ -57,12 +59,13 @@
             [ngTemplateOutletContext]="{key: UserGrantListSearchKey.DISPLAY_NAME}"></template>
         </th>
         <td mat-cell *matCellDef="let grant">
-          <a class="user" [routerLink]="['/users', grant.userId]">{{grant?.displayName}}</a>
+          <a class="user" [routerLink]="['/users', grant.userId]">{{grant.displayName ? grant.displayName :
+            grant.userName ? grant.userName : ''}}</a>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="org">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.GRANTEDORGDOMAIN' | translate }}
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ORG' | translate }}
           <template [ngTemplateOutlet]="templateRef"
             [ngTemplateOutletContext]="{key: UserGrantListSearchKey.ORG_NAME}"></template>
         </th>

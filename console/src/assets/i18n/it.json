@@ -1126,6 +1126,7 @@
       "SHOWDETAIL": "Mostra dettagli",
       "USER": "Utente",
       "MEMBERS": "Manager",
+      "ORG": "Organizzazione",
       "PROJECTNAME": "Nome del progetto",
       "GRANTEDORG": "Organizzazione concessa",
       "GRANTEDORGDOMAIN": "Dominio",
@@ -1598,6 +1599,10 @@
     "TOAST": {
       "UPDATED": "Sovvenzione aggiornata.",
       "BULKREMOVED": "Sussidi rimossi."
+    },
+    "DIALOG": {
+      "BULK_DELETE_TITLE": "Elimina autorizzazioni",
+      "BULK_DELETE_DESCRIPTION": "Stai per eliminare diverse autorizzazioni. Vuoi continuare?"
     }
   },
   "CHANGES": {

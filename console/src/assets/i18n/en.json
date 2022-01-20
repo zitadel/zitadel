@@ -49,7 +49,7 @@
     "IAM": "System Overview",
     "VIEWS": "Views",
     "FAILEDEVENTS": "Failed Events",
-    "ORGANIZATION": "Organisation",
+    "ORGANIZATION": "Organization",
     "DOMAINS": "Domains",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
@@ -59,9 +59,9 @@
     "HUMANUSERS": "Users",
     "MACHINEUSERS": "Service Users",
     "LOGOUT": "Logout All Users",
-    "NEWORG": "New Organisation",
+    "NEWORG": "New Organization",
     "IAMADMIN": "You are an IAM Administrator. Note that you have extended permissions.",
-    "SHOWORGS": "Show All Organisations",
+    "SHOWORGS": "Show All Organizations",
     "GRANTS": "Authorizations",
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
@@ -70,12 +70,12 @@
       "PERSONAL": "Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
       "IAMPOLICIES": "Manage ZITADELs global Access policies und elect ZITADEL Managers",
       "IAMEVENTSTORE": "Clear views and failed events",
-      "ORG": "Show your organisations access policies, and manage your domain names",
-      "SELFPROJECTS": "Show your organisations own projects",
-      "GRANTEDPROJECTS": "Show projects your organisation was granted access",
-      "HUMANUSERS": "Show all registered human users on your organisation",
-      "MACHINEUSERS": "Show service users of your organisation",
-      "AUTHZ": "Show authorizations available to your organisation users",
+      "ORG": "Show your organizations access policies, and manage your domain names",
+      "SELFPROJECTS": "Show your organizations own projects",
+      "GRANTEDPROJECTS": "Show projects your organization was granted access",
+      "HUMANUSERS": "Show all registered human users on your organization",
+      "MACHINEUSERS": "Show service users of your organization",
+      "AUTHZ": "Show authorizations available to your organization users",
       "ACTIONS": "Define scripts to execute on a certain event."
     }
   },
@@ -151,9 +151,9 @@
     "PAGES": {
       "LIST": "Users",
       "TITLE": "User",
-      "DESCRIPTION": "Create new users in your organisation and manage existing ones.",
+      "DESCRIPTION": "Create new users in your organization and manage existing ones.",
       "LISTMACHINE": "Service Users",
-      "DESCRIPTIONMACHINE": "Create and manage Service Users of your organisation",
+      "DESCRIPTIONMACHINE": "Create and manage Service Users of your organization",
       "DETAIL": "Detail",
       "CREATE": "Create",
       "MY": "My Informations",
@@ -204,7 +204,7 @@
         "3": "filter for Username",
         "4": "filter for Email",
         "5": "filter for DisplayName",
-        "10": "filter for organisation name",
+        "10": "filter for organization name",
         "12": "filter for project name"
       },
       "EMPTY": "No entries"
@@ -438,7 +438,7 @@
       "DESCRIPTION": "Grant this user access to certain projects",
       "CREATE": {
         "TITLE": "Create User Grant",
-        "DESCRIPTION": "Search for the organisation, the project and the corresponding project roles."
+        "DESCRIPTION": "Search for the organization, the project and the corresponding project roles."
       },
       "FILTER": {
         "0": "filter for user",
@@ -468,8 +468,8 @@
       "FOUND": "Found"
     },
     "TARGET": {
-      "SELF": "If you want to grant a user of an other organisation access",
-      "EXTERNAL": "To grant a user of your organisation access",
+      "SELF": "If you want to grant a user of an other organization access",
+      "EXTERNAL": "To grant a user of your organization access",
       "CLICKHERE": "click here"
     },
     "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
@@ -508,7 +508,7 @@
     },
     "MEMBERSHIPS": {
       "TITLE": "ZITADEL Manager Roles",
-      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organisation, project, or IAM detail pages.",
+      "DESCRIPTION": "These are all member grants of the user. You can modify them also on organization, project, or IAM detail pages.",
       "ORGCONTEXT": "You see all organizations and projects that are related to the currently selected organization.",
       "USERCONTEXT": "You see all organizations and projects to which you are authorized. Including other organizations.",
       "CREATIONDATE": "Creation Date",
@@ -520,7 +520,7 @@
       "UPDATED": "The membership was updated.",
       "TYPES": {
         "UNKNOWN": "Unknown",
-        "ORG": "Organisation",
+        "ORG": "Organization",
         "PROJECT": "Project",
         "GRANTEDPROJECT": "Granted Project"
       }
@@ -635,18 +635,18 @@
       "DATECHANGED": "Changed",
       "FILTER": "Filter",
       "FILTERPLACEHOLDER": "Filter for the name",
-      "LIST": "Organisations",
-      "LISTDESCRIPTION": "Choose an organisation.",
+      "LIST": "Organizations",
+      "LISTDESCRIPTION": "Choose an organization.",
       "ACTIVE": "Active",
-      "CREATE": "Create Organisation",
-      "USERSELFACCOUNT": "Use your personal account as organisation owner",
-      "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
-      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
-      "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
+      "CREATE": "Create Organization",
+      "USERSELFACCOUNT": "Use your personal account as organization owner",
+      "ORGDETAIL_TITLE": "Enter the name and domain of your new organization.",
+      "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organization.",
+      "ORGDETAILUSER_TITLE": "Configure Organization Owner",
       "ORGDOMAIN": {
-        "TITLE": "Organisation Domain Ownership Verification",
+        "TITLE": "Organization Domain Ownership Verification",
         "VERIFICATION": "To verify the ownership of your domain, you need to download a verification file and upload it at the provided URL listed below, or place a TXT Record DNS entry for the provided URL. To complete, click the button to verify.",
-        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organisation, but in order to use your organisation this step has to be completed!",
+        "VERIFICATION_SKIP": "You can skip verification for now and continue to create your organization, but in order to use your organization this step has to be completed!",
         "VERIFICATION_VALIDATION_DESC": "The tokens are checked regularly to ensure you are still owner of the domain.",
         "VERIFICATION_NEWTOKEN_TITLE": "Request New Token",
         "VERIFICATION_NEWTOKEN_DESC": "If you want to request a new token, select you preferred method. If you want to validate a persisting token, click the button above.",
@@ -660,7 +660,7 @@
         }
       },
       "DOWNLOAD_FILE": "Download File",
-      "SELECTORGTOOLTIP": "Select this organisation.",
+      "SELECTORGTOOLTIP": "Select this organization.",
       "PRIMARYDOMAIN": "Primary Domain",
       "STATE": "State",
       "USEPASSWORD": "Set Initial Password",
@@ -677,7 +677,7 @@
       },
       "ADD": {
         "TITLE": "Add Domain",
-        "DESCRIPTION": "You are about to add a domain for your organisation. After successful process, you users will be able to use the domain for their login."
+        "DESCRIPTION": "You are about to add a domain for your organization. After successful process, you users will be able to use the domain for their login."
       }
     },
     "STATE": {
@@ -686,12 +686,12 @@
       "2": "Deactivated"
     },
     "MEMBER": {
-      "TITLE": "Organisation Managers",
-      "DESCRIPTION": "Define the users who can change your organisations preferences."
+      "TITLE": "Organization Managers",
+      "DESCRIPTION": "Define the users who can change your organizations preferences."
     },
     "TOAST": {
-      "DEACTIVATED": "Organisation deactivated.",
-      "REACTIVATED": "Organisation reactivated.",
+      "DEACTIVATED": "Organization deactivated.",
+      "REACTIVATED": "Organization reactivated.",
       "DOMAINADDED": "Added domain.",
       "DOMAINREMOVED": "Removed domain.",
       "MEMBERADDED": "Manager added.",
@@ -789,7 +789,7 @@
       "RELEASE": "Release",
       "DROPFONT": "Drop fontfile here",
       "RELEASEFONT": "Release",
-      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organisation switcher in console",
+      "USEOFLOGO": "Your Logo will be used in the Login as well as emails, while the icon is used for smaller UI elements like in the organization switcher in console",
       "MAXSIZE": "The maximum size is limited to 524kB",
       "EMAILNOSVG": "The SVG file format is not supported in emails. Therefore upload your logo in PNG or other supported format.",
       "MAXSIZEEXCEEDED": "Maximum size of 524kB exceeded.",
@@ -824,7 +824,7 @@
       "TITLE": "Login Policy",
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
-      "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organisation only.",
+      "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
       "ADVANCED": "Advanced",
       "SAVED": "Saved successfully!"
     },
@@ -965,8 +965,8 @@
     }
   },
   "ORG_DETAIL": {
-    "TITLE": "Organisation",
-    "DESCRIPTION": "Here you can edit the configuration of your organisation and manage the members.",
+    "TITLE": "Organization",
+    "DESCRIPTION": "Here you can edit the configuration of your organization and manage the members.",
     "DETAIL": {
       "TITLE": "Detail",
       "NAME": "Name",
@@ -1000,7 +1000,7 @@
   "PROJECT": {
     "PAGES": {
       "TITLE": "Project",
-      "DESCRIPTION": "Here you can define applications, manage roles and grant other organisations to use your project.",
+      "DESCRIPTION": "Here you can define applications, manage roles and grant other organizations to use your project.",
       "DELETE": "Delete Project",
       "LIST": "Projects",
       "LISTDESCRIPTION": "If you can't find a project, contact a project owner or someone with the corresponding rights to gain project access.",
@@ -1020,11 +1020,11 @@
         "TITLE": "Branding Setting",
         "0": {
           "TITLE": "Unspecified",
-          "DESC": "As soon as the user is identified, the branding of the organisation of the identified user will be shown, before the system default is shown."
+          "DESC": "As soon as the user is identified, the branding of the organization of the identified user will be shown, before the system default is shown."
         },
         "1": {
           "TITLE": "Enforce project resource owner Policy",
-          "DESC": "The branding of the organisation which owns the project will be shown"
+          "DESC": "The branding of the organization which owns the project will be shown"
         },
         "2": {
           "TITLE": "Allow Login User resource owner policy",
@@ -1090,31 +1090,31 @@
       "USERID": "User ID"
     },
     "GRANT": {
-      "EMPTY": "No granted organisation.",
-      "TITLE": "Granted Organisations",
-      "DESCRIPTION": "Allow an other organisation to use your project.",
+      "EMPTY": "No granted organization.",
+      "TITLE": "Granted Organizations",
+      "DESCRIPTION": "Allow an other organization to use your project.",
       "CREATE": {
-        "TITLE": "Create Organisation Grant",
+        "TITLE": "Create Organization Grant",
         "SEL_USERS": "Select the users you wish to grant access",
         "SEL_PROJECT": "Search for a project",
         "SEL_ROLES": "Select the roles you want to be added to the grant",
         "SEL_USER": "Search for a user",
         "SEL_ORG": "Set the domain",
-        "SEL_ORG_DESC": "Enter the complete domain to specify the organisation to grant.",
-        "ORG_TITLE": "Organisation",
-        "ORG_DESCRIPTION": "You are about to grant a user for the organisation {{name}}.",
-        "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organisation.",
+        "SEL_ORG_DESC": "Enter the complete domain to specify the organization to grant.",
+        "ORG_TITLE": "Organization",
+        "ORG_DESCRIPTION": "You are about to grant a user for the organization {{name}}.",
+        "ORG_DESCRIPTION_DESC": "Switch the context in the header above to grant a user for another organization.",
         "SEL_ORG_FORMFIELD": "Complete Domain",
-        "SEL_ORG_BUTTON": "Search Organisation",
+        "SEL_ORG_BUTTON": "Search Organization",
         "FOR_ORG": "The grant is created for:"
       },
       "DETAIL": {
-        "TITLE": "Managers of the Granted Organisation",
-        "DESC": "These are the managers of the granted organisation. You can select which users are allowed to maintain control of the project.",
+        "TITLE": "Managers of the Granted Organization",
+        "DESC": "These are the managers of the granted organization. You can select which users are allowed to maintain control of the project.",
         "MEMBERTITLE": "Managers",
-        "MEMBERDESC": "These are the managers of the granted organisation. Add users here who should gain access to edit the data of the project.",
+        "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
-        "GRANTEDORG": "Granted Organisation",
+        "GRANTEDORG": "Granted Organization",
         "RESOURCEOWNER": "Resource Owner"
       },
       "STATE": "Status",
@@ -1126,11 +1126,12 @@
       "SHOWDETAIL": "Show Details",
       "USER": "User",
       "MEMBERS": "Managers",
+      "ORG": "Organization",
       "PROJECTNAME": "Project Name",
-      "GRANTEDORG": "Granted Organisation",
+      "GRANTEDORG": "Granted Organization",
       "GRANTEDORGDOMAIN": "Domain",
       "RESOURCEOWNER": "Resource Owner",
-      "GRANTEDORGNAME": "Organisation Name",
+      "GRANTEDORGNAME": "Organization Name",
       "CREATIONDATE": "Creation Date",
       "CHANGEDATE": "Last modified",
       "DATES": "Dates",
@@ -1177,15 +1178,15 @@
       "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
     "HAS_PROJECT": "Check for Project on Authentication",
-    "HAS_PROJECT_DESCRIPTION": "It is checked whether the user's organisation has this project. If not, the user cannot be authenticated.",
+    "HAS_PROJECT_DESCRIPTION": "It is checked whether the user's organization has this project. If not, the user cannot be authenticated.",
     "TABLE": {
       "TOTAL": "Entries total:",
       "SELECTION": "Selected Elements",
       "DEACTIVATE": "Deactivate Project",
       "ACTIVATE": "Activate Project",
       "DELETE": "Delete Project",
-      "ORGNAME": "Organisation Name",
-      "ORGDOMAIN": "Organisation Domain",
+      "ORGNAME": "Organization Name",
+      "ORGDOMAIN": "Organization Domain",
       "STATE": "Status",
       "TYPE": "Type",
       "CREATIONDATE": "Created at",
@@ -1231,7 +1232,7 @@
     "OWNERTYPES": {
       "0": "unknown",
       "1": "System",
-      "2": "Organisation"
+      "2": "Organization"
     },
     "TYPES": {
       "0": "unknown",
@@ -1331,7 +1332,7 @@
   "LOGINPOLICY": {
     "CREATE": {
       "TITLE": "Login Policy",
-      "DESCRIPTION": "Define how your users can be authenticated on your organisation."
+      "DESCRIPTION": "Define how your users can be authenticated on your organization."
     },
     "IDPS": "Identity Providers",
     "ADDIDP": {
@@ -1565,7 +1566,7 @@
     "CREATIONTYPE": "Creation Type",
     "CREATIONTYPES": {
       "3": "IAM",
-      "2": "Organisation",
+      "2": "Organization",
       "0": "Owned Project",
       "1": "Granted Project",
       "4": "Project"
@@ -1598,6 +1599,10 @@
     "TOAST": {
       "UPDATED": "Grant updated.",
       "BULKREMOVED": "Grants removed."
+    },
+    "DIALOG": {
+      "BULK_DELETE_TITLE": "Delete autorizations",
+      "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
     }
   },
   "CHANGES": {
@@ -1606,7 +1611,7 @@
     "LOADMORE": "Load more",
     "ORG": {
       "TITLE": "Activity",
-      "DESCRIPTION": "Here you can see the latest events that have generated an organisation change."
+      "DESCRIPTION": "Here you can see the latest events that have generated an organization change."
     },
     "PROJECT": {
       "TITLE": "Activity",

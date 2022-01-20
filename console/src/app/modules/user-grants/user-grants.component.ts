@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
@@ -20,6 +21,7 @@ import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
 
 export enum UserGrantListSearchKey {
@@ -67,7 +69,12 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public Type: any = Type;
   @Input() public type: Type | undefined = undefined;
 
-  constructor(private userService: ManagementService, private mgmtService: ManagementService, private toast: ToastService) {}
+  constructor(
+    private userService: ManagementService,
+    private mgmtService: ManagementService,
+    private toast: ToastService,
+    private dialog: MatDialog,
+  ) {}
 
   @Input() public displayedColumns: string[] = [
     'select',
@@ -231,23 +238,37 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   }
 
   deleteGrantSelection(): void {
-    this.userService
-      .bulkRemoveUserGrant(this.selection.selected.map((grant) => grant.id))
-      .then(() => {
-        this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
-        const data = this.dataSource.grantsSubject.getValue();
-        this.selection.selected.forEach((item) => {
-          const index = data.findIndex((i) => i.id === item.id);
-          if (index > -1) {
-            data.splice(index, 1);
-            this.dataSource.grantsSubject.next(data);
-          }
-        });
-        this.selection.clear();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'GRANTS.DIALOG.BULK_DELETE_TITLE',
+        descriptionKey: 'GRANTS.DIALOG.BULK_DELETE_DESCRIPTION',
+        width: '400px',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.userService
+          .bulkRemoveUserGrant(this.selection.selected.map((grant) => grant.id))
+          .then(() => {
+            this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
+            const data = this.dataSource.grantsSubject.getValue();
+            this.selection.selected.forEach((item) => {
+              const index = data.findIndex((i) => i.id === item.id);
+              if (index > -1) {
+                data.splice(index, 1);
+                this.dataSource.grantsSubject.next(data);
+              }
+            });
+            this.selection.clear();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 
   public changePage(event?: PageEvent): void {
