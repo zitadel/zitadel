@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/query"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
@@ -33,7 +32,7 @@ type EsRepository struct {
 	eventstore.AdministratorRepo
 }
 
-func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
+func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -47,7 +46,7 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, command, queries, static, localDevMode)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, command, static, localDevMode)
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
 	statikLoginFS, err := fs.NewWithNamespace("login")
