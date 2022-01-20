@@ -141,7 +141,7 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 	if err != nil {
 		return nil, err
 	}
-	return CustomTextsToLoginDomain(domain.IAMID, lang, texts), err
+	return CustomTextsToLoginDomain(aggregateID, lang, texts), err
 }
 
 func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
