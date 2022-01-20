@@ -23,10 +23,6 @@ type UserRepository interface {
 
 	//ProfileByID(ctx context.Context, userID string) (*model.Profile, error)
 
-	UserMFAs(ctx context.Context, userID string) ([]*model.MultiFactor, error)
-
-	GetPasswordless(ctx context.Context, userID string) ([]*model.WebAuthNView, error)
-
 	//EmailByID(ctx context.Context, userID string) (*model.Email, error)
 
 	//PhoneByID(ctx context.Context, userID string) (*model.Phone, error)

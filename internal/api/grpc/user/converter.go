@@ -173,64 +173,58 @@ func GenderToPb(gender domain.Gender) user_pb.Gender {
 	}
 }
 
-func AuthFactorsToPb(mfas []*model.MultiFactor) []*user_pb.AuthFactor {
-	factors := make([]*user_pb.AuthFactor, len(mfas))
-	for i, mfa := range mfas {
-		factors[i] = AuthFactorToPb(mfa)
+func AuthMethodsToPb(mfas *query.AuthMethods) []*user_pb.AuthFactor {
+	factors := make([]*user_pb.AuthFactor, len(mfas.AuthMethods))
+	for i, mfa := range mfas.AuthMethods {
+		factors[i] = AuthMethodToPb(mfa)
 	}
 	return factors
 }
 
-func AuthFactorToPb(mfa *model.MultiFactor) *user_pb.AuthFactor {
+func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 	factor := &user_pb.AuthFactor{
 		State: MFAStateToPb(mfa.State),
 	}
 	switch mfa.Type {
-	case model.MFATypeOTP:
+	case domain.UserAuthMethodTypeOTP:
 		factor.Type = &user_pb.AuthFactor_Otp{
 			Otp: &user_pb.AuthFactorOTP{},
 		}
-	case model.MFATypeU2F:
+	case domain.UserAuthMethodTypeU2F:
 		factor.Type = &user_pb.AuthFactor_U2F{
 			U2F: &user_pb.AuthFactorU2F{
-				Id:   mfa.ID,
-				Name: mfa.Attribute,
+				Id:   mfa.TokenID,
+				Name: mfa.Name,
 			},
 		}
 	}
 	return factor
 }
 
-func MFAStateToPb(state model.MFAState) user_pb.AuthFactorState {
+func MFAStateToPb(state domain.MFAState) user_pb.AuthFactorState {
 	switch state {
-	case model.MFAStateNotReady:
+	case domain.MFAStateNotReady:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
-	case model.MFAStateReady:
+	case domain.MFAStateReady:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_READY
 	default:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}
 }
 
-func WebAuthNTokensViewToPb(tokens []*model.WebAuthNView) []*user_pb.WebAuthNToken {
-	t := make([]*user_pb.WebAuthNToken, len(tokens))
-	for i, token := range tokens {
-		t[i] = WebAuthNTokenViewToPb(token)
+func UserAuthMethodsToWebAuthNTokenPb(methods *query.AuthMethods) []*user_pb.WebAuthNToken {
+	t := make([]*user_pb.WebAuthNToken, len(methods.AuthMethods))
+	for i, token := range methods.AuthMethods {
+		t[i] = UserAuthMethodToWebAuthNTokenPb(token)
 	}
 	return t
 }
 
-func WebAuthNTokenViewToPb(token *model.WebAuthNView) *user_pb.WebAuthNToken {
+func UserAuthMethodToWebAuthNTokenPb(token *query.AuthMethod) *user_pb.WebAuthNToken {
 	return &user_pb.WebAuthNToken{
 		Id:    token.TokenID,
 		State: MFAStateToPb(token.State),
 		Name:  token.Name,
-	}
-}
-
-func WebAuthNTokenToWebAuthNKeyPb(token *domain.WebAuthNToken) *user_pb.WebAuthNKey {
-	return &user_pb.WebAuthNKey{
-		PublicKey: token.PublicKey,
 	}
 }
 
