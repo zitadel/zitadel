@@ -167,8 +167,6 @@ services:
   grpc-web-gateway:
     profiles: ['backend', 'e2e']
     restart: on-failure
-    logging:
-      driver: none
     depends_on:
       backend-run:
         condition: service_healthy
