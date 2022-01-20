@@ -16,15 +16,15 @@ import (
 
 var (
 	personalAccessTokenStmt = regexp.QuoteMeta(
-		"SELECT zitadel.projections.machine_tokens.id," +
-			" zitadel.projections.machine_tokens.creation_date," +
-			" zitadel.projections.machine_tokens.change_date," +
-			" zitadel.projections.machine_tokens.resource_owner," +
-			" zitadel.projections.machine_tokens.sequence," +
-			" zitadel.projections.machine_tokens.user_id," +
-			" zitadel.projections.machine_tokens.expiration," +
-			" zitadel.projections.machine_tokens.scopes" +
-			" FROM zitadel.projections.machine_tokens")
+		"SELECT zitadel.projections.personal_access_tokens.id," +
+			" zitadel.projections.personal_access_tokens.creation_date," +
+			" zitadel.projections.personal_access_tokens.change_date," +
+			" zitadel.projections.personal_access_tokens.resource_owner," +
+			" zitadel.projections.personal_access_tokens.sequence," +
+			" zitadel.projections.personal_access_tokens.user_id," +
+			" zitadel.projections.personal_access_tokens.expiration," +
+			" zitadel.projections.personal_access_tokens.scopes" +
+			" FROM zitadel.projections.personal_access_tokens")
 	personalAccessTokenCols = []string{
 		"id",
 		"creation_date",
@@ -36,16 +36,16 @@ var (
 		"scopes",
 	}
 	personalAccessTokensStmt = regexp.QuoteMeta(
-		"SELECT zitadel.projections.machine_tokens.id," +
-			" zitadel.projections.machine_tokens.creation_date," +
-			" zitadel.projections.machine_tokens.change_date," +
-			" zitadel.projections.machine_tokens.resource_owner," +
-			" zitadel.projections.machine_tokens.sequence," +
-			" zitadel.projections.machine_tokens.user_id," +
-			" zitadel.projections.machine_tokens.expiration," +
-			" zitadel.projections.machine_tokens.scopes," +
+		"SELECT zitadel.projections.personal_access_tokens.id," +
+			" zitadel.projections.personal_access_tokens.creation_date," +
+			" zitadel.projections.personal_access_tokens.change_date," +
+			" zitadel.projections.personal_access_tokens.resource_owner," +
+			" zitadel.projections.personal_access_tokens.sequence," +
+			" zitadel.projections.personal_access_tokens.user_id," +
+			" zitadel.projections.personal_access_tokens.expiration," +
+			" zitadel.projections.personal_access_tokens.scopes," +
 			" COUNT(*) OVER ()" +
-			" FROM zitadel.projections.machine_tokens")
+			" FROM zitadel.projections.personal_access_tokens")
 	personalAccessTokensCols = []string{
 		"id",
 		"creation_date",

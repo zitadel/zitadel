@@ -12,6 +12,7 @@ import (
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/metadata"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
@@ -656,7 +657,7 @@ func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.List
 		return nil, err
 	}
 	return &mgmt_pb.ListPersonalAccessTokensResponse{
-		Result: user.PersonalAccessTokensToPb(result.PersonalAccessTokens),
+		Result: user_grpc.PersonalAccessTokensToPb(result.PersonalAccessTokens),
 		Details: obj_grpc.ToListDetails(
 			result.Count,
 			result.Sequence,
@@ -677,7 +678,7 @@ func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPer
 	return &mgmt_pb.AddPersonalAccessTokenResponse{
 		TokenId: pat.TokenID,
 		Token:   token,
-		Details: object.AddToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			pat.Sequence,
 			pat.ChangeDate,
 			pat.ResourceOwner,
