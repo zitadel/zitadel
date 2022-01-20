@@ -27,7 +27,6 @@ type Server struct {
 	org            repository.OrgRepository
 	user           repository.UserRepository
 	iam            repository.IamRepository
-	authZ          authz.Config
 	systemDefaults systemdefaults.SystemDefaults
 	assetAPIPrefix string
 }

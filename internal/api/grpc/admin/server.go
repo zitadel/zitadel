@@ -24,7 +24,6 @@ type Server struct {
 	query           *query.Queries
 	iam             repository.IAMRepository
 	administrator   repository.AdministratorRepository
-	repo            repository.Repository
 	iamDomain       string
 	assetsAPIDomain string
 }
@@ -39,7 +38,6 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		query:           query,
 		iam:             repo,
 		administrator:   repo,
-		repo:            repo,
 		iamDomain:       iamDomain,
 		assetsAPIDomain: assetsAPIDomain,
 	}

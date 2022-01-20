@@ -554,7 +554,7 @@ func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.Remo
 func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHumanPasswordlessRequest) (*mgmt_pb.ListHumanPasswordlessResponse, error) {
 	query := new(query.UserAuthMethodSearchQueries)
 	err := query.AppendUserIDQuery(req.UserId)
-if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)

@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/user/model"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
