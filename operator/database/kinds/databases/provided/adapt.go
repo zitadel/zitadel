@@ -3,6 +3,8 @@ package provided
 import (
 	"fmt"
 
+	"github.com/caos/zitadel/operator/database/kinds/databases/core"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/secret"
@@ -36,9 +38,10 @@ func Adapter() operator.AdaptFunc {
 		}
 		current.Parsed = currentDB
 
-		return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (operator.EnsureFunc, error) {
+		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				currentDB.Current.URL = desiredKind.Spec.URL
 				currentDB.Current.Port = desiredKind.Spec.Port
+				core.SetQueriedForDatabase(queried, current)
 
 				return func(k8sClient kubernetes.ClientInt) error {
 					return nil
