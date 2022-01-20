@@ -474,9 +474,14 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 
 func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHumanAuthFactorsRequest) (*mgmt_pb.ListHumanAuthFactorsResponse, error) {
 	query := new(query.UserAuthMethodSearchQueries)
-	query.AppendUserIDQuery(req.UserId)
-	types := []domain.UserAuthMethodType{domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP}
-	query.AppendAuthMethodsQuery(types...)
+	err := query.AppendUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	if err != nil {
+		return nil, err
+	}
 	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
