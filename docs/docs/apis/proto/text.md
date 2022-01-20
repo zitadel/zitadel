@@ -278,6 +278,7 @@ title: zitadel/text.proto
 | passwordless_registration_text |  PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  PasswordlessRegistrationDoneScreenText | - |  |
 | external_registration_user_overview_text |  ExternalRegistrationUserOverviewScreenText | - |  |
+| is_default |  bool | - |  |
 
 
 

@@ -84,6 +84,7 @@ message LoginCustomText {
     PasswordlessRegistrationScreenText passwordless_registration_text = 33;
     PasswordlessRegistrationDoneScreenText passwordless_registration_done_text = 34;
     ExternalRegistrationUserOverviewScreenText external_registration_user_overview_text = 35;
+    bool is_default = 36;
 }
 
 message SelectAccountScreenText {
