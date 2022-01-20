@@ -14,7 +14,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	proj_model "github.com/caos/zitadel/internal/project/model"
 	proj_view "github.com/caos/zitadel/internal/project/repository/view"
 	"github.com/caos/zitadel/internal/query"
@@ -22,8 +21,6 @@ import (
 
 type ProjectRepo struct {
 	v1.Eventstore
-	SearchLimit     uint64
-	View            *view.View
 	Roles           []string
 	IAMID           string
 	PrefixAvatarURL string

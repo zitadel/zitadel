@@ -17,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/i18n"
-	mgmt_view "github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
@@ -28,7 +27,6 @@ type OrgRepository struct {
 	Query                               *query.Queries
 	SearchLimit                         uint64
 	Eventstore                          v1.Eventstore
-	View                                *mgmt_view.View
 	Roles                               []string
 	SystemDefaults                      systemdefaults.SystemDefaults
 	PrefixAvatarURL                     string

@@ -14,48 +14,15 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type UserRepo struct {
 	v1.Eventstore
-	SearchLimit     uint64
-	View            *view.View
 	Query           *query.Queries
 	SystemDefaults  systemdefaults.SystemDefaults
 	PrefixAvatarURL string
-}
-
-func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
-	user, viewErr := repo.View.UserByID(id)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		user = new(model.UserView)
-	}
-
-	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return model.UserToModel(user, repo.PrefixAvatarURL), nil
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return model.UserToModel(user, repo.PrefixAvatarURL), nil
-		}
-	}
-	if userCopy.State == int32(usr_model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
-	}
-	return model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {
