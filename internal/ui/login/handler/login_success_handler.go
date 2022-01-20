@@ -23,6 +23,7 @@ func (l *Login) handleLoginSuccess(w http.ResponseWriter, r *http.Request) {
 	authRequest, _ := l.getAuthRequest(r)
 	if authRequest == nil {
 		l.renderSuccessAndCallback(w, r, nil, nil)
+		return
 	}
 	for _, step := range authRequest.PossibleSteps {
 		if step.Type() != domain.NextStepLoginSucceeded && step.Type() != domain.NextStepRedirectToCallback {

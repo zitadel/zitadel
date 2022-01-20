@@ -9,7 +9,6 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
@@ -197,16 +196,6 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 		return nil
 	}
 	return oidc.ErrServerError().WithParent(err)
-}
-
-func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
-	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
-}
-
-func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	return o.repo.GetKeySet(ctx)
 }
 
 func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {

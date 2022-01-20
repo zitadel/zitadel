@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/user/model"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
@@ -233,7 +234,7 @@ func WebAuthNTokenToWebAuthNKeyPb(token *domain.WebAuthNToken) *user_pb.WebAuthN
 	}
 }
 
-func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*domain.UserIDPLink {
+func ExternalIDPViewsToExternalIDPs(externalIDPs []*query.IDPUserLink) []*domain.UserIDPLink {
 	idps := make([]*domain.UserIDPLink, len(externalIDPs))
 	for i, idp := range externalIDPs {
 		idps[i] = &domain.UserIDPLink{
@@ -241,9 +242,9 @@ func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*do
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,
 			},
-			IDPConfigID:    idp.IDPConfigID,
-			ExternalUserID: idp.ExternalUserID,
-			DisplayName:    idp.UserDisplayName,
+			IDPConfigID:    idp.IDPID,
+			ExternalUserID: idp.ProvidedUserID,
+			DisplayName:    idp.ProvidedUsername,
 		}
 	}
 	return idps

@@ -11,7 +11,7 @@ title: Projects
 
 ## What is a project?
 
-import ProjectDescription from '../../concepts/zitadel/objects/_project_description.mdx';
+import ProjectDescription from '../../concepts/structure/_project_description.mdx';
 
 <ProjectDescription name="ProjectDescription" />
 
@@ -57,7 +57,7 @@ Now create another project (eg. “My second project”) and verify that there a
 
 ## What is a granted project?
 
-import GrantedProjectDescription from '../../concepts/zitadel/objects/_granted_project_description.mdx';
+import GrantedProjectDescription from '../../concepts/structure/_granted_project_description.mdx';
 
 <GrantedProjectDescription name="GrantedProjectDescription" />
 

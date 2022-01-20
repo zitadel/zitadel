@@ -33,23 +33,8 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, staticStorage static.Storage) []query.Handler {
 	return []query.Handler{
-		newProjectMember(handler{view, bulkLimit, configs.cycleDuration("ProjectMember"), errorCount, es}),
-		newProjectGrantMember(handler{view, bulkLimit, configs.cycleDuration("ProjectGrantMember"), errorCount, es}),
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			defaults.IamID),
-		newUserGrant(handler{view, bulkLimit, configs.cycleDuration("UserGrant"), errorCount, es}),
-		newOrgMember(
-			handler{view, bulkLimit, configs.cycleDuration("OrgMember"), errorCount, es}),
-		newUserMembership(
-			handler{view, bulkLimit, configs.cycleDuration("UserMembership"), errorCount, es}),
-		newIDPConfig(
-			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newIDPProvider(
-			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			defaults),
-		newExternalIDP(
-			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			defaults),
 		newMetadata(
 			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}

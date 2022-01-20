@@ -11,13 +11,10 @@ import (
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -258,15 +255,27 @@ func (s *Server) UnlockUser(ctx context.Context, req *mgmt_pb.UnlockUserRequest)
 }
 
 func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest) (*mgmt_pb.RemoveUserResponse, error) {
-	grants, err := s.usergrant.UserGrantsByUserID(ctx, req.Id)
+	userGrantUserQuery, err := query.NewUserGrantUserIDSearchQuery(req.Id)
 	if err != nil {
 		return nil, err
 	}
-	membersShips, err := s.user.UserMembershipsByUserID(ctx, req.Id)
+	grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{userGrantUserQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, UserMembershipViewsToDomain(membersShips), userGrantsToIDs(grants)...)
+	membershipsUserQuery, err := query.NewMembershipUserIDQuery(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	memberships, err := s.query.Memberships(ctx, &query.MembershipSearchQuery{
+		Queries: []query.SearchQuery{membershipsUserQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +284,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	}, nil
 }
 
-func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	converted := make([]string, len(userGrants))
 	for i, grant := range userGrants {
 		converted[i] = grant.ID
@@ -430,7 +439,7 @@ func (s *Server) RemoveHumanAvatar(ctx context.Context, req *mgmt_pb.RemoveHuman
 		return nil, err
 	}
 	return &mgmt_pb.RemoveHumanAvatarResponse{
-		Details: object.DomainToChangeDetailsPb(objectDetails),
+		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }
 
@@ -500,7 +509,7 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanPasswordlessResponse{
-		Result: user.WebAuthNTokensViewToPb(tokens),
+		Result: user_grpc.WebAuthNTokensViewToPb(tokens),
 	}, nil
 }
 
@@ -511,7 +520,7 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 		return nil, err
 	}
 	return &mgmt_pb.AddPasswordlessRegistrationResponse{
-		Details:    object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details:    obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 		Link:       initCode.Link(s.systemDefaults.Notifications.Endpoints.PasswordlessRegistration),
 		Expiration: durationpb.New(initCode.Expiration),
 	}, nil
@@ -524,7 +533,7 @@ func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.
 		return nil, err
 	}
 	return &mgmt_pb.SendPasswordlessRegistrationResponse{
-		Details: object.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
+		Details: obj_grpc.AddToDetailsPb(initCode.Sequence, initCode.ChangeDate, initCode.ResourceOwner),
 	}, nil
 }
 
@@ -601,7 +610,7 @@ func (s *Server) AddMachineKey(ctx context.Context, req *mgmt_pb.AddMachineKeyRe
 	return &mgmt_pb.AddMachineKeyResponse{
 		KeyId:      key.KeyID,
 		KeyDetails: keyDetails,
-		Details: object.AddToDetailsPb(
+		Details: obj_grpc.AddToDetailsPb(
 			key.Sequence,
 			key.ChangeDate,
 			key.ResourceOwner,

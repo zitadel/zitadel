@@ -2,29 +2,51 @@ package management
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func ListUserGrantsRequestToModel(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) *model.UserGrantSearchRequest {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	request := &model.UserGrantSearchRequest{
-		Offset:  offset,
-		Limit:   limit,
-		Asc:     asc,
-		Queries: user_grpc.UserGrantQueriesToModel(req.Queries),
+func ListUserGrantsRequestToQuery(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*query.UserGrantsQueries, error) {
+	queries, err := user_grpc.UserGrantQueriesToQuery(ctx, req.Queries)
+	if err != nil {
+		return nil, err
 	}
-	request.Queries = append(request.Queries, &model.UserGrantSearchQuery{
-		Key:    model.UserGrantSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  authz.GetCtxData(ctx).OrgID,
-	})
-	return request
+
+	if shouldAppendUserGrantOwnerQuery(req.Queries) {
+		ownerQuery, err := query.NewUserGrantResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, ownerQuery)
+	}
+
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	request := &query.UserGrantsQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: queries,
+	}
+
+	return request, nil
+}
+
+func shouldAppendUserGrantOwnerQuery(queries []*user.UserGrantQuery) bool {
+	for _, query := range queries {
+		if _, ok := query.Query.(*user.UserGrantQuery_WithGrantedQuery); ok {
+			return false
+		}
+	}
+	return true
 }
 
 func AddUserGrantRequestToDomain(req *mgmt_pb.AddUserGrantRequest) *domain.UserGrant {
