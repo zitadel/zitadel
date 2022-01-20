@@ -49,7 +49,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, staticStorage)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, staticStorage, queries)
 	assetsAPI := conf.APIDomain + "/assets/v1/"
 
 	statikLoginFS, err := fs.NewWithNamespace("login")

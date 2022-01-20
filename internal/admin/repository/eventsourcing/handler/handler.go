@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	query2 "github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 )
 
@@ -31,11 +32,11 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, command *command.Commands, static static.Storage, localDevMode bool) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, command *command.Commands, queries *query2.Queries, static static.Storage, localDevMode bool) []query.Handler {
 	handlers := []query.Handler{
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			defaults),
+			defaults, queries),
 	}
 	if static != nil {
 		handlers = append(handlers, newStyling(

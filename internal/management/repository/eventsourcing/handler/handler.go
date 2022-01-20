@@ -4,6 +4,7 @@ import (
 	"time"
 
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
+	query2 "github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -31,10 +32,10 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, staticStorage static.Storage) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, staticStorage static.Storage, queries *query2.Queries) []query.Handler {
 	return []query.Handler{
 		newUser(handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			defaults.IamID),
+			defaults.IamID, queries),
 		newMetadata(
 			handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 	}

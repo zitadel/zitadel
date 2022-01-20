@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	query2 "github.com/caos/zitadel/internal/query"
 )
 
 type Configs map[string]*Config
@@ -29,11 +30,11 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, queries *query2.Queries) []query.Handler {
 	return []query.Handler{
 		newUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			systemDefaults.IamID),
+			systemDefaults.IamID, queries),
 		newUserSession(
 			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
 		newToken(
@@ -45,10 +46,10 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
 		newIDPProvider(
 			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			systemDefaults),
+			systemDefaults, queries),
 		newExternalIDP(
 			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			systemDefaults),
+			systemDefaults, queries),
 		newRefreshToken(handler{view, bulkLimit, configs.cycleDuration("RefreshToken"), errorCount, es}),
 		newMetadata(handler{view, bulkLimit, configs.cycleDuration("Metadata"), errorCount, es}),
 		newOrgProjectMapping(handler{view, bulkLimit, configs.cycleDuration("OrgProjectMapping"), errorCount, es}),

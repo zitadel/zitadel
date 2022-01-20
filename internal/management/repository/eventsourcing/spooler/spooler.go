@@ -2,8 +2,10 @@ package spooler
 
 import (
 	"database/sql"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore/v1"
+	query2 "github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -18,12 +20,12 @@ type SpoolerConfig struct {
 	Handlers              handler.Configs
 }
 
-func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, defaults systemdefaults.SystemDefaults, staticStorage static.Storage) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, defaults systemdefaults.SystemDefaults, staticStorage static.Storage, queries *query2.Queries) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, defaults, staticStorage),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, defaults, staticStorage, queries),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

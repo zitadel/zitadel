@@ -4,18 +4,15 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	query2 "github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
-	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
@@ -32,15 +29,18 @@ type User struct {
 	handler
 	systemDefaults systemdefaults.SystemDefaults
 	subscription   *v1.Subscription
+	queries        *query2.Queries
 }
 
 func newUser(
 	handler handler,
 	systemDefaults systemdefaults.SystemDefaults,
+	queries *query2.Queries,
 ) *User {
 	h := &User{
 		handler:        handler,
 		systemDefaults: systemDefaults,
+		queries:        queries,
 	}
 
 	h.subscribe()
@@ -191,7 +191,7 @@ func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy := org.OrgIamPolicy
+	policy := new(query2.OrgIAMPolicy)
 	if policy == nil {
 		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
 		if err != nil {
@@ -213,7 +213,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 	if err != nil {
 		return err
 	}
-	policy := org.OrgIamPolicy
+	policy := new(query2.OrgIAMPolicy)
 	if policy == nil {
 		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
 		if err != nil {
@@ -238,7 +238,7 @@ func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
 	if err != nil {
 		return err
 	}
-	policy := org.OrgIamPolicy
+	policy := new(query2.OrgIAMPolicy)
 	if policy == nil {
 		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
 		if err != nil {
@@ -282,30 +282,6 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 	return org_es_model.OrgToModel(esOrg), nil
 }
 
-func (u *User) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
-	if err != nil {
-		return nil, err
-	}
-	iam := &model.IAM{
-		ObjectRoot: es_models.ObjectRoot{
-			AggregateID: domain.IAMID,
-		},
-	}
-	err = es_sdk.Filter(ctx, u.Eventstore().FilterEvents, iam.AppendEvents, query)
-	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
-		return nil, err
-	}
-	return model.IAMToModel(iam), nil
-}
-
-func (u *User) getDefaultOrgIAMPolicy(ctx context.Context) (*iam_model.OrgIAMPolicy, error) {
-	existingIAM, err := u.getIAMByID(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if existingIAM.DefaultOrgIAMPolicy == nil {
-		return nil, caos_errs.ThrowNotFound(nil, "EVENT-2Fj8s", "Errors.IAM.OrgIAMPolicy.NotExisting")
-	}
-	return existingIAM.DefaultOrgIAMPolicy, nil
+func (u *User) getDefaultOrgIAMPolicy(ctx context.Context) (*query2.OrgIAMPolicy, error) {
+	return u.queries.DefaultOrgIAMPolicy(ctx)
 }

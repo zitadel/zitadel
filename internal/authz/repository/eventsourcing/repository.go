@@ -27,7 +27,6 @@ type Config struct {
 type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.UserGrantRepo
-	eventstore.IamRepo
 	eventstore.TokenVerifierRepo
 }
 
@@ -62,10 +61,6 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, qu
 			IamID:      systemDefaults.IamID,
 			Auth:       authZ,
 			Eventstore: es,
-		},
-		eventstore.IamRepo{
-			IAMID:      systemDefaults.IamID,
-			IAMV2Query: queries,
 		},
 		eventstore.TokenVerifierRepo{
 			TokenVerificationKey: keyAlgorithm,

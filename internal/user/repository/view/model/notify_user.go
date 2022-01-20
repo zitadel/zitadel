@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	iam_model "github.com/caos/zitadel/internal/iam/model"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/logging"
 	"github.com/lib/pq"
@@ -99,7 +99,7 @@ func (u *NotifyUser) GenerateLoginName(domain string, appendDomain bool) string 
 	return u.UserName + "@" + domain
 }
 
-func (u *NotifyUser) SetLoginNames(policy *iam_model.OrgIAMPolicy, domains []*org_model.OrgDomain) {
+func (u *NotifyUser) SetLoginNames(policy *query.OrgIAMPolicy, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
