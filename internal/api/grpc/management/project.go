@@ -264,7 +264,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	if err != nil {
 		return nil, err
 	}
-	rolesQuery, err := query.NewUserGrantGrantIDSearchQuery(req.RoleKey)
+	rolesQuery, err := query.NewUserGrantRoleQuery(req.RoleKey)
 	if err != nil {
 		return nil, err
 	}
