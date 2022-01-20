@@ -473,12 +473,21 @@ func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mg
 }
 
 func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHumanAuthFactorsRequest) (*mgmt_pb.ListHumanAuthFactorsResponse, error) {
-	mfas, err := s.user.UserMFAs(ctx, req.UserId)
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodsQuery(domain.UserAuthMethodTypeU2F, domain.UserAuthMethodTypeOTP)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanAuthFactorsResponse{
-		Result: user_grpc.AuthFactorsToPb(mfas),
+		Result: user_grpc.AuthMethodsToPb(authMethods),
 	}, nil
 }
 
@@ -503,12 +512,21 @@ func (s *Server) RemoveHumanAuthFactorU2F(ctx context.Context, req *mgmt_pb.Remo
 }
 
 func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHumanPasswordlessRequest) (*mgmt_pb.ListHumanPasswordlessResponse, error) {
-	tokens, err := s.user.GetPasswordless(ctx, req.UserId)
+	query := new(query.UserAuthMethodSearchQueries)
+	err := query.AppendUserIDQuery(req.UserId)
+if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	if err != nil {
+		return nil, err
+	}
+	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListHumanPasswordlessResponse{
-		Result: user_grpc.WebAuthNTokensViewToPb(tokens),
+		Result: user_grpc.UserAuthMethodsToWebAuthNTokenPb(authMethods),
 	}, nil
 }
 

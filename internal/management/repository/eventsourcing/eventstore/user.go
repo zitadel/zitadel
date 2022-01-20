@@ -187,35 +187,6 @@ func (repo *UserRepo) SearchMetadata(ctx context.Context, userID, resourceOwner 
 	return result, nil
 }
 
-func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
-	}
-	mfas := make([]*usr_model.MultiFactor, 0)
-	if user.OTPState != usr_model.MFAStateUnspecified {
-		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeOTP, State: user.OTPState})
-	}
-	for _, u2f := range user.U2FTokens {
-		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
-	}
-	return mfas, nil
-}
-
-func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNView, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9anf8", "Errors.User.NotHuman")
-	}
-	return user.HumanView.PasswordlessTokens, nil
-}
-
 func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
 	user, err := repo.UserByID(ctx, userID)
 	if err != nil {
