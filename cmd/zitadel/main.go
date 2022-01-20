@@ -234,10 +234,10 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults, conf.Mgmt.APIDomain+"/assets/v1/"))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
+		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults, conf.Auth.APIDomain+"/assets/v1/"))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, es, projections, keyChan)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, es, projections, keyChan, conf.Mgmt.APIDomain+"/assets/v1/")
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {

@@ -32,11 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, command *command.Commands, static static.Storage, localDevMode bool) []query.Handler {
-	handlers := []query.Handler{
-		newUser(
-			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			defaults),
-	}
+	handlers := []query.Handler{}
 	if static != nil {
 		handlers = append(handlers, newStyling(
 			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},

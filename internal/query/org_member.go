@@ -95,7 +95,7 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 			HumanLastNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
 		).From(orgMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
