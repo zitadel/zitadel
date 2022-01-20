@@ -668,7 +668,7 @@ service ManagementService {
         };
     }
 
-    // Removed a machine key
+    // Removes a machine key
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
@@ -678,10 +678,11 @@ service ManagementService {
             permission: "user.write"
         };
     }
-    // Returns a machine key of a (machine) user
-    rpc GetMachineTokenByIDs(GetMachineTokenByIDsRequest) returns (GetMachineTokenByIDsResponse) {
+
+    // Returns a personal access token of a (machine) user
+    rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/tokens/{token_id}"
+            get: "/users/{user_id}/pats/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -689,11 +690,11 @@ service ManagementService {
         };
     }
 
-    // Returns all machine keys of a (machine) user which match the query
+    // Returns all personal access tokens of a (machine) user which match the query
     // Limit should always be set, there is a default limit set by the service
-    rpc ListMachineTokens(ListMachineTokensRequest) returns (ListMachineTokensResponse) {
+    rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/tokens/_search"
+            post: "/users/{user_id}/pats/_search"
             body: "*"
         };
 
@@ -702,10 +703,10 @@ service ManagementService {
         };
     }
 
-    // Generates a new machine key, details should be stored after return
-    rpc AddMachineToken(AddMachineTokenRequest) returns (AddMachineTokenResponse) {
+    // Generates a new personal access token for a machine user, details should be stored after return
+    rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
         option (google.api.http) = {
-            post: "/users/{user_id}/tokens"
+            post: "/users/{user_id}/pats"
             body: "*"
         };
 
@@ -714,10 +715,10 @@ service ManagementService {
         };
     }
 
-    // Removed a machine key
-    rpc RemoveMachineToken(RemoveMachineTokenRequest) returns (RemoveMachineTokenResponse) {
+    // Removes a personal access token
+    rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
         option (google.api.http) = {
-            delete: "/users/{user_id}/tokens/{token_id}"
+            delete: "/users/{user_id}/pats/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -3443,27 +3444,27 @@ message RemoveMachineKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetMachineTokenByIDsRequest {
+message GetPersonalAccessTokenByIDsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetMachineTokenByIDsResponse {
-    zitadel.user.v1.MachineToken token = 1;
+message GetPersonalAccessTokenByIDsResponse {
+    zitadel.user.v1.PersonalAccessToken token = 1;
 }
 
-message ListMachineTokensRequest {
+message ListPersonalAccessTokensRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
 }
 
-message ListMachineTokensResponse {
+message ListPersonalAccessTokensResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.user.v1.MachineToken result = 2;
+    repeated zitadel.user.v1.PersonalAccessToken result = 2;
 }
 
-message AddMachineTokenRequest {
+message AddPersonalAccessTokenRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
     google.protobuf.Timestamp expiration_date = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3473,18 +3474,18 @@ message AddMachineTokenRequest {
     ];
 }
 
-message AddMachineTokenResponse {
+message AddPersonalAccessTokenResponse {
     string token_id = 1;
     string token = 2;
     zitadel.v1.ObjectDetails details = 3;
 }
 
-message RemoveMachineTokenRequest {
+message RemovePersonalAccessTokenRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveMachineTokenResponse {
+message RemovePersonalAccessTokenResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

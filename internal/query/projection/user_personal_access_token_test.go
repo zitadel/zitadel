@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func TestMachineTokenProjection_reduces(t *testing.T) {
+func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -24,24 +24,24 @@ func TestMachineTokenProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "reduceMachineTokenAdded",
+			name: "reducePersonalAccessTokenAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.MachineTokenAddedType),
+					repository.EventType(user.PersonalAccessTokenAddedType),
 					user.AggregateType,
 					[]byte(`{"tokenId": "tokenID", "expiration": "9999-12-31T23:59:59Z", "scopes": ["openid"]}`),
-				), user.MachineTokenAddedEventMapper),
+				), user.PersonalAccessTokenAddedEventMapper),
 			},
-			reduce: (&MachineTokenProjection{}).reduceMachineTokenAdded,
+			reduce: (&PersonalAccessTokenProjection{}).reducePersonalAccessTokenAdded,
 			want: wantReduce{
-				projection:       MachineTokenProjectionTable,
+				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.machine_tokens (id, creation_date, change_date, resource_owner, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO zitadel.projections.personal_access_tokens (id, creation_date, change_date, resource_owner, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"tokenID",
 								anyArg{},
@@ -58,24 +58,24 @@ func TestMachineTokenProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceMachineTokenRemoved",
+			name: "reducePersonalAccessTokenRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.MachineTokenRemovedType),
+					repository.EventType(user.PersonalAccessTokenRemovedType),
 					user.AggregateType,
 					[]byte(`{"tokenId": "tokenID"}`),
-				), user.MachineTokenRemovedEventMapper),
+				), user.PersonalAccessTokenRemovedEventMapper),
 			},
-			reduce: (&MachineTokenProjection{}).reduceMachineTokenRemoved,
+			reduce: (&PersonalAccessTokenProjection{}).reducePersonalAccessTokenRemoved,
 			want: wantReduce{
-				projection:       MachineTokenProjectionTable,
+				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.machine_tokens WHERE (id = $1)",
+							expectedStmt: "DELETE FROM zitadel.projections.personal_access_tokens WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"tokenID",
 							},
@@ -88,21 +88,21 @@ func TestMachineTokenProjection_reduces(t *testing.T) {
 			name: "reduceUserRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(user.MachineTokenRemovedType),
+					repository.EventType(user.PersonalAccessTokenRemovedType),
 					user.AggregateType,
 					nil,
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&MachineTokenProjection{}).reduceUserRemoved,
+			reduce: (&PersonalAccessTokenProjection{}).reduceUserRemoved,
 			want: wantReduce{
-				projection:       MachineTokenProjectionTable,
+				projection:       PersonalAccessTokenProjectionTable,
 				aggregateType:    eventstore.AggregateType("user"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.machine_tokens WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM zitadel.projections.personal_access_tokens WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

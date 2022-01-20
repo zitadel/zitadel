@@ -619,35 +619,35 @@ func (s *Server) RemoveMachineKey(ctx context.Context, req *mgmt_pb.RemoveMachin
 	}, nil
 }
 
-func (s *Server) GetMachineTokenByIDs(ctx context.Context, req *mgmt_pb.GetMachineTokenByIDsRequest) (*mgmt_pb.GetMachineTokenByIDsResponse, error) {
-	resourceOwner, err := query.NewMachineTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+func (s *Server) GetPersonalAccessTokenByIDs(ctx context.Context, req *mgmt_pb.GetPersonalAccessTokenByIDsRequest) (*mgmt_pb.GetPersonalAccessTokenByIDsResponse, error) {
+	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	aggregateID, err := query.NewMachineTokenUserIDSearchQuery(req.UserId)
+	aggregateID, err := query.NewPersonalAccessTokenUserIDSearchQuery(req.UserId)
 	if err != nil {
 		return nil, err
 	}
-	token, err := s.query.MachineTokenByID(ctx, req.TokenId, resourceOwner, aggregateID)
+	token, err := s.query.PersonalAccessTokenByID(ctx, req.TokenId, resourceOwner, aggregateID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetMachineTokenByIDsResponse{
-		Token: user.MachineTokenToPb(token),
+	return &mgmt_pb.GetPersonalAccessTokenByIDsResponse{
+		Token: user.PersonalAccessTokenToPb(token),
 	}, nil
 }
 
-func (s *Server) ListMachineTokens(ctx context.Context, req *mgmt_pb.ListMachineTokensRequest) (*mgmt_pb.ListMachineTokensResponse, error) {
-	queries, err := ListMachineTokensRequestToQuery(ctx, req)
+func (s *Server) ListPersonalAccessTokens(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*mgmt_pb.ListPersonalAccessTokensResponse, error) {
+	queries, err := ListPersonalAccessTokensRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	result, err := s.query.SearchMachineTokens(ctx, queries)
+	result, err := s.query.SearchPersonalAccessTokens(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.ListMachineTokensResponse{
-		Result: user.MachineTokensToPb(result.MachineTokens),
+	return &mgmt_pb.ListPersonalAccessTokensResponse{
+		Result: user.PersonalAccessTokensToPb(result.PersonalAccessTokens),
 		Details: obj_grpc.ToListDetails(
 			result.Count,
 			result.Sequence,
@@ -656,32 +656,32 @@ func (s *Server) ListMachineTokens(ctx context.Context, req *mgmt_pb.ListMachine
 	}, nil
 }
 
-func (s *Server) AddMachineToken(ctx context.Context, req *mgmt_pb.AddMachineTokenRequest) (*mgmt_pb.AddMachineTokenResponse, error) {
+func (s *Server) AddPersonalAccessToken(ctx context.Context, req *mgmt_pb.AddPersonalAccessTokenRequest) (*mgmt_pb.AddPersonalAccessTokenResponse, error) {
 	expDate := time.Time{}
 	if req.ExpirationDate != nil {
 		expDate = req.ExpirationDate.AsTime()
 	}
-	machineToken, token, err := s.command.AddMachineToken(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, expDate)
+	pat, token, err := s.command.AddPersonalAccessToken(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, expDate, domain.UserTypeMachine)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.AddMachineTokenResponse{
-		TokenId: machineToken.TokenID,
+	return &mgmt_pb.AddPersonalAccessTokenResponse{
+		TokenId: pat.TokenID,
 		Token:   token,
 		Details: object.AddToDetailsPb(
-			machineToken.Sequence,
-			machineToken.ChangeDate,
-			machineToken.ResourceOwner,
+			pat.Sequence,
+			pat.ChangeDate,
+			pat.ResourceOwner,
 		),
 	}, nil
 }
 
-func (s *Server) RemoveMachineToken(ctx context.Context, req *mgmt_pb.RemoveMachineTokenRequest) (*mgmt_pb.RemoveMachineTokenResponse, error) {
-	objectDetails, err := s.command.RemoveMachineToken(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
+func (s *Server) RemovePersonalAccessToken(ctx context.Context, req *mgmt_pb.RemovePersonalAccessTokenRequest) (*mgmt_pb.RemovePersonalAccessTokenResponse, error) {
+	objectDetails, err := s.command.RemovePersonalAccessToken(ctx, req.UserId, req.TokenId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.RemoveMachineTokenResponse{
+	return &mgmt_pb.RemovePersonalAccessTokenResponse{
 		Details: obj_grpc.DomainToChangeDetailsPb(objectDetails),
 	}, nil
 }

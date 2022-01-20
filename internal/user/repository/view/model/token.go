@@ -110,14 +110,14 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 	t.Sequence = event.Sequence
 	switch event.Type {
 	case usr_es_model.UserTokenAdded,
-		es_models.EventType(user_repo.MachineTokenAddedType):
+		es_models.EventType(user_repo.PersonalAccessTokenAddedType):
 		t.setRootData(event)
 		err := t.setData(event)
 		if err != nil {
 			return err
 		}
 		t.CreationDate = event.CreationDate
-		t.IsPAT = event.Type == es_models.EventType(user_repo.MachineTokenAddedType)
+		t.IsPAT = event.Type == es_models.EventType(user_repo.PersonalAccessTokenAddedType)
 	}
 	return nil
 }

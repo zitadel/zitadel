@@ -39,3 +39,17 @@ const (
 func (f UserType) Valid() bool {
 	return f >= 0 && f < userTypeCount
 }
+
+type PersonalAccessTokenState int32
+
+const (
+	PersonalAccessTokenStateUnspecified PersonalAccessTokenState = iota
+	PersonalAccessTokenStateActive
+	PersonalAccessTokenStateRemoved
+
+	personalAccessTokenStateCount
+)
+
+func (f PersonalAccessTokenState) Valid() bool {
+	return f >= 0 && f < personalAccessTokenStateCount
+}

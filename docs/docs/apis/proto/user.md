@@ -125,20 +125,6 @@ title: zitadel/user.proto
 
 
 
-### MachineToken
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - |  |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| expiration_date |  google.protobuf.Timestamp | - |  |
-| scopes | repeated string | - |  |
-
-
-
-
 ### Membership
 
 
@@ -223,6 +209,20 @@ this query is always equals
 | ----- | ---- | ----------- | ----------- |
 | nick_name |  string | - | string.max_len: 200<br />  |
 | method |  zitadel.v1.TextQueryMethod | - | enum.defined_only: true<br />  |
+
+
+
+
+### PersonalAccessToken
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+| scopes | repeated string | - |  |
 
 
 

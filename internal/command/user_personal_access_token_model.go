@@ -9,17 +9,17 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-type MachineTokenWriteModel struct {
+type PersonalAccessTokenWriteModel struct {
 	eventstore.WriteModel
 
 	TokenID        string
 	ExpirationDate time.Time
 
-	State domain.MachineTokenState
+	State domain.PersonalAccessTokenState
 }
 
-func NewMachineTokenWriteModel(userID, tokenID, resourceOwner string) *MachineTokenWriteModel {
-	return &MachineTokenWriteModel{
+func NewPersonalAccessTokenWriteModel(userID, tokenID, resourceOwner string) *PersonalAccessTokenWriteModel {
+	return &PersonalAccessTokenWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   userID,
 			ResourceOwner: resourceOwner,
@@ -28,15 +28,15 @@ func NewMachineTokenWriteModel(userID, tokenID, resourceOwner string) *MachineTo
 	}
 }
 
-func (wm *MachineTokenWriteModel) AppendEvents(events ...eventstore.Event) {
+func (wm *PersonalAccessTokenWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *user.MachineTokenAddedEvent:
+		case *user.PersonalAccessTokenAddedEvent:
 			if wm.TokenID != e.TokenID {
 				continue
 			}
 			wm.WriteModel.AppendEvents(e)
-		case *user.MachineTokenRemovedEvent:
+		case *user.PersonalAccessTokenRemovedEvent:
 			if wm.TokenID != e.TokenID {
 				continue
 			}
@@ -47,35 +47,35 @@ func (wm *MachineTokenWriteModel) AppendEvents(events ...eventstore.Event) {
 	}
 }
 
-func (wm *MachineTokenWriteModel) Reduce() error {
+func (wm *PersonalAccessTokenWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *user.MachineTokenAddedEvent:
+		case *user.PersonalAccessTokenAddedEvent:
 			wm.TokenID = e.TokenID
 			wm.ExpirationDate = e.Expiration
-			wm.State = domain.MachineTokenStateActive
-		case *user.MachineTokenRemovedEvent:
-			wm.State = domain.MachineTokenStateRemoved
+			wm.State = domain.PersonalAccessTokenStateActive
+		case *user.PersonalAccessTokenRemovedEvent:
+			wm.State = domain.PersonalAccessTokenStateRemoved
 		case *user.UserRemovedEvent:
-			wm.State = domain.MachineTokenStateRemoved
+			wm.State = domain.PersonalAccessTokenStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *MachineTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *PersonalAccessTokenWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			user.MachineTokenAddedType,
-			user.MachineTokenRemovedType,
+			user.PersonalAccessTokenAddedType,
+			user.PersonalAccessTokenRemovedType,
 			user.UserRemovedType).
 		Builder()
 }
 
-func (wm *MachineTokenWriteModel) Exists() bool {
-	return wm.State != domain.MachineTokenStateUnspecified && wm.State != domain.MachineTokenStateRemoved
+func (wm *PersonalAccessTokenWriteModel) Exists() bool {
+	return wm.State != domain.PersonalAccessTokenStateUnspecified && wm.State != domain.PersonalAccessTokenStateRemoved
 }

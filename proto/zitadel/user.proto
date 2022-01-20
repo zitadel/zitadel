@@ -572,7 +572,7 @@ message RefreshToken {
 }
 
 
-message MachineToken {
+message PersonalAccessToken {
     string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";

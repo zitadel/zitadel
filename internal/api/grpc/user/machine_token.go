@@ -8,15 +8,15 @@ import (
 	"github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func MachineTokensToPb(tokens []*query.MachineToken) []*user.MachineToken {
-	t := make([]*user.MachineToken, len(tokens))
+func PersonalAccessTokensToPb(tokens []*query.PersonalAccessToken) []*user.PersonalAccessToken {
+	t := make([]*user.PersonalAccessToken, len(tokens))
 	for i, token := range tokens {
-		t[i] = MachineTokenToPb(token)
+		t[i] = PersonalAccessTokenToPb(token)
 	}
 	return t
 }
-func MachineTokenToPb(token *query.MachineToken) *user.MachineToken {
-	return &user.MachineToken{
+func PersonalAccessTokenToPb(token *query.PersonalAccessToken) *user.PersonalAccessToken {
+	return &user.PersonalAccessToken{
 		Id:             token.ID,
 		Details:        object.ChangeToDetailsPb(token.Sequence, token.ChangeDate, token.ResourceOwner),
 		ExpirationDate: timestamppb.New(token.Expiration),

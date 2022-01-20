@@ -25,17 +25,18 @@ import (
 	"github.com/caos/zitadel/internal/id"
 )
 
-func TestCommands_AddMachineToken(t *testing.T) {
+func TestCommands_AddPersonalAccessToken(t *testing.T) {
 	type fields struct {
 		eventstore   *eventstore.Eventstore
 		idGenerator  id.Generator
 		keyAlgorithm crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx            context.Context
-		userID         string
-		resourceOwner  string
-		expirationDate time.Time
+		ctx             context.Context
+		userID          string
+		resourceOwner   string
+		expirationDate  time.Time
+		allowedUserType domain.UserType
 	}
 	type res struct {
 		want  *domain.Token
@@ -60,6 +61,34 @@ func TestCommands_AddMachineToken(t *testing.T) {
 				userID:         "user1",
 				resourceOwner:  "org1",
 				expirationDate: time.Time{},
+			},
+			res{
+				err: caos_errs.IsPreconditionFailed,
+			},
+		},
+		{
+			"user type not allowed, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							user.NewMachineAddedEvent(context.Background(),
+								&user.NewAggregate("user1", "org1").Aggregate,
+								"machine",
+								"Machine",
+								"",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:             context.Background(),
+				userID:          "user1",
+				resourceOwner:   "org1",
+				expirationDate:  time.Time{},
+				allowedUserType: domain.UserTypeHuman,
 			},
 			res{
 				err: caos_errs.IsPreconditionFailed,
@@ -113,7 +142,7 @@ func TestCommands_AddMachineToken(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewMachineTokenAddedEvent(context.Background(),
+								user.NewPersonalAccessTokenAddedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"token1",
 									time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
@@ -152,7 +181,7 @@ func TestCommands_AddMachineToken(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, token, err := c.AddMachineToken(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.expirationDate)
+			got, token, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.expirationDate, tt.args.allowedUserType)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -167,7 +196,7 @@ func TestCommands_AddMachineToken(t *testing.T) {
 	}
 }
 
-func TestCommands_RemoveMachineToken(t *testing.T) {
+func TestCommands_RemovePersonalAccessToken(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -210,7 +239,7 @@ func TestCommands_RemoveMachineToken(t *testing.T) {
 				eventstore: eventstoreExpect(t,
 					expectFilter(
 						eventFromEventPusher(
-							user.NewMachineTokenAddedEvent(context.Background(),
+							user.NewPersonalAccessTokenAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								"token1",
 								time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
@@ -221,7 +250,7 @@ func TestCommands_RemoveMachineToken(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								user.NewMachineTokenRemovedEvent(context.Background(),
+								user.NewPersonalAccessTokenRemovedEvent(context.Background(),
 									&user.NewAggregate("user1", "org1").Aggregate,
 									"token1",
 								),
@@ -248,7 +277,7 @@ func TestCommands_RemoveMachineToken(t *testing.T) {
 			c := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := c.RemoveMachineToken(tt.args.ctx, tt.args.userID, tt.args.tokenID, tt.args.resourceOwner)
+			got, err := c.RemovePersonalAccessToken(tt.args.ctx, tt.args.userID, tt.args.tokenID, tt.args.resourceOwner)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

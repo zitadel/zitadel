@@ -1,6 +1,6 @@
 ALTER TABLE auth.tokens ADD COLUMN is_pat BOOLEAN DEFAULT false NOT NULL;
 
-CREATE TABLE zitadel.projections.machine_tokens (
+CREATE TABLE zitadel.projections.personal_access_tokens (
     id STRING
     , creation_date TIMESTAMPTZ NOT NULL
     , change_date TIMESTAMPTZ NOT NULL

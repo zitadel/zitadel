@@ -224,24 +224,24 @@ func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.Mac
 	}
 }
 
-func ListMachineTokensRequestToQuery(ctx context.Context, req *mgmt_pb.ListMachineTokensRequest) (*query.MachineTokenSearchQueries, error) {
-	resourcOwner, err := query.NewMachineTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+func ListPersonalAccessTokensRequestToQuery(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
+	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	userID, err := query.NewMachineTokenUserIDSearchQuery(req.UserId)
+	userID, err := query.NewPersonalAccessTokenUserIDSearchQuery(req.UserId)
 	if err != nil {
 		return nil, err
 	}
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	return &query.MachineTokenSearchQueries{
+	return &query.PersonalAccessTokenSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset: offset,
 			Limit:  limit,
 			Asc:    asc,
 		},
 		Queries: []query.SearchQuery{
-			resourcOwner,
+			resourceOwner,
 			userID,
 		},
 	}, nil

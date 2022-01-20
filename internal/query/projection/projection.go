@@ -65,7 +65,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
 	_, err := NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), defaults.KeyConfig)
 	NewAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
-	NewMachineTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["machine_tokens"]))
+	NewPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
 
 	return err
 }

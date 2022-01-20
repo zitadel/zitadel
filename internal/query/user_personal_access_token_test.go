@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	machineTokenStmt = regexp.QuoteMeta(
+	personalAccessTokenStmt = regexp.QuoteMeta(
 		"SELECT zitadel.projections.machine_tokens.id," +
 			" zitadel.projections.machine_tokens.creation_date," +
 			" zitadel.projections.machine_tokens.change_date," +
@@ -25,7 +25,7 @@ var (
 			" zitadel.projections.machine_tokens.expiration," +
 			" zitadel.projections.machine_tokens.scopes" +
 			" FROM zitadel.projections.machine_tokens")
-	machineTokenCols = []string{
+	personalAccessTokenCols = []string{
 		"id",
 		"creation_date",
 		"change_date",
@@ -35,7 +35,7 @@ var (
 		"expiration",
 		"scopes",
 	}
-	machineTokensStmt = regexp.QuoteMeta(
+	personalAccessTokensStmt = regexp.QuoteMeta(
 		"SELECT zitadel.projections.machine_tokens.id," +
 			" zitadel.projections.machine_tokens.creation_date," +
 			" zitadel.projections.machine_tokens.change_date," +
@@ -46,7 +46,7 @@ var (
 			" zitadel.projections.machine_tokens.scopes," +
 			" COUNT(*) OVER ()" +
 			" FROM zitadel.projections.machine_tokens")
-	machineTokensCols = []string{
+	personalAccessTokensCols = []string{
 		"id",
 		"creation_date",
 		"change_date",
@@ -59,7 +59,7 @@ var (
 	}
 )
 
-func Test_MachineTokenPrepares(t *testing.T) {
+func Test_PersonalAccessTokenPrepares(t *testing.T) {
 	type want struct {
 		sqlExpectations sqlExpectation
 		err             checkErr
@@ -71,11 +71,11 @@ func Test_MachineTokenPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareMachineTokenQuery no result",
-			prepare: prepareMachineTokenQuery,
+			name:    "preparePersonalAccessTokenQuery no result",
+			prepare: preparePersonalAccessTokenQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					machineTokenStmt,
+					personalAccessTokenStmt,
 					nil,
 					nil,
 				),
@@ -86,15 +86,15 @@ func Test_MachineTokenPrepares(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*MachineToken)(nil),
+			object: (*PersonalAccessToken)(nil),
 		},
 		{
-			name:    "prepareMachineTokenQuery found",
-			prepare: prepareMachineTokenQuery,
+			name:    "preparePersonalAccessTokenQuery found",
+			prepare: preparePersonalAccessTokenQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					machineTokenStmt,
-					machineTokenCols,
+					personalAccessTokenStmt,
+					personalAccessTokenCols,
 					[]driver.Value{
 						"token-id",
 						testNow,
@@ -107,7 +107,7 @@ func Test_MachineTokenPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &MachineToken{
+			object: &PersonalAccessToken{
 				ID:            "token-id",
 				CreationDate:  testNow,
 				ChangeDate:    testNow,
@@ -119,11 +119,11 @@ func Test_MachineTokenPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareMachineTokenQuery sql err",
-			prepare: prepareMachineTokenQuery,
+			name:    "preparePersonalAccessTokenQuery sql err",
+			prepare: preparePersonalAccessTokenQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					machineTokenStmt,
+					personalAccessTokenStmt,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -136,24 +136,24 @@ func Test_MachineTokenPrepares(t *testing.T) {
 			object: nil,
 		},
 		{
-			name:    "prepareMachineTokensQuery no result",
-			prepare: prepareMachineTokensQuery,
+			name:    "preparePersonalAccessTokensQuery no result",
+			prepare: preparePersonalAccessTokensQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					machineTokensStmt,
+					personalAccessTokensStmt,
 					nil,
 					nil,
 				),
 			},
-			object: &MachineTokens{MachineTokens: []*MachineToken{}},
+			object: &PersonalAccessTokens{PersonalAccessTokens: []*PersonalAccessToken{}},
 		},
 		{
-			name:    "prepareMachineTokensQuery one token",
-			prepare: prepareMachineTokensQuery,
+			name:    "preparePersonalAccessTokensQuery one token",
+			prepare: preparePersonalAccessTokensQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					machineTokensStmt,
-					machineTokensCols,
+					personalAccessTokensStmt,
+					personalAccessTokensCols,
 					[][]driver.Value{
 						{
 							"token-id",
@@ -168,11 +168,11 @@ func Test_MachineTokenPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &MachineTokens{
+			object: &PersonalAccessTokens{
 				SearchResponse: SearchResponse{
 					Count: 1,
 				},
-				MachineTokens: []*MachineToken{
+				PersonalAccessTokens: []*PersonalAccessToken{
 					{
 						ID:            "token-id",
 						CreationDate:  testNow,
@@ -187,12 +187,12 @@ func Test_MachineTokenPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareMachineTokensQuery multiple tokens",
-			prepare: prepareMachineTokensQuery,
+			name:    "preparePersonalAccessTokensQuery multiple tokens",
+			prepare: preparePersonalAccessTokensQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					machineTokensStmt,
-					machineTokensCols,
+					personalAccessTokensStmt,
+					personalAccessTokensCols,
 					[][]driver.Value{
 						{
 							"token-id",
@@ -217,11 +217,11 @@ func Test_MachineTokenPrepares(t *testing.T) {
 					},
 				),
 			},
-			object: &MachineTokens{
+			object: &PersonalAccessTokens{
 				SearchResponse: SearchResponse{
 					Count: 2,
 				},
-				MachineTokens: []*MachineToken{
+				PersonalAccessTokens: []*PersonalAccessToken{
 					{
 						ID:            "token-id",
 						CreationDate:  testNow,
@@ -246,11 +246,11 @@ func Test_MachineTokenPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareMachineTokensQuery sql err",
-			prepare: prepareMachineTokensQuery,
+			name:    "preparePersonalAccessTokensQuery sql err",
+			prepare: preparePersonalAccessTokensQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					machineTokensStmt,
+					personalAccessTokensStmt,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	machineTokenEventPrefix = machineEventPrefix + "token."
-	MachineTokenAddedType   = machineTokenEventPrefix + "added"
-	MachineTokenRemovedType = machineTokenEventPrefix + "removed"
+	personalAccessTokenEventPrefix = userEventTypePrefix + "pat."
+	PersonalAccessTokenAddedType   = personalAccessTokenEventPrefix + "added"
+	PersonalAccessTokenRemovedType = personalAccessTokenEventPrefix + "removed"
 )
 
-type MachineTokenAddedEvent struct {
+type PersonalAccessTokenAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	TokenID    string    `json:"tokenId"`
@@ -24,26 +24,26 @@ type MachineTokenAddedEvent struct {
 	Scopes     []string  `json:"scopes"`
 }
 
-func (e *MachineTokenAddedEvent) Data() interface{} {
+func (e *PersonalAccessTokenAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PersonalAccessTokenAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewMachineTokenAddedEvent(
+func NewPersonalAccessTokenAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tokenID string,
 	expiration time.Time,
 	scopes []string,
-) *MachineTokenAddedEvent {
-	return &MachineTokenAddedEvent{
+) *PersonalAccessTokenAddedEvent {
+	return &PersonalAccessTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			MachineTokenAddedType,
+			PersonalAccessTokenAddedType,
 		),
 		TokenID:    tokenID,
 		Expiration: expiration,
@@ -51,8 +51,8 @@ func NewMachineTokenAddedEvent(
 	}
 }
 
-func MachineTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	tokenAdded := &MachineTokenAddedEvent{
+func PersonalAccessTokenAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	tokenAdded := &PersonalAccessTokenAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, tokenAdded)
@@ -63,37 +63,37 @@ func MachineTokenAddedEventMapper(event *repository.Event) (eventstore.Event, er
 	return tokenAdded, nil
 }
 
-type MachineTokenRemovedEvent struct {
+type PersonalAccessTokenRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	TokenID string `json:"tokenId"`
 }
 
-func (e *MachineTokenRemovedEvent) Data() interface{} {
+func (e *PersonalAccessTokenRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *MachineTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *PersonalAccessTokenRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewMachineTokenRemovedEvent(
+func NewPersonalAccessTokenRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tokenID string,
-) *MachineTokenRemovedEvent {
-	return &MachineTokenRemovedEvent{
+) *PersonalAccessTokenRemovedEvent {
+	return &PersonalAccessTokenRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			MachineTokenRemovedType,
+			PersonalAccessTokenRemovedType,
 		),
 		TokenID: tokenID,
 	}
 }
 
-func MachineTokenRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	tokenRemoved := &MachineTokenRemovedEvent{
+func PersonalAccessTokenRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	tokenRemoved := &PersonalAccessTokenRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, tokenRemoved)
