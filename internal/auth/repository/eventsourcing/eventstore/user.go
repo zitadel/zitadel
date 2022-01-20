@@ -7,6 +7,8 @@ import (
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 
+	"github.com/caos/zitadel/internal/user/model"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -15,10 +17,7 @@ import (
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-	"github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-	usr_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
 type UserRepo struct {
@@ -34,32 +33,6 @@ func (repo *UserRepo) Health(ctx context.Context) error {
 	return repo.Eventstore.Health(ctx)
 }
 
-func (repo *UserRepo) MyUserMFAs(ctx context.Context) ([]*model.MultiFactor, error) {
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	mfas := make([]*model.MultiFactor, 0)
-	if user.OTPState != model.MFAStateUnspecified {
-		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeOTP, State: user.OTPState})
-	}
-	for _, u2f := range user.U2FTokens {
-		mfas = append(mfas, &model.MultiFactor{Type: model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
-	}
-	return mfas, nil
-}
-
-func (repo *UserRepo) GetMyPasswordless(ctx context.Context) ([]*model.WebAuthNView, error) {
-	user, err := repo.UserByID(ctx, authz.GetCtxData(ctx).UserID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "USER-9kF98", "Errors.User.NotHuman")
-	}
-	return user.HumanView.PasswordlessTokens, nil
-}
-
 func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID string) ([]string, error) {
 	userSessions, err := repo.View.UserSessionsByAgentID(agentID)
 	if err != nil {
@@ -72,28 +45,6 @@ func (repo *UserRepo) UserSessionUserIDsByAgentID(ctx context.Context, agentID s
 		}
 	}
 	return userIDs, nil
-}
-
-func (repo *UserRepo) UserByID(ctx context.Context, id string) (*model.UserView, error) {
-	user, err := repo.View.UserByID(id)
-	if err != nil {
-		return nil, err
-	}
-	events, err := repo.getUserEvents(ctx, id, user.Sequence)
-	if err != nil {
-		logging.Log("EVENT-PSoc3").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("error retrieving new events")
-		return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return usr_view_model.UserToModel(user, repo.PrefixAvatarURL), nil
-		}
-	}
-	if userCopy.State == int32(model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-vZ8us", "Errors.User.NotFound")
-	}
-	return usr_view_model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
 }
 
 func (repo *UserRepo) UserEventsByID(ctx context.Context, id string, sequence uint64) ([]*models.Event, error) {
