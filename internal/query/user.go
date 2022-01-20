@@ -689,7 +689,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 			e := new(Phone)
 
 			humanID := sql.NullString{}
-			email := sql.NullString{}
+			phone := sql.NullString{}
 			isPhoneVerified := sql.NullBool{}
 
 			err := row.Scan(
@@ -699,7 +699,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 				&e.ResourceOwner,
 				&e.Sequence,
 				&humanID,
-				&email,
+				&phone,
 				&isPhoneVerified,
 			)
 			if err != nil {
@@ -712,7 +712,7 @@ func preparePhoneQuery() (sq.SelectBuilder, func(*sql.Row) (*Phone, error)) {
 				return nil, errors.ThrowPreconditionFailed(nil, "QUERY-hliQl", "Errors.User.NotHuman")
 			}
 
-			e.Phone = email.String
+			e.Phone = phone.String
 			e.IsVerified = isPhoneVerified.Bool
 
 			return e, nil
