@@ -7,115 +7,22 @@ import (
 	"github.com/caos/logging"
 	"github.com/golang/protobuf/ptypes"
 
-	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/query"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/repository/view/model"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing/view"
 	usr_model "github.com/caos/zitadel/internal/user/model"
 	usr_view "github.com/caos/zitadel/internal/user/repository/view"
-	"github.com/caos/zitadel/internal/user/repository/view/model"
-	"github.com/caos/zitadel/internal/view/repository"
 )
 
 type UserRepo struct {
 	v1.Eventstore
-	SearchLimit     uint64
-	View            *view.View
+	Query           *query.Queries
 	SystemDefaults  systemdefaults.SystemDefaults
 	PrefixAvatarURL string
-}
-
-func (repo *UserRepo) UserByID(ctx context.Context, id string) (*usr_model.UserView, error) {
-	user, viewErr := repo.View.UserByID(id)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		user = new(model.UserView)
-	}
-
-	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return model.UserToModel(user, repo.PrefixAvatarURL), nil
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return model.UserToModel(user, repo.PrefixAvatarURL), nil
-		}
-	}
-	if userCopy.State == int32(usr_model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
-	}
-	return model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserRepo) UserByIDAndResourceOwner(ctx context.Context, id, resourceOwner string) (*usr_model.UserView, error) {
-	user, viewErr := repo.View.UserByIDAndResourceOwner(id, resourceOwner)
-	if viewErr != nil && !errors.IsNotFound(viewErr) {
-		return nil, viewErr
-	}
-	if errors.IsNotFound(viewErr) {
-		user = new(model.UserView)
-	}
-
-	events, esErr := repo.getUserEvents(ctx, id, user.Sequence)
-	if errors.IsNotFound(viewErr) && len(events) == 0 {
-		return nil, errors.ThrowNotFound(nil, "EVENT-Lsoj7", "Errors.User.NotFound")
-	}
-	if esErr != nil {
-		logging.Log("EVENT-PSoc3").WithError(esErr).Debug("error retrieving new events")
-		return model.UserToModel(user, repo.PrefixAvatarURL), nil
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return model.UserToModel(user, repo.PrefixAvatarURL), nil
-		}
-	}
-	if userCopy.State == int32(usr_model.UserStateDeleted) || userCopy.ResourceOwner != resourceOwner {
-		return nil, errors.ThrowNotFound(nil, "EVENT-4Fm9s", "Errors.User.NotFound")
-	}
-	return model.UserToModel(&userCopy, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserRepo) SearchUsers(ctx context.Context, request *usr_model.UserSearchRequest, ensureLimit bool) (*usr_model.UserSearchResponse, error) {
-	if ensureLimit {
-		err := request.EnsureLimit(repo.SearchLimit)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	sequence, sequenceErr := repo.View.GetLatestUserSequence()
-	logging.Log("EVENT-Lcn7d").OnError(sequenceErr).Warn("could not read latest user sequence")
-	users, count, err := repo.View.SearchUsers(request)
-	if err != nil {
-		return nil, err
-	}
-	result := &usr_model.UserSearchResponse{
-		Offset:      request.Offset,
-		Limit:       request.Limit,
-		TotalResult: count,
-		Result:      model.UsersToModel(users, repo.PrefixAvatarURL),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) UserIDsByDomain(ctx context.Context, domain string) ([]string, error) {
-	return repo.View.UserIDsByDomain(domain)
 }
 
 func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {
@@ -126,138 +33,19 @@ func (repo *UserRepo) UserChanges(ctx context.Context, id string, lastSequence u
 	for _, change := range changes.Changes {
 		change.ModifierName = change.ModifierID
 		change.ModifierLoginName = change.ModifierID
-		user, _ := repo.UserByID(ctx, change.ModifierID)
+		user, _ := repo.Query.GetUserByID(ctx, change.ModifierID)
 		if user != nil {
 			change.ModifierLoginName = user.PreferredLoginName
-			if user.HumanView != nil {
-				change.ModifierName = user.HumanView.DisplayName
-				change.ModifierAvatarURL = user.HumanView.AvatarURL
+			if user.Human != nil {
+				change.ModifierName = user.Human.DisplayName
+				change.ModifierAvatarURL = domain.AvatarURL(repo.PrefixAvatarURL, user.ResourceOwner, user.Human.AvatarKey)
 			}
-			if user.MachineView != nil {
-				change.ModifierName = user.MachineView.Name
+			if user.Machine != nil {
+				change.ModifierName = user.Machine.Name
 			}
 		}
 	}
 	return changes, nil
-}
-
-func (repo *UserRepo) GetUserByLoginNameGlobal(ctx context.Context, loginName string) (*usr_model.UserView, error) {
-	user, err := repo.View.GetGlobalUserByLoginName(loginName)
-	if err != nil {
-		return nil, err
-	}
-	return model.UserToModel(user, repo.PrefixAvatarURL), nil
-}
-
-func (repo *UserRepo) IsUserUnique(ctx context.Context, userName, email, orgID string) (bool, error) {
-	return repo.View.IsUserUnique(userName, email, orgID)
-}
-
-func (repo *UserRepo) GetMetadataByKey(ctx context.Context, userID, resourceOwner, key string) (*domain.Metadata, error) {
-	data, err := repo.View.MetadataByKeyAndResourceOwner(userID, resourceOwner, key)
-	if err != nil {
-		return nil, err
-	}
-	return iam_model.MetadataViewToDomain(data), nil
-}
-
-func (repo *UserRepo) SearchMetadata(ctx context.Context, userID, resourceOwner string, req *domain.MetadataSearchRequest) (*domain.MetadataSearchResponse, error) {
-	err := req.EnsureLimit(repo.SearchLimit)
-	if err != nil {
-		return nil, err
-	}
-	sequence, sequenceErr := repo.View.GetLatestUserSequence()
-	logging.Log("EVENT-m0ds3").OnError(sequenceErr).Warn("could not read latest user sequence")
-	req.AppendAggregateIDQuery(userID)
-	req.AppendResourceOwnerQuery(resourceOwner)
-	metadata, count, err := repo.View.SearchMetadata(req)
-	if err != nil {
-		return nil, err
-	}
-	result := &domain.MetadataSearchResponse{
-		Offset:      req.Offset,
-		Limit:       req.Limit,
-		TotalResult: count,
-		Result:      iam_model.MetadataViewsToDomain(metadata),
-	}
-	if sequenceErr == nil {
-		result.Sequence = sequence.CurrentSequence
-		result.Timestamp = sequence.LastSuccessfulSpoolerRun
-	}
-	return result, nil
-}
-
-func (repo *UserRepo) UserMFAs(ctx context.Context, userID string) ([]*usr_model.MultiFactor, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-xx0hV", "Errors.User.NotHuman")
-	}
-	mfas := make([]*usr_model.MultiFactor, 0)
-	if user.OTPState != usr_model.MFAStateUnspecified {
-		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeOTP, State: user.OTPState})
-	}
-	for _, u2f := range user.U2FTokens {
-		mfas = append(mfas, &usr_model.MultiFactor{Type: usr_model.MFATypeU2F, State: u2f.State, Attribute: u2f.Name, ID: u2f.TokenID})
-	}
-	return mfas, nil
-}
-
-func (repo *UserRepo) GetPasswordless(ctx context.Context, userID string) ([]*usr_model.WebAuthNView, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-9anf8", "Errors.User.NotHuman")
-	}
-	return user.HumanView.PasswordlessTokens, nil
-}
-
-func (repo *UserRepo) ProfileByID(ctx context.Context, userID string) (*usr_model.Profile, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-gDFC2", "Errors.User.NotHuman")
-	}
-	return user.GetProfile()
-}
-
-func (repo *UserRepo) EmailByID(ctx context.Context, userID string) (*usr_model.Email, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-pt7HY", "Errors.User.NotHuman")
-	}
-	return user.GetEmail()
-}
-
-func (repo *UserRepo) PhoneByID(ctx context.Context, userID string) (*usr_model.Phone, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-hliQl", "Errors.User.NotHuman")
-	}
-	return user.GetPhone()
-}
-
-func (repo *UserRepo) AddressByID(ctx context.Context, userID string) (*usr_model.Address, error) {
-	user, err := repo.UserByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	if user.HumanView == nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "EVENT-LQh4I", "Errors.User.NotHuman")
-	}
-	return user.GetAddress()
 }
 
 func (r *UserRepo) getUserChanges(ctx context.Context, userID string, lastSequence uint64, limit uint64, sortAscending bool, retention time.Duration) (*usr_model.UserChanges, error) {
@@ -310,48 +98,4 @@ func (r *UserRepo) getUserEvents(ctx context.Context, userID string, sequence ui
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
-}
-
-func handleSearchUserMembershipsPermissions(ctx context.Context, request *usr_model.UserMembershipSearchRequest, sequence *repository.CurrentSequence) *usr_model.UserMembershipSearchResponse {
-	permissions := authz.GetAllPermissionsFromCtx(ctx)
-	iamPerm := authz.HasGlobalExplicitPermission(permissions, iamMemberReadPerm)
-	orgPerm := authz.HasGlobalExplicitPermission(permissions, orgMemberReadPerm)
-	projectPerm := authz.HasGlobalExplicitPermission(permissions, projectMemberReadPerm)
-	projectGrantPerm := authz.HasGlobalExplicitPermission(permissions, projectGrantMemberReadPerm)
-	if iamPerm && orgPerm && projectPerm && projectGrantPerm {
-		return nil
-	}
-	if !iamPerm {
-		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: domain.SearchMethodNotEquals, Value: usr_model.MemberTypeIam})
-	}
-	if !orgPerm {
-		request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyMemberType, Method: domain.SearchMethodNotEquals, Value: usr_model.MemberTypeOrganisation})
-	}
-
-	ids := authz.GetExplicitPermissionCtxIDs(permissions, projectMemberReadPerm)
-	ids = append(ids, authz.GetExplicitPermissionCtxIDs(permissions, projectGrantMemberReadPerm)...)
-	if _, q := request.GetSearchQuery(usr_model.UserMembershipSearchKeyObjectID); q != nil {
-		containsID := false
-		for _, id := range ids {
-			if id == q.Value {
-				containsID = true
-				break
-			}
-		}
-		if !containsID {
-			result := &usr_model.UserMembershipSearchResponse{
-				Offset:      request.Offset,
-				Limit:       request.Limit,
-				TotalResult: uint64(0),
-				Result:      []*usr_model.UserMembershipView{},
-			}
-			if sequence != nil {
-				result.Sequence = sequence.CurrentSequence
-				result.Timestamp = sequence.LastSuccessfulSpoolerRun
-			}
-			return result
-		}
-	}
-	request.Queries = append(request.Queries, &usr_model.UserMembershipSearchQuery{Key: usr_model.UserMembershipSearchKeyObjectID, Method: domain.SearchMethodIsOneOf, Value: ids})
-	return nil
 }

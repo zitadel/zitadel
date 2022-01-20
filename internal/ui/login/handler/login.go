@@ -26,7 +26,6 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 	_ "github.com/caos/zitadel/internal/ui/login/statik"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 )
 
 type Login struct {
@@ -163,20 +162,16 @@ func (l *Login) Listen(ctx context.Context) {
 }
 
 func (l *Login) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgName string) ([]string, error) {
-	users, err := l.authRepo.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{
-			{
-				Key:    usr_model.UserSearchKeyPreferredLoginName,
-				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  "@" + domain.NewIAMDomainName(orgName, l.iamDomain),
-			},
-		},
-	})
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+domain.NewIAMDomainName(orgName, l.iamDomain), query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(users.Result))
-	for i, user := range users.Result {
+	users, err := l.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil

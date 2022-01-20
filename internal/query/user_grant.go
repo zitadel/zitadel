@@ -244,7 +244,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanDisplayNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 
 			UserGrantResourceOwner.identifier(),
 			OrgColumnName.identifier(),
@@ -347,7 +347,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanDisplayNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 
 			UserGrantResourceOwner.identifier(),
 			OrgColumnName.identifier(),

@@ -17,11 +17,11 @@ import (
 )
 
 func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*auth_pb.GetMyUserResponse, error) {
-	user, err := s.repo.MyUser(ctx)
+	user, err := s.query.GetUserByID(ctx, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user)}, nil
+	return &auth_pb.GetMyUserResponse{User: user_grpc.UserToPb(user, s.assetsAPIDomain)}, nil
 }
 
 func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {
@@ -66,14 +66,18 @@ func (s *Server) ListMyUserChanges(ctx context.Context, req *auth_pb.ListMyUserC
 }
 
 func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadataRequest) (*auth_pb.ListMyMetadataResponse, error) {
-	res, err := s.repo.SearchMyMetadata(ctx, ListUserMetadataToDomain(req))
+	queries, err := ListUserMetadataToQuery(req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.SearchUserMetadata(ctx, authz.GetCtxData(ctx).UserID, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyMetadataResponse{
-		Result: metadata.MetadataListToPb(res.Result),
+		Result: metadata.MetadataListToPb(res.Metadata),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),
@@ -81,7 +85,7 @@ func (s *Server) ListMyMetadata(ctx context.Context, req *auth_pb.ListMyMetadata
 }
 
 func (s *Server) GetMyMetadata(ctx context.Context, req *auth_pb.GetMyMetadataRequest) (*auth_pb.GetMyMetadataResponse, error) {
-	data, err := s.repo.GetMyMetadataByKey(ctx, req.Key)
+	data, err := s.query.GetUserMetadataByKey(ctx, authz.GetCtxData(ctx).UserID, req.Key)
 	if err != nil {
 		return nil, err
 	}

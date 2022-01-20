@@ -31,7 +31,6 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 	eventstore.IAMRepository
 	eventstore.AdministratorRepo
-	eventstore.UserRepo
 }
 
 func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, static static.Storage, roles []string, localDevMode bool) (*EsRepository, error) {
@@ -73,13 +72,6 @@ func Start(ctx context.Context, conf Config, systemDefaults sd.SystemDefaults, c
 		},
 		AdministratorRepo: eventstore.AdministratorRepo{
 			View: view,
-		},
-		UserRepo: eventstore.UserRepo{
-			Eventstore:      es,
-			View:            view,
-			SearchLimit:     conf.SearchLimit,
-			SystemDefaults:  systemDefaults,
-			PrefixAvatarURL: assetsAPI,
 		},
 	}, nil
 }
