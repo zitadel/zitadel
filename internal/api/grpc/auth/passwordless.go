@@ -16,8 +16,14 @@ import (
 
 func (s *Server) ListMyPasswordless(ctx context.Context, _ *auth_pb.ListMyPasswordlessRequest) (*auth_pb.ListMyPasswordlessResponse, error) {
 	query := new(query.UserAuthMethodSearchQueries)
-	query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
-	query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	err := query.AppendUserIDQuery(authz.GetCtxData(ctx).UserID)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	if err != nil {
+		return nil, err
+	}
 	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
