@@ -18,10 +18,11 @@ const (
 type KeyPair struct {
 	es_models.ObjectRoot
 
-	Usage      int32  `json:"usage"`
-	Algorithm  string `json:"algorithm"`
-	PrivateKey *Key   `json:"privateKey"`
-	PublicKey  *Key   `json:"publicKey"`
+	Usage       int32  `json:"usage"`
+	Algorithm   string `json:"algorithm"`
+	PrivateKey  *Key   `json:"privateKey"`
+	PublicKey   *Key   `json:"publicKey"`
+	Certificate *Key   `json:"certificate"`
 }
 
 type Key struct {
@@ -31,21 +32,23 @@ type Key struct {
 
 func KeyPairFromModel(pair *model.KeyPair) *KeyPair {
 	return &KeyPair{
-		ObjectRoot: pair.ObjectRoot,
-		Usage:      int32(pair.Usage),
-		Algorithm:  pair.Algorithm,
-		PrivateKey: KeyFromModel(pair.PrivateKey),
-		PublicKey:  KeyFromModel(pair.PublicKey),
+		ObjectRoot:  pair.ObjectRoot,
+		Usage:       int32(pair.Usage),
+		Algorithm:   pair.Algorithm,
+		PrivateKey:  KeyFromModel(pair.PrivateKey),
+		PublicKey:   KeyFromModel(pair.PublicKey),
+		Certificate: KeyFromModel(pair.Certificate),
 	}
 }
 
 func KeyPairToModel(pair *KeyPair) *model.KeyPair {
 	return &model.KeyPair{
-		ObjectRoot: pair.ObjectRoot,
-		Usage:      model.KeyUsage(pair.Usage),
-		Algorithm:  pair.Algorithm,
-		PrivateKey: KeyToModel(pair.PrivateKey),
-		PublicKey:  KeyToModel(pair.PublicKey),
+		ObjectRoot:  pair.ObjectRoot,
+		Usage:       model.KeyUsage(pair.Usage),
+		Algorithm:   pair.Algorithm,
+		PrivateKey:  KeyToModel(pair.PrivateKey),
+		PublicKey:   KeyToModel(pair.PublicKey),
+		Certificate: KeyToModel(pair.Certificate),
 	}
 }
 

@@ -1,9 +1,8 @@
 package model
 
 import (
-	"time"
-
 	"github.com/caos/logging"
+	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -11,13 +10,24 @@ import (
 )
 
 type KeyView struct {
-	ID        string
-	Private   bool
-	Expiry    time.Time
-	Algorithm string
-	Usage     KeyUsage
-	Key       *crypto.CryptoValue
-	Sequence  uint64
+	ID          string
+	Private     bool
+	Certificate bool
+	Expiry      time.Time
+	Algorithm   string
+	Usage       KeyUsage
+	Key         *crypto.CryptoValue
+	Sequence    uint64
+}
+
+type CertificateAndKeyView struct {
+	Certificate *KeyView
+	Key         *KeyView
+}
+
+type CertificateAndKey struct {
+	Key         *SigningKey
+	Certificate *Certificate
 }
 
 type SigningKey struct {
@@ -32,6 +42,13 @@ type PublicKey struct {
 	Algorithm string
 	Usage     KeyUsage
 	Key       interface{}
+}
+
+type Certificate struct {
+	ID          string
+	Algorithm   string
+	Certificate interface{}
+	Sequence    uint64
 }
 
 type KeySearchRequest struct {
@@ -50,6 +67,7 @@ const (
 	KeySearchKeyPrivate
 	KeySearchKeyExpiry
 	KeySearchKeyUsage
+	KeySearchKeyCertificate
 )
 
 type KeySearchQuery struct {
@@ -75,6 +93,31 @@ func (r *KeySearchRequest) EnsureLimit(limit uint64) error {
 	return nil
 }
 
+func CertificateFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*Certificate, error) {
+	if key.Usage != KeyUsageSAMLMetadataSigning &&
+		key.Usage != KeyUsageSAMLResponseSinging &&
+		key.Usage != KeyUsageSAMLCA {
+		return nil, errors.ThrowInvalidArgument(nil, "MODEL-5HAdh", "key must be private certificate")
+	}
+	keyData, err := crypto.Decrypt(key.Key, alg)
+	if err != nil {
+		return nil, err
+	}
+
+	cert, err := crypto.BytesToCertificate(keyData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Certificate{
+		ID:          key.ID,
+		Algorithm:   key.Algorithm,
+		Certificate: cert,
+		Sequence:    key.Sequence,
+	}, nil
+
+}
+
 func SigningKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*SigningKey, error) {
 	if key.Usage != KeyUsageSigning || !key.Private {
 		return nil, errors.ThrowInvalidArgument(nil, "MODEL-5HBdh", "key must be private signing key")
@@ -83,15 +126,67 @@ func SigningKeyFromKeyView(key *KeyView, alg crypto.EncryptionAlgorithm) (*Signi
 	if err != nil {
 		return nil, err
 	}
+
 	privateKey, err := crypto.BytesToPrivateKey(keyData)
 	if err != nil {
 		return nil, err
 	}
+
 	return &SigningKey{
 		ID:        key.ID,
 		Algorithm: key.Algorithm,
 		Key:       privateKey,
 		Sequence:  key.Sequence,
+	}, nil
+}
+
+func CertificateAndKeyFromCertificateAndKeyView(certAndKey *CertificateAndKeyView, alg crypto.EncryptionAlgorithm) (*CertificateAndKey, error) {
+	if (certAndKey.Certificate.Usage != KeyUsageSAMLCA &&
+		certAndKey.Certificate.Usage != KeyUsageSAMLResponseSinging &&
+		certAndKey.Certificate.Usage != KeyUsageSAMLMetadataSigning) ||
+		!certAndKey.Certificate.Private ||
+		!certAndKey.Certificate.Certificate ||
+		(certAndKey.Key.Usage != KeyUsageSAMLCA &&
+			certAndKey.Key.Usage != KeyUsageSAMLResponseSinging &&
+			certAndKey.Key.Usage != KeyUsageSAMLMetadataSigning) ||
+		!certAndKey.Key.Private ||
+		certAndKey.Key.Certificate {
+		return nil, errors.ThrowInvalidArgument(nil, "MODEL-5HBdh", "key must be private certificate and signing key")
+	}
+
+	certData, err := crypto.Decrypt(certAndKey.Certificate.Key, alg)
+	if err != nil {
+		return nil, err
+	}
+
+	cert, err := crypto.BytesToCertificate(certData)
+	if err != nil {
+		return nil, err
+	}
+
+	keyData, err := crypto.Decrypt(certAndKey.Key.Key, alg)
+	if err != nil {
+		return nil, err
+	}
+
+	privateKey, err := crypto.BytesToPrivateKey(keyData)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CertificateAndKey{
+		Key: &SigningKey{
+			ID:        certAndKey.Key.ID,
+			Algorithm: certAndKey.Key.Algorithm,
+			Key:       privateKey,
+			Sequence:  certAndKey.Key.Sequence,
+		},
+		Certificate: &Certificate{
+			ID:          certAndKey.Certificate.ID,
+			Algorithm:   certAndKey.Certificate.Algorithm,
+			Certificate: cert,
+			Sequence:    certAndKey.Certificate.Sequence,
+		},
 	}, nil
 }
 

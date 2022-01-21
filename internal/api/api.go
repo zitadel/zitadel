@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/caos/zitadel/internal/api/saml"
 	"net/http"
 
 	"github.com/caos/logging"
@@ -32,6 +33,7 @@ import (
 type Config struct {
 	GRPC grpc_util.Config
 	OIDC oidc.OPHandlerConfig
+	SAML saml.ProviderConfig
 }
 
 type API struct {

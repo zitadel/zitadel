@@ -19,12 +19,21 @@ type KeyUsage int32
 
 const (
 	KeyUsageSigning KeyUsage = iota
+	KeyUsageSAMLMetadataSigning
+	KeyUsageSAMLResponseSinging
+	KeyUsageSAMLCA
 )
 
 func (u KeyUsage) String() string {
 	switch u {
 	case KeyUsageSigning:
 		return "sig"
+	case KeyUsageSAMLCA:
+		return "saml_ca"
+	case KeyUsageSAMLResponseSinging:
+		return "saml_response_sig"
+	case KeyUsageSAMLMetadataSigning:
+		return "saml_metadata_sig"
 	}
 	return ""
 }

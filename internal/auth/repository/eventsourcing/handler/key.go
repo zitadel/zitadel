@@ -21,14 +21,24 @@ const (
 
 type Key struct {
 	handler
-	subscription *v1.Subscription
-	keyChan      chan<- *model.KeyView
+	subscription     *v1.Subscription
+	keyChan          chan<- *model.KeyView
+	caCertChan       chan<- *model.CertificateAndKeyView
+	metadataCertChan chan<- *model.CertificateAndKeyView
+	responseCertChan chan<- *model.CertificateAndKeyView
 }
 
-func newKey(handler handler, keyChan chan<- *model.KeyView) *Key {
+func newKey(handler handler,
+	keyChan chan<- *model.KeyView,
+	caCertChan chan<- *model.CertificateAndKeyView,
+	metadataCertChan chan<- *model.CertificateAndKeyView,
+	responseCertChan chan<- *model.CertificateAndKeyView) *Key {
 	h := &Key{
-		handler: handler,
-		keyChan: keyChan,
+		handler:          handler,
+		keyChan:          keyChan,
+		caCertChan:       caCertChan,
+		metadataCertChan: metadataCertChan,
+		responseCertChan: responseCertChan,
 	}
 
 	h.subscribe()
@@ -76,18 +86,28 @@ func (k *Key) EventQuery() (*models.SearchQuery, error) {
 func (k *Key) Reduce(event *models.Event) error {
 	switch event.Type {
 	case es_model.KeyPairAdded:
-		privateKey, publicKey, err := view_model.KeysFromPairEvent(event)
+		usage, privateKey, publicKey, cert, err := view_model.KeysFromPairEvent(event)
 		if err != nil {
 			return err
 		}
 		if privateKey.Expiry.Before(time.Now()) && publicKey.Expiry.Before(time.Now()) {
 			return k.view.ProcessedKeySequence(event)
 		}
-		err = k.view.PutKeys(privateKey, publicKey, event)
+		err = k.view.PutKeys(privateKey, publicKey, cert, event)
 		if err != nil {
 			return err
 		}
-		k.keyChan <- view_model.KeyViewToModel(privateKey)
+
+		switch model.KeyUsage(usage) {
+		case model.KeyUsageSigning:
+			k.keyChan <- view_model.KeyViewToModel(privateKey)
+		case model.KeyUsageSAMLCA:
+			k.caCertChan <- view_model.CertAndKeyViewToModel(cert, privateKey)
+		case model.KeyUsageSAMLMetadataSigning:
+			k.metadataCertChan <- view_model.CertAndKeyViewToModel(cert, privateKey)
+		case model.KeyUsageSAMLResponseSinging:
+			k.responseCertChan <- view_model.CertAndKeyViewToModel(cert, privateKey)
+		}
 		return nil
 	default:
 		return k.view.ProcessedKeySequence(event)

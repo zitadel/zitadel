@@ -2,23 +2,32 @@ package saml
 
 import (
 	"context"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"github.com/amdonov/xmlsig"
+	"github.com/caos/logging"
+	http_utils "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/auth/repository"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"gopkg.in/square/go-jose.v2"
 	"net/http"
 )
 
 type ProviderConfig struct {
-	EntityID string
+	BaseURL string
 
-	MetadataCertificate *Certificate
 	SignatureAlgorithm  string
 	DigestAlgorithm     string
 	EncryptionAlgorithm string
@@ -32,6 +41,8 @@ type ProviderConfig struct {
 
 	IDP           *IdentityProviderConfig
 	StorageConfig *StorageConfig
+
+	UserAgentCookieConfig *middleware.UserAgentCookieConfig
 }
 
 type Certificate struct {
@@ -66,11 +77,14 @@ const (
 )
 
 type Provider struct {
-	storage Storage
+	storage      Storage
+	httpHandler  http.Handler
+	interceptors []HttpInterceptor
+	caCert       string
+	caKey        string
 
-	Metadata  *md.EntityDescriptor
-	Signer    xmlsig.Signer
-	TlsConfig *tls.Config
+	Metadata *md.EntityDescriptor
+	Signer   xmlsig.Signer
 
 	IdentityProvider *IdentityProvider
 }
@@ -80,16 +94,10 @@ func NewProvider(
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
+	localDevMode bool,
 ) (*Provider, error) {
-	tlsConfig, err := ConfigureTLS(conf.MetadataCertificate.Path, conf.MetadataCertificate.PrivateKeyPath, conf.MetadataCertificate.CaPath)
-	if err != nil {
-		return nil, err
-	}
-
-	signer, err := xmlsig.NewSignerWithOptions(tlsConfig.Certificates[0], xmlsig.SignerOptions{
-		SignatureAlgorithm: conf.SignatureAlgorithm,
-		DigestAlgorithm:    conf.DigestAlgorithm,
-	})
+	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
+	cookieHandler, err := middleware.NewUserAgentHandler(conf.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +107,38 @@ func NewProvider(
 		command: command,
 		query:   query,
 	}
+	getCACert(storage)
+	cert, key := getMetadataCert(storage)
+
+	certPem := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: cert,
+		},
+	)
+
+	keyPem := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: x509.MarshalPKCS1PrivateKey(key),
+		},
+	)
+
+	tlsCert, err := tls.X509KeyPair(certPem, keyPem)
+	if err != nil {
+		return nil, err
+	}
+
+	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
+		SignatureAlgorithm: conf.SignatureAlgorithm,
+		DigestAlgorithm:    conf.DigestAlgorithm,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	idp, err := NewIdentityProvider(
-		conf.EntityID,
+		conf.BaseURL,
 		conf.IDP,
 		storage,
 	)
@@ -109,13 +146,27 @@ func NewProvider(
 		return nil, err
 	}
 
-	return &Provider{
+	prov := &Provider{
 		Metadata:         conf.getMetadata(idp),
-		TlsConfig:        tlsConfig,
 		Signer:           signer,
 		storage:          storage,
 		IdentityProvider: idp,
-	}, nil
+		interceptors: []HttpInterceptor{
+			middleware.MetricsHandler(metricTypes),
+			middleware.TelemetryHandler(),
+			middleware.NoCacheInterceptor,
+			cookieHandler,
+			http_utils.CopyHeadersToContext,
+		},
+	}
+
+	prov.httpHandler = CreateRouter(prov, prov.interceptors...)
+
+	return prov, nil
+}
+
+func (p *Provider) HttpHandler() http.Handler {
+	return p.httpHandler
 }
 
 func (p *Provider) Storage() Storage {
@@ -131,10 +182,53 @@ func (p *Provider) Probes() []ProbesFn {
 		ReadyStorage(p.Storage()),
 	}
 }
+func getCACert(storage Storage) ([]byte, *rsa.PrivateKey) {
+	ctx := context.Background()
+	certAndKeyCh := make(chan eventstore.CertificateAndKey)
+	go storage.GetCA(ctx, certAndKeyCh)
+	for {
+		select {
+		case <-ctx.Done():
+			//TODO
+		case certAndKey := <-certAndKeyCh:
+			if certAndKey.Key.Key == nil || certAndKey.Certificate.Key == nil {
+				logging.Log("OP-DAvt4").Warn("signer has no key")
+				continue
+			}
+			certWebKey := certAndKey.Certificate.Key.(jose.JSONWebKey)
+			keyWebKey := certAndKey.Key.Key.(jose.JSONWebKey)
+
+			return certWebKey.Key.([]byte), keyWebKey.Key.(*rsa.PrivateKey)
+		}
+	}
+
+}
+
+func getMetadataCert(storage Storage) ([]byte, *rsa.PrivateKey) {
+	ctx := context.Background()
+	certAndKeyCh := make(chan eventstore.CertificateAndKey)
+	go storage.GetMetadataSigningKey(ctx, certAndKeyCh)
+
+	for {
+		select {
+		case <-ctx.Done():
+			//TODO
+		case certAndKey := <-certAndKeyCh:
+			if certAndKey.Key.Key == nil || certAndKey.Certificate.Key == nil {
+				logging.Log("OP-DAvt4").Warn("signer has no key")
+				continue
+			}
+			certWebKey := certAndKey.Certificate.Key.(jose.JSONWebKey)
+			keyWebKey := certAndKey.Key.Key.(jose.JSONWebKey)
+
+			return certWebKey.Key.([]byte), keyWebKey.Key.(*rsa.PrivateKey)
+		}
+	}
+}
 
 type HttpInterceptor func(http.Handler) http.Handler
 
-func CreateRouter(p Provider, interceptors ...HttpInterceptor) *mux.Router {
+func CreateRouter(p *Provider, interceptors ...HttpInterceptor) *mux.Router {
 	intercept := buildInterceptor(interceptors...)
 	router := mux.NewRouter()
 	router.Use(handlers.CORS(

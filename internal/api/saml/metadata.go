@@ -34,14 +34,14 @@ func writeXML(w http.ResponseWriter, body interface{}) error {
 }
 
 func (p *IdentityProviderConfig) getMetadata(
-	entityID string,
+	baseURL string,
 	idpCertData []byte,
 ) (*md.IDPSSODescriptorType, *md.AttributeAuthorityDescriptorType) {
 	idpKeyDescriptors := []md.KeyDescriptorType{
 		{
 			Use: md.KeyTypesSigning,
 			KeyInfo: xml_dsig.KeyInfoType{
-				KeyName: []string{entityID + " IDP " + string(md.KeyTypesSigning)},
+				KeyName: []string{baseURL + " IDP " + string(md.KeyTypesSigning)},
 				X509Data: []xml_dsig.X509DataType{{
 					X509Certificate: base64.StdEncoding.EncodeToString(idpCertData),
 				}},
@@ -50,7 +50,7 @@ func (p *IdentityProviderConfig) getMetadata(
 		{
 			Use: md.KeyTypesEncryption,
 			KeyInfo: xml_dsig.KeyInfoType{
-				KeyName: []string{entityID + " IDP " + string(md.KeyTypesEncryption)},
+				KeyName: []string{baseURL + " IDP " + string(md.KeyTypesEncryption)},
 				X509Data: []xml_dsig.X509DataType{{
 					X509Certificate: base64.StdEncoding.EncodeToString(idpCertData),
 				}},
@@ -71,7 +71,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			ErrorURL:                   p.ErrorURL,
 			SingleSignOnService: []md.EndpointType{{
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-				Location: p.SingleSignOnService,
+				Location: baseURL + p.SingleSignOnService,
 			}},
 			//TODO definition for more profiles
 			AttributeProfile: []string{
@@ -83,16 +83,16 @@ func (p *IdentityProviderConfig) getMetadata(
 				Index:     "0",
 				IsDefault: "true",
 				Binding:   "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-				Location:  p.ArtifactResulationService,
+				Location:  baseURL + p.ArtifactResulationService,
 			}},
 			SingleLogoutService: []md.EndpointType{
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-					Location: p.SLOArtifactResulationService,
+					Location: baseURL + p.SLOArtifactResulationService,
 				},
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-					Location: p.SingleLogoutService,
+					Location: baseURL + p.SingleLogoutService,
 				},
 			},
 			NameIDFormat:  []string{p.NameIDFormat},
@@ -117,7 +117,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			ErrorURL:                   p.ErrorURL,
 			AttributeService: []md.EndpointType{{
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-				Location: p.AttributeService,
+				Location: baseURL + p.AttributeService,
 			}},
 			NameIDFormat: []string{p.NameIDFormat},
 			//TODO definition for more profiles
@@ -145,7 +145,7 @@ func (p *ProviderConfig) getMetadata(
 
 	entity := &md.EntityDescriptor{
 		XMLName:       xml.Name{Local: "md"},
-		EntityID:      md.EntityIDType(p.EntityID),
+		EntityID:      md.EntityIDType(p.BaseURL + "/" + metadataEndpoint),
 		Id:            NewID(),
 		Signature:     nil,
 		Organization:  nil,

@@ -10,10 +10,11 @@ import (
 type KeyPairWriteModel struct {
 	eventstore.WriteModel
 
-	Usage      domain.KeyUsage
-	Algorithm  string
-	PrivateKey *domain.Key
-	PublicKey  *domain.Key
+	Usage       domain.KeyUsage
+	Algorithm   string
+	PrivateKey  *domain.Key
+	PublicKey   *domain.Key
+	Certificate *domain.Key
 }
 
 func NewKeyPairWriteModel(aggregateID, resourceOwner string) *KeyPairWriteModel {
@@ -42,6 +43,10 @@ func (wm *KeyPairWriteModel) Reduce() error {
 			wm.PublicKey = &domain.Key{
 				Key:    e.PublicKey.Key,
 				Expiry: e.PublicKey.Expiry,
+			}
+			wm.Certificate = &domain.Key{
+				Key:    e.Certificate.Key,
+				Expiry: e.Certificate.Expiry,
 			}
 		}
 	}

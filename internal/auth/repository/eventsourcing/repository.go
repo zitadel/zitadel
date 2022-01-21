@@ -82,7 +82,10 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
 
 	keyChan := make(chan *key_model.KeyView)
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan)
+	caCertChan := make(chan *key_model.CertificateAndKeyView)
+	metadataCertChan := make(chan *key_model.CertificateAndKeyView)
+	responseCertChan := make(chan *key_model.CertificateAndKeyView)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, keyChan, caCertChan, metadataCertChan, responseCertChan)
 	locker := spooler.NewLocker(sqlClient)
 
 	userRepo := eventstore.UserRepo{
@@ -149,6 +152,9 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			KeyAlgorithm:             keyAlgorithm,
 			Locker:                   locker,
 			KeyChan:                  keyChan,
+			CaCertChan:               caCertChan,
+			MetadataCertChan:         metadataCertChan,
+			ResponseCertChan:         responseCertChan,
 		},
 		eventstore.ApplicationRepo{
 			Commands: command,

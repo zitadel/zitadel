@@ -10,16 +10,20 @@ import (
 type KeyPair struct {
 	es_models.ObjectRoot
 
-	Usage      KeyUsage
-	Algorithm  string
-	PrivateKey *Key
-	PublicKey  *Key
+	Usage       KeyUsage
+	Algorithm   string
+	PrivateKey  *Key
+	PublicKey   *Key
+	Certificate *Key
 }
 
 type KeyUsage int32
 
 const (
 	KeyUsageSigning KeyUsage = iota
+	KeyUsageSAMLMetadataSigning
+	KeyUsageSAMLResponseSinging
+	KeyUsageSAMLCA
 )
 
 func (u KeyUsage) String() string {
@@ -38,7 +42,8 @@ type Key struct {
 func (k *KeyPair) IsValid() bool {
 	return k.Algorithm != "" &&
 		k.PrivateKey != nil && k.PrivateKey.IsValid() &&
-		k.PublicKey != nil && k.PublicKey.IsValid()
+		k.PublicKey != nil && k.PublicKey.IsValid() &&
+		k.Certificate != nil && k.Certificate.IsValid()
 }
 
 func (k *Key) IsValid() bool {

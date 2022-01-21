@@ -23,7 +23,7 @@ func KeyByIDAndType(db *gorm.DB, table, keyID string, private bool) (*model.KeyV
 	return key, err
 }
 
-func GetSigningKey(db *gorm.DB, table string, expiry time.Time) (*model.KeyView, error) {
+func GetCertificate(db *gorm.DB, table string, expiry time.Time, usage key_model.KeyUsage) (*model.KeyView, error) {
 	if expiry.IsZero() {
 		expiry = time.Now().UTC()
 	}
@@ -32,7 +32,35 @@ func GetSigningKey(db *gorm.DB, table string, expiry time.Time) (*model.KeyView,
 		model.KeySearchRequest{
 			Queries: []*key_model.KeySearchQuery{
 				{Key: key_model.KeySearchKeyPrivate, Method: domain.SearchMethodEquals, Value: true},
-				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KeySearchKeyCertificate, Method: domain.SearchMethodEquals, Value: true},
+				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: usage},
+				{Key: key_model.KeySearchKeyExpiry, Method: domain.SearchMethodGreaterThan, Value: time.Now().UTC()},
+			},
+			SortingColumn: key_model.KeySearchKeyExpiry,
+			Limit:         1,
+		},
+	)
+	_, err := query(db, &keys)
+	if err != nil {
+		return nil, err
+	}
+	if len(keys) != 1 {
+		return nil, caos_errs.ThrowNotFound(err, "VIEW-BGA41", "key not found")
+	}
+	return keys[0], nil
+}
+
+func GetSigningKey(db *gorm.DB, table string, expiry time.Time, usage key_model.KeyUsage) (*model.KeyView, error) {
+	if expiry.IsZero() {
+		expiry = time.Now().UTC()
+	}
+	keys := make([]*model.KeyView, 0)
+	query := repository.PrepareSearchQuery(table,
+		model.KeySearchRequest{
+			Queries: []*key_model.KeySearchQuery{
+				{Key: key_model.KeySearchKeyPrivate, Method: domain.SearchMethodEquals, Value: true},
+				{Key: key_model.KeySearchKeyCertificate, Method: domain.SearchMethodEquals, Value: false},
+				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: usage},
 				{Key: key_model.KeySearchKeyExpiry, Method: domain.SearchMethodGreaterThan, Value: time.Now().UTC()},
 			},
 			SortingColumn: key_model.KeySearchKeyExpiry,
@@ -49,13 +77,14 @@ func GetSigningKey(db *gorm.DB, table string, expiry time.Time) (*model.KeyView,
 	return keys[0], nil
 }
 
-func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
+func GetActivePublicKeys(db *gorm.DB, table string, usage key_model.KeyUsage) ([]*model.KeyView, error) {
 	keys := make([]*model.KeyView, 0)
 	query := repository.PrepareSearchQuery(table,
 		model.KeySearchRequest{
 			Queries: []*key_model.KeySearchQuery{
 				{Key: key_model.KeySearchKeyPrivate, Method: domain.SearchMethodEquals, Value: false},
-				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: key_model.KeyUsageSigning},
+				{Key: key_model.KeySearchKeyCertificate, Method: domain.SearchMethodEquals, Value: false},
+				{Key: key_model.KeySearchKeyUsage, Method: domain.SearchMethodEquals, Value: usage},
 				{Key: key_model.KeySearchKeyExpiry, Method: domain.SearchMethodGreaterThan, Value: time.Now().UTC()},
 			},
 		},
@@ -64,9 +93,9 @@ func GetActivePublicKeys(db *gorm.DB, table string) ([]*model.KeyView, error) {
 	return keys, err
 }
 
-func PutKeys(db *gorm.DB, table string, privateKey, publicKey *model.KeyView) error {
+func PutKeys(db *gorm.DB, table string, privateKey, publicKey, cert *model.KeyView) error {
 	save := repository.PrepareBulkSave(table)
-	return save(db, privateKey, publicKey)
+	return save(db, privateKey, publicKey, cert)
 }
 
 func DeleteKey(db *gorm.DB, table, keyID string, private bool) error {

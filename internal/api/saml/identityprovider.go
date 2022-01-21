@@ -2,13 +2,18 @@ package saml
 
 import (
 	"context"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"github.com/amdonov/xmlsig"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
-	"io/ioutil"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	"gopkg.in/square/go-jose.v2"
 	"net/http"
 	"text/template"
 )
@@ -31,7 +36,6 @@ type IdentityProviderConfig struct {
 	CacheDuration string
 	ErrorURL      string
 
-	Certificate         *Certificate
 	SignatureAlgorithm  string
 	DigestAlgorithm     string
 	EncryptionAlgorithm string
@@ -56,7 +60,6 @@ type IdentityProvider struct {
 	Metadata   *md.IDPSSODescriptorType
 	AAMetadata *md.AttributeAuthorityDescriptorType
 	signer     xmlsig.Signer
-	tlsConfig  *tls.Config
 
 	LoginService                 string
 	SingleSignOnService          string
@@ -69,18 +72,28 @@ type IdentityProvider struct {
 	ServiceProviders []*ServiceProvider
 }
 
-func NewIdentityProvider(entityID string, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
-	certData, err := ioutil.ReadFile(conf.Certificate.Path)
+func NewIdentityProvider(baseURL string, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
+	cert, key := getResponseCert(storage)
+
+	certPem := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: cert,
+		},
+	)
+
+	keyPem := pem.EncodeToMemory(
+		&pem.Block{
+			Type:  "RSA PRIVATE KEY",
+			Bytes: x509.MarshalPKCS1PrivateKey(key),
+		},
+	)
+	tlsCert, err := tls.X509KeyPair(certPem, keyPem)
 	if err != nil {
 		return nil, err
 	}
 
-	tlsConfig, err := ConfigureTLS(conf.Certificate.Path, conf.Certificate.PrivateKeyPath, conf.Certificate.CaPath)
-	if err != nil {
-		return nil, err
-	}
-
-	signer, err := xmlsig.NewSignerWithOptions(tlsConfig.Certificates[0], xmlsig.SignerOptions{
+	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
 		SignatureAlgorithm: conf.SignatureAlgorithm,
 		DigestAlgorithm:    conf.DigestAlgorithm,
 	})
@@ -93,13 +106,12 @@ func NewIdentityProvider(entityID string, conf *IdentityProviderConfig, storage 
 		return nil, err
 	}
 
-	metadata, aaMetadata := conf.getMetadata(entityID, certData)
+	metadata, aaMetadata := conf.getMetadata(baseURL, certPem)
 	return &IdentityProvider{
 		storage:                      storage,
-		EntityID:                     entityID,
+		EntityID:                     baseURL + "/" + metadataEndpoint,
 		Metadata:                     metadata,
 		AAMetadata:                   aaMetadata,
-		tlsConfig:                    tlsConfig,
 		signer:                       signer,
 		LoginService:                 conf.LoginService,
 		SingleSignOnService:          conf.SingleSignOnService,
@@ -134,8 +146,9 @@ func (p *IdentityProvider) GetRedirectURL(requestID string) string {
 	return p.LoginService + "?requestId=" + requestID
 }
 
-func (p *IdentityProvider) GetServiceProvider(entityID string) *ServiceProvider {
-	index := 0
+func (p *IdentityProvider) GetServiceProvider(applicationID, entityID string) *ServiceProvider {
+	p.
+		index := 0
 	found := false
 	for i, sp := range p.ServiceProviders {
 		if sp.GetEntityID() == entityID {
@@ -186,8 +199,9 @@ func (p *IdentityProvider) getIssuer() *saml.Issuer {
 func (p *IdentityProvider) verifyRequestDestination(request *samlp.AuthnRequest) error {
 	foundEndpoint := false
 	for _, sso := range p.Metadata.SingleSignOnService {
-		if request.Destination != sso.Location {
+		if request.Destination == sso.Location {
 			foundEndpoint = true
+			break
 		}
 	}
 	if !foundEndpoint {
@@ -199,4 +213,26 @@ func (p *IdentityProvider) verifyRequestDestination(request *samlp.AuthnRequest)
 
 func notImplementedHandleFunc(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, fmt.Sprintf("not implemented yet"), http.StatusNotImplemented)
+}
+
+func getResponseCert(storage Storage) ([]byte, *rsa.PrivateKey) {
+	ctx := context.Background()
+	certAndKeyCh := make(chan eventstore.CertificateAndKey)
+	go storage.GetResponseSigningKey(ctx, certAndKeyCh)
+
+	for {
+		select {
+		case <-ctx.Done():
+			//TODO
+		case certAndKey := <-certAndKeyCh:
+			if certAndKey.Key.Key == nil || certAndKey.Certificate.Key == nil {
+				logging.Log("OP-DAvt4").Warn("signer has no key")
+				continue
+			}
+			certWebKey := certAndKey.Certificate.Key.(jose.JSONWebKey)
+			keyWebKey := certAndKey.Key.Key.(jose.JSONWebKey)
+
+			return certWebKey.Key.([]byte), keyWebKey.Key.(*rsa.PrivateKey)
+		}
+	}
 }

@@ -1261,6 +1261,20 @@ service ManagementService {
         };
     }
 
+  // Adds a new saml idp
+  // Returns a entityID
+  rpc AddSAMLApp(AddSAMLAppRequest) returns (AddSAMLAppResponse) {
+    option (google.api.http) = {
+      post: "/projects/{project_id}/apps/saml"
+      body: "*"
+    };
+
+    option (zitadel.v1.auth_option) = {
+      permission: "project.app.write"
+      check_field_name: "ProjectId"
+    };
+  }
+
     // Adds a new api application
     // Returns a client id
     // Returns a new generated secret if needed (Depending on the configuration)
@@ -3885,6 +3899,18 @@ message AddOIDCAppResponse {
     repeated zitadel.v1.LocalizedMessage compliance_problems = 6;
 }
 
+message AddSAMLAppRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.app.v1.SAMLConfig sp_config = 3;
+}
+
+message AddSAMLAppResponse {
+    string app_id = 1;
+    zitadel.v1.ObjectDetails details = 2;
+    string entity_id = 3;
+}
+
 message AddAPIAppRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -3940,6 +3966,18 @@ message UpdateOIDCAppConfigRequest {
 message UpdateOIDCAppConfigResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
+
+message UpdateSAMLAppConfigRequest {
+    string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string app_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+
+    zitadel.app.v1.SAMLConfig sp_config = 3;
+}
+
+message UpdateSAMLAppConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 
 message UpdateAPIAppConfigRequest {
     string project_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];

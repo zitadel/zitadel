@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/caos/zitadel/internal/api/saml"
 	"os"
 	"regexp"
 	"strconv"
@@ -88,6 +89,7 @@ var (
 	managementEnabled   = flag.Bool("management", true, "enable management api")
 	authEnabled         = flag.Bool("auth", true, "enable auth api")
 	oidcEnabled         = flag.Bool("oidc", true, "enable oidc api")
+	samlEnabled         = flag.Bool("saml", true, "enable saml api")
 	assetsEnabled       = flag.Bool("assets", true, "enable assets api")
 	loginEnabled        = flag.Bool("login", true, "enable login ui")
 	consoleEnabled      = flag.Bool("console", true, "enable console ui")
@@ -239,6 +241,22 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig, *localDevMode)
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
+
+	if *samlEnabled {
+		samlConfig := saml.GetTestConfig("./")
+		//TODO fix structure
+		samlConfig.UserAgentCookieConfig = conf.API.OIDC.UserAgentCookieConfig
+		idp, err := saml.NewProvider(samlConfig, command, query, authRepo, *localDevMode)
+		if err != nil {
+			logging.Log("API-pwaiks").OnError(err).Fatal("error starting saml")
+		}
+
+		if err := saml.AddTestSP(idp); err != nil {
+			logging.Log("API-pwaiks").OnError(err).Fatal("error adding saml sp")
+		}
+		apis.RegisterHandler("/saml", idp.HttpHandler())
+	}
+
 	if *assetsEnabled {
 		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo, query)
 		apis.RegisterHandler("/assets/v1", assetsHandler)

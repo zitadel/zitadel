@@ -36,7 +36,7 @@ func (sp *ServiceProvider) GetEntityID() string {
 }
 
 func NewServiceProvider(config *ServiceProviderConfig) (*ServiceProvider, error) {
-	var metadata *md.EntityDescriptor
+	metadata := &md.EntityDescriptor{}
 	metadataData := make([]byte, 0)
 	if config.URL != "" {
 		resp, err := http.Get(config.URL)
@@ -60,19 +60,23 @@ func NewServiceProvider(config *ServiceProviderConfig) (*ServiceProvider, error)
 	}
 
 	certStr := ""
-	for _, keydesc := range metadata.SPSSODescriptor.KeyDescriptor {
-		if keydesc.Use == md.KeyTypesSigning {
-			certStr = keydesc.KeyInfo.X509Data[0].X509Certificate
+	cert := &x509.Certificate{}
+	if metadata.SPSSODescriptor.KeyDescriptor != nil && len(metadata.SPSSODescriptor.KeyDescriptor) > 0 {
+		for _, keydesc := range metadata.SPSSODescriptor.KeyDescriptor {
+			if keydesc.Use == md.KeyTypesSigning {
+				certStr = keydesc.KeyInfo.X509Data[0].X509Certificate
+			}
 		}
-	}
 
-	block, err := base64.StdEncoding.DecodeString(certStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse PEM block containing the public key")
-	}
-	cert, err := x509.ParseCertificate(block)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse certificate: " + err.Error())
+		block, err := base64.StdEncoding.DecodeString(certStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse PEM block containing the public key")
+		}
+		certT, err := x509.ParseCertificate(block)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse certificate: " + err.Error())
+		}
+		cert = certT
 	}
 
 	return &ServiceProvider{

@@ -19,16 +19,37 @@ func (v *View) KeyByIDAndType(keyID string, private bool) (*model.KeyView, error
 	return view.KeyByIDAndType(v.Db, keyTable, keyID, private)
 }
 
-func (v *View) GetActivePrivateKeyForSigning(expiry time.Time) (*key_model.KeyView, error) {
-	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
+func (v *View) GetActiveCertificateAndKeyForSigning(expiry time.Time, usage key_model.KeyUsage) (*key_model.CertificateAndKeyView, error) {
+	cert, err := view.GetCertificate(v.Db, keyTable, expiry, usage)
+	if err != nil {
+		return nil, err
+	}
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry, usage)
+	if err != nil {
+		return nil, err
+	}
+	return model.CertAndKeyViewToModel(cert, key), nil
+}
+
+func (v *View) GetActivePrivateKeyForSigning(expiry time.Time, usage key_model.KeyUsage) (*key_model.KeyView, error) {
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry, usage)
 	if err != nil {
 		return nil, err
 	}
 	return model.KeyViewToModel(key), nil
 }
 
-func (v *View) GetSigningKey(expiry time.Time) (*key_model.SigningKey, time.Time, error) {
-	key, err := view.GetSigningKey(v.Db, keyTable, expiry)
+func (v *View) GetCertificate(expiry time.Time, usage key_model.KeyUsage) (*key_model.Certificate, time.Time, error) {
+	certView, err := view.GetCertificate(v.Db, keyTable, expiry, usage)
+	if err != nil {
+		return nil, time.Time{}, err
+	}
+	cert, err := key_model.CertificateFromKeyView(model.KeyViewToModel(certView), v.keyAlgorithm)
+	return cert, certView.Expiry, err
+}
+
+func (v *View) GetSigningKey(expiry time.Time, usage key_model.KeyUsage) (*key_model.SigningKey, time.Time, error) {
+	key, err := view.GetSigningKey(v.Db, keyTable, expiry, usage)
 	if err != nil {
 		return nil, time.Time{}, err
 	}
@@ -36,16 +57,16 @@ func (v *View) GetSigningKey(expiry time.Time) (*key_model.SigningKey, time.Time
 	return signingKey, key.Expiry, err
 }
 
-func (v *View) GetActiveKeySet() ([]*key_model.PublicKey, error) {
-	keys, err := view.GetActivePublicKeys(v.Db, keyTable)
+func (v *View) GetActiveKeySet(usage key_model.KeyUsage) ([]*key_model.PublicKey, error) {
+	keys, err := view.GetActivePublicKeys(v.Db, keyTable, usage)
 	if err != nil {
 		return nil, err
 	}
 	return key_model.PublicKeysFromKeyView(model.KeyViewsToModel(keys), v.keyAlgorithm)
 }
 
-func (v *View) PutKeys(privateKey, publicKey *model.KeyView, event *models.Event) error {
-	err := view.PutKeys(v.Db, keyTable, privateKey, publicKey)
+func (v *View) PutKeys(privateKey, publicKey, cert *model.KeyView, event *models.Event) error {
+	err := view.PutKeys(v.Db, keyTable, privateKey, publicKey, cert)
 	if err != nil {
 		return err
 	}

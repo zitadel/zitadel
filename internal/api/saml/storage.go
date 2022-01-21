@@ -5,8 +5,10 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"github.com/caos/zitadel/internal/auth/repository"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/errors"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
@@ -20,12 +22,17 @@ type Storage interface {
 
 type EntityStorage interface {
 	GetEntityByID(ctx context.Context, entityID string)
+	GetCA(context.Context, chan<- eventstore.CertificateAndKey)
+	GetMetadataSigningKey(context.Context, chan<- eventstore.CertificateAndKey)
+	GetResponseSigningKey(context.Context, chan<- eventstore.CertificateAndKey)
 }
 
 type ProviderStorage struct {
 	repo    repository.Repository
 	command *command.Commands
 	query   *query.Queries
+
+	SignAlgorithm string
 }
 
 func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) {
@@ -33,6 +40,18 @@ func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) {
 }
 func (p *ProviderStorage) Health(context.Context) error {
 	return nil
+}
+
+func (p *ProviderStorage) GetCA(ctx context.Context, certAndKeyChan chan<- eventstore.CertificateAndKey) {
+	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLCA)
+}
+
+func (p *ProviderStorage) GetMetadataSigningKey(ctx context.Context, certAndKeyChan chan<- eventstore.CertificateAndKey) {
+	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLMetadataSigning)
+}
+
+func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyChan chan<- eventstore.CertificateAndKey) {
+	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLResponseSinging)
 }
 
 func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest, relayState, issuerID string) (_ AuthRequestInt, err error) {
@@ -46,6 +65,9 @@ func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.Auth
 	authRequest := CreateAuthRequestToBusiness(ctx, req, issuerID, relayState, userAgentID)
 
 	resp, err := p.repo.CreateAuthRequest(ctx, authRequest)
+	if err != nil {
+		return nil, err
+	}
 
 	return AuthRequestFromBusiness(resp)
 }

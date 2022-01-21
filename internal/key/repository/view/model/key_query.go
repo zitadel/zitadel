@@ -59,6 +59,8 @@ func (key KeySearchKey) ToColumnName() string {
 		return KeyUsage
 	case key_model.KeySearchKeyExpiry:
 		return KeyExpiry
+	case key_model.KeySearchKeyCertificate:
+		return KeyCertificate
 	default:
 		return ""
 	}

@@ -18,12 +18,22 @@ type SpoolerConfig struct {
 	Handlers              handler.Configs
 }
 
-func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, client *sql.DB, systemDefaults sd.SystemDefaults, keyChan chan<- *key_model.KeyView) *spooler.Spooler {
+func StartSpooler(
+	c SpoolerConfig,
+	es v1.Eventstore,
+	view *view.View,
+	client *sql.DB,
+	systemDefaults sd.SystemDefaults,
+	keyChan chan<- *key_model.KeyView,
+	caCertChan chan<- *key_model.CertificateAndKeyView,
+	metadataCertChan chan<- *key_model.CertificateAndKeyView,
+	responseCertChan chan<- *key_model.CertificateAndKeyView,
+) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: client},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, systemDefaults, keyChan),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, systemDefaults, keyChan, caCertChan, metadataCertChan, responseCertChan),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

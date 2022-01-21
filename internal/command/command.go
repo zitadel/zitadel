@@ -53,6 +53,7 @@ type Commands struct {
 	webauthn           *webauthn_helper.WebAuthN
 	keySize            int
 	keyAlgorithm       crypto.EncryptionAlgorithm
+	certKeySize        int
 	privateKeyLifetime time.Duration
 	publicKeyLifetime  time.Duration
 	tokenVerifier      orgFeatureChecker
@@ -82,6 +83,7 @@ func StartCommands(
 		keySize:            defaults.KeyConfig.Size,
 		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
 		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
+		certKeySize:        4096,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)

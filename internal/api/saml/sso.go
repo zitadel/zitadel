@@ -104,10 +104,18 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
+	acsURL := ""
+	for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
+		if acs.Binding == authNRequest.ProtocolBinding {
+			acsURL = acs.Location
+			break
+		}
+	}
+
 	if err := verifyRequestContent(
 		authNRequest,
-		p.EntityID,
-		p.Metadata.SingleSignOnService[0].Location,
+		string(sp.metadata.EntityID),
+		acsURL,
 	); err != nil {
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			authNRequest.Id,

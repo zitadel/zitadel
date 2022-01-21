@@ -3,6 +3,7 @@ package oidc
 import (
 	"context"
 	"fmt"
+	key_model "github.com/caos/zitadel/internal/key/model"
 	"strings"
 	"time"
 
@@ -200,13 +201,13 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 }
 
 func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
-	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
+	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm, key_model.KeyUsageSigning)
 }
 
 func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return o.repo.GetKeySet(ctx)
+	return o.repo.GetKeySet(ctx, key_model.KeyUsageSigning)
 }
 
 func (o *OPStorage) assertProjectRoleScopes(project *query.Project, scopes []string) ([]string, error) {

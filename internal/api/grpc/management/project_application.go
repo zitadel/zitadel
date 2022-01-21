@@ -70,6 +70,18 @@ func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest)
 	}, nil
 }
 
+func (s *Server) AddSAMLApp(ctx context.Context, req *mgmt_pb.AddSAMLAppRequest) (*mgmt_pb.AddSAMLAppResponse, error) {
+	app, err := s.command.AddSAMLApplication(ctx, AddSAMLAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.AddSAMLAppResponse{
+		AppId:    app.AppID,
+		Details:  object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
+		EntityId: "test",
+	}, nil
+}
+
 func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (*mgmt_pb.AddAPIAppResponse, error) {
 	app, err := s.command.AddAPIApplication(ctx, AddAPIAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
 	if err != nil {
@@ -99,6 +111,20 @@ func (s *Server) UpdateOIDCAppConfig(ctx context.Context, req *mgmt_pb.UpdateOID
 		return nil, err
 	}
 	return &mgmt_pb.UpdateOIDCAppConfigResponse{
+		Details: object_grpc.ChangeToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) UpdateSAMLAppConfig(ctx context.Context, req *mgmt_pb.UpdateSAMLAppConfigRequest) (*mgmt_pb.UpdateSAMLAppConfigResponse, error) {
+	config, err := s.command.ChangeSAMLApplication(ctx, UpdateSAMLAppConfigRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.UpdateSAMLAppConfigResponse{
 		Details: object_grpc.ChangeToDetailsPb(
 			config.Sequence,
 			config.ChangeDate,
