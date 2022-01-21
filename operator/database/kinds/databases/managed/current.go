@@ -2,11 +2,15 @@ package managed
 
 import (
 	"crypto/rsa"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 )
+
+var _ core.DatabaseCurrent = (*Current)(nil)
 
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
