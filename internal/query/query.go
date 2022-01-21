@@ -10,7 +10,6 @@ import (
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/repository/action"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
@@ -19,7 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 )
@@ -79,24 +77,25 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	return repo, nil
 }
 
-func (r *Queries) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
-	readModel, err := r.iamByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return readModelToIAM(readModel), nil
-}
-
-func (r *Queries) iamByID(ctx context.Context, id string) (_ *ReadModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	readModel := NewReadModel(id)
-	err = r.eventstore.FilterToQueryReducer(ctx, readModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return readModel, nil
-}
+//
+//func (r *Queries) IAMByID(ctx context.Context, id string) (_ *iam_model.IAM, err error) {
+//	readModel, err := r.iamByID(ctx, id)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return readModelToIAM(readModel), nil
+//}
+//
+//func (r *Queries) iamByID(ctx context.Context, id string) (_ *ReadModel, err error) {
+//	ctx, span := tracing.NewSpan(ctx)
+//	defer func() { span.EndWithError(err) }()
+//
+//	readModel := NewReadModel(id)
+//	err = r.eventstore.FilterToQueryReducer(ctx, readModel)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return readModel, nil
+//}
