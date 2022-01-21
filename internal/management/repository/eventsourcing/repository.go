@@ -24,7 +24,6 @@ type EsRepository struct {
 	eventstore.OrgRepository
 	eventstore.ProjectRepo
 	eventstore.UserRepo
-	eventstore.IAMRepository
 }
 
 func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, queries *query.Queries, staticStorage static.Storage) (*EsRepository, error) {
@@ -55,8 +54,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, roles []string, querie
 			NotificationTranslationFileContents: make(map[string][]byte),
 			Query:                               queries,
 		},
-		ProjectRepo:   eventstore.ProjectRepo{es, roles, systemDefaults.IamID, assetsAPI, queries},
-		UserRepo:      eventstore.UserRepo{es, queries, systemDefaults, assetsAPI},
-		IAMRepository: eventstore.IAMRepository{IAMV2Query: queries},
+		ProjectRepo: eventstore.ProjectRepo{es, roles, systemDefaults.IamID, assetsAPI, queries},
+		UserRepo:    eventstore.UserRepo{es, queries, systemDefaults, assetsAPI},
 	}, nil
 }

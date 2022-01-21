@@ -26,7 +26,6 @@ type Server struct {
 	project        repository.ProjectRepository
 	org            repository.OrgRepository
 	user           repository.UserRepository
-	iam            repository.IamRepository
 	systemDefaults systemdefaults.SystemDefaults
 	assetAPIPrefix string
 }
@@ -42,7 +41,6 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 		project:        repo,
 		org:            repo,
 		user:           repo,
-		iam:            repo,
 		systemDefaults: sd,
 		assetAPIPrefix: assetAPIPrefix,
 	}

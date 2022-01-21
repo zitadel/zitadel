@@ -16,7 +16,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/i18n"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
@@ -36,18 +35,6 @@ type OrgRepository struct {
 	NotificationTranslationFileContents map[string][]byte
 	mutex                               sync.Mutex
 	supportedLangs                      []language.Tag
-}
-
-func (repo *OrgRepository) Languages(ctx context.Context) ([]language.Tag, error) {
-	if len(repo.supportedLangs) == 0 {
-		langs, err := i18n.SupportedLanguages(repo.LoginDir)
-		if err != nil {
-			logging.Log("ADMIN-tiMWs").WithError(err).Debug("unable to parse language")
-			return nil, err
-		}
-		repo.supportedLangs = langs
-	}
-	return repo.supportedLangs, nil
 }
 
 func (repo *OrgRepository) OrgChanges(ctx context.Context, id string, lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*org_model.OrgChanges, error) {
