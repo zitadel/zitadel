@@ -9,7 +9,10 @@
   <div *ngSwitchCase="ActionKeysType.DELETE" class="action-keys-row">
     <div class="action-key">
       <div class="key-overlay"></div>
-      <span>⌘</span>
+      <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
+      <ng-template #otherOS>
+        <span>crtl</span>
+      </ng-template>
     </div>
     +
     <div class="action-key">
@@ -20,7 +23,10 @@
   <div *ngSwitchCase="ActionKeysType.DEACTIVATE" class="action-keys-row">
     <div class="action-key">
       <div class="key-overlay"></div>
-      <span>⌘</span>
+      <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
+      <ng-template #otherOS>
+        <span>crtl</span>
+      </ng-template>
     </div>
     +
     <div class="action-key">
@@ -31,7 +37,10 @@
   <div *ngSwitchCase="ActionKeysType.REACTIVATE" class="action-keys-row">
     <div class="action-key">
       <div class="key-overlay"></div>
-      <span>⌘</span>
+      <span *ngIf="!(isMacLike || isIOS); else otherOS">⌘</span>
+      <ng-template #otherOS>
+        <span>crtl</span>
+      </ng-template>
     </div>
     +
     <div class="action-key">

@@ -14,9 +14,6 @@ export class UserListComponent {
   public Type: any = Type;
   public type: Type = Type.TYPE_HUMAN;
 
-  public displayedColumnsHuman: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
-  public displayedColumnsMachine: string[] = ['select', 'displayName', 'username', 'state', 'actions'];
-
   constructor(public translate: TranslateService, activatedRoute: ActivatedRoute, breadcrumbService: BreadcrumbService) {
     activatedRoute.data.pipe(take(1)).subscribe((params) => {
       const { type } = params;

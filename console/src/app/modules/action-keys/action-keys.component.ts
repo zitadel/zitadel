@@ -33,7 +33,6 @@ export class ActionKeysComponent {
         break;
 
       case ActionKeysType.DEACTIVATE:
-        console.log(event.code);
         if ((event.ctrlKey || event.metaKey) && event.code === 'ArrowDown') {
           event.preventDefault();
           this.actionTriggered.emit();
@@ -41,7 +40,6 @@ export class ActionKeysComponent {
         break;
 
       case ActionKeysType.REACTIVATE:
-        console.log(event.code);
         if ((event.ctrlKey || event.metaKey) && event.code === 'ArrowUp') {
           event.preventDefault();
           this.actionTriggered.emit();
@@ -51,4 +49,12 @@ export class ActionKeysComponent {
   }
   public ActionKeysType: any = ActionKeysType;
   constructor() {}
+
+  public get isMacLike(): boolean {
+    return /(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent);
+  }
+
+  public get isIOS(): boolean {
+    return /(iPhone|iPod|iPad)/i.test(navigator.userAgent);
+  }
 }

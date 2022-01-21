@@ -96,6 +96,17 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef
+          [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.USER_NAME}">
+          {{ 'USER.PROFILE.NAME' | translate }}
+          <template [ngTemplateOutlet]="templateRef"
+            [ngTemplateOutletContext]="{key: UserListSearchKey.USER_NAME}"></template>
+        </th>
+        <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
+          {{user.machine.name}} </td>
+      </ng-container>
+
       <ng-container matColumnDef="username">
         <th mat-header-cell *matHeaderCellDef
           [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.USER_NAME}">
@@ -115,7 +126,7 @@
             [ngTemplateOutletContext]="{key: UserListSearchKey.EMAIL}"></template>
         </th>
         <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-          <span *ngIf="user.human?.email?.email">{{user.human?.email.email}}</span>
+          <span *ngIf="user.human?.email?.email">l{{user.human?.email.email}}</span>
         </td>
       </ng-container>
 
@@ -139,8 +150,11 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"> </tr>
+      <tr mat-header-row *matHeaderRowDef="type === Type.TYPE_HUMAN ? displayedColumnsHuman : displayedColumnsMachine">
+      </tr>
+      <tr class="highlight" mat-row
+        *matRowDef="let row; columns: (type === Type.TYPE_HUMAN ? displayedColumnsHuman : displayedColumnsMachine);">
+      </tr>
 
     </table>
     <div *ngIf="(loading$ | async) === false && !dataSource?.data?.length" class="no-content-row">

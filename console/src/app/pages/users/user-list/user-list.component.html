@@ -18,9 +18,7 @@
       <h1>{{ 'USER.PAGES.LISTMACHINE' | translate }}</h1>
       <p class="sub">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
 
-      <cnsl-user-table [type]="Type.TYPE_MACHINE"
-        [displayedColumns]="type === Type.TYPE_HUMAN ? displayedColumnsHuman : displayedColumnsMachine"
-        [disabled]="(['user.write$'] | hasRole | async) === false">
+      <cnsl-user-table [type]="Type.TYPE_MACHINE" [disabled]="(['user.write$'] | hasRole | async) === false">
       </cnsl-user-table>
     </ng-container>
   </div>
