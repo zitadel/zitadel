@@ -340,6 +340,7 @@ Errors:
     NotExisting: Identity Provider Configuration doesn't exist
   Changes:
     NotFound: No history found
+    AuditRetention: History is outside of the Audit Log Retention
   Token:
     NotFound: Token not found
   UserSession:

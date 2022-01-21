@@ -29,8 +29,9 @@ import (
 )
 
 type Config struct {
-	GRPC grpc_util.Config
-	OIDC oidc.OPHandlerConfig
+	GRPC   grpc_util.Config
+	OIDC   oidc.OPHandlerConfig
+	Domain string
 }
 
 type API struct {

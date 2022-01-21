@@ -7,6 +7,9 @@ import (
 	"sync"
 
 	"github.com/caos/logging"
+	"github.com/rakyll/statik/fs"
+	"golang.org/x/text/language"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -18,8 +21,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/repository/usergrant"
-	"github.com/rakyll/statik/fs"
-	"golang.org/x/text/language"
 )
 
 type Queries struct {
@@ -34,13 +35,14 @@ type Queries struct {
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
 	supportedLangs                      []language.Tag
+	roles                               []string
 }
 
 type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, roles []string) (repo *Queries, err error) {
 	sqlClient, err := projections.CRDB.Start()
 	if err != nil {
 		return nil, err
@@ -61,6 +63,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
+		roles:                               roles,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)

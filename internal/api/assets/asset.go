@@ -17,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/management/repository"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 )
@@ -28,7 +27,6 @@ type Handler struct {
 	commands        *command.Commands
 	authInterceptor *http_mw.AuthInterceptor
 	idGenerator     id.Generator
-	orgRepo         repository.OrgRepository
 	query           *query.Queries
 }
 
@@ -74,7 +72,6 @@ func NewHandler(
 	authConfig authz.Config,
 	idGenerator id.Generator,
 	storage static.Storage,
-	orgRepo repository.OrgRepository,
 	queries *query.Queries,
 ) http.Handler {
 	h := &Handler{
@@ -83,7 +80,6 @@ func NewHandler(
 		authInterceptor: http_mw.AuthorizationInterceptor(verifier, authConfig),
 		idGenerator:     idGenerator,
 		storage:         storage,
-		orgRepo:         orgRepo,
 		query:           queries,
 	}
 
