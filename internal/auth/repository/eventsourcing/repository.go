@@ -85,6 +85,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		SearchLimit:     conf.SearchLimit,
 		Eventstore:      es,
 		View:            view,
+		Query:           queries,
 		SystemDefaults:  systemDefaults,
 		PrefixAvatarURL: assetsAPI,
 	}
