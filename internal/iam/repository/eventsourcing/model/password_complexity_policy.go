@@ -31,20 +31,6 @@ func PasswordComplexityPolicyToModel(policy *PasswordComplexityPolicy) *iam_mode
 	}
 }
 
-func (i *IAM) appendAddPasswordComplexityPolicyEvent(event *es_models.Event) error {
-	i.DefaultPasswordComplexityPolicy = new(PasswordComplexityPolicy)
-	err := i.DefaultPasswordComplexityPolicy.SetData(event)
-	if err != nil {
-		return err
-	}
-	i.DefaultPasswordComplexityPolicy.ObjectRoot.CreationDate = event.CreationDate
-	return nil
-}
-
-func (i *IAM) appendChangePasswordComplexityPolicyEvent(event *es_models.Event) error {
-	return i.DefaultPasswordComplexityPolicy.SetData(event)
-}
-
 func (p *PasswordComplexityPolicy) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {

@@ -79,7 +79,7 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, queries)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:     conf.SearchLimit,

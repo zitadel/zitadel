@@ -44,6 +44,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			systemDefaults.IamID,
+			queries,
 		),
 		newNotification(
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},

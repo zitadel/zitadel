@@ -73,7 +73,6 @@ func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *auth
 	}
 
 	api.verifier = authz.Start(&repo)
-	api.health = authZRepo
 	api.auth = authRepo
 	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
