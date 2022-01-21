@@ -48,6 +48,14 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Integrations",
+      collapsed: false,
+      items: [
+        "guides/integrations/authenticated-mongodb-charts",
+      ],
+    },
+    {
+      type: "category",
       label: "Solution Scenarios",
       collapsed: false,
       items: [

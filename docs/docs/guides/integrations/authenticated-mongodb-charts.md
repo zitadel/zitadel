@@ -15,15 +15,15 @@ You will need to provide some information about your app. We recommend creating 
 1. Use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
 1. Skip the redirect settings and confirm the app creation
 1. Copy the client ID, you will need to tell MongoDB Charts about it.
-1. When your app is created, expand, its _OIDC Configuration_ section. Change the _Auth Token Type_ to _JWT_ and save the change.
+1. When you created the app, expand its _OIDC Configuration_ section, change the _Auth Token Type_ to _JWT_ and save the change.
 
-Your application config should now look similar to this:
+Your application configuration should now look similar to this:
 
 ![Create app in console](/img/integrations/mongodb-charts-app-create-light.png)
 
 ## Setup Custom JWT Provider for MongoDB Charts
 
-Follow along the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) to configure ZITADEL as your _Custom JWT Provider_.
+Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
 
 Configure the following values:
 - Signing Algorithm: RS256
@@ -37,19 +37,17 @@ Your configuration should look similar to this:
 
 ## Embedding your Chart
 
-For actually embedding a chart into your application, follow the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
+Embed a chart into your application now, following the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
 
-If you've done the [Angular Quickstart](), your code could look something like this:
+If you've done the [Angular Quickstart](../../quickstarts/login/angular.md), your code could look something like this:
 
 ```html
 <!-- chart.component.html -->
-
 <div id="chart"></div>
 ```
 
 ```css
 /* chart.component.css */
-
 div#chart {
     height: 500px;    
 }
@@ -57,7 +55,6 @@ div#chart {
 
 ```ts
 // chart.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import ChartsEmbedSDK from "@mongodb-js/charts-embed-dom";
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -90,4 +87,3 @@ export class ChartComponent implements OnInit {
   }  
 }
 ```
-
