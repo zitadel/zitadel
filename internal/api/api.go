@@ -21,7 +21,6 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
@@ -46,7 +45,7 @@ type API struct {
 
 type health interface {
 	Health(ctx context.Context) error
-	IAMByID(ctx context.Context, id string) (*iam_model.IAM, error)
+	IAMByID(ctx context.Context, id string) (*query.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
@@ -112,10 +111,10 @@ func (a *API) healthHandler() http.Handler {
 			if err != nil && !errors.IsNotFound(err) {
 				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
 			}
-			if iam == nil || iam.SetUpStarted < domain.StepCount-1 {
+			if iam == nil || iam.SetupStarted < domain.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-HBfs3", "IAM NOT SET UP")
 			}
-			if iam.SetUpDone < domain.StepCount-1 {
+			if iam.SetupDone < domain.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-DASs2", "IAM SETUP RUNNING")
 			}
 			return nil
