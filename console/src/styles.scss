@@ -221,14 +221,17 @@ $caos-light-warn: (
   ),
 );
 
+$caos-dark-theme-text: var(--theme-dark-text);
+$caos-light-theme-text: var(--theme-light-text);
+
 $caos-dark-theme-background: (
   status-bar: map_get($caos-dark-background, 300),
   app-bar: map_get($caos-dark-background, 500),
   background: map_get($caos-dark-background, 500),
-  hover: rgba(black, .04),
+  hover: rgba(black, 0.04),
   card: map_get($caos-dark-background, 400),
   dialog: map_get($caos-dark-background, 500),
-  disabled-button: rgba(black, .12),
+  disabled-button: rgba(black, 0.12),
   raised-button: white,
   focused-button: $dark-focused,
   selected-button: map_get($caos-dark-background, 300),
@@ -246,10 +249,10 @@ $caos-light-theme-background: (
   status-bar: map_get($caos-light-background, 300),
   app-bar: map_get($caos-light-background, 100),
   background: map_get($caos-light-background, 500),
-  hover: rgba(black, .04),
+  hover: rgba(black, 0.04),
   card: map_get($caos-light-background, 400),
   dialog: map_get($caos-light-background, 500),
-  disabled-button: rgba(black, .12),
+  disabled-button: rgba(black, 0.12),
   raised-button: white,
   focused-button: $light-focused,
   selected-button: map_get($caos-light-background, 300),
@@ -268,17 +271,17 @@ $caos-dark-theme-foreground: (
   divider: $light-dividers,
   dividers: $light-dividers,
   disabled: $light-disabled-text,
-  disabled-button: rgba(white, .26),
+  disabled-button: rgba(white, 0.26),
   disabled-text: $light-disabled-text,
   elevation: black,
   hint-text: $light-disabled-text,
   secondary-text: $light-secondary-text,
-  icon: rgba(white, .54),
-  icons: rgba(white, .54),
-  text: rgba(white, .87),
-  slider-min: rgba(white, .87),
-  slider-off: rgba(white, .26),
-  slider-off-active: rgba(white, .38),
+  icon: rgba(white, 0.54),
+  icons: rgba(white, 0.54),
+  text: $caos-dark-theme-text,
+  slider-min: rgba(white, 0.87),
+  slider-off: rgba(white, 0.26),
+  slider-off-active: rgba(white, 0.38),
   infosection: #f0f0f0,
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
@@ -289,17 +292,17 @@ $caos-light-theme-foreground: (
   divider: $dark-dividers,
   dividers: $dark-dividers,
   disabled: $dark-disabled-text,
-  disabled-button: rgba(black, .26),
+  disabled-button: rgba(black, 0.26),
   disabled-text: $dark-disabled-text,
   elevation: black,
   hint-text: $dark-disabled-text,
   secondary-text: $dark-secondary-text,
-  icon: rgba(black, .54),
-  icons: rgba(black, .54),
-  text: rgba(black, .87),
-  slider-min: rgba(black, .87),
-  slider-off: rgba(black, .26),
-  slider-off-active: rgba(black, .38),
+  icon: rgba(black, 0.54),
+  icons: rgba(black, 0.54),
+  text: $caos-light-theme-text,
+  slider-min: rgba(black, 0.87),
+  slider-off: rgba(black, 0.26),
+  slider-off-active: rgba(black, 0.38),
   infosection: #4a4a4a,
   warninfosection: #620e0e,
   successinfosection: #0e6245,
@@ -323,10 +326,9 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography:
-  mat.define-typography-config(
-    $font-family: 'Lato',
-  );
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
 
 @include mat.core($custom-typography);
 @include component-themes($caos-dark-app-theme);
@@ -357,12 +359,12 @@ $custom-typography:
   .main-container,
   .mat-dialog-container {
     background-color: map-get($background, background);
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
     background-color: map-get($background, background);
     border-radius: 8px;
   }
@@ -397,29 +399,29 @@ $custom-typography:
   .main-container,
   .mat-dialog-container {
     background-color: map-get($background, background);
-    transition: background-color .3s cubic-bezier(.645, .045, .355, 1);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
   ::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     background-color: map-get($background, background);
     border-radius: 8px;
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
     background-color: map-get($background, background);
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   ::-webkit-scrollbar-thumb {
     background-color: #737c8870;
     border-radius: 8px;
     cursor: pointer;
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   .root-header {
@@ -437,19 +439,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 h1 {
@@ -502,5 +493,5 @@ i {
 }
 
 .mat-checkbox-inner-container.mat-checkbox-inner-container-no-side-margin {
-  margin-right: .5rem !important;
+  margin-right: 0.5rem !important;
 }
