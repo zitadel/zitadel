@@ -46,7 +46,7 @@ type API struct {
 
 type health interface {
 	Health(ctx context.Context) error
-	IamByID(ctx context.Context) (*iam_model.IAM, error)
+	IAMByID(ctx context.Context, id string) (*iam_model.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
@@ -73,6 +73,7 @@ func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *auth
 	}
 
 	api.verifier = authz.Start(&repo)
+	api.health = &repo
 	api.auth = authRepo
 	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
@@ -107,7 +108,7 @@ func (a *API) healthHandler() http.Handler {
 			return nil
 		},
 		func(ctx context.Context) error {
-			iam, err := a.health.IamByID(ctx)
+			iam, err := a.health.IAMByID(ctx, domain.IAMID)
 			if err != nil && !errors.IsNotFound(err) {
 				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
 			}
