@@ -102,7 +102,7 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, userID string, queries
 	if err != nil {
 		return nil, err
 	}
-	metadata.LatestSequence, err = q.latestSequence(ctx, userTable)
+	metadata.LatestSequence, err = q.latestSequence(ctx, userMetadataTable)
 	return metadata, err
 }
 
@@ -173,7 +173,6 @@ func prepareUserMetadataListQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserMet
 			UserMetadataValueCol.identifier(),
 			countColumn.identifier()).
 			From(userMetadataTable.identifier()).
-			LeftJoin(join(HumanUserIDCol, UserIDCol)).
 			PlaceholderFormat(sq.Dollar),
 		func(rows *sql.Rows) (*UserMetadataList, error) {
 			metadata := make([]*UserMetadata, 0)
