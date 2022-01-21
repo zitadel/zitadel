@@ -128,6 +128,10 @@ func NewUserAuthMethodTypeSearchQuery(value domain.UserAuthMethodType) (SearchQu
 	return NewNumberQuery(UserAuthMethodColumnMethodType, value, NumberEquals)
 }
 
+func NewUserAuthMethodStateSearchQuery(value domain.MFAState) (SearchQuery, error) {
+	return NewNumberQuery(UserAuthMethodColumnState, value, NumberEquals)
+}
+
 func NewUserAuthMethodTypesSearchQuery(values ...domain.UserAuthMethodType) (SearchQuery, error) {
 	list := make([]interface{}, len(values))
 	for i, value := range values {
@@ -156,6 +160,15 @@ func (r *UserAuthMethodSearchQueries) AppendUserIDQuery(userID string) error {
 
 func (r *UserAuthMethodSearchQueries) AppendTokenIDQuery(tokenID string) error {
 	query, err := NewUserAuthMethodTokenIDSearchQuery(tokenID)
+	if err != nil {
+		return err
+	}
+	r.Queries = append(r.Queries, query)
+	return nil
+}
+
+func (r *UserAuthMethodSearchQueries) AppendStateQuery(state domain.MFAState) error {
+	query, err := NewUserAuthMethodStateSearchQuery(state)
 	if err != nil {
 		return err
 	}

@@ -522,6 +522,10 @@ func (s *Server) ListHumanAuthFactors(ctx context.Context, req *mgmt_pb.ListHuma
 	if err != nil {
 		return nil, err
 	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
+	if err != nil {
+		return nil, err
+	}
 	authMethods, err := s.query.SearchUserAuthMethods(ctx, query)
 	if err != nil {
 		return nil, err
@@ -558,6 +562,10 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 		return nil, err
 	}
 	err = query.AppendAuthMethodQuery(domain.UserAuthMethodTypePasswordless)
+	if err != nil {
+		return nil, err
+	}
+	err = query.AppendStateQuery(domain.MFAStateReady)
 	if err != nil {
 		return nil, err
 	}
