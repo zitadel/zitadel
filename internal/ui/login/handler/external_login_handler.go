@@ -203,7 +203,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		if errors.IsNotFound(err) {
 			err = nil
 		}
-		iam, err := l.authRepo.GetIAM(r.Context())
+		iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 			return
@@ -248,13 +248,13 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
+func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.IAM, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, externalIDP *domain.UserIDPLink, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if orgIAMPolicy == nil {
-		iam, err = l.authRepo.GetIAM(r.Context())
+		iam, err = l.query.IAMByID(r.Context(), domain.IAMID)
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
@@ -335,7 +335,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 }
 
 func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	iam, err := l.authRepo.GetIAM(r.Context())
+	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return

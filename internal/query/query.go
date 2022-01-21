@@ -33,6 +33,7 @@ type Queries struct {
 	mutex                               sync.Mutex
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
+	supportedLangs                      []language.Tag
 }
 
 type Config struct {
