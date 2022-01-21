@@ -75,10 +75,8 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 	search := builder.AddQuery()
 	query(search)
 	if sortAscending {
-		builder.OrderAsc()
 		search.SequenceGreater(lastSequence)
 	} else {
-		builder.OrderAsc()
 		search.SequenceLess(lastSequence)
 	}
 
@@ -92,7 +90,7 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 	}
 	changes := make([]*Change, 0, len(events))
 	for _, event := range events {
-		if event.CreationDate().After(time.Now().Add(-auditLogRetention)) {
+		if event.CreationDate().Before(time.Now().Add(-auditLogRetention)) {
 			continue
 		}
 		lastSequence = event.Sequence()
