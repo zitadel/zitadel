@@ -1,0 +1,46 @@
+<div class="filter-button-wrapper">
+  <button mat-stroked-button class="filter-toggle cnsl-action-button" color="primary"
+    (click)="showFilter = !showFilter">
+    <i class="las la-filter no-margin"></i>
+    <span>{{ 'ACTIONS.FILTER' | translate }}</span>
+    <span *ngIf="filterCount" class="filter-count">{{filterCount}}</span>
+  </button>
+  <div *ngIf="showFilter" class="filter-wrapper">
+    <div class="filter-top">
+      <button mat-stroked-button color="primary" (click)="reset(); emitFilter()">{{'ACTIONS.RESET' |
+        translate}}</button>
+      <span>{{'FILTER.TITLE' | translate}}</span>
+      <button mat-raised-button color="primary" (click)="emitFilter()">{{'ACTIONS.FINISH' | translate}}</button>
+    </div>
+
+    <div class="filter-row" *ngIf="type === FilterType.USER && searchQuery">
+      <div class="name-query">
+        <mat-checkbox id="displayname" class="cb" [checked]="$any(searchQuery).getDisplayNameQuery()"
+          (change)="changeCheckbox(SubQuery.DISPLAYNAME, $event )">{{'FILTER.DISPLAYNAME' | translate}}
+        </mat-checkbox>
+        <div class="subquery" *ngIf="$any(searchQuery).getDisplayNameQuery() as dnq">
+          <span class="filter-value-label">{{'FILTER.CONTAINS_IGNORE_CASE' | translate}}</span>
+
+          <cnsl-form-field class="filter-input-value" appearance="outline">
+            <input cnslInput name="value" [value]="dnq.getDisplayName()"
+              (change)="setValue(SubQuery.DISPLAYNAME, dnq, $event)" />
+          </cnsl-form-field>
+        </div>
+      </div>
+
+      <div class="email-query">
+        <mat-checkbox id="email" class="cb" [checked]="$any(searchQuery).getEmailQuery()"
+          (change)="changeCheckbox(SubQuery.EMAIL, $event )">{{'FILTER.EMAIL' | translate}}
+        </mat-checkbox>
+        <div class="subquery" *ngIf="$any(searchQuery).getEmailQuery() as eq">
+          <span class="filter-value-label">{{'FILTER.CONTAINS_IGNORE_CASE' | translate}}</span>
+
+          <cnsl-form-field class="filter-input-value" appearance="outline">
+            <input cnslInput name="value" [value]="eq.getEmailAddress()"
+              (change)="setValue(SubQuery.EMAIL, eq, $event)" />
+          </cnsl-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

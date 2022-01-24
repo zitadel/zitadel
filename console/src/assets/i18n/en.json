@@ -81,10 +81,12 @@
   },
   "ACTIONS": {
     "ACTIONS": "Actions",
+    "FILTER": "Filter",
     "RENAME": "Rename",
     "SET": "Set",
     "COPY": "Copy to Clipboard",
     "COPIED": "Copied to clipboard.",
+    "RESET": "Reset",
     "RESETDEFAULT": "Reset to Default",
     "RESETTO": "Reset to: ",
     "RESETCURRENT": "Reset to current",
@@ -122,6 +124,12 @@
     "CONTINUEWITHOUTSAVE": "Continue without saving",
     "GOTOFEATURES": "Go to features",
     "OF": "of"
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "DISPLAYNAME": "Display Name",
+    "EMAIL": "Email",
+    "CONTAINS_IGNORE_CASE": "contains"
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
@@ -723,7 +731,7 @@
       "BTN": "Change Tier"
     },
     "HEADERS": {
-      "LOGINPOLICY": "Login Policy",
+      "LOGINPOLICY": "Login Settings",
       "PASSWORD": "Password",
       "LABELPOLICY": "Privatelabelling",
       "DOMAIN": "Organization Domain",
@@ -821,7 +829,7 @@
       "ACTIVATEPREVIEW": "Activate Configuration"
     },
     "LOGIN_POLICY": {
-      "TITLE": "Login Policy",
+      "TITLE": "Login Settings",
       "DESCRIPTION": "Define how Users can be authenticated and configure Identity Providers",
       "DESCRIPTIONCREATEADMIN": "Users can choose from the available identity providers below.",
       "DESCRIPTIONCREATEMGMT": "Users can choose from the available identity providers below. Note: You can use System-set providers as well as providers set for your organization only.",
@@ -1216,7 +1224,7 @@
   "IDP": {
     "LIST": {
       "TITLE": "Identity Providers",
-      "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Policy.",
+      "DESCRIPTION": "Manage your Identity Provider configuration, which can then be activated in your Login Settings.",
       "ACTIVETITLE": "Active Identity Providers"
     },
     "CREATE": {
@@ -1311,7 +1319,7 @@
     },
     "DELETE": {
       "TITLE": "Delete Factor",
-      "DESCRIPTION": "You are about to delete a Factor from Login Policy. Are you sure?"
+      "DESCRIPTION": "You are about to delete a Factor from Login Settings. Are you sure?"
     },
     "TOAST": {
       "ADDED": "Added successfully.",
@@ -1331,7 +1339,7 @@
   },
   "LOGINPOLICY": {
     "CREATE": {
-      "TITLE": "Login Policy",
+      "TITLE": "Login Settings",
       "DESCRIPTION": "Define how your users can be authenticated on your organization."
     },
     "IDPS": "Identity Providers",

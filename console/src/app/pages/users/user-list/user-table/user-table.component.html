@@ -28,6 +28,7 @@
       <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE">
       </cnsl-action-keys>
     </button>
+    <cnsl-filter *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery($any($event))"></cnsl-filter>
     <a *ngIf="!selection.hasValue()" [routerLink]="[ '/users',type === Type.TYPE_HUMAN ? 'create' : 'create-machine']"
       color="primary" mat-raised-button [disabled]="disabled" class="cnsl-action-button">
       <mat-icon class="icon">add</mat-icon>

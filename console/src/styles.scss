@@ -336,10 +336,9 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography:
-  mat.define-typography-config(
-    $font-family: 'Lato',
-  );
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
 
 @include mat.core($custom-typography);
 @include component-themes($caos-dark-app-theme);
@@ -360,7 +359,8 @@ $custom-typography:
   display: flex;
   align-items: center;
 
-  &.mat-raised-button {
+  &.mat-raised-button,
+  &.mat-stroked-button {
     padding-left: 0.5rem;
     height: 36px;
 
@@ -369,7 +369,7 @@ $custom-typography:
       align-items: center;
     }
 
-    i {
+    i:not(.no-margin) {
       margin-right: 0.25rem;
       font-size: 1.3rem;
     }
@@ -484,19 +484,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 h1 {

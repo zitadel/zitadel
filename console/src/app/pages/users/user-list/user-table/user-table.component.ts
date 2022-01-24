@@ -151,7 +151,13 @@ export class UserTableComponent implements OnInit {
     this.router.navigate(rL);
   }
 
-  private async getData(limit: number, offset: number, type: Type, searchValue?: string): Promise<void> {
+  private async getData(
+    limit: number,
+    offset: number,
+    type: Type,
+    searchQuery?: SearchQuery,
+    searchValue?: string,
+  ): Promise<void> {
     this.loadingSubject.next(true);
 
     let query = new SearchQuery();
@@ -202,7 +208,11 @@ export class UserTableComponent implements OnInit {
     }
 
     this.userService
-      .listUsers(limit, offset, searchValue && this.userSearchKey !== undefined ? [query, queryT] : [queryT])
+      .listUsers(
+        limit,
+        offset,
+        searchQuery ? [queryT, searchQuery] : searchValue && this.userSearchKey !== undefined ? [query, queryT] : [queryT],
+      )
       .then((resp) => {
         if (resp.details?.totalResult) {
           this.totalResult = resp.details?.totalResult;
@@ -229,7 +239,24 @@ export class UserTableComponent implements OnInit {
     this.selection.clear();
     const filterValue = (event.target as HTMLInputElement).value;
 
-    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, filterValue);
+    this.getData(
+      this.paginator.pageSize,
+      this.paginator.pageIndex * this.paginator.pageSize,
+      this.type,
+      undefined,
+      filterValue,
+    );
+  }
+
+  public applySearchQuery(searchQuery: SearchQuery): void {
+    this.selection.clear();
+    this.getData(
+      this.paginator.pageSize,
+      this.paginator.pageIndex * this.paginator.pageSize,
+      this.type,
+      searchQuery,
+      undefined,
+    );
   }
 
   public setFilter(key: UserListSearchKey): void {
