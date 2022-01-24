@@ -10,6 +10,7 @@
     "chromeWebSecurity": false,
     "experimentalSessionSupport": true,
     "integrationFolder": "cypress/setup",
-    "trashAssetsBeforeRuns": false
+    "trashAssetsBeforeRuns": false,
+    "defaultCommandTimeout": 30000
   }
   
