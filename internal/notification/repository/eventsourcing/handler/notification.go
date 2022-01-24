@@ -436,25 +436,5 @@ func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.
 }
 
 func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
-	user, usrErr := n.view.NotifyUserByID(userID)
-	if usrErr != nil && !errors.IsNotFound(usrErr) {
-		return nil, usrErr
-	}
-	if user == nil {
-		user = &model.NotifyUser{}
-	}
-	events, err := n.getUserEvents(userID, user.Sequence)
-	if err != nil {
-		return user, usrErr
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return user, nil
-		}
-	}
-	if userCopy.State == int32(model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
-	}
-	return &userCopy, nil
+	return n.view.NotifyUserByID(userID)
 }

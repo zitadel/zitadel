@@ -196,12 +196,10 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 	if err != nil {
 		return err
 	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
+
+	policy, err := u.getDefaultOrgIAMPolicy(context.Background())
+	if err != nil {
+		return err
 	}
 	if !policy.UserLoginMustBeDomain {
 		return nil
@@ -225,12 +223,10 @@ func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
 	if err != nil {
 		return err
 	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
+
+	policy, err := u.getDefaultOrgIAMPolicy(context.Background())
+	if err != nil {
+		return err
 	}
 	user.SetLoginNames(policy, org.Domains)
 	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
