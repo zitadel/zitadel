@@ -11,6 +11,7 @@
     "experimentalSessionSupport": true,
     "integrationFolder": "cypress/setup",
     "trashAssetsBeforeRuns": false,
-    "defaultCommandTimeout": 30000
+    "defaultCommandTimeout": 30000,
+    "pageLoadTimeout": 120000
   }
   
