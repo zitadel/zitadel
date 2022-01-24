@@ -72,15 +72,11 @@ func (q *Queries) UserChanges(ctx context.Context, userID string, lastSequence u
 
 func (q *Queries) changes(ctx context.Context, query func(query *eventstore.SearchQuery), lastSequence uint64, limit uint64, sortAscending bool, auditLogRetention time.Duration) (*Changes, error) {
 	builder := eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).Limit(limit)
-	search := builder.AddQuery()
-	query(search)
-	if sortAscending {
-		search.SequenceGreater(lastSequence)
-	} else if lastSequence == 0 {
+	if !sortAscending {
 		builder.OrderDesc()
-	} else {
-		search.SequenceLess(lastSequence)
 	}
+	search := builder.AddQuery().SequenceGreater(lastSequence) //always use greater (less is done automatically by sorting desc)
+	query(search)
 
 	events, err := q.eventstore.Filter(ctx, builder)
 	if err != nil {
