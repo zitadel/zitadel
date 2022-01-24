@@ -76,6 +76,8 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 	query(search)
 	if sortAscending {
 		search.SequenceGreater(lastSequence)
+	} else if lastSequence == 0 {
+		builder.OrderDesc()
 	} else {
 		search.SequenceLess(lastSequence)
 	}
