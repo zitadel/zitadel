@@ -16,6 +16,18 @@ func getPreContainer(
 	customImageRegistry string,
 ) []corev1.Container {
 
+	insecure := false
+
+	certsDir := "--certs-dir=/certificates"
+	volumemounts := []corev1.VolumeMount{{
+		Name:      rootUserInternal,
+		MountPath: rootUserPath,
+	}}
+	if insecure {
+		certsDir = "--insecure"
+		volumemounts = nil
+	}
+
 	return []corev1.Container{
 		{
 			Name:  "check-db-ready",
@@ -30,19 +42,16 @@ func getPreContainer(
 			ImagePullPolicy:          "IfNotPresent",
 		},
 		{
-			Name:  "create-flyway-user",
-			Image: common.CockroachImage.Reference(customImageRegistry),
-			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
-			VolumeMounts: []corev1.VolumeMount{{
-				Name:      rootUserInternal,
-				MountPath: rootUserPath,
-			}},
-			Command: []string{"/bin/bash", "-c", "--"},
+			Name:         "create-flyway-user",
+			Image:        common.CockroachImage.Reference(customImageRegistry),
+			Env:          baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
+			VolumeMounts: volumemounts,
+			Command:      []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{
 					createUserCommand(envMigrationUser, envMigrationPW, createFile),
 					grantUserCommand(envMigrationUser, grantFile),
-					"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
+					"cockroach.sh sql " + certsDir + " --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
 				},
 					";"),
 			},

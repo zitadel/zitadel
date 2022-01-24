@@ -82,6 +82,37 @@ func AdaptFunc(
 			dbHost := dbCurrent.Host
 			dbPort := dbCurrent.Port
 
+			// TODO: parameterize
+			insecure := false
+
+			volumes := []corev1.Volume{{
+				Name: migrationConfigmap,
+				VolumeSource: corev1.VolumeSource{
+					ConfigMap: &corev1.ConfigMapVolumeSource{
+						LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
+					},
+				},
+			}, {
+				Name: secretPasswordName,
+				VolumeSource: corev1.VolumeSource{
+					Secret: &corev1.SecretVolumeSource{
+						SecretName: secretPasswordName,
+					},
+				},
+			}}
+
+			if !insecure {
+				volumes = append(volumes, corev1.Volume{
+					Name: rootUserInternal,
+					VolumeSource: corev1.VolumeSource{
+						Secret: &corev1.SecretVolumeSource{
+							SecretName:  "cockroachdb.client.root",
+							DefaultMode: helpers.PointerInt32(0400),
+						},
+					},
+				})
+			}
+
 			allScripts := getMigrationFiles(monitor, "/cockroach/")
 
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
@@ -113,29 +144,7 @@ func AdaptFunc(
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
 							TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-							Volumes: []corev1.Volume{{
-								Name: migrationConfigmap,
-								VolumeSource: corev1.VolumeSource{
-									ConfigMap: &corev1.ConfigMapVolumeSource{
-										LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
-									},
-								},
-							}, {
-								Name: rootUserInternal,
-								VolumeSource: corev1.VolumeSource{
-									Secret: &corev1.SecretVolumeSource{
-										SecretName:  "cockroachdb.client.root",
-										DefaultMode: helpers.PointerInt32(0400),
-									},
-								},
-							}, {
-								Name: secretPasswordName,
-								VolumeSource: corev1.VolumeSource{
-									Secret: &corev1.SecretVolumeSource{
-										SecretName: secretPasswordName,
-									},
-								},
-							}},
+							Volumes:                       volumes,
 						},
 					},
 				},

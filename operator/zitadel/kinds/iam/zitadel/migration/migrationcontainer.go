@@ -17,22 +17,32 @@ func getMigrationContainer(
 	customImageRegistry string,
 ) corev1.Container {
 
+	// TODO: Parameterize
+	insecure := false
+
+	var rootCertPath string
+	volumeMounts := []corev1.VolumeMount{{
+		Name:      migrationConfigmap,
+		MountPath: migrationsPath,
+	}}
+	if !insecure {
+		rootCertPath = rootUserPath
+		volumeMounts = append(volumeMounts, corev1.VolumeMount{
+			Name:      rootUserInternal,
+			MountPath: rootUserPath,
+		})
+	}
+
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
 		Args: []string{
-			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
+			"-url=" + connectionString(dbHost, dbPort, rootCertPath),
 			"-locations=filesystem:" + migrationsPath,
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName, users),
-		VolumeMounts: []corev1.VolumeMount{{
-			Name:      migrationConfigmap,
-			MountPath: migrationsPath,
-		}, {
-			Name:      rootUserInternal,
-			MountPath: rootUserPath,
-		}},
+		Env:                      migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName, users),
+		VolumeMounts:             volumeMounts,
 		TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 		TerminationMessagePolicy: "File",
 		ImagePullPolicy:          "IfNotPresent",
@@ -58,4 +68,12 @@ func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPassw
 		})
 	}
 	return migrationEnvVars
+}
+
+func connectionString(dbHost, dbPort, rootCertPath string) string {
+	location := "jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb"
+	if rootCertPath != "" {
+		location += "?sslmode=verify-full&ssl=true&sslrootcert=" + rootCertPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory"
+	}
+	return location
 }

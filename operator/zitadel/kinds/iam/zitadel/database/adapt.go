@@ -16,7 +16,7 @@ func AdaptFunc(
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
-		dbHost, dbPort, err := dbClient.GetConnectionInfo(monitor, k8sClient)
+		dbHost, dbPort, queryParams, err := dbClient.GetConnectionInfo(monitor, k8sClient)
 		if err != nil {
 			return nil, err
 		}
@@ -27,9 +27,10 @@ func AdaptFunc(
 		}
 
 		curr := &Current{
-			Host:  dbHost,
-			Port:  dbPort,
-			Users: users,
+			Host:             dbHost,
+			Port:             dbPort,
+			Users:            users,
+			ExtraQueryParams: queryParams,
 		}
 
 		SetDatabaseInQueried(queried, curr)

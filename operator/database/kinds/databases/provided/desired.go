@@ -13,11 +13,11 @@ type DesiredV0 struct {
 }
 
 type Spec struct {
-	Verbose   bool
-	Namespace string
-	URL       string
-	Port      string
-	Users     []string
+	Verbose          bool
+	URL              string
+	Port             string
+	Users            []string
+	ExtraQueryParams []string
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {

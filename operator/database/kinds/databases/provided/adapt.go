@@ -41,6 +41,7 @@ func Adapter() operator.AdaptFunc {
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				currentDB.Current.URL = desiredKind.Spec.URL
 				currentDB.Current.Port = desiredKind.Spec.Port
+				currentDB.Current.QueryParams = desiredKind.Spec.ExtraQueryParams
 				core.SetQueriedForDatabase(queried, current)
 
 				return func(k8sClient kubernetes.ClientInt) error {

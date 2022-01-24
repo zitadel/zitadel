@@ -68,7 +68,7 @@ func GetBackupList(
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
 		return managed.BackupList()(monitor, k8sClient, desiredTree)
-	case "databases.caos.ch/ProvidedDatabse":
+	case "databases.caos.ch/ProvidedDatabase":
 		return nil, mntr.ToUserError(fmt.Errorf("no backups supported for database kind %s", desiredTree.Common.Kind))
 	default:
 		return nil, mntr.ToUserError(fmt.Errorf("unknown database kind %s", desiredTree.Common.Kind))

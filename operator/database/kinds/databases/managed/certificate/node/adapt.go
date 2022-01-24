@@ -3,10 +3,12 @@ package node
 import (
 	"crypto/rsa"
 	"errors"
-	"github.com/caos/zitadel/operator"
 	"reflect"
 
+	dbclient "github.com/caos/zitadel/operator/database/kinds/databases/managed/client"
+
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -47,6 +49,8 @@ func AdaptFunc(
 				return nil, err
 			}
 
+			managedCurrentDB := currentDB.(dbclient.ManagedDatabase)
+
 			allNodeSecrets, err := k8sClient.ListSecrets(namespace, nodeSecretSelector)
 			if err != nil {
 				return nil, err
@@ -60,11 +64,11 @@ func AdaptFunc(
 
 				emptyCert := true
 				emptyKey := true
-				if currentCaCert := currentDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
+				if currentCaCert := managedCurrentDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
 					emptyCert = false
 					caCert = currentCaCert
 				}
-				if currentCaCertKey := currentDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
+				if currentCaCertKey := managedCurrentDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
 					emptyKey = false
 					caPrivKey = currentCaCertKey
 				}
@@ -127,8 +131,8 @@ func AdaptFunc(
 				caCert = cert
 			}
 
-			currentDB.SetCertificate(caCert)
-			currentDB.SetCertificateKey(caPrivKey)
+			managedCurrentDB.SetCertificate(caCert)
+			managedCurrentDB.SetCertificateKey(caPrivKey)
 
 			return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 		}, func(k8sClient kubernetes.ClientInt) error {

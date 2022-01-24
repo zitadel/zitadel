@@ -2,8 +2,11 @@ package client
 
 import (
 	"errors"
-	"github.com/caos/zitadel/operator"
 	"strings"
+
+	dbclient "github.com/caos/zitadel/operator/database/kinds/databases/managed/client"
+
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/pkg/labels"
 
@@ -48,8 +51,10 @@ func AdaptFunc(
 					return nil, err
 				}
 
-				caCert := currentDB.GetCertificate()
-				caKey := currentDB.GetCertificateKey()
+				managedCurrentDB := currentDB.(dbclient.ManagedDatabase)
+
+				caCert := managedCurrentDB.GetCertificate()
+				caKey := managedCurrentDB.GetCertificateKey()
 				if caKey == nil || caCert == nil || len(caCert) == 0 {
 					return nil, errors.New("no ca-certificate found")
 				}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"crypto/rsa"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
@@ -26,6 +27,8 @@ func (c *CurrentDBList) GetURL() string {
 func (c *CurrentDBList) GetPort() string {
 	return ""
 }
+
+func (c *CurrentDBList) GetQueryParams() []string { return nil }
 
 func (c *CurrentDBList) GetReadyQuery() operator.EnsureFunc {
 	return nil

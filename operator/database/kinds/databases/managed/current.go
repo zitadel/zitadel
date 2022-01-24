@@ -3,14 +3,15 @@ package managed
 import (
 	"crypto/rsa"
 
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/client"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 )
 
-var _ core.DatabaseCurrent = (*Current)(nil)
+var _ client.ManagedDatabase = (*Current)(nil)
 
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
@@ -28,37 +29,23 @@ type CurrentDB struct {
 	ListDatabasesFunc func(k8sClient kubernetes.ClientInt) ([]string, error)
 }
 
-func (c *Current) GetURL() string {
-	return c.Current.URL
-}
+func (c *Current) GetURL() string { return c.Current.URL }
 
-func (c *Current) GetPort() string {
-	return c.Current.Port
-}
+func (c *Current) GetPort() string { return c.Current.Port }
 
-func (c *Current) GetReadyQuery() operator.EnsureFunc {
-	return c.Current.ReadyFunc
-}
+func (c *Current) GetQueryParams() []string { return nil }
 
-func (c *Current) GetCA() *certificate.Current {
-	return c.Current.CA
-}
+func (c *Current) GetReadyQuery() operator.EnsureFunc { return c.Current.ReadyFunc }
 
-func (c *Current) GetCertificateKey() *rsa.PrivateKey {
-	return c.Current.CA.CertificateKey
-}
+func (c *Current) GetCA() *certificate.Current { return c.Current.CA }
 
-func (c *Current) SetCertificateKey(key *rsa.PrivateKey) {
-	c.Current.CA.CertificateKey = key
-}
+func (c *Current) GetCertificateKey() *rsa.PrivateKey { return c.Current.CA.CertificateKey }
 
-func (c *Current) GetCertificate() []byte {
-	return c.Current.CA.Certificate
-}
+func (c *Current) SetCertificateKey(key *rsa.PrivateKey) { c.Current.CA.CertificateKey = key }
 
-func (c *Current) SetCertificate(cert []byte) {
-	c.Current.CA.Certificate = cert
-}
+func (c *Current) GetCertificate() []byte { return c.Current.CA.Certificate }
+
+func (c *Current) SetCertificate(cert []byte) { c.Current.CA.Certificate = cert }
 
 func (c *Current) GetListDatabasesFunc() func(k8sClient kubernetes.ClientInt) ([]string, error) {
 	return c.Current.ListDatabasesFunc

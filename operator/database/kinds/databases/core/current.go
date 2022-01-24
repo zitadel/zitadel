@@ -1,7 +1,6 @@
 package core
 
 import (
-	"crypto/rsa"
 	"errors"
 
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -14,15 +13,16 @@ const queriedName = "database"
 type DatabaseCurrent interface {
 	GetURL() string
 	GetPort() string
-	GetReadyQuery() operator.EnsureFunc
-	GetCertificateKey() *rsa.PrivateKey
-	SetCertificateKey(*rsa.PrivateKey)
-	GetCertificate() []byte
-	SetCertificate([]byte)
+	GetQueryParams() []string
+	/*	GetReadyQuery() operator.EnsureFunc
+		GetCertificateKey() *rsa.PrivateKey
+		SetCertificateKey(*rsa.PrivateKey)
+		GetCertificate() []byte
+		SetCertificate([]byte)*/
 	GetAddUserFunc() func(user string) (operator.QueryFunc, error)
 	GetDeleteUserFunc() func(user string) (operator.DestroyFunc, error)
 	GetListUsersFunc() func(k8sClient kubernetes.ClientInt) ([]string, error)
-	GetListDatabasesFunc() func(k8sClient kubernetes.ClientInt) ([]string, error)
+	//	GetListDatabasesFunc() func(k8sClient kubernetes.ClientInt) ([]string, error)
 }
 
 func ParseQueriedForDatabase(queried map[string]interface{}) (DatabaseCurrent, error) {

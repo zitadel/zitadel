@@ -5,9 +5,10 @@ import (
 )
 
 type Current struct {
-	Host  string
-	Port  string
-	Users []string
+	Host             string
+	Port             string
+	Users            []string
+	ExtraQueryParams []string
 }
 
 func SetDatabaseInQueried(queried map[string]interface{}, current *Current) {
