@@ -126,7 +126,7 @@
             [ngTemplateOutletContext]="{key: UserListSearchKey.EMAIL}"></template>
         </th>
         <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
-          <span *ngIf="user.human?.email?.email">l{{user.human?.email.email}}</span>
+          <span *ngIf="user.human?.email?.email">{{user.human?.email.email}}</span>
         </td>
       </ng-container>
 

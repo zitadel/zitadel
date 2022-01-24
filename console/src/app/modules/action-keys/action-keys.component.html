@@ -10,9 +10,6 @@
     <div class="action-key">
       <div class="key-overlay"></div>
       <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
-      <ng-template #otherOS>
-        <span>crtl</span>
-      </ng-template>
     </div>
     +
     <div class="action-key">
@@ -24,9 +21,6 @@
     <div class="action-key">
       <div class="key-overlay"></div>
       <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
-      <ng-template #otherOS>
-        <span>crtl</span>
-      </ng-template>
     </div>
     +
     <div class="action-key">
@@ -37,10 +31,8 @@
   <div *ngSwitchCase="ActionKeysType.REACTIVATE" class="action-keys-row">
     <div class="action-key">
       <div class="key-overlay"></div>
-      <span *ngIf="!(isMacLike || isIOS); else otherOS">⌘</span>
-      <ng-template #otherOS>
-        <span>crtl</span>
-      </ng-template>
+      <span *ngIf="isMacLike || isIOS; else otherOS">⌘</span>
+
     </div>
     +
     <div class="action-key">
@@ -49,3 +41,7 @@
     </div>
   </div>
 </div>
+
+<ng-template #otherOS>
+  <span>crtl</span>
+</ng-template>
