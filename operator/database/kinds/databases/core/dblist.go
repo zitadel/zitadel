@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/operator"
 )
 
-var current DatabaseCurrent = &CurrentDBList{}
+var current SecureDatabase = &CurrentDBList{}
 
 type CurrentDBList struct {
 	Common  *tree.Common `yaml:",inline"`

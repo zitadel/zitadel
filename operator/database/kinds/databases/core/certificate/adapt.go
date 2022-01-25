@@ -5,8 +5,8 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/client"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/node"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate/client"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate/node"
 )
 
 var (

@@ -5,8 +5,6 @@ import (
 	"errors"
 	"reflect"
 
-	dbclient "github.com/caos/zitadel/operator/database/kinds/databases/managed/client"
-
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 
@@ -14,8 +12,8 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/certificates"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate/certificates"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate/pem"
 )
 
 const (
@@ -49,8 +47,6 @@ func AdaptFunc(
 				return nil, err
 			}
 
-			managedCurrentDB := currentDB.(dbclient.ManagedDatabase)
-
 			allNodeSecrets, err := k8sClient.ListSecrets(namespace, nodeSecretSelector)
 			if err != nil {
 				return nil, err
@@ -64,11 +60,11 @@ func AdaptFunc(
 
 				emptyCert := true
 				emptyKey := true
-				if currentCaCert := managedCurrentDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
+				if currentCaCert := currentDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
 					emptyCert = false
 					caCert = currentCaCert
 				}
-				if currentCaCertKey := managedCurrentDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
+				if currentCaCertKey := currentDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
 					emptyKey = false
 					caPrivKey = currentCaCertKey
 				}
@@ -131,8 +127,8 @@ func AdaptFunc(
 				caCert = cert
 			}
 
-			managedCurrentDB.SetCertificate(caCert)
-			managedCurrentDB.SetCertificateKey(caPrivKey)
+			currentDB.SetCertificate(caCert)
+			currentDB.SetCertificateKey(caPrivKey)
 
 			return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 		}, func(k8sClient kubernetes.ClientInt) error {

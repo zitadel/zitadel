@@ -14,8 +14,8 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/certificates"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate/certificates"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate/pem"
 )
 
 const (

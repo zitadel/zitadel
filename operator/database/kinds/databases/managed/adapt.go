@@ -19,7 +19,7 @@ import (
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
 	"github.com/caos/zitadel/operator/database/kinds/databases/core"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
@@ -120,7 +120,7 @@ func Adapter(
 		cockroachNameLabels := labels.MustForName(componentLabels, SfsName)
 		cockroachSelector := labels.DeriveNameSelector(cockroachNameLabels, false)
 		cockroachSelectabel := labels.AsSelectable(cockroachNameLabels)
-		querySFS, destroySFS, ensureInit, checkDBReady, listDatabases, err := statefulset.AdaptFunc(
+		querySFS, destroySFS, ensureInit, checkDBReady, err := statefulset.AdaptFunc(
 			internalMonitor,
 			cockroachSelectabel,
 			cockroachSelector,
@@ -258,7 +258,6 @@ func Adapter(
 					currentDB.Current.AddUserFunc = addUser
 					currentDB.Current.DeleteUserFunc = deleteUser
 					currentDB.Current.ListUsersFunc = listUsers
-					currentDB.Current.ListDatabasesFunc = listDatabases
 
 					core.SetQueriedForDatabase(queried, current)
 					internalMonitor.Info("set current state of managed database")

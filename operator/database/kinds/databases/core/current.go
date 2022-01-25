@@ -1,6 +1,7 @@
 package core
 
 import (
+	"crypto/rsa"
 	"errors"
 
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -10,22 +11,20 @@ import (
 
 const queriedName = "database"
 
-type DatabaseCurrent interface {
+type SecureDatabase interface {
 	GetURL() string
 	GetPort() string
 	GetQueryParams() []string
-	/*	GetReadyQuery() operator.EnsureFunc
-		GetCertificateKey() *rsa.PrivateKey
-		SetCertificateKey(*rsa.PrivateKey)
-		GetCertificate() []byte
-		SetCertificate([]byte)*/
+	GetCertificateKey() *rsa.PrivateKey
+	SetCertificateKey(*rsa.PrivateKey)
+	GetCertificate() []byte
+	SetCertificate([]byte)
 	GetAddUserFunc() func(user string) (operator.QueryFunc, error)
 	GetDeleteUserFunc() func(user string) (operator.DestroyFunc, error)
 	GetListUsersFunc() func(k8sClient kubernetes.ClientInt) ([]string, error)
-	//	GetListDatabasesFunc() func(k8sClient kubernetes.ClientInt) ([]string, error)
 }
 
-func ParseQueriedForDatabase(queried map[string]interface{}) (DatabaseCurrent, error) {
+func ParseQueriedForDatabase(queried map[string]interface{}) (SecureDatabase, error) {
 	queriedDB, ok := queried[queriedName]
 	if !ok {
 		return nil, errors.New("no current state for database found")
@@ -34,7 +33,7 @@ func ParseQueriedForDatabase(queried map[string]interface{}) (DatabaseCurrent, e
 	if !ok {
 		return nil, errors.New("current state does not fullfil interface")
 	}
-	currentDB, ok := currentDBTree.Parsed.(DatabaseCurrent)
+	currentDB, ok := currentDBTree.Parsed.(SecureDatabase)
 	if !ok {
 		return nil, errors.New("current state does not fullfil interface")
 	}

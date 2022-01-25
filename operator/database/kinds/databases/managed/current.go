@@ -3,15 +3,15 @@ package managed
 import (
 	"crypto/rsa"
 
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/client"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
+	"github.com/caos/zitadel/operator/database/kinds/databases/core/certificate"
 )
 
-var _ client.ManagedDatabase = (*Current)(nil)
+var _ core.SecureDatabase = (*Current)(nil)
 
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
@@ -19,14 +19,13 @@ type Current struct {
 }
 
 type CurrentDB struct {
-	URL               string
-	Port              string
-	ReadyFunc         operator.EnsureFunc
-	CA                *certificate.Current
-	AddUserFunc       func(user string) (operator.QueryFunc, error)
-	DeleteUserFunc    func(user string) (operator.DestroyFunc, error)
-	ListUsersFunc     func(k8sClient kubernetes.ClientInt) ([]string, error)
-	ListDatabasesFunc func(k8sClient kubernetes.ClientInt) ([]string, error)
+	URL            string
+	Port           string
+	ReadyFunc      operator.EnsureFunc
+	CA             *certificate.Current
+	AddUserFunc    func(user string) (operator.QueryFunc, error)
+	DeleteUserFunc func(user string) (operator.DestroyFunc, error)
+	ListUsersFunc  func(k8sClient kubernetes.ClientInt) ([]string, error)
 }
 
 func (c *Current) GetURL() string { return c.Current.URL }
@@ -34,8 +33,6 @@ func (c *Current) GetURL() string { return c.Current.URL }
 func (c *Current) GetPort() string { return c.Current.Port }
 
 func (c *Current) GetQueryParams() []string { return nil }
-
-func (c *Current) GetReadyQuery() operator.EnsureFunc { return c.Current.ReadyFunc }
 
 func (c *Current) GetCA() *certificate.Current { return c.Current.CA }
 
@@ -46,10 +43,6 @@ func (c *Current) SetCertificateKey(key *rsa.PrivateKey) { c.Current.CA.Certific
 func (c *Current) GetCertificate() []byte { return c.Current.CA.Certificate }
 
 func (c *Current) SetCertificate(cert []byte) { c.Current.CA.Certificate = cert }
-
-func (c *Current) GetListDatabasesFunc() func(k8sClient kubernetes.ClientInt) ([]string, error) {
-	return c.Current.ListDatabasesFunc
-}
 
 func (c *Current) GetListUsersFunc() func(k8sClient kubernetes.ClientInt) ([]string, error) {
 	return c.Current.ListUsersFunc
