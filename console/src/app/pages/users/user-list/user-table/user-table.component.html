@@ -69,8 +69,6 @@
         <th mat-header-cell *matHeaderCellDef
           [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.DISPLAY_NAME}">
           {{ 'USER.PROFILE.DISPLAYNAME' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserListSearchKey.DISPLAY_NAME}"></template>
         </th>
         <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
           <span *ngIf="user.human">{{user.human.profile?.displayName}}</span>
@@ -100,8 +98,6 @@
         <th mat-header-cell *matHeaderCellDef
           [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.USER_NAME}">
           {{ 'USER.PROFILE.NAME' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserListSearchKey.USER_NAME}"></template>
         </th>
         <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
           {{user.machine.name}} </td>
@@ -111,8 +107,6 @@
         <th mat-header-cell *matHeaderCellDef
           [ngClass]="{'search-active': this.userSearchKey === UserListSearchKey.USER_NAME}">
           {{ 'USER.PROFILE.USERNAME' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserListSearchKey.USER_NAME}"></template>
         </th>
         <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
           {{user.userName}} </td>
@@ -122,8 +116,6 @@
         <th mat-header-cell *matHeaderCellDef
           [ngClass]="{'search-active': this.UserListSearchKey === UserListSearchKey.EMAIL}">
           {{ 'USER.EMAIL' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserListSearchKey.EMAIL}"></template>
         </th>
         <td class="pointer" mat-cell *matCellDef="let user" [routerLink]="user.id ? ['/users', user.id ]: null">
           <span *ngIf="user.human?.email?.email">{{user.human?.email.email}}</span>

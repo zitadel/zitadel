@@ -81,10 +81,12 @@
   },
   "ACTIONS": {
     "ACTIONS": "Aktionen",
+    "FILTER": "Filter",
     "RENAME": "Umbenennen",
     "SET": "Übernehmen",
     "COPY": "In die Zwischenablage kopieren",
     "COPIED": "In die Zwischenablage kopiert.",
+    "RESET": "Zurücksetzen",
     "RESETDEFAULT": "Auf Standard zurücksetzen",
     "RESETTO": "Zurücksetzen auf: ",
     "RESETCURRENT": "Auf aktuellen Wert zurücksetzen",
@@ -122,6 +124,17 @@
     "CONTINUEWITHOUTSAVE": "Ohne speichern fortfahren",
     "GOTOFEATURES": "Zu den Features",
     "OF": "von"
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "DISPLAYNAME": "Display Name",
+    "EMAIL": "Email",
+    "USERNAME": "User Name",
+    "METHODS": {
+      "5": "beinhaltet",
+      "7": "endet mit",
+      "1": "ist gleich"
+    }
   },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {

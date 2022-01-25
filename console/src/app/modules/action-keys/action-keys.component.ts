@@ -5,6 +5,7 @@ export enum ActionKeysType {
   DELETE,
   DEACTIVATE,
   REACTIVATE,
+  FILTER,
 }
 
 @Component({
@@ -41,6 +42,13 @@ export class ActionKeysComponent {
 
       case ActionKeysType.REACTIVATE:
         if ((event.ctrlKey || event.metaKey) && event.code === 'ArrowUp') {
+          event.preventDefault();
+          this.actionTriggered.emit();
+        }
+        break;
+
+      case ActionKeysType.FILTER:
+        if (event.code === 'KeyF') {
           event.preventDefault();
           this.actionTriggered.emit();
         }

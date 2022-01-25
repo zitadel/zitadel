@@ -60,7 +60,9 @@
     &.no-contrast-mode {
       .action-keys-row {
         .key-overlay {
+          z-index: 0;
           background: if($is-dark-theme, #ffffff, #000000);
+          opacity: 0.15;
         }
       }
     }

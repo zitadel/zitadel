@@ -1,12 +1,15 @@
 <div class="filter-button-wrapper">
-  <button mat-stroked-button class="filter-toggle cnsl-action-button" color="primary" (click)="toggleFilter()">
+  <button mat-stroked-button class="filter-toggle cnsl-action-button" (click)="toggleFilter()">
     <i class="las la-filter no-margin"></i>
     <span>{{ 'ACTIONS.FILTER' | translate }}</span>
     <span *ngIf="filterCount" class="filter-count">{{filterCount}}</span>
+    <cnsl-action-keys *ngIf="!showFilter" [doNotUseContrast]="true" [type]="ActionKeysType.FILTER"
+      (actionTriggered)="toggleFilter()">
+    </cnsl-action-keys>
   </button>
   <div *ngIf="showFilter" class="filter-wrapper">
     <div class="filter-top">
-      <button mat-stroked-button color="primary" (click)="reset(); emitFilter()">{{'ACTIONS.RESET' |
+      <button mat-stroked-button (click)="reset(); emitFilter()">{{'ACTIONS.RESET' |
         translate}}</button>
       <span>{{'FILTER.TITLE' | translate}}</span>
       <button mat-raised-button color="primary" (click)="emitFilter()">{{'ACTIONS.FINISH' | translate}}</button>
@@ -18,11 +21,10 @@
           (change)="changeCheckbox(SubQuery.DISPLAYNAME, $event )">{{'FILTER.DISPLAYNAME' | translate}}
         </mat-checkbox>
         <div class="subquery" *ngIf="getSubFilter(SubQuery.DISPLAYNAME) as dnq">
-          <!-- <span class="filter-value-label">{{'FILTER.CONTAINS_IGNORE_CASE' | translate}}</span> -->
           <cnsl-form-field class="filter-select-method" appearance="outline">
             <mat-select [value]="dnq.getMethod()" (selectionChange)="setMethod(dnq, $event)">
               <mat-option *ngFor="let method of methods" [value]="method">
-                {{ 'FILTER.METHODS.'+method | translate}}
+                {{ 'FILTER.METHODS.'+method | translate }}
               </mat-option>
             </mat-select>
           </cnsl-form-field>

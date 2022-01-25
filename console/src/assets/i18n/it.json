@@ -81,10 +81,12 @@
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",
+    "FILTER": "Filtra",
     "RENAME": "Rinomina",
     "SET": "Salva",
     "COPY": "Copia negli appunti",
     "COPIED": "Copiato negli appunti.",
+    "RESET": "Ripristina",
     "RESETDEFAULT": "Ripristino delle impostazioni predefinite",
     "RESETTO": "Resettare a:",
     "RESETCURRENT": "Ripristina",
@@ -122,6 +124,17 @@
     "CONTINUEWITHOUTSAVE": "Continua senza salvare",
     "GOTOFEATURES": "Vai alle caratteristiche",
     "OF": "di"
+  },
+  "FILTER": {
+    "TITLE": "Filter",
+    "DISPLAYNAME": "Display Name",
+    "EMAIL": "Email",
+    "USERNAME": "User Name",
+    "METHODS": {
+      "5": "contiene",
+      "7": "finisce con",
+      "1": "equivale"
+    }
   },
   "RESOURCEID": "Resource ID",
   "TABLE": {

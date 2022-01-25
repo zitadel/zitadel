@@ -11,6 +11,8 @@ import {
   UserNameQuery,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
+import { ActionKeysType } from '../action-keys/action-keys.component';
+
 enum FilterType {
   USER,
   USERGRANT,
@@ -44,6 +46,7 @@ export class FilterComponent implements OnInit {
     TextQueryMethod.TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE,
     TextQueryMethod.TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE,
   ];
+  ActionKeysType: any = ActionKeysType;
   constructor() {}
 
   ngOnInit(): void {
