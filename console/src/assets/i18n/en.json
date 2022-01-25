@@ -129,6 +129,7 @@
     "TITLE": "Filter",
     "DISPLAYNAME": "Display Name",
     "EMAIL": "Email",
+    "USERNAME": "User Name",
     "CONTAINS_IGNORE_CASE": "contains"
   },
   "RESOURCEID": "Resource Id",

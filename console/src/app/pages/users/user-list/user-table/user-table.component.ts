@@ -155,7 +155,7 @@ export class UserTableComponent implements OnInit {
     limit: number,
     offset: number,
     type: Type,
-    searchQuery?: SearchQuery,
+    searchQueries?: SearchQuery[],
     searchValue?: string,
   ): Promise<void> {
     this.loadingSubject.next(true);
@@ -211,7 +211,11 @@ export class UserTableComponent implements OnInit {
       .listUsers(
         limit,
         offset,
-        searchQuery ? [queryT, searchQuery] : searchValue && this.userSearchKey !== undefined ? [query, queryT] : [queryT],
+        searchQueries?.length
+          ? [queryT, ...searchQueries]
+          : searchValue && this.userSearchKey !== undefined
+          ? [query, queryT]
+          : [queryT],
       )
       .then((resp) => {
         if (resp.details?.totalResult) {
@@ -248,13 +252,13 @@ export class UserTableComponent implements OnInit {
     );
   }
 
-  public applySearchQuery(searchQuery: SearchQuery): void {
+  public applySearchQuery(searchQueries: SearchQuery[]): void {
     this.selection.clear();
     this.getData(
       this.paginator.pageSize,
       this.paginator.pageIndex * this.paginator.pageSize,
       this.type,
-      searchQuery,
+      searchQueries,
       undefined,
     );
   }

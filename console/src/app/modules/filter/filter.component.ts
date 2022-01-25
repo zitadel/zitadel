@@ -8,6 +8,7 @@ import {
   EmailQuery,
   SearchQuery as UserSearchQuery,
   UserGrantQuery,
+  UserNameQuery,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 enum FilterType {
@@ -19,6 +20,7 @@ enum FilterType {
 enum SubQuery {
   DISPLAYNAME,
   EMAIL,
+  USERNAME,
 }
 
 type FilterSearchQuery = UserSearchQuery | MemberSearchQuery | UserGrantQuery | ProjectQuery;
@@ -32,9 +34,9 @@ export class FilterComponent implements OnInit {
   @Input() type: FilterType = FilterType.USER;
   public FilterType: any = FilterType;
   public SubQuery: any = SubQuery;
-  public searchQuery: FilterSearchQuery = new UserSearchQuery();
+  public searchQueries: FilterSearchQuery[] = [];
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
-  @Output() public filterChanged: EventEmitter<FilterSearchQuery | undefined> = new EventEmitter();
+  @Output() public filterChanged: EventEmitter<FilterSearchQuery[] | undefined> = new EventEmitter();
   public showFilter: boolean = false;
   constructor() {}
 
@@ -49,68 +51,121 @@ export class FilterComponent implements OnInit {
           const dnq = new DisplayNameQuery();
           dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
           dnq.setDisplayName('');
-          (this.searchQuery as UserSearchQuery).setDisplayNameQuery(dnq);
+
+          const dn_sq = new UserSearchQuery();
+          dn_sq.setDisplayNameQuery(dnq);
+
+          this.searchQueries.push(dn_sq);
           break;
         case SubQuery.EMAIL:
           const eq = new EmailQuery();
           eq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
           eq.setEmailAddress('');
-          (this.searchQuery as UserSearchQuery).setEmailQuery(eq);
+
+          const e_sq = new UserSearchQuery();
+          e_sq.setEmailQuery(eq);
+
+          this.searchQueries.push(e_sq);
+          break;
+
+        case SubQuery.USERNAME:
+          const unq = new UserNameQuery();
+          unq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+          unq.setUserName('');
+
+          const un_sq = new UserSearchQuery();
+          un_sq.setUserNameQuery(unq);
+
+          this.searchQueries.push(un_sq);
           break;
       }
     } else {
       switch (subquery) {
         case SubQuery.DISPLAYNAME:
-          (this.searchQuery as UserSearchQuery).setDisplayNameQuery(undefined);
+          const index_dn = this.searchQueries.findIndex(
+            (q) => (q as UserSearchQuery).toObject().displayNameQuery !== undefined,
+          );
+          if (index_dn > -1) {
+            this.searchQueries.splice(index_dn, 1);
+          }
           break;
         case SubQuery.EMAIL:
-          (this.searchQuery as UserSearchQuery).setEmailQuery(undefined);
+          const index_e = this.searchQueries.findIndex((q) => (q as UserSearchQuery).toObject().emailQuery !== undefined);
+          if (index_e > -1) {
+            this.searchQueries.splice(index_e, 1);
+          }
+          break;
+        case SubQuery.USERNAME:
+          const index_un = this.searchQueries.findIndex(
+            (q) => (q as UserSearchQuery).toObject().userNameQuery !== undefined,
+          );
+          if (index_un > -1) {
+            this.searchQueries.splice(index_un, 1);
+          }
           break;
       }
     }
+
+    // firstNameQuery?: FirstNameQuery.AsObject,
+    // lastNameQuery?: LastNameQuery.AsObject,
+    // nickNameQuery?: NickNameQuery.AsObject,
+    // stateQuery?: StateQuery.AsObject,
+    // typeQuery?: TypeQuery.AsObject,
   }
 
   public setValue(subquery: SubQuery, query: any, event: any) {
     switch (subquery) {
       case SubQuery.DISPLAYNAME:
         (query as DisplayNameQuery).setDisplayName(event?.target?.value);
-        this.filterChanged.emit(this.filterCount ? this.searchQuery : undefined);
+        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
         break;
       case SubQuery.EMAIL:
         (query as EmailQuery).setEmailAddress(event?.target?.value);
-        this.filterChanged.emit(this.filterCount ? this.searchQuery : undefined);
+        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        break;
+      case SubQuery.USERNAME:
+        (query as UserNameQuery).setUserName(event?.target?.value);
+        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
         break;
     }
   }
 
   public reset() {
-    switch (this.type) {
-      case FilterType.USER:
-        this.searchQuery = new UserSearchQuery();
-        this.searchQuery.setTypeQuery();
-        this.searchQuery.setDisplayNameQuery();
-        this.searchQuery.setUserNameQuery();
-        this.searchQuery.setEmailQuery();
-        this.searchQuery.setStateQuery();
-
-        break;
-      case FilterType.USERGRANT:
-        this.searchQuery = new UserGrantQuery();
-        break;
-      case FilterType.PROJECT:
-        this.searchQuery = new ProjectQuery();
-        break;
-    }
+    this.searchQueries = [];
   }
 
   public emitFilter(): void {
-    this.filterChanged.emit(this.filterCount ? this.searchQuery : undefined);
+    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
     this.showFilter = false;
   }
 
   public get filterCount(): number {
-    return this.searchQuery
-      ? Object.entries(this.searchQuery.toObject()).filter(([key, value]) => value !== undefined).length
-      : 0;
+    return this.searchQueries.length;
+  }
+
+  public getSubFilter(subquery: SubQuery): any {
+    switch (subquery) {
+      case SubQuery.DISPLAYNAME:
+        const dn = this.searchQueries.find((q) => (q as UserSearchQuery).toObject().displayNameQuery !== undefined);
+        if (dn) {
+          return (dn as UserSearchQuery).getDisplayNameQuery();
+        } else {
+          return undefined;
+        }
+      case SubQuery.EMAIL:
+        const e = this.searchQueries.find((q) => (q as UserSearchQuery).toObject().emailQuery !== undefined);
+        if (e) {
+          return (e as UserSearchQuery).getEmailQuery();
+        } else {
+          return undefined;
+        }
+      case SubQuery.USERNAME:
+        const un = this.searchQueries.find((q) => (q as UserSearchQuery).toObject().userNameQuery !== undefined);
+        if (un) {
+          return (un as UserSearchQuery).getUserNameQuery();
+        } else {
+          return undefined;
+        }
+    }
   }
 }

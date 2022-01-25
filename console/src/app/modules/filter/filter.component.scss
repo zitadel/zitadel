@@ -57,6 +57,7 @@
 
         .cb {
           padding: 0.5rem 0;
+          font-size: 15px;
         }
 
         .subquery {
@@ -77,6 +78,11 @@
           .filter-input-value {
             .cnsl-form-field-wrapper {
               margin: 0 !important;
+            }
+
+            input {
+              height: 30px;
+              font-size: 15px;
             }
           }
         }

@@ -13,12 +13,12 @@
       <button mat-raised-button color="primary" (click)="emitFilter()">{{'ACTIONS.FINISH' | translate}}</button>
     </div>
 
-    <div class="filter-row" *ngIf="type === FilterType.USER && searchQuery">
+    <div class="filter-row" *ngIf="type === FilterType.USER">
       <div class="name-query">
-        <mat-checkbox id="displayname" class="cb" [checked]="$any(searchQuery).getDisplayNameQuery()"
+        <mat-checkbox id="displayname" class="cb" [checked]="getSubFilter(SubQuery.DISPLAYNAME)"
           (change)="changeCheckbox(SubQuery.DISPLAYNAME, $event )">{{'FILTER.DISPLAYNAME' | translate}}
         </mat-checkbox>
-        <div class="subquery" *ngIf="$any(searchQuery).getDisplayNameQuery() as dnq">
+        <div class="subquery" *ngIf="getSubFilter(SubQuery.DISPLAYNAME) as dnq">
           <span class="filter-value-label">{{'FILTER.CONTAINS_IGNORE_CASE' | translate}}</span>
 
           <cnsl-form-field class="filter-input-value" appearance="outline">
@@ -29,15 +29,29 @@
       </div>
 
       <div class="email-query">
-        <mat-checkbox id="email" class="cb" [checked]="$any(searchQuery).getEmailQuery()"
+        <mat-checkbox id="email" class="cb" [checked]="getSubFilter(SubQuery.EMAIL)"
           (change)="changeCheckbox(SubQuery.EMAIL, $event )">{{'FILTER.EMAIL' | translate}}
         </mat-checkbox>
-        <div class="subquery" *ngIf="$any(searchQuery).getEmailQuery() as eq">
+        <div class="subquery" *ngIf="getSubFilter(SubQuery.EMAIL) as eq">
           <span class="filter-value-label">{{'FILTER.CONTAINS_IGNORE_CASE' | translate}}</span>
 
           <cnsl-form-field class="filter-input-value" appearance="outline">
             <input cnslInput name="value" [value]="eq.getEmailAddress()"
               (change)="setValue(SubQuery.EMAIL, eq, $event)" />
+          </cnsl-form-field>
+        </div>
+      </div>
+
+      <div class="usernane-query">
+        <mat-checkbox id="username" class="cb" [checked]="getSubFilter(SubQuery.USERNAME)"
+          (change)="changeCheckbox(SubQuery.USERNAME, $event )">{{'FILTER.USERNAME' | translate}}
+        </mat-checkbox>
+        <div class="subquery" *ngIf="getSubFilter(SubQuery.USERNAME) as unq">
+          <span class="filter-value-label">{{'FILTER.CONTAINS_IGNORE_CASE' | translate}}</span>
+
+          <cnsl-form-field class="filter-input-value" appearance="outline">
+            <input cnslInput name="value" [value]="unq.getUserName()"
+              (change)="setValue(SubQuery.USERNAME, unq, $event)" />
           </cnsl-form-field>
         </div>
       </div>

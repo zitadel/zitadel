@@ -6,9 +6,8 @@
         <ng-container *ngFor="let member of membersSubject | async; index as i">
           <div @animate (click)="emitShowDetail()" class="contributor-avatar-circle"
             matTooltip="{{ member.displayName }} | {{member.rolesList?.join(' ')}}" [ngStyle]="{'z-index': 100 - i}">
-            <cnsl-avatar *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
-              class="contributor-avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''"
-              [forColor]="member.preferredLoginName ?? 'A'"
+            <cnsl-avatar *ngIf="member && member.displayName; else cog" class="contributor-avatar dontcloseonclick"
+              [avatarUrl]="member.avatarUrl|| ''" [forColor]="member.preferredLoginName ?? 'A'"
               [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)" [size]="32">
             </cnsl-avatar>
             <ng-template #cog>
