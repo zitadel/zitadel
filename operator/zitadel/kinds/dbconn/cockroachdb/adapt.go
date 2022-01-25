@@ -1,7 +1,9 @@
-package provided
+package cockroachdb
 
 import (
 	"fmt"
+
+	"github.com/caos/orbos/pkg/labels"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -9,9 +11,10 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/pkg/databases/db"
 )
 
-func Adapter() operator.AdaptFunc {
+func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
 		desired *tree.Tree,
@@ -32,13 +35,14 @@ func Adapter() operator.AdaptFunc {
 		desired.Parsed = desiredKind
 
 		currentDB := &Current{
-			Common: tree.NewCommon("databases.caos.ch/ProvidedDatabase", "v0", false),
+			Common: tree.NewCommon("zitadel.caos.ch/CockroachDB", "v0", false),
 		}
 		current.Parsed = currentDB
 
-		return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (operator.EnsureFunc, error) {
+		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				currentDB.Current.URL = desiredKind.Spec.URL
 				currentDB.Current.Port = desiredKind.Spec.Port
+				db.SetQueriedForDatabase(queried, current)
 
 				return func(k8sClient kubernetes.ClientInt) error {
 					return nil

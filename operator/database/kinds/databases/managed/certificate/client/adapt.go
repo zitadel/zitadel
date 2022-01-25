@@ -2,15 +2,18 @@ package client
 
 import (
 	"errors"
-	"github.com/caos/zitadel/operator"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
+
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/certificates"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
 )
@@ -43,13 +46,15 @@ func AdaptFunc(
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriers := make([]operator.QueryFunc, 0)
 
-				currentDB, err := core.ParseQueriedForDatabase(queried)
+				currentDB, err := db.ParseQueriedForDatabase(queried)
 				if err != nil {
 					return nil, err
 				}
 
-				caCert := currentDB.GetCertificate()
-				caKey := currentDB.GetCertificateKey()
+				managedDB := currentDB.(*current.Current)
+
+				caCert := managedDB.GetCertificate()
+				caKey := managedDB.GetCertificateKey()
 				if caKey == nil || caCert == nil || len(caCert) == 0 {
 					return nil, errors.New("no ca-certificate found")
 				}

@@ -3,17 +3,19 @@ package node
 import (
 	"crypto/rsa"
 	"errors"
-	"github.com/caos/zitadel/operator"
 	"reflect"
+
+	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/pkg/labels"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/certificates"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
+	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 )
 
 const (
@@ -42,10 +44,12 @@ func AdaptFunc(
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 			queriers := make([]operator.QueryFunc, 0)
 
-			currentDB, err := core.ParseQueriedForDatabase(queried)
+			currentDB, err := db.ParseQueriedForDatabase(queried)
 			if err != nil {
 				return nil, err
 			}
+
+			managedDB := currentDB.(*managedCurr.Current)
 
 			allNodeSecrets, err := k8sClient.ListSecrets(namespace, nodeSecretSelector)
 			if err != nil {
@@ -60,11 +64,11 @@ func AdaptFunc(
 
 				emptyCert := true
 				emptyKey := true
-				if currentCaCert := currentDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
+				if currentCaCert := managedDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
 					emptyCert = false
 					caCert = currentCaCert
 				}
-				if currentCaCertKey := currentDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
+				if currentCaCertKey := managedDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
 					emptyKey = false
 					caPrivKey = currentCaCertKey
 				}
@@ -127,8 +131,8 @@ func AdaptFunc(
 				caCert = cert
 			}
 
-			currentDB.SetCertificate(caCert)
-			currentDB.SetCertificateKey(caPrivKey)
+			managedDB.SetCertificate(caCert)
+			managedDB.SetCertificateKey(caPrivKey)
 
 			return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 		}, func(k8sClient kubernetes.ClientInt) error {

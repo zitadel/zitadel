@@ -3,6 +3,8 @@ package cmds
 import (
 	"errors"
 
+	"github.com/caos/zitadel/pkg/databases"
+
 	"github.com/caos/orbos/mntr"
 
 	"github.com/caos/orbos/pkg/tree"
@@ -72,6 +74,11 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 			err = nil
 		}
 
+		dbClient, err := databases.NewClient(rv.Monitor, rv.Gitops, rv.OrbConfig)
+		if err != nil {
+			return err
+		}
+
 		if err := cfg.ApplyOrbconfigSecret(
 			rv.OrbConfig,
 			k8sClient,
@@ -116,11 +123,11 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 					}
 
 					_, _, configure, _, _, _, err := orbzit.AdaptFunc(
-						rv.OrbConfig,
 						"configure",
 						nil,
 						rv.Gitops,
 						nil,
+						dbClient,
 					)(rv.Monitor, desired, &tree.Tree{})
 					if err != nil {
 						return nil, nil, err

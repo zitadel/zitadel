@@ -1,4 +1,11 @@
-package database
+package client
+
+/*
+import (
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/orbos/pkg/kubernetes"
+	"github.com/caos/zitadel/pkg/databases"
+)
 
 import (
 	"github.com/caos/orbos/mntr"
@@ -54,3 +61,4 @@ func (c *CrdClient) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientI
 		k8sClient,
 	)
 }
+*/

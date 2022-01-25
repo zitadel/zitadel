@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"gopkg.in/yaml.v3"
 	core "k8s.io/api/core/v1"
 
@@ -30,7 +32,7 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	dbClient database.Client,
+	dbClient db.Client,
 	namespace string,
 	action string,
 	version *string,

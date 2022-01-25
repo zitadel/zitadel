@@ -1,11 +1,13 @@
-package managed
+package current
 
 import (
 	"crypto/rsa"
+
+	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/current"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 )
 
 type Current struct {
@@ -17,7 +19,7 @@ type CurrentDB struct {
 	URL               string
 	Port              string
 	ReadyFunc         operator.EnsureFunc
-	CA                *certificate.Current
+	CA                *cacurr.Current
 	AddUserFunc       func(user string) (operator.QueryFunc, error)
 	DeleteUserFunc    func(user string) (operator.DestroyFunc, error)
 	ListUsersFunc     func(k8sClient kubernetes.ClientInt) ([]string, error)
@@ -36,7 +38,7 @@ func (c *Current) GetReadyQuery() operator.EnsureFunc {
 	return c.Current.ReadyFunc
 }
 
-func (c *Current) GetCA() *certificate.Current {
+func (c *Current) GetCA() *cacurr.Current {
 	return c.Current.CA
 }
 

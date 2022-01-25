@@ -1,4 +1,4 @@
-package provided
+package cockroachdb
 
 import (
 	"github.com/caos/orbos/pkg/tree"

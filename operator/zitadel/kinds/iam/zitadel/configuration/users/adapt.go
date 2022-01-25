@@ -5,11 +5,12 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
-	dbClient database.Client,
+	dbClient db.Client,
 ) (
 	func(users map[string]string) operator.QueryFunc,
 	operator.DestroyFunc,

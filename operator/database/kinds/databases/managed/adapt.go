@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
@@ -18,8 +20,9 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
+	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/current"
+	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
@@ -158,10 +161,10 @@ func Adapter(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		currentDB := &Current{
+		currentDB := &managedCurr.Current{
 			Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
-			Current: &CurrentDB{
-				CA: &certificate.Current{},
+			Current: &managedCurr.CurrentDB{
+				CA: &certCurr.Current{},
 			},
 		}
 		current.Parsed = currentDB
@@ -249,7 +252,7 @@ func Adapter(
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
+				queriedCurrentDB, err := db.ParseQueriedForDatabase(queried)
 				if err != nil || queriedCurrentDB == nil {
 					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
@@ -260,7 +263,7 @@ func Adapter(
 					currentDB.Current.ListUsersFunc = listUsers
 					currentDB.Current.ListDatabasesFunc = listDatabases
 
-					core.SetQueriedForDatabase(queried, current)
+					db.SetQueriedForDatabase(queried, current)
 					internalMonitor.Info("set current state of managed database")
 				}
 

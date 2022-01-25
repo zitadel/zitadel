@@ -1,7 +1,9 @@
 package core
 
+/*
 import (
 	"crypto/rsa"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
@@ -66,3 +68,4 @@ func (c *CurrentDBList) GetAddUserFunc() func(user string) (operator.QueryFunc, 
 func (c *CurrentDBList) GetDeleteUserFunc() func(user string) (operator.DestroyFunc, error) {
 	return nil
 }
+*/

@@ -11,7 +11,7 @@ import (
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration/users"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 type ConsoleEnv struct {
@@ -41,7 +41,7 @@ func AdaptFunc(
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordName string,
-	dbClient database.Client,
+	dbClient db.Client,
 	getClientID func() string,
 ) (
 	func(

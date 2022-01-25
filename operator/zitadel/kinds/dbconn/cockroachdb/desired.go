@@ -1,4 +1,4 @@
-package provided
+package cockroachdb
 
 import (
 	"fmt"
