@@ -104,9 +104,11 @@ export class UserTableComponent implements OnInit {
 
   public deactivateSelectedUsers(): void {
     Promise.all(
-      this.selection.selected.map((value) => {
-        return this.userService.deactivateUser(value.id);
-      }),
+      this.selection.selected
+        .filter((u) => u.state === UserState.USER_STATE_ACTIVE)
+        .map((value) => {
+          return this.userService.deactivateUser(value.id);
+        }),
     )
       .then(() => {
         this.toast.showInfo('USER.TOAST.SELECTEDDEACTIVATED', true);
@@ -122,9 +124,11 @@ export class UserTableComponent implements OnInit {
 
   public reactivateSelectedUsers(): void {
     Promise.all(
-      this.selection.selected.map((value) => {
-        return this.userService.reactivateUser(value.id);
-      }),
+      this.selection.selected
+        .filter((u) => u.state === UserState.USER_STATE_INACTIVE)
+        .map((value) => {
+          return this.userService.reactivateUser(value.id);
+        }),
     )
       .then(() => {
         this.toast.showInfo('USER.TOAST.SELECTEDREACTIVATED', true);
