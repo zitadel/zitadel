@@ -95,6 +95,22 @@ func (p *UserProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceHumanRegistered,
 				},
 				{
+					Event:  user.HumanInitialCodeAddedType,
+					Reduce: p.reduceHumanInitCodeAdded,
+				},
+				{
+					Event:  user.UserV1InitialCodeAddedType,
+					Reduce: p.reduceHumanInitCodeAdded,
+				},
+				{
+					Event:  user.HumanInitializedCheckSucceededType,
+					Reduce: p.reduceHumanInitCodeSucceeded,
+				},
+				{
+					Event:  user.UserV1InitializedCheckSucceededType,
+					Reduce: p.reduceHumanInitCodeSucceeded,
+				},
+				{
 					Event:  user.UserLockedType,
 					Reduce: p.reduceUserLocked,
 				},
@@ -201,7 +217,7 @@ func (p *UserProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 				handler.NewCol(UserCreationDateCol, e.CreationDate()),
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
 				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(UserStateCol, domain.UserStateInitial),
+				handler.NewCol(UserStateCol, domain.UserStateActive),
 				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
 				handler.NewCol(UserTypeCol, domain.UserTypeHuman),
@@ -258,6 +274,40 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 			},
 			crdb.WithTableSuffix(UserHumanSuffix),
 		),
+	), nil
+}
+
+func (p *UserProjection) reduceHumanInitCodeAdded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanInitialCodeAddedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-DSfe2", "seq", event.Sequence(), "expectedType", user.HumanInitialCodeAddedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dvgws", "reduce.wrong.event.type")
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserStateCol, domain.UserStateInitial),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserProjection) reduceHumanInitCodeSucceeded(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*user.HumanInitializedCheckSucceededEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-Dgff2", "seq", event.Sequence(), "expectedType", user.HumanInitializedCheckSucceededType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dfvwq", "reduce.wrong.event.type")
+	}
+	return crdb.NewUpdateStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(UserStateCol, domain.UserStateActive),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserIDCol, e.Aggregate().ID),
+		},
 	), nil
 }
 
@@ -656,7 +706,7 @@ func (p *UserProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 				handler.NewCol(UserCreationDateCol, e.CreationDate()),
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
 				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(UserStateCol, domain.UserStateInitial),
+				handler.NewCol(UserStateCol, domain.UserStateActive),
 				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
 				handler.NewCol(UserTypeCol, domain.UserTypeMachine),

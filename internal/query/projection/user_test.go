@@ -56,7 +56,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
 								domain.UserTypeHuman,
@@ -114,7 +114,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
 								domain.UserTypeHuman,
@@ -167,7 +167,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
 								domain.UserTypeHuman,
@@ -354,6 +354,118 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{},
 								"email@zitadel.ch",
 								&sql.NullString{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceHumanInitCodeAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanInitialCodeAddedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitialCodeAddedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeAdded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateInitial,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1InitCodeAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1InitialCodeAddedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitialCodeAddedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeAdded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateInitial,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceHumanInitCodeSucceeded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanInitializedCheckSucceededType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitializedCheckSucceededEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeSucceeded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateActive,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1InitCodeAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1InitializedCheckSucceededType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitializedCheckSucceededEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeSucceeded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateActive,
+								"agg-id",
 							},
 						},
 					},
@@ -1110,7 +1222,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"username",
 								domain.UserTypeMachine,
@@ -1156,7 +1268,7 @@ func TestUserProjection_reduces(t *testing.T) {
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"username",
 								domain.UserTypeMachine,
