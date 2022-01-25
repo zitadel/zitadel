@@ -39,6 +39,7 @@ Errors:
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     AlreadyInactive: Benutzer ist bereits deaktiviert
     NotInactive: Benutzer ist nicht inaktiv
+    CantDeactivateInitial: Benutzer mit dem Status initial kann nur gelöscht und nicht deaktiviert werden
     ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
     AlreadyInitialised: Benutzer ist bereits initialisiert
     NotInitialised: Benutzer ist noch nicht initialisiert

@@ -155,6 +155,7 @@ module.exports = {
       label: "API Definition",
       collapsed: false,
       items: [
+        "apis/statuscodes",
         {
           type: "category",
           label: "Proto",

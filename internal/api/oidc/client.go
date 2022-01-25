@@ -17,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	user_model "github.com/caos/zitadel/internal/user/model"
 )
 
 const (
@@ -203,7 +202,7 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 				userInfo.SetFamilyName(user.Human.LastName)
 				userInfo.SetGivenName(user.Human.FirstName)
 				userInfo.SetNickname(user.Human.NickName)
-				userInfo.SetGender(oidc.Gender(user.Human.Gender))
+				userInfo.SetGender(getGender(user.Human.Gender))
 				userInfo.SetLocale(user.Human.PreferredLanguage)
 				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix, user.ResourceOwner, user.Human.AvatarKey))
 			} else {
@@ -367,13 +366,13 @@ func appendRole(roles map[string]map[string]string, role, orgID, orgPrimaryDomai
 	roles[role][orgID] = orgPrimaryDomain
 }
 
-func getGender(gender user_model.Gender) string {
+func getGender(gender domain.Gender) oidc.Gender {
 	switch gender {
-	case user_model.GenderFemale:
+	case domain.GenderFemale:
 		return "female"
-	case user_model.GenderMale:
+	case domain.GenderMale:
 		return "male"
-	case user_model.GenderDiverse:
+	case domain.GenderDiverse:
 		return "diverse"
 	}
 	return ""
