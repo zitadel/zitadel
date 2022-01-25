@@ -37,7 +37,13 @@ export class FilterComponent implements OnInit {
   public searchQueries: FilterSearchQuery[] = [];
   @Output() public closedCard: EventEmitter<void> = new EventEmitter();
   @Output() public filterChanged: EventEmitter<FilterSearchQuery[] | undefined> = new EventEmitter();
+  @Output() public filterOpen: EventEmitter<boolean> = new EventEmitter<boolean>(false);
   public showFilter: boolean = false;
+  public methods: TextQueryMethod[] = [
+    TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE,
+    TextQueryMethod.TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE,
+    TextQueryMethod.TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE,
+  ];
   constructor() {}
 
   ngOnInit(): void {
@@ -105,12 +111,6 @@ export class FilterComponent implements OnInit {
           break;
       }
     }
-
-    // firstNameQuery?: FirstNameQuery.AsObject,
-    // lastNameQuery?: LastNameQuery.AsObject,
-    // nickNameQuery?: NickNameQuery.AsObject,
-    // stateQuery?: StateQuery.AsObject,
-    // typeQuery?: TypeQuery.AsObject,
   }
 
   public setValue(subquery: SubQuery, query: any, event: any) {
@@ -130,13 +130,24 @@ export class FilterComponent implements OnInit {
     }
   }
 
+  public setMethod(query: any, event: any) {
+    (query as UserNameQuery).setMethod(event.value);
+    this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+  }
+
   public reset() {
     this.searchQueries = [];
+  }
+
+  public toggleFilter(): void {
+    this.showFilter = !this.showFilter;
+    this.filterOpen.emit(this.showFilter);
   }
 
   public emitFilter(): void {
     this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
     this.showFilter = false;
+    this.filterOpen.emit(false);
   }
 
   public get filterCount(): number {

@@ -38,7 +38,7 @@
       box-sizing: border-box;
       border-radius: 0.5rem;
       outline: none;
-      width: 280px;
+      width: 320px;
       display: flex;
       flex-direction: column;
       padding: 0.5rem;
@@ -65,7 +65,7 @@
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
-          padding: 0.5rem;
+          padding: 0 0.5rem;
           background-color: if($is-dark-theme, #00000020, #ffffff20);
           margin: 0 -0.5rem;
 
@@ -75,13 +75,14 @@
             color: var(--grey);
           }
 
-          .filter-input-value {
-            .cnsl-form-field-wrapper {
-              margin: 0 !important;
-            }
+          .filter-select-method {
+            min-width: 100px;
+            margin-right: 0.5rem;
+          }
 
+          .filter-input-value {
             input {
-              height: 30px;
+              height: 36px;
               font-size: 15px;
             }
           }

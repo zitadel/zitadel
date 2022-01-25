@@ -66,6 +66,8 @@ export class UserTableComponent implements OnInit {
   public UserListSearchKey: any = UserListSearchKey;
 
   public ActionKeysType: any = ActionKeysType;
+  public filterOpen: boolean = false;
+
   constructor(
     private router: Router,
     public translate: TranslateService,

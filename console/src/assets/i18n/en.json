@@ -130,7 +130,11 @@
     "DISPLAYNAME": "Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
-    "CONTAINS_IGNORE_CASE": "contains"
+    "METHODS": {
+      "5": "contains",
+      "7": "ends with",
+      "1": "equals"
+    }
   },
   "RESOURCEID": "Resource Id",
   "TABLE": {
