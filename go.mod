@@ -216,3 +216,4 @@ require (
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
+replace github.com/caos/oidc => /Users/livio/workspaces/go/src/github.com/caos/oidc

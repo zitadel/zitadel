@@ -10,6 +10,7 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -35,14 +36,14 @@ type Queries struct {
 	LoginTranslationFileContents        map[string][]byte
 	NotificationTranslationFileContents map[string][]byte
 	supportedLangs                      []language.Tag
-	roles                               []string
+	zitadelRoles                        []authz.RoleMapping
 }
 
 type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, roles []string) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	sqlClient, err := projections.CRDB.Start()
 	if err != nil {
 		return nil, err
@@ -63,7 +64,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
-		roles:                               roles,
+		zitadelRoles:                        zitadelRoles,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)

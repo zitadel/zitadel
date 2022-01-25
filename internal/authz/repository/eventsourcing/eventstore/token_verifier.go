@@ -30,7 +30,7 @@ type TokenVerifierRepo struct {
 	Query                *query.Queries
 }
 
-func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
+func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
 	token, viewErr := repo.View.TokenByID(tokenID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
@@ -79,7 +79,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if len(splittedToken) != 2 {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
 	}
-	token, err := repo.TokenByID(ctx, splittedToken[0], splittedToken[1])
+	token, err := repo.tokenByID(ctx, splittedToken[0], splittedToken[1])
 	if err != nil {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}

@@ -18,7 +18,6 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	user_model "github.com/caos/zitadel/internal/user/model"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 const (
@@ -109,7 +108,14 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	return o.repo.AuthorizeClientIDSecret(ctx, id, secret)
+	app, err := o.query.AppByClientID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if app.OIDCConfig != nil {
+		return o.command.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
+	}
+	return o.command.VerifyAPIClientSecret(ctx, app.ProjectID, app.ID, secret)
 }
 
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.UserInfoSetter, tokenID, subject, origin string) (err error) {
@@ -294,13 +300,23 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if err != nil {
 		return nil, err
 	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(projectID, userID)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, userIDQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
 	projectRoles := make(map[string]map[string]string)
 	for _, requestedRole := range requestedRoles {
-		for _, grant := range grants {
+		for _, grant := range grants.UserGrants {
 			checkGrantedRoles(projectRoles, grant, requestedRole)
 		}
 	}
@@ -336,8 +352,8 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	}, nil
 }
 
-func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {
-	for _, grantedRole := range grant.RoleKeys {
+func checkGrantedRoles(roles map[string]map[string]string, grant *query.UserGrant, requestedRole string) {
+	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
 			appendRole(roles, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain)
 		}

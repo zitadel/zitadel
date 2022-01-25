@@ -12,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
 )
 
@@ -26,7 +25,12 @@ func (s *Server) GetMyUser(ctx context.Context, _ *auth_pb.GetMyUserRequest) (*a
 
 func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserRequest) (*auth_pb.RemoveMyUserResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	grants, err := s.repo.SearchMyUserGrants(ctx, &grant_model.UserGrantSearchRequest{Queries: []*grant_model.UserGrantSearchQuery{}})
+	userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(ctxData.UserID)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID}}
+	grants, err := s.query.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +45,7 @@ func (s *Server) RemoveMyUser(ctx context.Context, _ *auth_pb.RemoveMyUserReques
 	if err != nil {
 		return nil, err
 	}
-	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, memberships.Memberships, userGrantsToIDs(grants.Result)...)
+	details, err := s.command.RemoveUser(ctx, ctxData.UserID, ctxData.ResourceOwner, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -124,14 +128,18 @@ func ctxToObjectRoot(ctx context.Context) models.ObjectRoot {
 }
 
 func (s *Server) ListMyUserGrants(ctx context.Context, req *auth_pb.ListMyUserGrantsRequest) (*auth_pb.ListMyUserGrantsResponse, error) {
-	res, err := s.repo.SearchMyUserGrants(ctx, ListMyUserGrantsRequestToModel(req))
+	queries, err := ListMyUserGrantsRequestToQuery(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.query.UserGrants(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &auth_pb.ListMyUserGrantsResponse{
-		Result: UserGrantsToPb(res.Result),
+		Result: UserGrantsToPb(res.UserGrants),
 		Details: obj_grpc.ToListDetails(
-			res.TotalResult,
+			res.Count,
 			res.Sequence,
 			res.Timestamp,
 		),
@@ -152,13 +160,21 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 
 	//client of user is not in project of ZITADEL
 	if ctxData.ProjectID != iam.IAMProjectID {
-		grants, err := s.repo.UserGrantsByProjectAndUserID(ctxData.ProjectID, ctxData.UserID)
+		userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(ctxData.ProjectID)
+		if err != nil {
+			return nil, err
+		}
+		userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(ctxData.UserID)
+		if err != nil {
+			return nil, err
+		}
+		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}})
 		if err != nil {
 			return nil, err
 		}
 
-		ids := make([]string, 0, len(grants))
-		for _, grant := range grants {
+		ids := make([]string, 0, len(grants.UserGrants))
+		for _, grant := range grants.UserGrants {
 			ids = appendIfNotExists(ids, grant.ResourceOwner)
 		}
 
@@ -276,7 +292,7 @@ func MemberTypeToDomain(m *query.Membership) (_ domain.MemberType, displayName, 
 	return domain.MemberTypeUnspecified, "", "", ""
 }
 
-func userGrantsToIDs(userGrants []*grant_model.UserGrantView) []string {
+func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 	converted := make([]string, len(userGrants))
 	for i, grant := range userGrants {
 		converted[i] = grant.ID

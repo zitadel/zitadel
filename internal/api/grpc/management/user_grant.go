@@ -11,11 +11,15 @@ import (
 )
 
 func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrantByIDRequest) (*mgmt_pb.GetUserGrantByIDResponse, error) {
+	idQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	if err != nil {
+		return nil, err
+	}
 	ownerQuery, err := query.NewUserGrantResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	grant, err := s.query.UserGrantByID(ctx, req.GrantId, ownerQuery)
+	grant, err := s.query.UserGrant(ctx, idQuery, ownerQuery)
 	if err != nil {
 		return nil, err
 	}

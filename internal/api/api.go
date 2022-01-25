@@ -17,7 +17,7 @@ import (
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/oidc"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -59,16 +59,16 @@ type admin interface {
 	GetSpoolerDiv(database, viewName string) int64
 }
 
-func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 
 	repo := struct {
-		authz_es.EsRepository
+		authz_repo.Repository
 		query.Queries
 	}{
-		*authZRepo,
+		authZRepo,
 		*q,
 	}
 

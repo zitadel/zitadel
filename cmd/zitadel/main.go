@@ -23,7 +23,7 @@ import (
 	"github.com/caos/zitadel/internal/api/oidc"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -156,14 +156,10 @@ func startZitadel(configPaths []string) {
 	}
 
 	keyChan := make(chan interface{})
-	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
-	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
-		roles[i] = role.Role
-	}
-	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, roles)
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
-	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
+	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
@@ -179,15 +175,15 @@ func startZitadel(configPaths []string) {
 
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
-		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
+		authRepo, err = auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
 	repo := struct {
-		authz_repo.EsRepository
+		authz_repo.Repository
 		query.Queries
 	}{
-		*authZRepo,
+		authZRepo,
 		*queries,
 	}
 
@@ -217,7 +213,7 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) {
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) {
 	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
