@@ -254,7 +254,7 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 				handler.NewCol(UserCreationDateCol, e.CreationDate()),
 				handler.NewCol(UserChangeDateCol, e.CreationDate()),
 				handler.NewCol(UserResourceOwnerCol, e.Aggregate().ResourceOwner),
-				handler.NewCol(UserStateCol, domain.UserStateInitial),
+				handler.NewCol(UserStateCol, domain.UserStateActive),
 				handler.NewCol(UserSequenceCol, e.Sequence()),
 				handler.NewCol(UserUsernameCol, e.UserName),
 				handler.NewCol(UserTypeCol, domain.UserTypeHuman),
