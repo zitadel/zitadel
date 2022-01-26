@@ -33,17 +33,17 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
 	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.org.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, features.AuditLogRetention)
+	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgChangesResponse{
-		Result: change_grpc.OrgChangesToPb(response.Changes),
+		Result: change_grpc.ChangesToPb(response.Changes, s.assetAPIPrefix),
 	}, nil
 }
 
@@ -211,7 +211,7 @@ func (s *Server) ListOrgMemberRoles(ctx context.Context, req *mgmt_pb.ListOrgMem
 	if err != nil {
 		return nil, err
 	}
-	roles := s.org.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID)
+	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID)
 	return &mgmt_pb.ListOrgMemberRolesResponse{
 		Result: roles,
 	}, nil

@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query/projection"
 )
 
@@ -352,11 +351,6 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	}
 	row := q.client.QueryRowContext(ctx, stmt, args...)
 	return scan(row)
-}
-
-func (q *Queries) UserEvents(ctx context.Context, orgID, userID string, sequence uint64) ([]eventstore.Event, error) {
-	query := NewUserEventSearchQuery(userID, orgID, sequence)
-	return q.eventstore.Filter(ctx, query)
 }
 
 func (q *UserSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
