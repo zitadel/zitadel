@@ -18,8 +18,7 @@ import (
 )
 
 type Changes struct {
-	LastSequence uint64
-	Changes      []*Change
+	Changes []*Change
 }
 
 type Change struct {
@@ -91,7 +90,6 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 		if event.CreationDate().Before(time.Now().Add(-auditLogRetention)) {
 			continue
 		}
-		lastSequence = event.Sequence()
 		change := &Change{
 			ChangeDate:        event.CreationDate(),
 			EventType:         string(event.Type()),
@@ -119,7 +117,6 @@ func (q *Queries) changes(ctx context.Context, query func(query *eventstore.Sear
 		return nil, errors.ThrowPreconditionFailed(nil, "QUERY-DEGS2", "Errors.Changes.AuditRetention")
 	}
 	return &Changes{
-		LastSequence: lastSequence,
-		Changes:      changes,
+		Changes: changes,
 	}, nil
 }
