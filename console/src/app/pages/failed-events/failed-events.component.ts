@@ -39,7 +39,7 @@ export class FailedEventsComponent implements AfterViewInit {
       new Breadcrumb({
         type: BreadcrumbType.IAM,
         name: 'System',
-        routerLink: ['/iam'],
+        routerLink: ['/system'],
       }),
     ];
     this.breadcrumbService.setBreadcrumb(breadcrumbs);

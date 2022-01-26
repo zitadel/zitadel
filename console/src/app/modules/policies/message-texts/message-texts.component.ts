@@ -427,11 +427,16 @@ export class MessageTextsComponent implements OnDestroy {
                 this.orgName = org.name;
               }
 
+              const iambread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/system'],
+              });
               const bread: Breadcrumb = {
                 type: BreadcrumbType.ORG,
                 routerLink: ['/org'],
               };
-              breadcrumbService.setBreadcrumb([bread]);
+              breadcrumbService.setBreadcrumb([iambread, bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
               this.service = this.injector.get(AdminService as Type<AdminService>);
@@ -443,7 +448,7 @@ export class MessageTextsComponent implements OnDestroy {
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
                 name: 'IAM',
-                routerLink: ['/iam'],
+                routerLink: ['/system'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
 

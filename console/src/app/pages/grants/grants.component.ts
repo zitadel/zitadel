@@ -42,6 +42,11 @@ export class GrantsComponent implements OnDestroy {
 
             const breadcrumbs = [
               new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/system'],
+              }),
+              new Breadcrumb({
                 type: BreadcrumbType.ORG,
                 routerLink: ['/org'],
               }),
@@ -57,11 +62,16 @@ export class GrantsComponent implements OnDestroy {
           });
         }
       } else if (context === UserGrantContext.NONE) {
+        const iambread = new Breadcrumb({
+          type: BreadcrumbType.IAM,
+          name: 'IAM',
+          routerLink: ['/system'],
+        });
         const bread: Breadcrumb = {
           type: BreadcrumbType.ORG,
           routerLink: ['/org'],
         };
-        breadcrumbService.setBreadcrumb([bread]);
+        breadcrumbService.setBreadcrumb([iambread, bread]);
       }
     });
   }

@@ -41,11 +41,16 @@ export class OrgDetailComponent implements OnInit {
     private router: Router,
     breadcrumbService: BreadcrumbService,
   ) {
+    const iamBread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'IAM',
+      routerLink: ['/system'],
+    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([bread]);
+    breadcrumbService.setBreadcrumb([iamBread, bread]);
   }
 
   public ngOnInit(): void {
@@ -149,10 +154,15 @@ export class OrgDetailComponent implements OnInit {
 
   public loadFeatures(): void {
     this.loadingSubject.next(true);
-    this.mgmtService.getFeatures().then((resp) => {
-      if (resp.features) {
-        this.features = resp.features;
-      }
-    });
+    this.mgmtService
+      .getFeatures()
+      .then((resp) => {
+        if (resp.features) {
+          this.features = resp.features;
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 }

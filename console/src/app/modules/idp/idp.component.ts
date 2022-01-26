@@ -401,7 +401,7 @@ export class IdpComponent implements OnDestroy {
       case PolicyComponentServiceType.MGMT:
         return ['/org', 'policy', 'login'];
       case PolicyComponentServiceType.ADMIN:
-        return ['/iam', 'policy', 'login'];
+        return ['/system', 'policy', 'login'];
     }
   }
 

@@ -161,11 +161,16 @@ export class LoginTextsComponent implements OnDestroy {
                 this.orgName = org.name;
               }
 
+              const iambread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'IAM',
+                routerLink: ['/system'],
+              });
               const bread: Breadcrumb = {
                 type: BreadcrumbType.ORG,
                 routerLink: ['/org'],
               };
-              breadcrumbService.setBreadcrumb([bread]);
+              breadcrumbService.setBreadcrumb([iambread, bread]);
 
               break;
             case PolicyComponentServiceType.ADMIN:
@@ -180,7 +185,7 @@ export class LoginTextsComponent implements OnDestroy {
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
                 name: 'IAM',
-                routerLink: ['/iam'],
+                routerLink: ['/system'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
               break;

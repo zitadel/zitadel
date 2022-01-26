@@ -7,6 +7,6 @@
   <ng-template #human>
     <img class="dontcloseonclick" *ngIf="avatarUrl; else creds" [src]="avatarUrl"
       onerror="this.src='/assets/images/transparent.png';this.onerror='';" />
-    <ng-template #creds><span>{{credentials}}</span></ng-template>
+    <ng-template #creds><span class="dontcloseonclick">{{credentials}}</span></ng-template>
   </ng-template>
 </div>

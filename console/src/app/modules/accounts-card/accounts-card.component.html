@@ -1,5 +1,5 @@
 <div class="accounts-card" cnslOutsideClick (clickOutside)="closeCard($event)">
-  <cnsl-avatar
+  <cnsl-avatar (click)="editUserProfile()"
     *ngIf="user.human?.profile && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
     class="avatar" [ngClass]="{'iam-user': iamuser}" [forColor]="user.preferredLoginName"
     [avatarUrl]="user.human?.profile?.avatarUrl || ''"
@@ -9,7 +9,7 @@
 
   <span class="u-name">{{user.human?.profile?.displayName ? user.human?.profile?.displayName : 'A'}}</span>
   <span class="u-email" *ngIf="user.preferredLoginName">{{user.preferredLoginName}}</span>
-  <a [routerLink]="[ '/iam']" class="iamuser" *ngIf="iamuser" (click)="close()">
+  <a [routerLink]="[ '/system']" class="iamuser" *ngIf="iamuser" (click)="close()">
     <span class="label">{{'MENU.SYSTEM' | translate}}</span>
     <a class="iambtn">
       <i class="las la-cog"></i>
@@ -23,7 +23,7 @@
     </a>
   </a>
 
-  <button color="primary" (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
+  <button (click)="editUserProfile()" mat-stroked-button>{{'USER.EDITACCOUNT' | translate}}</button>
   <div class="l-accounts">
     <mat-progress-bar *ngIf="loadingUsers" color="primary" mode="indeterminate"></mat-progress-bar>
     <a class="row" *ngFor="let session of sessions" (click)="selectAccount(session.loginName)">

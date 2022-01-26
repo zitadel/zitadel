@@ -80,6 +80,6 @@ export class AccountsCardComponent implements OnInit {
   }
 
   public get isOnSystem(): boolean {
-    return this.router.url.includes('/iam');
+    return this.router.url.includes('/system');
   }
 }

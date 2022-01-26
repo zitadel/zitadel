@@ -1,5 +1,5 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
-  [emitRefreshOnPreviousRoutes]="['/iam/idp/create']" [timestamp]="idpResult?.details?.viewTimestamp"
+  [emitRefreshOnPreviousRoutes]="['/system/idp/create']" [timestamp]="idpResult?.details?.viewTimestamp"
   [selection]="selection">
   <div actions>
     <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="ar-button"

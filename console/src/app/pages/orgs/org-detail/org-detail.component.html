@@ -8,7 +8,6 @@
             [ngClass]="{'active': org?.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org?.state === OrgState.ORG_STATE_INACTIVE }">
           </div>
         </div>
-        <!-- <p class="org-sub">{{'ORG_DETAIL.DESCRIPTION' | translate}}</p> -->
       </div>
       <span class="fill-space"></span>
       <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"

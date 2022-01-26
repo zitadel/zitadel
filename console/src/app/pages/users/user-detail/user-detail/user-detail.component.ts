@@ -72,11 +72,17 @@ export class UserDetailComponent implements OnInit {
     private mediaMatcher: MediaMatcher,
     breadcrumbService: BreadcrumbService,
   ) {
-    const bread: Breadcrumb = {
-      type: BreadcrumbType.ORG,
-      routerLink: ['/org'],
-    };
-    breadcrumbService.setBreadcrumb([bread]);
+    breadcrumbService.setBreadcrumb([
+      new Breadcrumb({
+        type: BreadcrumbType.IAM,
+        name: 'IAM',
+        routerLink: ['/system'],
+      }),
+      new Breadcrumb({
+        type: BreadcrumbType.ORG,
+        routerLink: ['/org'],
+      }),
+    ]);
 
     const mediaq: string = '(max-width: 500px)';
     const small = this.mediaMatcher.matchMedia(mediaq).matches;

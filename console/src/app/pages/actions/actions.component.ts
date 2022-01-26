@@ -36,11 +36,16 @@ export class ActionsComponent {
     private dialog: MatDialog,
     private toast: ToastService,
   ) {
+    const iambread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'IAM',
+      routerLink: ['/system'],
+    });
     const bread: Breadcrumb = {
       type: BreadcrumbType.ORG,
       routerLink: ['/org'],
     };
-    breadcrumbService.setBreadcrumb([bread]);
+    breadcrumbService.setBreadcrumb([iambread, bread]);
     this.loadFlow();
   }
 

@@ -29,21 +29,18 @@
     <ng-container *ngFor="let bread of (breadcrumbService.breadcrumbs$ | async) as bc; index as i">
 
       <ng-container *ngIf="bread.type === BreadcrumbType.IAM">
-        <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-          stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
-          <path d="M16.88 3.549L7.12 20.451"></path>
-        </svg>
+        <ng-template cnslHasRole [hasRole]="['iam.read']">
+          <svg class=" slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
+            stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
+            <path d="M16.88 3.549L7.12 20.451"></path>
+          </svg>
 
-        <div class="breadcrumb-context">
-          <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
-            {{bread.name}}
-          </a>
-        </div>
-
-        <svg *ngIf="bc.length > 1" class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor"
-          stroke-width="1" stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
-          <path d="M16.88 3.549L7.12 20.451"></path>
-        </svg>
+          <div class="breadcrumb-context">
+            <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
+              {{'MENU.SYSTEM' | translate}}
+            </a>
+          </div>
+        </ng-template>
       </ng-container>
 
       <ng-container *ngIf="bread.type === BreadcrumbType.ORG">
@@ -100,7 +97,7 @@
       {{'MENU.DOCUMENTATION' | translate}}
     </a>
 
-    <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/iam']" routerLinkActive="hide"
+    <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/system']" routerLinkActive="hide"
       class="iam-settings" mat-stroked-button>
       <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>
       <i class="las la-cog"></i>

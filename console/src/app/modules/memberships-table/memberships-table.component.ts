@@ -129,7 +129,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
         this.router.navigate(['/projects', membership.projectId, 'members']);
       });
     } else if (membership.iam) {
-      this.router.navigate(['/iam/members']);
+      this.router.navigate(['/system/members']);
     }
   }
 
