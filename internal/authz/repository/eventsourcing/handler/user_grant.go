@@ -29,18 +29,15 @@ const (
 
 type UserGrant struct {
 	handler
-	iamID        string
 	iamProjectID string
 	subscription *v1.Subscription
 }
 
 func newUserGrant(
 	handler handler,
-	iamID string,
 ) *UserGrant {
 	h := &UserGrant{
 		handler: handler,
-		iamID:   iamID,
 	}
 
 	h.subscribe()
@@ -151,15 +148,15 @@ func (u *UserGrant) processIAMMember(event *es_models.Event, rolePrefix string, 
 	case iam_es_model.IAMMemberAdded, iam_es_model.IAMMemberChanged:
 		member.SetData(event)
 
-		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
+		grant, err := u.view.UserGrantByIDs(domain.IAMID, u.iamProjectID, member.UserID)
 		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
 		if errors.IsNotFound(err) {
 			grant = &view_model.UserGrantView{
 				ID:            u.iamProjectID + member.UserID,
-				ResourceOwner: u.iamID,
-				OrgName:       u.iamID,
+				ResourceOwner: domain.IAMID,
+				OrgName:       domain.IAMID,
 				ProjectID:     u.iamProjectID,
 				UserID:        member.UserID,
 				RoleKeys:      member.Roles,
@@ -182,7 +179,7 @@ func (u *UserGrant) processIAMMember(event *es_models.Event, rolePrefix string, 
 	case iam_es_model.IAMMemberRemoved,
 		iam_es_model.IAMMemberCascadeRemoved:
 		member.SetData(event)
-		grant, err := u.view.UserGrantByIDs(u.iamID, u.iamProjectID, member.UserID)
+		grant, err := u.view.UserGrantByIDs(domain.IAMID, u.iamProjectID, member.UserID)
 		if err != nil {
 			return err
 		}

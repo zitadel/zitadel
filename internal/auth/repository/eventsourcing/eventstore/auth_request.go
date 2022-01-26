@@ -54,8 +54,6 @@ type AuthRequestRepo struct {
 	MFAInitSkippedLifeTime     time.Duration
 	SecondFactorCheckLifeTime  time.Duration
 	MultiFactorCheckLifeTime   time.Duration
-
-	IAMID string
 }
 
 type labelPolicyProvider interface {
@@ -519,7 +517,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, domain.IAMID, orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -534,7 +532,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = repo.IAMID
+		orgID = domain.IAMID
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)

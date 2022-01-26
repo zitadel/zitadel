@@ -27,6 +27,8 @@ Errors:
       RemoveFailed: Object could not be removed
   Limit:
     ExceedsDefault: Limit exceeds default limit
+  Language:
+    NotParsed: Could not parse languge
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists

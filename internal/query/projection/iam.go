@@ -41,6 +41,10 @@ func (p *IAMProjection) reducers() []handler.AggregateReducer {
 					Reduce: p.reduceIAMProjectSet,
 				},
 				{
+					Event:  iam.DefaultLanguageSetEventType,
+					Reduce: p.reduceDefaultLanguageSet,
+				},
+				{
 					Event:  iam.SetupStartedEventType,
 					Reduce: p.reduceSetupEvent,
 				},
@@ -56,13 +60,14 @@ func (p *IAMProjection) reducers() []handler.AggregateReducer {
 type IAMColumn string
 
 const (
-	IAMColumnID           = "id"
-	IAMColumnChangeDate   = "change_date"
-	IAMColumnGlobalOrgID  = "global_org_id"
-	IAMColumnProjectID    = "iam_project_id"
-	IAMColumnSequence     = "sequence"
-	IAMColumnSetUpStarted = "setup_started"
-	IAMColumnSetUpDone    = "setup_done"
+	IAMColumnID              = "id"
+	IAMColumnChangeDate      = "change_date"
+	IAMColumnGlobalOrgID     = "global_org_id"
+	IAMColumnProjectID       = "iam_project_id"
+	IAMColumnSequence        = "sequence"
+	IAMColumnSetUpStarted    = "setup_started"
+	IAMColumnSetUpDone       = "setup_done"
+	IAMColumnDefaultLanguage = "default_language"
 )
 
 func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
@@ -95,6 +100,23 @@ func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.St
 			handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 			handler.NewCol(IAMColumnSequence, e.Sequence()),
 			handler.NewCol(IAMColumnProjectID, e.ProjectID),
+		},
+	), nil
+}
+
+func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*iam.DefaultLanguageSetEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-3n9le", "seq", event.Sequence(), "expectedType", iam.DefaultLanguageSetEventType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-30o0e", "reduce.wrong.event.type")
+	}
+	return crdb.NewUpsertStatement(
+		e,
+		[]handler.Column{
+			handler.NewCol(IAMColumnID, e.Aggregate().ID),
+			handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
+			handler.NewCol(IAMColumnSequence, e.Sequence()),
+			handler.NewCol(IAMColumnProjectID, e.DefaultLanguage),
 		},
 	), nil
 }

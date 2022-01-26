@@ -27,6 +27,8 @@ Errors:
       RemoveFailed: L'oggetto non può essere rimosso
   Limit:
     ExceedsDefault: Il limite supera quello predefinito
+  Language:
+    NotParsed: Impossibile analizzare la lingua
   User:
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente

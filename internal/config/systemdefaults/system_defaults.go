@@ -23,7 +23,6 @@ type SystemDefaults struct {
 	Multifactors             MultifactorConfig
 	VerificationLifetimes    VerificationLifetimes
 	DomainVerification       DomainVerification
-	IamID                    string
 	Notifications            Notifications
 	WebAuthN                 WebAuthN
 	KeyConfig                KeyConfig

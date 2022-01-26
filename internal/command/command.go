@@ -21,7 +21,6 @@ import (
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/caos/zitadel/internal/repository/usergrant"
 	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
@@ -141,19 +140,6 @@ func StartCommands(
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil
-}
-
-func (c *Commands) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewIAMWriteModel()
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModel, nil
 }
 
 func AppendAndReduce(object interface {

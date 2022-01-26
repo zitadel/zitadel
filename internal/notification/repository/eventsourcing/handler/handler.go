@@ -43,7 +43,6 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 	return []queryv1.Handler{
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			systemDefaults.IamID,
 			queries,
 		),
 		newNotification(

@@ -161,6 +161,28 @@ service AdminService {
         };
     }
 
+    // Set the default language
+    rpc SetDefaultLanguages(SetDefaultLanguageRequest) returns (SetDefaultLanguageResponse) {
+        option (google.api.http) = {
+            put: "/languages/default/{language}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Set the default language
+    rpc GetDefaultLanguages(GetDefaultLanguageRequest) returns (GetDefaultLanguageResponse) {
+        option (google.api.http) = {
+            get: "/languages/default";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -2189,6 +2211,22 @@ message GetSupportedLanguagesRequest {}
 message GetSupportedLanguagesResponse {
     repeated string languages = 1;
 }
+
+message SetDefaultLanguageRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 10}];
+}
+
+message SetDefaultLanguageResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetDefaultLanguageRequest {}
+
+message GetDefaultLanguageResponse {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 10}];
+}
+
 
 // if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {

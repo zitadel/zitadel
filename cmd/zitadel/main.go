@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/getsentry/sentry-go"
 	"github.com/rs/cors"
 
@@ -257,6 +258,6 @@ func startSetup(configPaths []string) {
 	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil, nil)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
-	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)
+	err = setup.Execute(ctx, conf.SetUp, domain.IAMID, commands)
 	logging.Log("MAIN-djs3R").OnError(err).Panic("failed to execute setup steps")
 }

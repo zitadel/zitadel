@@ -32,8 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults) []query.Handler {
 	return []query.Handler{
 		newUserGrant(
-			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es},
-			systemDefaults.IamID),
+			handler{view, bulkLimit, configs.cycleDuration("UserGrants"), errorCount, es}),
 		newUserMembership(
 			handler{view, bulkLimit, configs.cycleDuration("UserMemberships"), errorCount, es}),
 	}

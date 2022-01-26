@@ -64,7 +64,6 @@ SystemDefaults:
     MFAInitSkip: 720h #30d
     SecondFactorCheck: 18h
     MultiFactorCheck: 12h
-  IamID: 'IAM'
   DomainVerification:
     VerificationKey:
       EncryptionKeyID: $ZITADEL_DOMAIN_VERIFICATION_KEY

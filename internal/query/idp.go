@@ -185,7 +185,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 					IDPResourceOwnerCol.identifier(): resourceOwner,
 				},
 				sq.Eq{
-					IDPResourceOwnerCol.identifier(): q.iamID,
+					IDPResourceOwnerCol.identifier(): domain.IAMID,
 				},
 			},
 		},

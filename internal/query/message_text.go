@@ -119,7 +119,7 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 				MessageTextColAggregateID.identifier(): orgID,
 			},
 			sq.Eq{
-				MessageTextColAggregateID.identifier(): q.iamID,
+				MessageTextColAggregateID.identifier(): domain.IAMID,
 			},
 		}).
 		OrderBy(MessageTextColAggregateID.identifier()).
@@ -135,7 +135,7 @@ func (q *Queries) MessageTextByOrg(ctx context.Context, orgID string) (*MessageT
 func (q *Queries) DefaultMessageText(ctx context.Context) (*MessageText, error) {
 	stmt, scan := prepareMessageTextQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		MessageTextColAggregateID.identifier(): q.iamID,
+		MessageTextColAggregateID.identifier(): domain.IAMID,
 	}).
 		Limit(1).ToSql()
 	if err != nil {

@@ -32,6 +32,30 @@ Returns the default languages
     GET: /languages
 
 
+### SetDefaultLanguages
+
+> **rpc** SetDefaultLanguages([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
+[SetDefaultLanguageResponse](#setdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    PUT: /languages/default/{language}
+
+
+### GetDefaultLanguages
+
+> **rpc** GetDefaultLanguages([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
+[GetDefaultLanguageResponse](#getdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    GET: /languages/default
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1587,6 +1611,23 @@ This is an empty response
 
 
 
+### GetDefaultLanguageRequest
+This is an empty request
+
+
+
+
+### GetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+
+
+
+
 ### GetDefaultLoginTextsRequest
 
 
@@ -2598,6 +2639,28 @@ This is an empty request
 
 
 ### SetDefaultInitMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultLanguageRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+
+
+
+
+### SetDefaultLanguageResponse
 
 
 

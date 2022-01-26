@@ -112,7 +112,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 	case model.IDPConfigChanged, org_es_model.IDPConfigChanged:
 		esConfig := new(iam_view_model.IDPConfigView)
 		providerType := iam_model.IDPProviderTypeSystem
-		if event.AggregateID != i.systemDefaults.IamID {
+		if event.AggregateID != domain.IAMID {
 			providerType = iam_model.IDPProviderTypeOrg
 		}
 		esConfig.AppendEvent(providerType, event)
@@ -121,7 +121,7 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 			return err
 		}
 		config := new(query2.IDP)
-		if event.AggregateID == i.systemDefaults.IamID {
+		if event.AggregateID == domain.IAMID {
 			config, err = i.getDefaultIDPConfig(context.TODO(), esConfig.IDPConfigID)
 		} else {
 			config, err = i.getOrgIDPConfig(context.TODO(), event.AggregateID, esConfig.IDPConfigID)

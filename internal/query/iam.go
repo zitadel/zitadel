@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -44,6 +45,10 @@ var (
 		name:  projection.IAMColumnSetUpDone,
 		table: iamTable,
 	}
+	IAMColumnDefaultLanguage = Column{
+		name:  projection.IAMColumnDefaultLanguage,
+		table: iamTable,
+	}
 )
 
 type IAM struct {
@@ -51,10 +56,11 @@ type IAM struct {
 	ChangeDate time.Time
 	Sequence   uint64
 
-	GlobalOrgID  string
-	IAMProjectID string
-	SetupStarted domain.Step
-	SetupDone    domain.Step
+	GlobalOrgID     string
+	IAMProjectID    string
+	DefaultLanguage language.Tag
+	SetupStarted    domain.Step
+	SetupDone       domain.Step
 }
 
 type IAMSearchQueries struct {
@@ -92,6 +98,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 			IAMColumnProjectID.identifier(),
 			IAMColumnSetupStarted.identifier(),
 			IAMColumnSetupDone.identifier(),
+			IAMColumnDefaultLanguage.identifier(),
 		).
 			From(iamTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IAM, error) {
@@ -104,6 +111,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 				&o.IAMProjectID,
 				&o.SetupStarted,
 				&o.SetupDone,
+				&o.DefaultLanguage,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

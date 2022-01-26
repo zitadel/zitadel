@@ -25,7 +25,6 @@ import (
 )
 
 type Queries struct {
-	iamID      string
 	eventstore *eventstore.Eventstore
 	client     *sql.DB
 
@@ -56,7 +55,6 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
 
 	repo = &Queries{
-		iamID:                               defaults.IamID,
 		eventstore:                          es,
 		client:                              sqlClient,
 		DefaultLanguage:                     defaults.DefaultLanguage,

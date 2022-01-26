@@ -111,7 +111,6 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			MFAInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MFAInitSkip.Duration,
 			SecondFactorCheckLifeTime:  systemDefaults.VerificationLifetimes.SecondFactorCheck.Duration,
 			MultiFactorCheckLifeTime:   systemDefaults.VerificationLifetimes.MultiFactorCheck.Duration,
-			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{
 			View:       view,
