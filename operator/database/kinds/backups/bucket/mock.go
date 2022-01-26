@@ -4,7 +4,6 @@ import (
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/restore"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
 	"github.com/golang/mock/gomock"
 	corev1 "k8s.io/api/core/v1"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
@@ -14,7 +13,7 @@ import (
 
 func SetQueriedForDatabases(databases, users []string) map[string]interface{} {
 	queried := map[string]interface{}{}
-	core.SetQueriedForDatabaseDBList(queried, databases, users)
+	//	core.SetQueriedForDatabaseDBList(queried, databases, users)
 
 	return queried
 }

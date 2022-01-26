@@ -123,7 +123,7 @@ func Adapter(
 		cockroachNameLabels := labels.MustForName(componentLabels, SfsName)
 		cockroachSelector := labels.DeriveNameSelector(cockroachNameLabels, false)
 		cockroachSelectabel := labels.AsSelectable(cockroachNameLabels)
-		querySFS, destroySFS, ensureInit, checkDBReady, listDatabases, err := statefulset.AdaptFunc(
+		querySFS, destroySFS, ensureInit, checkDBReady, err := statefulset.AdaptFunc(
 			internalMonitor,
 			cockroachSelectabel,
 			cockroachSelector,
@@ -257,11 +257,9 @@ func Adapter(
 					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
 					currentDB.Current.URL = PublicServiceName
-					currentDB.Current.ReadyFunc = checkDBReady
 					currentDB.Current.AddUserFunc = addUser
 					currentDB.Current.DeleteUserFunc = deleteUser
 					currentDB.Current.ListUsersFunc = listUsers
-					currentDB.Current.ListDatabasesFunc = listDatabases
 
 					db.SetQueriedForDatabase(queried, current)
 					internalMonitor.Info("set current state of managed database")

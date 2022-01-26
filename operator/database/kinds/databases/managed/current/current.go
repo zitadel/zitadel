@@ -3,6 +3,9 @@ package current
 import (
 	"crypto/rsa"
 
+	"github.com/caos/orbos/mntr"
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/current"
 
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -10,32 +13,20 @@ import (
 	"github.com/caos/zitadel/operator"
 )
 
+var _ db.Client = (*Current)(nil)
+
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
 	Current *CurrentDB
 }
 
 type CurrentDB struct {
-	URL               string
-	Port              string
-	ReadyFunc         operator.EnsureFunc
-	CA                *cacurr.Current
-	AddUserFunc       func(user string) (operator.QueryFunc, error)
-	DeleteUserFunc    func(user string) (operator.DestroyFunc, error)
-	ListUsersFunc     func(k8sClient kubernetes.ClientInt) ([]string, error)
-	ListDatabasesFunc func(k8sClient kubernetes.ClientInt) ([]string, error)
-}
-
-func (c *Current) GetURL() string {
-	return c.Current.URL
-}
-
-func (c *Current) GetPort() string {
-	return c.Current.Port
-}
-
-func (c *Current) GetReadyQuery() operator.EnsureFunc {
-	return c.Current.ReadyFunc
+	URL            string
+	Port           string
+	CA             *cacurr.Current
+	AddUserFunc    func(user string) (operator.QueryFunc, error)
+	DeleteUserFunc func(user string) (operator.DestroyFunc, error)
+	ListUsersFunc  func(k8sClient kubernetes.ClientInt) ([]string, error)
 }
 
 func (c *Current) GetCA() *cacurr.Current {
@@ -58,18 +49,28 @@ func (c *Current) SetCertificate(cert []byte) {
 	c.Current.CA.Certificate = cert
 }
 
-func (c *Current) GetListDatabasesFunc() func(k8sClient kubernetes.ClientInt) ([]string, error) {
-	return c.Current.ListDatabasesFunc
+func (c *Current) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error) {
+	return c.Current.URL, c.Current.Port, nil
 }
-
-func (c *Current) GetListUsersFunc() func(k8sClient kubernetes.ClientInt) ([]string, error) {
-	return c.Current.ListUsersFunc
+func (c *Current) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
+	destroy, err := c.Current.DeleteUserFunc(user)
+	if err != nil {
+		return err
+	}
+	return destroy(k8sClient)
 }
+func (c *Current) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
+	query, err := c.Current.AddUserFunc(user)
+	if err != nil {
+		return err
+	}
 
-func (c *Current) GetAddUserFunc() func(user string) (operator.QueryFunc, error) {
-	return c.Current.AddUserFunc
+	ensure, err := query(k8sClient, nil)
+	if err != nil {
+		return err
+	}
+	return ensure(k8sClient)
 }
-
-func (c *Current) GetDeleteUserFunc() func(user string) (operator.DestroyFunc, error) {
-	return c.Current.DeleteUserFunc
+func (c *Current) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
+	return c.Current.ListUsersFunc(k8sClient)
 }

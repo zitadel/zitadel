@@ -71,7 +71,7 @@ func AdaptFunc(
 	resources.DestroyFunc,
 	operator.EnsureFunc,
 	operator.EnsureFunc,
-	func(k8sClient kubernetes.ClientInt) ([]string, error),
+	//	func(k8sClient kubernetes.ClientInt) ([]string, error),
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "statefulset")
@@ -209,11 +209,11 @@ func AdaptFunc(
 
 	query, err := statefulset.AdaptFuncToEnsure(statefulsetDef, force)
 	if err != nil {
-		return nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	destroy, err := statefulset.AdaptFuncToDestroy(namespace, name)
 	if err != nil {
-		return nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	wrapedQuery, wrapedDestroy, err := resources.WrapFuncs(internalMonitor, query, destroy)
@@ -261,34 +261,36 @@ func AdaptFunc(
 		return nil
 	}
 
-	getAllDBs := func(k8sClient kubernetes.ClientInt) ([]string, error) {
-		if err := checkDBRunning(k8sClient); err != nil {
-			return nil, err
-		}
-
-		if err := checkDBReady(k8sClient); err != nil {
-			return nil, err
-		}
-
-		command := "/cockroach/cockroach sql --certs-dir=" + clientCertPath + " --host=" + name + "-0." + name + " -e 'SHOW DATABASES;'"
-
-		databasesStr, err := k8sClient.ExecInPodWithOutput(namespace, name+"-0", name, command)
-		if err != nil {
-			return nil, err
-		}
-		databases := strings.Split(databasesStr, "\n")
-		dbAndOwners := databases[1 : len(databases)-1]
-		dbs := []string{}
-		for _, dbAndOwner := range dbAndOwners {
-			parts := strings.Split(dbAndOwner, "\t")
-			if parts[1] != "node" {
-				dbs = append(dbs, parts[0])
+	/*
+		getAllDBs := func(k8sClient kubernetes.ClientInt) ([]string, error) {
+			if err := checkDBRunning(k8sClient); err != nil {
+				return nil, err
 			}
-		}
-		return dbs, nil
-	}
 
-	return wrapedQuery, wrapedDestroy, ensureInit, checkDBReady, getAllDBs, err
+			if err := checkDBReady(k8sClient); err != nil {
+				return nil, err
+			}
+
+			command := "/cockroach/cockroach sql --certs-dir=" + clientCertPath + " --host=" + name + "-0." + name + " -e 'SHOW DATABASES;'"
+
+			databasesStr, err := k8sClient.ExecInPodWithOutput(namespace, name+"-0", name, command)
+			if err != nil {
+				return nil, err
+			}
+			databases := strings.Split(databasesStr, "\n")
+			dbAndOwners := databases[1 : len(databases)-1]
+			dbs := []string{}
+			for _, dbAndOwner := range dbAndOwners {
+				parts := strings.Split(dbAndOwner, "\t")
+				if parts[1] != "node" {
+					dbs = append(dbs, parts[0])
+				}
+			}
+			return dbs, nil
+		}
+	*/
+
+	return wrapedQuery, wrapedDestroy, ensureInit, checkDBReady, err
 }
 
 func getJoinExec(

@@ -124,8 +124,8 @@ func AdaptFunc(
 			case "iam", "migration", "scaleup", "scaledown":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
-					queryIAM,
 					queryDBConn,
+					queryIAM,
 				)
 				destroyers = append(destroyers, destroyIAM, destroyDBConn)
 			case "operator":
