@@ -1,7 +1,6 @@
 import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
@@ -139,9 +138,9 @@ export class ProjectGrantDetailComponent {
       });
   }
 
-  updateRoles(selectionChange: MatSelectChange): void {
+  updateRoles(selectionChange: string[]): void {
     this.mgmtService
-      .updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange.value)
+      .updateProjectGrant(this.grant.grantId, this.grant.projectId, selectionChange)
       .then(() => {
         this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
       })
@@ -203,9 +202,9 @@ export class ProjectGrantDetailComponent {
     });
   }
 
-  updateMemberRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+  updateMemberRoles(member: Member.AsObject, selectionChange: string[]): void {
     this.mgmtService
-      .updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange.value)
+      .updateProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId, selectionChange)
       .then(() => {
         this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERCHANGED', true);
       })

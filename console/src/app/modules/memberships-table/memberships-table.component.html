@@ -49,28 +49,22 @@
       <ng-container matColumnDef="rolesList">
         <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'ROLESLABEL' | translate }} </th>
         <td mat-cell *matCellDef="let membership">
-          <div class="membership-auth-line">
-            <div *ngIf="!userId" class="membership-role-list">
-              <span *ngFor="let role of membership.rolesList">{{ role }}</span>
-            </div>
+          <div class="membership-line">
+            <mat-chip-list class="cnsl-chip-list" aria-label="role selection">
+              <mat-chip class="cnsl-chip" *ngFor="let role of membership.rolesList" [removable]="!!userId"
+                [selectable]="false" (removed)="removeRole(membership, role)">
+                <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+                <span>{{role | roletransform}}</span>
+                <button *ngIf="!!userId" matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+            </mat-chip-list>
             <button matTooltip="{{'ACTIONS.EDIT' | translate}}" (click)="goto(membership)" mat-icon-button
               class="goto-btn">
               <i class="las la-angle-right"></i>
             </button>
           </div>
-          <cnsl-form-field *ngIf="membership && userId" class="form-field" appearance="outline">
-            <mat-select [(ngModel)]="membership.rolesList" multiple (openedChange)="loadRoles(membership, $event)"
-              [disabled]="false" (selectionChange)="updateRoles(membership, $event)">
-              <mat-option
-                *ngFor="let role of ((isCurrentMembership(membership) && membershipRoleOptions.length && !loadingRoles) ? membershipRoleOptions : membership.rolesList)"
-                [value]="role">
-                {{ role }}
-              </mat-option>
-              <div class="roles-sp-wrapper">
-                <mat-spinner *ngIf="loadingRoles" diameter="25"></mat-spinner>
-              </div>
-            </mat-select>
-          </cnsl-form-field>
         </td>
       </ng-container>
 

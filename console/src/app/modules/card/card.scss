@@ -57,4 +57,24 @@
       }
     }
   }
+
+  .cnsl-chip {
+    border: 1px solid $border-color;
+  }
+
+  .cnsl-chip-list {
+    padding: 0.5rem 0;
+    display: block;
+  }
+
+  .cnsl-chip-dot {
+    height: 1rem;
+    width: 1rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: #cd5c5c;
+    margin-left: -4px;
+    margin-right: 8px;
+    box-shadow: 0 0 3px #0000001a;
+  }
 }

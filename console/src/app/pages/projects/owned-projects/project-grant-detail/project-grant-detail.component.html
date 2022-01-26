@@ -33,7 +33,7 @@
 
   <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
     <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event)">
+    <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event.value)">
       <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
         {{role.key}}
       </mat-option>

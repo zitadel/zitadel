@@ -1,6 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -11,6 +10,7 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { getColor } from '../avatar/avatar.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { MembershipsDataSource } from './memberships-datasource';
 
@@ -177,49 +177,104 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     );
   }
 
-  public updateRoles(membership: Membership.AsObject, selectionChange: MatSelectChange): void {
-    console.log(membership, selectionChange);
-    if (membership.orgId) {
-      console.log('org member', membership.userId, selectionChange.value);
-      this.mgmtService
-        .updateOrgMember(membership.userId, selectionChange.value)
-        .then(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-          this.changePage(this.paginator);
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
-    } else if (membership.projectGrantId) {
-      this.mgmtService
-        .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
-        .then(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-          this.changePage(this.paginator);
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
-    } else if (membership.projectId) {
-      this.mgmtService
-        .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
-        .then(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-          this.changePage(this.paginator);
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
-    } else if (membership.iam) {
-      this.adminService
-        .updateIAMMember(membership.userId, selectionChange.value)
-        .then(() => {
-          this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-          this.changePage(this.paginator);
-        })
-        .catch((error) => {
-          this.toastService.showError(error);
-        });
+  public getColor(role: string) {
+    return getColor(role);
+  }
+
+  public removeRole(membership: Membership.AsObject, role: string): void {
+    const newRoles = Object.assign([], membership.rolesList);
+    const index = newRoles.findIndex((r) => r === role);
+    if (index > -1) {
+      newRoles.splice(index);
+      if (membership.orgId) {
+        console.log('org member', membership.userId, newRoles);
+        this.mgmtService
+          .updateOrgMember(membership.userId, newRoles)
+          .then(() => {
+            this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+            this.changePage(this.paginator);
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      } else if (membership.projectGrantId) {
+        this.mgmtService
+          .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, newRoles)
+          .then(() => {
+            this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+            this.changePage(this.paginator);
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      } else if (membership.projectId) {
+        console.log(membership.projectId, membership.userId, newRoles);
+        this.mgmtService
+          .updateProjectMember(membership.projectId, membership.userId, newRoles)
+          .then(() => {
+            this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+            this.changePage(this.paginator);
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      } else if (membership.iam) {
+        this.adminService
+          .updateIAMMember(membership.userId, newRoles)
+          .then(() => {
+            this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+            this.changePage(this.paginator);
+          })
+          .catch((error) => {
+            this.toastService.showError(error);
+          });
+      }
     }
   }
+
+  // public updateRoles(membership: Membership.AsObject, selectionChange: MatSelectChange): void {
+  //   console.log(membership, selectionChange);
+  //   if (membership.orgId) {
+  //     console.log('org member', membership.userId, selectionChange.value);
+  //     this.mgmtService
+  //       .updateOrgMember(membership.userId, selectionChange.value)
+  //       .then(() => {
+  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+  //         this.changePage(this.paginator);
+  //       })
+  //       .catch((error) => {
+  //         this.toastService.showError(error);
+  //       });
+  //   } else if (membership.projectGrantId) {
+  //     this.mgmtService
+  //       .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
+  //       .then(() => {
+  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+  //         this.changePage(this.paginator);
+  //       })
+  //       .catch((error) => {
+  //         this.toastService.showError(error);
+  //       });
+  //   } else if (membership.projectId) {
+  //     this.mgmtService
+  //       .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
+  //       .then(() => {
+  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+  //         this.changePage(this.paginator);
+  //       })
+  //       .catch((error) => {
+  //         this.toastService.showError(error);
+  //       });
+  //   } else if (membership.iam) {
+  //     this.adminService
+  //       .updateIAMMember(membership.userId, selectionChange.value)
+  //       .then(() => {
+  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
+  //         this.changePage(this.paginator);
+  //       })
+  //       .catch((error) => {
+  //         this.toastService.showError(error);
+  //       });
+  //   }
+  // }
 }

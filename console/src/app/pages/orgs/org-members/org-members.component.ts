@@ -1,12 +1,11 @@
 import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -34,7 +33,16 @@ export class OrgMembersComponent {
     private toast: ToastService,
     breadcrumbService: BreadcrumbService,
   ) {
-    breadcrumbService.setBreadcrumb([]);
+    const iamBread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'IAM',
+      routerLink: ['/system'],
+    });
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([iamBread, bread]);
 
     this.mgmtService.getMyOrg().then((resp) => {
       if (resp.org) {
@@ -62,9 +70,9 @@ export class OrgMembersComponent {
       });
   }
 
-  updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+  updateRoles(member: Member.AsObject, selectionChange: string[]): void {
     this.mgmtService
-      .updateOrgMember(member.userId, selectionChange.value)
+      .updateOrgMember(member.userId, selectionChange)
       .then(() => {
         this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
       })

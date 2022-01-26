@@ -1,7 +1,6 @@
 import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -53,9 +52,9 @@ export class IamMembersComponent {
       });
   }
 
-  updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+  updateRoles(member: Member.AsObject, selectionChange: string[]): void {
     this.adminService
-      .updateIAMMember(member.userId, selectionChange.value)
+      .updateIAMMember(member.userId, selectionChange)
       .then(() => {
         this.toast.showInfo('ORG.TOAST.MEMBERCHANGED', true);
       })

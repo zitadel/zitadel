@@ -1,7 +1,6 @@
 import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
 import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs/operators';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
@@ -218,10 +217,10 @@ export class ProjectMembersComponent {
     });
   }
 
-  updateRoles(member: Member.AsObject, selectionChange: MatSelectChange): void {
+  updateRoles(member: Member.AsObject, selectionChange: string[]): void {
     if (this.projectType === ProjectType.PROJECTTYPE_OWNED) {
       this.mgmtService
-        .updateProjectMember((this.project as Project.AsObject).id, member.userId, selectionChange.value)
+        .updateProjectMember((this.project as Project.AsObject).id, member.userId, selectionChange)
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);
         })
@@ -234,7 +233,7 @@ export class ProjectMembersComponent {
           (this.project as GrantedProject.AsObject).projectId,
           this.grantId,
           member.userId,
-          selectionChange.value,
+          selectionChange,
         )
         .then(() => {
           this.toast.showInfo('PROJECT.TOAST.MEMBERCHANGED', true);

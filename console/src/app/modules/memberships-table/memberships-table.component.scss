@@ -17,7 +17,35 @@
   box-sizing: border-box;
 }
 
-.membership-auth-line {
+// .membership-auth-line {
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center;
+//   justify-content: space-between;
+
+//   .membership-role-list {
+//     display: flex;
+//     flex-direction: column;
+//     margin: 0.25rem;
+//     font-size: 14px;
+//     text-overflow: ellipsis;
+//     overflow: hidden;
+//     justify-items: center;
+//     align-self: center;
+//   }
+
+//   .goto-btn {
+//     margin-left: 0.5rem;
+
+//     i {
+//       height: 1rem;
+//       line-height: 1rem;
+//       font-size: 1rem;
+//     }
+//   }
+// }
+
+.membership-line {
   display: flex;
   flex-direction: row;
   align-items: center;
