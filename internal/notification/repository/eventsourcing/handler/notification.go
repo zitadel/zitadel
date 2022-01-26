@@ -410,7 +410,7 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.systemDefaults.DefaultLanguage})
+	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(context.TODO())})
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/iam"
-	"golang.org/x/text/language"
 )
 
 func TestIAMProjection_reduces(t *testing.T) {
@@ -89,7 +88,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 					repository.EventType(iam.DefaultLanguageSetEventType),
 					iam.AggregateType,
 					[]byte(`{"defaultLanguage": "en"}`),
-				), iam.ProjectSetMapper),
+				), iam.DefaultLanguageSetMapper),
 			},
 			reduce: (&IAMProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
@@ -105,7 +104,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 								"agg-id",
 								anyArg{},
 								uint64(15),
-								language.English,
+								"en",
 							},
 						},
 					},

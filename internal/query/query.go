@@ -57,7 +57,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	repo = &Queries{
 		eventstore:                          es,
 		client:                              sqlClient,
-		DefaultLanguage:                     defaults.DefaultLanguage,
+		DefaultLanguage:                     language.Und,
 		LoginDir:                            statikLoginFS,
 		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),

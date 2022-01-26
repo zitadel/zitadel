@@ -89,6 +89,14 @@ func (q *Queries) IAMByID(ctx context.Context, id string) (*IAM, error) {
 	return scan(row)
 }
 
+func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
+	iam, err := q.IAMByID(ctx, domain.IAMID)
+	if err != nil {
+		return language.Und
+	}
+	return iam.DefaultLanguage
+}
+
 func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 	return sq.Select(
 			IAMColumnID.identifier(),
@@ -102,16 +110,17 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 		).
 			From(iamTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IAM, error) {
-			o := new(IAM)
+			iam := new(IAM)
+			lang := ""
 			err := row.Scan(
-				&o.ID,
-				&o.ChangeDate,
-				&o.Sequence,
-				&o.GlobalOrgID,
-				&o.IAMProjectID,
-				&o.SetupStarted,
-				&o.SetupDone,
-				&o.DefaultLanguage,
+				&iam.ID,
+				&iam.ChangeDate,
+				&iam.Sequence,
+				&iam.GlobalOrgID,
+				&iam.IAMProjectID,
+				&iam.SetupStarted,
+				&iam.SetupDone,
+				&lang,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -119,6 +128,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			return o, nil
+			iam.DefaultLanguage = language.Make(lang)
+			return iam, nil
 		}
 }

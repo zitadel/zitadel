@@ -76,7 +76,7 @@ func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo authz
 	api.health = &repo
 	api.auth = authRepo
 	api.admin = adminRepo
-	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, q)
 	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
 	api.RegisterHandler("", api.healthHandler())
 
