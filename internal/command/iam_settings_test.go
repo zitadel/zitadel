@@ -13,16 +13,12 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/id"
-	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/repository/iam"
-	"github.com/caos/zitadel/internal/repository/project"
 )
 
 func TestCommandSide_AddSecretGenerator(t *testing.T) {
 	type fields struct {
-		eventstore  *eventstore.Eventstore
-		idGenerator id.Generator
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx           context.Context
@@ -77,7 +73,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(iam.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&project.NewAggregate("IAM", "IAM").Aggregate,
+								&iam.NewAggregate().Aggregate,
 								"CONFIG",
 								4,
 								time.Hour*1,
@@ -91,7 +87,6 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(iam.NewAddSecretGeneratorTypeUniqueConstraint("CONFIG")),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -115,11 +110,11 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internl"),
+					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(iam.NewSecretGeneratorAddedEvent(
 								context.Background(),
-								&project.NewAggregate("IAM", "IAM").Aggregate,
+								&iam.NewAggregate().Aggregate,
 								"CONFIG",
 								4,
 								time.Hour*1,
@@ -133,7 +128,6 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(iam.NewAddSecretGeneratorTypeUniqueConstraint("CONFIG")),
 					),
 				),
-				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "project1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -157,8 +151,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:  tt.fields.eventstore,
-				idGenerator: tt.fields.idGenerator,
+				eventstore: tt.fields.eventstore,
 			}
 			got, err := r.AddSecretGeneratorConfig(tt.args.ctx, tt.args.generatorType, tt.args.generator)
 			if tt.res.err == nil {
@@ -203,7 +196,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 			args: args{
 				ctx:           context.Background(),
 				generator:     &crypto.GeneratorConfig{},
-				generatorType: "CONFIG",
+				generatorType: "",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,

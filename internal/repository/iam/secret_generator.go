@@ -12,7 +12,7 @@ import (
 
 const (
 	UniqueSecretGeneratorType       = "secret_generator"
-	secretGeneratorPrefix           = ""
+	secretGeneratorPrefix           = "secret.generator."
 	SecretGeneratorAddedEventType   = iamEventTypePrefix + secretGeneratorPrefix + "added"
 	SecretGeneratorChangedEventType = iamEventTypePrefix + secretGeneratorPrefix + "changed"
 	SecretGeneratorRemovedEventType = iamEventTypePrefix + secretGeneratorPrefix + "removed"
@@ -191,7 +191,7 @@ type SecretGeneratorRemovedEvent struct {
 }
 
 func (e *SecretGeneratorRemovedEvent) Data() interface{} {
-	return nil
+	return e
 }
 
 func (e *SecretGeneratorRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
@@ -214,7 +214,14 @@ func NewSecretGeneratorRemovedEvent(
 }
 
 func SecretGeneratorRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &SecretGeneratorRemovedEvent{
+	e := &SecretGeneratorRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
+	}
+
+	err := json.Unmarshal(event.Data, e)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IAM-m09ke", "unable to unmarshal secret generator removed")
+	}
+
+	return e, nil
 }

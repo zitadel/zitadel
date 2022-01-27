@@ -52,7 +52,8 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SecretGenerator.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&generatorWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSecretGeneratorAddedEvent(
+
+	changedEvent, hasChanged, err := generatorWriteModel.NewChangedEvent(
 		ctx,
 		iamAgg,
 		generatorType,
@@ -61,7 +62,14 @@ func (c *Commands) ChangeSecretGeneratorConfig(ctx context.Context, generatorTyp
 		config.IncludeLowerLetters,
 		config.IncludeUpperLetters,
 		config.IncludeDigits,
-		config.IncludeSymbols))
+		config.IncludeSymbols)
+	if err != nil {
+		return nil, err
+	}
+	if !hasChanged {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
