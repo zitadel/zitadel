@@ -13,15 +13,20 @@
 
     <ng-template cnslHasRole selectactions [hasRole]="['iam.member.delete']">
       <button color="warn" (click)="removeMemberSelection()" matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}"
-        class="del-button" mat-raised-button>
+        mat-raised-button>
         <i class="las la-trash"></i>
-        {{'ACTIONS.SELECTIONDELETE' | translate}}
+        <span>{{'ACTIONS.SELECTIONDELETE' | translate}}</span>
+        <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeMemberSelection()">
+        </cnsl-action-keys>
       </button>
     </ng-template>
     <ng-template cnslHasRole writeactions [hasRole]="['iam.member.write']">
-      <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
-        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-      </a>
+      <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="openAddMember()">
+        </cnsl-action-keys>
+      </button>
     </ng-template>
   </cnsl-members-table>
 </cnsl-detail-layout>

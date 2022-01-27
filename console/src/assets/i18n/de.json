@@ -1121,7 +1121,7 @@
       },
       "DETAIL": {
         "TITLE": "Organisationsberechtigung",
-        "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und editieren.",
+        "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und Manager editieren.",
         "MEMBERTITLE": "Berechtigte Manager der Organisation",
         "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
         "PROJECTNAME": "Projektname",
@@ -1581,7 +1581,9 @@
       "0": "Eigenes Projekt",
       "1": "Berechtigtes Projekt",
       "4": "Projekt"
-    }
+    },
+    "EDITROLE": "Rollen editieren",
+    "EDITFOR": "Bearbeiten Sie die Rollen für den Benutzer: {{value}}"
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
@@ -1612,8 +1614,10 @@
       "BULKREMOVED": "Berechtigungen entfernt."
     },
     "DIALOG": {
+      "DELETE_TITLE": "Authorisierung löschen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff eine Autorisierung zu entfernen. Wollen Sie fortfahren?",
       "BULK_DELETE_TITLE": "Autorisierungen löschen",
-      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff eine mehrere Autorisierungen zu entfernen. Wollen Sie fortfahren?"
+      "BULK_DELETE_DESCRIPTION": "Sie sind im Begriff mehrere Autorisierungen zu entfernen. Wollen Sie fortfahren?"
     }
   },
   "CHANGES": {

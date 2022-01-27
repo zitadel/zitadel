@@ -2,6 +2,7 @@ import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
+import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -38,6 +39,9 @@ export class ProjectGrantDetailComponent {
   public changePage: EventEmitter<void> = new EventEmitter();
   public selection: Array<Member.AsObject> = [];
   public dataSource!: ProjectGrantMembersDataSource;
+
+  public ActionKeysType: any = ActionKeysType;
+
   constructor(
     private mgmtService: ManagementService,
     private route: ActivatedRoute,
@@ -83,12 +87,6 @@ export class ProjectGrantDetailComponent {
               name: '',
               param: { key: 'projectid', value: resp.projectGrant.projectId },
               routerLink: ['/projects', resp.projectGrant.projectId],
-            }),
-            new Breadcrumb({
-              type: BreadcrumbType.PROJECTGRANT,
-              name: resp.projectGrant.grantedOrgName,
-              param: { key: 'grantid', value: resp.projectGrant.grantId },
-              routerLink: ['/projects', resp.projectGrant.projectId, 'projectgrants', resp.projectGrant.grantId],
             }),
           ];
           this.breadcrumbService.setBreadcrumb(breadcrumbs);
@@ -165,6 +163,20 @@ export class ProjectGrantDetailComponent {
           });
       }),
     );
+  }
+
+  public removeProjectMember(member: Member.AsObject): void {
+    this.mgmtService
+      .removeProjectGrantMember(this.grant.projectId, this.grant.grantId, member.userId)
+      .then(() => {
+        this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTMEMBERREMOVED', true);
+        setTimeout(() => {
+          this.changePage.emit();
+        }, 1000);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+      });
   }
 
   public async openAddMember(): Promise<any> {

@@ -4,48 +4,25 @@
 }
 
 .desc {
-  color: rgb(201, 51, 71);
   font-size: 0.9rem;
 }
 
-.form-field {
-  width: 100%;
+.roles-selection {
+  display: flex;
+  flex-direction: column;
+  .role-cb {
+    padding: 0.25rem 0;
+
+    .role-cb-content {
+      padding-left: 0.5rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+  }
 }
 
 .action {
   display: flex;
   justify-content: space-between;
-
-  .ok-button {
-    margin-left: 0.5rem;
-  }
-}
-
-.row {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-
-  .left,
-  .right {
-    font-size: 14px;
-    flex: 1 0 auto;
-  }
-
-  .left {
-    color: var(--grey);
-    margin-right: 1rem;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  .right {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    overflow: auto;
-  }
-}
-
-.download-button {
-  margin-bottom: 1rem;
 }

@@ -1,5 +1,12 @@
 <cnsl-detail-layout [backRouterLink]="[ '/projects', projectid, 'projectgrants']"
-  title="{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}" description="{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}">
+  title="{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}">
+  <p class="subinfo" sub>
+    <span class="label">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</span>
+    <a mat-icon-button href="https://docs.zitadel.ch/docs/concepts/structure/projects#granted-organizations"
+      target="_blank">
+      <i class="las la-info-circle"></i>
+    </a>
+  </p>
   <div class="master-row">
     <div class="left-col">
       <div class="row">
@@ -31,7 +38,7 @@
     </div>
   </div>
 
-  <cnsl-form-field class="formfield" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
+  <cnsl-form-field class="grant-detail-roles" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
     <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
     <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event.value)">
       <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
@@ -45,20 +52,26 @@
   <h2 class="project-grant-h2">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h2>
   <p class="desc max-width-description">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>
 
-  <cnsl-members-table *ngIf="grant" style="width: 100%;" [dataSource]="dataSource"
+  <cnsl-members-table *ngIf="grant" [dataSource]="dataSource"
     [canWrite]="['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async"
+    [canDelete]="['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async"
     [memberRoleOptions]="memberRoleOptions" (updateRoles)="updateMemberRoles($event.member, $event.change)"
-    [factoryLoadFunc]="changePageFactory" (changedSelection)="selection = $event" [refreshTrigger]="changePage">
-    <button selectactions (click)="removeProjectMemberSelection()"
+    (deleteMember)="removeProjectMember($event)" [factoryLoadFunc]="changePageFactory"
+    (changedSelection)="selection = $event" [refreshTrigger]="changePage">
+    <button class="cnsl-action-button" selectactions (click)="removeProjectMemberSelection()"
       [disabled]="(['project.grant.member.delete','project.grant.member.delete:' + grant.grantId] | hasRole | async) === false"
-      matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" color="warn" mat-raised-button>
+      matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" color="warn" mat-raised-button>
       <i class="las la-trash"></i>
-      {{'ACTIONS.SELECTIONDELETE' | translate}}
+      <span>{{'ACTIONS.SELECTIONDELETE' | translate}}</span>
+      <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
+      </cnsl-action-keys>
     </button>
-    <a writeactions color="primary"
+    <button class="cnsl-action-button" writeactions color="primary"
       [disabled]="(['project.grant.member.write','project.grant.member.write:' + grant.grantId] | hasRole | async) === false"
       (click)="openAddMember()" color="primary" mat-raised-button>
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-    </a>
+      <cnsl-action-keys (actionTriggered)="openAddMember()">
+      </cnsl-action-keys>
+    </button>
   </cnsl-members-table>
 </cnsl-detail-layout>

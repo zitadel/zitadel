@@ -1,13 +1,3 @@
-.del-button {
-  margin-right: 0.5rem;
-  transition: all 0.2s ease;
-  cursor: pointer;
-
-  &:not(:hover) {
-    color: var(--grey) !important;
-  }
-}
-
 .subinfo {
   display: flex;
   align-items: center;

@@ -133,12 +133,17 @@
                 <span *ngFor="let role of grant.roleKeysList">{{ role }}</span>
               </div>
               <span class="fill-space"></span>
-              <button mat-stroked-button *ngIf="grant.id ? grantToEdit !== grant.id : grantToEdit !== grant.id"
-                [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
-                (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
-                <i class="las la-edit"></i>
-                {{'ACTIONS.EDIT' | translate}}
-              </button>
+              <div class="cnsl-table-action-wrapper">
+                <div class="cnsl-table-action">
+                  <button mat-icon-button *ngIf="grant.id ? grantToEdit !== grant.id : grantToEdit !== grant.id"
+                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
+                    (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
+                    <i class="las la-edit"></i>
+                  </button>
+                  <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteGrant(grant)"
+                    mat-icon-button><i class="las la-trash"></i></button>
+                </div>
+              </div>
             </div>
           </ng-container>
 

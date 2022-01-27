@@ -8,7 +8,6 @@
 
   .detail-layout-head {
     margin-bottom: 2rem;
-    padding-top: 0.5rem;
 
     .detail-layout-top-view {
       display: flex;
@@ -29,6 +28,7 @@
     div {
       h1 {
         font-size: 1.8rem;
+        margin-top: 0;
       }
 
       .head-desc {

@@ -245,7 +245,39 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  deleteGrantSelection(): void {
+  public deleteGrant(grant: UserGrant.AsObject): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'GRANTS.DIALOG.DELETE_TITLE',
+        descriptionKey: 'GRANTS.DIALOG.DELETE_DESCRIPTION',
+        width: '400px',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.userService
+          .removeUserGrant(grant.id, grant.userId)
+          .then(() => {
+            this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
+            const data = this.dataSource.grantsSubject.getValue();
+
+            const index = data.findIndex((i) => i.id === grant.id);
+            if (index > -1) {
+              data.splice(index, 1);
+              this.dataSource.grantsSubject.next(data);
+            }
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
+  }
+
+  public deleteGrantSelection(): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',

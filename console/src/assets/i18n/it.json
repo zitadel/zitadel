@@ -1120,8 +1120,8 @@
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
-        "TITLE": "Managers del org grant",
-        "DESC": "Questi sono i manager dell'org grant. Puoi selezionare quali utenti sono autorizzati a mantenere il controllo del progetto.",
+        "TITLE": "Organizzazione concessa",
+        "DESC": "Puoi definire quali ruoli possono essere usati e gestire i manager",
         "MEMBERTITLE": "Manager",
         "MEMBERDESC": "Questi sono i manager dell'org grant. Aggiungi qui gli utenti che devono ottenere l'accesso per modificare i dati del progetto.",
         "PROJECTNAME": "Nome del progetto",
@@ -1581,7 +1581,9 @@
       "0": "Progetto proprio",
       "1": "Progetto concesso",
       "4": "Progetto"
-    }
+    },
+    "EDITROLE": "Modifica ruoli",
+    "EDITFOR": "Modifica i ruoli per l'utente: {{value}}"
   },
   "ROLESLABEL": "Ruoli",
   "GRANTS": {
@@ -1612,6 +1614,8 @@
       "BULKREMOVED": "Sussidi rimossi."
     },
     "DIALOG": {
+      "DELETE_TITLE": "Elima autorizzazione",
+      "DELETE_DESCRIPTION": "Stai per eliminare un' autorizzazione. Vuoi continuare?",
       "BULK_DELETE_TITLE": "Elimina autorizzazioni",
       "BULK_DELETE_DESCRIPTION": "Stai per eliminare diverse autorizzazioni. Vuoi continuare?"
     }

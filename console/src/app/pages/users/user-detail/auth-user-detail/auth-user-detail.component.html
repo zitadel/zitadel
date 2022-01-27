@@ -3,9 +3,6 @@
     <div class="header-row">
       <div class="text">
         <div class="user-title-wrapper">
-          <a (click)="navigateBack()" mat-icon-button>
-            <mat-icon class="icon">arrow_back</mat-icon>
-          </a>
           <div>
             <div *ngIf="user" class="user-title-row">
               <h1 class="user-title">
@@ -19,7 +16,6 @@
             <span class="user-loginname" *ngIf="user?.preferredLoginName">{{user?.preferredLoginName}}</span>
           </div>
         </div>
-        <!-- <p class="sub">{{'USER.DESCRIPTION' | translate}}</p> -->
       </div>
     </div>
 

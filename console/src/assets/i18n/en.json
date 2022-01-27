@@ -1120,8 +1120,8 @@
         "FOR_ORG": "The grant is created for:"
       },
       "DETAIL": {
-        "TITLE": "Managers of the Granted Organization",
-        "DESC": "These are the managers of the granted organization. You can select which users are allowed to maintain control of the project.",
+        "TITLE": "Granted Organization",
+        "DESC": "You can select which roles can be used by the specified organization, and elect managers",
         "MEMBERTITLE": "Managers",
         "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",
         "PROJECTNAME": "Project Name",
@@ -1581,7 +1581,9 @@
       "0": "Owned Project",
       "1": "Granted Project",
       "4": "Project"
-    }
+    },
+    "EDITROLE": "Edit roles",
+    "EDITFOR": "Edit the roles for the user: {{value}}"
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {
@@ -1612,6 +1614,8 @@
       "BULKREMOVED": "Grants removed."
     },
     "DIALOG": {
+      "DELETE_TITLE": "Delete authorization",
+      "DELETE_DESCRIPTION": "You are about to delete an authorization. Do you want to continue?",
       "BULK_DELETE_TITLE": "Delete autorizations",
       "BULK_DELETE_DESCRIPTION": "You are about to delete multiple authorizations. Do you want to continue?"
     }

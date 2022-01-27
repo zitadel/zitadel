@@ -1,10 +1,18 @@
-.desc {
+.subinfo {
+  display: flex;
+  align-items: center;
   font-size: 14px;
-  color: var(--grey);
-}
+  margin: -1.5rem 0 0 0;
 
-.del-button {
-  margin-right: 0.5rem;
+  .label {
+    color: var(--grey);
+  }
+
+  i {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+  }
 }
 
 .master-row {
@@ -40,8 +48,10 @@
   }
 }
 
-.formfield {
+.grant-detail-roles {
+  display: block;
   width: 100%;
+  max-width: 400px;
 }
 
 .divider {

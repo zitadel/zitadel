@@ -1,6 +1,7 @@
 import { Component, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
+import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { CreationType, MemberCreateDialogComponent } from 'src/app/modules/add-member-dialog/member-create-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
@@ -26,6 +27,7 @@ export class OrgMembersComponent {
   public changePageFactory!: Function;
   public changePage: EventEmitter<void> = new EventEmitter();
   public selection: Array<Member.AsObject> = [];
+  public ActionKeysType: any = ActionKeysType;
 
   constructor(
     private mgmtService: ManagementService,

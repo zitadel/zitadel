@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -15,7 +15,20 @@ export class ProjectsComponent {
   public projectType$: BehaviorSubject<any> = new BehaviorSubject(ProjectType.PROJECTTYPE_OWNED);
   public ProjectType: any = ProjectType;
   public grid: boolean = true;
-  constructor(private router: Router, public mgmtService: ManagementService, breadcrumbService: BreadcrumbService) {
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    public mgmtService: ManagementService,
+    breadcrumbService: BreadcrumbService,
+  ) {
+    this.activatedRoute.queryParams.subscribe((params: Params) => {
+      const type = params.type;
+      if (type && type === 'owned') {
+        this.setType(ProjectType.PROJECTTYPE_OWNED);
+      } else if (type && type === 'granted') {
+        this.setType(ProjectType.PROJECTTYPE_GRANTED);
+      }
+    });
     mgmtService.getIAM().then((iam) => {
       this.zitadelProjectId = iam.iamProjectId;
     });

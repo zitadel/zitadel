@@ -1,5 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTable } from '@angular/material/table';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -10,6 +11,7 @@ import {
 } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 
+import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { getColor } from '../avatar/avatar.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
@@ -43,7 +45,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   private destroyed: Subject<void> = new Subject();
   public displayedColumns: string[] = ['select', 'userId', 'displayName', 'loginname', 'email', 'roles'];
 
-  constructor() {
+  constructor(private dialog: MatDialog) {
     this.selection.changed.pipe(takeUntil(this.destroyed)).subscribe((_) => {
       this.changedSelection.emit(this.selection.selected);
     });
@@ -54,7 +56,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
       this.changePage(this.paginator);
     });
 
-    if (this.canDelete) {
+    if (this.canDelete || this.canWrite) {
       this.displayedColumns.push('actions');
     }
   }
@@ -72,8 +74,27 @@ export class MembersTableComponent implements OnInit, OnDestroy {
     const index = newRoles.findIndex((r) => r === role);
     if (index > -1) {
       newRoles.splice(index);
+      member.rolesList = newRoles;
       this.updateRoles.emit({ member: member, change: newRoles });
     }
+  }
+
+  public addRole(member: Member.AsObject) {
+    const dialogRef = this.dialog.open(AddMemberRolesDialogComponent, {
+      data: {
+        user: member.displayName,
+        allRoles: this.memberRoleOptions,
+        selectedRoles: member.rolesList,
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp && resp.length) {
+        member.rolesList = resp;
+        this.updateRoles.emit({ member: member, change: resp });
+      }
+    });
   }
 
   public isAllSelected(): boolean {

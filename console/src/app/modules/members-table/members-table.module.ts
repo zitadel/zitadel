@@ -14,6 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { RoleTransformPipeModule } from 'src/app/pipes/role-transform/role-transform.module';
 
+import { AddMemberRolesDialogModule } from '../add-member-roles-dialog/add-member-roles-dialog.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
@@ -31,6 +32,7 @@ import { MembersTableComponent } from './members-table.component';
     MatChipsModule,
     RoleTransformPipeModule,
     PaginatorModule,
+    AddMemberRolesDialogModule,
     MatSortModule,
     MatTooltipModule,
     FormsModule,

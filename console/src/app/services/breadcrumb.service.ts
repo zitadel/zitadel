@@ -26,6 +26,7 @@ export class Breadcrumb {
   };
   routerLink: any[] = [];
   isZitadel?: boolean = false;
+  hideNav?: boolean = false;
 
   constructor(init: Partial<Breadcrumb>) {
     Object.assign(this, init);

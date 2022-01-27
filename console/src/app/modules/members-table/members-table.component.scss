@@ -20,21 +20,8 @@ th {
   width: 40px;
 }
 
-tr {
-  .dlt-button {
-    visibility: hidden;
-    transition: color 0.2s ease;
-
-    &:not(:hover) {
-      color: var(--grey);
-    }
-  }
-
-  &:hover {
-    .dlt-button {
-      visibility: visible;
-    }
-  }
+.member-action-tr {
+  max-width: 100px;
 }
 
 .sa-icon {

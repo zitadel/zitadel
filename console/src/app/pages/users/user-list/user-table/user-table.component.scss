@@ -56,21 +56,8 @@ th {
   }
 }
 
-tr {
-  .dlt-button {
-    visibility: hidden;
-    transition: color 0.2s ease;
-
-    &:not(:hover) {
-      color: var(--grey);
-    }
-  }
-
-  &:hover {
-    .dlt-button {
-      visibility: visible;
-    }
-  }
+.user-tr-actions {
+  width: 50px;
 }
 
 .filtername {

@@ -5,7 +5,7 @@
     <ng-content select="[selectactions]"></ng-content>
   </ng-container>
 
-  <div actions>
+  <div actions *ngIf="!selection.hasValue()">
     <ng-content select="[writeactions]"></ng-content>
   </div>
 
@@ -61,23 +61,22 @@
 
       <ng-container matColumnDef="actions" stickyEnd>
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let view">
-          <button class="dlt-button" matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn"
-            (click)="triggerDeleteMember(view)" mat-icon-button><i class="las la-trash"></i></button>
+        <td mat-cell *matCellDef="let member" class="member-action-tr">
+          <div class="cnsl-table-action-wrapper">
+            <div class="cnsl-table-action">
+              <button matTooltip="{{'ACTIONS.ADD' | translate}}" (click)="addRole(member)" mat-icon-button>
+                <mat-icon>add</mat-icon>
+              </button>
+              <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="triggerDeleteMember(member)"
+                mat-icon-button><i class="las la-trash"></i></button>
+            </div>
+          </div>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="roles">
         <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'ROLESLABEL' | translate }} </th>
         <td mat-cell *matCellDef="let member" class="role-row">
-          <!-- <cnsl-form-field class="form-field" appearance="outline">
-            <mat-select [(ngModel)]="member.rolesList" multiple [disabled]="!canWrite"
-              (selectionChange)="updateRoles.emit({member: member, change: $event})">
-              <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-                {{ role }}
-              </mat-option>
-            </mat-select>
-          </cnsl-form-field> -->
           <mat-chip-list class="cnsl-chip-list" aria-label="role selection">
             <mat-chip class="cnsl-chip" *ngFor="let role of member.rolesList" [removable]="true" [selectable]="false"
               (removed)="removeRole(member, role)">

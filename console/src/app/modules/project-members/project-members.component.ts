@@ -6,10 +6,11 @@ import { take } from 'rxjs/operators';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, Project } from 'src/app/proto/generated/zitadel/project_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
-import { BreadcrumbService } from 'src/app/services/breadcrumb.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { ActionKeysType } from '../action-keys/action-keys.component';
 import { CreationType, MemberCreateDialogComponent } from '../add-member-dialog/member-create-dialog.component';
 import { ProjectMembersDataSource, ProjectType } from './project-members-datasource';
 
@@ -26,12 +27,15 @@ export class ProjectMembersComponent {
   public projectName: string = '';
   public dataSource!: ProjectMembersDataSource;
   public memberRoleOptions: string[] = [];
+  public isZitadel: boolean = false;
 
   public changePageFactory!: Function;
   public changePage: EventEmitter<void> = new EventEmitter();
   public selection: Array<Member.AsObject> = [];
 
   public ProjectType: any = ProjectType;
+  public ActionKeysType: any = ActionKeysType;
+
   constructor(
     private mgmtService: ManagementService,
     private dialog: MatDialog,
@@ -39,8 +43,6 @@ export class ProjectMembersComponent {
     breadcrumbService: BreadcrumbService,
     private route: ActivatedRoute,
   ) {
-    breadcrumbService.setBreadcrumb([]);
-
     this.route.data.pipe(take(1)).subscribe((data) => {
       this.projectType = data.type;
 
@@ -65,6 +67,30 @@ export class ProjectMembersComponent {
                   this.grantId,
                 );
               };
+
+              this.mgmtService.getIAM().then((iam) => {
+                const isZitadel = iam.iamProjectId === (this.project as Project.AsObject).id;
+                const breadcrumbs = [
+                  new Breadcrumb({
+                    type: BreadcrumbType.IAM,
+                    name: 'IAM',
+                    routerLink: ['/system'],
+                  }),
+                  new Breadcrumb({
+                    type: BreadcrumbType.ORG,
+                    routerLink: ['/org'],
+                  }),
+                  new Breadcrumb({
+                    type: BreadcrumbType.PROJECT,
+                    // name: this.project.name,
+                    param: { key: 'projectid', value: (this.project as Project.AsObject).id },
+                    routerLink: ['/projects', (this.project as Project.AsObject).id],
+                    isZitadel: isZitadel,
+                    hideNav: true,
+                  }),
+                ];
+                breadcrumbService.setBreadcrumb(breadcrumbs);
+              });
             }
           });
         } else if (this.projectType === ProjectType.PROJECTTYPE_GRANTED) {

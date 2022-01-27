@@ -21,17 +21,3 @@ h1 {
 .projects-table-wrapper {
   padding-top: 0.5rem;
 }
-
-tr {
-  outline: none;
-
-  .dlt-button {
-    visibility: hidden;
-  }
-
-  &:hover {
-    .dlt-button {
-      visibility: visible;
-    }
-  }
-}

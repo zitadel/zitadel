@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { saveAs } from 'file-saver';
-import { AddAppKeyResponse, AddMachineKeyResponse } from 'src/app/proto/generated/zitadel/management_pb';
+
+import { getColor } from '../avatar/avatar.component';
 
 @Component({
   selector: 'cnsl-add-member-roles-dialog',
@@ -9,22 +9,32 @@ import { AddAppKeyResponse, AddMachineKeyResponse } from 'src/app/proto/generate
   styleUrls: ['./add-member-roles-dialog.component.scss'],
 })
 export class AddMemberRolesDialogComponent {
-  public keyResponse!: AddMachineKeyResponse.AsObject | AddAppKeyResponse.AsObject;
+  public allRoles: string[] = [];
+  public selectedRoles: string[] = [];
 
   constructor(public dialogRef: MatDialogRef<AddMemberRolesDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.keyResponse = data.key;
+    this.allRoles = Object.assign([], data.allRoles);
+    this.selectedRoles = Object.assign([], data.selectedRoles);
   }
 
-  public saveFile(): void {
-    const json = atob(this.keyResponse.keyDetails.toString());
-    const blob = new Blob([json], { type: 'text/plain;charset=utf-8' });
-    const name = (this.keyResponse as AddMachineKeyResponse.AsObject).keyId
-      ? (this.keyResponse as AddMachineKeyResponse.AsObject).keyId
-      : (this.keyResponse as AddAppKeyResponse.AsObject).id;
-    saveAs(blob, `${name}.json`);
+  public closeDialogWithRoles(): void {
+    this.dialogRef.close(this.selectedRoles);
   }
 
   public closeDialog(): void {
     this.dialogRef.close(false);
+  }
+
+  public toggleRole(role: string): void {
+    const index = this.selectedRoles.findIndex((r) => r === role);
+    if (index > -1) {
+      this.selectedRoles.splice(index, 1);
+    } else {
+      this.selectedRoles.push(role);
+    }
+  }
+
+  public getColor(role: string) {
+    return getColor(role);
   }
 }

@@ -14,6 +14,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
@@ -22,34 +23,35 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 import { ProjectGrantDetailRoutingModule } from './project-grant-detail-routing.module';
 import { ProjectGrantDetailComponent } from './project-grant-detail.component';
 import {
-    ProjectGrantMembersCreateDialogModule,
+  ProjectGrantMembersCreateDialogModule,
 } from './project-grant-members-create-dialog/project-grant-members-create-dialog.module';
 
 @NgModule({
-    declarations: [ProjectGrantDetailComponent],
-    imports: [
-        CommonModule,
-        ProjectGrantDetailRoutingModule,
-        ProjectGrantMembersCreateDialogModule,
-        MatAutocompleteModule,
-        HasRoleModule,
-        MatChipsModule,
-        MatButtonModule,
-        MatCheckboxModule,
-        MatIconModule,
-        MatTableModule,
-        MatPaginatorModule,
-        InputModule,
-        MatTooltipModule,
-        ReactiveFormsModule,
-        MatProgressSpinnerModule,
-        FormsModule,
-        TranslateModule,
-        MatSelectModule,
-        DetailLayoutModule,
-        HasRolePipeModule,
-        MembersTableModule,
-        MatDialogModule,
-    ],
+  declarations: [ProjectGrantDetailComponent],
+  imports: [
+    CommonModule,
+    ProjectGrantDetailRoutingModule,
+    ProjectGrantMembersCreateDialogModule,
+    MatAutocompleteModule,
+    HasRoleModule,
+    MatChipsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatTableModule,
+    MatPaginatorModule,
+    InputModule,
+    MatTooltipModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    ActionKeysModule,
+    FormsModule,
+    TranslateModule,
+    MatSelectModule,
+    DetailLayoutModule,
+    HasRolePipeModule,
+    MembersTableModule,
+    MatDialogModule,
+  ],
 })
-export class ProjectGrantDetailModule { }
+export class ProjectGrantDetailModule {}

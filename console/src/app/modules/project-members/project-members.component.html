@@ -16,16 +16,21 @@
     <ng-template cnslHasRole selectactions
       [hasRole]="['project.member.delete:' + (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '', 'project.member.delete']">
       <button (click)="removeProjectMemberSelection()" color="warn"
-        matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" class="del-button" mat-raised-button>
+        matTooltip="{{'ORG_DETAIL.TABLE.DELETE' | translate}}" mat-raised-button>
         <i class="las la-trash"></i>
-        {{'ACTIONS.SELECTIONDELETE' | translate}}
+        <span>{{'ACTIONS.SELECTIONDELETE' | translate}}</span>
+        <cnsl-action-keys [type]="ActionKeysType.DELETE" (actionTriggered)="removeProjectMemberSelection()">
+        </cnsl-action-keys>
       </button>
     </ng-template>
     <ng-template cnslHasRole writeactions
       [hasRole]="['project.member.write:'+(projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '','project.member.write']">
-      <a color="primary" (click)="openAddMember()" color="primary" mat-raised-button>
-        <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-      </a>
+      <button color="primary" (click)="openAddMember()" class="cnsl-action-button" mat-raised-button>
+        <mat-icon class="icon">add</mat-icon>
+        <span>{{ 'ACTIONS.NEW' | translate }}</span>
+        <cnsl-action-keys (actionTriggered)="openAddMember()">
+        </cnsl-action-keys>
+      </button>
     </ng-template>
   </cnsl-members-table>
 </cnsl-detail-layout>

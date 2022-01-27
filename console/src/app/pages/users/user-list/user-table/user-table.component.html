@@ -133,12 +133,14 @@
       </ng-container>
 
       <ng-container matColumnDef="actions" stickyEnd>
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let user">
-          <button class="dlt-button" [disabled]="(['user.delete$', 'user.delete:'+user.id] | hasRole | async) === false"
-            color="warn" mat-icon-button matTooltip="{{'USER.PAGES.DELETE' | translate}}" (click)="deleteUser(user)">
-            <i class="las la-trash"></i>
-          </button>
+        <th mat-header-cell *matHeaderCellDef class="user-tr-actions"></th>
+        <td mat-cell *matCellDef="let user" class="user-tr-actions">
+          <div class="cnsl-table-action-wrapper">
+            <div class="cnsl-table-action">
+              <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteUser(user)"
+                mat-icon-button><i class="las la-trash"></i></button>
+            </div>
+          </div>
         </td>
       </ng-container>
 
