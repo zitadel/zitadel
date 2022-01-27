@@ -97,7 +97,7 @@
       {{'MENU.DOCUMENTATION' | translate}}
     </a>
 
-    <a *ngIf="(['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/system']" routerLinkActive="hide"
+    <a *ngIf="!isOnSystem && (['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/system']"
       class="iam-settings" mat-stroked-button>
       <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>
       <i class="las la-cog"></i>
