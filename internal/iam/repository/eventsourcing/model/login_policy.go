@@ -79,14 +79,6 @@ func IDPProvidersToModel(members []*IDPProvider) []*iam_model.IDPProvider {
 	return convertedProviders
 }
 
-func IDOProvidersFromModel(members []*iam_model.IDPProvider) []*IDPProvider {
-	convertedProviders := make([]*IDPProvider, len(members))
-	for i, m := range members {
-		convertedProviders[i] = IDPProviderFromModel(m)
-	}
-	return convertedProviders
-}
-
 func IDPProviderToModel(provider *IDPProvider) *iam_model.IDPProvider {
 	return &iam_model.IDPProvider{
 		ObjectRoot:  provider.ObjectRoot,
@@ -95,44 +87,12 @@ func IDPProviderToModel(provider *IDPProvider) *iam_model.IDPProvider {
 	}
 }
 
-func IDPProviderFromModel(provider *iam_model.IDPProvider) *IDPProvider {
-	return &IDPProvider{
-		ObjectRoot:  provider.ObjectRoot,
-		Type:        int32(provider.Type),
-		IDPConfigID: provider.IDPConfigID,
-	}
-}
-
-func SecondFactorsFromModel(mfas []domain.SecondFactorType) []int32 {
-	convertedMFAs := make([]int32, len(mfas))
-	for i, mfa := range mfas {
-		convertedMFAs[i] = int32(mfa)
-	}
-	return convertedMFAs
-}
-
-func SecondFactorFromModel(mfa domain.SecondFactorType) *MFA {
-	return &MFA{MFAType: int32(mfa)}
-}
-
 func SecondFactorsToModel(mfas []int32) []domain.SecondFactorType {
 	convertedMFAs := make([]domain.SecondFactorType, len(mfas))
 	for i, mfa := range mfas {
 		convertedMFAs[i] = domain.SecondFactorType(mfa)
 	}
 	return convertedMFAs
-}
-
-func MultiFactorsFromModel(mfas []iam_model.MultiFactorType) []int32 {
-	convertedMFAs := make([]int32, len(mfas))
-	for i, mfa := range mfas {
-		convertedMFAs[i] = int32(mfa)
-	}
-	return convertedMFAs
-}
-
-func MultiFactorFromModel(mfa iam_model.MultiFactorType) *MFA {
-	return &MFA{MFAType: int32(mfa)}
 }
 
 func MultiFactorsToModel(mfas []int32) []domain.MultiFactorType {
@@ -162,96 +122,6 @@ func (p *LoginPolicy) Changes(changed *LoginPolicy) map[string]interface{} {
 		changes["passwordlessType"] = changed.PasswordlessType
 	}
 	return changes
-}
-
-func (i *IAM) appendAddLoginPolicyEvent(event *es_models.Event) error {
-	i.DefaultLoginPolicy = new(LoginPolicy)
-	err := i.DefaultLoginPolicy.SetData(event)
-	if err != nil {
-		return err
-	}
-	i.DefaultLoginPolicy.ObjectRoot.CreationDate = event.CreationDate
-	return nil
-}
-
-func (i *IAM) appendChangeLoginPolicyEvent(event *es_models.Event) error {
-	return i.DefaultLoginPolicy.SetData(event)
-}
-
-func (iam *IAM) appendAddIDPProviderToLoginPolicyEvent(event *es_models.Event) error {
-	provider := new(IDPProvider)
-	err := provider.SetData(event)
-	if err != nil {
-		return err
-	}
-	provider.ObjectRoot.CreationDate = event.CreationDate
-	iam.DefaultLoginPolicy.IDPProviders = append(iam.DefaultLoginPolicy.IDPProviders, provider)
-	return nil
-}
-
-func (iam *IAM) appendRemoveIDPProviderFromLoginPolicyEvent(event *es_models.Event) error {
-	provider := new(IDPProvider)
-	err := provider.SetData(event)
-	if err != nil {
-		return err
-	}
-	if i, m := GetIDPProvider(iam.DefaultLoginPolicy.IDPProviders, provider.IDPConfigID); m != nil {
-		iam.DefaultLoginPolicy.IDPProviders[i] = iam.DefaultLoginPolicy.IDPProviders[len(iam.DefaultLoginPolicy.IDPProviders)-1]
-		iam.DefaultLoginPolicy.IDPProviders[len(iam.DefaultLoginPolicy.IDPProviders)-1] = nil
-		iam.DefaultLoginPolicy.IDPProviders = iam.DefaultLoginPolicy.IDPProviders[:len(iam.DefaultLoginPolicy.IDPProviders)-1]
-		return nil
-	}
-	return nil
-}
-
-func (iam *IAM) appendAddSecondFactorToLoginPolicyEvent(event *es_models.Event) error {
-	mfa := new(MFA)
-	err := mfa.SetData(event)
-	if err != nil {
-		return err
-	}
-	iam.DefaultLoginPolicy.SecondFactors = append(iam.DefaultLoginPolicy.SecondFactors, mfa.MFAType)
-	return nil
-}
-
-func (iam *IAM) appendRemoveSecondFactorFromLoginPolicyEvent(event *es_models.Event) error {
-	mfa := new(MFA)
-	err := mfa.SetData(event)
-	if err != nil {
-		return err
-	}
-	if i, m := GetMFA(iam.DefaultLoginPolicy.SecondFactors, mfa.MFAType); m != 0 {
-		iam.DefaultLoginPolicy.SecondFactors[i] = iam.DefaultLoginPolicy.SecondFactors[len(iam.DefaultLoginPolicy.SecondFactors)-1]
-		iam.DefaultLoginPolicy.SecondFactors[len(iam.DefaultLoginPolicy.SecondFactors)-1] = 0
-		iam.DefaultLoginPolicy.SecondFactors = iam.DefaultLoginPolicy.SecondFactors[:len(iam.DefaultLoginPolicy.SecondFactors)-1]
-		return nil
-	}
-	return nil
-}
-
-func (iam *IAM) appendAddMultiFactorToLoginPolicyEvent(event *es_models.Event) error {
-	mfa := new(MFA)
-	err := mfa.SetData(event)
-	if err != nil {
-		return err
-	}
-	iam.DefaultLoginPolicy.MultiFactors = append(iam.DefaultLoginPolicy.MultiFactors, mfa.MFAType)
-	return nil
-}
-
-func (iam *IAM) appendRemoveMultiFactorFromLoginPolicyEvent(event *es_models.Event) error {
-	mfa := new(MFA)
-	err := mfa.SetData(event)
-	if err != nil {
-		return err
-	}
-	if i, m := GetMFA(iam.DefaultLoginPolicy.MultiFactors, mfa.MFAType); m != 0 {
-		iam.DefaultLoginPolicy.MultiFactors[i] = iam.DefaultLoginPolicy.MultiFactors[len(iam.DefaultLoginPolicy.MultiFactors)-1]
-		iam.DefaultLoginPolicy.MultiFactors[len(iam.DefaultLoginPolicy.MultiFactors)-1] = 0
-		iam.DefaultLoginPolicy.MultiFactors = iam.DefaultLoginPolicy.MultiFactors[:len(iam.DefaultLoginPolicy.MultiFactors)-1]
-		return nil
-	}
-	return nil
 }
 
 func (p *LoginPolicy) SetData(event *es_models.Event) error {

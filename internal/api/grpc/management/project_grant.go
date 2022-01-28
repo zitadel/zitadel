@@ -27,7 +27,10 @@ func (s *Server) ListProjectGrants(ctx context.Context, req *mgmt_pb.ListProject
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
 	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
@@ -47,8 +50,14 @@ func (s *Server) ListAllProjectGrants(ctx context.Context, req *mgmt_pb.ListAllP
 	if err != nil {
 		return nil, err
 	}
-	queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
-	queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	err = queries.AppendMyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	err = queries.AppendPermissionQueries(authz.GetRequestPermissionsFromCtx(ctx))
+	if err != nil {
+		return nil, err
+	}
 	grants, err := s.query.SearchProjectGrants(ctx, queries)
 	if err != nil {
 		return nil, err
@@ -127,7 +136,21 @@ func (s *Server) ReactivateProjectGrant(ctx context.Context, req *mgmt_pb.Reacti
 }
 
 func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProjectGrantRequest) (*mgmt_pb.RemoveProjectGrantResponse, error) {
-	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	grantQuery, err := query.NewUserGrantGrantIDSearchQuery(req.GrantId)
+	if err != nil {
+		return nil, err
+	}
+	userGrants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, grantQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.RemoveProjectGrant(ctx, req.ProjectId, req.GrantId, authz.GetCtxData(ctx).OrgID, userGrantsToIDs(userGrants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +160,7 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProj
 }
 
 func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectGrantMemberRolesRequest) (*mgmt_pb.ListProjectGrantMemberRolesResponse, error) {
-	roles := s.project.GetProjectGrantMemberRoles()
+	roles := s.query.GetProjectGrantMemberRoles()
 	return &mgmt_pb.ListProjectGrantMemberRolesResponse{
 		Result:  roles,
 		Details: object_grpc.ToListDetails(uint64(len(roles)), 0, time.Now()),

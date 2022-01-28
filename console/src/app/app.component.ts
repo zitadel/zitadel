@@ -224,6 +224,9 @@ export class AppComponent implements OnInit, OnDestroy {
       const darkBackground = '#212224';
       const lightBackground = '#fafafa';
 
+      const darkText = '#ffffff';
+      const lightText = '#000000';
+
       this.themeService.savePrimaryColor(darkPrimary, true);
       this.themeService.savePrimaryColor(lightPrimary, false);
 
@@ -232,6 +235,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
       this.themeService.saveBackgroundColor(darkBackground, true);
       this.themeService.saveBackgroundColor(lightBackground, false);
+
+      this.themeService.saveTextColor(darkText, true);
+      this.themeService.saveTextColor(lightText, false);
     };
 
     setDefaultColors();
@@ -240,14 +246,20 @@ export class AppComponent implements OnInit, OnDestroy {
       if (labelpolicy.policy) {
         this.labelpolicy = labelpolicy.policy;
 
+        const isDark = (color: string) => this.themeService.isDark(color);
+        const isLight = (color: string) => this.themeService.isLight(color);
+
         const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
         const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
 
         const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
         const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
-        const darkBackground = this.labelpolicy?.backgroundColorDark || '#212224';
-        const lightBackground = this.labelpolicy?.backgroundColor || '#fafafa';
+        let darkBackground = this.labelpolicy?.backgroundColorDark;
+        let lightBackground = this.labelpolicy?.backgroundColor;
+
+        let darkText = this.labelpolicy.fontColorDark;
+        let lightText = this.labelpolicy.fontColor;
 
         this.themeService.savePrimaryColor(darkPrimary, true);
         this.themeService.savePrimaryColor(lightPrimary, false);
@@ -255,8 +267,37 @@ export class AppComponent implements OnInit, OnDestroy {
         this.themeService.saveWarnColor(darkWarn, true);
         this.themeService.saveWarnColor(lightWarn, false);
 
-        this.themeService.saveBackgroundColor(darkBackground, true);
-        this.themeService.saveBackgroundColor(lightBackground, false);
+        if (darkBackground && !isDark(darkBackground)) {
+          console.info(
+            `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
+          );
+          darkBackground = '#212224';
+        }
+        this.themeService.saveBackgroundColor(darkBackground || '#212224', true);
+
+        if (lightBackground && !isLight(lightBackground)) {
+          console.info(
+            `Background (${lightBackground}) is not light enough for a light theme. Falling back to zitadel background`,
+          );
+          lightBackground = '#fafafa';
+        }
+        this.themeService.saveBackgroundColor(lightBackground || '#fafafa', false);
+
+        if (darkText && !isLight(darkText)) {
+          console.info(
+            `Text color (${darkText}) is not light enough for a dark theme. Falling back to zitadel's text color`,
+          );
+          darkText = '#ffffff';
+        }
+        this.themeService.saveTextColor(darkText || '#ffffff', true);
+
+        if (lightText && !isDark(lightText)) {
+          console.info(
+            `Text color (${lightText}) is not dark enough for a light theme. Falling back to zitadel's text color`,
+          );
+          lightText = '#000000';
+        }
+        this.themeService.saveTextColor(lightText || '#000000', false);
       }
     });
   }

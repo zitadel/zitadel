@@ -300,9 +300,10 @@ const (
 type CustomLoginText struct {
 	models.ObjectRoot
 
-	State    PolicyState
-	Default  bool
-	Language language.Tag
+	State     PolicyState
+	Default   bool
+	Language  language.Tag
+	IsDefault bool
 
 	SelectAccount                    SelectAccountScreenText
 	Login                            LoginScreenText

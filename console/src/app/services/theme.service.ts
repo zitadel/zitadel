@@ -58,6 +58,12 @@ export class ThemeService {
     this.updateTheme(this.backgroundColorPalette, 'background', isDark ? 'dark' : 'light');
   }
 
+  public saveTextColor(colorHex: string, isDark: boolean): void {
+    this.primaryColorPalette = this.computeColors(colorHex);
+    const theme = isDark ? 'dark' : 'light';
+    document.documentElement.style.setProperty(`--theme-${theme}-${'text'}`, colorHex);
+  }
+
   private computeColors(hex: string): Color[] {
     return [
       this.getColorObject(tinycolor(hex).lighten(52), '50'),
@@ -84,5 +90,15 @@ export class ThemeService {
       hex: c.toHexString(),
       darkContrast: c.isLight(),
     };
+  }
+
+  public isLight(hex: string): boolean {
+    const color = tinycolor(hex);
+    return color.isLight();
+  }
+
+  public isDark(hex: string): boolean {
+    const color = tinycolor(hex);
+    return color.isDark();
   }
 }

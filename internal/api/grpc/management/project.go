@@ -110,17 +110,17 @@ func (s *Server) ListGrantedProjectRoles(ctx context.Context, req *mgmt_pb.ListG
 }
 
 func (s *Server) ListProjectChanges(ctx context.Context, req *mgmt_pb.ListProjectChangesRequest) (*mgmt_pb.ListProjectChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
 	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.project.ProjectChanges(ctx, req.ProjectId, sequence, limit, asc, features.AuditLogRetention)
+	res, err := s.query.ProjectChanges(ctx, req.ProjectId, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListProjectChangesResponse{
-		Result: change_grpc.ProjectChangesToPb(res.Changes),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix),
 	}, nil
 }
 
@@ -264,7 +264,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 	if err != nil {
 		return nil, err
 	}
-	rolesQuery, err := query.NewUserGrantGrantIDSearchQuery(req.RoleKey)
+	rolesQuery, err := query.NewUserGrantRoleQuery(req.RoleKey)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +289,7 @@ func (s *Server) RemoveProjectRole(ctx context.Context, req *mgmt_pb.RemoveProje
 }
 
 func (s *Server) ListProjectMemberRoles(ctx context.Context, _ *mgmt_pb.ListProjectMemberRolesRequest) (*mgmt_pb.ListProjectMemberRolesResponse, error) {
-	roles, err := s.project.GetProjectMemberRoles(ctx)
+	roles, err := s.query.GetProjectMemberRoles(ctx)
 	if err != nil {
 		return nil, err
 	}

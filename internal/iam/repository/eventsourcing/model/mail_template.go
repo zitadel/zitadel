@@ -23,14 +23,6 @@ func MailTemplateToModel(template *MailTemplate) *iam_model.MailTemplate {
 	}
 }
 
-func MailTemplateFromModel(template *iam_model.MailTemplate) *MailTemplate {
-	return &MailTemplate{
-		ObjectRoot: template.ObjectRoot,
-		State:      int32(template.State),
-		Template:   template.Template,
-	}
-}
-
 func (p *MailTemplate) Changes(changed *MailTemplate) map[string]interface{} {
 	changes := make(map[string]interface{}, 1)
 	if b64.StdEncoding.EncodeToString(changed.Template) != b64.StdEncoding.EncodeToString(p.Template) {
@@ -38,20 +30,6 @@ func (p *MailTemplate) Changes(changed *MailTemplate) map[string]interface{} {
 	}
 
 	return changes
-}
-
-func (i *IAM) appendAddMailTemplateEvent(event *es_models.Event) error {
-	i.DefaultMailTemplate = new(MailTemplate)
-	err := i.DefaultMailTemplate.SetDataLabel(event)
-	if err != nil {
-		return err
-	}
-	i.DefaultMailTemplate.ObjectRoot.CreationDate = event.CreationDate
-	return nil
-}
-
-func (i *IAM) appendChangeMailTemplateEvent(event *es_models.Event) error {
-	return i.DefaultMailTemplate.SetDataLabel(event)
 }
 
 func (p *MailTemplate) SetDataLabel(event *es_models.Event) error {

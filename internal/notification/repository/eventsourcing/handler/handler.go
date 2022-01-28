@@ -44,6 +44,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			systemDefaults.IamID,
+			queries,
 		),
 		newNotification(
 			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
@@ -60,7 +61,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	c, ok := configs[viewModel]
 	if !ok {
-		return 3 * time.Minute
+		return 1 * time.Minute
 	}
 	return c.MinimumCycleDuration.Duration
 }

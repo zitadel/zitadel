@@ -3,20 +3,14 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/logging"
-	"github.com/rakyll/statik/fs"
-
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	es2 "github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
@@ -40,14 +34,11 @@ type EsRepository struct {
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
 	eventstore.RefreshTokenRepo
-	eventstore.ApplicationRepo
 	eventstore.UserSessionRepo
-	eventstore.UserGrantRepo
 	eventstore.OrgRepository
-	eventstore.IAMRepository
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -76,23 +67,18 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		return nil, err
 	}
 
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	logging.Log("CONFI-20opp").OnError(err).Panic("unable to start login statik dir")
-
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, queries)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:     conf.SearchLimit,
 		Eventstore:      es,
 		View:            view,
+		Query:           queries,
 		SystemDefaults:  systemDefaults,
 		PrefixAvatarURL: assetsAPI,
 	}
 	//TODO: remove as soon as possible
-	queryView := struct {
-		*query.Queries
-		*auth_view.View
-	}{
+	queryView := queryViewWrapper{
 		queries,
 		view,
 	}
@@ -137,21 +123,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			SearchLimit:  conf.SearchLimit,
 			KeyAlgorithm: keyAlgorithm,
 		},
-		eventstore.ApplicationRepo{
-			Commands: command,
-			Query:    queries,
-		},
-
 		eventstore.UserSessionRepo{
 			View: view,
-		},
-		eventstore.UserGrantRepo{
-			SearchLimit: conf.SearchLimit,
-			View:        view,
-			IamID:       systemDefaults.IamID,
-			Auth:        authZ,
-			AuthZRepo:   authZRepo,
-			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
@@ -160,14 +133,30 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			Eventstore:     es,
 			Query:          queries,
 		},
-		eventstore.IAMRepository{
-			IAMID:          systemDefaults.IamID,
-			LoginDir:       statikLoginFS,
-			IAMV2QuerySide: queries,
-		},
 	}, nil
 }
 
+type queryViewWrapper struct {
+	*query.Queries
+	*auth_view.View
+}
+
+func (q queryViewWrapper) UserGrantsByProjectAndUserID(projectID, userID string) ([]*query.UserGrant, error) {
+	userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
+	grants, err := q.Queries.UserGrants(context.TODO(), queries)
+	if err != nil {
+		return nil, err
+	}
+	return grants.UserGrants, nil
+}
 func (repo *EsRepository) Health(ctx context.Context) error {
 	if err := repo.UserRepo.Health(ctx); err != nil {
 		return err

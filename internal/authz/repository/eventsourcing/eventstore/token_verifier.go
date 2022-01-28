@@ -14,9 +14,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view "github.com/caos/zitadel/internal/iam/repository/view"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -33,7 +30,7 @@ type TokenVerifierRepo struct {
 	Query                *query.Queries
 }
 
-func (repo *TokenVerifierRepo) TokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
+func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID string) (*usr_model.TokenView, error) {
 	token, viewErr := repo.View.TokenByID(tokenID)
 	if viewErr != nil && !caos_errs.IsNotFound(viewErr) {
 		return nil, viewErr
@@ -82,7 +79,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	if len(splittedToken) != 2 {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
 	}
-	token, err := repo.TokenByID(ctx, splittedToken[0], splittedToken[1])
+	token, err := repo.tokenByID(ctx, splittedToken[0], splittedToken[1])
 	if err != nil {
 		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}
@@ -237,7 +234,7 @@ func (repo *TokenVerifierRepo) VerifierClientID(ctx context.Context, appName str
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	iam, err := repo.getIAMByID(ctx)
+	iam, err := repo.Query.IAMByID(ctx, domain.IAMID)
 	if err != nil {
 		return "", "", err
 	}
@@ -259,23 +256,6 @@ func (r *TokenVerifierRepo) getUserEvents(ctx context.Context, userID string, se
 		return nil, err
 	}
 	return r.Eventstore.FilterEvents(ctx, query)
-}
-
-func (u *TokenVerifierRepo) getIAMByID(ctx context.Context) (*iam_model.IAM, error) {
-	query, err := iam_view.IAMByIDQuery(domain.IAMID, 0)
-	if err != nil {
-		return nil, err
-	}
-	iam := &iam_es_model.IAM{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: domain.IAMID,
-		},
-	}
-	err = es_sdk.Filter(ctx, u.Eventstore.FilterEvents, iam.AppendEvents, query)
-	if err != nil && caos_errs.IsNotFound(err) && iam.Sequence == 0 {
-		return nil, err
-	}
-	return iam_es_model.IAMToModel(iam), nil
 }
 
 func (repo *TokenVerifierRepo) checkDefaultFeatures(ctx context.Context, requiredFeatures ...string) error {

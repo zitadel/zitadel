@@ -185,14 +185,12 @@ var (
 	}
 )
 
-func (q *Queries) UserGrantByID(ctx context.Context, id string, queries ...SearchQuery) (*UserGrant, error) {
+func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserGrant, error) {
 	query, scan := prepareUserGrantQuery()
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(sq.Eq{
-		UserGrantID.identifier(): id,
-	}).ToSql()
+	stmt, args, err := query.ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
@@ -244,7 +242,7 @@ func prepareUserGrantQuery() (sq.SelectBuilder, func(*sql.Row) (*UserGrant, erro
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanDisplayNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 
 			UserGrantResourceOwner.identifier(),
 			OrgColumnName.identifier(),
@@ -347,7 +345,7 @@ func prepareUserGrantsQuery() (sq.SelectBuilder, func(*sql.Rows) (*UserGrants, e
 			HumanLastNameCol.identifier(),
 			HumanEmailCol.identifier(),
 			HumanDisplayNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 
 			UserGrantResourceOwner.identifier(),
 			OrgColumnName.identifier(),
