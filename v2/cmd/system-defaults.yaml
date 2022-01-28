@@ -1,0 +1,158 @@
+SystemDefaults:
+  DefaultLanguage: 'en'
+  Domain: $ZITADEL_DEFAULT_DOMAIN
+  ZitadelDocs:
+    Issuer: $ZITADEL_ISSUER
+    DiscoveryEndpoint: '$ZITADEL_ISSUER/.well-known/openid-configuration'
+  UserVerificationKey:
+    EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
+  IDPConfigVerificationKey:
+    EncryptionKeyID: $ZITADEL_IDP_CONFIG_VERIFICATION_KEY
+  SecretGenerators:
+    PasswordSaltCost: 14
+    ClientSecretGenerator:
+      Length: 64
+      IncludeLowerLetters: true
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    InitializeUserCode:
+      Length: 6
+      Expiry: '72h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    EmailVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PhoneVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PasswordVerificationCode:
+      Length: 6
+      Expiry: '1h'
+      IncludeLowerLetters: false
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    PasswordlessInitCode:
+      Length: 12
+      Expiry: '1h'
+      IncludeLowerLetters: true
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+    MachineKeySize: 2048
+    ApplicationKeySize: 2048
+  Multifactors:
+    OTP:
+      Issuer: 'ZITADEL'
+      VerificationKey:
+        EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
+  VerificationLifetimes:
+    PasswordCheck: 240h #10d
+    ExternalLoginCheck: 240h #10d
+    MFAInitSkip: 720h #30d
+    SecondFactorCheck: 18h
+    MultiFactorCheck: 12h
+  IamID: 'IAM'
+  DomainVerification:
+    VerificationKey:
+      EncryptionKeyID: $ZITADEL_DOMAIN_VERIFICATION_KEY
+    VerificationGenerator:
+      Length: 32
+      IncludeLowerLetters: true
+      IncludeUpperLetters: true
+      IncludeDigits: true
+      IncludeSymbols: false
+  Notifications:
+    DebugMode: $DEBUG_MODE
+    Endpoints:
+      InitCode: '$ZITADEL_ACCOUNTS/user/init?userID={{.UserID}}&code={{.Code}}&passwordset={{.PasswordSet}}'
+      PasswordReset: '$ZITADEL_ACCOUNTS/password/init?userID={{.UserID}}&code={{.Code}}'
+      VerifyEmail: '$ZITADEL_ACCOUNTS/mail/verification?userID={{.UserID}}&code={{.Code}}'
+      DomainClaimed: '$ZITADEL_ACCOUNTS/login'
+      PasswordlessRegistration: '$ZITADEL_ACCOUNTS/login/passwordless/init'
+    Providers:
+      Email:
+        SMTP:
+          Host: $SMTP_HOST
+          User: $SMTP_USER
+          Password: $SMTP_PASSWORD
+        From: $EMAIL_SENDER_ADDRESS
+        FromName: $EMAIL_SENDER_NAME
+        Tls: $SMTP_TLS
+      Twilio:
+        SID: $TWILIO_SERVICE_SID
+        Token: $TWILIO_TOKEN
+        From: $TWILIO_SENDER_NAME
+      FileSystem:
+        Enabled: $FS_NOTIFICATIONS_ENABLED
+        Path: $FS_NOTIFICATIONS_PATH
+        Compact: $FS_NOTIFICATIONS_COMPACT
+      Log:
+        Enabled: $LOG_NOTIFICATIONS_ENABLED
+        Compact: $LOG_NOTIFICATIONS_COMPACT
+      Chat:
+        Enabled: $CHAT_ENABLED
+        Url: $CHAT_URL
+        Compact: $CHAT_COMPACT
+        SplitCount: 4000
+    TemplateData:
+      InitCode:
+        Title: 'InitCode.Title'
+        PreHeader: 'InitCode.PreHeader'
+        Subject: 'InitCode.Subject'
+        Greeting: 'InitCode.Greeting'
+        Text: 'InitCode.Text'
+        ButtonText: 'InitCode.ButtonText'
+      PasswordReset:
+        Title: 'PasswordReset.Title'
+        PreHeader: 'PasswordReset.PreHeader'
+        Subject: 'PasswordReset.Subject'
+        Greeting: 'PasswordReset.Greeting'
+        Text: 'PasswordReset.Text'
+        ButtonText: 'PasswordReset.ButtonText'
+      VerifyEmail:
+        Title: 'VerifyEmail.Title'
+        PreHeader: 'VerifyEmail.PreHeader'
+        Subject: 'VerifyEmail.Subject'
+        Greeting: 'VerifyEmail.Greeting'
+        Text: 'VerifyEmail.Text'
+        ButtonText: 'VerifyEmail.ButtonText'
+      VerifyPhone:
+        Title: 'VerifyPhone.Title'
+        PreHeader: 'VerifyPhone.PreHeader'
+        Subject: 'VerifyPhone.Subject'
+        Greeting: 'VerifyPhone.Greeting'
+        Text: 'VerifyPhone.Text'
+        ButtonText: 'VerifyPhone.ButtonText'
+      DomainClaimed:
+        Title: 'DomainClaimed.Title'
+        PreHeader: 'DomainClaimed.PreHeader'
+        Subject: 'DomainClaimed.Subject'
+        Greeting: 'DomainClaimed.Greeting'
+        Text: 'DomainClaimed.Text'
+        ButtonText: 'DomainClaimed.ButtonText'
+  WebAuthN:
+    ID: $ZITADEL_DEFAULT_DOMAIN
+    OriginLogin: $ZITADEL_ACCOUNTS
+    OriginConsole: $ZITADEL_CONSOLE
+    DisplayName: ZITADEL
+  KeyConfig:
+    Size: 2048
+    PrivateKeyLifetime: 6h
+    PublicKeyLifetime: 30h
+    EncryptionConfig:
+      EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
+    SigningKeyRotationCheck: 10s
+    SigningKeyGracefulPeriod: 10m

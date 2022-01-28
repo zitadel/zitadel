@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
+
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -41,6 +42,58 @@ type Queries struct {
 
 type Config struct {
 	Eventstore types.SQLUser
+}
+type ConfigV2 struct {
+	Eventstore types.SQLUser2
+}
+
+//
+//var DefaultConfig = ConfigV2{
+//	Eventstore: types.SQLUser2{
+//		User:            queryUser,
+//		Password:        os.Getenv(keyQueriesPassword),
+//		MaxOpenConns:    2,
+//		MaxConnLifetime: types.Duration{Duration: 30 * time.Minute},
+//		MaxConnIdleTime: types.Duration{Duration: 30 * time.Minute},
+//		SSL: types.SSLUser{
+//			Cert: os.Getenv(keyQueriesCert),
+//			Key:  os.Getenv(keyQueriesKey),
+//		},
+//	},
+//}
+
+func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+	//statikLoginFS, err := fs.NewWithNamespace("login")
+	//logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
+	//
+	//statikNotificationFS, err := fs.NewWithNamespace("notification")
+	//logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
+
+	repo = &Queries{
+		iamID:           defaults.IamID,
+		eventstore:      es,
+		client:          sqlClient,
+		DefaultLanguage: defaults.DefaultLanguage,
+		//LoginDir:                            statikLoginFS,
+		//NotificationDir:                     statikNotificationFS,
+		LoginTranslationFileContents:        make(map[string][]byte),
+		NotificationTranslationFileContents: make(map[string][]byte),
+		zitadelRoles:                        zitadelRoles,
+	}
+	iam_repo.RegisterEventMappers(repo.eventstore)
+	usr_repo.RegisterEventMappers(repo.eventstore)
+	org.RegisterEventMappers(repo.eventstore)
+	project.RegisterEventMappers(repo.eventstore)
+	action.RegisterEventMappers(repo.eventstore)
+	keypair.RegisterEventMappers(repo.eventstore)
+	usergrant.RegisterEventMappers(repo.eventstore)
+
+	err = projection.Start(ctx, sqlClient, es, projections, defaults, keyChan)
+	if err != nil {
+		return nil, err
+	}
+
+	return repo, nil
 }
 
 func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {

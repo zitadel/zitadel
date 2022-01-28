@@ -1,0 +1,371 @@
+Log:
+  Level: $ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text
+
+Tracing:
+  Type: $ZITADEL_TRACING_TYPE
+  Config:
+    ProjectID: $ZITADEL_TRACING_PROJECT_ID
+    MetricPrefix: ZITADEL-V1
+    Fraction: $ZITADEL_TRACING_FRACTION
+    Endpoint: $ZITADEL_TRACING_ENDPOINT
+
+AssetStorage:
+  Type: $ZITADEL_ASSET_STORAGE_TYPE
+  Config:
+    Endpoint: $ZITADEL_ASSET_STORAGE_ENDPOINT
+    AccessKeyID: $ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID
+    SecretAccessKey: $ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY
+    SSL: $ZITADEL_ASSET_STORAGE_SSL
+    Location: $ZITADEL_ASSET_STORAGE_LOCATION
+    BucketPrefix: $ZITADEL_ASSET_STORAGE_BUCKET_PREFIX
+    MultiDelete: $ZITADEL_ASSET_STORAGE_MULTI_DELETE
+
+Metrics:
+  Type: 'otel'
+  Config:
+    MeterName: 'github.com/caos/zitadel'
+
+#EventstoreBase:
+#  Host: $ZITADEL_EVENTSTORE_HOST
+#  Port: $ZITADEL_EVENTSTORE_PORT
+#  Database: 'eventstore'
+#  MaxOpenConns: 3
+#  MaxConnLifetime: 30m
+#  MaxConnIdleTime: 30m
+#  Options: $CR_OPTIONS
+#  SSL:
+#    Mode: $CR_SSL_MODE
+#    RootCert: $CR_ROOT_CERT
+#    Cert: $CR_EVENTSTORE_CERT
+#    Key: $CR_EVENTSTORE_KEY
+#
+#Commands:
+#  Eventstore:
+#    User: 'eventstore'
+#    Password: $CR_EVENTSTORE_PASSWORD
+#    MaxOpenConns: 5
+#    MaxConnLifetime: 30m
+#    MaxConnIdleTime: 30m
+#    SSL:
+#      Mode: $CR_SSL_MODE
+#      RootCert: $CR_ROOT_CERT
+#      Cert: $CR_EVENTSTORE_CERT
+#      Key: $CR_EVENTSTORE_KEY
+#
+#Queries:
+#  Eventstore:
+#    User: 'queries'
+#    Password: $CR_QUERIES_PASSWORD
+#    MaxOpenConns: 2
+#    MaxConnLifetime: 30m
+#    MaxConnIdleTime: 30m
+#    Options: $CR_OPTIONS
+#    SSL:
+#      Cert: $CR_QUERIES_CERT
+#      Key: $CR_QUERIES_KEY
+#
+#Projections:
+#  Projection:
+#    RequeueEvery: 10s
+#    RetryFailedAfter: 1s
+#    MaxFailureCount: 5
+#    BulkLimit: 200
+#    MaxIterators: 1
+#    Customizations:
+#      projects:
+#        BulkLimit: 2000
+#  CRDB:
+#    Host: $ZITADEL_EVENTSTORE_HOST
+#    Port: $ZITADEL_EVENTSTORE_PORT
+#    User: 'queries'
+#    Database: 'zitadel'
+#    Schema: 'projections'
+#    Password: $CR_QUERIES_PASSWORD
+#    MaxOpenConns: 3
+#    MaxConnLifetime: 30m
+#    MaxConnIdleTime: 30m
+#    Options: $CR_OPTIONS
+#    SSL:
+#      Mode: $CR_SSL_MODE
+#      RootCert: $CR_ROOT_CERT
+#      Cert: $CR_QUERIES_CERT
+#      Key: $CR_QUERIES_KEY
+
+AuthZ:
+  Repository:
+    Eventstore:
+      ServiceName: 'AuthZ'
+      Repository:
+        SQL:
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'authz'
+          Database: 'eventstore'
+          Password: $CR_AUTHZ_PASSWORD
+          MaxOpenConns: 3
+          MaxConnLifetime: 30m
+          MaxConnIdleTime: 30m
+          Options: $CR_OPTIONS
+          SSL:
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_AUTHZ_CERT
+            Key: $CR_AUTHZ_KEY
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'authz'
+      Database: 'authz'
+      Password: $CR_AUTHZ_PASSWORD
+      MaxOpenConns: 3
+      MaxConnLifetime: 30m
+      MaxConnIdleTime: 30m
+      Options: $CR_OPTIONS
+      SSL:
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_AUTHZ_CERT
+        Key: $CR_AUTHZ_KEY
+    Spooler:
+      ConcurrentWorkers: 1
+      BulkLimit: 10000
+      FailureCountUntilSkip: 5
+
+Auth:
+  SearchLimit: 1000
+  Domain: $ZITADEL_DEFAULT_DOMAIN
+  APIDomain: $ZITADEL_API_DOMAIN
+  Eventstore:
+    ServiceName: 'authAPI'
+    Repository:
+      SQL:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'auth'
+        Database: 'eventstore'
+        Password: $CR_AUTH_PASSWORD
+        MaxOpenConns: 3
+        MaxConnLifetime: 30m
+        MaxConnIdleTime: 30m
+        Options: $CR_OPTIONS
+        SSL:
+          Mode: $CR_SSL_MODE
+          RootCert: $CR_ROOT_CERT
+          Cert: $CR_AUTH_CERT
+          Key: $CR_AUTH_KEY
+    Cache:
+      Type: 'fastcache'
+      Config:
+        MaxCacheSizeInByte: 10485760 #10mb
+  AuthRequest:
+    Connection:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'auth'
+      Database: 'auth'
+      Password: $CR_AUTH_PASSWORD
+      MaxOpenConns: 3
+      MaxConnLifetime: 30m
+      MaxConnIdleTime: 30m
+      Options: $CR_OPTIONS
+      SSL:
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_AUTH_CERT
+        Key: $CR_AUTH_KEY
+  View:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'auth'
+    Database: 'auth'
+    Password: $CR_AUTH_PASSWORD
+    MaxOpenConns: 3
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: $CR_OPTIONS
+    SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
+      Cert: $CR_AUTH_CERT
+      Key: $CR_AUTH_KEY
+  Spooler:
+    ConcurrentWorkers: 1
+    BulkLimit: 10000
+    FailureCountUntilSkip: 5
+
+Admin:
+  SearchLimit: 1000
+  Domain: $ZITADEL_DEFAULT_DOMAIN
+  APIDomain: $ZITADEL_API_DOMAIN
+  Eventstore:
+    ServiceName: 'Admin'
+    Repository:
+      SQL:
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'adminapi'
+        Database: 'eventstore'
+        Password: $CR_ADMINAPI_PASSWORD
+        MaxOpenConns: 3
+        MaxConnLifetime: 30m
+        MaxConnIdleTime: 30m
+        Options: $CR_OPTIONS
+        SSL:
+          Mode: $CR_SSL_MODE
+          RootCert: $CR_ROOT_CERT
+          Cert: $CR_ADMINAPI_CERT
+          Key: $CR_ADMINAPI_KEY
+    Cache:
+      Type: 'fastcache'
+      Config:
+        MaxCacheSizeInByte: 10485760 #10mb
+  View:
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'adminapi'
+    Database: 'adminapi'
+    Password: $CR_ADMINAPI_PASSWORD
+    MaxOpenConns: 3
+    MaxConnLifetime: 30m
+    MaxConnIdleTime: 30m
+    Options: $CR_OPTIONS
+    SSL:
+      Mode: $CR_SSL_MODE
+      RootCert: $CR_ROOT_CERT
+      Cert: $CR_ADMINAPI_CERT
+      Key: $CR_ADMINAPI_KEY
+  Spooler:
+    ConcurrentWorkers: 1
+    BulkLimit: 10000
+    FailureCountUntilSkip: 5
+
+#OIDC:
+#  OPConfig:
+#    Issuer: $ZITADEL_ISSUER
+#    DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
+#  StorageConfig:
+#    DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+#    DefaultAccessTokenLifetime: 12h
+#    DefaultIdTokenLifetime: 12h
+#    DefaultRefreshTokenIdleExpiration: 720h #30d
+#    DefaultRefreshTokenExpiration: 2160h #90d
+#    SigningKeyAlgorithm: RS256
+#  UserAgentCookieConfig:
+#    Name: caos.zitadel.useragent
+#    Domain: $ZITADEL_COOKIE_DOMAIN
+#    MaxAge: 8760h #365*24h (1 year)
+#    Key:
+#      EncryptionKeyID: $ZITADEL_COOKIE_KEY
+#  Cache:
+#    MaxAge: $ZITADEL_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  Endpoints:
+#    Auth:
+#      Path: 'authorize2'
+#      URL: '$ZITADEL_AUTHORIZE/authorize2'
+#    Token:
+#      Path: 'token2'
+#      URL: '$ZITADEL_OAUTH/token2'
+#    Introspection:
+#      Path: 'introspect2'
+#      URL: '$ZITADEL_OAUTH/introspect2'
+#    Revocation:
+#      Path: 'revoke2'
+#      URL: '$ZITADEL_OAUTH/revoke2'
+#    EndSession:
+#      Path: 'endsession2'
+#      URL: '$ZITADEL_AUTHORIZE/endsession2'
+#    Userinfo:
+#      Path: 'userinfo2'
+#      URL: '$ZITADEL_OAUTH/userinfo2'
+#    Keys:
+#      Path: 'keys2'
+#      URL: '$ZITADEL_OAUTH/keys2'
+
+#Login:
+#  BaseURL: '$ZITADEL_ACCOUNTS'
+#  OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
+#  ZitadelURL: '$ZITADEL_CONSOLE'
+#  LanguageCookieName: 'caos.zitadel.login.lang'
+#  DefaultLanguage: 'de'
+#  CSRF:
+#    CookieName: 'caos.zitadel.login.csrf'
+#    Key:
+#      EncryptionKeyID: $ZITADEL_CSRF_KEY
+#    Development: $ZITADEL_CSRF_DEV
+#  UserAgentCookieConfig:
+#    Name: caos.zitadel.useragent
+#    Domain: $ZITADEL_COOKIE_DOMAIN
+#    MaxAge: 8760h #365*24h (1 year)
+#    Key:
+#      EncryptionKeyID: $ZITADEL_COOKIE_KEY
+#  Cache:
+#    MaxAge: $ZITADEL_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  StaticCache:
+#    Type: bigcache
+#    Config:
+#      MaxCacheSizeInByte: 52428800 #50MB
+Console:
+  ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
+  ShortCache:
+    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+  LongCache:
+    MaxAge: $ZITADEL_CACHE_MAXAGE
+    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
+
+Notification:
+  APIDomain: $ZITADEL_API_DOMAIN
+  Repository:
+    DefaultLanguage: 'de'
+    Domain: $ZITADEL_DEFAULT_DOMAIN
+    Eventstore:
+      ServiceName: 'Notification'
+      Repository:
+        SQL:
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'notification'
+          Database: 'eventstore'
+          Password: $CR_NOTIFICATION_PASSWORD
+          MaxOpenConns: 2
+          MaxConnLifetime: 30m
+          MaxConnIdleTime: 30m
+          Options: $CR_OPTIONS
+          SSL:
+            Mode: $CR_SSL_MODE
+            RootCert: $CR_ROOT_CERT
+            Cert: $CR_NOTIFICATION_CERT
+            Key: $CR_NOTIFICATION_KEY
+      Cache:
+        Type: 'fastcache'
+        Config:
+          MaxCacheSizeInByte: 10485760 #10mb
+    View:
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'notification'
+      Database: 'notification'
+      Password: $CR_NOTIFICATION_PASSWORD
+      MaxOpenConns: 2
+      MaxConnLifetime: 30m
+      MaxConnIdleTime: 30m
+      Options: $CR_OPTIONS
+      SSL:
+        Mode: $CR_SSL_MODE
+        RootCert: $CR_ROOT_CERT
+        Cert: $CR_NOTIFICATION_CERT
+        Key: $CR_NOTIFICATION_KEY
+    Spooler:
+      ConcurrentWorkers: 1
+      BulkLimit: 10000
+      FailureCountUntilSkip: 5
+      Handlers:

@@ -1,0 +1,10 @@
+{{ define "error-message" }}
+{{if .ErrMessage }}
+<div class="lgn-error" title="{{.ErrID}}">
+    <i class="lgn-icon-exclamation-circle-solid lgn-warn"></i>
+    <p class="lgn-error-message">
+        {{ .ErrMessage }}
+    </p>
+</div>
+{{end}}
+{{ end }}

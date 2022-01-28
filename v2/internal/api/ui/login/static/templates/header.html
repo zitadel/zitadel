@@ -1,0 +1,17 @@
+{{define "header"}}
+<header class="lgn-header">
+    {{ if hasCustomPolicy .LabelPolicy }}
+        {{ $logo := customLogoResource .PrivateLabelingOrgID .LabelPolicy .DarkMode }}
+        {{if $logo}}
+            <img class="lgn-logo" src="{{$logo}}" alt="Logo">
+        {{end}}
+    {{ else }}
+
+        {{if .DarkMode }}
+            <img class="lgn-logo" src="{{ resourceThemeUrl "logo-light.svg" .Theme }}" alt="Logo">
+        {{else}}
+            <img class="lgn-logo" src="{{ resourceThemeUrl "logo-dark.svg" .Theme }}" alt="Logo">
+        {{end}}
+    {{end}}
+</header>
+{{end}}

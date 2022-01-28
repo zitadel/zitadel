@@ -1,0 +1,22 @@
+@import 'qrcode';
+
+@mixin lgn-qrcode-theme() {
+    @include lgn-qrcode-color();
+}
+
+@mixin lgn-qrcode-color() {
+
+    .lgn-qrcode {
+        svg {
+            background: var(--zitadel-color-qr-background);
+        }
+
+        svg rect.color {
+            fill: var(--zitadel-color-qr);
+        }
+
+        svg rect.bg-color {
+            fill: var(--zitadel-color-qr-background);
+        }
+    }
+}

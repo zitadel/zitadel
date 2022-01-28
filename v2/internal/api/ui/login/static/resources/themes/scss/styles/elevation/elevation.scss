@@ -1,0 +1,165 @@
+@function _get-umbra-map($color, $opacity) {
+  $shadow-color: if(
+    type-of($color) == color,
+    rgba($color, $opacity * 0.2),
+    $color
+  );
+
+  @return (
+    0: "0px 0px 0px 0px #{$shadow-color}",
+    1: "0px 2px 1px -1px #{$shadow-color}",
+    2: "0px 3px 1px -2px #{$shadow-color}",
+    3: "0px 3px 3px -2px #{$shadow-color}",
+    4: "0px 2px 4px -1px #{$shadow-color}",
+    5: "0px 3px 5px -1px #{$shadow-color}",
+    6: "0px 3px 5px -1px #{$shadow-color}",
+    7: "0px 4px 5px -2px #{$shadow-color}",
+    8: "0px 5px 5px -3px #{$shadow-color}",
+    9: "0px 5px 6px -3px #{$shadow-color}",
+    10: "0px 6px 6px -3px #{$shadow-color}",
+    11: "0px 6px 7px -4px #{$shadow-color}",
+    12: "0px 7px 8px -4px #{$shadow-color}",
+    13: "0px 7px 8px -4px #{$shadow-color}",
+    14: "0px 7px 9px -4px #{$shadow-color}",
+    15: "0px 8px 9px -5px #{$shadow-color}",
+    16: "0px 8px 10px -5px #{$shadow-color}",
+    17: "0px 8px 11px -5px #{$shadow-color}",
+    18: "0px 9px 11px -5px #{$shadow-color}",
+    19: "0px 9px 12px -6px #{$shadow-color}",
+    20: "0px 10px 13px -6px #{$shadow-color}",
+    21: "0px 10px 13px -6px #{$shadow-color}",
+    22: "0px 10px 14px -6px #{$shadow-color}",
+    23: "0px 11px 14px -7px #{$shadow-color}",
+    24: "0px 11px 15px -7px #{$shadow-color}"
+  );
+}
+
+@function _get-penumbra-map($color, $opacity) {
+  $shadow-color: if(
+    type-of($color) == color,
+    rgba($color, $opacity * 0.14),
+    $color
+  );
+
+  @return (
+    0: "0px 0px 0px 0px #{$shadow-color}",
+    1: "0px 1px 1px 0px #{$shadow-color}",
+    2: "0px 2px 2px 0px #{$shadow-color}",
+    3: "0px 3px 4px 0px #{$shadow-color}",
+    4: "0px 4px 5px 0px #{$shadow-color}",
+    5: "0px 5px 8px 0px #{$shadow-color}",
+    6: "0px 6px 10px 0px #{$shadow-color}",
+    7: "0px 7px 10px 1px #{$shadow-color}",
+    8: "0px 8px 10px 1px #{$shadow-color}",
+    9: "0px 9px 12px 1px #{$shadow-color}",
+    10: "0px 10px 14px 1px #{$shadow-color}",
+    11: "0px 11px 15px 1px #{$shadow-color}",
+    12: "0px 12px 17px 2px #{$shadow-color}",
+    13: "0px 13px 19px 2px #{$shadow-color}",
+    14: "0px 14px 21px 2px #{$shadow-color}",
+    15: "0px 15px 22px 2px #{$shadow-color}",
+    16: "0px 16px 24px 2px #{$shadow-color}",
+    17: "0px 17px 26px 2px #{$shadow-color}",
+    18: "0px 18px 28px 2px #{$shadow-color}",
+    19: "0px 19px 29px 2px #{$shadow-color}",
+    20: "0px 20px 31px 3px #{$shadow-color}",
+    21: "0px 21px 33px 3px #{$shadow-color}",
+    22: "0px 22px 35px 3px #{$shadow-color}",
+    23: "0px 23px 36px 3px #{$shadow-color}",
+    24: "0px 24px 38px 3px #{$shadow-color}"
+  );
+}
+
+@function _get-ambient-map($color, $opacity) {
+  $shadow-color: if(
+    type-of($color) == color,
+    rgba($color, $opacity * 0.12),
+    $color
+  );
+
+  @return (
+    0: "0px 0px 0px 0px #{$shadow-color}",
+    1: "0px 1px 3px 0px #{$shadow-color}",
+    2: "0px 1px 5px 0px #{$shadow-color}",
+    3: "0px 1px 8px 0px #{$shadow-color}",
+    4: "0px 1px 10px 0px #{$shadow-color}",
+    5: "0px 1px 14px 0px #{$shadow-color}",
+    6: "0px 1px 18px 0px #{$shadow-color}",
+    7: "0px 2px 16px 1px #{$shadow-color}",
+    8: "0px 3px 14px 2px #{$shadow-color}",
+    9: "0px 3px 16px 2px #{$shadow-color}",
+    10: "0px 4px 18px 3px #{$shadow-color}",
+    11: "0px 4px 20px 3px #{$shadow-color}",
+    12: "0px 5px 22px 4px #{$shadow-color}",
+    13: "0px 5px 24px 4px #{$shadow-color}",
+    14: "0px 5px 26px 4px #{$shadow-color}",
+    15: "0px 6px 28px 5px #{$shadow-color}",
+    16: "0px 6px 30px 5px #{$shadow-color}",
+    17: "0px 6px 32px 5px #{$shadow-color}",
+    18: "0px 7px 34px 6px #{$shadow-color}",
+    19: "0px 7px 36px 6px #{$shadow-color}",
+    20: "0px 8px 38px 7px #{$shadow-color}",
+    21: "0px 8px 40px 7px #{$shadow-color}",
+    22: "0px 8px 42px 7px #{$shadow-color}",
+    23: "0px 9px 44px 8px #{$shadow-color}",
+    24: "0px 9px 46px 8px #{$shadow-color}"
+  );
+}
+
+$lgn-elevation-transition-duration: 280ms !default;
+$lgn-elevation-transition-timing-function: cubic-bezier(
+  0.4,
+  0,
+  0.2,
+  1
+) !default;
+$lgn-elevation-color: black !default;
+
+// scaling value for elevation shadows.
+$lgn-elevation-opacity: 1 !default;
+
+// Applies the correct css rules to an element to give it the elevation specified by $zValue.
+// The $zValue must be between 0 and 24.
+@mixin lgn-elevation(
+  $zValue,
+  $color: $lgn-elevation-color,
+  $opacity: $lgn-elevation-opacity
+) {
+  @if type-of($zValue) != number or not unitless($zValue) {
+    @error '$zValue must be a unitless number';
+  }
+  @if $zValue < 0 or $zValue > 24 {
+    @error '$zValue must be between 0 and 24';
+  }
+
+  box-shadow: #{map-get(_get-umbra-map($color, $opacity), $zValue)},
+    #{map-get(_get-penumbra-map($color, $opacity), $zValue)},
+    #{map-get(_get-ambient-map($color, $opacity), $zValue)};
+}
+
+// Returns a string that can be used as the value for a transition property for elevation.
+// Calling this function directly is useful in situations where a component needs to transition
+// more than one property.
+//
+// .foo {
+//   transition: lgn-elevation-transition-property-value(), opacity 100ms ease;
+// }
+@function lgn-elevation-transition-property-value(
+  $duration: $lgn-elevation-transition-duration,
+  $easing: $lgn-elevation-transition-timing-function
+) {
+  @return box-shadow #{$duration} #{$easing};
+}
+
+// Applies the correct css rules needed to have an element transition between elevations.
+// This mixin should be applied to elements whose elevation values will change depending on their
+// context (e.g. when active or disabled).
+//
+// NOTE(traviskaufman): Both this mixin and the above function use default parameters so they can
+// be used in the same way by clients.
+@mixin lgn-elevation-transition(
+  $duration: $lgn-elevation-transition-duration,
+  $easing: $lgn-elevation-transition-timing-function
+) {
+  transition: lgn-elevation-transition-property-value($duration, $easing);
+}

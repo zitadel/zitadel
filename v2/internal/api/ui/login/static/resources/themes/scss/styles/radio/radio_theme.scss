@@ -1,0 +1,51 @@
+@import '../theming/theming';
+@import 'radio';
+
+@mixin lgn-radio-theme() {
+    @include lgn-radio-color();
+}
+
+@mixin lgn-radio-color() {
+    label {
+        &::before {
+            border-color: var(--zitadel-color-input-border);
+        }
+
+        &::after {
+            background: var(--zitadel-color-primary);
+        }
+    }
+
+    input[type='radio'] {
+        opacity: 0;
+
+        &:checked + label::before {
+            border-color: var(--zitadel-color-primary);
+        }
+
+        &:focus + label {
+            opacity: 1;
+            outline: none;
+        }
+
+        &:disabled {
+            + label::before {
+                border-color: var(--zitadel-color-button-disabled-background);
+            }
+
+            &:checked {
+                + label::before {
+                    color: var(--zitadel-color-button-selected-background);
+                }
+
+                + label::after {
+                    background:  var(--zitadel-color-button-disabled-selected-background);
+                }
+            }
+
+            &:focus {
+                opacity: 0;
+            }
+        }
+    }
+}

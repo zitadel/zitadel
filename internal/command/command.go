@@ -64,6 +64,9 @@ type orgFeatureChecker interface {
 type Config struct {
 	Eventstore types.SQLUser
 }
+type ConfigV2 struct {
+	Eventstore types.SQLUser2
+}
 
 func StartCommands(
 	es *eventstore.Eventstore,

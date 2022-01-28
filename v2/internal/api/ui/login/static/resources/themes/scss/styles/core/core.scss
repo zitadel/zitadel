@@ -1,0 +1,25 @@
+  
+  @mixin lgn-core($typography-config: null) {
+    @include zitadel-lgn-typography($typography-config);
+  }
+  
+  @mixin lgn-core-color() {
+
+    // Wrapper element that provides the theme background
+    .lgn-app-background#{if(&, ', &.lgn-app-background', '')} {
+      background-color: var(--zitadel-color-background);
+      color: var(--zitadel-color-text);
+    }
+  
+    // Marker that is used to determine whether the user has added a theme to their page.
+    @at-root {
+      .lgn-theme-loaded-marker {
+        display: none;
+      }
+    }
+  }
+
+  // Mixin that renders all of the core styles that depend on the theme.
+  @mixin lgn-core-theme() {
+    @include lgn-core-color();
+  }

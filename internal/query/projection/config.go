@@ -12,6 +12,11 @@ type Config struct {
 	MaxIterators     int
 }
 
+type ConfigV2 struct {
+	Config
+	CRDB types.SQL2
+}
+
 type CustomConfig struct {
 	RequeueEvery     *types.Duration
 	RetryFailedAfter *types.Duration

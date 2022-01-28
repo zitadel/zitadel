@@ -1,0 +1,39 @@
+@mixin lgn-list-base {
+    &.lgn-policy {
+        display: flex;
+        flex-wrap: wrap;
+
+        li {
+            flex: 1 0 50%;
+        }
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        margin: 4px 0;
+        font-style: italic;
+
+        i {
+            margin: 0 .5rem;
+            font-size: 20px;
+        }
+    }
+
+    &:not(.lgn-no-dots) {
+        li::before {
+            content: "\2022";
+            font-weight: bold;
+            display: inline-block;
+            width: 20px;
+            margin-left: -20px;
+            font-style: normal;
+        }
+    }
+
+    &.lgn-no-dots {
+        list-style-type: none;
+        padding-inline-start: 0;
+    }
+}

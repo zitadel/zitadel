@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
