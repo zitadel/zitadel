@@ -56,6 +56,42 @@ Set the default language
     GET: /languages/default
 
 
+### ListSecretGenerators
+
+> **rpc** ListSecretGenerators([ListSecretGeneratorsRequest](#listsecretgeneratorsrequest))
+[ListSecretGeneratorsResponse](#listsecretgeneratorsresponse)
+
+Set the default language
+
+
+
+    POST: /secretgenerators/_search
+
+
+### GetSecretGenerator
+
+> **rpc** GetSecretGenerator([GetSecretGeneratorRequest](#getsecretgeneratorrequest))
+[GetSecretGeneratorResponse](#getsecretgeneratorresponse)
+
+Set the default language
+
+
+
+    GET: /secretgenerators/{generator_type}
+
+
+### UpdateSecretGenerator
+
+> **rpc** UpdateSecretGenerator([UpdateSecretGeneratorRequest](#updatesecretgeneratorrequest))
+[UpdateSecretGeneratorResponse](#updatesecretgeneratorresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /secretgenerators/{generator_type}
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1940,6 +1976,28 @@ This is an empty request
 
 
 
+### GetSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSecretGeneratorResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -2170,6 +2228,30 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSecretGeneratorsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.settings.v1.SecretGeneratorQuery | criterias the client is looking for |  |
+
+
+
+
+### ListSecretGeneratorsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SecretGenerator | - |  |
 
 
 
@@ -3213,6 +3295,34 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  string | - | string.min_len: 1<br /> string.max_len: 210<br />  |
+| length |  uint32 | - |  |
+| expiry |  google.protobuf.Duration | - |  |
+| include_lower_letters |  bool | - |  |
+| include_upper_letters |  bool | - |  |
+| include_digits |  bool | - |  |
+| include_symbols |  bool | - |  |
+
+
+
+
+### UpdateSecretGeneratorResponse
 
 
 

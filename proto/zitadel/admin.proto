@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "zitadel/idp.proto";
 import "zitadel/user.proto";
+import "zitadel/settings.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
@@ -180,6 +181,41 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.read";
+        };
+    }
+
+    // Set the default language
+    rpc ListSecretGenerators(ListSecretGeneratorsRequest) returns (ListSecretGeneratorsResponse) {
+        option (google.api.http) = {
+            post: "/secretgenerators/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Set the default language
+    rpc GetSecretGenerator(GetSecretGeneratorRequest) returns (GetSecretGeneratorResponse) {
+        option (google.api.http) = {
+            get: "/secretgenerators/{generator_type}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Update secret generator configuration
+    rpc UpdateSecretGenerator(UpdateSecretGeneratorRequest) returns (UpdateSecretGeneratorResponse) {
+        option (google.api.http) = {
+            put: "/secretgenerators/{generator_type}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
         };
     }
 
@@ -2227,6 +2263,39 @@ message GetDefaultLanguageResponse {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 10}];
 }
 
+message ListSecretGeneratorsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+    //criterias the client is looking for
+    repeated zitadel.settings.v1.SecretGeneratorQuery queries = 2;
+}
+
+message ListSecretGeneratorsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.SecretGenerator result = 3;
+}
+
+message GetSecretGeneratorRequest {
+    string generator_type = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetSecretGeneratorResponse {
+    zitadel.settings.v1.SecretGenerator secret_generator = 1;
+}
+
+message UpdateSecretGeneratorRequest {
+    string generator_type = 1 [(validate.rules).string = {min_len: 1, max_len: 210}];
+    uint32 length = 2;
+    google.protobuf.Duration  expiry   = 3;
+    bool include_lower_letters = 4;
+    bool include_upper_letters = 5;
+    bool include_digits = 6;
+    bool include_symbols = 7;
+}
+
+message UpdateSecretGeneratorResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
 
 // if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {

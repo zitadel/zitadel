@@ -106,42 +106,6 @@ SystemDefaults:
         Url: $CHAT_URL
         Compact: $CHAT_COMPACT
         SplitCount: 4000
-    TemplateData:
-      InitCode:
-        Title: 'InitCode.Title'
-        PreHeader: 'InitCode.PreHeader'
-        Subject: 'InitCode.Subject'
-        Greeting: 'InitCode.Greeting'
-        Text: 'InitCode.Text'
-        ButtonText: 'InitCode.ButtonText'
-      PasswordReset:
-        Title: 'PasswordReset.Title'
-        PreHeader: 'PasswordReset.PreHeader'
-        Subject: 'PasswordReset.Subject'
-        Greeting: 'PasswordReset.Greeting'
-        Text: 'PasswordReset.Text'
-        ButtonText: 'PasswordReset.ButtonText'
-      VerifyEmail:
-        Title: 'VerifyEmail.Title'
-        PreHeader: 'VerifyEmail.PreHeader'
-        Subject: 'VerifyEmail.Subject'
-        Greeting: 'VerifyEmail.Greeting'
-        Text: 'VerifyEmail.Text'
-        ButtonText: 'VerifyEmail.ButtonText'
-      VerifyPhone:
-        Title: 'VerifyPhone.Title'
-        PreHeader: 'VerifyPhone.PreHeader'
-        Subject: 'VerifyPhone.Subject'
-        Greeting: 'VerifyPhone.Greeting'
-        Text: 'VerifyPhone.Text'
-        ButtonText: 'VerifyPhone.ButtonText'
-      DomainClaimed:
-        Title: 'DomainClaimed.Title'
-        PreHeader: 'DomainClaimed.PreHeader'
-        Subject: 'DomainClaimed.Subject'
-        Greeting: 'DomainClaimed.Greeting'
-        Text: 'DomainClaimed.Text'
-        ButtonText: 'DomainClaimed.ButtonText'
   WebAuthN:
     ID: $ZITADEL_DEFAULT_DOMAIN
     OriginLogin: $ZITADEL_ACCOUNTS

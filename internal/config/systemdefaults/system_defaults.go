@@ -68,10 +68,9 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	DebugMode    bool
-	Endpoints    Endpoints
-	Providers    Channels
-	TemplateData TemplateData
+	DebugMode bool
+	Endpoints Endpoints
+	Providers Channels
 }
 
 type Endpoints struct {
