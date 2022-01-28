@@ -11,6 +11,7 @@ import { Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { GetFeaturesResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageKey, StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { StripeCustomer, SubscriptionService } from 'src/app/services/subscription.service';
@@ -53,7 +54,19 @@ export class FeaturesComponent implements OnDestroy {
     private adminService: AdminService,
     private subService: SubscriptionService,
     private dialog: MatDialog,
+    breadcrumbService: BreadcrumbService,
   ) {
+    const iamBread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'IAM',
+      routerLink: ['/system'],
+    });
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([iamBread, bread]);
+
     const temporg: Org.AsObject | null = this.storage.getItem(StorageKey.organization, StorageLocation.session);
 
     if (temporg) {

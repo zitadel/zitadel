@@ -1,6 +1,11 @@
 <cnsl-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/system' : '/org']"
-  [title]="('FEATURES.TITLE' | translate)" [description]="'FEATURES.DESCRIPTION' | translate">
-
+  [title]="('FEATURES.TITLE' | translate)">
+  <p class="subinfo" sub>
+    <span class="label">{{'FEATURES.DESCRIPTION' | translate}}</span>
+    <a mat-icon-button href="https://docs.zitadel.ch/docs/legal/introduction" target="_blank">
+      <i class="las la-info-circle"></i>
+    </a>
+  </p>
   <h2>{{'FEATURES.TIER.TITLE' | translate}}</h2>
   <p *ngIf="serviceType === FeatureServiceType.MGMT" class="tier-desc">{{'FEATURES.TIER.DESCRIPTION' | translate}}
     {{'FEATURES.TIER.QUESTIONS' | translate}} <a href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>

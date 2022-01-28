@@ -95,6 +95,14 @@ export class UserTableComponent implements OnInit {
 
   public setType(type: Type): void {
     this.type = type;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        type: type === Type.TYPE_HUMAN ? 'human' : type === Type.TYPE_MACHINE ? 'machine' : 'human',
+      },
+      queryParamsHandling: 'merge',
+      skipLocationChange: false,
+    });
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
   }
 
