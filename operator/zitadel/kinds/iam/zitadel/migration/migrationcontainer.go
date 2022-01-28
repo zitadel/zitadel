@@ -26,7 +26,7 @@ func getMigrationContainer(
 			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey, []string{}),
+		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
 		VolumeMounts: []corev1.VolumeMount{{
 			Name:      migrationConfigmap,
 			MountPath: migrationsPath,
@@ -40,18 +40,28 @@ func getMigrationContainer(
 	}
 }
 
-func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string, users []string) []corev1.EnvVar {
+func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string) []corev1.EnvVar {
 	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey)
 
 	vars := make([]corev1.EnvVar, 0)
 	for _, v := range envVars {
 		vars = append(vars, v)
 	}
-	for _, user := range users {
+
+	deprecatedUsers := []string{
+		"management",
+		"adminapi",
+		"auth",
+		"authz",
+		"notification",
+		"eventstore",
+		"queries",
+	}
+	for _, user := range deprecatedUsers {
 		vars = append(vars, corev1.EnvVar{
 			Name: "FLYWAY_PLACEHOLDERS_" + strings.ToUpper(user) + "PASSWORD",
 			// TODO: Delete users in a new migration
-			Value: "to-be-deleted",
+			Value: "'to-be-deleted'",
 			/*			ValueFrom: &corev1.EnvVarSource{
 						SecretKeyRef: &corev1.SecretKeySelector{
 							LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
