@@ -2,6 +2,8 @@ package migration
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/zitadel/operator/common"
@@ -16,21 +18,6 @@ func getMigrationContainer(
 
 	pwSecretName, pwSecretKey := dbConn.PasswordSecret()
 
-	/*	var pwSecretEnv string
-		if pwSecretName != "" {
-			pwSecretEnv = envMigrationPW
-		}
-
-	*/
-
-	//			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + certsDir + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory"},
-	/*		Args: []string{
-			"-url=jdbc:" + dbConn.URL(certsDir, pwSecretEnv),
-			//			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + certsDir + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
-			"-locations=filesystem:" + migrationsPath,
-			"migrate",
-		},*/
-
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
@@ -39,7 +26,7 @@ func getMigrationContainer(
 			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
 			"migrate",
 		},
-		Env: baseEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
+		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey, []string{}),
 		VolumeMounts: []corev1.VolumeMount{{
 			Name:      migrationConfigmap,
 			MountPath: migrationsPath,
@@ -53,25 +40,25 @@ func getMigrationContainer(
 	}
 }
 
-/*
-func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string, users []string) []corev1.EnvVar {
-	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, migrationUser)
+func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string, users []string) []corev1.EnvVar {
+	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey)
 
-	migrationEnvVars := make([]corev1.EnvVar, 0)
+	vars := make([]corev1.EnvVar, 0)
 	for _, v := range envVars {
-		migrationEnvVars = append(migrationEnvVars, v)
+		vars = append(vars, v)
 	}
 	for _, user := range users {
-		migrationEnvVars = append(migrationEnvVars, corev1.EnvVar{
+		vars = append(vars, corev1.EnvVar{
 			Name: "FLYWAY_PLACEHOLDERS_" + strings.ToUpper(user) + "PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-					Key:                  user,
-				},
-			},
+			// TODO: Delete users in a new migration
+			Value: "to-be-deleted",
+			/*			ValueFrom: &corev1.EnvVarSource{
+						SecretKeyRef: &corev1.SecretKeySelector{
+							LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
+							Key:                  user,
+						},
+					},*/
 		})
 	}
-	return migrationEnvVars
+	return vars
 }
-*/
