@@ -1,5 +1,6 @@
 package users
 
+/*
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -69,3 +70,4 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(internalMonitor, destroyers),
 		nil
 }
+*/

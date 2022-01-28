@@ -17,10 +17,14 @@ type DesiredV0 struct {
 
 type Spec struct {
 	Verbose             bool
-	URL                 string
-	Port                string
+	Host                string
+	Port                uint16
+	Cluster             string
+	User                string
 	Certificate         *secret.Secret   `yaml:"certificate,omitempty"`
 	ExistingCertificate *secret.Existing `yaml:"existingCertificate,omitempty"`
+	Password            *secret.Secret   `yaml:"password,omitempty"`
+	ExistingPassword    *secret.Existing `yaml:"existingPassword,omitempty"`
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
@@ -48,20 +52,9 @@ func (d *DesiredV0) validate() (err error) {
 		return errors.New("spec is empty")
 	}
 
-	if d.Spec.URL == "" {
-		return errors.New("url is empty")
+	if d.Spec.Host == "" {
+		return errors.New("host is empty")
 	}
 
-	if d.Spec.Port == "" {
-		return errors.New("port is empty")
-	}
-
-	return nil
-}
-
-func (d *DesiredV0) validateSecrets() (err error) {
-	if err := secret.ValidateSecret(d.Spec.Certificate, d.Spec.ExistingCertificate); err != nil {
-		return fmt.Errorf("validating certificate failed: %w", err)
-	}
 	return nil
 }

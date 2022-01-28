@@ -27,7 +27,7 @@ func DestroyOperator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kube
 		return err
 	}
 
-	dbClient, err := databases.NewClient(monitor, gitops, orbConfig)
+	dbClient, err := databases.NewConnection(monitor, k8sClient, gitops, orbConfig)
 	if err != nil {
 		return err
 	}

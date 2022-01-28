@@ -31,7 +31,7 @@ func GetAllSecretsFunc(
 	gitops bool,
 	gitClient *git.Client,
 	k8sClient kubernetes.ClientInt,
-	dbClient db.Client,
+	dbConn db.Connection,
 ) func() (
 	map[string]*secret.Secret,
 	map[string]*secret.Existing,
@@ -44,7 +44,7 @@ func GetAllSecretsFunc(
 		map[string]*tree.Tree,
 		error,
 	) {
-		return getAllSecrets(monitor, printLogs, gitops, gitClient, k8sClient, dbClient)
+		return getAllSecrets(monitor, printLogs, gitops, gitClient, k8sClient, dbConn)
 	}
 }
 
@@ -54,7 +54,7 @@ func getAllSecrets(
 	gitops bool,
 	gitClient *git.Client,
 	k8sClient kubernetes.ClientInt,
-	dbClient db.Client,
+	dbConn db.Connection,
 ) (
 	map[string]*secret.Secret,
 	map[string]*secret.Existing,
@@ -76,7 +76,7 @@ func getAllSecrets(
 		allExisting,
 		func() (t *tree.Tree, err error) { return crdzit.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, bool, error) {
-			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc("secret", nil, gitops, []string{}, dbClient)(monitor, t, &tree.Tree{})
+			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc("secret", nil, gitops, []string{}, dbConn)(monitor, t, &tree.Tree{})
 			return secrets, existing, migrate, err
 		},
 	); err != nil {

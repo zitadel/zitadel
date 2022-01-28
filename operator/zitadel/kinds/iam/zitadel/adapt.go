@@ -21,7 +21,6 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/services"
@@ -32,7 +31,7 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	dbClient db.Client,
+	dbConn db.Connection,
 	namespace string,
 	action string,
 	version *string,
@@ -130,24 +129,25 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			dbClient,
 			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
-
-		queryDB, err := database.AdaptFunc(
-			monitor,
-			dbClient,
-		)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
+		/*
+			queryDB, err := database.AdaptFunc(
+				monitor,
+				dbClient,
+			)
+			if err != nil {
+				return nil, nil, nil, nil, nil, false, err
+			}
+		*/
 		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "database"),
+			dbConn,
 			namespace,
 			action,
 			secretPasswordName,
@@ -261,7 +261,7 @@ func AdaptFunc(
 				return nil, err
 			}
 			return concatQueriers(
-				queryDB,
+				//				queryDB,
 				getQueryC(users),
 				operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(
 					monitor,

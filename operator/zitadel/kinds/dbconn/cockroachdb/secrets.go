@@ -28,5 +28,15 @@ func getSecretsMap(desiredKind *DesiredV0) (
 	secrets[certKey] = desiredKind.Spec.Certificate
 	existing[certKey] = desiredKind.Spec.ExistingCertificate
 
+	if desiredKind.Spec.Password == nil {
+		desiredKind.Spec.Password = &secret.Secret{}
+	}
+	if desiredKind.Spec.ExistingPassword == nil {
+		desiredKind.Spec.ExistingPassword = &secret.Existing{}
+	}
+	pwKey := "password"
+	secrets[pwKey] = desiredKind.Spec.Password
+	existing[pwKey] = desiredKind.Spec.ExistingPassword
+
 	return secrets, existing
 }

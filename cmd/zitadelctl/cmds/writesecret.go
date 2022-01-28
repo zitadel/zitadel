@@ -64,7 +64,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 		}
 		err = nil
 
-		dbClient, err := databases.NewClient(rv.Monitor, rv.Gitops, rv.OrbConfig)
+		dbClient, err := databases.NewConnection(rv.Monitor, k8sClient, rv.Gitops, rv.OrbConfig)
 		if err != nil {
 			return err
 		}

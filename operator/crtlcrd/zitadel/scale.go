@@ -11,11 +11,11 @@ import (
 func ScaleDown(
 	monitor mntr.Monitor,
 	k8sClient *kubernetes.Client,
-	dbClient db.Client,
+	dbConn db.Connection,
 	version *string,
 ) (bool, error) {
 	noZitadel := false
-	if err := Takeoff(monitor, k8sClient, orb.AdaptFunc("scaledown", version, false, []string{"scaledown"}, dbClient)); err != nil {
+	if err := Takeoff(monitor, k8sClient, orb.AdaptFunc("scaledown", version, false, []string{"scaledown"}, dbConn)); err != nil {
 		if macherrs.IsNotFound(err) {
 			noZitadel = true
 		} else {
@@ -28,8 +28,8 @@ func ScaleDown(
 func ScaleUp(
 	monitor mntr.Monitor,
 	k8sClient *kubernetes.Client,
-	dbClient db.Client,
+	dbConn db.Connection,
 	version *string,
 ) error {
-	return Takeoff(monitor, k8sClient, orb.AdaptFunc("scaleup", version, false, []string{"scaleup"}, dbClient))
+	return Takeoff(monitor, k8sClient, orb.AdaptFunc("scaleup", version, false, []string{"scaleup"}, dbConn))
 }

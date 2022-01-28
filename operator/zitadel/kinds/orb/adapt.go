@@ -27,7 +27,7 @@ func AdaptFunc(
 	binaryVersion *string,
 	gitops bool,
 	features []string,
-	dbClient db.Client,
+	dbConn db.Connection,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -103,7 +103,7 @@ func AdaptFunc(
 			iamCurrent,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
-			dbClient,
+			dbConn,
 			namespaceName,
 			action,
 			&desiredKind.Spec.Version,

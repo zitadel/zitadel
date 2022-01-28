@@ -1,12 +1,7 @@
 package database
 
-import (
-	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/pkg/databases/db"
-)
-
+// TODO: Why?
+/*
 func AdaptFunc(
 	monitor mntr.Monitor,
 	dbClient db.Client,
@@ -17,7 +12,7 @@ func AdaptFunc(
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
-		dbHost, dbPort, err := dbClient.GetConnectionInfo(monitor, k8sClient)
+		dbHost, dbPort, dbConnectionURL, err := dbClient.GetConnectionInfo(monitor, k8sClient)
 		if err != nil {
 			return nil, err
 		}
@@ -28,9 +23,10 @@ func AdaptFunc(
 		}
 
 		curr := &Current{
-			Host:  dbHost,
-			Port:  dbPort,
-			Users: users,
+			Host:          dbHost,
+			Port:          dbPort,
+			ConnectionURL: dbConnectionURL,
+			Users:         users,
 		}
 
 		SetDatabaseInQueried(queried, curr)
@@ -40,3 +36,4 @@ func AdaptFunc(
 		}, nil
 	}, nil
 }
+*/

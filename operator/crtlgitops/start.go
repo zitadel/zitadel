@@ -36,7 +36,7 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		dbClient, err := databases.NewClient(monitor, gitops, orbConfig)
+		dbClient, err := databases.NewConnection(monitor, k8sClient, gitops, orbConfig)
 		if err != nil {
 			return err
 		}

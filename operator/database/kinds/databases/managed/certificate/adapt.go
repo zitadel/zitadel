@@ -24,7 +24,7 @@ func AdaptFunc(
 	operator.DestroyFunc,
 	func(user string) (operator.QueryFunc, error),
 	func(user string) (operator.DestroyFunc, error),
-	func(k8sClient kubernetes.ClientInt) ([]string, error),
+	//	func(k8sClient kubernetes.ClientInt) ([]string, error),
 	error,
 ) {
 	cMonitor := monitor.WithField("type", "certificates")
@@ -37,7 +37,7 @@ func AdaptFunc(
 		generateNodeIfNotExists,
 	)
 	if err != nil {
-		return nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	queriers := []operator.QueryFunc{
@@ -84,8 +84,8 @@ func AdaptFunc(
 
 			return destroy(user), nil
 		},
-		func(k8sClient kubernetes.ClientInt) ([]string, error) {
-			return client.QueryCertificates(namespace, labels.DeriveComponentSelector(componentLabels, false), k8sClient)
-		},
+		/*		func(k8sClient kubernetes.ClientInt) ([]string, error) {
+				return client.QueryCertificates(namespace, labels.DeriveComponentSelector(componentLabels, false), k8sClient)
+			},*/
 		nil
 }

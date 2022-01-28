@@ -10,7 +10,7 @@ const queriedName = "database"
 
 var ErrNoCurrentState = errors.New("no current state for database found")
 
-func ParseQueriedForDatabase(queried map[string]interface{}) (Client, error) {
+func ParseQueriedForDatabase(queried map[string]interface{}) (Connection, error) {
 	queriedDB, ok := queried[queriedName]
 	if !ok {
 		return nil, ErrNoCurrentState
@@ -19,7 +19,7 @@ func ParseQueriedForDatabase(queried map[string]interface{}) (Client, error) {
 	if !ok {
 		return nil, errors.New("current state does not fullfil interface")
 	}
-	currentDB, ok := currentDBTree.Parsed.(Client)
+	currentDB, ok := currentDBTree.Parsed.(Connection)
 	if !ok {
 		return nil, errors.New("current state does not fullfil interface")
 	}

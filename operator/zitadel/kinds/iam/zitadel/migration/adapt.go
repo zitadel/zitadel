@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"sort"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"github.com/rakyll/statik/fs"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -23,26 +25,28 @@ import (
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	_ "github.com/caos/zitadel/statik"
 )
 
 const (
-	migrationConfigmap = "migrate-db"
-	migrationsPath     = "/migrate"
-	rootUserInternal   = "root"
-	rootUserPath       = "/certificates"
-	envMigrationUser   = "FLYWAY_USER"
-	envMigrationPW     = "FLYWAY_PASSWORD"
-	jobNamePrefix      = "cockroachdb-cluster-migration-"
-	createFile         = "create.sql"
-	grantFile          = "grant.sql"
-	deleteFile         = "delete.sql"
+	migrationConfigmap     = "migrate-db"
+	migrationsPath         = "/migrate"
+	rootUserInternal       = "root"
+	certsDir               = "/certificates"
+	chownedCertsDir        = "/chownedcerts"
+	envMigrationUser       = "FLYWAY_USER"
+	envMigrationPW         = "FLYWAY_PASSWORD"
+	jobNamePrefix          = "cockroachdb-cluster-migration-"
+	createFile             = "create.sql"
+	grantFile              = "grant.sql"
+	deleteFile             = "delete.sql"
+	chownedCertsVolumeName = "chowned-certs"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
+	dbConn db.Connection,
 	namespace string,
 	reason string,
 	secretPasswordName string,
@@ -75,12 +79,15 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			dbCurrent, err := database.GetDatabaseInQueried(queried)
-			if err != nil {
-				return nil, err
-			}
-			dbHost := dbCurrent.Host
-			dbPort := dbCurrent.Port
+			/*			dbCurrent, err := database.GetDatabaseInQueried(queried)
+						if err != nil {
+							return nil, err
+						}
+						dbHost := dbCurrent.Host
+						dbPort := dbCurrent.Port
+						dbConnectionUrl := dbCurrent.ConnectionURL
+
+			*/
 
 			allScripts := getMigrationFiles(monitor, "/cockroach/")
 
@@ -105,9 +112,9 @@ func AdaptFunc(
 						Spec: corev1.PodSpec{
 							NodeSelector:   nodeselector,
 							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry),
+							InitContainers: getPreContainer(dbConn, customImageRegistry),
 							Containers: []corev1.Container{
-								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry),
+								getMigrationContainer(dbConn, customImageRegistry),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
@@ -134,6 +141,11 @@ func AdaptFunc(
 									Secret: &corev1.SecretVolumeSource{
 										SecretName: secretPasswordName,
 									},
+								},
+							}, {
+								Name: chownedCertsVolumeName,
+								VolumeSource: corev1.VolumeSource{
+									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							}},
 						},
@@ -164,20 +176,25 @@ func AdaptFunc(
 		nil
 }
 
-func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string) []corev1.EnvVar {
+func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string) []corev1.EnvVar {
+
 	envVars := []corev1.EnvVar{
 		{
 			Name:  envMigrationUser,
 			Value: migrationUser,
-		}, {
+		},
+	}
+
+	if userPasswordsSecret != "" {
+		envVars = append(envVars, corev1.EnvVar{
 			Name: envMigrationPW,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-					Key:                  migrationUser,
+					Key:                  userPasswordKey,
 				},
 			},
-		},
+		})
 	}
 	return envVars
 }

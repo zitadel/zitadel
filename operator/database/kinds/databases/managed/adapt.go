@@ -105,7 +105,7 @@ func Adapter(
 			}
 		}
 
-		queryCert, destroyCert, addUser, deleteUser, listUsers, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
+		queryCert, destroyCert, addUser, deleteUser, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
@@ -257,10 +257,11 @@ func Adapter(
 					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
 					currentDB.Current.URL = PublicServiceName
-					currentDB.Current.AddUserFunc = addUser
-					currentDB.Current.DeleteUserFunc = deleteUser
-					currentDB.Current.ListUsersFunc = listUsers
-
+					/*
+						currentDB.Current.AddUserFunc = addUser
+						currentDB.Current.DeleteUserFunc = deleteUser
+						currentDB.Current.ListUsersFunc = listUsers
+					*/
 					db.SetQueriedForDatabase(queried, current)
 					internalMonitor.Info("set current state of managed database")
 				}

@@ -1,14 +1,6 @@
 package databases
 
-import (
-	"github.com/caos/orbos/mntr"
-	"github.com/caos/orbos/pkg/git"
-	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator/api/database"
-	"github.com/caos/zitadel/operator/api/zitadel"
-)
-
+/*
 func CrdListUsers(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
@@ -39,7 +31,7 @@ func listUsers(
 	desiredZitadel func() (*tree.Tree, error),
 	desiredDatabase func() (*tree.Tree, error),
 ) ([]string, error) {
-	queriedClient, err := client(monitor, k8sClient, gitOps, desiredZitadel, desiredDatabase)
+	queriedClient, err := connection(monitor, k8sClient, gitOps, desiredZitadel, desiredDatabase)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +85,7 @@ func addUser(
 	user string,
 ) error {
 
-	queriedClient, err := client(monitor, k8sClient, gitOps, desiredZitadel, desiredDatabase)
+	queriedClient, err := connection(monitor, k8sClient, gitOps, desiredZitadel, desiredDatabase)
 	if err != nil {
 		return err
 	}
@@ -136,10 +128,11 @@ func deleteUser(
 	user string,
 ) error {
 
-	queriedClient, err := client(monitor, k8sClient, gitOps, desiredZitadel, desiredDatabase)
+	queriedClient, err := connection(monitor, k8sClient, gitOps, desiredZitadel, desiredDatabase)
 	if err != nil {
 		return err
 	}
 
 	return queriedClient.DeleteUser(monitor, user, k8sClient)
 }
+*/

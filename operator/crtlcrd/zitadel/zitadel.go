@@ -38,7 +38,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 
-	dbClient, err := databases.NewClient(r.Monitor, false, nil)
+	dbClient, err := databases.NewConnection(r.Monitor, r.ClientInt, false, nil)
 	if err != nil {
 		return res, err
 	}

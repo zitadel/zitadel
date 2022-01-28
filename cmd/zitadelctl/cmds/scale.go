@@ -15,7 +15,7 @@ func scaleForFunction(
 	monitor mntr.Monitor,
 	gitClient *git.Client,
 	k8sClient *kubernetes.Client,
-	dbClient db.Client,
+	dbConn db.Connection,
 	version *string,
 	gitops bool,
 	ensureFunc func() error,
@@ -31,13 +31,13 @@ func scaleForFunction(
 
 	noZitadel := false
 	if gitops {
-		noZitadelT, err := crtlgitops.ScaleDown(monitor, gitClient, k8sClient, dbClient, version, gitops)
+		noZitadelT, err := crtlgitops.ScaleDown(monitor, gitClient, k8sClient, dbConn, version, gitops)
 		if err != nil {
 			return err
 		}
 		noZitadel = noZitadelT
 	} else {
-		noZitadelT, err := zitadel.ScaleDown(monitor, k8sClient, dbClient, version)
+		noZitadelT, err := zitadel.ScaleDown(monitor, k8sClient, dbConn, version)
 		if err != nil {
 			return err
 		}
@@ -65,11 +65,11 @@ func scaleForFunction(
 
 	if !noZitadel {
 		if gitops {
-			if err := crtlgitops.ScaleUp(monitor, gitClient, k8sClient, dbClient, version, gitops); err != nil {
+			if err := crtlgitops.ScaleUp(monitor, gitClient, k8sClient, dbConn, version, gitops); err != nil {
 				return err
 			}
 		} else {
-			if err := zitadel.ScaleUp(monitor, k8sClient, dbClient, version); err != nil {
+			if err := zitadel.ScaleUp(monitor, k8sClient, dbConn, version); err != nil {
 				return err
 			}
 		}

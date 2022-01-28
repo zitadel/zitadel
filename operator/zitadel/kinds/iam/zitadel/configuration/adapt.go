@@ -3,6 +3,8 @@ package configuration
 import (
 	"time"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/configmap"
@@ -10,8 +12,6 @@ import (
 	"github.com/caos/orbos/pkg/labels"
 
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration/users"
-	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 type ConsoleEnv struct {
@@ -41,8 +41,8 @@ func AdaptFunc(
 	consoleCMName string,
 	secretVarsName string,
 	secretPasswordName string,
-	dbClient db.Client,
 	getClientID func() string,
+	dbConn db.Connection,
 ) (
 	func(
 		necessaryUsers map[string]string,
@@ -77,13 +77,16 @@ func AdaptFunc(
 		return nil, nil, nil, err
 	}
 
-	_, destroyUser, err := users.AdaptFunc(internalMonitor, dbClient)
-	if err != nil {
-		return nil, nil, nil, err
-	}
+	/*
+		_, destroyUser, err := users.AdaptFunc(internalMonitor, dbClient)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+	*/
 
 	destroyers := []operator.DestroyFunc{
-		destroyUser,
+		//		destroyUser,
 		operator.ResourceDestroyToZitadelDestroy(destroyS),
 		operator.ResourceDestroyToZitadelDestroy(destroyCM),
 		operator.ResourceDestroyToZitadelDestroy(destroyCCM),
@@ -104,10 +107,13 @@ func AdaptFunc(
 					return nil, err
 				}
 
-				queryUser, _, err := users.AdaptFunc(internalMonitor, dbClient)
-				if err != nil {
-					return nil, err
-				}
+				/*
+					queryUser, _, err := users.AdaptFunc(internalMonitor, dbClient)
+					if err != nil {
+						return nil, err
+					}
+
+				*/
 				queryS, err := secret.AdaptFuncToEnsure(namespace, labels.MustForName(componentLabels, secretName), literalsSecret)
 				if err != nil {
 					return nil, err
@@ -143,12 +149,11 @@ func AdaptFunc(
 					labels.MustForNameK8SMap(componentLabels, cmName),
 					literalsConfigMap(
 						desired,
-						necessaryUsers,
+						dbConn,
 						certPath,
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
-						queried,
 					),
 				)
 				if err != nil {
@@ -156,7 +161,7 @@ func AdaptFunc(
 				}
 
 				queriers := []operator.QueryFunc{
-					queryUser(necessaryUsers),
+					//					queryUser(necessaryUsers),
 					operator.ResourceQueryToZitadelQuery(queryS),
 					operator.ResourceQueryToZitadelQuery(queryCCM),
 					operator.ResourceQueryToZitadelQuery(querySV),
@@ -189,12 +194,11 @@ func AdaptFunc(
 				cmName: getHash(
 					literalsConfigMap(
 						desired,
-						necessaryUsers,
+						dbConn,
 						certPath,
 						secretPath,
 						googleServiceAccountJSONPath,
 						zitadelKeysPath,
-						queried,
 					),
 				),
 				consoleCMName: getHash(

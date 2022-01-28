@@ -9,14 +9,14 @@ import (
 	"github.com/caos/zitadel/pkg/databases/db"
 )
 
-func Destroy(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, dbClient db.Client, version string) error {
+func Destroy(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, dbConn db.Connection, version string) error {
 	desired, err := zitadel.ReadCrd(k8sClient)
 	if err != nil {
 		return err
 	}
 
 	if desired != nil {
-		_, destroy, _, _, _, _, err := orbz.AdaptFunc("ensure", &version, false, []string{"operator", "iam", "dbconnection"}, dbClient)(monitor, desired, &tree.Tree{})
+		_, destroy, _, _, _, _, err := orbz.AdaptFunc("ensure", &version, false, []string{"operator", "iam", "dbconnection"}, dbConn)(monitor, desired, &tree.Tree{})
 		if err != nil {
 			return err
 		}

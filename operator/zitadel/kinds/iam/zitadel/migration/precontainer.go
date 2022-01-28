@@ -1,7 +1,10 @@
 package migration
 
 import (
+	"fmt"
 	"strings"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/zitadel/operator/common"
 
@@ -9,10 +12,7 @@ import (
 )
 
 func getPreContainer(
-	dbHost string,
-	dbPort string,
-	migrationUser string,
-	secretPasswordName string,
+	dbConn db.Connection,
 	customImageRegistry string,
 ) []corev1.Container {
 
@@ -23,33 +23,45 @@ func getPreContainer(
 			Command: []string{
 				"sh",
 				"-c",
-				"until pg_isready -h " + dbHost + " -p " + dbPort + "; do echo waiting for database; sleep 2; done;",
+				"until pg_isready -h " + dbConn.Host() + " -p " + dbConn.Port() + "; do echo waiting for database; sleep 2; done;",
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
 			ImagePullPolicy:          "IfNotPresent",
-		},
-		{
-			Name:  "create-flyway-user",
-			Image: common.CockroachImage.Reference(customImageRegistry),
-			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
+		}, {
+			Name:    "chown-certs",
+			Image:   "busybox",
+			Command: []string{"sh", "-c"},
+			Args:    []string{fmt.Sprintf("cp %s/* %s/ && chown -R 101:101 %s/* && chmod 600 %s/*", certsDir, chownedCertsDir, chownedCertsDir, chownedCertsDir)},
 			VolumeMounts: []corev1.VolumeMount{{
 				Name:      rootUserInternal,
-				MountPath: rootUserPath,
+				MountPath: certsDir,
+			}, {
+				Name:      chownedCertsVolumeName,
+				MountPath: chownedCertsDir,
+			}},
+		}, /*{
+			Name:  "create-flyway-user",
+			Image: common.CockroachImage.Reference(customImageRegistry),
+			Env:   baseEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), secretPasswordName),
+			VolumeMounts: []corev1.VolumeMount{{
+				Name:      rootUserInternal,
+				MountPath: certsDir,
 			}},
 			Command: []string{"/bin/bash", "-c", "--"},
 			Args: []string{
 				strings.Join([]string{
-					createUserCommand(envMigrationUser, envMigrationPW, createFile),
+					//					createUserCommand(envMigrationUser, envMigrationPW, createFile),
 					grantUserCommand(envMigrationUser, grantFile),
-					"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
+					//					"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
+					fmt.Sprintf(`cockroach.sh sql --url='%s' -e "$(cat %s)" -e "$(cat %s)";`, dbConn.URL("/certificates"), createFile, grantFile),
 				},
 					";"),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
 			ImagePullPolicy:          "IfNotPresent",
-		},
+		},*/
 	}
 }
 
@@ -79,8 +91,10 @@ func createUserCommand(user, pw, file string) string {
 }
 
 func grantUserCommand(user, file string) string {
+
 	return strings.Join([]string{
-		"echo -n 'GRANT admin TO ' > " + file,
+		"echo -n 'CREATE ROLE IF NOT EXISTS can_create_db WITH CREATEDB;' >> " + file,
+		"echo -n 'GRANT can_create_db TO ' >> " + file,
 		"echo -n ${" + user + "} >> " + file,
 		"echo -n ' WITH ADMIN OPTION;'  >> " + file,
 	}, ";")

@@ -44,7 +44,7 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
-		dbClient, err := databases.NewClient(monitor, rv.Gitops, orbConfig)
+		dbClient, err := databases.NewConnection(monitor, k8sClient, rv.Gitops, orbConfig)
 		if err != nil {
 			return err
 		}

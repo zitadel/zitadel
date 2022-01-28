@@ -5,12 +5,13 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"github.com/caos/orbos/mntr"
 
 	"github.com/caos/orbos/pkg/secret/read"
 
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 const (
@@ -19,9 +20,8 @@ const (
 
 func literalsConfigMap(
 	desired *Configuration,
-	users map[string]string,
+	dbConn db.Connection,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
-	queried map[string]interface{},
 ) map[string]string {
 
 	tls := ""
@@ -43,12 +43,9 @@ func literalsConfigMap(
 		"CR_ROOT_CERT":                   certPath + "/ca.crt",
 	}
 
-	if users != nil {
-		for user := range users {
-			literalsConfigMap["CR_"+strings.ToUpper(user)+"_CERT"] = certPath + "/client." + user + ".crt"
-			literalsConfigMap["CR_"+strings.ToUpper(user)+"_KEY"] = certPath + "/client." + user + ".key"
-		}
-	}
+	user := dbConn.User()
+	literalsConfigMap["CR_"+strings.ToUpper(user)+"_CERT"] = certPath + "/client." + user + ".crt"
+	literalsConfigMap["CR_"+strings.ToUpper(user)+"_KEY"] = certPath + "/client." + user + ".key"
 
 	if desired != nil {
 		if desired.Tracing != nil {
@@ -120,11 +117,11 @@ func literalsConfigMap(
 	literalsConfigMap["SENTRY_ENVIRONMENT"] = sentryEnv
 	literalsConfigMap["SENTRY_USAGE"] = strconv.FormatBool(doIngest)
 
-	db, err := database.GetDatabaseInQueried(queried)
-	if err == nil {
-		literalsConfigMap["ZITADEL_EVENTSTORE_HOST"] = db.Host
-		literalsConfigMap["ZITADEL_EVENTSTORE_PORT"] = db.Port
-	}
+	//	db, err := database.GetDatabaseInQueried(queried)
+	//	if err == nil {
+	literalsConfigMap["ZITADEL_EVENTSTORE_HOST"] = dbConn.Host()
+	literalsConfigMap["ZITADEL_EVENTSTORE_PORT"] = dbConn.Port()
+	//	}
 
 	return literalsConfigMap
 }

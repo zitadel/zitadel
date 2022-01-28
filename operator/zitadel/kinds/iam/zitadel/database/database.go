@@ -1,13 +1,15 @@
 package database
 
+/*
 import (
 	"errors"
 )
 
 type Current struct {
-	Host  string
-	Port  string
-	Users []string
+	Host          string
+	Port          string
+	ConnectionURL func(string) string
+	Users         []string
 }
 
 func SetDatabaseInQueried(queried map[string]interface{}, current *Current) {
@@ -22,3 +24,4 @@ func GetDatabaseInQueried(queried map[string]interface{}) (*Current, error) {
 
 	return curr, nil
 }
+*/

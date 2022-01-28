@@ -14,12 +14,12 @@ func ScaleDown(
 	monitor mntr.Monitor,
 	gitClient *git.Client,
 	k8sClient *kubernetes.Client,
-	dbClient db.Client,
+	dbConn db.Connection,
 	version *string,
 	gitops bool,
 ) (bool, error) {
 	noZitadel := false
-	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc("scaledown", version, gitops, []string{"scaledown"}, dbClient), k8sClient)(); err != nil {
+	if err := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc("scaledown", version, gitops, []string{"scaledown"}, dbConn), k8sClient)(); err != nil {
 		if macherrs.IsNotFound(err) {
 			noZitadel = true
 		} else {
@@ -33,9 +33,9 @@ func ScaleUp(
 	monitor mntr.Monitor,
 	gitClient *git.Client,
 	k8sClient *kubernetes.Client,
-	dbClient db.Client,
+	dbConn db.Connection,
 	version *string,
 	gitops bool,
 ) error {
-	return zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc("scaleup", version, gitops, []string{"scaleup"}, dbClient), k8sClient)()
+	return zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc("scaleup", version, gitops, []string{"scaleup"}, dbConn), k8sClient)()
 }

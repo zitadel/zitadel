@@ -1,13 +1,6 @@
 package migration
 
-import (
-	"strings"
-
-	"github.com/caos/zitadel/operator/common"
-
-	corev1 "k8s.io/api/core/v1"
-)
-
+/*
 func getPostContainers(
 	dbHost string,
 	dbPort string,
@@ -30,7 +23,7 @@ func getPostContainers(
 			Env: baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
 			VolumeMounts: []corev1.VolumeMount{{
 				Name:      rootUserInternal,
-				MountPath: rootUserPath,
+				MountPath: certsDir,
 			}},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
@@ -46,3 +39,4 @@ func deleteUserCommand(user, file string) string {
 		"echo -n ';' >> " + file,
 	}, ";")
 }
+*/

@@ -2,6 +2,7 @@ package cockroachdb
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/caos/orbos/pkg/secret/read"
 
@@ -21,7 +22,6 @@ import (
 const (
 	namespace = "caos-zitadel"
 	component = "dbconnection"
-	certKey   = "client.root.crt"
 )
 
 func Adapter(apiLabels *labels.API) operator.AdaptFunc {
@@ -55,12 +55,22 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		}
 		current.Parsed = currentDB
 
-		certLabels := labels.MustForName(labels.MustForComponent(apiLabels, component), "cockroachdb.client.root")
+		componentLabels := labels.MustForComponent(apiLabels, component)
+		certLabels := labels.MustForName(componentLabels, "cockroachdb.client.root")
+		pwLabels := labels.MustForName(componentLabels, "dbpassword")
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
-				if err := desiredKind.validateSecrets(); err != nil {
-					return nil, err
+				currentDB.Current.Host = desiredKind.Spec.Host
+				currentDB.Current.Cluster = desiredKind.Spec.Cluster
+				currentDB.Current.Port = strconv.Itoa(int(desiredKind.Spec.Port))
+				if currentDB.Current.Port == "" {
+					currentDB.Current.Port = "26257"
+				}
+
+				currentDB.Current.User = desiredKind.Spec.User
+				if currentDB.Current.User == "" {
+					currentDB.Current.User = "root"
 				}
 
 				certificate, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Certificate, desiredKind.Spec.ExistingCertificate)
@@ -68,16 +78,50 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 					return nil, err
 				}
 
-				certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
-					certKey: certificate,
-				})
+				var queriers []operator.QueryFunc
+				if certificate != "" {
+					certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
+						fmt.Sprintf("client.%s.crt", currentDB.Current.User): certificate,
+					})
+					if err != nil {
+						return nil, err
+					}
+					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
+				}
+				currentDB.Current.Secure = certificate != ""
+
+				password, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Password, desiredKind.Spec.ExistingPassword)
 				if err != nil {
 					return nil, err
 				}
-				queriers := []operator.QueryFunc{operator.ResourceQueryToZitadelQuery(certQuerier)}
 
-				currentDB.Current.URL = desiredKind.Spec.URL
-				currentDB.Current.Port = desiredKind.Spec.Port
+				if password != "" {
+					currentDB.Current.PasswordSecretName = pwLabels.Name()
+					currentDB.Current.PasswordSecretKey = currentDB.Current.User
+					pwQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(pwLabels), map[string]string{
+						currentDB.Current.PasswordSecretKey: password,
+					})
+					if err != nil {
+						return nil, err
+					}
+					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(pwQuerier))
+				}
+
+				/*
+
+					if password != "" {
+						certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
+							: certificate,
+						})
+						if err != nil {
+							return nil, err
+						}
+						queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
+
+					}
+
+				*/
+
 				db.SetQueriedForDatabase(queried, current)
 				return operator.QueriersToEnsureFunc(monitor, true, queriers, k8sClient, queried)
 			}, func(k8sClient kubernetes.ClientInt) error { return nil },

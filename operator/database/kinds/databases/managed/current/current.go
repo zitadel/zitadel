@@ -2,18 +2,16 @@ package current
 
 import (
 	"crypto/rsa"
+	"fmt"
 
-	"github.com/caos/orbos/mntr"
 	"github.com/caos/zitadel/pkg/databases/db"
 
 	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/current"
 
-	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
-	"github.com/caos/zitadel/operator"
 )
 
-var _ db.Client = (*Current)(nil)
+var _ db.Connection = (*Current)(nil)
 
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
@@ -21,12 +19,15 @@ type Current struct {
 }
 
 type CurrentDB struct {
-	URL            string
-	Port           string
-	CA             *cacurr.Current
-	AddUserFunc    func(user string) (operator.QueryFunc, error)
-	DeleteUserFunc func(user string) (operator.DestroyFunc, error)
-	ListUsersFunc  func(k8sClient kubernetes.ClientInt) ([]string, error)
+	URL  string
+	Port string
+	CA   *cacurr.Current
+	/*
+		AddUserFunc    func(user string) (operator.QueryFunc, error)
+		DeleteUserFunc func(user string) (operator.DestroyFunc, error)
+		ListUsersFunc  func(k8sClient kubernetes.ClientInt) ([]string, error)
+
+	*/
 }
 
 func (c *Current) GetCA() *cacurr.Current {
@@ -49,9 +50,15 @@ func (c *Current) SetCertificate(cert []byte) {
 	c.Current.CA.Certificate = cert
 }
 
-func (c *Current) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, error) {
-	return c.Current.URL, c.Current.Port, nil
+func (c *Current) Host() string                     { return "cockroachdb-public" }
+func (c *Current) Port() string                     { return "26257" }
+func (c *Current) User() string                     { return "root" }
+func (c *Current) PasswordSecret() (string, string) { return "", "" }
+func (c *Current) ConnectionParams(certsDir string) string {
+	return fmt.Sprintf("sslmode=verify-full&sslrootcert=%s/ca.crt&sslcert=%s/client.root.crt&sslkey=%s/client.root.key", certsDir, certsDir, certsDir)
 }
+
+/*
 func (c *Current) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
 	destroy, err := c.Current.DeleteUserFunc(user)
 	if err != nil {
@@ -74,3 +81,4 @@ func (c *Current) AddUser(monitor mntr.Monitor, user string, k8sClient kubernete
 func (c *Current) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
 	return c.Current.ListUsersFunc(k8sClient)
 }
+*/

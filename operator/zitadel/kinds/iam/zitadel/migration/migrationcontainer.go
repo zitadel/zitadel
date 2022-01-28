@@ -1,7 +1,8 @@
 package migration
 
 import (
-	"strings"
+	"fmt"
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/zitadel/operator/common"
 
@@ -9,29 +10,42 @@ import (
 )
 
 func getMigrationContainer(
-	dbHost string,
-	dbPort string,
-	migrationUser string,
-	secretPasswordName string,
-	users []string,
+	dbConn db.Connection,
 	customImageRegistry string,
 ) corev1.Container {
+
+	pwSecretName, pwSecretKey := dbConn.PasswordSecret()
+
+	/*	var pwSecretEnv string
+		if pwSecretName != "" {
+			pwSecretEnv = envMigrationPW
+		}
+
+	*/
+
+	//			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + certsDir + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory"},
+	/*		Args: []string{
+			"-url=jdbc:" + dbConn.URL(certsDir, pwSecretEnv),
+			//			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + certsDir + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
+			"-locations=filesystem:" + migrationsPath,
+			"migrate",
+		},*/
 
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
 		Args: []string{
-			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
-			"-locations=filesystem:" + migrationsPath,
+			fmt.Sprintf("-url=jdbc:postgresql://%s:%s/defaultdb?%s", dbConn.Host(), dbConn.Port(), dbConn.ConnectionParams(chownedCertsDir)),
+			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName, users),
+		Env: baseEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
 		VolumeMounts: []corev1.VolumeMount{{
 			Name:      migrationConfigmap,
 			MountPath: migrationsPath,
 		}, {
-			Name:      rootUserInternal,
-			MountPath: rootUserPath,
+			Name:      chownedCertsVolumeName,
+			MountPath: chownedCertsDir,
 		}},
 		TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 		TerminationMessagePolicy: "File",
@@ -39,8 +53,9 @@ func getMigrationContainer(
 	}
 }
 
+/*
 func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string, users []string) []corev1.EnvVar {
-	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret)
+	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, migrationUser)
 
 	migrationEnvVars := make([]corev1.EnvVar, 0)
 	for _, v := range envVars {
@@ -59,3 +74,4 @@ func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPassw
 	}
 	return migrationEnvVars
 }
+*/
