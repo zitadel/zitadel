@@ -70,7 +70,11 @@ func (o *OPStorage) getSigningKey(ctx context.Context, renewTimer *time.Timer, k
 		return
 	}
 	if len(keys.Keys) == 0 {
-		o.refreshSigningKey(ctx, keyCh, o.signingKeyAlgorithm, keys.LatestSequence)
+		var sequence uint64
+		if keys.LatestSequence != nil {
+			sequence = keys.LatestSequence.Sequence
+		}
+		o.refreshSigningKey(ctx, keyCh, o.signingKeyAlgorithm, sequence)
 		checkAfter := o.resetTimer(renewTimer, true)
 		logging.Log("OIDC-ASDf3").Infof("next signing key check in %s", checkAfter)
 		return
@@ -94,12 +98,12 @@ func (o *OPStorage) resetTimer(timer *time.Timer, shortRefresh bool) (nextCheck 
 	return maxLifetime - o.signingKeyGracefulPeriod - o.signingKeyRotationCheck
 }
 
-func (o *OPStorage) refreshSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, algorithm string, sequence *query.LatestSequence) {
+func (o *OPStorage) refreshSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey, algorithm string, sequence uint64) {
 	if o.currentKey != nil && o.currentKey.Expiry().Before(time.Now().UTC()) {
 		logging.Log("OIDC-ADg26").Info("unset current signing key")
 		keyCh <- jose.SigningKey{}
 	}
-	ok, err := o.ensureIsLatestKey(ctx, sequence.Sequence)
+	ok, err := o.ensureIsLatestKey(ctx, sequence)
 	if err != nil {
 		logging.Log("OIDC-sdz53").WithError(err).Error("could not ensure latest key")
 		return

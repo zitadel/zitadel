@@ -219,7 +219,10 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 		return nil, err
 	}
 	keys.LatestSequence, err = q.latestSequence(ctx, keyTable)
-	return keys, err
+	if !errors.IsNotFound(err) {
+		return keys, err
+	}
+	return keys, nil
 }
 
 func preparePublicKeysQuery() (sq.SelectBuilder, func(*sql.Rows) (*PublicKeys, error)) {
