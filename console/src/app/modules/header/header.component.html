@@ -114,7 +114,7 @@
         *ngIf="user && (user.human?.profile?.displayName || (user.human?.profile?.firstName && user.human?.profile?.lastName))"
         class="avatar-toggle dontcloseonclick" (click)="showAccount = !showAccount" [active]="showAccount"
         [avatarUrl]="user.human?.profile?.avatarUrl || ''" [forColor]="user?.preferredLoginName || ''"
-        [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName ?? '' : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName) ?? ''"
+        [name]="user.human?.profile?.displayName ? user.human?.profile?.displayName ?? '' : (user.human?.profile?.firstName + ' '+ user.human?.profile?.lastName)"
         [size]="38">
       </cnsl-avatar>
       <cnsl-accounts-card @accounts class="a_card" *ngIf="showAccount" (closedCard)="showAccount = false" [user]="user"

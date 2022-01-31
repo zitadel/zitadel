@@ -13,8 +13,8 @@
           translate}}
           {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
         <div class="name-row">
-          <span class="name" *ngIf="$any(item).name">{{ $any(item).name ?? '' }}</span>
-          <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName ?? '' }}</span>
+          <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
+          <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName }}</span>
 
           <div class="state-dot"
             [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">
@@ -39,8 +39,8 @@
         <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
           {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
         <div class="name-row">
-          <span class="name" *ngIf="$any(item).name">{{ $any(item).name ?? '' }}</span>
-          <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName ?? '' }}</span>
+          <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
+          <span class="name" *ngIf="$any(item).projectName">{{ $any(item).projectName }}</span>
 
           <div class="state-dot"
             [ngClass]="{'active': item.state === ProjectState.PROJECT_STATE_ACTIVE, 'inactive': item.state === ProjectState.PROJECT_STATE_INACTIVE}">

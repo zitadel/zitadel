@@ -59,7 +59,7 @@
         <cnsl-avatar
           *ngIf="user.human && user.human.profile && user.human.profile.displayName && user.human.profile.firstName && user.human.profile.lastName; else cog"
           class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human.profile?.avatarUrl || ''"
-          [forColor]="user.preferredLoginName ?? 'A'" [size]="32">
+          [forColor]="user.preferredLoginName" [size]="32">
         </cnsl-avatar>
         <ng-template #cog>
           <cnsl-avatar class="avatar" [isMachine]="true" [size]="32">

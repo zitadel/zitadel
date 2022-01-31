@@ -27,7 +27,9 @@
             "scripts": ["./node_modules/tinycolor2/dist/tinycolor-min.js"],
             "allowedCommonJsDependencies": [
               "@angular/common/locales/de",
+              "codemirror/mode/javascript/javascript",
               "src/app/proto/generated/zitadel/admin_pb",
+              "src/app/proto/generated/zitadel/org_pb",
               "src/app/proto/generated/zitadel/management_pb",
               "src/app/proto/generated/**",
               "google-protobuf/google/protobuf/empty_pb",
