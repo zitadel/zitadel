@@ -23,6 +23,7 @@
 @mixin changes-theme($theme) {
   $is-dark-theme: map-get($theme, is-dark);
   $foreground: map-get($theme, foreground);
+  $secondary-text: map-get($foreground, secondary-text);
 
   .scroll-container {
     overflow-y: auto;
@@ -60,12 +61,15 @@
           display: flex;
           flex-direction: column;
           margin-top: -0.5rem;
+          margin-left: 1rem;
 
           .change-action {
             display: flex;
             flex-direction: row;
             align-items: center;
             flex: 1;
+            padding: 0.25rem 0;
+            cursor: default;
 
             .icon {
               width: 32px;
@@ -89,45 +93,9 @@
 
             .block {
               display: block;
-            }
-
-            .restore {
-              visibility: hidden;
-              display: none;
-              opacity: 0;
-              margin-left: 1rem;
-              transform: opacity 0.2s ease-in-out;
-            }
-
-            &:hover {
-              .restore {
-                visibility: visible;
-                display: inline-block;
-                opacity: 1;
-                color: #81868a;
-
-                &[disabled] {
-                  visibility: hidden;
-                }
-
-                &:hover {
-                  color: white;
-                }
-              }
+              color: $secondary-text;
             }
           }
-        }
-
-        /* stylelint-disable */
-        $primary: map-get($theme, primary);
-        $is-dark-theme: map-get($theme, is-dark);
-        $transparent-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-
-        /* stylelint-enable */
-
-        &.change-item-back {
-          background-color: rgba($transparent-color, 0.93);
-          transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
         }
       }
     }

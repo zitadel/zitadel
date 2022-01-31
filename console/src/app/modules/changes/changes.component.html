@@ -1,12 +1,9 @@
 <div class="change-header">
   <span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
-  <!-- <button matTooltip="{{'ACTIONS.REFRESH' | translate}}" (click)="init()" mat-icon-button>
-    <mat-icon class="icon">refresh</mat-icon>
-  </button> -->
 </div>
 
 <div class="scroll-container" [ngClass]="{'maxheight': limitHeight}">
-  <li class="item change-item-back" *ngFor="let hist of data | async; index as histindex">
+  <li class="item" *ngFor="let hist of data | async; index as histindex">
     <span *ngIf="hist.values[0].dates[0]" class="date">
       {{ hist.values[0].dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}
     </span>
@@ -20,18 +17,15 @@
           <div class="spacer"></div>
         </ng-template>
         <div class="change-actions">
-          <div class="change-action" *ngFor="let action of dayelement.eventTypes; index as j">
-            <button disabled mat-icon-button aria-label="Restore history"
-              matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}">
-              <mat-icon class="icon">schedule</mat-icon>
-            </button>
-
-            <span>
+          <div class="change-action"
+            matTooltip="{{ dayelement.dates[j] | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm' }}"
+            *ngFor="let action of dayelement.eventTypes; index as j">
+            <div>
               <span class="msg">{{ action.localizedMessage }}</span>
               <span class="block">{{
                 dayelement.dates[j] | timestampToDate | localizedDate: 'HH:mm'
                 }}</span>
-            </span>
+            </div>
           </div>
         </div>
       </div>

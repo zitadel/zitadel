@@ -13,6 +13,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $secondary-text: map-get($foreground, secondary-text);
 
   .accounts-card {
     border-radius: 0.5rem;
@@ -153,7 +154,7 @@
 
           .email,
           .loginname {
-            color: var(--grey);
+            color: $secondary-text;
             font-size: 0.8rem;
             line-height: 1rem;
           }

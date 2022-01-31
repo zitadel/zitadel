@@ -55,34 +55,4 @@
       flex: 1;
     }
   }
-
-  .divider {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin: 5px 0;
-
-    span {
-      border: 1px solid #81868a40;
-      padding: 2px 1rem;
-      border-radius: 50vw;
-      color: var(--grey);
-      font-size: 11px;
-    }
-
-    .line {
-      display: block;
-      background-color: #81868a40;
-      height: 1px;
-      margin: 0.5rem 0;
-      flex: 1;
-      min-width: 10px;
-    }
-
-    .hiddenline {
-      display: block;
-      visibility: hidden;
-      width: 4rem;
-    }
-  }
 }

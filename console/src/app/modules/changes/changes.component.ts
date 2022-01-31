@@ -82,12 +82,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
     this.destroyed$.next();
   }
 
-  // public scrollHandler(e: any): void {
-  //   if (e === 'bottom') {
-  //     this.more();
-  //   }
-  // }
-
   public init(): void {
     let first: Promise<ListChanges>;
     switch (this.changeType) {
@@ -175,6 +169,7 @@ export class ChangesComponent implements OnInit, OnDestroy {
             const mapped = this.mapChanges(values);
             // update source with new values, done loading
             // this._data.next(values);
+            console.log(mapped);
             this._data.next(mapped);
 
             this._loading.next(false);
@@ -201,6 +196,8 @@ export class ChangesComponent implements OnInit, OnDestroy {
     key: string;
     values: any[];
   }[] {
+    console.log(changes);
+
     const splitted: { [editorId: string]: any[] } = {};
     changes.forEach((change) => {
       if (change.changeDate) {
