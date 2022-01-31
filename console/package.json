@@ -36,7 +36,7 @@
     "google-proto-files": "^2.5.0",
     "google-protobuf": "^3.19.1",
     "grpc-web": "^1.3.0",
-    "libphonenumber-js": "^1.9.44",
+    "libphonenumber-js": "^1.9.46",
     "moment": "^2.29.1",
     "ng-qrcode": "^6.0.0",
     "ngx-color": "^7.2.0",
