@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, resourceOwner string) (*domain.Phone, error) {
+func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, resourceOwner string, phoneCodeGenerator crypto.Generator) (*domain.Phone, error) {
 	if !phone.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-6M0ds", "Errors.Phone.Invalid")
 	}
@@ -36,7 +36,7 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 	if phone.IsPhoneVerified {
 		events = append(events, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 	} else {
-		phoneCode, err := domain.NewPhoneCode(c.phoneVerificationCode)
+		phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func (c *Commands) ChangeHumanPhone(ctx context.Context, phone *domain.Phone, re
 	return writeModelToPhone(existingPhone), nil
 }
 
-func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceowner string) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceowner string, phoneCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Km9ds", "Errors.User.UserIDMissing")
 	}
@@ -75,7 +75,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.phoneVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, phoneCodeGenerator)
 	if err == nil {
 		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanPhoneVerifiedEvent(ctx, userAgg))
 		if err != nil {
@@ -92,7 +92,7 @@ func (c *Commands) VerifyHumanPhone(ctx context.Context, userID, code, resourceo
 	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-sM0cs", "Errors.User.Code.Invalid")
 }
 
-func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string) (*domain.ObjectDetails, error) {
+func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID, resourceowner string, phoneCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -112,7 +112,7 @@ func (c *Commands) CreateHumanPhoneVerificationCode(ctx context.Context, userID,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sf", "Errors.User.Phone.AlreadyVerified")
 	}
 
-	phoneCode, err := domain.NewPhoneCode(c.phoneVerificationCode)
+	phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}

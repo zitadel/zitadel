@@ -33,16 +33,12 @@ type Commands struct {
 
 	idpConfigSecretCrypto crypto.EncryptionAlgorithm
 
+	UserCodeAlg                 crypto.EncryptionAlgorithm
 	userPasswordAlg             crypto.HashAlgorithm
-	initializeUserCode          crypto.Generator
-	emailVerificationCode       crypto.Generator
-	phoneVerificationCode       crypto.Generator
-	passwordVerificationCode    crypto.Generator
-	passwordlessInitCode        crypto.Generator
 	machineKeyAlg               crypto.EncryptionAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
-	applicationSecretGenerator  crypto.Generator
+	PasswordHashAlg             crypto.HashAlgorithm
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
@@ -97,11 +93,7 @@ func StartCommands(
 	if err != nil {
 		return nil, err
 	}
-	repo.initializeUserCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.InitializeUserCode, userEncryptionAlgorithm)
-	repo.emailVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.EmailVerificationCode, userEncryptionAlgorithm)
-	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PhoneVerificationCode, userEncryptionAlgorithm)
-	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordVerificationCode, userEncryptionAlgorithm)
-	repo.passwordlessInitCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordlessInitCode, userEncryptionAlgorithm)
+	repo.UserCodeAlg = userEncryptionAlgorithm
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
@@ -117,8 +109,7 @@ func StartCommands(
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
-	passwordAlg := crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.applicationSecretGenerator = crypto.NewHashGenerator(defaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
+	repo.PasswordHashAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 
 	repo.domainVerificationAlg, err = crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	if err != nil {

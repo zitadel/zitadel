@@ -57,7 +57,11 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 
 func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPasswordlessLinkRequest) (*auth_pb.AddMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +74,11 @@ func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPass
 
 func (s *Server) SendMyPasswordlessLink(ctx context.Context, _ *auth_pb.SendMyPasswordlessLinkRequest) (*auth_pb.SendMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, ctxData.UserID, ctxData.ResourceOwner, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}

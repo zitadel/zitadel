@@ -129,8 +129,8 @@ func (c *Commands) HumanAddPasswordlessSetup(ctx context.Context, userID, resour
 	return createdWebAuthN, nil
 }
 
-func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID, resourceowner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (*domain.WebAuthNToken, error) {
-	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode)
+func (c *Commands) HumanAddPasswordlessSetupInitCode(ctx context.Context, userID, resourceowner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment, passwordlessCodeGenerator crypto.Generator) (*domain.WebAuthNToken, error) {
+	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -208,8 +208,8 @@ func (c *Commands) HumanVerifyU2FSetup(ctx context.Context, userID, resourceowne
 	return writeModelToObjectDetails(&verifyWebAuthN.WriteModel), nil
 }
 
-func (c *Commands) HumanPasswordlessSetupInitCode(ctx context.Context, userID, resourceowner, tokenName, userAgentID, codeID, verificationCode string, credentialData []byte) (*domain.ObjectDetails, error) {
-	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode)
+func (c *Commands) HumanPasswordlessSetupInitCode(ctx context.Context, userID, resourceowner, tokenName, userAgentID, codeID, verificationCode string, credentialData []byte, passwordlessCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
+	err := c.humanVerifyPasswordlessInitCode(ctx, userID, resourceowner, codeID, verificationCode, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -483,8 +483,8 @@ func (c *Commands) HumanRemovePasswordless(ctx context.Context, userID, webAuthN
 	return c.removeHumanWebAuthN(ctx, userID, webAuthNID, resourceOwner, event)
 }
 
-func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
-	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true)
+func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, passwordlessCodeGenerator crypto.Generator) (*domain.PasswordlessInitCode, error) {
+	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, true, passwordlessCodeGenerator)
 	pushedEvents, err := c.eventstore.Push(ctx, codeEvent)
 	if err != nil {
 		return nil, err
@@ -496,8 +496,8 @@ func (c *Commands) HumanAddPasswordlessInitCode(ctx context.Context, userID, res
 	return writeModelToPasswordlessInitCode(initCode, code), nil
 }
 
-func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string) (*domain.PasswordlessInitCode, error) {
-	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, false)
+func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, passwordlessCodeGenerator crypto.Generator) (*domain.PasswordlessInitCode, error) {
+	codeEvent, initCode, code, err := c.humanAddPasswordlessInitCode(ctx, userID, resourceOwner, false, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -512,7 +512,7 @@ func (c *Commands) HumanSendPasswordlessInitCode(ctx context.Context, userID, re
 	return writeModelToPasswordlessInitCode(initCode, code), nil
 }
 
-func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool) (eventstore.Command, *HumanPasswordlessInitCodeWriteModel, string, error) {
+func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, resourceOwner string, direct bool, passwordlessCodeGenerator crypto.Generator) (eventstore.Command, *HumanPasswordlessInitCodeWriteModel, string, error) {
 	if userID == "" {
 		return nil, nil, "", caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
@@ -527,7 +527,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 		return nil, nil, "", err
 	}
 
-	cryptoCode, code, err := crypto.NewCode(c.passwordlessInitCode)
+	cryptoCode, code, err := crypto.NewCode(passwordlessCodeGenerator)
 	if err != nil {
 		return nil, nil, "", err
 	}
@@ -539,7 +539,7 @@ func (c *Commands) humanAddPasswordlessInitCode(ctx context.Context, userID, res
 			return usr_repo.NewHumanPasswordlessInitCodeRequestedEvent(ctx, agg, id, cryptoCode, exp)
 		}
 	}
-	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, c.passwordlessInitCode.Expiry())
+	codeEvent := codeEventCreator(ctx, UserAggregateFromWriteModel(&initCode.WriteModel), codeID, cryptoCode, passwordlessCodeGenerator.Expiry())
 	return codeEvent, initCode, code, nil
 }
 
@@ -563,7 +563,7 @@ func (c *Commands) HumanPasswordlessInitCodeSent(ctx context.Context, userID, re
 	return err
 }
 
-func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, resourceOwner, codeID, verificationCode string) error {
+func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, passwordlessCodeGenerator crypto.Generator) error {
 	if userID == "" || codeID == "" {
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-GVfg3", "Errors.IDMissing")
 	}
@@ -572,7 +572,7 @@ func (c *Commands) humanVerifyPasswordlessInitCode(ctx context.Context, userID, 
 	if err != nil {
 		return err
 	}
-	err = crypto.VerifyCode(initCode.ChangeDate, initCode.Expiration, initCode.CryptoCode, verificationCode, c.passwordlessInitCode)
+	err = crypto.VerifyCode(initCode.ChangeDate, initCode.Expiration, initCode.CryptoCode, verificationCode, passwordlessCodeGenerator)
 	if err != nil || initCode.State != domain.PasswordlessInitCodeStateActive {
 		userAgg := UserAggregateFromWriteModel(&initCode.WriteModel)
 		_, err = c.eventstore.Push(ctx, usr_repo.NewHumanPasswordlessInitCodeCheckFailedEvent(ctx, userAgg, codeID))

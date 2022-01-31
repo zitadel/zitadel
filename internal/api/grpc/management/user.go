@@ -188,7 +188,15 @@ func (s *Server) BulkRemoveUserMetadata(ctx context.Context, req *mgmt_pb.BulkRe
 }
 
 func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequest) (*mgmt_pb.AddHumanUserResponse, error) {
-	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req))
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.InitCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyPhoneCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	human, err := s.command.AddHuman(ctx, authz.GetCtxData(ctx).OrgID, AddHumanUserRequestToDomain(req), initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +212,19 @@ func (s *Server) AddHumanUser(ctx context.Context, req *mgmt_pb.AddHumanUserRequ
 
 func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUserRequest) (*mgmt_pb.ImportHumanUserResponse, error) {
 	human, passwordless := ImportHumanUserRequestToDomain(req)
-	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless)
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.InitCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyPhoneCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	addedHuman, code, err := s.command.ImportHuman(ctx, authz.GetCtxData(ctx).OrgID, human, passwordless, initCodeGenerator, phoneCodeGenerator, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +404,11 @@ func (s *Server) GetHumanEmail(ctx context.Context, req *mgmt_pb.GetHumanEmailRe
 }
 
 func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanEmailRequest) (*mgmt_pb.UpdateHumanEmailResponse, error) {
-	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(ctx, req))
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyEmailCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	email, err := s.command.ChangeHumanEmail(ctx, UpdateHumanEmailRequestToDomain(ctx, req), emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -398,7 +422,11 @@ func (s *Server) UpdateHumanEmail(ctx context.Context, req *mgmt_pb.UpdateHumanE
 }
 
 func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.ResendHumanInitializationRequest) (*mgmt_pb.ResendHumanInitializationResponse, error) {
-	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID)
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.InitCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	details, err := s.command.ResendInitialMail(ctx, req.UserId, req.Email, authz.GetCtxData(ctx).OrgID, initCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +436,11 @@ func (s *Server) ResendHumanInitialization(ctx context.Context, req *mgmt_pb.Res
 }
 
 func (s *Server) ResendHumanEmailVerification(ctx context.Context, req *mgmt_pb.ResendHumanEmailVerificationRequest) (*mgmt_pb.ResendHumanEmailVerificationResponse, error) {
-	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyEmailCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.CreateHumanEmailVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -438,7 +470,11 @@ func (s *Server) GetHumanPhone(ctx context.Context, req *mgmt_pb.GetHumanPhoneRe
 }
 
 func (s *Server) UpdateHumanPhone(ctx context.Context, req *mgmt_pb.UpdateHumanPhoneRequest) (*mgmt_pb.UpdateHumanPhoneResponse, error) {
-	phone, err := s.command.ChangeHumanPhone(ctx, UpdateHumanPhoneRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyPhoneCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phone, err := s.command.ChangeHumanPhone(ctx, UpdateHumanPhoneRequestToDomain(req), authz.GetCtxData(ctx).OrgID, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +498,11 @@ func (s *Server) RemoveHumanPhone(ctx context.Context, req *mgmt_pb.RemoveHumanP
 }
 
 func (s *Server) ResendHumanPhoneVerification(ctx context.Context, req *mgmt_pb.ResendHumanPhoneVerificationRequest) (*mgmt_pb.ResendHumanPhoneVerificationResponse, error) {
-	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID)
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyPhoneCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.CreateHumanPhoneVerificationCode(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -503,7 +543,11 @@ func (s *Server) SetHumanPassword(ctx context.Context, req *mgmt_pb.SetHumanPass
 }
 
 func (s *Server) SendHumanResetPasswordNotification(ctx context.Context, req *mgmt_pb.SendHumanResetPasswordNotificationRequest) (*mgmt_pb.SendHumanResetPasswordNotificationResponse, error) {
-	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type))
+	passwordCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordResetCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.RequestSetPassword(ctx, req.UserId, authz.GetCtxData(ctx).OrgID, notifyTypeToDomain(req.Type), passwordCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -580,7 +624,11 @@ func (s *Server) ListHumanPasswordless(ctx context.Context, req *mgmt_pb.ListHum
 
 func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.AddPasswordlessRegistrationRequest) (*mgmt_pb.AddPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanAddPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}
@@ -593,7 +641,11 @@ func (s *Server) AddPasswordlessRegistration(ctx context.Context, req *mgmt_pb.A
 
 func (s *Server) SendPasswordlessRegistration(ctx context.Context, req *mgmt_pb.SendPasswordlessRegistrationRequest) (*mgmt_pb.SendPasswordlessRegistrationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	initCode, err := s.command.HumanSendPasswordlessInitCode(ctx, req.UserId, ctxData.OrgID, passwordlessInitCode)
 	if err != nil {
 		return nil, err
 	}

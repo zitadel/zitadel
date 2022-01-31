@@ -145,7 +145,17 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
-	_, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.InitCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.VerifyPhoneCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -216,7 +226,17 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.InitCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.VerifyPhoneCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderRegisterOption(w, r, authReq, err)
+		return
+	}
+	_, err = l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, user, externalIDP, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

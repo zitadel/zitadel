@@ -379,13 +379,21 @@ func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID
 func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType)
+	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, repo.Command.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType, passwordlessInitCode)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData)
+	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, repo.Command.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData, passwordlessInitCode)
 	return err
 }
 
@@ -445,7 +453,15 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles)
+	initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.InitCodeGeneratorType, repo.Command.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.VerifyPhoneCodeGeneratorType, repo.Command.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}

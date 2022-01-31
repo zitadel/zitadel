@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/caos/zitadel/internal/domain"
 	"net/http"
 	"strconv"
+
+	"github.com/caos/zitadel/internal/domain"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
@@ -72,7 +73,12 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.InitCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
+		return
+	}
+	err = l.command.HumanVerifyInitCode(setContext(r.Context(), userOrgID), data.UserID, userOrgID, data.Code, data.Password, initCodeGenerator)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return
@@ -85,7 +91,12 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	_, err := l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.InitCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
+		return
+	}
+	_, err = l.command.ResendInitialMail(setContext(r.Context(), userOrgID), userID, "", userOrgID, initCodeGenerator)
 	l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
 }
 

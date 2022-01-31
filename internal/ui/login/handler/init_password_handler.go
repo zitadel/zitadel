@@ -70,7 +70,12 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		userOrg = authReq.UserOrgID
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID)
+	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.PasswordResetCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
+		return
+	}
+	err = l.command.SetPasswordWithVerifyCode(setContext(r.Context(), userOrg), userOrg, data.UserID, data.Code, data.Password, userAgentID, passwordCodeGenerator)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
@@ -92,12 +97,17 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
+	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.PasswordResetCodeGeneratorType, l.command.UserCodeAlg)
+	if err != nil {
+		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
+		return
+	}
 	user, err := l.query.GetUser(setContext(r.Context(), userOrg), loginName)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, user.ResourceOwner, domain.NotificationTypeEmail)
+	_, err = l.command.RequestSetPassword(setContext(r.Context(), userOrg), user.ID, user.ResourceOwner, domain.NotificationTypeEmail, passwordCodeGenerator)
 	l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 }
 

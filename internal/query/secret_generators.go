@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query/projection"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -86,6 +88,38 @@ type SecretGenerator struct {
 type SecretGeneratorSearchQueries struct {
 	SearchRequest
 	Queries []SearchQuery
+}
+
+func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType string, algorithm crypto.EncryptionAlgorithm) (crypto.Generator, error) {
+	generatorConfig, err := q.SecretGeneratorByType(ctx, generatorType)
+	if err != nil {
+		return nil, err
+	}
+	cryptoConfig := crypto.GeneratorConfig{
+		Length:              generatorConfig.Length,
+		Expiry:              types.Duration{Duration: generatorConfig.Expiry},
+		IncludeLowerLetters: generatorConfig.IncludeLowerLetters,
+		IncludeUpperLetters: generatorConfig.IncludeUpperLetters,
+		IncludeDigits:       generatorConfig.IncludeDigits,
+		IncludeSymbols:      generatorConfig.IncludeSymbols,
+	}
+	return crypto.NewEncryptionGenerator(cryptoConfig, algorithm), nil
+}
+
+func (q *Queries) InitHashGenerator(ctx context.Context, generatorType string, algorithm crypto.HashAlgorithm) (crypto.Generator, error) {
+	generatorConfig, err := q.SecretGeneratorByType(ctx, generatorType)
+	if err != nil {
+		return nil, err
+	}
+	cryptoConfig := crypto.GeneratorConfig{
+		Length:              generatorConfig.Length,
+		Expiry:              types.Duration{Duration: generatorConfig.Expiry},
+		IncludeLowerLetters: generatorConfig.IncludeLowerLetters,
+		IncludeUpperLetters: generatorConfig.IncludeUpperLetters,
+		IncludeDigits:       generatorConfig.IncludeDigits,
+		IncludeSymbols:      generatorConfig.IncludeSymbols,
+	}
+	return crypto.NewHashGenerator(cryptoConfig, algorithm), nil
 }
 
 func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType string) (*SecretGenerator, error) {

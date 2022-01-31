@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
@@ -134,7 +135,10 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 					EmailAddress:    organisation.Owner.Email,
 					IsEmailVerified: true,
 				},
-			}, orgIAMPolicy, pwPolicy, nil, false)
+			}, orgIAMPolicy, pwPolicy,
+			nil, //TODO: Code Generator missing!
+			nil, //TODO: Code Generator missing!
+			nil, false)
 		if err != nil {
 			return err
 		}
@@ -180,14 +184,16 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 			}
 			//create applications
 			for _, app := range proj.OIDCApps {
-				applicationEvents, err := setUpOIDCApplication(ctx, c, projectWriteModel, project, app, orgAgg.ID)
+				//TODO: Add Secret Generator
+				applicationEvents, err := setUpOIDCApplication(ctx, c, projectWriteModel, project, app, orgAgg.ID, nil)
 				if err != nil {
 					return err
 				}
 				events = append(events, applicationEvents...)
 			}
 			for _, app := range proj.APIs {
-				applicationEvents, err := setUpAPI(ctx, c, projectWriteModel, project, app, orgAgg.ID)
+				//TODO: Add Secret Generator
+				applicationEvents, err := setUpAPI(ctx, c, projectWriteModel, project, app, orgAgg.ID, nil)
 				if err != nil {
 					return err
 				}
@@ -205,7 +211,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 	return nil
 }
 
-func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string) ([]eventstore.Command, error) {
+func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, oidcApp OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) ([]eventstore.Command, error) {
 	app := &domain.OIDCApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectWriteModel.AggregateID,
@@ -220,7 +226,7 @@ func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *P
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&projectWriteModel.WriteModel)
-	events, _, err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner)
+	events, _, err := r.addOIDCApplication(ctx, projectAgg, project, app, resourceOwner, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +234,7 @@ func setUpOIDCApplication(ctx context.Context, r *Commands, projectWriteModel *P
 	return events, nil
 }
 
-func setUpAPI(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, apiApp API, resourceOwner string) ([]eventstore.Command, error) {
+func setUpAPI(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteModel, project *domain.Project, apiApp API, resourceOwner string, appSecretGenerator crypto.Generator) ([]eventstore.Command, error) {
 	app := &domain.APIApp{
 		ObjectRoot: models.ObjectRoot{
 			AggregateID: projectWriteModel.AggregateID,
@@ -238,7 +244,7 @@ func setUpAPI(ctx context.Context, r *Commands, projectWriteModel *ProjectWriteM
 	}
 
 	projectAgg := ProjectAggregateFromWriteModel(&projectWriteModel.WriteModel)
-	events, _, err := r.addAPIApplication(ctx, projectAgg, project, app, resourceOwner)
+	events, _, err := r.addAPIApplication(ctx, projectAgg, project, app, resourceOwner, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
