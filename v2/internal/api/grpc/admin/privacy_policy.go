@@ -3,9 +3,9 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/caos/zitadel/v2/internal/api/grpc/policy"
 )
 
 func (s *Server) GetPrivacyPolicy(ctx context.Context, _ *admin_pb.GetPrivacyPolicyRequest) (*admin_pb.GetPrivacyPolicyResponse, error) {

@@ -4,15 +4,15 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	change_grpc "github.com/caos/zitadel/v2/internal/api/grpc/change"
+	member_grpc "github.com/caos/zitadel/v2/internal/api/grpc/member"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	org_grpc "github.com/caos/zitadel/v2/internal/api/grpc/org"
+	policy_grpc "github.com/caos/zitadel/v2/internal/api/grpc/policy"
 )
 
 func (s *Server) GetMyOrg(ctx context.Context, req *mgmt_pb.GetMyOrgRequest) (*mgmt_pb.GetMyOrgResponse, error) {

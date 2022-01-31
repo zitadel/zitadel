@@ -3,11 +3,10 @@ package authn
 import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
-	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/authn"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func KeysToPb(keys []*query.AuthNKey) []*authn.Key {
@@ -34,7 +33,7 @@ func KeyToPb(key *query.AuthNKey) *authn.Key {
 
 func KeyTypeToPb(typ domain.AuthNKeyType) authn.KeyType {
 	switch typ {
-	case key_model.AuthNKeyTypeJSON:
+	case domain.AuthNKeyTypeJSON:
 		return authn.KeyType_KEY_TYPE_JSON
 	default:
 		return authn.KeyType_KEY_TYPE_UNSPECIFIED

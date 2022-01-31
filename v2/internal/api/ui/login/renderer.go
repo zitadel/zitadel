@@ -110,19 +110,19 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointLogin)
 		},
 		"externalIDPAuthURL": func(authReqID, idpConfigID string) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalLogin, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalLogin, QueryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
 		},
 		"externalIDPRegisterURL": func(authReqID, idpConfigID string) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalRegister, queryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s&%s=%s", EndpointExternalRegister, QueryAuthRequestID, authReqID, queryIDPConfigID, idpConfigID))
 		},
 		"registerUrl": func(id string) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, queryAuthRequestID, id))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointRegister, QueryAuthRequestID, id))
 		},
 		"loginNameUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointLoginName)
 		},
 		"loginNameChangeUrl": func(id string) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointLoginName, queryAuthRequestID, id))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointLoginName, QueryAuthRequestID, id))
 		},
 		"userSelectionUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointUserSelection)
@@ -137,7 +137,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointPasswordlessPrompt)
 		},
 		"passwordResetUrl": func(id string) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, queryAuthRequestID, id))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s", EndpointPasswordReset, QueryAuthRequestID, id))
 		},
 		"passwordUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointPassword)
@@ -149,7 +149,7 @@ func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage 
 			return path.Join(r.pathPrefix, EndpointMFAPrompt)
 		},
 		"mfaPromptChangeUrl": func(id string, provider domain.MFAType) string {
-			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, queryAuthRequestID, id, "provider", provider))
+			return path.Join(r.pathPrefix, fmt.Sprintf("%s?%s=%s;%s=%v", EndpointMFAPrompt, QueryAuthRequestID, id, "provider", provider))
 		},
 		"mfaInitVerifyUrl": func() string {
 			return path.Join(r.pathPrefix, EndpointMFAInitVerify)
@@ -490,7 +490,7 @@ func getRequestID(authReq *domain.AuthRequest, r *http.Request) string {
 	if authReq != nil {
 		return authReq.ID
 	}
-	return r.FormValue(queryAuthRequestID)
+	return r.FormValue(QueryAuthRequestID)
 }
 
 func (l *Login) csrfErrorHandler() http.Handler {

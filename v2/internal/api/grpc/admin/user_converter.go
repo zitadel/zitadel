@@ -4,9 +4,9 @@ import (
 	"github.com/caos/logging"
 	"golang.org/x/text/language"
 
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	admin_grpc "github.com/caos/zitadel/pkg/grpc/admin"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func setUpOrgHumanToDomain(human *admin_grpc.SetUpOrgRequest_Human) *domain.Human {

@@ -5,10 +5,10 @@ import (
 
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	text_grpc "github.com/caos/zitadel/internal/api/grpc/text"
 	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	text_grpc "github.com/caos/zitadel/v2/internal/api/grpc/text"
 )
 
 func (s *Server) GetDefaultInitMessageText(ctx context.Context, req *admin_pb.GetDefaultInitMessageTextRequest) (*admin_pb.GetDefaultInitMessageTextResponse, error) {

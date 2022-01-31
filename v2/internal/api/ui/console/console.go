@@ -17,7 +17,6 @@ type Config struct {
 	ConsoleOverwriteDir string
 	ShortCache          middleware.CacheConfig
 	LongCache           middleware.CacheConfig
-	CSPDomain           string
 }
 
 type spaHandler struct {
@@ -27,7 +26,7 @@ type spaHandler struct {
 const (
 	envRequestPath    = "/assets/environment.json"
 	consoleDefaultDir = "./console/"
-	handlerPrefix     = "/ui/console"
+	HandlerPrefix     = "/ui/console"
 )
 
 var (
@@ -51,7 +50,7 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config, domain, issuer, clientID string) (http.Handler, string, error) {
+func Start(config Config, domain, port, issuer, clientID string) (http.Handler, error) {
 	consoleDir := consoleDefaultDir
 	//if config.ConsoleOverwriteDir != "" {
 	//	consoleDir = config.ConsoleOverwriteDir
@@ -65,11 +64,11 @@ func Start(config Config, domain, issuer, clientID string) (http.Handler, string
 		Issuer                 string `json:"issuer,omitempty"`
 		ClientID               string `json:"clientid,omitempty"`
 	}{
-		AuthServiceUrl:         domain,
-		MgmtServiceUrl:         domain,
-		AdminServiceUrl:        domain,
-		SubscriptionServiceUrl: domain,
-		AssetServiceUrl:        domain,
+		AuthServiceUrl:         domain + ":" + port,
+		MgmtServiceUrl:         domain + ":" + port,
+		AdminServiceUrl:        domain + ":" + port,
+		SubscriptionServiceUrl: domain + ":" + port,
+		AssetServiceUrl:        domain + ":" + port,
 		Issuer:                 issuer,
 		ClientID:               clientID,
 	}
@@ -83,13 +82,13 @@ func Start(config Config, domain, issuer, clientID string) (http.Handler, string
 		config.LongCache.MaxAge.Duration,
 		config.LongCache.SharedMaxAge.Duration,
 	)
-	security := middleware.SecurityHeaders(csp(config.CSPDomain), nil)
+	security := middleware.SecurityHeaders(csp(domain), nil)
 	handler := &http.ServeMux{}
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
 	handler.Handle(envRequestPath, cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write(environmentJSON)
 	}))))
-	return handler, handlerPrefix, nil
+	return handler, nil
 }
 
 func csp(zitadelDomain string) *middleware.CSP {

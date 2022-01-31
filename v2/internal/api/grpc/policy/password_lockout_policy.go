@@ -1,9 +1,9 @@
 package policy
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/query"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func ModelLockoutPolicyToPb(policy *query.LockoutPolicy) *policy_pb.LockoutPolicy {

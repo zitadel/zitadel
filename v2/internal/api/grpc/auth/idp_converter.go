@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func ListMyLinkedIDPsRequestToQuery(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*query.IDPUserLinksSearchQuery, error) {

@@ -12,12 +12,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	client_middleware "github.com/caos/zitadel/internal/api/grpc/client/middleware"
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-
 	http_util "github.com/caos/zitadel/internal/api/http"
+	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
+	client_middleware "github.com/caos/zitadel/v2/internal/api/grpc/client/middleware"
 )
 
 const (

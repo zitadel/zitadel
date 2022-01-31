@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	queryAuthRequestID = "authRequestID"
+	QueryAuthRequestID = "authRequestID"
 	queryUserAgentID   = "userAgentID"
 )
 
 func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
-	authRequestID := r.FormValue(queryAuthRequestID)
+	authRequestID := r.FormValue(QueryAuthRequestID)
 	if authRequestID == "" {
 		return nil, nil
 	}

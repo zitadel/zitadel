@@ -8,14 +8,13 @@ import (
 	"github.com/caos/logging"
 	"gopkg.in/square/go-jose.v2"
 
-	"github.com/caos/zitadel/internal/telemetry/tracing"
-
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/keypair"
+	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (

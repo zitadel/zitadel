@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	authn_grpc "github.com/caos/zitadel/v2/internal/api/grpc/authn"
+	change_grpc "github.com/caos/zitadel/v2/internal/api/grpc/change"
+	object_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
+	project_grpc "github.com/caos/zitadel/v2/internal/api/grpc/project"
 )
 
 func (s *Server) GetAppByID(ctx context.Context, req *mgmt_pb.GetAppByIDRequest) (*mgmt_pb.GetAppByIDResponse, error) {

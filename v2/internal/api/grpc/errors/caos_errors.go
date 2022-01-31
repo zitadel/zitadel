@@ -7,8 +7,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/pkg/grpc/message"
+	caos_errs "github.com/caos/zitadel/v2/internal/errors"
 )
 
 func CaosToGRPCError(ctx context.Context, err error) error {

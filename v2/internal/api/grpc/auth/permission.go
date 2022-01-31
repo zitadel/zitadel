@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/query"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	obj_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func (s *Server) ListMyZitadelPermissions(ctx context.Context, _ *auth_pb.ListMyZitadelPermissionsRequest) (*auth_pb.ListMyZitadelPermissionsResponse, error) {

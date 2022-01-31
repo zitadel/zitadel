@@ -20,16 +20,6 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	"github.com/caos/zitadel/internal/domain"
-
-	"github.com/caos/zitadel/v2/internal/api"
-	"github.com/caos/zitadel/v2/internal/api/grpc/admin"
-	"github.com/caos/zitadel/v2/internal/api/grpc/auth"
-	"github.com/caos/zitadel/v2/internal/api/grpc/management"
-	"github.com/caos/zitadel/v2/internal/api/oidc"
-	"github.com/caos/zitadel/v2/internal/api/ui/console"
-	"github.com/caos/zitadel/v2/internal/api/ui/login"
-
 	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api/assets"
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
@@ -41,17 +31,29 @@ import (
 	"github.com/caos/zitadel/internal/cache/bigcache"
 	cache_config "github.com/caos/zitadel/internal/cache/config"
 	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
+	types_v1 "github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
+	es_sql "github.com/caos/zitadel/internal/eventstore/repository/sql"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
 	"github.com/caos/zitadel/openapi"
+	"github.com/caos/zitadel/v2/internal/api"
+	"github.com/caos/zitadel/v2/internal/api/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/api/grpc/auth"
+	"github.com/caos/zitadel/v2/internal/api/grpc/management"
+	middlewareV2 "github.com/caos/zitadel/v2/internal/api/http/middleware"
+	"github.com/caos/zitadel/v2/internal/api/oidc"
+	"github.com/caos/zitadel/v2/internal/api/ui/console"
+	"github.com/caos/zitadel/v2/internal/api/ui/login"
+	"github.com/caos/zitadel/v2/internal/config"
+	"github.com/caos/zitadel/v2/internal/config/types"
 )
 
 const (
@@ -63,29 +65,33 @@ const (
 var version = "dev-v2"
 
 type startConfig struct {
-	Commands       command.ConfigV2
-	Queries        query.ConfigV2
-	Projections    projection.ConfigV2
+	BaseDomain     string
+	Commands       types.SQLUser
+	Queries        types.SQLUser
+	Projections    projectionConfig
 	SystemDefaults systemdefaults.SystemDefaults
 	AuthZ          authz.Config
 	InternalAuthZ  internal_authz.Config
-	EventstoreBase types.SQLBase2
+	EventstoreBase types.SQLBase
 	Auth           auth_es.Config
 	AssetStorage   static_config.AssetStorageConfig
 	Admin          admin_es.Config
 	OIDC           api.Config
 	Login          login.Config
 	Console        console.Config
+	Notification   notification.Config
 }
 
-type querySQLConnection struct {
-	types.SQL
+type projectionConfig struct {
+	projection.Config
+	CRDB types.SQL
 }
 
 const (
 	eventstoreDB             = "eventstore"
 	queryUser                = "queries"
 	commandUser              = "eventstore"
+	projectionSchema         = "projections"
 	maxOpenConnection        = 3
 	maxConnLifetime          = 30 * time.Minute
 	maxConnIdleTime          = 30 * time.Minute
@@ -96,226 +102,31 @@ const (
 	queryMaxConnLifetime     = 30 * time.Minute
 	queryMaxConnIdleTime     = 30 * time.Minute
 
-	keyEventstoreHost   = "ZITADEL_EVENTSTORE_HOST"
-	keyEventstorePort   = "ZITADEL_EVENTSTORE_PORT"
-	keyCockroachOptions = "CR_OPTIONS"
-	keyCommandPassword  = "CR_EVENTSTORE_PASSWORD"
-	keyCommandCert      = "CR_EVENTSTORE_CERT"
-	keyCommandKey       = "CR_EVENTSTORE_KEY"
-	keyQueriesPassword  = "CR_QUERIES_PASSWORD"
-	keyQueriesCert      = "CR_QUERIES_CERT"
-	keyQueriesKey       = "CR_QUERIES_KEY"
-
-	pathLogin   = "/ui/login"
-	pathOAuthV2 = "/oauth/v2"
-	pathConsole = "ui/console"
+	envBaseDomain          = "ZITADEL_BASE_DOMAIN"
+	envEventstoreHost      = "ZITADEL_EVENTSTORE_HOST"
+	envEventstorePort      = "ZITADEL_EVENTSTORE_PORT"
+	envEventstoreSSLMode   = "CR_SSL_MODE"
+	envEventstoreRootCert  = "CR_ROOT_CERT"
+	envCockroachOptions    = "CR_OPTIONS"
+	envCommandPassword     = "CR_EVENTSTORE_PASSWORD"
+	envCommandCert         = "CR_EVENTSTORE_CERT"
+	envCommandKey          = "CR_EVENTSTORE_KEY"
+	envQueriesPassword     = "CR_QUERIES_PASSWORD"
+	envQueriesCert         = "CR_QUERIES_CERT"
+	envQueriesKey          = "CR_QUERIES_KEY"
+	envConsoleOverwriteDir = "ZITADEL_CONSOLE_DIR"
+	envCSRFKey             = "ZITADEL_CSRF_KEY"
+	envCookieKey           = "ZITADEL_COOKIE_KEY"
+	envOIDCKey             = "ZITADEL_OIDC_KEYS_ID"
+	envSentryUsage         = "SENTRY_USAGE"
+	envSentryEnvironment   = "SENTRY_ENVIRONMENT"
+	pathLogin              = "/ui/login"
+	pathOAuthV2            = "/oauth/v2"
+	pathAssetAPI           = "/assets/v1"
+	projectionDB           = "zitadel"
 
 	defaultPort = "50002" //TODO: change to 80?
 )
-
-func defaultStartConfig() *startConfig {
-	return &startConfig{
-		Commands:       defaultCommandConfig(),
-		Queries:        defaultQueryConfig(),
-		Projections:    defaultProjectionConfig(),
-		SystemDefaults: systemdefaults.SystemDefaults{}, //remove later; until then, read from startup.yaml
-		AuthZ:          authz.Config{},                  //remove later; until then, read from startup.yaml
-		InternalAuthZ:  internal_authz.Config{},
-		EventstoreBase: eventstoreConfig(),
-		Auth:           auth_es.Config{},
-		AssetStorage:   static_config.AssetStorageConfig{},
-		Admin:          admin_es.Config{},
-		OIDC:           defaultOIDCConfig(),
-		Login:          defaultLoginConfig(),
-		Console:        defaultConsoleConfig(),
-	}
-}
-
-func defaultConsoleConfig() console.Config {
-	return console.Config{
-		ConsoleOverwriteDir: os.Getenv("ZITADEL_CONSOLE_DIR"),
-		ShortCache:          defaultShortCacheConfig(),
-		LongCache:           defaultCacheConfig(),
-		CSPDomain:           os.Getenv("ZITADEL_DEFAULT_DOMAIN"),
-	}
-}
-
-func defaultShortCacheConfig() middleware.CacheConfig {
-	return middleware.CacheConfig{
-		MaxAge:       types.Duration{Duration: 5 * time.Minute},
-		SharedMaxAge: types.Duration{Duration: 15 * time.Minute},
-	}
-}
-
-func defaultLoginConfig() login.Config {
-	return login.Config{
-		BaseURL:             os.Getenv("ZITADEL_ACCOUNTS"),
-		OidcAuthCallbackURL: pathOAuthV2 + "/authorize/callback?id=", //TODO: provide from op
-		ZitadelURL:          pathConsole,
-		LanguageCookieName:  "zitadel.login.lang", //TODO: constant? (console might need it as well)
-		//DefaultLanguage:       language.Tag{},
-		CSRF: login.CSRF{
-			CookieName: "zitadel.login.csrf", //TODO: constant?
-			Key: &crypto.KeyConfig{
-				EncryptionKeyID: os.Getenv("ZITADEL_CSRF_KEY"),
-			},
-			Development: func() bool { //TODO: ???
-				ok, _ := strconv.ParseBool(os.Getenv("ZITADEL_CSRF_DEV"))
-				return ok
-			}(),
-		},
-		UserAgentCookieConfig: defaultUserAgentCookieConfig(),
-		Cache:                 defaultCacheConfig(),
-		StaticCache: cache_config.CacheConfig{
-			Type: "bigcache",
-			Config: &bigcache.Config{
-				MaxCacheSizeInMB: 52428800, //50MB
-			},
-		},
-	}
-}
-
-func defaultCacheConfig() middleware.CacheConfig {
-	return middleware.CacheConfig{
-		MaxAge:       types.Duration{Duration: 12 * time.Hour},
-		SharedMaxAge: types.Duration{Duration: 168 * time.Hour}, // 7 days
-	}
-}
-
-func defaultUserAgentCookieConfig() *middleware.UserAgentCookieConfig {
-	return &middleware.UserAgentCookieConfig{
-		Name:   "zitadel.useragent", //TODO: constant?
-		Domain: os.Getenv("ZITADEL_COOKIE_DOMAIN"),
-		Key: &crypto.KeyConfig{
-			EncryptionKeyID: os.Getenv("ZITADEL_COOKIE_KEY"),
-		},
-		MaxAge: types.Duration{Duration: 8760 * time.Hour}, // 365 days
-	}
-}
-
-func defaultOIDCConfig() api.Config {
-	return api.Config{
-		OPHandlerConfig: oidc.OPHandlerConfig{
-			OPConfig: &op.Config{
-				Issuer:                   os.Getenv("ZITADEL_ISSUER"),
-				CryptoKey:                [32]byte{},
-				DefaultLogoutRedirectURI: pathLogin + "/logout/done",
-				CodeMethodS256:           true,
-				AuthMethodPost:           true,
-				AuthMethodPrivateKeyJWT:  true,
-				GrantTypeRefreshToken:    true,
-				RequestObjectSupported:   true,
-				SupportedUILocales:       nil, //TODO: change config type?
-			},
-			StorageConfig: oidc.StorageConfig{
-				DefaultLoginURL:                   pathLogin + "/login?authRequestID=",
-				SigningKeyAlgorithm:               "RS256",
-				DefaultAccessTokenLifetime:        types.Duration{Duration: 12 * time.Hour},
-				DefaultIdTokenLifetime:            types.Duration{Duration: 12 * time.Hour},
-				DefaultRefreshTokenIdleExpiration: types.Duration{Duration: 720 * time.Hour},  // 30 days
-				DefaultRefreshTokenExpiration:     types.Duration{Duration: 2160 * time.Hour}, // 90 days
-			},
-			UserAgentCookieConfig: defaultUserAgentCookieConfig(),
-			Cache: &middleware.CacheConfig{
-				MaxAge:       types.Duration{Duration: 12 * time.Hour},
-				SharedMaxAge: types.Duration{Duration: 168 * time.Hour}, // 7 days
-			},
-			Endpoints: nil, // use default endpoints from OIDC library
-		},
-	}
-}
-
-const projectionDB = "zitadel"
-
-const projectionSchema = "projections"
-
-func defaultProjectionConfig() projection.ConfigV2 {
-	return projection.ConfigV2{
-		Config: projection.Config{
-			RequeueEvery:     types.Duration{Duration: 10 * time.Second},
-			RetryFailedAfter: types.Duration{Duration: 1 * time.Second},
-			MaxFailureCount:  5,
-			BulkLimit:        200,
-			MaxIterators:     1,
-			Customizations: map[string]projection.CustomConfig{
-				"projects": {
-					BulkLimit: func(i uint64) *uint64 { return &i }(2000),
-				},
-			},
-		},
-		CRDB: types.SQL2{
-			Host:     os.Getenv(keyEventstoreHost),
-			Port:     os.Getenv(keyEventstorePort),
-			User:     queryUser,
-			Password: os.Getenv(keyQueriesPassword),
-			Database: projectionDB,
-			Schema:   projectionSchema,
-			SSL: &types.SSL{
-				Mode:     os.Getenv("CR_SSL_MODE"),
-				RootCert: os.Getenv("CR_ROOT_CERT"),
-				Cert:     os.Getenv(keyQueriesCert),
-				Key:      os.Getenv(keyQueriesKey),
-			},
-			Options:         os.Getenv(keyCockroachOptions),
-			MaxOpenConns:    maxOpenConnection,
-			MaxConnLifetime: types.Duration{Duration: maxConnLifetime},
-			MaxConnIdleTime: types.Duration{Duration: maxConnIdleTime},
-		},
-	}
-}
-
-func eventstoreConfig() types.SQLBase2 {
-	return types.SQLBase2{
-		Host:            os.Getenv(keyEventstoreHost),
-		Port:            os.Getenv(keyEventstorePort),
-		Database:        eventstoreDB,
-		Schema:          "",
-		SSL:             defaultEventstoreSSL(),
-		Options:         os.Getenv(keyCockroachOptions),
-		MaxOpenConns:    maxOpenConnection,
-		MaxConnLifetime: types.Duration{Duration: maxConnLifetime},
-		MaxConnIdleTime: types.Duration{Duration: maxConnIdleTime},
-	}
-}
-
-func defaultEventstoreSSL() types.SSLBase {
-	return types.SSLBase{
-		Mode:     os.Getenv("CR_SSL_MODE"),
-		RootCert: os.Getenv("CR_ROOT_CERT"),
-	}
-}
-
-func defaultCommandConfig() command.ConfigV2 {
-	return command.ConfigV2{
-		Eventstore: types.SQLUser2{
-			User:            commandUser,
-			Password:        os.Getenv(keyCommandPassword),
-			MaxOpenConns:    commandMaxOpenConnection,
-			MaxConnLifetime: types.Duration{Duration: commandMaxConnLifetime},
-			MaxConnIdleTime: types.Duration{Duration: commandMaxConnIdleTime},
-			SSL: types.SSLUser{
-				Cert: os.Getenv(keyCommandCert),
-				Key:  os.Getenv(keyCommandKey),
-			},
-		},
-	}
-}
-
-func defaultQueryConfig() query.ConfigV2 {
-	return query.ConfigV2{
-		Eventstore: types.SQLUser2{
-			User:            queryUser,
-			Password:        os.Getenv(keyQueriesPassword),
-			MaxOpenConns:    queryMaxOpenConnection,
-			MaxConnLifetime: types.Duration{Duration: queryMaxConnLifetime},
-			MaxConnIdleTime: types.Duration{Duration: queryMaxConnIdleTime},
-			SSL: types.SSLUser{
-				Cert: os.Getenv(keyQueriesCert),
-				Key:  os.Getenv(keyQueriesKey),
-			},
-		},
-	}
-}
 
 var (
 	configPaths = config.NewArrayFlags("authz.yaml", "system-defaults.yaml", "startup.yaml")
@@ -335,7 +146,7 @@ var (
 )
 
 func main() {
-	sentryEnabled, _ := strconv.ParseBool(os.Getenv("SENTRY_USAGE")) //TODO: default false!!! do we want that
+	sentryEnabled, _ := strconv.ParseBool(os.Getenv(envSentryUsage)) //TODO: default false!!! do we want that
 	if sentryEnabled {
 		enableSentry()
 	}
@@ -360,27 +171,27 @@ func startZitadel() {
 	ctx := context.Background()
 
 	keyChan := make(chan interface{})
-
-	esQueries, err := eventstore.StartWithUser2(conf.EventstoreBase, conf.Queries.Eventstore)
-	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
-
 	projectionsDB, err := conf.Projections.CRDB.Start()
 	logging.Log("MAIN-DAgw1").OnError(err).Fatal("cannot start client for projection")
+	store, err := conf.AssetStorage.Config.NewStorage()
+	logging.Log("MAIN-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
+	sqlClient, err := conf.Queries.Start(conf.EventstoreBase)
+	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
+	esQueries := eventstore.NewEventstore(es_sql.NewCRDB(sqlClient))
 	queries, err := query.StartQueries2(ctx, esQueries, projectionsDB, conf.Projections.Config, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
 	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
-	//
-	esCommands, err := eventstore.StartWithUser2(conf.EventstoreBase, conf.Commands.Eventstore)
-	logging.Log("ZITAD-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
 
-	store, err := conf.AssetStorage.Config.NewStorage()
-	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
-
+	sqlClient, err = conf.Commands.Start(conf.EventstoreBase)
+	logging.Log("MAIN-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
+	esCommands := eventstore.NewEventstore(es_sql.NewCRDB(sqlClient))
 	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
-	logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
+	logging.Log("MAIN-bmNiJ").OnError(err).Fatal("cannot start commands")
+
+	notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, queries, store != nil)
 
 	router := mux.NewRouter()
 	startAPIs(ctx, router, commands, queries, esQueries, projectionsDB, keyChan, conf, store, authZRepo)
@@ -390,7 +201,7 @@ func startZitadel() {
 func configureStart() *startConfig {
 	conf := defaultStartConfig()
 	err := config.Read(conf, configPaths.Values()...)
-	logging.Log("ZITAD-EDz31").OnError(err).Fatal("cannot read config")
+	logging.Log("MAIN-EDz31").OnError(err).Fatal("cannot read config")
 
 	return conf
 }
@@ -412,29 +223,29 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	authRepo, err := auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries)
 	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 
-	apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, "/assets/v1/"))
-	apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, "/assets/v1/"))
-	apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, "/assets/v1/"))
+	apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, pathAssetAPI))
+	apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, pathAssetAPI))
+	apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, pathAssetAPI))
 
 	if store != nil {
 		assetsHandler := assets.NewHandler(commands, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, store, queries)
-		apis.RegisterHandler("/assets/v1", assetsHandler)
+		apis.RegisterHandler(pathAssetAPI, assetsHandler)
 	}
 
-	op := oidc.NewProvider(ctx, conf.OIDC.OPHandlerConfig, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, eventstore, projectionsDB, keyChan, "/assets/v1/")
-	apis.RegisterHandler("/oauth/v2", op.HttpHandler())
+	oidcProvider := oidc.NewProvider(ctx, conf.OIDC.OPHandlerConfig, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, eventstore, projectionsDB, keyChan, pathAssetAPI, conf.BaseDomain)
+	apis.RegisterHandler("/oauth/v2", oidcProvider.HttpHandler())
 
 	openAPIHandler, err := openapi.Start()
 	logging.Log("MAIN-8pRk1").OnError(err).Fatal("Unable to start openapi handler")
 	apis.RegisterHandler("/openapi/v2/swagger", cors.AllowAll().Handler(openAPIHandler))
 
-	l, _ := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode)
-	apis.RegisterHandler(pathLogin, l.Handler())
-
-	id, err := consoleClientID(ctx, queries)
+	consoleID, err := consoleClientID(ctx, queries)
 	logging.Log("MAIN-Dgfqs").OnError(err).Fatal("unable to get client_id for console")
-	c, consoleRoute, err := console.Start(conf.Console, conf.Auth.APIDomain, conf.OIDC.OPConfig.Issuer, id)
-	apis.RegisterHandler(consoleRoute, c)
+	c, err := console.Start(conf.Console, conf.BaseDomain, *port, conf.OIDC.OPConfig.Issuer, consoleID)
+	apis.RegisterHandler(console.HandlerPrefix, c)
+
+	l := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode, conf.BaseDomain, console.HandlerPrefix)
+	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
 
 	apis.Router()
 }
@@ -457,11 +268,7 @@ func listen(ctx context.Context, router *mux.Router) {
 		logging.Log("MAIN-SWE2A").WithError(shutdownErr).Panic("graceful server shutdown failed")
 	}
 
-	//if errors.Is(err, http.ErrServerClosed) {
-	//	fmt.Println("server closed")
-	//} else if err != nil {
-	//	panic(err)
-	//}
+	logging.Log("MAIN-dsGra").Info("server close")
 }
 
 func enableSentry() {
@@ -470,7 +277,7 @@ func enableSentry() {
 		sentryVersion = version
 	}
 	err := sentry.Init(sentry.ClientOptions{
-		Environment: os.Getenv("SENTRY_ENVIRONMENT"),
+		Environment: os.Getenv(envSentryEnvironment),
 		Release:     fmt.Sprintf("zitadel-%s", sentryVersion),
 	})
 	if err != nil {
@@ -487,6 +294,197 @@ func enableSentry() {
 			panic(err)
 		}
 	}()
+}
+
+func defaultStartConfig() *startConfig {
+	return &startConfig{
+		BaseDomain:     os.Getenv(envBaseDomain),
+		EventstoreBase: eventstoreConfig(),
+		Commands:       defaultCommandConfig(),
+		Queries:        defaultQueryConfig(),
+		Projections:    defaultProjectionConfig(),
+		OIDC:           defaultOIDCConfig(),
+		Login:          defaultLoginConfig(),
+		Console:        defaultConsoleConfig(),
+		SystemDefaults: systemdefaults.SystemDefaults{},    //remove later; until then, read from system-defaults.yaml
+		AuthZ:          authz.Config{},                     //remove later; until then, read from startup.yaml
+		InternalAuthZ:  internal_authz.Config{},            //remove later?
+		Auth:           auth_es.Config{},                   //remove later; until then, read from startup.yaml
+		AssetStorage:   static_config.AssetStorageConfig{}, //TODO: default config?
+		Admin:          admin_es.Config{},                  //remove later; until then, read from startup.yaml
+	}
+}
+
+func eventstoreConfig() types.SQLBase {
+	return types.SQLBase{
+		Host:            os.Getenv(envEventstoreHost),
+		Port:            os.Getenv(envEventstorePort),
+		Database:        eventstoreDB,
+		SSL:             defaultEventstoreSSL(),
+		Options:         os.Getenv(envCockroachOptions),
+		MaxOpenConns:    maxOpenConnection,
+		MaxConnLifetime: types.Duration{Duration: maxConnLifetime},
+		MaxConnIdleTime: types.Duration{Duration: maxConnIdleTime},
+	}
+}
+
+func defaultEventstoreSSL() types.SSLBase {
+	return types.SSLBase{
+		Mode:     os.Getenv(envEventstoreSSLMode),
+		RootCert: os.Getenv(envEventstoreRootCert),
+	}
+}
+
+func defaultCommandConfig() types.SQLUser {
+	return types.SQLUser{
+		User:            commandUser,
+		Password:        os.Getenv(envCommandPassword),
+		MaxOpenConns:    commandMaxOpenConnection,
+		MaxConnLifetime: types.Duration{Duration: commandMaxConnLifetime},
+		MaxConnIdleTime: types.Duration{Duration: commandMaxConnIdleTime},
+		SSL: types.SSLUser{
+			Cert: os.Getenv(envCommandCert),
+			Key:  os.Getenv(envCommandKey),
+		},
+	}
+}
+
+func defaultQueryConfig() types.SQLUser {
+	return types.SQLUser{
+		User:            queryUser,
+		Password:        os.Getenv(envQueriesPassword),
+		MaxOpenConns:    queryMaxOpenConnection,
+		MaxConnLifetime: types.Duration{Duration: queryMaxConnLifetime},
+		MaxConnIdleTime: types.Duration{Duration: queryMaxConnIdleTime},
+		SSL: types.SSLUser{
+			Cert: os.Getenv(envQueriesCert),
+			Key:  os.Getenv(envQueriesKey),
+		},
+	}
+}
+
+func defaultProjectionConfig() projectionConfig {
+	return projectionConfig{
+		Config: projection.Config{
+			RequeueEvery:     types_v1.Duration{Duration: 10 * time.Second},
+			RetryFailedAfter: types_v1.Duration{Duration: 1 * time.Second},
+			MaxFailureCount:  5,
+			BulkLimit:        200,
+			MaxIterators:     1,
+			Customizations: map[string]projection.CustomConfig{
+				"projects": {
+					BulkLimit: func(i uint64) *uint64 { return &i }(2000),
+				},
+			},
+		},
+		CRDB: types.SQL{
+			Host:     os.Getenv(envEventstoreHost),
+			Port:     os.Getenv(envEventstorePort),
+			User:     queryUser,
+			Password: os.Getenv(envQueriesPassword),
+			Database: projectionDB,
+			Schema:   projectionSchema,
+			SSL: &types.SSL{
+				Mode:     os.Getenv(envEventstoreSSLMode),
+				RootCert: os.Getenv(envEventstoreRootCert),
+				Cert:     os.Getenv(envQueriesCert),
+				Key:      os.Getenv(envQueriesKey),
+			},
+			Options:         os.Getenv(envCockroachOptions),
+			MaxOpenConns:    maxOpenConnection,
+			MaxConnLifetime: types.Duration{Duration: maxConnLifetime},
+			MaxConnIdleTime: types.Duration{Duration: maxConnIdleTime},
+		},
+	}
+}
+
+func defaultOIDCConfig() api.Config {
+	return api.Config{
+		OPHandlerConfig: oidc.OPHandlerConfig{
+			OPConfig: &op.Config{
+				Issuer:                   os.Getenv(envBaseDomain) + pathOAuthV2, //TODO: BaseDomain/oauth/v2/ ??
+				CryptoKey:                [32]byte{},                             //TODO: change config type?
+				DefaultLogoutRedirectURI: pathLogin + "/logout/done",             //TODO: still config?
+				CodeMethodS256:           true,
+				AuthMethodPost:           true,
+				AuthMethodPrivateKeyJWT:  true,
+				GrantTypeRefreshToken:    true,
+				RequestObjectSupported:   true,
+				SupportedUILocales:       nil, //TODO: change config type?
+			},
+			StorageConfig: oidc.StorageConfig{
+				DefaultLoginURL:                   fmt.Sprintf("%s%s?%s=", pathLogin, login.EndpointLogin, login.QueryAuthRequestID), //TODO: still config?
+				SigningKeyAlgorithm:               "RS256",
+				DefaultAccessTokenLifetime:        types.Duration{Duration: 12 * time.Hour},
+				DefaultIdTokenLifetime:            types.Duration{Duration: 12 * time.Hour},
+				DefaultRefreshTokenIdleExpiration: types.Duration{Duration: 720 * time.Hour},  // 30 days
+				DefaultRefreshTokenExpiration:     types.Duration{Duration: 2160 * time.Hour}, // 90 days
+			},
+			UserAgentCookieConfig: defaultUserAgentCookieConfig(),
+			Cache: &middleware.CacheConfig{
+				MaxAge:       types_v1.Duration{Duration: 12 * time.Hour},
+				SharedMaxAge: types_v1.Duration{Duration: 168 * time.Hour}, // 7 days
+			},
+			KeyConfig: &crypto.KeyConfig{
+				EncryptionKeyID: os.Getenv(envOIDCKey),
+			},
+			CustomEndpoints: nil, // use default endpoints from OIDC library
+		},
+	}
+}
+
+func defaultLoginConfig() login.Config {
+	return login.Config{
+		OidcAuthCallbackURL: pathOAuthV2 + "/authorize/callback?id=", //TODO: provide from op
+		LanguageCookieName:  "zitadel.login.lang",                    //TODO: constant? (console might need it as well)
+		CSRF: login.CSRF{
+			CookieName: "zitadel.login.csrf", //TODO: constant?
+			Key: &crypto.KeyConfig{
+				EncryptionKeyID: os.Getenv(envCSRFKey),
+			},
+			Development: *localDevMode, //TODO: ?
+		},
+		UserAgentCookieConfig: defaultUserAgentCookieConfig(),
+		Cache:                 defaultCacheConfig(),
+		StaticCache: cache_config.CacheConfig{
+			Type: "bigcache",
+			Config: &bigcache.Config{
+				MaxCacheSizeInMB: 52428800, //50MB
+			},
+		},
+	}
+}
+
+func defaultConsoleConfig() console.Config {
+	return console.Config{
+		ConsoleOverwriteDir: os.Getenv(envConsoleOverwriteDir),
+		ShortCache:          defaultShortCacheConfig(),
+		LongCache:           defaultCacheConfig(),
+	}
+}
+
+func defaultShortCacheConfig() middleware.CacheConfig {
+	return middleware.CacheConfig{
+		MaxAge:       types_v1.Duration{Duration: 5 * time.Minute},
+		SharedMaxAge: types_v1.Duration{Duration: 15 * time.Minute},
+	}
+}
+
+func defaultCacheConfig() middleware.CacheConfig {
+	return middleware.CacheConfig{
+		MaxAge:       types_v1.Duration{Duration: 12 * time.Hour},
+		SharedMaxAge: types_v1.Duration{Duration: 168 * time.Hour}, // 7 days
+	}
+}
+
+func defaultUserAgentCookieConfig() *middlewareV2.UserAgentCookieConfig {
+	return &middlewareV2.UserAgentCookieConfig{
+		Name: "zitadel.useragent", //TODO: constant?
+		Key: &crypto.KeyConfig{
+			EncryptionKeyID: os.Getenv(envCookieKey),
+		},
+		MaxAge: types.Duration{Duration: 8760 * time.Hour}, // 365 days
+	}
 }
 
 //TODO:!!??!!

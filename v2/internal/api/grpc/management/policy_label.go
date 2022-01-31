@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/caos/zitadel/v2/internal/api/grpc/policy"
 )
 
 func (s *Server) GetLabelPolicy(ctx context.Context, req *mgmt_pb.GetLabelPolicyRequest) (*mgmt_pb.GetLabelPolicyResponse, error) {

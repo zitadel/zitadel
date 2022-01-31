@@ -3,10 +3,10 @@ package action
 import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	action_pb "github.com/caos/zitadel/pkg/grpc/action"
+	object_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func FlowTypeToDomain(flowType action_pb.FlowType) domain.FlowType {

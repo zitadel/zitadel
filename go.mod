@@ -18,7 +18,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.21.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v1.0.0
+	github.com/caos/oidc v1.0.2-beta.1
 	github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
 	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51

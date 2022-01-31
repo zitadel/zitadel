@@ -115,7 +115,7 @@ func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authR
 		return
 	}
 	q := redirect.Query()
-	q.Set(queryAuthRequestID, authReq.ID)
+	q.Set(QueryAuthRequestID, authReq.ID)
 	userAgentID, ok := http_mw.UserAgentIDFromCtx(r.Context())
 	if !ok {
 		l.renderLogin(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))

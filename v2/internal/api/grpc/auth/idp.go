@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	idp_grpc "github.com/caos/zitadel/v2/internal/api/grpc/idp"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func (s *Server) ListMyLinkedIDPs(ctx context.Context, req *auth_pb.ListMyLinkedIDPsRequest) (*auth_pb.ListMyLinkedIDPsResponse, error) {

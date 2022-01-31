@@ -3,14 +3,13 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/grpc/user"
-	"github.com/caos/zitadel/internal/query"
-
-	"github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/api/grpc/idp"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/caos/zitadel/v2/internal/api/grpc/policy"
+	"github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func (s *Server) GetLoginPolicy(ctx context.Context, _ *admin_pb.GetLoginPolicyRequest) (*admin_pb.GetLoginPolicyResponse, error) {

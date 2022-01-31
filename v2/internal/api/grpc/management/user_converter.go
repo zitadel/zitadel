@@ -8,15 +8,15 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/authn"
-	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/v2/internal/api/grpc/authn"
+	"github.com/caos/zitadel/v2/internal/api/grpc/metadata"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func ListUsersRequestToModel(req *mgmt_pb.ListUsersRequest) (*query.UserSearchQueries, error) {

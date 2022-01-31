@@ -265,6 +265,8 @@ Admin:
 #  Cache:
 #    MaxAge: $ZITADEL_CACHE_MAXAGE
 #    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  KeyConfig:
+#    EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
 #  Endpoints:
 #    Auth:
 #      Path: 'authorize2'
@@ -312,15 +314,15 @@ Admin:
 #    Type: bigcache
 #    Config:
 #      MaxCacheSizeInByte: 52428800 #50MB
-Console:
-  ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
-  ShortCache:
-    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
-    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
-  LongCache:
-    MaxAge: $ZITADEL_CACHE_MAXAGE
-    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
+#Console:
+#  ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
+#  ShortCache:
+#    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+#  LongCache:
+#    MaxAge: $ZITADEL_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 Notification:
   APIDomain: $ZITADEL_API_DOMAIN

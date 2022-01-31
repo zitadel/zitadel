@@ -1,12 +1,12 @@
 package user
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func UsersToPb(users []*query.User, assetPrefix string) []*user_pb.User {

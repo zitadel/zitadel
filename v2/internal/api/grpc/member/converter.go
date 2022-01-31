@@ -1,11 +1,11 @@
 package member
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	member_pb "github.com/caos/zitadel/pkg/grpc/member"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func MemberToDomain(member *member_pb.Member) *domain.Member {

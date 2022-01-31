@@ -1,11 +1,11 @@
 package org
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	org_pb "github.com/caos/zitadel/pkg/grpc/org"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func OrgQueriesToModel(queries []*org_pb.OrgQuery) (_ []query.SearchQuery, err error) {

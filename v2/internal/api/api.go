@@ -9,17 +9,16 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 
-	server2 "github.com/caos/zitadel/v2/internal/api/grpc/server"
-	"github.com/caos/zitadel/v2/internal/api/oidc"
-
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/v2/internal/api/grpc/server"
+	"github.com/caos/zitadel/v2/internal/api/oidc"
 )
 
 type API struct {
 	port           string
 	grpcServer     *grpc.Server
-	gatewayHandler *server2.GatewayHandler
+	gatewayHandler *server.GatewayHandler
 	verifier       *internal_authz.TokenVerifier
 	router         *mux.Router
 }
@@ -34,13 +33,13 @@ func New(ctx context.Context, port string, router *mux.Router, verifier *interna
 		verifier: verifier,
 		router:   router,
 	}
-	api.grpcServer = server2.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
-	api.gatewayHandler = server2.CreateGatewayHandler(port)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
+	api.gatewayHandler = server.CreateGatewayHandler(port)
 
 	return api
 }
 
-func (a *API) RegisterServer(ctx context.Context, server server2.Server) {
+func (a *API) RegisterServer(ctx context.Context, server server.Server) {
 	server.RegisterServer(a.grpcServer)
 	a.gatewayHandler.RegisterGateway(ctx, server)
 	a.verifier.RegisterServer(server.AppName(), server.MethodPrefix(), server.AuthMethods())

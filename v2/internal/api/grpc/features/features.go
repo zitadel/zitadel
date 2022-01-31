@@ -3,10 +3,10 @@ package features
 import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	features_pb "github.com/caos/zitadel/pkg/grpc/features"
+	object_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func ModelFeaturesToPb(features *query.Features) *features_pb.Features {

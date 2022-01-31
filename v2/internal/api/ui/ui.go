@@ -7,9 +7,9 @@ package ui
 //
 //	sentryhttp "github.com/getsentry/sentry-go/http"
 //
-//	http_util "github.com/caos/zitadel/internal/api/http"
-//	"github.com/caos/zitadel/internal/ui/console"
-//	"github.com/caos/zitadel/internal/ui/login"
+//	http_util "github.com/caos/zitadel/v2/internal/api/http"
+//	"github.com/caos/zitadel/v2/internal/ui/console"
+//	"github.com/caos/zitadel/v2/internal/ui/login"
 //)
 //
 //const (

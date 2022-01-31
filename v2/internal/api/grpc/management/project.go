@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	change_grpc "github.com/caos/zitadel/v2/internal/api/grpc/change"
+	member_grpc "github.com/caos/zitadel/v2/internal/api/grpc/member"
+	object_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
+	project_grpc "github.com/caos/zitadel/v2/internal/api/grpc/project"
 )
 
 func (s *Server) GetProjectByID(ctx context.Context, req *mgmt_pb.GetProjectByIDRequest) (*mgmt_pb.GetProjectByIDResponse, error) {

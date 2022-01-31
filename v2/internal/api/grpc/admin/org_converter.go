@@ -1,12 +1,12 @@
 package admin
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/caos/zitadel/pkg/grpc/org"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	org_grpc "github.com/caos/zitadel/v2/internal/api/grpc/org"
 )
 
 func listOrgRequestToModel(req *admin.ListOrgsRequest) (*query.OrgSearchQueries, error) {

@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	obj_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
+	"github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func (s *Server) GetUserGrantByID(ctx context.Context, req *mgmt_pb.GetUserGrantByIDRequest) (*mgmt_pb.GetUserGrantByIDResponse, error) {

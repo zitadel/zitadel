@@ -3,9 +3,9 @@ package admin
 import (
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/grpc/text"
 	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/api/grpc/text"
 )
 
 func SetInitCustomTextToDomain(msg *admin_pb.SetDefaultInitMessageTextRequest) *domain.CustomMessageText {

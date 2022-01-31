@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	idp_grpc "github.com/caos/zitadel/v2/internal/api/grpc/idp"
+	object_pb "github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRequest) (*mgmt_pb.GetOrgIDPByIDResponse, error) {

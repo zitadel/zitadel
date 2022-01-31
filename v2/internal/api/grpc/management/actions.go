@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	action_grpc "github.com/caos/zitadel/internal/api/grpc/action"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	action_grpc "github.com/caos/zitadel/v2/internal/api/grpc/action"
+	obj_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func (s *Server) ListActions(ctx context.Context, req *mgmt_pb.ListActionsRequest) (*mgmt_pb.ListActionsResponse, error) {

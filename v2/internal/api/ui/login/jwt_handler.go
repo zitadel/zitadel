@@ -180,7 +180,7 @@ func (l *Login) redirectToJWTCallback(authReq *domain.AuthRequest) (string, erro
 		return "", err
 	}
 	q := redirect.Query()
-	q.Set(queryAuthRequestID, authReq.ID)
+	q.Set(QueryAuthRequestID, authReq.ID)
 	nonce, err := l.IDPConfigAesCrypto.Encrypt([]byte(authReq.AgentID))
 	if err != nil {
 		return "", err

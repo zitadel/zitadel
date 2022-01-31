@@ -4,7 +4,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/caos/zitadel/internal/domain"
-
 	"github.com/caos/zitadel/internal/query"
 	change_pb "github.com/caos/zitadel/pkg/grpc/change"
 	"github.com/caos/zitadel/pkg/grpc/message"

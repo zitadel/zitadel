@@ -63,19 +63,19 @@ type ConfigV2 struct {
 //}
 
 func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
-	//statikLoginFS, err := fs.NewWithNamespace("login")
-	//logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
-	//
-	//statikNotificationFS, err := fs.NewWithNamespace("notification")
-	//logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
+
+	statikNotificationFS, err := fs.NewWithNamespace("notification")
+	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
 
 	repo = &Queries{
-		iamID:           defaults.IamID,
-		eventstore:      es,
-		client:          sqlClient,
-		DefaultLanguage: defaults.DefaultLanguage,
-		//LoginDir:                            statikLoginFS,
-		//NotificationDir:                     statikNotificationFS,
+		iamID:                               defaults.IamID,
+		eventstore:                          es,
+		client:                              sqlClient,
+		DefaultLanguage:                     defaults.DefaultLanguage,
+		LoginDir:                            statikLoginFS,
+		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,

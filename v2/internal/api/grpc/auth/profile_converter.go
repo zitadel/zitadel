@@ -6,9 +6,9 @@ import (
 	"github.com/caos/logging"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func UpdateProfileToDomain(ctx context.Context, profile *auth.UpdateMyProfileRequest) *domain.Profile {

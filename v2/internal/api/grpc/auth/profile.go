@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	object_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func (s *Server) GetMyProfile(ctx context.Context, req *auth_pb.GetMyProfileRequest) (*auth_pb.GetMyProfileResponse, error) {

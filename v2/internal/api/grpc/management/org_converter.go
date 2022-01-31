@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	member_grpc "github.com/caos/zitadel/v2/internal/api/grpc/member"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	org_grpc "github.com/caos/zitadel/v2/internal/api/grpc/org"
 )
 
 func ListOrgDomainsRequestToModel(req *mgmt_pb.ListOrgDomainsRequest) (*query.OrgDomainSearchQueries, error) {

@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	"github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func ListUserGrantsRequestToQuery(ctx context.Context, req *mgmt_pb.ListUserGrantRequest) (*query.UserGrantsQueries, error) {

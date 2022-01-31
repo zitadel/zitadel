@@ -10,12 +10,10 @@ import (
 	"golang.org/x/text/language"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
@@ -23,14 +21,17 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	middlewareV2 "github.com/caos/zitadel/v2/internal/api/http/middleware"
+	"github.com/caos/zitadel/v2/internal/config/types"
 )
 
 type OPHandlerConfig struct {
 	OPConfig              *op.Config
 	StorageConfig         StorageConfig
-	UserAgentCookieConfig *middleware.UserAgentCookieConfig
+	UserAgentCookieConfig *middlewareV2.UserAgentCookieConfig
 	Cache                 *middleware.CacheConfig
-	Endpoints             *EndpointConfig
+	KeyConfig             *crypto.KeyConfig
+	CustomEndpoints       *EndpointConfig
 }
 
 type StorageConfig struct {
@@ -77,10 +78,10 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix string) op.OpenIDProvider {
-	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
+func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix, baseDomain string) op.OpenIDProvider {
+	cookieHandler, err := middlewareV2.NewUserAgentHandler(config.UserAgentCookieConfig, baseDomain, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
-	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, keyConfig.EncryptionConfig.EncryptionKeyID)
+	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, config.KeyConfig.EncryptionKeyID)
 	logging.Log("OIDC-ADvbv").OnError(err).Panic("cannot load OP crypto key")
 	cryptoKey := []byte(tokenKey)
 	if len(cryptoKey) != 32 {
@@ -102,7 +103,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 			http_utils.CopyHeadersToContext,
 		),
 	}
-	options = append(options, customEndpoints(config.Endpoints)...)
+	options = append(options, customEndpoints(config.CustomEndpoints)...)
 	provider, err := op.NewOpenIDProvider(
 		ctx,
 		config.OPConfig,

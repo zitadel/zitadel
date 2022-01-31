@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/auth"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func (s *Server) ListMyRefreshTokens(ctx context.Context, req *auth.ListMyRefreshTokensRequest) (*auth.ListMyRefreshTokensResponse, error) {

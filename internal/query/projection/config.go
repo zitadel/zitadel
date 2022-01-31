@@ -1,6 +1,8 @@
 package projection
 
-import "github.com/caos/zitadel/internal/config/types"
+import (
+	"github.com/caos/zitadel/internal/config/types"
+)
 
 type Config struct {
 	RequeueEvery     types.Duration
@@ -10,11 +12,6 @@ type Config struct {
 	CRDB             types.SQL
 	Customizations   map[string]CustomConfig
 	MaxIterators     int
-}
-
-type ConfigV2 struct {
-	Config
-	CRDB types.SQL2
 }
 
 type CustomConfig struct {

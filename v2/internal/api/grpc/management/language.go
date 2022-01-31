@@ -3,8 +3,8 @@ package management
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/grpc/text"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/v2/internal/api/grpc/text"
 )
 
 func (s *Server) GetSupportedLanguages(ctx context.Context, req *mgmt_pb.GetSupportedLanguagesRequest) (*mgmt_pb.GetSupportedLanguagesResponse, error) {

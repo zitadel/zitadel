@@ -5,12 +5,12 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	org_grpc "github.com/caos/zitadel/v2/internal/api/grpc/org"
 )
 
 func (s *Server) IsOrgUnique(ctx context.Context, req *admin_pb.IsOrgUniqueRequest) (*admin_pb.IsOrgUniqueResponse, error) {

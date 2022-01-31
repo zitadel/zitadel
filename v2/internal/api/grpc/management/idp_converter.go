@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	idp_grpc "github.com/caos/zitadel/v2/internal/api/grpc/idp"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func addOIDCIDPRequestToDomain(req *mgmt_pb.AddOrgOIDCIDPRequest) *domain.IDPConfig {

@@ -1,10 +1,10 @@
 package user
 
 import (
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	auth_req_model "github.com/caos/zitadel/internal/auth_request/model"
 	user_model "github.com/caos/zitadel/internal/user/model"
 	"github.com/caos/zitadel/pkg/grpc/user"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func UserSessionsToPb(sessions []*user_model.UserSessionView) []*user.Session {

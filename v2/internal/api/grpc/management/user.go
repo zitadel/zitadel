@@ -6,15 +6,15 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/authn"
-	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
-	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
-	"github.com/caos/zitadel/internal/api/grpc/metadata"
-	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	user_grpc "github.com/caos/zitadel/internal/api/grpc/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	"github.com/caos/zitadel/v2/internal/api/grpc/authn"
+	change_grpc "github.com/caos/zitadel/v2/internal/api/grpc/change"
+	idp_grpc "github.com/caos/zitadel/v2/internal/api/grpc/idp"
+	"github.com/caos/zitadel/v2/internal/api/grpc/metadata"
+	obj_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
+	user_grpc "github.com/caos/zitadel/v2/internal/api/grpc/user"
 )
 
 func (s *Server) GetUserByID(ctx context.Context, req *mgmt_pb.GetUserByIDRequest) (*mgmt_pb.GetUserByIDResponse, error) {

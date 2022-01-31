@@ -3,9 +3,9 @@ package admin
 import (
 	"testing"
 
-	"github.com/caos/zitadel/internal/test"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	"github.com/caos/zitadel/pkg/grpc/idp"
+	"github.com/caos/zitadel/v2/internal/test"
 )
 
 func Test_addOIDCIDPRequestToDomain(t *testing.T) {

@@ -3,10 +3,10 @@ package admin
 import (
 	"context"
 
-	features_grpc "github.com/caos/zitadel/internal/api/grpc/features"
-	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	features_grpc "github.com/caos/zitadel/v2/internal/api/grpc/features"
+	object_grpc "github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func (s *Server) GetDefaultFeatures(ctx context.Context, _ *admin_pb.GetDefaultFeaturesRequest) (*admin_pb.GetDefaultFeaturesResponse, error) {

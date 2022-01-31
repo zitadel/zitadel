@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	authn_grpc "github.com/caos/zitadel/internal/api/grpc/authn"
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	app_grpc "github.com/caos/zitadel/internal/api/grpc/project"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
+	authn_grpc "github.com/caos/zitadel/v2/internal/api/grpc/authn"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	app_grpc "github.com/caos/zitadel/v2/internal/api/grpc/project"
 )
 
 func ListAppsRequestToModel(req *mgmt_pb.ListAppsRequest) (*query.AppSearchQueries, error) {

@@ -3,10 +3,10 @@ package admin_test
 import (
 	"testing"
 
-	admin_grpc "github.com/caos/zitadel/internal/api/grpc/admin"
-	"github.com/caos/zitadel/internal/test"
-	"github.com/caos/zitadel/internal/view/model"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	admin_grpc "github.com/caos/zitadel/v2/internal/api/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/test"
+	"github.com/caos/zitadel/v2/internal/view/model"
 )
 
 func TestFailedEventsToPbFields(t *testing.T) {

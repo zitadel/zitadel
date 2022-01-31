@@ -3,11 +3,11 @@ package admin
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/grpc/object"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
+	policy_grpc "github.com/caos/zitadel/v2/internal/api/grpc/policy"
 )
 
 func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolicyRequest) (*admin_pb.GetOrgIAMPolicyResponse, error) {

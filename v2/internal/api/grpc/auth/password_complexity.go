@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	auth_pb "github.com/caos/zitadel/pkg/grpc/auth"
+	policy_grpc "github.com/caos/zitadel/v2/internal/api/grpc/policy"
 )
 
 func (s *Server) GetMyPasswordComplexityPolicy(ctx context.Context, _ *auth_pb.GetMyPasswordComplexityPolicyRequest) (*auth_pb.GetMyPasswordComplexityPolicyResponse, error) {

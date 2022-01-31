@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
-	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
+	member_grpc "github.com/caos/zitadel/v2/internal/api/grpc/member"
+	"github.com/caos/zitadel/v2/internal/api/grpc/object"
 )
 
 func listProjectGrantsRequestToModel(req *mgmt_pb.ListProjectGrantsRequest) (*query.ProjectGrantSearchQueries, error) {

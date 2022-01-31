@@ -10,11 +10,11 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
 
-	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
+	"github.com/caos/zitadel/v2/internal/api/http/middleware"
 )
 
 func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest, userID string) (_ op.AuthRequest, err error) {
