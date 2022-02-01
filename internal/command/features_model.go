@@ -31,7 +31,7 @@ type FeaturesWriteModel struct {
 	CustomTextMessage        bool
 	CustomTextLogin          bool
 	LockoutPolicy            bool
-	Actions                  bool
+	ActionsAllowed           domain.ActionsAllowed
 	MaxActions               int
 }
 
@@ -104,7 +104,13 @@ func (wm *FeaturesWriteModel) Reduce() error {
 				wm.LockoutPolicy = *e.LockoutPolicy
 			}
 			if e.Actions != nil {
-				wm.Actions = *e.Actions
+				wm.ActionsAllowed = domain.ActionsNotAllowed
+				if *e.Actions {
+					wm.ActionsAllowed = domain.ActionsAllowedUnlimited
+				}
+			}
+			if e.ActionsAllowed != nil {
+				wm.ActionsAllowed = *e.ActionsAllowed
 			}
 			if e.MaxActions != nil {
 				wm.MaxActions = *e.MaxActions

@@ -309,7 +309,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
 					LockoutPolicy:            false,
-					Actions:                  false,
+					ActionsAllowed:           domain.ActionsNotAllowed,
 				},
 			},
 			res: res{
@@ -514,7 +514,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
-					Actions:                  false,
+					ActionsAllowed:           domain.ActionsNotAllowed,
 				},
 			},
 			res: res{
@@ -729,7 +729,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
-					Actions:                  false,
+					ActionsAllowed:           domain.ActionsNotAllowed,
 				},
 			},
 			res: res{
@@ -954,7 +954,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
-					Actions:                  false,
+					ActionsAllowed:           domain.ActionsNotAllowed,
 				},
 			},
 			res: res{
@@ -1248,7 +1248,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					MetadataUser:             false,
 					PrivacyPolicy:            false,
 					LockoutPolicy:            false,
-					Actions:                  false,
+					ActionsAllowed:           domain.ActionsNotAllowed,
 				},
 			},
 			res: res{
@@ -1439,7 +1439,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					PrivacyPolicy:            false,
 					MetadataUser:             false,
 					LockoutPolicy:            false,
-					Actions:                  false,
+					ActionsAllowed:           domain.ActionsNotAllowed,
 				},
 			},
 			res: res{

@@ -31,7 +31,8 @@ message Features {
   bool custom_text_login = 20;
   bool lockout_policy = 21;
   bool actions = 22;
-  int32 max_actions = 23;
+  ActionsAllowed actions_allowed = 23;
+  int32 max_actions = 24;
 }
 
 message FeatureTier {
@@ -47,4 +48,10 @@ enum FeaturesState {
   FEATURES_STATE_ACTION_REQUIRED = 1;
   FEATURES_STATE_CANCELED = 2;
   FEATURES_STATE_GRANDFATHERED = 3;
+}
+
+enum ActionsAllowed {
+  ACTIONS_ALLOWED_NOT_ALLOWED = 0;
+  ACTIONS_ALLOWED_MAX = 1;
+  ACTIONS_ALLOWED_UNLIMITED = 2;
 }

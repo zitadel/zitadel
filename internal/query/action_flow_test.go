@@ -31,6 +31,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script,`+
@@ -54,6 +55,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script,`+
@@ -67,6 +69,7 @@ func Test_FlowPrepares(t *testing.T) {
 						"creation_date",
 						"change_date",
 						"resource_owner",
+						"state",
 						"sequence",
 						"name",
 						"script",
@@ -80,6 +83,7 @@ func Test_FlowPrepares(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
+							domain.ActionStateActive,
 							uint64(20211115),
 							"action-name",
 							"script",
@@ -99,6 +103,7 @@ func Test_FlowPrepares(t *testing.T) {
 							CreationDate:  testNow,
 							ChangeDate:    testNow,
 							ResourceOwner: "ro",
+							State:         domain.ActionStateActive,
 							Sequence:      20211115,
 							Name:          "action-name",
 							Script:        "script",
@@ -116,6 +121,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script,`+
@@ -129,6 +135,7 @@ func Test_FlowPrepares(t *testing.T) {
 						"creation_date",
 						"change_date",
 						"resource_owner",
+						"state",
 						"sequence",
 						"name",
 						"script",
@@ -142,6 +149,7 @@ func Test_FlowPrepares(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
+							domain.ActionStateActive,
 							uint64(20211115),
 							"action-name-pre",
 							"script",
@@ -154,6 +162,7 @@ func Test_FlowPrepares(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
+							domain.ActionStateActive,
 							uint64(20211115),
 							"action-name-post",
 							"script",
@@ -173,6 +182,7 @@ func Test_FlowPrepares(t *testing.T) {
 							CreationDate:  testNow,
 							ChangeDate:    testNow,
 							ResourceOwner: "ro",
+							State:         domain.ActionStateActive,
 							Sequence:      20211115,
 							Name:          "action-name-pre",
 							Script:        "script",
@@ -184,6 +194,7 @@ func Test_FlowPrepares(t *testing.T) {
 							CreationDate:  testNow,
 							ChangeDate:    testNow,
 							ResourceOwner: "ro",
+							State:         domain.ActionStateActive,
 							Sequence:      20211115,
 							Name:          "action-name-post",
 							Script:        "script",
@@ -201,6 +212,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script,`+
@@ -214,6 +226,7 @@ func Test_FlowPrepares(t *testing.T) {
 						"creation_date",
 						"change_date",
 						"resource_owner",
+						"state",
 						"sequence",
 						"name",
 						"script",
@@ -223,6 +236,7 @@ func Test_FlowPrepares(t *testing.T) {
 					},
 					[][]driver.Value{
 						{
+							nil,
 							nil,
 							nil,
 							nil,
@@ -251,6 +265,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script,`+
@@ -279,6 +294,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script`+
@@ -299,6 +315,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script`+
@@ -309,6 +326,7 @@ func Test_FlowPrepares(t *testing.T) {
 						"creation_date",
 						"change_date",
 						"resource_owner",
+						"state",
 						"sequence",
 						"name",
 						"script",
@@ -319,6 +337,7 @@ func Test_FlowPrepares(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
+							domain.AddressStateActive,
 							uint64(20211115),
 							"action-name",
 							"script",
@@ -332,6 +351,7 @@ func Test_FlowPrepares(t *testing.T) {
 					CreationDate:  testNow,
 					ChangeDate:    testNow,
 					ResourceOwner: "ro",
+					State:         domain.ActionStateActive,
 					Sequence:      20211115,
 					Name:          "action-name",
 					Script:        "script",
@@ -347,6 +367,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script`+
@@ -357,6 +378,7 @@ func Test_FlowPrepares(t *testing.T) {
 						"creation_date",
 						"change_date",
 						"resource_owner",
+						"state",
 						"sequence",
 						"name",
 						"script",
@@ -367,6 +389,7 @@ func Test_FlowPrepares(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
+							domain.AddressStateActive,
 							uint64(20211115),
 							"action-name-1",
 							"script",
@@ -376,6 +399,7 @@ func Test_FlowPrepares(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
+							domain.ActionStateActive,
 							uint64(20211115),
 							"action-name-2",
 							"script",
@@ -389,6 +413,7 @@ func Test_FlowPrepares(t *testing.T) {
 					CreationDate:  testNow,
 					ChangeDate:    testNow,
 					ResourceOwner: "ro",
+					State:         domain.ActionStateActive,
 					Sequence:      20211115,
 					Name:          "action-name-1",
 					Script:        "script",
@@ -398,6 +423,7 @@ func Test_FlowPrepares(t *testing.T) {
 					CreationDate:  testNow,
 					ChangeDate:    testNow,
 					ResourceOwner: "ro",
+					State:         domain.ActionStateActive,
 					Sequence:      20211115,
 					Name:          "action-name-2",
 					Script:        "script",
@@ -413,6 +439,7 @@ func Test_FlowPrepares(t *testing.T) {
 						` zitadel.projections.actions.creation_date,`+
 						` zitadel.projections.actions.change_date,`+
 						` zitadel.projections.actions.resource_owner,`+
+						` zitadel.projections.actions.action_state,`+
 						` zitadel.projections.actions.sequence,`+
 						` zitadel.projections.actions.name,`+
 						` zitadel.projections.actions.script`+

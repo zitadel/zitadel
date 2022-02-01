@@ -5,6 +5,8 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/domain"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -82,7 +84,7 @@ const (
 	FeatureCustomTextMessageCol        = "custom_text_message"
 	FeatureCustomTextLoginCol          = "custom_text_login"
 	FeatureLockoutPolicyCol            = "lockout_policy"
-	FeatureActionsCol                  = "actions"
+	FeatureActionsAllowedCol           = "actions_allowed"
 	FeatureMaxActionsCol               = "max_actions"
 )
 
@@ -174,7 +176,14 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 		cols = append(cols, handler.NewCol(FeatureLockoutPolicyCol, *featureEvent.LockoutPolicy))
 	}
 	if featureEvent.Actions != nil {
-		cols = append(cols, handler.NewCol(FeatureActionsCol, *featureEvent.Actions))
+		actionsAllowed := domain.ActionsNotAllowed
+		if *featureEvent.Actions {
+			actionsAllowed = domain.ActionsAllowedUnlimited
+		}
+		cols = append(cols, handler.NewCol(FeatureActionsAllowedCol, actionsAllowed))
+	}
+	if featureEvent.ActionsAllowed != nil {
+		cols = append(cols, handler.NewCol(FeatureActionsAllowedCol, *featureEvent.ActionsAllowed))
 	}
 	if featureEvent.MaxActions != nil {
 		cols = append(cols, handler.NewCol(FeatureMaxActionsCol, *featureEvent.MaxActions))

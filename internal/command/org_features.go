@@ -45,7 +45,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.CustomTextMessage,
 		features.CustomTextLogin,
 		features.LockoutPolicy,
-		features.Actions,
+		features.ActionsAllowed,
 		features.MaxActions,
 	)
 	if !hasChanged {
@@ -178,7 +178,7 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeOrgUserMetadatas...)
 		}
 	}
-	if !features.Actions {
+	if features.ActionsAllowed == domain.ActionsNotAllowed {
 		removeOrgActions, err := c.removeActionsFromOrg(ctx, orgID)
 		if err != nil {
 			return nil, err
@@ -187,12 +187,14 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeOrgActions...)
 		}
 	}
-	deactivateActions, err := c.deactivateNotAllowedActionsFromOrg(ctx, orgID, features.MaxActions)
-	if err != nil {
-		return nil, err
-	}
-	if len(deactivateActions) > 0 {
-		events = append(events, deactivateActions...)
+	if features.ActionsAllowed == domain.ActionsMaxAllowed {
+		deactivateActions, err := c.deactivateNotAllowedActionsFromOrg(ctx, orgID, features.MaxActions)
+		if err != nil {
+			return nil, err
+		}
+		if len(deactivateActions) > 0 {
+			events = append(events, deactivateActions...)
+		}
 	}
 	return events, nil
 }

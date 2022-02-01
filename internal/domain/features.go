@@ -54,7 +54,7 @@ type Features struct {
 	PrivacyPolicy            bool
 	MetadataUser             bool
 	LockoutPolicy            bool
-	Actions                  bool
+	ActionsAllowed           ActionsAllowed
 	MaxActions               int
 }
 

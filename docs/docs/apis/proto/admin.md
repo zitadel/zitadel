@@ -2564,6 +2564,7 @@ This is an empty request
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
 | actions |  bool | - |  |
+| actions_allowed |  zitadel.features.v1.ActionsAllowed | - |  |
 | max_actions |  int32 | - |  |
 
 
@@ -2755,6 +2756,7 @@ This is an empty request
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
 | actions |  bool | - |  |
+| actions_allowed |  zitadel.features.v1.ActionsAllowed | - |  |
 | max_actions |  int32 | - |  |
 
 

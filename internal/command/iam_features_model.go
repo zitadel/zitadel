@@ -72,8 +72,8 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	metadataUser,
 	customTextMessage,
 	customTextLogin,
-	lockoutPolicy,
-	actions bool,
+	lockoutPolicy bool,
+	actionsAllowed domain.ActionsAllowed,
 	maxActions int,
 ) (*iam.FeaturesSetEvent, bool) {
 
@@ -139,8 +139,8 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if wm.LockoutPolicy != lockoutPolicy {
 		changes = append(changes, features.ChangeLockoutPolicy(lockoutPolicy))
 	}
-	if wm.Actions != actions {
-		changes = append(changes, features.ChangeActions(actions))
+	if wm.ActionsAllowed != actionsAllowed {
+		changes = append(changes, features.ChangeActionsAllowed(actionsAllowed))
 	}
 	if wm.MaxActions != maxActions {
 		changes = append(changes, features.ChangeMaxActions(maxActions))

@@ -60,6 +60,10 @@ func (s *Server) ResetOrgFeatures(ctx context.Context, req *admin_pb.ResetOrgFea
 }
 
 func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) *domain.Features {
+	actionsAllowed := features_grpc.ActionsAllowedToDomain(req.ActionsAllowed)
+	if req.Actions {
+		actionsAllowed = domain.ActionsAllowedUnlimited
+	}
 	return &domain.Features{
 		TierName:                 req.TierName,
 		TierDescription:          req.Description,
@@ -79,12 +83,16 @@ func setDefaultFeaturesRequestToDomain(req *admin_pb.SetDefaultFeaturesRequest) 
 		CustomTextLogin:          req.CustomTextLogin || req.CustomText,
 		CustomTextMessage:        req.CustomTextMessage,
 		LockoutPolicy:            req.LockoutPolicy,
-		Actions:                  req.Actions,
+		ActionsAllowed:           actionsAllowed,
 		MaxActions:               int(req.MaxActions),
 	}
 }
 
 func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.Features {
+	actionsAllowed := features_grpc.ActionsAllowedToDomain(req.ActionsAllowed)
+	if req.Actions {
+		actionsAllowed = domain.ActionsAllowedUnlimited
+	}
 	return &domain.Features{
 		TierName:                 req.TierName,
 		TierDescription:          req.Description,
@@ -106,7 +114,7 @@ func setOrgFeaturesRequestToDomain(req *admin_pb.SetOrgFeaturesRequest) *domain.
 		CustomTextLogin:          req.CustomTextLogin || req.CustomText,
 		CustomTextMessage:        req.CustomTextMessage,
 		LockoutPolicy:            req.LockoutPolicy,
-		Actions:                  req.Actions,
+		ActionsAllowed:           actionsAllowed,
 		MaxActions:               int(req.MaxActions),
 	}
 }

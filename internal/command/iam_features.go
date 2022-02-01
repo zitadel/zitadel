@@ -55,7 +55,7 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.CustomTextMessage,
 		features.CustomTextLogin,
 		features.LockoutPolicy,
-		features.Actions,
+		features.ActionsAllowed,
 		features.MaxActions,
 	)
 	if !hasChanged {
