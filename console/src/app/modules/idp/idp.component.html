@@ -75,8 +75,8 @@
               <cnsl-label>{{ 'IDP.CLIENTID' | translate }}</cnsl-label>
               <input cnslInput formControlName="clientId" />
             </cnsl-form-field>
-            <mat-checkbox class="idp-desc" [(ngModel)]="showIdSecretSection" [disabled]="(canWrite | async) === false"
-              [ngModelOptions]="{standalone: true}">
+            <mat-checkbox class="idp-desc cnsl-secondary-text" [(ngModel)]="showIdSecretSection"
+              [disabled]="(canWrite | async) === false" [ngModelOptions]="{standalone: true}">
               Update Client Secret
             </mat-checkbox>
             <cnsl-form-field appearance="outline" class="formfield" *ngIf="showIdSecretSection">

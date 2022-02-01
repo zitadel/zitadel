@@ -9,7 +9,7 @@
         <div class="step card">
           <ng-content select="[icon]"></ng-content>
           <h6>{{ link.i18nTitle | translate }}</h6>
-          <p>{{link.i18nDesc | translate}}</p>
+          <p class="cnsl-secondary-text">{{link.i18nDesc | translate}}</p>
           <span class="fill-space"></span>
           <a *ngIf="link.routerLink" [routerLink]="link.routerLink" color="primary" mat-stroked-button>
             {{'ACTIONS.CONTINUE' | translate}}
@@ -22,7 +22,7 @@
       <div class="step card" *ngIf="!link.withRole">
         <i *ngIf="link.iconClasses" class="{{link.iconClasses}}"></i>
         <h6>{{ link.i18nTitle | translate }}</h6>
-        <p>{{link.i18nDesc | translate}}</p>
+        <p class="cnsl-secondary-text">{{link.i18nDesc | translate}}</p>
         <span class="fill-space"></span>
         <a *ngIf="link.routerLink" [routerLink]="link.routerLink" mat-stroked-button>
           {{'ACTIONS.CONTINUE' | translate}}

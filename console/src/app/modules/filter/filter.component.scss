@@ -69,12 +69,6 @@
           background-color: if($is-dark-theme, #00000020, #ffffff20);
           margin: 0 -0.5rem;
 
-          .filter-value-label {
-            margin-right: 1rem;
-            font-size: 14px;
-            color: var(--grey);
-          }
-
           .filter-select-method {
             min-width: 100px;
             margin-right: 0.5rem;

@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>
   <span class="title">{{'FEATURES.TIER.DETAILS' | translate}} {{data?.number}}</span>
 </h1>
-<p class="desc">{{'FEATURES.TIER.DETAILS_DESC' | translate}}</p>
+<p class="desc cnsl-secondary-text">{{'FEATURES.TIER.DETAILS_DESC' | translate}}</p>
 <mat-spinner class="spinner" *ngIf="stripeLoading" diameter="20"></mat-spinner>
 
 <div mat-dialog-content>
@@ -40,7 +40,7 @@
               <img height="20px" width="30px" style="margin-right: 1rem; border-radius: 2px; vertical-align: middle;"
                 src="../../../../assets/flags/{{country.isoCode.toLowerCase()}}.png" />
             </div>
-            {{country.isoCode}} <span class="lighter">|&nbsp;{{country.name}}</span>
+            {{country.isoCode}} <span class="lighter cnsl-secondary-text">|&nbsp;{{country.name}}</span>
           </div>
         </mat-option>
       </mat-select>

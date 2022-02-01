@@ -11,6 +11,7 @@
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
+  $secondary-text: map-get($foreground, secondary-text);
 
   .footer-wrapper {
     padding: 2rem;
@@ -36,11 +37,11 @@
         margin: 1rem 0;
 
         a {
-          color: var(--grey);
           display: flex;
           align-items: center;
           text-decoration: none;
           margin: 0 0.25rem;
+          color: $secondary-text;
 
           i {
             font-size: 1.875rem;

@@ -17,7 +17,8 @@
       <mat-select [(ngModel)]="locale" name="locale" (selectionChange)="changeLocale($event)">
         <mat-option *ngFor="let loc of LOCALES" [value]="loc">
           <div class="centerline">
-            <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
+            <span>{{loc}} <span class="lighter cnsl-secondary-text">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc |
+                translate }}</span></span>
           </div>
         </mat-option>
       </mat-select>

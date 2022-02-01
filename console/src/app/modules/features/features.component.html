@@ -12,7 +12,7 @@
     {{'FEATURES.TIER.QUESTIONS' | translate}} <a href="mailto:support@zitadel.ch">support@zitadel.ch</a>.</p>
 
   <div class="detail">
-    <p class="title">{{'FEATURES.TIER.NAME' | translate}}</p>
+    <p class="title cnsl-secondary-text">{{'FEATURES.TIER.NAME' | translate}}</p>
     <p class="center">{{features?.tier?.name}}
       <a class="ext" href="https://zitadel.ch/pricing" target="_blank">
         <i class="las la-external-link-alt"></i>
@@ -23,7 +23,7 @@
   <ng-container *ngIf="serviceType === FeatureServiceType.MGMT">
     <mat-spinner class="spinner" diameter="20" *ngIf="customerLoading || stripeLoading"></mat-spinner>
     <div class="detail" *ngIf="stripeCustomer || stripeCustomer === null">
-      <p class="title">{{'FEATURES.TIER.DETAILS' | translate}}
+      <p class="title cnsl-secondary-text">{{'FEATURES.TIER.DETAILS' | translate}}
         <a (click)="setCustomer()">{{'ACTIONS.EDIT' | translate}}</a>
       </p>
       <p>{{stripeCustomer?.contact}}</p>
@@ -64,7 +64,7 @@
         translate}}</span>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.LOGINPOLICY' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.LOGINPOLICY' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar green">
@@ -144,7 +144,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.PASSWORD' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.PASSWORD' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar yellow">
@@ -174,7 +174,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.LABELPOLICY' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.LABELPOLICY' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar blue">
@@ -202,7 +202,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.DOMAIN' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.DOMAIN' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar purple">
@@ -216,7 +216,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.TEXTSANDLINKS' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.TEXTSANDLINKS' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar red">
@@ -257,7 +257,7 @@
       </mat-slide-toggle>
     </div>
 
-    <p class="feature-section">{{'FEATURES.HEADERS.METADATA' | translate}}</p>
+    <p class="feature-section cnsl-secondary-text">{{'FEATURES.HEADERS.METADATA' | translate}}</p>
 
     <div class="row">
       <div class="featureavatar blue">

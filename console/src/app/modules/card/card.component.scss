@@ -1,7 +1,7 @@
 .card {
   margin: 1rem 0;
   padding: 1.5rem;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   padding-top: 1rem;
   min-width: 300px;
 
@@ -26,7 +26,7 @@
         font-weight: 400;
         font-size: 16px;
         text-transform: uppercase;
-        letter-spacing: .05em;
+        letter-spacing: 0.05em;
         text-overflow: ellipsis;
         overflow: hidden;
       }
@@ -36,13 +36,12 @@
       }
 
       .button {
-        margin-right: -.5rem;
+        margin-right: -0.5rem;
       }
     }
 
     .desc {
-      font-size: .9rem;
-      color: var(--grey);
+      font-size: 0.9rem;
     }
   }
 
@@ -57,7 +56,7 @@
   }
 
   @media only screen and (max-width: 500px) {
-    margin: .5rem 0;
+    margin: 0.5rem 0;
     padding: 1rem;
   }
 }

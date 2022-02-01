@@ -10,7 +10,7 @@
         <mat-icon *ngIf="expanded">keyboard_arrow_up</mat-icon>
       </button>
     </div>
-    <p *ngIf="description" class="desc">{{description}}</p>
+    <p *ngIf="description" class="desc cnsl-secondary-text">{{description}}</p>
   </div>
   <div class="card-content" *ngIf="expanded" [@openClose]="animate">
     <ng-content></ng-content>

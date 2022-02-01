@@ -11,7 +11,7 @@
       <p class="newer-title" *ngIf="newerVersionExists">{{'POLICY.LOGIN_TEXTS.NEWERVERSIONEXISTS' | translate}}</p>
       <p *ngIf="newerPolicyChangeDate && newerVersionExists">{{'POLICY.LOGIN_TEXTS.CHANGEDATE' | translate}}:
         {{newerPolicyChangeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm:ss'}}</p>
-      <p class="gray" *ngIf="currentPolicyChangeDate">{{'POLICY.LOGIN_TEXTS.CURRENTDATE' | translate}}:
+      <p class="cnsl-secondary-text" *ngIf="currentPolicyChangeDate">{{'POLICY.LOGIN_TEXTS.CURRENTDATE' | translate}}:
         {{currentPolicyChangeDate | timestampToDate | localizedDate: 'dd. MMMM YYYY, HH:mm:ss'}}</p>
     </div>
     <button [disabled]="!newerVersionExists" color="primary" mat-raised-button (click)="loadData()">
@@ -33,7 +33,8 @@
       <mat-select formControlName="locale" name="locale">
         <mat-option *ngFor="let loc of LOCALES" [value]="loc">
           <div class="centerline">
-            <span>{{loc}} <span class="lighter">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc | translate }}</span></span>
+            <span>{{loc}} <span class="lighter cnsl-secondary-text">|&nbsp;{{'POLICY.LOGIN_TEXTS.LOCALES.'+loc |
+                translate }}</span></span>
           </div>
         </mat-option>
       </mat-select>

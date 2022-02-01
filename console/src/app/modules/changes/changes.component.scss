@@ -71,15 +71,6 @@
             padding: 0.25rem 0;
             cursor: default;
 
-            .icon {
-              width: 32px;
-              display: inline-block;
-              height: 1.2rem;
-              line-height: 1.2rem;
-              font-size: 1.2rem;
-              color: var(--grey);
-            }
-
             span {
               flex: 1;
               font-weight: 500;
@@ -117,8 +108,7 @@
       flex-direction: column;
 
       span {
-        color: var(--grey);
-        font-size: 14px;
+        font-size: 13px;
       }
     }
   }
