@@ -359,3 +359,21 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 	}
 	return events, nil
 }
+
+func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*domain.Features, error) {
+	existingFeatures := NewOrgFeaturesWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	if err != nil {
+		return nil, err
+	}
+	if existingFeatures.State != domain.FeaturesStateUnspecified && existingFeatures.State != domain.FeaturesStateRemoved {
+		return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
+	}
+
+	existingIAMFeatures := NewIAMFeaturesWriteModel()
+	err = c.eventstore.FilterToQueryReducer(ctx, existingIAMFeatures)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToFeatures(&existingIAMFeatures.FeaturesWriteModel), nil
+}

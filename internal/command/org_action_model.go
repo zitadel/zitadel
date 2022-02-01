@@ -159,7 +159,7 @@ func (wm *ActionExistsModel) Query() *eventstore.SearchQueryBuilder {
 type ActionsListByOrgModel struct {
 	eventstore.WriteModel
 
-	Actions map[string]ActionWriteModel
+	Actions map[string]*ActionWriteModel
 }
 
 func NewActionsListByOrgModel(resourceOwner string) *ActionsListByOrgModel {
@@ -167,7 +167,7 @@ func NewActionsListByOrgModel(resourceOwner string) *ActionsListByOrgModel {
 		WriteModel: eventstore.WriteModel{
 			ResourceOwner: resourceOwner,
 		},
-		Actions: make(map[string]ActionWriteModel),
+		Actions: make(map[string]*ActionWriteModel),
 	}
 }
 
@@ -175,7 +175,7 @@ func (wm *ActionsListByOrgModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *action.AddedEvent:
-			wm.Actions[e.Aggregate().ID] = ActionWriteModel{
+			wm.Actions[e.Aggregate().ID] = &ActionWriteModel{
 				WriteModel: eventstore.WriteModel{
 					AggregateID: e.Aggregate().ID,
 					ChangeDate:  e.CreationDate(),
@@ -184,11 +184,9 @@ func (wm *ActionsListByOrgModel) Reduce() error {
 				State: domain.ActionStateActive,
 			}
 		case *action.DeactivatedEvent:
-			a := wm.Actions[e.Aggregate().ID]
-			a.State = domain.ActionStateInactive
+			wm.Actions[e.Aggregate().ID].State = domain.ActionStateInactive
 		case *action.ReactivatedEvent:
-			a := wm.Actions[e.Aggregate().ID]
-			a.State = domain.ActionStateActive
+			wm.Actions[e.Aggregate().ID].State = domain.ActionStateActive
 		case *action.RemovedEvent:
 			delete(wm.Actions, e.Aggregate().ID)
 		}
@@ -202,6 +200,8 @@ func (wm *ActionsListByOrgModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(action.AggregateType).
 		EventTypes(action.AddedEventType,
+			action.DeactivatedEventType,
+			action.ReactivatedEventType,
 			action.RemovedEventType).
 		Builder()
 }

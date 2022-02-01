@@ -2758,6 +2758,30 @@ Change JWT identity provider configuration of the organisation
     PUT: /actions/{id}
 
 
+### DeactivateAction
+
+> **rpc** DeactivateAction([DeactivateActionRequest](#deactivateactionrequest))
+[DeactivateActionResponse](#deactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_deactivate
+
+
+### ReactivateAction
+
+> **rpc** ReactivateAction([ReactivateActionRequest](#reactivateactionrequest))
+[ReactivateActionResponse](#reactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_reactivate
+
+
 ### DeleteAction
 
 > **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
