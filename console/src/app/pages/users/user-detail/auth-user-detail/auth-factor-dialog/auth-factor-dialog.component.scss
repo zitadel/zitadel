@@ -1,12 +1,12 @@
 .type-selection {
   display: flex;
-  margin: 0 -.5rem;
+  margin: 0 -0.5rem;
 
   .otp-btn,
   .u2f-btn {
     flex: 1;
     min-height: 100px;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,13 +20,12 @@
   }
 
   button {
-    margin: .5rem;
+    margin: 0.5rem;
   }
 }
 
 .desc {
   font-size: 14px;
-  color: var(--grey);
 }
 
 .otp {
@@ -49,10 +48,10 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   button {
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 }

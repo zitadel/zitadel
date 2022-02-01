@@ -8,7 +8,7 @@
           <i class="las la-info-circle"></i>
         </a>
       </div>
-      <p class="sub">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
+      <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTION' | translate }}</p>
 
       <cnsl-user-table [type]="Type.TYPE_HUMAN" [disabled]="(['user.write$'] | hasRole | async) === false">
       </cnsl-user-table>
@@ -16,7 +16,7 @@
 
     <ng-container *ngSwitchCase="Type.TYPE_MACHINE">
       <h1>{{ 'USER.PAGES.LISTMACHINE' | translate }}</h1>
-      <p class="sub">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
+      <p class="user-list-sub cnsl-secondary-text">{{ 'USER.PAGES.DESCRIPTIONMACHINE' | translate }}</p>
 
       <cnsl-user-table [type]="Type.TYPE_MACHINE" [disabled]="(['user.write$'] | hasRole | async) === false">
       </cnsl-user-table>

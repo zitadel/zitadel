@@ -6,7 +6,6 @@
   }
 
   .desc {
-    color: var(--grey);
     margin: 1rem 0 0 0;
     font-size: 14px;
   }
@@ -41,18 +40,6 @@
 
     .role-row {
       min-width: 100px;
-    }
-
-    .date-block {
-      margin: 0.5rem 0;
-      display: block;
-      min-width: 120px;
-
-      .date-sub {
-        font-size: 13px;
-        color: var(--grey);
-        display: block;
-      }
     }
   }
 }

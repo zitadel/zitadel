@@ -1,7 +1,7 @@
 <div class="max-width-container">
   <div class="project-grants-wrapper">
     <h1>{{'PROJECT.GRANT.TITLE' | translate}}</h1>
-    <p class="desc">{{'PROJECT.GRANT.DESCRIPTION' | translate}}</p>
+    <p class="desc cnsl-secondary-text">{{'PROJECT.GRANT.DESCRIPTION' | translate}}</p>
 
     <div class="project-grants">
       <cnsl-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"

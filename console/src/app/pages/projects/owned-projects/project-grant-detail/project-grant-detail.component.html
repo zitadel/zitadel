@@ -1,7 +1,7 @@
 <cnsl-detail-layout [backRouterLink]="[ '/projects', projectid, 'projectgrants']"
   title="{{ 'PROJECT.GRANT.DETAIL.TITLE' | translate }}">
   <p class="subinfo" sub>
-    <span class="label">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</span>
+    <span class="cnsl-secondary-text">{{ 'PROJECT.GRANT.DETAIL.DESC' | translate }}</span>
     <a mat-icon-button href="https://docs.zitadel.ch/docs/concepts/structure/projects#granted-organizations"
       target="_blank">
       <i class="las la-info-circle"></i>
@@ -10,17 +10,17 @@
   <div class="master-row">
     <div class="left-col">
       <div class="row">
-        <span class="first">{{'PROJECT.GRANT.DETAIL.PROJECTNAME' | translate}}</span>
+        <span class="cnsl-secondary-text">{{'PROJECT.GRANT.DETAIL.PROJECTNAME' | translate}}</span>
         <span class="fill-space"></span>
         <span>{{grant?.projectName}}</span>
       </div>
       <div class="row">
-        <span class="first">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
+        <span class="cnsl-secondary-text">{{'PROJECT.GRANT.DETAIL.RESOURCEOWNER' | translate}}</span>
         <span class="fill-space"></span>
         <span>{{grant?.projectOwnerName}}</span>
       </div>
       <div class="row">
-        <span class="first">{{'PROJECT.GRANT.DETAIL.GRANTEDORG' | translate}}</span>
+        <span class="cnsl-secondary-text">{{'PROJECT.GRANT.DETAIL.GRANTEDORG' | translate}}</span>
         <span class="fill-space"></span>
         <span>{{grant?.grantedOrgName}}</span>
       </div>

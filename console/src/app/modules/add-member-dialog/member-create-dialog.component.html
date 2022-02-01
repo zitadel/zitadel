@@ -1,10 +1,9 @@
 <h1 mat-dialog-title>
   <span class="title">{{'MEMBER.ADD' | translate}}</span>
 </h1>
-<p class="desc"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
+<p class="desc cnsl-secondary-text"> {{'ORG_DETAIL.MEMBER.ADDDESCRIPTION' | translate}}</p>
 
 <div mat-dialog-content>
-  <!-- if no context -->
   <ng-container *ngIf="showCreationTypeSelector">
     <cnsl-form-field class="full-width" appearance="outline">
       <cnsl-label>{{ 'MEMBER.CREATIONTYPE' | translate }}</cnsl-label>
@@ -23,7 +22,6 @@
       </cnsl-search-project-autocomplete>
     </ng-container>
   </ng-container>
-  <!-- if no context end -->
 
   <cnsl-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $any($event)">
   </cnsl-search-user-autocomplete>

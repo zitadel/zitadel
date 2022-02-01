@@ -9,7 +9,8 @@
       (click)="navigateToProject(type, item, $event)"
       [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
       <div class="text-part">
-        <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' |
+        <span *ngIf="item.details && item.details.changeDate"
+          class="top cnsl-secondary-text">{{'PROJECT.PAGES.LASTMODIFIED' |
           translate}}
           {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
         <div class="name-row">
@@ -36,7 +37,8 @@
       (click)="navigateToProject(type, $any(item), $event)"
       [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
       <div class="text-part">
-        <span *ngIf="item.details && item.details.changeDate" class="top">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
+        <span *ngIf="item.details && item.details.changeDate"
+          class="top cnsl-secondary-text">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
           {{ item.details.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm' }}</span>
         <div class="name-row">
           <span class="name" *ngIf="$any(item).name">{{ $any(item).name }}</span>
@@ -48,7 +50,8 @@
         </div>
 
         <span class="owning-org" *ngIf="$any(item).projectOwnerName">{{$any(item).projectOwnerName}}</span>
-        <span *ngIf="item.details && item.details.creationDate" class="created">{{'PROJECT.PAGES.CREATEDON' |
+        <span *ngIf="item.details && item.details.creationDate"
+          class="created cnsl-secondary-text">{{'PROJECT.PAGES.CREATEDON' |
           translate}}
           {{
           item.details.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM, HH:mm'
@@ -62,7 +65,8 @@
       <template [ngTemplateOutlet]="toggleButton" [ngTemplateOutletContext]="{key: item}"></template>
     </div>
 
-    <p class="n-items" *ngIf="(loading$ | async) === false && projectList.length === 0">{{'PROJECT.PAGES.NOITEMS' |
+    <p class="n-items cnsl-secondary-text" *ngIf="(loading$ | async) === false && projectList.length === 0">
+      {{'PROJECT.PAGES.NOITEMS' |
       translate}}</p>
 
     <ng-container *ngIf="type === ProjectType.PROJECTTYPE_OWNED">

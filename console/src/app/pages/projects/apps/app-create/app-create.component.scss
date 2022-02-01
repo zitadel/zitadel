@@ -5,7 +5,6 @@ h1 {
 
 p.desc {
   font-size: 14px;
-  color: var(--grey);
 }
 
 .proswitch {
@@ -39,7 +38,7 @@ p.desc {
 }
 
 .margin-right {
-  margin-right: .5rem;
+  margin-right: 0.5rem;
 }
 
 .full-width {
@@ -57,12 +56,11 @@ p.desc {
   .step-title {
     font-size: 1rem;
     text-transform: uppercase;
-    letter-spacing: .05em;
+    letter-spacing: 0.05em;
   }
 
   .step-description {
-    font-size: .9rem;
-    color: var(--grey);
+    font-size: 0.9rem;
   }
 }
 
@@ -71,7 +69,7 @@ p.desc {
   flex-direction: column;
 
   .checkbox {
-    margin: .5rem 0;
+    margin: 0.5rem 0;
   }
 }
 
@@ -81,9 +79,8 @@ p.desc {
 
   .left,
   .right {
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
     font-size: 14px;
-    color: var(--grey);
   }
 }
 
@@ -91,13 +88,13 @@ p.desc {
   button[mat-stroked-button] {
     float: left;
     margin-top: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
   }
 
   button[mat-raised-button] {
     float: right;
     margin-top: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     min-width: 100px;
   }
 }
@@ -105,14 +102,14 @@ p.desc {
 .dev {
   .content {
     display: flex;
-    margin: 0 -.5rem;
+    margin: 0 -0.5rem;
     flex-wrap: wrap;
     flex-direction: row;
 
     .formfield {
       flex: 1;
       box-sizing: border-box;
-      margin: 0 .5rem;
+      margin: 0 0.5rem;
 
       &.full-width {
         flex-basis: 80%;
@@ -123,7 +120,7 @@ p.desc {
   .continue-button {
     margin-top: 3rem;
     display: block;
-    padding: .5rem 4rem;
+    padding: 0.5rem 4rem;
     float: right;
   }
 }

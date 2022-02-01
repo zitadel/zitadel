@@ -13,7 +13,7 @@
 
       <form *ngIf="userForm" [formGroup]="userForm" (ngSubmit)="createUser()" class="user-create-form">
         <div class="user-create-content">
-          <p class="user-create-section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
+          <p class="user-create-section cnsl-secondary-text">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.PROFILE.EMAIL' | translate }}*</cnsl-label>
             <input cnslInput matRipple formControlName="email" required />
@@ -102,7 +102,7 @@
             </form>
           </div>
 
-          <p class="user-create-section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
+          <p class="user-create-section cnsl-secondary-text">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.PROFILE.GENDER' | translate }}</cnsl-label>
@@ -127,7 +127,7 @@
             </mat-select>
           </cnsl-form-field>
 
-          <p class="user-create-section">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
+          <p class="user-create-section cnsl-secondary-text">{{ 'USER.CREATE.ADDRESSANDPHONESECTION' | translate }}</p>
 
           <cnsl-form-field class="formfield">
             <cnsl-label>{{ 'USER.PROFILE.PHONE' | translate }}</cnsl-label>

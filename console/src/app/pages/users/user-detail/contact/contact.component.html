@@ -1,7 +1,7 @@
 <div class="method-col">
   <div class="method-row">
     <div class="left">
-      <span class="label">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
+      <span class="label cnsl-secondary-text">{{ 'USER.PROFILE.PASSWORD' | translate }}</span>
       <span class="name">*********</span>
 
       <ng-content select="[pwdAction]"></ng-content>
@@ -17,7 +17,7 @@
 
   <div class="method-row">
     <div class="left">
-      <span class="label">{{ 'USER.EMAIL' | translate }}</span>
+      <span class="label cnsl-secondary-text">{{ 'USER.EMAIL' | translate }}</span>
       <span class="name">{{human?.email?.email}}</span>
       <span *ngIf="human?.email?.isEmailVerified" class="contact-state verified">{{'USER.EMAILVERIFIED' |
         translate}}</span>
@@ -25,7 +25,8 @@
         <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
         <ng-container *ngIf="human?.email">
-          <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
+          <a *ngIf="canWrite" class="verify cnsl-secondary-text"
+            matTooltip="{{'USER.LOGINMETHODS.EMAIL.RESEND' | translate}}"
             (click)="emitEmailVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
         </ng-container>
       </div>
@@ -44,7 +45,7 @@
 
   <div class="method-row">
     <div class="left">
-      <span class="label">{{ 'USER.PHONE' | translate }}</span>
+      <span class="label cnsl-secondary-text">{{ 'USER.PHONE' | translate }}</span>
       <span class="name">{{human?.phone?.phone ? human.phone?.phone : ('USER.PHONEEMPTY' | translate)}}</span>
       <span *ngIf="human?.phone?.isPhoneVerified" class="contact-state verified">{{'USER.PHONEVERIFIED' |
         translate}}</span>
@@ -52,10 +53,11 @@
         <span class="contact-state notverified">{{'USER.NOTVERIFIED' | translate}}</span>
 
         <ng-container *ngIf="human?.phone?.phone">
-          <a *ngIf="!disablePhoneCode && canWrite" class="verify"
+          <a *ngIf="!disablePhoneCode && canWrite" class="verify cnsl-secondary-text"
             matTooltip="{{'USER.LOGINMETHODS.ENTERCODE_DESC' | translate}}"
             (click)="enterCode()">{{'USER.LOGINMETHODS.ENTERCODE' | translate}}</a>
-          <a *ngIf="canWrite" class="verify" matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
+          <a *ngIf="canWrite" class="verify cnsl-secondary-text"
+            matTooltip="{{'USER.LOGINMETHODS.PHONE.RESEND' | translate}}"
             (click)="emitPhoneVerification()">{{'USER.LOGINMETHODS.RESENDCODE' | translate}}</a>
         </ng-container>
       </div>

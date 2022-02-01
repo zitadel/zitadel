@@ -1,7 +1,7 @@
 <h1 mat-dialog-title class="title">
   <span>{{'PROJECT.ROLE.EDITTITLE' | translate}}</span>
 </h1>
-<p class="desc"> {{'PROJECT.ROLE.EDITDESCRIPTION' | translate}}</p>
+<p class="desc cnsl-secondary-text"> {{'PROJECT.ROLE.EDITDESCRIPTION' | translate}}</p>
 <div mat-dialog-content>
   <form *ngIf="formGroup" class="role-detail-full-width" [formGroup]="formGroup" (ngSubmit)="submitForm()">
     <cnsl-form-field>

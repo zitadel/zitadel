@@ -59,7 +59,6 @@
       }
 
       .granted-project-sub {
-        color: var(--grey);
         margin: 1rem 1rem 0 0;
         font-size: 14px;
 
@@ -67,11 +66,6 @@
           font-size: 14px;
           color: $warn-color;
         }
-      }
-
-      .granted-project-top-desc {
-        color: var(--grey);
-        font-size: 14px;
       }
 
       .fill-space {
@@ -126,16 +120,4 @@
       }
     }
   }
-}
-
-.desc {
-  color: var(--grey);
-  font-size: 14px;
-  margin-bottom: 2rem;
-}
-
-.divider {
-  height: 1px;
-  background-color: var(--grey);
-  margin-bottom: 1.5rem;
 }

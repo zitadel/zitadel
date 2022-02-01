@@ -27,6 +27,7 @@
 @import 'src/app/pages/users/user-list/user-table/user-table.component';
 @import 'src/app/pages/projects/project-grid/project-grid.component';
 @import 'src/app/app.component.scss';
+@import './styles/color.scss';
 @import 'src/app/pages/iam/iam.component.scss';
 @import 'src/app/modules/refresh-table/refresh-table.component.scss';
 @import 'src/app/modules/form-field/form-field.component.scss';
@@ -49,6 +50,7 @@
 @import './styles/codemirror.scss';
 
 @mixin component-themes($theme) {
+  @include cnsl-color-theme($theme);
   @include main-theme($theme);
   @include avatar-theme($theme);
   @include nav-theme($theme);

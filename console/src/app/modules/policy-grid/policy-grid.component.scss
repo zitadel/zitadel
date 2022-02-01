@@ -1,12 +1,11 @@
 h2 {
   font-size: 1.2rem;
-  letter-spacing: .05em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   margin-top: 2rem;
 }
 
 .top-desc {
-  color: var(--grey);
   font-size: 14px;
 }
 
@@ -14,12 +13,12 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  margin: 0 -.5rem 1rem -.5rem;
+  margin: 0 -0.5rem 1rem -0.5rem;
 
   .tag {
     display: flex;
     align-items: center;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
     cursor: pointer;
 
     &:hover,
@@ -63,7 +62,7 @@ h2 {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
       background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
 
       &.purple {
@@ -115,18 +114,17 @@ h2 {
 
     .desc {
       font-size: 14px;
-      color: var(--grey);
     }
 
     .warn {
-      margin-bottom: .5rem;
+      margin-bottom: 0.5rem;
     }
 
     .icons {
       margin-bottom: 1rem;
 
       .icon {
-        margin-right: .5rem;
+        margin-right: 0.5rem;
       }
     }
 
@@ -136,8 +134,7 @@ h2 {
 
     .tags {
       .tag {
-        color: var(--grey);
-        font-size: 12px;
+        font-size: 13px;
 
         i {
           font-size: 18px;

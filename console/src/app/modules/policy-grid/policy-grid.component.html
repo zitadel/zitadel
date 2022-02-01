@@ -1,6 +1,6 @@
 <h2>{{'POLICY.TITLE' | translate}}</h2>
 
-<p class="top-desc">{{'POLICY.DESCRIPTION' | translate}}</p>
+<p class="top-desc cnsl-secondary-text">{{'POLICY.DESCRIPTION' | translate}}</p>
 
 <div class="tags" *ngIf="tags">
   <span class="tag" [ngClass]="{'active': tag === tagForFilter}"
@@ -21,12 +21,12 @@
           <span>{{policy.i18nTitle | translate}}</span>
         </div>
 
-        <p class="desc">
+        <p class="desc cnsl-secondary-text">
           {{policy.i18nDesc | translate}}</p>
 
         <span class="fill-space"></span>
         <div class="tags" *ngIf="policy.tags">
-          <span class="tag" *ngFor="let tag of policy.tags"
+          <span class="tag cnsl-secondary-text" *ngFor="let tag of policy.tags"
             (click)="tagForFilter !== tag ? tagForFilter = tag : tagForFilter = ''"><i
               class="las la-hashtag"></i>{{tag}}</span>
         </div>
