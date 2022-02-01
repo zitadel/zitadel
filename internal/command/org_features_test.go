@@ -276,7 +276,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(),
 					expectFilter(),
-					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -474,7 +473,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectFilter(),
 					expectFilter(),
 					expectPush(
@@ -686,7 +684,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectFilter(),
 					expectFilter(),
 					expectPush(
@@ -908,7 +905,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectFilter(),
 					expectFilter(),
 					expectPush(
@@ -1187,7 +1183,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 					),
 					expectFilter(),
 					expectFilter(),
-					expectFilter(),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
@@ -1402,7 +1397,6 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
@@ -1652,7 +1646,6 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 							),
 						),
 					),
-					expectFilter(),
 					expectFilter(),
 					expectFilter(),
 					expectPush(
