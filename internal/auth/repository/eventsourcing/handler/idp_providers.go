@@ -3,20 +3,19 @@ package handler
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/domain"
-	"github.com/caos/zitadel/internal/eventstore/v1"
-	query2 "github.com/caos/zitadel/internal/query"
-
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
+	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	query2 "github.com/caos/zitadel/internal/query"
 )
 
 const (
@@ -166,7 +165,16 @@ func (i *IDPProvider) fillConfigData(provider *iam_view_model.IDPProviderView, c
 	} else if config.JWTIDP != nil {
 		provider.IDPConfigType = int32(domain.IDPConfigTypeJWT)
 	}
-	provider.IDPState = int32(config.State)
+	switch config.State {
+	case domain.IDPConfigStateActive:
+		provider.IDPState = int32(iam_model.IDPConfigStateActive)
+	case domain.IDPConfigStateInactive:
+		provider.IDPState = int32(iam_model.IDPConfigStateActive)
+	case domain.IDPConfigStateRemoved:
+		provider.IDPState = int32(iam_model.IDPConfigStateRemoved)
+	default:
+		provider.IDPState = int32(iam_model.IDPConfigStateActive)
+	}
 }
 
 func (i *IDPProvider) OnError(event *es_models.Event, err error) error {

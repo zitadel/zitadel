@@ -207,6 +207,7 @@ RegistrationUser:
   LanguageLabel: Sprache
   German: Deutsch
   English: English
+  Italian: Italiano
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -234,6 +235,7 @@ ExternalRegistrationUserOverview:
   LanguageLabel: Sprache
   German: Deutsch
   English: English
+  Italian: Italiano
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -286,6 +288,9 @@ ExternalNotFoundOption:
   TosLinkText: AGBs
   TosConfirmAnd: und die
   PrivacyLinkText: Datenschutzerklärung
+  German: Deutsch
+  English: English
+  Italian: Italiano
 
 Footer:
   PoweredBy: Powered By
