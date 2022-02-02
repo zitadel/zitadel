@@ -60,9 +60,7 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfi
 		config.From,
 		config.FromName,
 		config.SMTP.Host,
-		config.SMTP.User,
-		config.SMTP.Password,
-		c.smtpPasswordCrypto)
+		config.SMTP.User)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +68,33 @@ func (c *Commands) ChangeSMTPConfig(ctx context.Context, config *smtp.EmailConfi
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-m0o3f", "Errors.NoChangesFound")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(smtpConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&smtpConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) ChangeSMTPConfigPassword(ctx context.Context, password string) (*domain.ObjectDetails, error) {
+	smtpConfigWriteModel, err := c.getSMTPConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if smtpConfigWriteModel.State == domain.SMTPConfigStateUnspecified {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3n9ls", "Errors.SMTPConfig.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&smtpConfigWriteModel.WriteModel)
+	newPW, err := crypto.Encrypt([]byte(password), c.smtpPasswordCrypto)
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMTPConfigPasswordChangedEvent(
+		ctx,
+		iamAgg,
+		newPW))
 	if err != nil {
 		return nil, err
 	}

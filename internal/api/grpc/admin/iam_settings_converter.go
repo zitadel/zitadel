@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
@@ -70,4 +71,17 @@ func SecretGeneratorToPb(generator *query.SecretGenerator) *settings_pb.SecretGe
 		Details:             obj_grpc.ToViewDetailsPb(generator.Sequence, generator.CreationDate, generator.ChangeDate, generator.ID),
 	}
 	return mapped
+}
+
+func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.EmailConfig {
+	return &smtp.EmailConfig{
+		Tls:      req.Tls,
+		From:     req.FromAddress,
+		FromName: req.FromName,
+		SMTP: smtp.SMTP{
+			Host:     req.SmtpHost,
+			User:     req.SmtpUser,
+			Password: req.SmtpPassword,
+		},
+	}
 }

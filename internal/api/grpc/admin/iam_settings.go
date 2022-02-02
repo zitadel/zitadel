@@ -43,3 +43,39 @@ func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.Update
 			details.ResourceOwner),
 	}, nil
 }
+
+func (s *Server) GetSMTPConfig(ctx context.Context, req *admin_pb.GetSMTPConfigRequest) (*admin_pb.GetSMTPConfigResponse, error) {
+	//generator, err := s.query.SecretGeneratorByType(ctx, req.GetGeneratorType())
+	//if err != nil {
+	//	return nil, err
+	//}
+	return &admin_pb.GetSMTPConfigResponse{
+		//SecretGenerator: SecretGeneratorToPb(generator),
+	}, nil
+}
+
+func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPConfigRequest) (*admin_pb.UpdateSMTPConfigResponse, error) {
+	details, err := s.command.ChangeSMTPConfig(ctx, UpdateSMTPToConfig(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateSMTPConfigResponse{
+		Details: object.ChangeToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner),
+	}, nil
+}
+
+func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
+	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.SmtpPassword)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateSMTPConfigPasswordResponse{
+		Details: object.ChangeToDetailsPb(
+			details.Sequence,
+			details.EventDate,
+			details.ResourceOwner),
+	}, nil
+}

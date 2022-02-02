@@ -47,3 +47,13 @@ message SecretGeneratorTypeQuery {
     }
   ];
 }
+
+message SMTPConfig {
+  zitadel.v1.ObjectDetails details = 1;
+  string from_address = 2;
+  string from_name = 3;
+  bool tls = 4;
+  string smtp_host = 5;
+  string smtp_user = 6;
+  string smtp_password = 7;
+}

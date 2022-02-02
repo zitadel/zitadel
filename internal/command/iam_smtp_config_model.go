@@ -57,9 +57,6 @@ func (wm *IAMSMTPConfigWriteModel) Reduce() error {
 			if e.SMTPUser != nil {
 				wm.SMTPUser = *e.SMTPUser
 			}
-			if e.SMTPPassword != nil {
-				wm.SMTPPassword = e.SMTPPassword
-			}
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -77,7 +74,7 @@ func (wm *IAMSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, smtpHost, smtpUser, smtpPassword string, passwordCrypto crypto.EncryptionAlgorithm) (*iam.SMTPConfigChangedEvent, bool, error) {
+func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, smtpHost, smtpUser string) (*iam.SMTPConfigChangedEvent, bool, error) {
 	changes := make([]iam.SMTPConfigChanges, 0)
 	var err error
 
@@ -97,17 +94,6 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregat
 		changes = append(changes, iam.ChangeSMTPConfigSMTPUser(smtpUser))
 	}
 
-	existingPW, err := crypto.DecryptString(wm.SMTPPassword, passwordCrypto)
-	if err != nil {
-		return nil, false, err
-	}
-	if existingPW != smtpPassword {
-		newPW, err := crypto.Encrypt([]byte(smtpPassword), passwordCrypto)
-		if err != nil {
-			return nil, false, err
-		}
-		changes = append(changes, iam.ChangeSMTPConfigSMTPPassword(newPW))
-	}
 	if len(changes) == 0 {
 		return nil, false, nil
 	}

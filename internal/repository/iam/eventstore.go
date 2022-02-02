@@ -13,6 +13,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(SecretGeneratorAddedEventType, SecretGeneratorAddedEventMapper).
 		RegisterFilterEventMapper(SecretGeneratorChangedEventType, SecretGeneratorChangedEventMapper).
 		RegisterFilterEventMapper(SecretGeneratorRemovedEventType, SecretGeneratorRemovedEventMapper).
+		RegisterFilterEventMapper(SMTPConfigAddedEventType, SMTPConfigAddedEventMapper).
+		RegisterFilterEventMapper(SMTPConfigChangedEventType, SMTPConfigChangedEventMapper).
+		RegisterFilterEventMapper(SMTPConfigPasswordChangedEventType, SMTPConfigPasswordChangedEventMapper).
 		RegisterFilterEventMapper(UniqueConstraintsMigratedEventType, MigrateUniqueConstraintEventMapper).
 		RegisterFilterEventMapper(LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).

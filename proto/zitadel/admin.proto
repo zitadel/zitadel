@@ -242,6 +242,18 @@ service AdminService {
         };
     }
 
+    // Update secret generator configuration
+    rpc UpdateSMTPConfigPassword(UpdateSMTPConfigPasswordRequest) returns (UpdateSMTPConfigPasswordResponse) {
+        option (google.api.http) = {
+            put: "/smtp/password";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -2328,16 +2340,22 @@ message GetSMTPConfigResponse {
 }
 
 message UpdateSMTPConfigRequest {
-    string generator_type = 1 [(validate.rules).string = {min_len: 1, max_len: 210}];
-    uint32 length = 2;
-    google.protobuf.Duration  expiry   = 3;
-    bool include_lower_letters = 4;
-    bool include_upper_letters = 5;
-    bool include_digits = 6;
-    bool include_symbols = 7;
+    string from_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string from_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    bool tls = 3;
+    string smtp_host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
+    string smtp_user = 5;
 }
 
 message UpdateSMTPConfigResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMTPConfigPasswordRequest {
+    string smtp_password = 1;
+}
+
+message UpdateSMTPConfigPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

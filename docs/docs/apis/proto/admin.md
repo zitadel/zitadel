@@ -92,6 +92,42 @@ Update secret generator configuration
     PUT: /secretgenerators/{generator_type}
 
 
+### GetSMTPConfig
+
+> **rpc** GetSMTPConfig([GetSMTPConfigRequest](#getsmtpconfigrequest))
+[GetSMTPConfigResponse](#getsmtpconfigresponse)
+
+Set the default language
+
+
+
+    GET: /smtp
+
+
+### UpdateSMTPConfig
+
+> **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
+[UpdateSMTPConfigResponse](#updatesmtpconfigresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /smtp
+
+
+### UpdateSMTPConfigPassword
+
+> **rpc** UpdateSMTPConfigPassword([UpdateSMTPConfigPasswordRequest](#updatesmtpconfigpasswordrequest))
+[UpdateSMTPConfigPasswordResponse](#updatesmtpconfigpasswordresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /smtp/password
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1976,6 +2012,23 @@ This is an empty request
 
 
 
+### GetSMTPConfigRequest
+This is an empty request
+
+
+
+
+### GetSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| secret_generator |  zitadel.settings.v1.SMTPConfig | - |  |
+
+
+
+
 ### GetSecretGeneratorRequest
 
 
@@ -3295,6 +3348,54 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| smtp_password |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| from_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| smtp_host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| smtp_user |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigResponse
 
 
 

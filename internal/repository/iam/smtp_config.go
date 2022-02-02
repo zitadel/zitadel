@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	smtpConfigPrefix           = "smtp.config"
-	SMTPConfigAddedEventType   = iamEventTypePrefix + smtpConfigPrefix + "added"
-	SMTPConfigChangedEventType = iamEventTypePrefix + smtpConfigPrefix + "changed"
+	smtpConfigPrefix                   = "smtp.config"
+	SMTPConfigAddedEventType           = iamEventTypePrefix + smtpConfigPrefix + "added"
+	SMTPConfigChangedEventType         = iamEventTypePrefix + smtpConfigPrefix + "changed"
+	SMTPConfigPasswordChangedEventType = iamEventTypePrefix + smtpConfigPrefix + "password.changed"
 )
 
 type SMTPConfigAddedEvent struct {
@@ -75,12 +76,11 @@ func SMTPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, erro
 type SMTPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FromAddress  *string             `json:"fromAddress,omitempty"`
-	FromName     *string             `json:"fromName,omitempty"`
-	TLS          *bool               `json:"tls,omitempty"`
-	SMTPHost     *string             `json:"host,omitempty"`
-	SMTPUser     *string             `json:"user,omitempty"`
-	SMTPPassword *crypto.CryptoValue `json:"password,omitempty"`
+	FromAddress *string `json:"fromAddress,omitempty"`
+	FromName    *string `json:"fromName,omitempty"`
+	TLS         *bool   `json:"tls,omitempty"`
+	SMTPHost    *string `json:"host,omitempty"`
+	SMTPUser    *string `json:"user,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Data() interface{} {
@@ -144,12 +144,6 @@ func ChangeSMTPConfigSMTPUser(smtpUser string) func(event *SMTPConfigChangedEven
 	}
 }
 
-func ChangeSMTPConfigSMTPPassword(smtpPassword *crypto.CryptoValue) func(event *SMTPConfigChangedEvent) {
-	return func(e *SMTPConfigChangedEvent) {
-		e.SMTPPassword = smtpPassword
-	}
-}
-
 func SMTPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SMTPConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
@@ -161,4 +155,45 @@ func SMTPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, er
 	}
 
 	return e, nil
+}
+
+type SMTPConfigPasswordChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	SMTPPassword *crypto.CryptoValue `json:"password,omitempty"`
+}
+
+func NewSMTPConfigPasswordChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	smtpPassword *crypto.CryptoValue,
+) *SMTPConfigPasswordChangedEvent {
+	return &SMTPConfigPasswordChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SMTPConfigPasswordChangedEventType,
+		),
+		SMTPPassword: smtpPassword,
+	}
+}
+
+func (e *SMTPConfigPasswordChangedEvent) Data() interface{} {
+	return e
+}
+
+func (e *SMTPConfigPasswordChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func SMTPConfigPasswordChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	smtpConfigPasswordChagned := &SMTPConfigPasswordChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, smtpConfigPasswordChagned)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal smtp config password changed")
+	}
+
+	return smtpConfigPasswordChagned, nil
 }
