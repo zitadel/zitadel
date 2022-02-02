@@ -52,7 +52,7 @@ FROM node:${NODE_VERSION} as npm-base
 WORKDIR /console
 
 COPY console/package.json console/package-lock.json ./
-RUN npm install --loglevel verbose
+RUN npm ci --loglevel verbose
 
 COPY console .
 COPY --from=base /proto /proto
