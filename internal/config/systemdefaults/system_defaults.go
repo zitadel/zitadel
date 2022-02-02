@@ -14,18 +14,19 @@ import (
 )
 
 type SystemDefaults struct {
-	DefaultLanguage          language.Tag
-	Domain                   string
-	ZitadelDocs              ZitadelDocs
-	SecretGenerators         SecretGenerators
-	UserVerificationKey      *crypto.KeyConfig
-	IDPConfigVerificationKey *crypto.KeyConfig
-	Multifactors             MultifactorConfig
-	VerificationLifetimes    VerificationLifetimes
-	DomainVerification       DomainVerification
-	Notifications            Notifications
-	WebAuthN                 WebAuthN
-	KeyConfig                KeyConfig
+	DefaultLanguage             language.Tag
+	Domain                      string
+	ZitadelDocs                 ZitadelDocs
+	SecretGenerators            SecretGenerators
+	UserVerificationKey         *crypto.KeyConfig
+	IDPConfigVerificationKey    *crypto.KeyConfig
+	SMTPPasswordVerificationKey *crypto.KeyConfig
+	Multifactors                MultifactorConfig
+	VerificationLifetimes       VerificationLifetimes
+	DomainVerification          DomainVerification
+	Notifications               Notifications
+	WebAuthN                    WebAuthN
+	KeyConfig                   KeyConfig
 }
 
 type ZitadelDocs struct {
@@ -34,15 +35,15 @@ type ZitadelDocs struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost         int
-	ClientSecretGenerator    crypto.GeneratorConfig
-	InitializeUserCode       crypto.GeneratorConfig
-	EmailVerificationCode    crypto.GeneratorConfig
-	PhoneVerificationCode    crypto.GeneratorConfig
-	PasswordVerificationCode crypto.GeneratorConfig
-	PasswordlessInitCode     crypto.GeneratorConfig
-	MachineKeySize           uint32
-	ApplicationKeySize       uint32
+	PasswordSaltCost int
+	//ClientSecretGenerator    crypto.GeneratorConfig
+	//InitializeUserCode       crypto.GeneratorConfig
+	//EmailVerificationCode    crypto.GeneratorConfig
+	//PhoneVerificationCode    crypto.GeneratorConfig
+	//PasswordVerificationCode crypto.GeneratorConfig
+	//PasswordlessInitCode     crypto.GeneratorConfig
+	MachineKeySize     uint32
+	ApplicationKeySize uint32
 }
 
 type MultifactorConfig struct {

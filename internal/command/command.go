@@ -32,6 +32,7 @@ type Commands struct {
 	zitadelRoles []authz.RoleMapping
 
 	idpConfigSecretCrypto crypto.EncryptionAlgorithm
+	smtpPasswordCrypto    crypto.EncryptionAlgorithm
 
 	UserCodeAlg                 crypto.EncryptionAlgorithm
 	userPasswordAlg             crypto.HashAlgorithm
@@ -86,6 +87,10 @@ func StartCommands(
 	action.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
+	if err != nil {
+		return nil, err
+	}
+	repo.smtpPasswordCrypto, err = crypto.NewAESCrypto(defaults.SMTPPasswordVerificationKey)
 	if err != nil {
 		return nil, err
 	}

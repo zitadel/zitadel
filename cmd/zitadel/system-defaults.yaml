@@ -8,6 +8,8 @@ SystemDefaults:
     EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
   IDPConfigVerificationKey:
     EncryptionKeyID: $ZITADEL_IDP_CONFIG_VERIFICATION_KEY
+  SMTPPasswordVerificationKey:
+    EncryptionKeyID: $ZITADEL_SMTP_PASSWORD_VERIFICATION_KEY
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecretGenerator:
