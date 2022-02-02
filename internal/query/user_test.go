@@ -24,7 +24,7 @@ var (
 		` zitadel.projections.users.state,` +
 		` zitadel.projections.users.type,` +
 		` zitadel.projections.users.username,` +
-		` login_names.login_names,` +
+		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
 		` zitadel.projections.users_humans.user_id,` +
 		` zitadel.projections.users_humans.first_name,` +
@@ -45,7 +45,7 @@ var (
 		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id` +
 		` LEFT JOIN zitadel.projections.users_machines ON zitadel.projections.users.id = zitadel.projections.users_machines.user_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as login_names` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
 		` FROM zitadel.projections.login_names as login_names` +
 		` GROUP BY login_names.user_id) as login_names` +
 		` on login_names.user_id = zitadel.projections.users.id` +
@@ -61,7 +61,7 @@ var (
 		"state",
 		"type",
 		"username",
-		"login_names",
+		"loginnames",
 		"login_name",
 		//human
 		"user_id",
@@ -195,7 +195,7 @@ var (
 		` zitadel.projections.users.state,` +
 		` zitadel.projections.users.type,` +
 		` zitadel.projections.users.username,` +
-		` login_names.login_names,` +
+		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
 		` zitadel.projections.users_humans.user_id,` +
 		` zitadel.projections.users_humans.first_name,` +
@@ -217,7 +217,7 @@ var (
 		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id` +
 		` LEFT JOIN zitadel.projections.users_machines ON zitadel.projections.users.id = zitadel.projections.users_machines.user_id` +
 		` LEFT JOIN` +
-		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as login_names` +
+		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
 		` FROM zitadel.projections.login_names as login_names` +
 		` GROUP BY login_names.user_id) as login_names` +
 		` on login_names.user_id = zitadel.projections.users.id` +
@@ -233,7 +233,7 @@ var (
 		"state",
 		"type",
 		"username",
-		"login_names",
+		"loginnames",
 		"login_name",
 		//human
 		"user_id",
