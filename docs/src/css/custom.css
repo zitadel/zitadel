@@ -4,9 +4,70 @@
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
+@import "../../static/icons/line-awesome/css/line-awesome.min.css";
+
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 400;
+  src: url(../../static/fonts/lato/Lato-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 900;
+  src: url(../../static/fonts/lato/Lato-Black.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 900;
+  src: url(../../static/fonts/lato/Lato-BlackItalic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 700;
+  src: url(../../static/fonts/lato/Lato-Bold.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 700;
+  src: url(../../static/fonts/lato/Lato-BoldItalic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 400;
+  src: url(../../static/fonts/lato/Lato-Italic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 300;
+  src: url(../../static/fonts/lato/Lato-Light.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 300;
+  src: url(../../static/fonts/lato/Lato-LightItalic.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 100;
+  src: url(../../static/fonts/lato/Lato-Thin.ttf) format("truetype");
+}
+@font-face {
+  font-family: Lato;
+  font-style: italic;
+  font-weight: 100;
+  src: url(../../static/fonts/lato/Lato-ThinItalic.ttf) format("truetype");
+}
 
 /* You can override the default Infima variables here. */
-@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
 
 :root {
   --ifm-navbar-background-color: #ffffff;
