@@ -70,7 +70,8 @@ func (wm *IAMSMTPConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			iam.SMTPConfigAddedEventType,
-			iam.SMTPConfigChangedEventType).
+			iam.SMTPConfigChangedEventType,
+			iam.SMTPConfigPasswordChangedEventType).
 		Builder()
 }
 

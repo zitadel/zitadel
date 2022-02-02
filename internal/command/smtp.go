@@ -15,6 +15,9 @@ func (c *Commands) AddSMTPConfig(ctx context.Context, config *smtp.EmailConfig) 
 	if err != nil {
 		return nil, err
 	}
+	if smtpConfigWriteModel.State == domain.SMTPConfigStateActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-en9lw", "Errors.SMTPConfig.AlreadyExists")
+	}
 	var smtpPassword *crypto.CryptoValue
 	if config.SMTP.Password != "" {
 		smtpPassword, err = crypto.Encrypt([]byte(config.SMTP.Password), c.smtpPasswordCrypto)
