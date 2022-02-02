@@ -74,7 +74,6 @@ func csp(zitadelDomain string) *middleware.CSP {
 	}
 	csp := middleware.DefaultSCP
 	csp.StyleSrc = csp.StyleSrc.AddInline()
-	csp.FontSrc = csp.FontSrc.AddHost("maxst.icons8.com")                  //TODO: host it
 	csp.ScriptSrc = csp.ScriptSrc.AddEval()
 	csp.ConnectSrc = csp.ConnectSrc.AddHost(zitadelDomain)
 	csp.ImgSrc = csp.ImgSrc.AddHost(zitadelDomain).AddScheme("blob")
