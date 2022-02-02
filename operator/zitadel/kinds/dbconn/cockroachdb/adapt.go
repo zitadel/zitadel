@@ -56,7 +56,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		current.Parsed = currentDB
 
 		componentLabels := labels.MustForComponent(apiLabels, component)
-		certLabels := labels.MustForName(componentLabels, "cockroachdb.client.root")
+		certLabels := labels.MustForName(componentLabels, db.CertsSecret)
 		pwLabels := labels.MustForName(componentLabels, "dbpassword")
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -81,7 +81,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 				var queriers []operator.QueryFunc
 				if certificate != "" {
 					certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
-						fmt.Sprintf("client.%s.crt", currentDB.Current.User): certificate,
+						db.RootCert: certificate,
 					})
 					if err != nil {
 						return nil, err

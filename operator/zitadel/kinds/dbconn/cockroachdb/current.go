@@ -30,6 +30,20 @@ func (c *Current) PasswordSecret() (string, string) {
 	return c.Current.PasswordSecretName, c.Current.PasswordSecretKey
 }
 
+func (c *Current) SSL() *db.SSL {
+	return &db.SSL{
+		RootCert:       c.Current.Secure,
+		UserCertAndKey: false,
+	}
+}
+
+func (c *Current) Options() string {
+	if c.Current.Cluster != "" {
+		return "--cluster%3D" + c.Current.Cluster
+	}
+	return ""
+}
+
 func (c *Current) ConnectionParams(certsDir string) string {
 
 	var params []string

@@ -1,7 +1,6 @@
 package migration
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/caos/zitadel/pkg/databases/db"
@@ -28,18 +27,6 @@ func getPreContainer(
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
 			ImagePullPolicy:          "IfNotPresent",
-		}, {
-			Name:    "chown-certs",
-			Image:   "busybox",
-			Command: []string{"sh", "-c"},
-			Args:    []string{fmt.Sprintf("cp %s/* %s/ && chown -R 101:101 %s/* && chmod 600 %s/*", certsDir, chownedCertsDir, chownedCertsDir, chownedCertsDir)},
-			VolumeMounts: []corev1.VolumeMount{{
-				Name:      rootUserInternal,
-				MountPath: certsDir,
-			}, {
-				Name:      chownedCertsVolumeName,
-				MountPath: chownedCertsDir,
-			}},
 		}, /*{
 			Name:  "create-flyway-user",
 			Image: common.CockroachImage.Reference(customImageRegistry),

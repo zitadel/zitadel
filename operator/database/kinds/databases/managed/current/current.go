@@ -2,7 +2,6 @@ package current
 
 import (
 	"crypto/rsa"
-	"fmt"
 
 	"github.com/caos/zitadel/pkg/databases/db"
 
@@ -54,9 +53,14 @@ func (c *Current) Host() string                     { return "cockroachdb-public
 func (c *Current) Port() string                     { return "26257" }
 func (c *Current) User() string                     { return "root" }
 func (c *Current) PasswordSecret() (string, string) { return "", "" }
-func (c *Current) ConnectionParams(certsDir string) string {
-	return fmt.Sprintf("sslmode=verify-full&sslrootcert=%s/ca.crt&sslcert=%s/client.root.crt&sslkey=%s/client.root.key", certsDir, certsDir, certsDir)
+
+func (c *Current) SSL() *db.SSL {
+	return &db.SSL{
+		RootCert:       true,
+		UserCertAndKey: true,
+	}
 }
+func (c *Current) Options() string { return "" }
 
 /*
 func (c *Current) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {

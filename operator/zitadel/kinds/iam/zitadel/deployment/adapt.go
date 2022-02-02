@@ -1,7 +1,10 @@
 package deployment
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -47,6 +50,7 @@ func AdaptFunc(
 	configurationDone operator.EnsureFunc,
 	setupDone operator.EnsureFunc,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) (
 	func(
 		necessaryUsers map[string]string,
@@ -94,6 +98,7 @@ func AdaptFunc(
 					secretVarsName,
 					secretPasswordsName,
 					customImageRegistry,
+					dbConn,
 				)
 
 				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
@@ -146,7 +151,19 @@ func deploymentDef(
 	secretVarsName string,
 	secretPasswordsName string,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) *appsv1.Deployment {
+
+	chownedVolumeMount := corev1.VolumeMount{
+		Name:      "chowned-certs",
+		MountPath: "/chownedcerts",
+	}
+
+	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", RunAsUser, RunAsUser), corev1.VolumeMount{
+		Name:      "certs",
+		MountPath: "certificates",
+	}, chownedVolumeMount)
+
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        nameLabels.Name(),
@@ -172,18 +189,10 @@ func deploymentDef(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector: nodeSelector,
-					Tolerations:  tolerations,
-					Affinity:     affinity.K8s(),
-					InitContainers: []corev1.Container{
-						GetInitContainer(
-							rootSecret,
-							dbSecrets,
-							users,
-							RunAsUser,
-							customImageRegistry,
-						),
-					},
+					NodeSelector:   nodeSelector,
+					Tolerations:    tolerations,
+					Affinity:       affinity.K8s(),
+					InitContainers: []corev1.Container{chownCertsContainer},
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
@@ -202,14 +211,15 @@ func deploymentDef(
 							dbSecrets,
 							"start",
 							customImageRegistry,
+							dbConn,
 						),
 					},
-					Volumes: GetVolumes(
+					Volumes: append(GetVolumes(
 						secretName,
 						secretPasswordsName,
 						consoleCMName,
 						users,
-					),
+					), srcVolume, destVolume),
 				},
 			},
 		},

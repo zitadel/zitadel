@@ -2,6 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -40,12 +41,14 @@ func literalsConfigMap(
 		"SMTP_TLS":                       tls,
 		"CAOS_OIDC_DEV":                  "true",
 		"CR_SSL_MODE":                    "require",
-		"CR_ROOT_CERT":                   certPath + "/ca.crt",
+		"CR_HOST":                        dbConn.Host(),
+		"CR_PORT":                        dbConn.Port(),
+		"CR_USER":                        dbConn.User(),
+		"CR_OPTIONS":                     dbConn.Options(),
+		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.RootCert),
+		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert),
+		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey),
 	}
-
-	user := dbConn.User()
-	literalsConfigMap["CR_"+strings.ToUpper(user)+"_CERT"] = certPath + "/client." + user + ".crt"
-	literalsConfigMap["CR_"+strings.ToUpper(user)+"_KEY"] = certPath + "/client." + user + ".key"
 
 	if desired != nil {
 		if desired.Tracing != nil {
@@ -116,12 +119,6 @@ func literalsConfigMap(
 	sentryEnv, _, doIngest := mntr.Environment()
 	literalsConfigMap["SENTRY_ENVIRONMENT"] = sentryEnv
 	literalsConfigMap["SENTRY_USAGE"] = strconv.FormatBool(doIngest)
-
-	//	db, err := database.GetDatabaseInQueried(queried)
-	//	if err == nil {
-	literalsConfigMap["ZITADEL_EVENTSTORE_HOST"] = dbConn.Host()
-	literalsConfigMap["ZITADEL_EVENTSTORE_PORT"] = dbConn.Port()
-	//	}
 
 	return literalsConfigMap
 }

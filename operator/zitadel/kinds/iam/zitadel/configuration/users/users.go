@@ -1,5 +1,6 @@
 package users
 
+/*
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -38,3 +39,4 @@ func deleteIfNotRequired(monitor mntr.Monitor, listedUser string, list []string,
 
 	return nil
 }
+*/

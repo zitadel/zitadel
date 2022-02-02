@@ -1,5 +1,6 @@
 package deployment
 
+/*
 import (
 	"sort"
 	"strconv"
@@ -60,3 +61,4 @@ func GetInitContainer(
 		ImagePullPolicy:          corev1.PullIfNotPresent,
 	}
 }
+*/

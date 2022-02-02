@@ -3,8 +3,6 @@ package deployment
 import (
 	"github.com/caos/zitadel/operator/helpers"
 	corev1 "k8s.io/api/core/v1"
-	"sort"
-	"strings"
 )
 
 func GetVolumes(
@@ -13,20 +11,13 @@ func GetVolumes(
 	consoleCMName string,
 	users []string,
 ) []corev1.Volume {
-	volumes := []corev1.Volume{{
+
+	return []corev1.Volume{{
 		Name: secretName,
 		VolumeSource: corev1.VolumeSource{
 			Secret: &corev1.SecretVolumeSource{
 				SecretName:  secretName,
 				DefaultMode: helpers.PointerInt32(420),
-			},
-		},
-	}, {
-		Name: rootSecret,
-		VolumeSource: corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{
-				SecretName:  "cockroachdb.client.root",
-				DefaultMode: helpers.PointerInt32(384),
 			},
 		},
 	}, {
@@ -51,10 +42,9 @@ func GetVolumes(
 			EmptyDir: &corev1.EmptyDirVolumeSource{},
 		},
 	}}
-
-	return append(volumes, userVolumes(users)...)
 }
 
+/*
 func userVolumes(
 	users []string,
 ) []corev1.Volume {
@@ -76,3 +66,4 @@ func userVolumes(
 	}
 	return volumes
 }
+*/

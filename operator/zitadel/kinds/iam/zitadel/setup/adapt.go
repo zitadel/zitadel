@@ -1,6 +1,8 @@
 package setup
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
@@ -9,6 +11,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
+	"github.com/caos/zitadel/pkg/databases/db"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,6 +41,7 @@ func AdaptFunc(
 	secretVarsName string,
 	secretPasswordsName string,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) (
 	func(
 		necessaryUsers map[string]string,
@@ -86,6 +90,7 @@ func AdaptFunc(
 					nodeselector,
 					tolerations,
 					customImageRegistry,
+					dbConn,
 				)
 
 				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
@@ -132,15 +137,8 @@ func jobDef(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) *batchv1.Job {
-	initContainers := []corev1.Container{
-		deployment.GetInitContainer(
-			rootSecret,
-			dbSecrets,
-			users,
-			deployment.RunAsUser,
-			customImageRegistry,
-		)}
 
 	containers := []corev1.Container{
 		deployment.GetContainer(
@@ -160,9 +158,18 @@ func jobDef(
 			dbSecrets,
 			"setup",
 			customImageRegistry,
+			dbConn,
 		)}
 
-	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users)
+	chownedVolumeMount := corev1.VolumeMount{
+		Name:      "chowned-certs",
+		MountPath: "/chownedcerts",
+	}
+
+	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
+		Name:      "certs",
+		MountPath: "certificates",
+	}, chownedVolumeMount)
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -178,16 +185,19 @@ func jobDef(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector:   nodeselector,
-					Tolerations:    tolerations,
-					InitContainers: initContainers,
-					Containers:     containers,
-
+					NodeSelector:                  nodeselector,
+					Tolerations:                   tolerations,
+					InitContainers:                []corev1.Container{chownCertsContainer},
+					Containers:                    containers,
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
 					SchedulerName:                 "default-scheduler",
 					TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-					Volumes:                       volumes,
+					Volumes: append(
+						deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users),
+						srcVolume,
+						destVolume,
+					),
 				},
 			},
 		},

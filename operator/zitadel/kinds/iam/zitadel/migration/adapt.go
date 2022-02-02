@@ -29,18 +29,18 @@ import (
 )
 
 const (
-	migrationConfigmap     = "migrate-db"
-	migrationsPath         = "/migrate"
-	rootUserInternal       = "root"
-	certsDir               = "/certificates"
-	chownedCertsDir        = "/chownedcerts"
-	envMigrationUser       = "FLYWAY_USER"
-	envMigrationPW         = "FLYWAY_PASSWORD"
-	jobNamePrefix          = "cockroachdb-cluster-migration-"
-	createFile             = "create.sql"
-	grantFile              = "grant.sql"
-	deleteFile             = "delete.sql"
-	chownedCertsVolumeName = "chowned-certs"
+	migrationConfigmap = "migrate-db"
+	migrationsPath     = "/migrate"
+	rootUserInternal   = "root"
+	envMigrationUser   = "FLYWAY_USER"
+	envMigrationPW     = "FLYWAY_PASSWORD"
+	jobNamePrefix      = "cockroachdb-cluster-migration-"
+	/*
+		createFile             = "create.sql"
+		grantFile              = "grant.sql"
+		deleteFile             = "delete.sql"
+
+	*/
 )
 
 func AdaptFunc(
@@ -79,17 +79,18 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			/*			dbCurrent, err := database.GetDatabaseInQueried(queried)
-						if err != nil {
-							return nil, err
-						}
-						dbHost := dbCurrent.Host
-						dbPort := dbCurrent.Port
-						dbConnectionUrl := dbCurrent.ConnectionURL
-
-			*/
 
 			allScripts := getMigrationFiles(monitor, "/cockroach/")
+
+			chownedVolumeMount := corev1.VolumeMount{
+				Name:      "chowned-certs",
+				MountPath: "/chownedcerts",
+			}
+
+			srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, "101:101", corev1.VolumeMount{
+				Name:      "certs",
+				MountPath: "certificates",
+			}, chownedVolumeMount)
 
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
@@ -112,27 +113,19 @@ func AdaptFunc(
 						Spec: corev1.PodSpec{
 							NodeSelector:   nodeselector,
 							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbConn, customImageRegistry),
+							InitContainers: append(getPreContainer(dbConn, customImageRegistry), chownCertsContainer),
 							Containers: []corev1.Container{
-								getMigrationContainer(dbConn, customImageRegistry),
+								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
 							TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-							Volumes: []corev1.Volume{{
+							Volumes: []corev1.Volume{srcVolume, destVolume, {
 								Name: migrationConfigmap,
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
-									},
-								},
-							}, {
-								Name: rootUserInternal,
-								VolumeSource: corev1.VolumeSource{
-									Secret: &corev1.SecretVolumeSource{
-										SecretName:  "cockroachdb.client.root",
-										DefaultMode: helpers.PointerInt32(0400),
 									},
 								},
 							}, {
@@ -141,11 +134,6 @@ func AdaptFunc(
 									Secret: &corev1.SecretVolumeSource{
 										SecretName: secretPasswordName,
 									},
-								},
-							}, {
-								Name: chownedCertsVolumeName,
-								VolumeSource: corev1.VolumeSource{
-									EmptyDir: &corev1.EmptyDirVolumeSource{},
 								},
 							}},
 						},

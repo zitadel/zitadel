@@ -178,6 +178,7 @@ func AdaptFunc(
 			secretVarsName,
 			secretPasswordName,
 			customImageRegistry,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -206,6 +207,7 @@ func AdaptFunc(
 			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			setup.GetDoneFunc(monitor, namespace, action),
 			customImageRegistry,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
