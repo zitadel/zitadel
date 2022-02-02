@@ -38,7 +38,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, keyConfig *crypto.KeyConfig) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 		return nil, err
 	}
 
-	keyAlgorithm, err := crypto.NewAESCrypto(systemDefaults.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}

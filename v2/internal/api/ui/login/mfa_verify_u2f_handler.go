@@ -6,7 +6,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	http_mw "github.com/caos/zitadel/v2/internal/api/http/middleware"
 )
 
 const (

@@ -8,10 +8,10 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"golang.org/x/text/language"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
+	http_mw "github.com/caos/zitadel/v2/internal/api/http/middleware"
 )
 
 const (

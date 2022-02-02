@@ -9,8 +9,8 @@ import (
 	svg "github.com/ajstarks/svgo"
 	"github.com/boombuler/barcode/qr"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/qrcode"
+	http_mw "github.com/caos/zitadel/v2/internal/api/http/middleware"
 )
 
 const (

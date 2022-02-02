@@ -3,10 +3,10 @@ package login
 import (
 	"net/http"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
+	http_mw "github.com/caos/zitadel/v2/internal/api/http/middleware"
 )
 
 const (

@@ -65,13 +65,7 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(
-	es *eventstore.Eventstore,
-	defaults sd.SystemDefaults,
-	authZConfig authz.Config,
-	staticStore static.Storage,
-	authZRepo authz_repo.Repository,
-) (repo *Commands, err error) {
+func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo authz_repo.Repository, keyConfig *crypto.KeyConfig) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
 		static:             staticStore,
@@ -133,7 +127,7 @@ func StartCommands(
 	}
 	repo.webauthn = web
 
-	keyAlgorithm, err := crypto.NewAESCrypto(defaults.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}

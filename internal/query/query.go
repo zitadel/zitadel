@@ -10,6 +10,8 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/crypto"
+
 	"github.com/caos/zitadel/internal/api/authz"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -62,7 +64,7 @@ type ConfigV2 struct {
 //	},
 //}
 
-func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
 
@@ -88,7 +90,7 @@ func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sq
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
 
-	err = projection.Start(ctx, sqlClient, es, projections, defaults, keyChan)
+	err = projection.Start(ctx, sqlClient, es, projections, keyConfig, keyChan)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +129,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 	keypair.RegisterEventMappers(repo.eventstore)
 	usergrant.RegisterEventMappers(repo.eventstore)
 
-	err = projection.Start(ctx, sqlClient, es, projections, defaults, keyChan)
+	err = projection.Start(ctx, sqlClient, es, projections, defaults.KeyConfig.EncryptionConfig, keyChan)
 	if err != nil {
 		return nil, err
 	}

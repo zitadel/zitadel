@@ -7,7 +7,10 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/op"
+	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/i18n"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -81,7 +84,7 @@ type OPStorage struct {
 func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix, baseDomain string) op.OpenIDProvider {
 	cookieHandler, err := middlewareV2.NewUserAgentHandler(config.UserAgentCookieConfig, baseDomain, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
-	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, config.KeyConfig.EncryptionKeyID)
+	tokenKey, err := crypto.LoadKey(config.KeyConfig, config.KeyConfig.EncryptionKeyID)
 	logging.Log("OIDC-ADvbv").OnError(err).Panic("cannot load OP crypto key")
 	cryptoKey := []byte(tokenKey)
 	if len(cryptoKey) != 32 {
@@ -92,7 +95,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
 	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es, projections, keyChan, assetAPIPrefix)
+	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, config.KeyConfig, es, projections, keyChan, assetAPIPrefix)
 	logging.Log("OIDC-Jdg2k").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create storage")
 	options := []op.Option{
 		op.WithHttpInterceptors(
@@ -143,8 +146,8 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	return options
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
-	encAlg, err := crypto.NewAESCrypto(keyConfig.EncryptionConfig)
+func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
+	encAlg, err := crypto.NewAESCrypto(c)
 	if err != nil {
 		return nil, err
 	}
@@ -173,10 +176,9 @@ func (o *OPStorage) Health(ctx context.Context) error {
 }
 
 func getSupportedLanguages() ([]language.Tag, error) {
-	//statikLoginFS, err := fs.NewWithNamespace("login")
-	//if err != nil {
-	//	return nil, err
-	//}
-	//return i18n.SupportedLanguages(i18nDir)
-	return nil, nil //TODO: handle embed
+	statikLoginFS, err := fs.NewWithNamespace("login")
+	if err != nil {
+		return nil, err
+	}
+	return i18n.SupportedLanguages(statikLoginFS)
 }

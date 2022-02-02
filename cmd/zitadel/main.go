@@ -159,7 +159,7 @@ func startZitadel(configPaths []string) {
 	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
-	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
+	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries, conf.SystemDefaults.KeyConfig.EncryptionConfig)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
@@ -168,14 +168,14 @@ func startZitadel(configPaths []string) {
 	store, err := conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo, conf.SystemDefaults.KeyConfig.EncryptionConfig)
 	if err != nil {
 		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
 	}
 
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
-		authRepo, err = auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries)
+		authRepo, err = auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries, conf.SystemDefaults.KeyConfig.EncryptionConfig)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
@@ -254,7 +254,7 @@ func startSetup(configPaths []string) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
-	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil, nil)
+	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil, nil, conf.SystemDefaults.KeyConfig.EncryptionConfig)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
 	err = setup.Execute(ctx, conf.SetUp, conf.SystemDefaults.IamID, commands)

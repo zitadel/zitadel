@@ -12,12 +12,13 @@ import (
 	"github.com/gorilla/csrf"
 	"golang.org/x/text/language"
 
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
+	http_mw_v1 "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/renderer"
 	"github.com/caos/zitadel/internal/static"
+	http_mw "github.com/caos/zitadel/v2/internal/api/http/middleware"
 )
 
 const (
@@ -344,7 +345,7 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		DisplayLoginNameSuffix: l.isDisplayLoginNameSuffix(authReq),
 		AuthReqID:              getRequestID(authReq, r),
 		CSRF:                   csrf.TemplateField(r),
-		Nonce:                  http_mw.GetNonce(r),
+		Nonce:                  http_mw_v1.GetNonce(r),
 	}
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy

@@ -84,7 +84,8 @@ type startConfig struct {
 
 type projectionConfig struct {
 	projection.Config
-	CRDB types.SQL
+	CRDB      types.SQL
+	KeyConfig *crypto.KeyConfig
 }
 
 const (
@@ -179,16 +180,16 @@ func startZitadel() {
 	sqlClient, err := conf.Queries.Start(conf.EventstoreBase)
 	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
 	esQueries := eventstore.NewEventstore(es_sql.NewCRDB(sqlClient))
-	queries, err := query.StartQueries2(ctx, esQueries, projectionsDB, conf.Projections.Config, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
+	queries, err := query.StartQueries2(ctx, esQueries, projectionsDB, conf.Projections.Config, conf.SystemDefaults, conf.Projections.KeyConfig, keyChan, conf.InternalAuthZ.RolePermissionMappings)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
-	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
+	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries, conf.OIDC.KeyConfig)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 
 	sqlClient, err = conf.Commands.Start(conf.EventstoreBase)
 	logging.Log("MAIN-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
 	esCommands := eventstore.NewEventstore(es_sql.NewCRDB(sqlClient))
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo, conf.OIDC.KeyConfig)
 	logging.Log("MAIN-bmNiJ").OnError(err).Fatal("cannot start commands")
 
 	notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, queries, store != nil)
@@ -220,7 +221,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 
 	adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, commands, store, *localDevMode)
 	logging.Log("MAIN-D42tq").OnError(err).Fatal("error starting auth repo")
-	authRepo, err := auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries)
+	authRepo, err := auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries, conf.OIDC.KeyConfig)
 	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 
 	apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, pathAssetAPI))
@@ -395,6 +396,9 @@ func defaultProjectionConfig() projectionConfig {
 			MaxConnLifetime: types.Duration{Duration: maxConnLifetime},
 			MaxConnIdleTime: types.Duration{Duration: maxConnIdleTime},
 		},
+		KeyConfig: &crypto.KeyConfig{
+			EncryptionKeyID: os.Getenv(envOIDCKey),
+		},
 	}
 }
 
@@ -402,9 +406,9 @@ func defaultOIDCConfig() api.Config {
 	return api.Config{
 		OPHandlerConfig: oidc.OPHandlerConfig{
 			OPConfig: &op.Config{
-				Issuer:                   os.Getenv(envBaseDomain) + pathOAuthV2, //TODO: BaseDomain/oauth/v2/ ??
-				CryptoKey:                [32]byte{},                             //TODO: change config type?
-				DefaultLogoutRedirectURI: pathLogin + "/logout/done",             //TODO: still config?
+				Issuer:                   os.Getenv(envBaseDomain) + ":" + *port + pathOAuthV2, //TODO: BaseDomain/oauth/v2/ ??
+				CryptoKey:                [32]byte{},                                           //TODO: change config type?
+				DefaultLogoutRedirectURI: pathLogin + "/logout/done",                           //TODO: still config?
 				CodeMethodS256:           true,
 				AuthMethodPost:           true,
 				AuthMethodPrivateKeyJWT:  true,
