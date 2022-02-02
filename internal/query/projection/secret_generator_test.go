@@ -84,7 +84,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceProjectAdded",
+			name: "reduceSecretGeneratorAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.SecretGeneratorAddedEventType),
