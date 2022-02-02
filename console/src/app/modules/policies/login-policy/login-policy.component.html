@@ -196,9 +196,6 @@
   <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
     mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
 
-  <div class="divider"></div>
-
-
   <ng-template cnslHasRole [hasRole]="['org.idp.read']">
     <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
       [expanded]="false">

@@ -53,7 +53,7 @@
   </div>
 
   <div class="found" *ngIf="target === UserTarget.EXTERNAL && users.length > 0">
-    <span class="found-label">{{'USER.SEARCH.FOUND' | translate}}:</span>
+    <span class="found-label cnsl-secondary-text">{{'USER.SEARCH.FOUND' | translate}}:</span>
     <div class="found-user-row" *ngFor="let user of users; index as i">
       <div class="circle">
         <cnsl-avatar

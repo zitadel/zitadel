@@ -47,7 +47,7 @@
             <div class="user">
               <form [formGroup]="userForm" class="form">
                 <div class="content">
-                  <p class="section">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
+                  <p class="section cnsl-secondary-text">{{ 'USER.CREATE.NAMEANDEMAILSECTION' | translate }}</p>
                   <cnsl-form-field class="formfield" appearance="outline">
                     <cnsl-label>{{ 'USER.PROFILE.USERNAME' | translate }}</cnsl-label>
                     <input cnslInput formControlName="userName" required />
@@ -84,7 +84,7 @@
                     </span>
                   </cnsl-form-field>
 
-                  <p class="section">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
+                  <p class="section cnsl-secondary-text">{{ 'USER.CREATE.GENDERLANGSECTION' | translate }}</p>
 
                   <cnsl-form-field class="formfield" appearance="outline">
                     <cnsl-label>{{ 'USER.PROFILE.GENDER' | translate }}</cnsl-label>
@@ -114,7 +114,7 @@
                     {{'ORG.PAGES.USEPASSWORD' | translate}}</mat-checkbox>
 
                   <ng-container *ngIf="usePassword && pwdForm">
-                    <p class="section">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
+                    <p class="section cnsl-secondary-text">{{ 'USER.CREATE.PASSWORDSECTION' | translate }}</p>
 
                     <cnsl-password-complexity-view class="complexity-view" [policy]="this.policy" [password]="password">
                     </cnsl-password-complexity-view>

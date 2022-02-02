@@ -91,20 +91,6 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="dates">
-        <th mat-header-cell *matHeaderCellDef> DATES </th>
-        <td mat-cell *matCellDef="let grant">
-          <div class="date-block" *ngIf="grant.details?.creationDate">
-            <span class="date-sub">{{ 'PROJECT.GRANT.CREATIONDATE' | translate }}:</span>
-            <span>{{grant.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
-          </div>
-          <div class="date-block" *ngIf="grant.details?.changeDate">
-            <span class="date-sub">{{ 'PROJECT.GRANT.CHANGEDATE' | translate }}</span>
-            <span>{{grant.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
-          </div>
-        </td>
-      </ng-container>
-
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef> {{'PROJECT.GRANT.CREATIONDATE' | translate}} </th>
         <td mat-cell *matCellDef="let grant">

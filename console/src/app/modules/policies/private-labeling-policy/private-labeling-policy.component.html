@@ -7,7 +7,8 @@
   </p>
 
   <div class="privatelabeling-policy">
-    <cnsl-info-section class="desc">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}</cnsl-info-section>
+    <cnsl-info-section class="desc cnsl-secondary-text">{{'POLICY.PRIVATELABELING.PREVIEW_DESCRIPTION' | translate}}
+    </cnsl-info-section>
 
     <cnsl-info-section *ngIf="isDefault"> {{'POLICY.DEFAULTLABEL' | translate}}</cnsl-info-section>
 
@@ -79,7 +80,7 @@
 
           <div class="logo-setup-wrapper">
             <div class="part">
-              <span class="label">Logo</span>
+              <span class="label cnsl-secondary-text">Logo</span>
               <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
@@ -108,8 +109,9 @@
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverLogo(theme, $event)"
                 (dropped)="onDropLogo(theme, $event)" [class.hovering]="isHoveringOverDarkLogo">
                 <label class="file-label">
-                  <i class="icon las la-image"></i>
-                  <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
+                  <i class="icon cnsl-secondary-text las la-image"></i>
+                  <span class="cnsl-secondary-text">{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' |
+                    translate):
                     ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                   <input #selectedFile style="display: none;" class="file-input" type="file"
                     (change)="onDropLogo(theme, $any($event.target).files)">
@@ -122,7 +124,7 @@
             </div>
 
             <div class="part">
-              <span class="label">Icon</span>
+              <span class="label cnsl-secondary-text">Icon</span>
               <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
@@ -153,8 +155,9 @@
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
                 (dropped)="onDropIcon(theme, $event)" [class.hovering]="isHoveringOverDarkIcon">
                 <label class="file-label">
-                  <i class="icon las la-image"></i>
-                  <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
+                  <i class="icon cnsl-secondary-text las la-image"></i>
+                  <span class="cnsl-secondary-text">{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' |
+                    translate):
                     ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                   <input #selectedFileIcon style="display: none;" class="file-input" type="file"
                     (change)="onDropIcon(theme, $any($event.target).files)">
@@ -268,7 +271,8 @@
               [class.hovering]="isHoveringOverFont">
               <label class="file-label">
                 <i class="icon las la-file"></i>
-                <span>{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate):
+                <span class="cnsl-secondary-text">{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' |
+                  translate):
                   ('POLICY.PRIVATELABELING.DROPFONT' | translate)}}</span>
                 <input #selectedFontFile style="display: none;" class="file-input" type="file"
                   (change)="onDropFont($any($event.target).files)">

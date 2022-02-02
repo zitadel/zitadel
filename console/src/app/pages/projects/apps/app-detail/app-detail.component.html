@@ -135,7 +135,7 @@
             </button>
           </h2>
           <ng-container *ngIf="showAdditionalOrigins">
-            <p class="desc">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
+            <p class="desc cnsl-secondary-text">{{'APP.ADDITIONALORIGINSDESC' | translate}}</p>
             <cnsl-additional-origins *ngIf="appType?.value !== undefined" class="input" [canWrite]="canWrite"
               [getValues]="requestRedirectValuesSubject$" (changedUris)="additionalOriginsList = $any($event)"
               [urisList]="additionalOriginsList" title="{{ 'APP.ORIGINS' | translate }}">
@@ -154,8 +154,8 @@
           <ng-container *ngIf="showUrls">
             <div class="app-info-row">
               <div class="app-info-wrapper" *ngFor="let environmentV of (environmentMap | keyvalue)">
-                <p class="app-info-row-title">{{environmentV.key}}</p>
-                <div class="app-copy-row">
+                <p class="app-info-row-title cnsl-secondary-text">{{environmentV.key}}</p>
+                <div class=" app-copy-row">
                   <div *ngIf="environmentV.value" class="environment">
                     <button [disabled]="copied === environmentV.value"
                       [matTooltip]="(copied !== environmentV.value ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
@@ -285,7 +285,7 @@
               <span>{{'APP.OIDC.IDTOKENUSERINFOASSERTION_DESCRIPTION' | translate}}</span>
             </cnsl-info-section>
 
-            <p class="clockskew-title">ClockSkew</p>
+            <p class="clockskew-title cnsl-secondary-text">ClockSkew</p>
             <mat-slider color="primary" formControlName="clockSkewSeconds" class="clockskew-slider" thumbLabel
               [displayWith]="formatClockSkewLabel" tickInterval=".1" min="0" [step]="1" max="5">
             </mat-slider>

@@ -1,5 +1,5 @@
 <div class="preview" *ngIf="policy">
-  <span class="label">{{label}}</span>
+  <span class="label cnsl-secondary-text">{{label}}</span>
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}"
     [style.background]="theme === Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper" [style.color]="theme === Theme.DARK ? policy.fontColorDark : policy.fontColor">

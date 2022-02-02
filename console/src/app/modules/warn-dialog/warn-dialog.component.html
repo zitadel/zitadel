@@ -3,7 +3,7 @@
   <div class="icon-wrapper" *ngIf="data.icon">
     <i class="icon {{data.icon}}"></i>
   </div>
-  <p class="desc"> {{data.descriptionKey | translate: data.descriptionParam}}</p>
+  <p class="desc cnsl-secondary-text"> {{data.descriptionKey | translate: data.descriptionParam}}</p>
 
   <cnsl-form-field *ngIf="data.confirmation && data.confirmationKey" class="formfield">
     <cnsl-label>{{data.confirmationKey | translate: {value: data.confirmation} }}</cnsl-label>

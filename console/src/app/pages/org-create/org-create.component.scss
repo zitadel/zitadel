@@ -35,40 +35,12 @@ h1 {
     }
   }
 
-  .desc {
-    color: var(--grey);
-    font-size: 0.9rem;
-    margin: 1rem 0;
-  }
-
   .margin-right {
     margin-right: 0.5rem;
   }
 
   .user {
     flex: 1;
-
-    .head {
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid #ffffff20;
-      flex-wrap: wrap;
-
-      a {
-        display: block;
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      .desc {
-        width: 100%;
-        display: block;
-        font-size: 0.9rem;
-        color: var(--grey);
-      }
-    }
 
     .form {
       padding-top: 1rem;
@@ -93,7 +65,6 @@ h1 {
         .section {
           padding: 0.5rem;
           flex-basis: 100%;
-          color: var(--grey);
           font-size: 0.9rem;
         }
 

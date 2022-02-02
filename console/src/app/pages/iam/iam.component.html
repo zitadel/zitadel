@@ -5,7 +5,7 @@
         <div class="iam-title-row">
           <h1 class="iam-title">{{'IAM.POLICIES.TITLE' | translate}}</h1>
         </div>
-        <p class="iam-sub">{{'IAM.POLICIES.DESCRIPTION' | translate}}</p>
+        <p class="iam-sub cnsl-secondary-text">{{'IAM.POLICIES.DESCRIPTION' | translate}}</p>
       </div>
       <span class="fill-space"></span>
       <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
@@ -18,7 +18,7 @@
 </div>
 <div class="max-width-container">
   <h1 class="iam-subtitle">{{'FEATURES.TITLE' | translate}}</h1>
-  <p class="iam-top-desc">{{'FEATURES.DESCRIPTION' | translate}} </p>
+  <p class="iam-top-desc cnsl-secondary-text">{{'FEATURES.DESCRIPTION' | translate}} </p>
   <cnsl-zitadel-tier [features]="features" [iam]="true"></cnsl-zitadel-tier>
 
   <cnsl-policy-grid class="policies" [type]="PolicyComponentServiceType.ADMIN"></cnsl-policy-grid>

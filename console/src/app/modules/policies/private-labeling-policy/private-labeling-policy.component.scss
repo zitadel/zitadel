@@ -34,7 +34,6 @@
 
     .desc {
       font-size: 14px;
-      color: var(--grey);
       max-width: 800px;
       margin-bottom: 2rem;
     }
@@ -200,30 +199,19 @@
             i {
               font-size: 2.5rem;
             }
-
-            span {
-              color: var(--grey);
-            }
           }
 
           .icon {
             font-size: 1.5rem;
-            color: var(--grey);
-          }
-
-          .desc {
-            font-size: 14px;
-            color: var(--grey);
           }
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+              (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+              (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);
@@ -248,7 +236,6 @@
 
             .label {
               font-size: 14px;
-              color: var(--grey);
               margin-bottom: 1rem;
               display: block;
             }

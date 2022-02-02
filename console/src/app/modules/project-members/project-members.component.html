@@ -2,7 +2,7 @@
   [backRouterLink]="[ '/projects', (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '']"
   title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}">
   <p class="subinfo" sub>
-    <span class="label">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>
+    <span class="cnsl-secondary-text">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>
     <a mat-icon-button href="https://docs.zitadel.ch/docs/manuals/admin-managers" target="_blank">
       <i class="las la-info-circle"></i>
     </a>

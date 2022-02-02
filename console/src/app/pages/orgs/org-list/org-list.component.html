@@ -1,7 +1,7 @@
 <div class="max-width-container">
   <div class="enlarged-container">
     <h1>{{ 'ORG.PAGES.LIST' | translate }}</h1>
-    <p class="top-desc">{{'ORG.PAGES.LISTDESCRIPTION' | translate}}</p>
+    <p class="cnsl-secondary-text">{{'ORG.PAGES.LISTDESCRIPTION' | translate}}</p>
 
     <cnsl-refresh-table *ngIf="dataSource" (refreshed)="refresh()" [dataSize]="dataSource.data.length"
       [loading]="loading$ | async">

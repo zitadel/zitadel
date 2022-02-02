@@ -1,7 +1,7 @@
 <div class="max-width-container">
   <div class="enlarged-container">
     <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
-    <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">{{'FLOWS.DESCRIPTION' | translate }}</p>
 
     <cnsl-info-section *ngIf="(['actions'] | hasFeature | async) === false" [featureLink]="['/org/features']"
       class="info" [type]="InfoSectionType.WARN">
