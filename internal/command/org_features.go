@@ -45,7 +45,8 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.CustomTextMessage,
 		features.CustomTextLogin,
 		features.LockoutPolicy,
-		features.Actions,
+		features.ActionsAllowed,
+		features.MaxActions,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -177,13 +178,22 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeOrgUserMetadatas...)
 		}
 	}
-	if !features.Actions {
+	if features.ActionsAllowed == domain.ActionsNotAllowed {
 		removeOrgActions, err := c.removeActionsFromOrg(ctx, orgID)
 		if err != nil {
 			return nil, err
 		}
 		if len(removeOrgActions) > 0 {
 			events = append(events, removeOrgActions...)
+		}
+	}
+	if features.ActionsAllowed == domain.ActionsMaxAllowed {
+		deactivateActions, err := c.deactivateNotAllowedActionsFromOrg(ctx, orgID, features.MaxActions)
+		if err != nil {
+			return nil, err
+		}
+		if len(deactivateActions) > 0 {
+			events = append(events, deactivateActions...)
 		}
 	}
 	return events, nil
@@ -350,4 +360,22 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 		events = append(events, org.NewLabelPolicyActivatedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel)))
 	}
 	return events, nil
+}
+
+func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*domain.Features, error) {
+	existingFeatures := NewOrgFeaturesWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	if err != nil {
+		return nil, err
+	}
+	if existingFeatures.State != domain.FeaturesStateUnspecified && existingFeatures.State != domain.FeaturesStateRemoved {
+		return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
+	}
+
+	existingIAMFeatures := NewIAMFeaturesWriteModel()
+	err = c.eventstore.FilterToQueryReducer(ctx, existingIAMFeatures)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToFeatures(&existingIAMFeatures.FeaturesWriteModel), nil
 }
