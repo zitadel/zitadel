@@ -734,8 +734,8 @@ The Following Variables can be used:
 > **rpc** ResetCustomInitMessageTextToDefault([ResetCustomInitMessageTextToDefaultRequest](#resetcustominitmessagetexttodefaultrequest))
 [ResetCustomInitMessageTextToDefaultResponse](#resetcustominitmessagetexttodefaultresponse)
 
-Removes the custom init message text of the organisation
-The default text of the IAM will trigger after
+Removes the custom init message text of the system
+The default text from the translation file will trigger after
 
 
 
@@ -786,8 +786,8 @@ The Following Variables can be used:
 > **rpc** ResetCustomPasswordResetMessageTextToDefault([ResetCustomPasswordResetMessageTextToDefaultRequest](#resetcustompasswordresetmessagetexttodefaultrequest))
 [ResetCustomPasswordResetMessageTextToDefaultResponse](#resetcustompasswordresetmessagetexttodefaultresponse)
 
-Removes the custom password reset message text of the organisation
-The default text of the IAM will trigger after
+Removes the custom password reset message text of the system
+The default text from the translation file will trigger after
 
 
 
@@ -838,8 +838,8 @@ The Following Variables can be used:
 > **rpc** ResetCustomVerifyEmailMessageTextToDefault([ResetCustomVerifyEmailMessageTextToDefaultRequest](#resetcustomverifyemailmessagetexttodefaultrequest))
 [ResetCustomVerifyEmailMessageTextToDefaultResponse](#resetcustomverifyemailmessagetexttodefaultresponse)
 
-Removes the custom verify email message text of the organisation
-The default text of the IAM will trigger after
+Removes the custom verify email message text of the system
+The default text from the translation file will trigger after
 
 
 
@@ -890,8 +890,8 @@ The Following Variables can be used:
 > **rpc** ResetCustomVerifyPhoneMessageTextToDefault([ResetCustomVerifyPhoneMessageTextToDefaultRequest](#resetcustomverifyphonemessagetexttodefaultrequest))
 [ResetCustomVerifyPhoneMessageTextToDefaultResponse](#resetcustomverifyphonemessagetexttodefaultresponse)
 
-Removes the custom verify phone text of the organisation
-The default text of the IAM will trigger after
+Removes the custom verify phone text of the system
+The default text from the translation file will trigger after
 
 
 
@@ -942,8 +942,8 @@ The Following Variables can be used:
 > **rpc** ResetCustomDomainClaimedMessageTextToDefault([ResetCustomDomainClaimedMessageTextToDefaultRequest](#resetcustomdomainclaimedmessagetexttodefaultrequest))
 [ResetCustomDomainClaimedMessageTextToDefaultResponse](#resetcustomdomainclaimedmessagetexttodefaultresponse)
 
-Removes the custom domain claimed message text of the organisation
-The default text of the IAM will trigger after
+Removes the custom domain claimed message text of the system
+The default text from the translation file will trigger after
 
 
 
@@ -994,8 +994,8 @@ The Following Variables can be used:
 > **rpc** ResetCustomPasswordlessRegistrationMessageTextToDefault([ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest](#resetcustompasswordlessregistrationmessagetexttodefaultrequest))
 [ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse](#resetcustompasswordlessregistrationmessagetexttodefaultresponse)
 
-Removes the custom passwordless link message text of the organisation
-The default text of the IAM will trigger after
+Removes the custom passwordless link message text of the system
+The default text from the translation file will trigger after
 
 
 
@@ -2465,7 +2465,7 @@ This is an empty request
 
 
 ### ResetCustomDomainClaimedMessageTextToDefaultRequest
-This is an empty request
+
 
 
 | Field | Type | Description | Validation |
