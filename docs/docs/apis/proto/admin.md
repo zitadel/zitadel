@@ -2024,7 +2024,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| secret_generator |  zitadel.settings.v1.SMTPConfig | - |  |
+| smtp_config |  zitadel.settings.v1.SMTPConfig | - |  |
 
 
 

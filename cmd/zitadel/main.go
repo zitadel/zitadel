@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/getsentry/sentry-go"
 	"github.com/rs/cors"
@@ -157,7 +158,10 @@ func startZitadel(configPaths []string) {
 	}
 
 	keyChan := make(chan interface{})
-	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
+	smtpPasswordCrypto, err := crypto.NewAESCrypto(conf.SystemDefaults.SMTPPasswordVerificationKey)
+	logging.Log("MAIN-en9ew").OnError(err).Fatal("cannot create smtp crypto")
+
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings, smtpPasswordCrypto)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
 	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
@@ -169,7 +173,7 @@ func startZitadel(configPaths []string) {
 	store, err := conf.AssetStorage.Config.NewStorage()
 	logging.Log("ZITAD-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
 
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo)
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo, smtpPasswordCrypto)
 	if err != nil {
 		logging.Log("ZITAD-bmNiJ").OnError(err).Fatal("cannot start commands")
 	}
@@ -255,7 +259,10 @@ func startSetup(configPaths []string) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-Ddt3").OnError(err).Fatal("cannot start eventstore")
 
-	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil, nil)
+	smtpPasswordCrypto, err := crypto.NewAESCrypto(conf.SystemDefaults.SMTPPasswordVerificationKey)
+	logging.Log("MAIN-en9ew").OnError(err).Fatal("cannot create smtp crypto")
+
+	commands, err := command.StartCommands(es, conf.SystemDefaults, conf.InternalAuthZ, nil, nil, smtpPasswordCrypto)
 	logging.Log("MAIN-dsjrr").OnError(err).Fatal("cannot start command side")
 
 	err = setup.Execute(ctx, conf.SetUp, domain.IAMID, commands)

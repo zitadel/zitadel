@@ -67,6 +67,7 @@ func StartCommands(
 	authZConfig authz.Config,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
+	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
@@ -77,6 +78,7 @@ func StartCommands(
 		keySize:            defaults.KeyConfig.Size,
 		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
 		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
+		smtpPasswordCrypto: smtpPasswordEncAlg,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
@@ -87,10 +89,6 @@ func StartCommands(
 	action.RegisterEventMappers(repo.eventstore)
 
 	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(defaults.IDPConfigVerificationKey)
-	if err != nil {
-		return nil, err
-	}
-	repo.smtpPasswordCrypto, err = crypto.NewAESCrypto(defaults.SMTPPasswordVerificationKey)
 	if err != nil {
 		return nil, err
 	}

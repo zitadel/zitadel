@@ -52,6 +52,7 @@ func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
 
 const (
 	SecretGeneratorColumnGeneratorType       = "generator_type"
+	SecretGeneratorColumnAggregateID         = "aggregate_id"
 	SecretGeneratorColumnCreationDate        = "creation_date"
 	SecretGeneratorColumnChangeDate          = "change_date"
 	SecretGeneratorColumnResourceOwner       = "resource_owner"
@@ -73,6 +74,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 	return crdb.NewCreateStatement(
 		e,
 		[]handler.Column{
+			handler.NewCol(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCol(SecretGeneratorColumnGeneratorType, e.GeneratorType),
 			handler.NewCol(SecretGeneratorColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SecretGeneratorColumnChangeDate, e.CreationDate()),
@@ -120,6 +122,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 		e,
 		columns,
 		[]handler.Condition{
+			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SecretGeneratorColumnGeneratorType, e.GeneratorType),
 		},
 	), nil
@@ -134,6 +137,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstor
 	return crdb.NewDeleteStatement(
 		e,
 		[]handler.Condition{
+			handler.NewCond(SecretGeneratorColumnAggregateID, e.Aggregate().ID),
 			handler.NewCond(SecretGeneratorColumnGeneratorType, e.GeneratorType),
 		},
 	), nil

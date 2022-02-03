@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/channels/chat"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
 )
@@ -83,8 +82,8 @@ type Endpoints struct {
 }
 
 type Channels struct {
-	Chat       chat.ChatConfig
-	Email      smtp.EmailConfig
+	Chat chat.ChatConfig
+	//Email      smtp.EmailConfig
 	Twilio     twilio.TwilioConfig
 	FileSystem fs.FSConfig
 	Log        log.LogConfig

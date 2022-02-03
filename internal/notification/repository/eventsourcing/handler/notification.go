@@ -18,6 +18,7 @@ import (
 	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/types"
 	"github.com/caos/zitadel/internal/query"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
@@ -160,7 +161,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), translator, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -198,7 +199,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), translator, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -237,7 +238,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), translator, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -302,7 +303,8 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), translator, user, data["userName"], n.systemDefaults, colors, n.apiDomain)
+
+	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.systemDefaults, n.getSMTPConfig, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -348,7 +350,8 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordlessRegistrationLink(string(template.Template), translator, user, addedEvent, n.systemDefaults, n.AesCrypto, colors, n.apiDomain)
+
+	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
 	if err != nil {
 		return err
 	}
@@ -407,6 +410,27 @@ func (n *Notification) getLabelPolicy(ctx context.Context) (*query.LabelPolicy, 
 // Read organization specific template
 func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate, error) {
 	return n.queries.MailTemplateByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+}
+
+// Read iam smtp config
+func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, error) {
+	config, err := n.queries.SMTPConfigByAggregateID(ctx, domain.IAMID)
+	if err != nil {
+		return nil, err
+	}
+	password, err := crypto.Decrypt(config.SMTPPassword, n.queries.SmtpPasswordCrypto)
+	if err != nil {
+		return nil, err
+	}
+	return &smtp.EmailConfig{
+		From:     config.FromAddress,
+		FromName: config.FromName,
+		SMTP: smtp.SMTP{
+			Host:     config.SMTPHost,
+			User:     config.SMTPUser,
+			Password: string(password),
+		},
+	}, nil
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {

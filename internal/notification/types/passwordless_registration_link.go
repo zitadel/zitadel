@@ -1,10 +1,13 @@
 package types
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/templates"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/repository/user"
@@ -16,7 +19,7 @@ type PasswordlessRegistrationLinkData struct {
 	URL string
 }
 
-func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *user.HumanPasswordlessInitCodeRequestedEvent, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
+func SendPasswordlessRegistrationLink(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *user.HumanPasswordlessInitCodeRequestedEvent, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -33,5 +36,5 @@ func SendPasswordlessRegistrationLink(mailhtml string, translator *i18n.Translat
 	if err != nil {
 		return err
 	}
-	return generateEmail(user, emailCodeData.Subject, template, systemDefaults.Notifications, true)
+	return generateEmail(ctx, user, emailCodeData.Subject, template, systemDefaults.Notifications, smtpConfig, true)
 }

@@ -39,8 +39,9 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.secret_generators WHERE (generator_type = $1)",
+							expectedStmt: "DELETE FROM zitadel.projections.secret_generators WHERE (aggregate_id = $1) AND (generator_type = $2)",
 							expectedArgs: []interface{}{
+								"agg-id",
 								"type",
 							},
 						},
@@ -66,7 +67,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.secret_generators SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (generator_type = $9)",
+							expectedStmt: "UPDATE zitadel.projections.secret_generators SET (change_date, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9) AND (generator_type = $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -76,6 +77,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 								true,
 								true,
 								true,
+								"agg-id",
 								"type",
 							},
 						},
@@ -101,8 +103,9 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.secret_generators (generator_type, creation_date, change_date, resource_owner, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO zitadel.projections.secret_generators (aggregate_id, generator_type, creation_date, change_date, resource_owner, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
+								"agg-id",
 								"type",
 								anyArg{},
 								anyArg{},

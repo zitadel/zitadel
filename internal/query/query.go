@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
@@ -36,13 +37,14 @@ type Queries struct {
 	NotificationTranslationFileContents map[string][]byte
 	supportedLangs                      []language.Tag
 	zitadelRoles                        []authz.RoleMapping
+	SmtpPasswordCrypto                  crypto.EncryptionAlgorithm
 }
 
 type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping, smtpPasswordEncAlg crypto.EncryptionAlgorithm) (repo *Queries, err error) {
 	sqlClient, err := projections.CRDB.Start()
 	if err != nil {
 		return nil, err
@@ -63,6 +65,7 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections pr
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
+		SmtpPasswordCrypto:                  smtpPasswordEncAlg,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)

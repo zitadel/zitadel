@@ -18,6 +18,10 @@ var (
 	secretGeneratorsTable = table{
 		name: projection.SecretGeneratorProjectionTable,
 	}
+	SecretGeneratorColumnAggregateID = Column{
+		name:  projection.SecretGeneratorColumnAggregateID,
+		table: secretGeneratorsTable,
+	}
 	SecretGeneratorColumnGeneratorType = Column{
 		name:  projection.SecretGeneratorColumnGeneratorType,
 		table: secretGeneratorsTable,
@@ -70,7 +74,7 @@ type SecretGenerators struct {
 }
 
 type SecretGenerator struct {
-	ID            string
+	AggregateID   string
 	CreationDate  time.Time
 	ChangeDate    time.Time
 	ResourceOwner string
@@ -164,6 +168,7 @@ func (q *SecretGeneratorSearchQueries) toQuery(query sq.SelectBuilder) sq.Select
 
 func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGenerator, error)) {
 	return sq.Select(
+			SecretGeneratorColumnAggregateID.identifier(),
 			SecretGeneratorColumnGeneratorType.identifier(),
 			SecretGeneratorColumnCreationDate.identifier(),
 			SecretGeneratorColumnChangeDate.identifier(),
@@ -177,13 +182,20 @@ func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGen
 			SecretGeneratorColumnIncludeSymbols.identifier()).
 			From(secretGeneratorsTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*SecretGenerator, error) {
-			p := new(SecretGenerator)
+			secretGenerator := new(SecretGenerator)
 			err := row.Scan(
-				&p.ID,
-				&p.CreationDate,
-				&p.ChangeDate,
-				&p.ResourceOwner,
-				&p.Sequence,
+				&secretGenerator.AggregateID,
+				&secretGenerator.GeneratorType,
+				&secretGenerator.CreationDate,
+				&secretGenerator.ChangeDate,
+				&secretGenerator.ResourceOwner,
+				&secretGenerator.Sequence,
+				&secretGenerator.Length,
+				&secretGenerator.Expiry,
+				&secretGenerator.IncludeLowerLetters,
+				&secretGenerator.IncludeUpperLetters,
+				&secretGenerator.IncludeDigits,
+				&secretGenerator.IncludeSymbols,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -191,12 +203,13 @@ func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGen
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-2k99d", "Errors.Internal")
 			}
-			return p, nil
+			return secretGenerator, nil
 		}
 }
 
 func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretGenerators, error)) {
 	return sq.Select(
+			SecretGeneratorColumnAggregateID.identifier(),
 			SecretGeneratorColumnGeneratorType.identifier(),
 			SecretGeneratorColumnCreationDate.identifier(),
 			SecretGeneratorColumnChangeDate.identifier(),
@@ -216,7 +229,8 @@ func prepareSecretGeneratorsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SecretG
 			for rows.Next() {
 				secretGenerator := new(SecretGenerator)
 				err := rows.Scan(
-					&secretGenerator.ID,
+					&secretGenerator.AggregateID,
+					&secretGenerator.GeneratorType,
 					&secretGenerator.CreationDate,
 					&secretGenerator.ChangeDate,
 					&secretGenerator.ResourceOwner,

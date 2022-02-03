@@ -1,6 +1,7 @@
 package smtp
 
 import (
+	"context"
 	"crypto/tls"
 	"net"
 	"net/smtp"
@@ -16,11 +17,14 @@ import (
 var _ channels.NotificationChannel = (*Email)(nil)
 
 type Email struct {
-	smtpClient *smtp.Client
+	smtpClient  *smtp.Client
+	fromAddress string
+	fromName    string
 }
 
-func InitSMTPChannel(config EmailConfig) (*Email, error) {
-	client, err := config.SMTP.connectToSMTP(config.Tls)
+func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*EmailConfig, error)) (*Email, error) {
+	smtpConfig, err := getSMTPConfig(ctx)
+	client, err := smtpConfig.SMTP.connectToSMTP(smtpConfig.Tls)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +46,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	if emailMsg.Content == "" || emailMsg.Subject == "" || len(emailMsg.Recipients) == 0 {
 		return caos_errs.ThrowInternalf(nil, "EMAIL-zGemZ", "subject, recipients and content must be set but got subject %s, recipients length %d and content length %d", emailMsg.Subject, len(emailMsg.Recipients), len(emailMsg.Content))
 	}
-
+	emailMsg.SenderEmail = email.fromName
 	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)

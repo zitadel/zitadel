@@ -68,7 +68,7 @@ func SecretGeneratorToPb(generator *query.SecretGenerator) *settings_pb.SecretGe
 		IncludeLowerLetters: generator.IncludeLowerLetters,
 		IncludeDigits:       generator.IncludeDigits,
 		IncludeSymbols:      generator.IncludeSymbols,
-		Details:             obj_grpc.ToViewDetailsPb(generator.Sequence, generator.CreationDate, generator.ChangeDate, generator.ID),
+		Details:             obj_grpc.ToViewDetailsPb(generator.Sequence, generator.CreationDate, generator.ChangeDate, generator.AggregateID),
 	}
 	return mapped
 }
@@ -79,9 +79,20 @@ func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.EmailConfig
 		From:     req.FromAddress,
 		FromName: req.FromName,
 		SMTP: smtp.SMTP{
-			Host:     req.SmtpHost,
-			User:     req.SmtpUser,
-			Password: req.SmtpPassword,
+			Host: req.SmtpHost,
+			User: req.SmtpUser,
 		},
 	}
+}
+
+func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
+	mapped := &settings_pb.SMTPConfig{
+		Tls:         smtp.Tls,
+		FromAddress: smtp.FromAddress,
+		FromName:    smtp.FromName,
+		SmtpHost:    smtp.SMTPHost,
+		SmtpUser:    smtp.SMTPUser,
+		Details:     obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
+	}
+	return mapped
 }

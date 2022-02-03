@@ -55,5 +55,4 @@ message SMTPConfig {
   bool tls = 4;
   string smtp_host = 5;
   string smtp_user = 6;
-  string smtp_password = 7;
 }
