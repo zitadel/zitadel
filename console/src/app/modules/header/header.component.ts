@@ -11,6 +11,8 @@ import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.s
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
+import { InfoOverlayArrowType } from '../info-overlay/info-overlay.component';
+
 @Component({
   selector: 'cnsl-header',
   templateUrl: './header.component.html',
@@ -32,7 +34,7 @@ export class HeaderComponent implements OnDestroy {
   public showAccount: boolean = false;
   public hideAdminWarn: boolean = true;
   private destroy$: Subject<void> = new Subject();
-
+  InfoOverlayArrowType: any = InfoOverlayArrowType;
   public BreadcrumbType: any = BreadcrumbType;
   constructor(
     public authenticationService: AuthenticationService,

@@ -48,13 +48,13 @@
           <path d="M16.88 3.549L7.12 20.451"></path>
         </svg>
 
-        <div class="org-context" *ngIf="user && org">
-          <a matRipple [matRippleUnbounded]="false" class="org-link" [routerLink]="[ '/org']">
+        <div class="org-context">
+          <a *ngIf="org" matRipple [matRippleUnbounded]="false" class="org-link" id="orglink" [routerLink]="[ '/org']">
             {{org?.name ? org.name : 'NO NAME'}}</a>
 
           <div class="org-context-wrapper" (clickOutside)="showOrgContext ? showOrgContext = false: null">
-            <button matRipple [matRippleUnbounded]="false" class="org-switch-button dontcloseonclick"
-              (click)="showOrgContext = !showOrgContext">
+            <button *ngIf="org" matRipple [matRippleUnbounded]="false" id="orgswitchbutton"
+              class="org-switch-button dontcloseonclick" (click)="showOrgContext = !showOrgContext">
               <span class="svgsapn dontcloseonclick">
                 <svg xmlns=" http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd"
@@ -63,10 +63,15 @@
                 </svg>
               </span>
             </button>
-            <cnsl-org-context class="context_card" *ngIf="showOrgContext" (closedCard)="showOrgContext = false"
+            <cnsl-org-context class="context_card" *ngIf="org && showOrgContext" (closedCard)="showOrgContext = false"
               [org]="org" (setOrg)="setActiveOrg($event)">
             </cnsl-org-context>
-            <cnsl-info-overlay></cnsl-info-overlay>
+            <cnsl-info-overlay [show]="false" [idsToHighlight]="['orglink', 'orgswitchbutton']"
+              inset="55px auto auto -1rem">
+              <p>This is the context switcher of ZITADEL. All organization settings occur on this very organization.
+                You
+                can also add an new organization here.</p>
+            </cnsl-info-overlay>
           </div>
         </div>
       </ng-container>
@@ -97,16 +102,24 @@
       {{'MENU.DOCUMENTATION' | translate}}
     </a>
 
-    <a *ngIf="!isOnSystem && (['iam.read$','iam.write$'] | hasRole | async)" [routerLink]="[ '/system']"
-      class="iam-settings" mat-stroked-button>
-      <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>
-      <i class="las la-cog"></i>
-    </a>
-    <a *ngIf="isOnSystem && (['org.read'] | hasRole | async)" [routerLink]="[ '/org']" class="org-settings"
-      mat-stroked-button>
-      <span class="iam-label">{{'MENU.ORGANIZATION' | translate}}</span>
-      <i class="las la-cog"></i>
-    </a>
+    <div class="system-rel">
+      <a id="systembutton" *ngIf="!isOnSystem && (['iam.read$','iam.write$'] | hasRole | async)"
+        [routerLink]="[ '/system']" class="iam-settings" mat-stroked-button>
+        <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>
+        <i class="las la-cog"></i>
+      </a>
+      <a id="orgbutton" *ngIf="isOnSystem && (['org.read'] | hasRole | async)" [routerLink]="[ '/org']"
+        class="org-settings" mat-stroked-button>
+        <span class="iam-label">{{'MENU.ORGANIZATION' | translate}}</span>
+        <i class="las la-cog"></i>
+      </a>
+
+      <cnsl-info-overlay [arrowType]="InfoOverlayArrowType.TOP_RIGHT" [show]="false"
+        [idsToHighlight]="['systembutton', 'orgbutton']" inset="55px 1rem auto auto">
+        <p>Note that you are a system administrator and you have enhanced rights. Here you can navigate to the system
+          settings.</p>
+      </cnsl-info-overlay>
+    </div>
 
     <div cnslOutsideClick (clickOutside)="closeAccountCard()" class="icon-container"
       [ngClass]="{'iam-user': (['iam.write$'] | hasRole | async)}">

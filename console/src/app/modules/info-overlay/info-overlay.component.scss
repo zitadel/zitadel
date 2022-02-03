@@ -28,8 +28,6 @@
     background-color: map-get($background, card);
     // color: mat.get-color-from-palette($primary, default-contrast);
     border-radius: 6px;
-    left: -1rem;
-    top: 55px;
     padding: 1rem;
     font-size: 14px;
     width: 300px;
@@ -40,16 +38,31 @@
     filter: drop-shadow(0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.1));
 
     &::before {
+      visibility: hidden;
       content: '';
       position: absolute;
       width: 0;
       height: 0;
-      bottom: 100%;
-      left: 1.5em;
       border: 0.75rem solid transparent;
       border-top: none;
       border-radius: 4px;
       border-bottom-color: map-get($background, card);
+    }
+
+    &.top-left {
+      &::before {
+        visibility: visible;
+        bottom: 100%;
+        left: 1.5em;
+      }
+    }
+
+    &.top-right {
+      &::before {
+        visibility: visible;
+        bottom: 100%;
+        right: 1.5em;
+      }
     }
 
     .info-row {

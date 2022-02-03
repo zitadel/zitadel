@@ -59,7 +59,7 @@
           display: flex;
           align-items: center;
           transition: all ease 0.1s;
-          z-index: 502;
+          // z-index: 502;
 
           &:hover {
             background-color: if($is-dark-theme, #ffffff10, #00000010);
@@ -94,7 +94,7 @@
             background-color: transparent;
             cursor: pointer;
             transition: all ease 0.2s;
-            z-index: 502;
+            // z-index: 502;
 
             &:hover {
               background-color: if($is-dark-theme, #ffffff10, #00000010);
@@ -208,21 +208,28 @@
         }
       }
 
-      .iam-settings,
-      .org-settings {
-        margin-right: 1rem;
-        display: none;
+      .system-rel {
+        position: relative;
+        display: flex;
 
-        &.hide {
+        .iam-settings,
+        .org-settings {
+          margin-right: 1rem;
           display: none;
-        }
+          position: relative;
+          height: 36px;
 
-        @media only screen and (min-width: 600px) {
-          display: inline;
+          &.hide {
+            display: none;
+          }
 
-          i {
-            margin-right: -0.5rem;
-            margin-left: 0.25rem;
+          @media only screen and (min-width: 600px) {
+            display: inline;
+
+            i {
+              margin-right: -0.5rem;
+              margin-left: 0.25rem;
+            }
           }
         }
       }
