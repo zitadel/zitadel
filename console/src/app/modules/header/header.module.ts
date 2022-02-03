@@ -14,6 +14,7 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { AccountsCardModule } from '../accounts-card/accounts-card.module';
 import { AvatarModule } from '../avatar/avatar.module';
+import { InfoOverlayModule } from '../info-overlay/info-overlay.module';
 import { OrgContextModule } from '../org-context/org-context.module';
 import { HeaderComponent } from './header.component';
 
@@ -30,6 +31,7 @@ import { HeaderComponent } from './header.component';
     MatButtonModule,
     HasRoleModule,
     MatProgressSpinnerModule,
+    InfoOverlayModule,
     TranslateModule,
     OrgContextModule,
     OutsideClickModule,

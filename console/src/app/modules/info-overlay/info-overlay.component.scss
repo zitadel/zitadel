@@ -1,0 +1,78 @@
+@mixin info-overlay-theme($theme) {
+  /* stylelint-disable */
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
+
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
+
+  .context_viewport_overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: if($is-dark-theme, #00000080, #ffffff80);
+    backdrop-filter: blur(1px);
+    z-index: 500;
+  }
+
+  .context_intro_overlay {
+    position: absolute;
+    background-color: map-get($background, card);
+    // color: mat.get-color-from-palette($primary, default-contrast);
+    border-radius: 6px;
+    left: -1rem;
+    top: 55px;
+    padding: 1rem;
+    font-size: 14px;
+    width: 300px;
+    z-index: 501;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+    filter: drop-shadow(0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.1));
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      bottom: 100%;
+      left: 1.5em;
+      border: 0.75rem solid transparent;
+      border-top: none;
+      border-radius: 4px;
+      border-bottom-color: map-get($background, card);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: -1rem -1rem 0 0;
+      align-items: center;
+
+      .info {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: $primary-color;
+      }
+    }
+
+    p {
+      margin: 0;
+      font-size: 15px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-style: italic;
+      line-height: 1.3rem;
+    }
+  }
+}

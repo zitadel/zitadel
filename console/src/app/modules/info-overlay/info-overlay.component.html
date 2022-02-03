@@ -1,0 +1,14 @@
+<ng-container *ngIf="show">
+  <div class="context_viewport_overlay"></div>
+  <div class="context_intro_overlay">
+    <div class="info-row">
+      <span class="info">INFO</span>
+      <button mat-icon-button (click)="dismiss()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <p>This is the context switcher of ZITADEL. All organization settings occur on this very organization.
+      You
+      can also add an new organization here.</p>
+  </div>
+</ng-container>
