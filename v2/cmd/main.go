@@ -121,10 +121,10 @@ const (
 	envOIDCKey             = "ZITADEL_OIDC_KEYS_ID"
 	envSentryUsage         = "SENTRY_USAGE"
 	envSentryEnvironment   = "SENTRY_ENVIRONMENT"
-	pathLogin              = "/ui/login"
-	pathOAuthV2            = "/oauth/v2"
-	pathAssetAPI           = "/assets/v1"
-	projectionDB           = "zitadel"
+
+	pathOAuthV2  = "/oauth/v2"
+	pathAssetAPI = "/assets/v1"
+	projectionDB = "zitadel"
 
 	defaultPort = "50002" //TODO: change to 80?
 )
@@ -174,8 +174,11 @@ func startZitadel() {
 	keyChan := make(chan interface{})
 	projectionsDB, err := conf.Projections.CRDB.Start()
 	logging.Log("MAIN-DAgw1").OnError(err).Fatal("cannot start client for projection")
-	store, err := conf.AssetStorage.Config.NewStorage()
-	logging.Log("MAIN-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
+	var storage static.Storage
+	if *assetsEnabled {
+		storage, err = conf.AssetStorage.Config.NewStorage()
+		logging.Log("MAIN-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
+	}
 
 	sqlClient, err := conf.Queries.Start(conf.EventstoreBase)
 	logging.Log("MAIN-Ddv21").OnError(err).Fatal("cannot start eventstore for queries")
@@ -189,13 +192,15 @@ func startZitadel() {
 	sqlClient, err = conf.Commands.Start(conf.EventstoreBase)
 	logging.Log("MAIN-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
 	esCommands := eventstore.NewEventstore(es_sql.NewCRDB(sqlClient))
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, store, authZRepo, conf.OIDC.KeyConfig)
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, storage, authZRepo, conf.OIDC.KeyConfig)
 	logging.Log("MAIN-bmNiJ").OnError(err).Fatal("cannot start commands")
 
-	notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, queries, store != nil)
+	if *notificationEnabled {
+		notification.Start(ctx, conf.Notification, conf.SystemDefaults, commands, queries, storage != nil)
+	}
 
 	router := mux.NewRouter()
-	startAPIs(ctx, router, commands, queries, esQueries, projectionsDB, keyChan, conf, store, authZRepo)
+	startAPIs(ctx, router, commands, queries, esQueries, projectionsDB, keyChan, conf, storage, authZRepo)
 	listen(ctx, router)
 }
 
@@ -219,34 +224,45 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 
 	apis := api.New(ctx, *port, router, verifier, conf.InternalAuthZ, conf.SystemDefaults)
 
-	adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, commands, store, *localDevMode)
-	logging.Log("MAIN-D42tq").OnError(err).Fatal("error starting auth repo")
 	authRepo, err := auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries, conf.OIDC.KeyConfig)
 	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
+	if *adminEnabled {
+		adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, commands, store, *localDevMode)
+		logging.Log("MAIN-D42tq").OnError(err).Fatal("error starting auth repo")
+		apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, pathAssetAPI))
+	}
+	if *managementEnabled {
+		apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, pathAssetAPI))
+	}
+	if *authEnabled {
+		apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, pathAssetAPI))
+	}
 
-	apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, pathAssetAPI))
-	apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, pathAssetAPI))
-	apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, pathAssetAPI))
-
-	if store != nil {
+	if *assetsEnabled {
 		assetsHandler := assets.NewHandler(commands, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, store, queries)
 		apis.RegisterHandler(pathAssetAPI, assetsHandler)
 	}
 
-	oidcProvider := oidc.NewProvider(ctx, conf.OIDC.OPHandlerConfig, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, eventstore, projectionsDB, keyChan, pathAssetAPI, conf.BaseDomain)
-	apis.RegisterHandler("/oauth/v2", oidcProvider.HttpHandler())
+	if *oidcEnabled {
+		oidcProvider := oidc.NewProvider(ctx, conf.OIDC.OPHandlerConfig, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, eventstore, projectionsDB, keyChan, pathAssetAPI, conf.BaseDomain)
+		apis.RegisterHandler(pathOAuthV2, oidcProvider.HttpHandler())
+	}
 
 	openAPIHandler, err := openapi.Start()
 	logging.Log("MAIN-8pRk1").OnError(err).Fatal("Unable to start openapi handler")
 	apis.RegisterHandler("/openapi/v2/swagger", cors.AllowAll().Handler(openAPIHandler))
 
-	consoleID, err := consoleClientID(ctx, queries)
-	logging.Log("MAIN-Dgfqs").OnError(err).Fatal("unable to get client_id for console")
-	c, err := console.Start(conf.Console, conf.BaseDomain, *port, conf.OIDC.OPConfig.Issuer, consoleID)
-	apis.RegisterHandler(console.HandlerPrefix, c)
+	if *consoleEnabled {
+		consoleID, err := consoleClientID(ctx, queries)
+		logging.Log("MAIN-Dgfqs").OnError(err).Fatal("unable to get client_id for console")
+		c, err := console.Start(conf.Console, localURL(conf.BaseDomain), conf.OIDC.OPConfig.Issuer, consoleID)
+		apis.RegisterHandler(console.HandlerPrefix, c)
+	}
 
-	l := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode, conf.BaseDomain, console.HandlerPrefix)
-	apis.RegisterHandler(login.HandlerPrefix, l.Handler())
+	if *loginEnabled {
+		l := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode, conf.BaseDomain, console.HandlerPrefix)
+		apis.RegisterHandler(login.HandlerPrefix, l.Handler())
+	}
 
 	apis.Router()
 }
@@ -406,9 +422,9 @@ func defaultOIDCConfig() api.Config {
 	return api.Config{
 		OPHandlerConfig: oidc.OPHandlerConfig{
 			OPConfig: &op.Config{
-				Issuer:                   os.Getenv(envBaseDomain) + ":" + *port + pathOAuthV2, //TODO: BaseDomain/oauth/v2/ ??
-				CryptoKey:                [32]byte{},                                           //TODO: change config type?
-				DefaultLogoutRedirectURI: pathLogin + "/logout/done",                           //TODO: still config?
+				Issuer:                   "http://" + localURL(os.Getenv(envBaseDomain)) + pathOAuthV2, //TODO: BaseDomain/oauth/v2/ ??
+				CryptoKey:                [32]byte{},                                                   //TODO: change config type?
+				DefaultLogoutRedirectURI: login.HandlerPrefix + "/logout/done",                         //TODO: still config?
 				CodeMethodS256:           true,
 				AuthMethodPost:           true,
 				AuthMethodPrivateKeyJWT:  true,
@@ -417,7 +433,7 @@ func defaultOIDCConfig() api.Config {
 				SupportedUILocales:       nil, //TODO: change config type?
 			},
 			StorageConfig: oidc.StorageConfig{
-				DefaultLoginURL:                   fmt.Sprintf("%s%s?%s=", pathLogin, login.EndpointLogin, login.QueryAuthRequestID), //TODO: still config?
+				DefaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID), //TODO: still config?
 				SigningKeyAlgorithm:               "RS256",
 				DefaultAccessTokenLifetime:        types.Duration{Duration: 12 * time.Hour},
 				DefaultIdTokenLifetime:            types.Duration{Duration: 12 * time.Hour},
@@ -435,6 +451,13 @@ func defaultOIDCConfig() api.Config {
 			CustomEndpoints: nil, // use default endpoints from OIDC library
 		},
 	}
+}
+
+func localURL(host string) string {
+	if *localDevMode {
+		host = host + ":" + *port
+	}
+	return host
 }
 
 func defaultLoginConfig() login.Config {

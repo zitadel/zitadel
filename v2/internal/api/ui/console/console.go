@@ -50,43 +50,29 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config, domain, port, issuer, clientID string) (http.Handler, error) {
-	consoleDir := consoleDefaultDir
-	//if config.ConsoleOverwriteDir != "" {
-	//	consoleDir = config.ConsoleOverwriteDir
-	//}
-	environment := struct {
-		AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
-		MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
-		AdminServiceUrl        string `json:"adminServiceUrl,omitempty"`
-		SubscriptionServiceUrl string `json:"subscriptionServiceUrl,omitempty"`
-		AssetServiceUrl        string `json:"assetServiceUrl,omitempty"`
-		Issuer                 string `json:"issuer,omitempty"`
-		ClientID               string `json:"clientid,omitempty"`
-	}{
-		AuthServiceUrl:         domain + ":" + port,
-		MgmtServiceUrl:         domain + ":" + port,
-		AdminServiceUrl:        domain + ":" + port,
-		SubscriptionServiceUrl: domain + ":" + port,
-		AssetServiceUrl:        domain + ":" + port,
-		Issuer:                 issuer,
-		ClientID:               clientID,
-	}
-	environmentJSON, err := json.Marshal(environment)
-	logging.Log("CONSO-tMAsY").OnError(err).Error("unable to marshal env")
+func Start(config Config, domain, issuer, clientID string) (http.Handler, error) {
+	environmentJSON, err := createEnvironmentJSON(domain, issuer, clientID)
+	logging.Log("CONSO-tMAsY").OnError(err).Fatal("unable to marshal env")
 
+	consoleDir := consoleDefaultDir
+	if config.ConsoleOverwriteDir != "" {
+		consoleDir = config.ConsoleOverwriteDir
+	}
 	consoleHTTPDir := http.Dir(consoleDir)
-	cache := AssetsCacheInterceptorIgnoreManifest(
+
+	cache := assetsCacheInterceptorIgnoreManifest(
 		config.ShortCache.MaxAge.Duration,
 		config.ShortCache.SharedMaxAge.Duration,
 		config.LongCache.MaxAge.Duration,
 		config.LongCache.SharedMaxAge.Duration,
 	)
 	security := middleware.SecurityHeaders(csp(domain), nil)
+
 	handler := &http.ServeMux{}
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
 	handler.Handle(envRequestPath, cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write(environmentJSON)
+		_, err := w.Write(environmentJSON)
+		logging.Log("CONSOLE-sdet2").OnError(err).Error("error serving environment.json")
 	}))))
 	return handler, nil
 }
@@ -107,7 +93,28 @@ func csp(zitadelDomain string) *middleware.CSP {
 	return &csp
 }
 
-func AssetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMaxAge, longSharedMaxAge time.Duration) func(http.Handler) http.Handler {
+func createEnvironmentJSON(domain, issuer, clientID string) ([]byte, error) {
+	environment := struct {
+		AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
+		MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
+		AdminServiceUrl        string `json:"adminServiceUrl,omitempty"`
+		SubscriptionServiceUrl string `json:"subscriptionServiceUrl,omitempty"`
+		AssetServiceUrl        string `json:"assetServiceUrl,omitempty"`
+		Issuer                 string `json:"issuer,omitempty"`
+		ClientID               string `json:"clientid,omitempty"`
+	}{
+		AuthServiceUrl:         domain,
+		MgmtServiceUrl:         domain,
+		AdminServiceUrl:        domain,
+		SubscriptionServiceUrl: domain,
+		AssetServiceUrl:        domain,
+		Issuer:                 issuer,
+		ClientID:               clientID,
+	}
+	return json.Marshal(environment)
+}
+
+func assetsCacheInterceptorIgnoreManifest(shortMaxAge, shortSharedMaxAge, longMaxAge, longSharedMaxAge time.Duration) func(http.Handler) http.Handler {
 	return func(handler http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			for _, file := range shortCacheFiles {

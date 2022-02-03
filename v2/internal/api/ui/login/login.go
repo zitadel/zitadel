@@ -81,10 +81,6 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		IDPConfigAesCrypto:  aesCrypto,
 		iamDomain:           systemDefaults.Domain,
 	}
-	//prefix := ""
-	//if localDevMode {
-	//	prefix = HandlerPrefix
-	//}
 	login.staticCache, err = config.StaticCache.Config.NewCache()
 	logging.Log("CONFI-dgg31").OnError(err).Panic("unable to create storage cache")
 
