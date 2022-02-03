@@ -27,72 +27,71 @@ Metrics:
   Config:
     MeterName: 'github.com/caos/zitadel'
 
-EventstoreBase:
-  Host: $ZITADEL_EVENTSTORE_HOST
-  Port: $ZITADEL_EVENTSTORE_PORT
-  Database: 'eventstore'
-  MaxOpenConns: 3
-  MaxConnLifetime: 30m
-  MaxConnIdleTime: 30m
-  Options: $CR_OPTIONS
-  SSL:
-    Mode: $CR_SSL_MODE
-    RootCert: $CR_ROOT_CERT
-    Cert: $CR_EVENTSTORE_CERT
-    Key: $CR_EVENTSTORE_KEY
-
-Commands:
-  Eventstore:
-    User: 'eventstore'
-    Password: $CR_EVENTSTORE_PASSWORD
-    MaxOpenConns: 5
-    MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
-    SSL:
-      Mode: $CR_SSL_MODE
-      RootCert: $CR_ROOT_CERT
-      Cert: $CR_EVENTSTORE_CERT
-      Key: $CR_EVENTSTORE_KEY
-
-Queries:
-  Eventstore:
-    User: 'queries'
-    Password: $CR_QUERIES_PASSWORD
-    MaxOpenConns: 2
-    MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
-    Options: $CR_OPTIONS
-    SSL:
-      Mode: $CR_SSL_MODE
-      RootCert: $CR_ROOT_CERT
-      Cert: $CR_QUERIES_CERT
-      Key: $CR_QUERIES_KEY
-
-Projections:  
-  RequeueEvery: 10s
-  RetryFailedAfter: 1s
-  MaxFailureCount: 5
-  BulkLimit: 200
-  MaxIterators: 1
-  CRDB:
-    Host: $ZITADEL_EVENTSTORE_HOST
-    Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'queries'
-    Database: 'zitadel'
-    Schema: 'projections'
-    Password: $CR_QUERIES_PASSWORD
-    MaxOpenConns: 3
-    MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
-    Options: $CR_OPTIONS
-    SSL:
-      Mode: $CR_SSL_MODE
-      RootCert: $CR_ROOT_CERT
-      Cert: $CR_QUERIES_CERT
-      Key: $CR_QUERIES_KEY
-  Customizations:
-    projects:
-      BulkLimit: 2000
+#EventstoreBase:
+#  Host: $ZITADEL_EVENTSTORE_HOST
+#  Port: $ZITADEL_EVENTSTORE_PORT
+#  Database: 'eventstore'
+#  MaxOpenConns: 3
+#  MaxConnLifetime: 30m
+#  MaxConnIdleTime: 30m
+#  Options: $CR_OPTIONS
+#  SSL:
+#    Mode: $CR_SSL_MODE
+#    RootCert: $CR_ROOT_CERT
+#    Cert: $CR_EVENTSTORE_CERT
+#    Key: $CR_EVENTSTORE_KEY
+#
+#Commands:
+#  Eventstore:
+#    User: 'eventstore'
+#    Password: $CR_EVENTSTORE_PASSWORD
+#    MaxOpenConns: 5
+#    MaxConnLifetime: 30m
+#    MaxConnIdleTime: 30m
+#    SSL:
+#      Mode: $CR_SSL_MODE
+#      RootCert: $CR_ROOT_CERT
+#      Cert: $CR_EVENTSTORE_CERT
+#      Key: $CR_EVENTSTORE_KEY
+#
+#Queries:
+#  Eventstore:
+#    User: 'queries'
+#    Password: $CR_QUERIES_PASSWORD
+#    MaxOpenConns: 2
+#    MaxConnLifetime: 30m
+#    MaxConnIdleTime: 30m
+#    Options: $CR_OPTIONS
+#    SSL:
+#      Cert: $CR_QUERIES_CERT
+#      Key: $CR_QUERIES_KEY
+#
+#Projections:
+#  Projection:
+#    RequeueEvery: 10s
+#    RetryFailedAfter: 1s
+#    MaxFailureCount: 5
+#    BulkLimit: 200
+#    MaxIterators: 1
+#    Customizations:
+#      projects:
+#        BulkLimit: 2000
+#  CRDB:
+#    Host: $ZITADEL_EVENTSTORE_HOST
+#    Port: $ZITADEL_EVENTSTORE_PORT
+#    User: 'queries'
+#    Database: 'zitadel'
+#    Schema: 'projections'
+#    Password: $CR_QUERIES_PASSWORD
+#    MaxOpenConns: 3
+#    MaxConnLifetime: 30m
+#    MaxConnIdleTime: 30m
+#    Options: $CR_OPTIONS
+#    SSL:
+#      Mode: $CR_SSL_MODE
+#      RootCert: $CR_ROOT_CERT
+#      Cert: $CR_QUERIES_CERT
+#      Key: $CR_QUERIES_KEY
 
 AuthZ:
   Repository:
@@ -246,92 +245,84 @@ Admin:
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
-API:
-  Domain: $ZITADEL_API_DOMAIN
-  GRPC:
-    ServerPort: 50001
-    GatewayPort: 50002
-    CustomHeaders:
-      - x-zitadel-
-  OIDC:
-    OPConfig:
-      Issuer: $ZITADEL_ISSUER
-      DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
-    StorageConfig:
-      DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
-      DefaultAccessTokenLifetime: 12h
-      DefaultIdTokenLifetime: 12h
-      DefaultRefreshTokenIdleExpiration: 720h #30d
-      DefaultRefreshTokenExpiration: 2160h #90d
-      SigningKeyAlgorithm: RS256
-    UserAgentCookieConfig:
-      Name: caos.zitadel.useragent
-      Domain: $ZITADEL_COOKIE_DOMAIN
-      MaxAge: 8760h #365*24h (1 year)
-      Key:
-        EncryptionKeyID: $ZITADEL_COOKIE_KEY
-    Cache:
-      MaxAge: $ZITADEL_CACHE_MAXAGE
-      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-    Endpoints:
-      Auth:
-        Path: 'authorize'
-        URL: '$ZITADEL_AUTHORIZE/authorize'
-      Token:
-        Path: 'token'
-        URL: '$ZITADEL_OAUTH/token'
-      Introspection:
-        Path: 'introspect'
-        URL: '$ZITADEL_OAUTH/introspect'
-      Revocation:
-        Path: 'revoke'
-        URL: '$ZITADEL_OAUTH/revoke'
-      EndSession:
-        Path: 'endsession'
-        URL: '$ZITADEL_AUTHORIZE/endsession'
-      Userinfo:
-        Path: 'userinfo'
-        URL: '$ZITADEL_OAUTH/userinfo'
-      Keys:
-        Path: 'keys'
-        URL: '$ZITADEL_OAUTH/keys'
+#OIDC:
+#  OPConfig:
+#    Issuer: $ZITADEL_ISSUER
+#    DefaultLogoutRedirectURI: $ZITADEL_ACCOUNTS/logout/done
+#  StorageConfig:
+#    DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+#    DefaultAccessTokenLifetime: 12h
+#    DefaultIdTokenLifetime: 12h
+#    DefaultRefreshTokenIdleExpiration: 720h #30d
+#    DefaultRefreshTokenExpiration: 2160h #90d
+#    SigningKeyAlgorithm: RS256
+#  UserAgentCookieConfig:
+#    Name: caos.zitadel.useragent
+#    Domain: $ZITADEL_COOKIE_DOMAIN
+#    MaxAge: 8760h #365*24h (1 year)
+#    Key:
+#      EncryptionKeyID: $ZITADEL_COOKIE_KEY
+#  Cache:
+#    MaxAge: $ZITADEL_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  KeyConfig:
+#    EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
+#  Endpoints:
+#    Auth:
+#      Path: 'authorize2'
+#      URL: '$ZITADEL_AUTHORIZE/authorize2'
+#    Token:
+#      Path: 'token2'
+#      URL: '$ZITADEL_OAUTH/token2'
+#    Introspection:
+#      Path: 'introspect2'
+#      URL: '$ZITADEL_OAUTH/introspect2'
+#    Revocation:
+#      Path: 'revoke2'
+#      URL: '$ZITADEL_OAUTH/revoke2'
+#    EndSession:
+#      Path: 'endsession2'
+#      URL: '$ZITADEL_AUTHORIZE/endsession2'
+#    Userinfo:
+#      Path: 'userinfo2'
+#      URL: '$ZITADEL_OAUTH/userinfo2'
+#    Keys:
+#      Path: 'keys2'
+#      URL: '$ZITADEL_OAUTH/keys2'
 
-UI:
-  Port: 50003
-  Login:
-    Handler:
-      BaseURL: '$ZITADEL_ACCOUNTS'
-      OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
-      ZitadelURL: '$ZITADEL_CONSOLE'
-      LanguageCookieName: 'caos.zitadel.login.lang'
-      DefaultLanguage: 'de'
-      CSRF:
-        CookieName: 'caos.zitadel.login.csrf'
-        Key:
-          EncryptionKeyID: $ZITADEL_CSRF_KEY
-        Development: $ZITADEL_CSRF_DEV
-      UserAgentCookieConfig:
-        Name: caos.zitadel.useragent
-        Domain: $ZITADEL_COOKIE_DOMAIN
-        MaxAge: 8760h #365*24h (1 year)
-        Key:
-          EncryptionKeyID: $ZITADEL_COOKIE_KEY
-      Cache:
-        MaxAge: $ZITADEL_CACHE_MAXAGE
-        SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-      StaticCache:
-        Type: bigcache
-        Config:
-          MaxCacheSizeInByte: 52428800 #50MB
-  Console:
-    ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
-    ShortCache:
-      MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
-      SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
-    LongCache:
-      MaxAge: $ZITADEL_CACHE_MAXAGE
-      SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
-    CSPDomain: $ZITADEL_DEFAULT_DOMAIN
+#Login:
+#  BaseURL: '$ZITADEL_ACCOUNTS'
+#  OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
+#  ZitadelURL: '$ZITADEL_CONSOLE'
+#  LanguageCookieName: 'caos.zitadel.login.lang'
+#  DefaultLanguage: 'de'
+#  CSRF:
+#    CookieName: 'caos.zitadel.login.csrf'
+#    Key:
+#      EncryptionKeyID: $ZITADEL_CSRF_KEY
+#    Development: $ZITADEL_CSRF_DEV
+#  UserAgentCookieConfig:
+#    Name: caos.zitadel.useragent
+#    Domain: $ZITADEL_COOKIE_DOMAIN
+#    MaxAge: 8760h #365*24h (1 year)
+#    Key:
+#      EncryptionKeyID: $ZITADEL_COOKIE_KEY
+#  Cache:
+#    MaxAge: $ZITADEL_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  StaticCache:
+#    Type: bigcache
+#    Config:
+#      MaxCacheSizeInByte: 52428800 #50MB
+#Console:
+#  ConsoleOverwriteDir: $ZITADEL_CONSOLE_DIR
+#  ShortCache:
+#    MaxAge: $ZITADEL_SHORT_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_SHORT_CACHE_SHARED_MAXAGE
+#  LongCache:
+#    MaxAge: $ZITADEL_CACHE_MAXAGE
+#    SharedMaxAge: $ZITADEL_CACHE_SHARED_MAXAGE
+#  CSPDomain: $ZITADEL_DEFAULT_DOMAIN
 
 Notification:
   APIDomain: $ZITADEL_API_DOMAIN

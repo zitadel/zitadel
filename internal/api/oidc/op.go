@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/caos/logging"
@@ -30,7 +31,8 @@ type OPHandlerConfig struct {
 	StorageConfig         StorageConfig
 	UserAgentCookieConfig *middleware.UserAgentCookieConfig
 	Cache                 *middleware.CacheConfig
-	Endpoints             *EndpointConfig
+	KeyConfig             *crypto.KeyConfig
+	CustomEndpoints       *EndpointConfig
 }
 
 type StorageConfig struct {
@@ -77,30 +79,23 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, assetAPIPrefix string) op.OpenIDProvider {
-	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
+func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix, baseDomain string) op.OpenIDProvider {
+	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, baseDomain, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
-	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, keyConfig.EncryptionConfig.EncryptionKeyID)
+	tokenKey, err := crypto.LoadKey(config.KeyConfig, config.KeyConfig.EncryptionKeyID)
 	logging.Log("OIDC-ADvbv").OnError(err).Panic("cannot load OP crypto key")
 	cryptoKey := []byte(tokenKey)
 	if len(cryptoKey) != 32 {
 		logging.Log("OIDC-Dsfds").Panic("OP crypto key must be exactly 32 bytes")
 	}
 	copy(config.OPConfig.CryptoKey[:], cryptoKey)
-	config.OPConfig.CodeMethodS256 = true
-	config.OPConfig.AuthMethodPost = true
-	config.OPConfig.AuthMethodPrivateKeyJWT = true
-	config.OPConfig.GrantTypeRefreshToken = true
 	supportedLanguages, err := getSupportedLanguages()
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
 	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es, projections, keyChan, assetAPIPrefix)
+	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, config.KeyConfig, es, projections, keyChan, assetAPIPrefix)
 	logging.Log("OIDC-Jdg2k").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create storage")
-	provider, err := op.NewOpenIDProvider(
-		ctx,
-		config.OPConfig,
-		storage,
+	options := []op.Option{
 		op.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
@@ -108,24 +103,49 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 			cookieHandler,
 			http_utils.CopyHeadersToContext,
 		),
-		op.WithCustomAuthEndpoint(op.NewEndpointWithURL(config.Endpoints.Auth.Path, config.Endpoints.Auth.URL)),
-		op.WithCustomTokenEndpoint(op.NewEndpointWithURL(config.Endpoints.Token.Path, config.Endpoints.Token.URL)),
-		op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(config.Endpoints.Introspection.Path, config.Endpoints.Introspection.URL)),
-		op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(config.Endpoints.Userinfo.Path, config.Endpoints.Userinfo.URL)),
-		op.WithCustomRevocationEndpoint(op.NewEndpointWithURL(config.Endpoints.Revocation.Path, config.Endpoints.Revocation.URL)),
-		op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(config.Endpoints.EndSession.Path, config.Endpoints.EndSession.URL)),
-		op.WithCustomKeysEndpoint(op.NewEndpointWithURL(config.Endpoints.Keys.Path, config.Endpoints.Keys.URL)),
+	}
+	options = append(options, customEndpoints(config.CustomEndpoints)...)
+	provider, err := op.NewOpenIDProvider(
+		ctx,
+		config.OPConfig,
+		storage,
+		options...,
 	)
 	logging.Log("OIDC-asf13").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create provider")
 	return provider
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
-	encAlg, err := crypto.NewAESCrypto(keyConfig.EncryptionConfig)
-	if err != nil {
-		return nil, err
+func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
+	if endpointConfig == nil {
+		return nil
 	}
-	sqlClient, err := projections.Start()
+	options := []op.Option{}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomAuthEndpoint(op.NewEndpointWithURL(endpointConfig.Auth.Path, endpointConfig.Auth.URL)))
+	}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomTokenEndpoint(op.NewEndpointWithURL(endpointConfig.Token.Path, endpointConfig.Token.URL)))
+	}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(endpointConfig.Introspection.Path, endpointConfig.Introspection.URL)))
+	}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(endpointConfig.Userinfo.Path, endpointConfig.Userinfo.URL)))
+	}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomRevocationEndpoint(op.NewEndpointWithURL(endpointConfig.Revocation.Path, endpointConfig.Revocation.URL)))
+	}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(endpointConfig.EndSession.Path, endpointConfig.EndSession.URL)))
+	}
+	if endpointConfig.Auth != nil {
+		options = append(options, op.WithCustomKeysEndpoint(op.NewEndpointWithURL(endpointConfig.Keys.Path, endpointConfig.Keys.URL)))
+	}
+	return options
+}
+
+func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
+	encAlg, err := crypto.NewAESCrypto(c)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +163,7 @@ func newStorage(config StorageConfig, command *command.Commands, query *query.Qu
 		encAlg:                            encAlg,
 		signingKeyGracefulPeriod:          keyConfig.SigningKeyGracefulPeriod.Duration,
 		signingKeyRotationCheck:           keyConfig.SigningKeyRotationCheck.Duration,
-		locker:                            crdb.NewLocker(sqlClient, locksTable, signingKey),
+		locker:                            crdb.NewLocker(projections, locksTable, signingKey),
 		keyChan:                           keyChan,
 		assetAPIPrefix:                    assetAPIPrefix,
 	}, nil

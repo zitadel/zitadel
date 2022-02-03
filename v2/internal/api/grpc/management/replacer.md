@@ -1,1 +1,0 @@
-` | sed -e "s/UnimplementedManagementServiceServer/s *Server/" -e "s/(context.Context, \*/(ctx context.Context, req *mgmt_pb./" -e "s/) (\*/) (*mgmt_pb./" -e "s/return .*/ return nil,nil/"`

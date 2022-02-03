@@ -45,9 +45,6 @@ type Queries struct {
 type Config struct {
 	Eventstore types.SQLUser
 }
-type ConfigV2 struct {
-	Eventstore types.SQLUser2
-}
 
 //
 //var DefaultConfig = ConfigV2{
@@ -64,7 +61,7 @@ type ConfigV2 struct {
 //	},
 //}
 
-func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
 
@@ -91,45 +88,6 @@ func StartQueries2(ctx context.Context, es *eventstore.Eventstore, sqlClient *sq
 	usergrant.RegisterEventMappers(repo.eventstore)
 
 	err = projection.Start(ctx, sqlClient, es, projections, keyConfig, keyChan)
-	if err != nil {
-		return nil, err
-	}
-
-	return repo, nil
-}
-
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, projections projection.Config, defaults sd.SystemDefaults, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
-	sqlClient, err := projections.CRDB.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	statikLoginFS, err := fs.NewWithNamespace("login")
-	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
-
-	statikNotificationFS, err := fs.NewWithNamespace("notification")
-	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
-
-	repo = &Queries{
-		iamID:                               defaults.IamID,
-		eventstore:                          es,
-		client:                              sqlClient,
-		DefaultLanguage:                     defaults.DefaultLanguage,
-		LoginDir:                            statikLoginFS,
-		NotificationDir:                     statikNotificationFS,
-		LoginTranslationFileContents:        make(map[string][]byte),
-		NotificationTranslationFileContents: make(map[string][]byte),
-		zitadelRoles:                        zitadelRoles,
-	}
-	iam_repo.RegisterEventMappers(repo.eventstore)
-	usr_repo.RegisterEventMappers(repo.eventstore)
-	org.RegisterEventMappers(repo.eventstore)
-	project.RegisterEventMappers(repo.eventstore)
-	action.RegisterEventMappers(repo.eventstore)
-	keypair.RegisterEventMappers(repo.eventstore)
-	usergrant.RegisterEventMappers(repo.eventstore)
-
-	err = projection.Start(ctx, sqlClient, es, projections, defaults.KeyConfig.EncryptionConfig, keyChan)
 	if err != nil {
 		return nil, err
 	}

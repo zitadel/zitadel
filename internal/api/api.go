@@ -6,42 +6,35 @@ import (
 
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/metric"
+	"github.com/gorilla/mux"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 
-	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/api/authz"
-	grpc_util "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/authz/repository"
+
+	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/api/oidc"
-	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
+
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/api/oidc"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	view_model "github.com/caos/zitadel/internal/view/model"
 )
 
 type Config struct {
-	GRPC   grpc_util.Config
-	OIDC   oidc.OPHandlerConfig
-	Domain string
+	OIDC oidc.OPHandlerConfig
 }
 
 type API struct {
+	port           string
 	grpcServer     *grpc.Server
 	gatewayHandler *server.GatewayHandler
-	verifier       *authz.TokenVerifier
-	serverPort     string
+	verifier       *internal_authz.TokenVerifier
 	health         health
-	auth           auth
-	admin          admin
+	router         *mux.Router
 }
 
 type health interface {
@@ -50,35 +43,21 @@ type health interface {
 	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
-type auth interface {
-	ActiveUserSessionCount() int64
-}
-
-type admin interface {
-	GetViews() ([]*view_model.View, error)
-	GetSpoolerDiv(database, viewName string) int64
-}
-
-func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func New(ctx context.Context, port string, router *mux.Router, repo *struct {
+	repository.Repository
+	*query.Queries
+}, authZ internal_authz.Config, sd systemdefaults.SystemDefaults) *API {
+	verifier := internal_authz.Start(repo)
 	api := &API{
-		serverPort: config.GRPC.ServerPort,
+		port:     port,
+		verifier: verifier,
+		health:   repo,
+		router:   router,
 	}
-
-	repo := struct {
-		authz_repo.Repository
-		query.Queries
-	}{
-		authZRepo,
-		*q,
-	}
-
-	api.verifier = authz.Start(&repo)
-	api.health = &repo
-	api.auth = authRepo
-	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
-	api.gatewayHandler = server.CreateGatewayHandler(config.GRPC)
-	api.RegisterHandler("", api.healthHandler())
+	api.gatewayHandler = server.CreateGatewayHandler(port)
+
+	//api.RegisterHandler("", api.healthHandler())
 
 	return api
 }
@@ -91,12 +70,29 @@ func (a *API) RegisterServer(ctx context.Context, server server.Server) {
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
-	a.gatewayHandler.RegisterHandler(prefix, sentryHandler.Handle(handler))
+	subRouter := a.router.PathPrefix(prefix).Subrouter()
+	subRouter.PathPrefix("/").Handler(http.StripPrefix(prefix, sentryHandler.Handle(handler)))
 }
 
-func (a *API) Start(ctx context.Context) {
-	server.Serve(ctx, a.grpcServer, a.serverPort)
-	a.gatewayHandler.Serve(ctx)
+func (a *API) Router() *mux.Router {
+	a.routeGRPC()
+	a.routeHTTP()
+	return a.router
+}
+
+func (a *API) routeGRPC() {
+	http2Route := a.router.Methods(http.MethodPost). //TODO: grpc-web is called with http/1.1
+								MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
+			return r.ProtoMajor == 2
+		}).
+		Subrouter()
+	http2Route.Headers("Content-Type", "application/grpc").Handler(a.grpcServer)
+	a.router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcweb.WrapServer(a.grpcServer))
+}
+
+func (a *API) routeHTTP() {
+	a.router.PathPrefix("/").Handler(a.gatewayHandler.Router())
+	//http1Router.PathPrefix("/").Handler(http.StripPrefix("/", a.gatewayHandler.Router()))
 }
 
 func (a *API) healthHandler() http.Handler {
@@ -126,7 +122,6 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
 	handler.HandleFunc("/clientID", a.handleClientID)
-	handler.Handle("/metrics", a.handleMetrics())
 
 	return handler
 }
@@ -165,48 +160,6 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http_util.MarshalJSON(w, id, nil, http.StatusOK)
-}
-
-func (a *API) handleMetrics() http.Handler {
-	a.registerActiveSessionCounters()
-	a.registerSpoolerDivCounters()
-	return metrics.GetExporter()
-}
-
-func (a *API) registerActiveSessionCounters() {
-	metrics.RegisterValueObserver(
-		metrics.ActiveSessionCounter,
-		metrics.ActiveSessionCounterDescription,
-		func(ctx context.Context, result metric.Int64ObserverResult) {
-			result.Observe(
-				a.auth.ActiveUserSessionCount(),
-			)
-		},
-	)
-}
-
-func (a *API) registerSpoolerDivCounters() {
-	views, err := a.admin.GetViews()
-	if err != nil {
-		logging.Log("API-3M8sd").WithError(err).Error("could not read views for metrics")
-		return
-	}
-	metrics.RegisterValueObserver(
-		metrics.SpoolerDivCounter,
-		metrics.SpoolerDivCounterDescription,
-		func(ctx context.Context, result metric.Int64ObserverResult) {
-			for _, view := range views {
-				labels := map[string]attribute.Value{
-					metrics.Database: attribute.StringValue(view.Database),
-					metrics.ViewName: attribute.StringValue(view.ViewName),
-				}
-				result.Observe(
-					a.admin.GetSpoolerDiv(view.Database, view.ViewName),
-					otel.MapToKeyValue(labels)...,
-				)
-			}
-		},
-	)
 }
 
 type ValidationFunction func(ctx context.Context) error
