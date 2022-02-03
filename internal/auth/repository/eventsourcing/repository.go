@@ -3,17 +3,14 @@ package eventsourcing
 import (
 	"context"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
 	auth_view "github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	es2 "github.com/caos/zitadel/internal/eventstore"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/id"
@@ -37,13 +34,11 @@ type EsRepository struct {
 	eventstore.AuthRequestRepo
 	eventstore.TokenRepo
 	eventstore.RefreshTokenRepo
-	eventstore.ApplicationRepo
 	eventstore.UserSessionRepo
-	eventstore.UserGrantRepo
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, authZRepo *authz_repo.EsRepository, esV2 *es2.Eventstore) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries) (*EsRepository, error) {
 	es, err := v1.Start(conf.Eventstore)
 	if err != nil {
 		return nil, err
@@ -78,14 +73,12 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 		SearchLimit:     conf.SearchLimit,
 		Eventstore:      es,
 		View:            view,
+		Query:           queries,
 		SystemDefaults:  systemDefaults,
 		PrefixAvatarURL: assetsAPI,
 	}
 	//TODO: remove as soon as possible
-	queryView := struct {
-		*query.Queries
-		*auth_view.View
-	}{
+	queryView := queryViewWrapper{
 		queries,
 		view,
 	}
@@ -130,21 +123,8 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 			SearchLimit:  conf.SearchLimit,
 			KeyAlgorithm: keyAlgorithm,
 		},
-		eventstore.ApplicationRepo{
-			Commands: command,
-			Query:    queries,
-		},
-
 		eventstore.UserSessionRepo{
 			View: view,
-		},
-		eventstore.UserGrantRepo{
-			SearchLimit: conf.SearchLimit,
-			View:        view,
-			IamID:       systemDefaults.IamID,
-			Auth:        authZ,
-			AuthZRepo:   authZRepo,
-			Query:       queries,
 		},
 		eventstore.OrgRepository{
 			SearchLimit:    conf.SearchLimit,
@@ -156,6 +136,27 @@ func Start(conf Config, authZ authz.Config, systemDefaults sd.SystemDefaults, co
 	}, nil
 }
 
+type queryViewWrapper struct {
+	*query.Queries
+	*auth_view.View
+}
+
+func (q queryViewWrapper) UserGrantsByProjectAndUserID(projectID, userID string) ([]*query.UserGrant, error) {
+	userGrantProjectID, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userGrantUserID, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	queries := &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantUserID, userGrantProjectID}}
+	grants, err := q.Queries.UserGrants(context.TODO(), queries)
+	if err != nil {
+		return nil, err
+	}
+	return grants.UserGrants, nil
+}
 func (repo *EsRepository) Health(ctx context.Context) error {
 	if err := repo.UserRepo.Health(ctx); err != nil {
 		return err

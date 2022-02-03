@@ -160,7 +160,7 @@ func (s *Server) RemoveProjectGrant(ctx context.Context, req *mgmt_pb.RemoveProj
 }
 
 func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.ListProjectGrantMemberRolesRequest) (*mgmt_pb.ListProjectGrantMemberRolesResponse, error) {
-	roles := s.project.GetProjectGrantMemberRoles()
+	roles := s.query.GetProjectGrantMemberRoles()
 	return &mgmt_pb.ListProjectGrantMemberRolesResponse{
 		Result:  roles,
 		Details: object_grpc.ToListDetails(uint64(len(roles)), 0, time.Now()),

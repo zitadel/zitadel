@@ -2894,6 +2894,8 @@ message SetDefaultFeaturesRequest {
     bool custom_text_login = 21;
     bool lockout_policy = 22;
     bool actions = 23;
+    zitadel.features.v1.ActionsAllowed actions_allowed = 24;
+    int32 max_actions = 25;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2934,6 +2936,8 @@ message SetOrgFeaturesRequest {
     bool custom_text_login = 22;
     bool lockout_policy = 23;
     bool actions = 24;
+    zitadel.features.v1.ActionsAllowed actions_allowed = 25;
+    int32 max_actions = 26;
 }
 
 message SetOrgFeaturesResponse {
