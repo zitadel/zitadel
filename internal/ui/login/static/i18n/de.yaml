@@ -259,7 +259,7 @@ RegistrationOrg:
   TosLinkText: AGBs
   TosConfirmAnd: und die
   PrivacyLinkText: Datenschutzerklärung
-  SaveButtonText: speichern
+  SaveButtonText: Organisation speichern
 
 LoginSuccess:
   Title: Erfolgreich eingeloggt

@@ -260,7 +260,7 @@ RegistrationOrg:
   TosLinkText: Termini di servizio
   TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
-  SaveButtonText: Salva
+  SaveButtonText: Creare organizzazione
 
 LoginSuccess:
   Title: Accesso riuscito
