@@ -260,7 +260,7 @@ RegistrationOrg:
   TosLinkText: TOS
   TosConfirmAnd: and the
   PrivacyLinkText: privacy policy
-  SaveButtonText: save
+  SaveButtonText: Create organization
 
 LoginSuccess:
   Title: Login successful
