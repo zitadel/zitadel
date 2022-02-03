@@ -22,7 +22,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		}
 		resourceOwner = iam.GlobalOrgID
 	}
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(ctx, domain.FlowTypeExternalAuthentication, domain.TriggerTypePostAuthentication, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 }
 
 func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, metadata []*domain.Metadata, resourceOwner string) (*domain.Human, []*domain.Metadata, error) {
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation, resourceOwner)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePreCreation, resourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -54,7 +54,7 @@ func (l *Login) customExternalUserToLoginUserMapping(user *domain.Human, tokens 
 }
 
 func (l *Login) customGrants(userID string, tokens *oidc.Tokens, req *domain.AuthRequest, config *iam_model.IDPConfigView, resourceOwner string) ([]*domain.UserGrant, error) {
-	triggerActions, err := l.query.GetActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, resourceOwner)
+	triggerActions, err := l.query.GetActiveActionsByFlowAndTriggerType(context.TODO(), domain.FlowTypeExternalAuthentication, domain.TriggerTypePostCreation, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
