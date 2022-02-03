@@ -27,7 +27,6 @@
     </ng-template> -->
 
     <ng-container *ngFor="let bread of (breadcrumbService.breadcrumbs$ | async) as bc; index as i">
-
       <ng-container *ngIf="bread.type === BreadcrumbType.IAM">
         <ng-template cnslHasRole [hasRole]="['iam.read']">
           <svg class=" slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
@@ -67,6 +66,18 @@
             <cnsl-org-context class="context_card" *ngIf="showOrgContext" (closedCard)="showOrgContext = false"
               [org]="org" (setOrg)="setActiveOrg($event)">
             </cnsl-org-context>
+            <div class="context_viewport_overlay"></div>
+            <div class="context_intro_overlay">
+              <div class="info-row">
+                <span class="info">INFO</span>
+                <button mat-icon-button>
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+              <p>This is the context switcher of ZITADEL. All organization settings occur on this very organization.
+                You
+                can also add an new organization here.</p>
+            </div>
           </div>
         </div>
       </ng-container>

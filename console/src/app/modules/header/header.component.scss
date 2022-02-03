@@ -93,6 +93,7 @@
             background-color: transparent;
             cursor: pointer;
             transition: all ease 0.2s;
+            z-index: 502;
 
             &:hover {
               background-color: if($is-dark-theme, #ffffff10, #00000010);
@@ -115,6 +116,75 @@
                 height: 1.25rem;
                 width: 1.25rem;
               }
+            }
+          }
+
+          .context_viewport_overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #00000020;
+            backdrop-filter: blur(10px);
+            z-index: 500;
+          }
+
+          .context_intro_overlay {
+            position: absolute;
+            background-color: $primary-color;
+            color: mat.get-color-from-palette($primary, default-contrast);
+            border-radius: 6px;
+            left: -1rem;
+            top: 55px;
+            padding: 1rem;
+            font-size: 14px;
+            width: 300px;
+            z-index: 501;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+            filter: drop-shadow(0 -0.0625rem 0.0625rem rgba(0, 0, 0, 0.1));
+
+            &::before {
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 0;
+              bottom: 100%;
+              left: 1.5em;
+              border: 0.75rem solid transparent;
+              border-top: none;
+              border-radius: 4px;
+              border-bottom-color: $primary-color;
+            }
+
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              margin: -1rem -1rem 0 0;
+              align-items: center;
+
+              .info {
+                font-size: 12px;
+                text-transform: uppercase;
+                color: mat.get-color-from-palette($primary, 900);
+              }
+
+              // button {
+              //   height: 1.2rem;
+              //   width: 1.2rem;
+              //   font-size: 1.2rem;
+              // }
+            }
+
+            p {
+              margin: 0;
+              line-height: 1.5rem;
+              font-size: 15px;
+              word-wrap: break-word;
+              white-space: pre-wrap;
+              word-break: break-word;
             }
           }
 

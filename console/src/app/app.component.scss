@@ -43,7 +43,7 @@
       background-color: map-get($background, toolbar) !important;
       backdrop-filter: blur(10px) !important;
       border-bottom: 1px solid map-get($foreground, divider);
-      z-index: 200;
+      z-index: 50;
       transform: all 0.2s ease;
 
       &.shadow {

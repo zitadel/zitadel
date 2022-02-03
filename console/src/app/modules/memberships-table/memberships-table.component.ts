@@ -118,14 +118,12 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       this.authService.getActiveOrg(membership.orgId).then(() => {
         this.router.navigate(['/org/members']);
       });
-    } else if (membership.projectGrantId && membership.orgId) {
-      // TODO: orgId should be non emptystring
-      this.authService.getActiveOrg(membership.orgId).then(() => {
+    } else if (membership.projectGrantId && membership.details?.resourceOwner) {
+      this.authService.getActiveOrg(membership.details?.resourceOwner).then(() => {
         this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
       });
-    } else if (membership.projectId && membership.orgId) {
-      // TODO: orgId should be non emptystring
-      this.authService.getActiveOrg(membership.orgId).then(() => {
+    } else if (membership.projectId && membership.details?.resourceOwner) {
+      this.authService.getActiveOrg(membership.details?.resourceOwner).then(() => {
         this.router.navigate(['/projects', membership.projectId, 'members']);
       });
     } else if (membership.iam) {
