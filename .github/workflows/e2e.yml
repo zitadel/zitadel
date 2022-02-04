@@ -55,7 +55,7 @@ jobs:
       working-directory: ./console
 
     - name: Setup Test Environment
-      run: docker compose -f ./build/local/docker-compose-local.yml --profile e2e up
+      run: docker compose -f ./build/local/docker-compose-local.yml --profile frontend --profile backend up
 
     - name: Run Tests
       working-directory: ./console
