@@ -1,8 +1,8 @@
-ALTER TABLE zitadel.projections.iam ADD COLUMN default_language TEXT DEFAuLT '';
+ALTER TABLE zitadel.projections.iam ADD COLUMN default_language TEXT DEFAULT '';
 
 CREATE TABLE zitadel.projections.secret_generators (
     generator_type STRING NOT NULL
-    , aggregate_id NOT NULL
+    , aggregate_id STRING NOT NULL
     , creation_date TIMESTAMPTZ NOT NULL
     , change_date TIMESTAMPTZ NOT NULL
     , resource_owner STRING NOT NULL
