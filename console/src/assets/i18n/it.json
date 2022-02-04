@@ -123,7 +123,9 @@
     "RESTORE": "Ripristina",
     "CONTINUEWITHOUTSAVE": "Continua senza salvare",
     "GOTOFEATURES": "Vai alle caratteristiche",
-    "OF": "di"
+    "OF": "di",
+    "PREVIOUS": "Precedente",
+    "NEXT": "Avanti"
   },
   "FILTER": {
     "TITLE": "Filter",

@@ -123,7 +123,9 @@
     "RESTORE": "Wiederherstellen",
     "CONTINUEWITHOUTSAVE": "Ohne speichern fortfahren",
     "GOTOFEATURES": "Zu den Features",
-    "OF": "von"
+    "OF": "von",
+    "PREVIOUS": "Zurück",
+    "NEXT": "Weiter"
   },
   "FILTER": {
     "TITLE": "Filter",

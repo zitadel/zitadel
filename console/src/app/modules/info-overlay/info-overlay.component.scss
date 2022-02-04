@@ -87,5 +87,16 @@
       font-style: italic;
       line-height: 1.3rem;
     }
+
+    .overlay-actions {
+      display: flex;
+      align-items: center;
+      padding-top: 0.5rem;
+      justify-content: flex-end;
+
+      button {
+        margin-left: 0.5rem;
+      }
+    }
   }
 }
