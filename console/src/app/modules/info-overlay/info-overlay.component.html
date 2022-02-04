@@ -1,25 +1,21 @@
-<ng-container *ngIf="show">
-  <div class="context_viewport_overlay"></div>
-  <div class="context_intro_overlay"
-    [ngClass]="{'top-left': arrowType === InfoOverlayArrowType.TOP_LEFT, 'top-right': arrowType === InfoOverlayArrowType.TOP_RIGHT}"
-    [style.inset]="inset">
-    <div class="info-row">
-      <span class="info">INFO</span>
-      <button mat-icon-button (click)="overlayService.complete()">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-    <ng-content></ng-content>
-    <div class="overlay-actions">
-      <button (click)="overlayService.triggerNext()" *ngIf="overlayService.nextExists$ | async; else complete"
-        mat-stroked-button>{{'ACTIONS.NEXT' | translate}}</button>
-
-      <ng-template #complete>
-        <button (click)="overlayService.triggerPrevious()" *ngIf="overlayService.previousExists$ | async"
-          mat-stroked-button>{{'ACTIONS.PREVIOUS' | translate}}</button>
-        <button (click)="overlayService.complete()" color="primary" mat-raised-button>{{'ACTIONS.FINISH' |
-          translate}}</button>
-      </ng-template>
-    </div>
+<div class="context_intro_overlay"
+  [ngClass]="{'top-left': arrowType === InfoOverlayArrowType.TOP_LEFT, 'top-right': arrowType === InfoOverlayArrowType.TOP_RIGHT}">
+  <div class="info-row">
+    <span class="info">INFO</span>
+    <button mat-icon-button (click)="dismiss()">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
-</ng-container>
+  <ng-content></ng-content>
+  <div class="overlay-actions">
+    <button (click)="overlayService.triggerNext()" *ngIf="overlayService.nextExists$ | async; else complete"
+      mat-stroked-button>{{'ACTIONS.NEXT' | translate}}</button>
+
+    <ng-template #complete>
+      <button (click)="overlayService.triggerPrevious()" *ngIf="overlayService.previousExists$ | async"
+        mat-stroked-button>{{'ACTIONS.PREVIOUS' | translate}}</button>
+      <button (click)="overlayService.complete()" color="primary" mat-raised-button>{{'ACTIONS.FINISH' |
+        translate}}</button>
+    </ng-template>
+  </div>
+</div>

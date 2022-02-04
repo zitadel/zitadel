@@ -66,12 +66,12 @@
             <cnsl-org-context class="context_card" *ngIf="org && showOrgContext" (closedCard)="showOrgContext = false"
               [org]="org" (setOrg)="setActiveOrg($event)">
             </cnsl-org-context>
-            <cnsl-info-overlay [workflowStepId]="'orgswitcher'" [idsToHighlight]="['orglink', 'orgswitchbutton']"
+            <!-- <cnsl-info-overlay [workflowStepId]="'orgswitcher'" [idsToHighlight]="['orglink', 'orgswitchbutton']"
               inset="55px auto auto -1rem">
               <p>This is the context switcher of ZITADEL. All organization settings occur on this very organization.
                 You
                 can also add an new organization here.</p>
-            </cnsl-info-overlay>
+            </cnsl-info-overlay> -->
           </div>
         </div>
       </ng-container>
@@ -114,11 +114,11 @@
         <i class="las la-cog"></i>
       </a>
 
-      <cnsl-info-overlay [workflowStepId]="'systembutton'" [arrowType]="InfoOverlayArrowType.TOP_RIGHT"
+      <!-- <cnsl-info-overlay [workflowStepId]="'systembutton'" [arrowType]="InfoOverlayArrowType.TOP_RIGHT"
         [idsToHighlight]="['systembutton', 'orgbutton']" inset="55px 1rem auto auto">
         <p>Note that you are a system administrator and you have enhanced rights. Here you can navigate to the system
           settings.</p>
-      </cnsl-info-overlay>
+      </cnsl-info-overlay> -->
     </div>
 
     <div cnslOutsideClick (clickOutside)="closeAccountCard()" class="icon-container"
@@ -134,10 +134,10 @@
         [iamuser]="(['iam.write$'] | hasRole) | async">
       </cnsl-accounts-card>
 
-      <cnsl-info-overlay [workflowStepId]="'profilebutton'" [arrowType]="InfoOverlayArrowType.TOP_RIGHT"
+      <!-- <cnsl-info-overlay [workflowStepId]="'profilebutton'" [arrowType]="InfoOverlayArrowType.TOP_RIGHT"
         [idsToHighlight]="['avatartoggle']" inset="55px -15px auto auto">
         <p>This is your current user. You can add multiple accounts and edit your personal information from here.</p>
-      </cnsl-info-overlay>
+      </cnsl-info-overlay> -->
     </div>
   </div>
 </mat-toolbar>

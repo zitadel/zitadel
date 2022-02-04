@@ -16,6 +16,7 @@ import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb'
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
+import { OverlayService } from './services/overlay.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 
@@ -63,6 +64,7 @@ export class AppComponent implements OnInit, OnDestroy {
     public matIconRegistry: MatIconRegistry,
     public domSanitizer: DomSanitizer,
     private router: Router,
+    private overlayService: OverlayService,
     update: UpdateService,
     private activatedRoute: ActivatedRoute,
     @Inject(DOCUMENT) private document: Document,
