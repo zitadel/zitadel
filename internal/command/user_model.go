@@ -144,6 +144,10 @@ func isUserStateInactive(state domain.UserState) bool {
 	return hasUserState(state, domain.UserStateInactive)
 }
 
+func isUserStateInitial(state domain.UserState) bool {
+	return hasUserState(state, domain.UserStateInitial)
+}
+
 func hasUserState(check domain.UserState, states ...domain.UserState) bool {
 	for _, state := range states {
 		if check == state {

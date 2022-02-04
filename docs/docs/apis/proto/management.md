@@ -2807,6 +2807,30 @@ Change JWT identity provider configuration of the organisation
     PUT: /actions/{id}
 
 
+### DeactivateAction
+
+> **rpc** DeactivateAction([DeactivateActionRequest](#deactivateactionrequest))
+[DeactivateActionResponse](#deactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_deactivate
+
+
+### ReactivateAction
+
+> **rpc** ReactivateAction([ReactivateActionRequest](#reactivateactionrequest))
+[ReactivateActionResponse](#reactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_reactivate
+
+
 ### DeleteAction
 
 > **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
@@ -5276,8 +5300,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5550,8 +5573,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5689,8 +5711,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5880,8 +5901,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 

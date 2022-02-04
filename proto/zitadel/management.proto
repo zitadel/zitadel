@@ -2841,30 +2841,29 @@ service ManagementService {
         };
     }
 
-//TODO: enable in next release
-//    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_deactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
-//
-//    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_reactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
+    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
+
+    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
 
     rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
         option (google.api.http) = {
@@ -2980,7 +2979,9 @@ message ListUserChangesRequest {
 }
 
 message ListUserChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3541,7 +3542,9 @@ message ListOrgChangesRequest {
 }
 
 message ListOrgChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3728,7 +3731,9 @@ message ListProjectChangesRequest {
 }
 
 message ListProjectChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3935,7 +3940,9 @@ message ListAppChangesRequest {
 }
 
 message ListAppChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 

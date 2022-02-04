@@ -111,7 +111,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	iam, err := l.authRepo.GetIAM(r.Context())
+	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -137,7 +137,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := iam.GlobalOrgID
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
@@ -194,7 +194,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	iam, err := l.authRepo.GetIAM(r.Context())
+	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

@@ -7,7 +7,6 @@ import (
 
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
-	"golang.org/x/text/language"
 	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -18,8 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
-	user_model "github.com/caos/zitadel/internal/user/model"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
 const (
@@ -81,7 +78,7 @@ func (o *OPStorage) GetKeyByIDAndIssuer(ctx context.Context, keyID, issuer strin
 }
 
 func (o *OPStorage) ValidateJWTProfileScopes(ctx context.Context, subject string, scopes []string) ([]string, error) {
-	user, err := o.repo.UserByID(ctx, subject)
+	user, err := o.query.GetUserByID(ctx, subject)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +107,14 @@ func (o *OPStorage) AuthorizeClientIDSecret(ctx context.Context, id string, secr
 		UserID: oidcCtx,
 		OrgID:  oidcCtx,
 	})
-	return o.repo.AuthorizeClientIDSecret(ctx, id, secret)
+	app, err := o.query.AppByClientID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if app.OIDCConfig != nil {
+		return o.command.VerifyOIDCClientSecret(ctx, app.ProjectID, app.ID, secret)
+	}
+	return o.command.VerifyAPIClientSecret(ctx, app.ProjectID, app.ID, secret)
 }
 
 func (o *OPStorage) SetUserinfoFromToken(ctx context.Context, userInfo oidc.UserInfoSetter, tokenID, subject, origin string) (err error) {
@@ -182,7 +186,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSetter, userID, applicationID string, scopes []string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := o.repo.UserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -192,38 +196,31 @@ func (o *OPStorage) setUserinfo(ctx context.Context, userInfo oidc.UserInfoSette
 		case oidc.ScopeOpenID:
 			userInfo.SetSubject(user.ID)
 		case oidc.ScopeEmail:
-			if user.HumanView == nil {
+			if user.Human == nil {
 				continue
 			}
-			userInfo.SetEmail(user.Email, user.IsEmailVerified)
+			userInfo.SetEmail(user.Human.Email, user.Human.IsEmailVerified)
 		case oidc.ScopeProfile:
 			userInfo.SetPreferredUsername(user.PreferredLoginName)
 			userInfo.SetUpdatedAt(user.ChangeDate)
-			if user.HumanView != nil {
-				userInfo.SetName(user.DisplayName)
-				userInfo.SetFamilyName(user.LastName)
-				userInfo.SetGivenName(user.FirstName)
-				userInfo.SetNickname(user.NickName)
-				userInfo.SetGender(oidc.Gender(getGender(user.Gender)))
-				locale, _ := language.Parse(user.PreferredLanguage)
-				userInfo.SetLocale(locale)
-				userInfo.SetPicture(user.AvatarURL)
+			if user.Human != nil {
+				userInfo.SetName(user.Human.DisplayName)
+				userInfo.SetFamilyName(user.Human.LastName)
+				userInfo.SetGivenName(user.Human.FirstName)
+				userInfo.SetNickname(user.Human.NickName)
+				userInfo.SetGender(getGender(user.Human.Gender))
+				userInfo.SetLocale(user.Human.PreferredLanguage)
+				userInfo.SetPicture(domain.AvatarURL(o.assetAPIPrefix, user.ResourceOwner, user.Human.AvatarKey))
 			} else {
-				userInfo.SetName(user.MachineView.Name)
+				userInfo.SetName(user.Machine.Name)
 			}
 		case oidc.ScopePhone:
-			if user.HumanView == nil {
+			if user.Human == nil {
 				continue
 			}
-			userInfo.SetPhone(user.Phone, user.IsPhoneVerified)
+			userInfo.SetPhone(user.Human.Phone, user.Human.IsPhoneVerified)
 		case oidc.ScopeAddress:
-			if user.HumanView == nil {
-				continue
-			}
-			if user.StreetAddress == "" && user.Locality == "" && user.Region == "" && user.PostalCode == "" && user.Country == "" {
-				continue
-			}
-			userInfo.SetAddress(oidc.NewUserInfoAddress(user.StreetAddress, user.Locality, user.Region, user.PostalCode, user.Country, ""))
+			//TODO: handle address for human users as soon as implemented
 		case ScopeUserMetaData:
 			userMetaData, err := o.assertUserMetaData(ctx, userID)
 			if err != nil {
@@ -308,13 +305,23 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 	if err != nil {
 		return nil, err
 	}
-	grants, err := o.repo.UserGrantsByProjectAndUserID(projectID, userID)
+	projectQuery, err := query.NewUserGrantProjectIDSearchQuery(projectID)
+	if err != nil {
+		return nil, err
+	}
+	userIDQuery, err := query.NewUserGrantUserIDSearchQuery(userID)
+	if err != nil {
+		return nil, err
+	}
+	grants, err := o.query.UserGrants(ctx, &query.UserGrantsQueries{
+		Queries: []query.SearchQuery{projectQuery, userIDQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
 	projectRoles := make(map[string]map[string]string)
 	for _, requestedRole := range requestedRoles {
-		for _, grant := range grants {
+		for _, grant := range grants.UserGrants {
 			checkGrantedRoles(projectRoles, grant, requestedRole)
 		}
 	}
@@ -322,20 +329,20 @@ func (o *OPStorage) assertRoles(ctx context.Context, userID, applicationID strin
 }
 
 func (o *OPStorage) assertUserMetaData(ctx context.Context, userID string) (map[string]string, error) {
-	metaData, err := o.repo.SearchUserMetadata(ctx, userID)
+	metaData, err := o.query.SearchUserMetadata(ctx, userID, &query.UserMetadataSearchQueries{})
 	if err != nil {
 		return nil, err
 	}
 
 	userMetaData := make(map[string]string)
-	for _, md := range metaData.Result {
+	for _, md := range metaData.Metadata {
 		userMetaData[md.Key] = base64.RawURLEncoding.EncodeToString(md.Value)
 	}
 	return userMetaData, nil
 }
 
 func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) (map[string]string, error) {
-	user, err := o.repo.UserByID(ctx, userID)
+	user, err := o.query.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -350,8 +357,8 @@ func (o *OPStorage) assertUserResourceOwner(ctx context.Context, userID string) 
 	}, nil
 }
 
-func checkGrantedRoles(roles map[string]map[string]string, grant *grant_model.UserGrantView, requestedRole string) {
-	for _, grantedRole := range grant.RoleKeys {
+func checkGrantedRoles(roles map[string]map[string]string, grant *query.UserGrant, requestedRole string) {
+	for _, grantedRole := range grant.Roles {
 		if requestedRole == grantedRole {
 			appendRole(roles, grantedRole, grant.ResourceOwner, grant.OrgPrimaryDomain)
 		}
@@ -365,13 +372,13 @@ func appendRole(roles map[string]map[string]string, role, orgID, orgPrimaryDomai
 	roles[role][orgID] = orgPrimaryDomain
 }
 
-func getGender(gender user_model.Gender) string {
+func getGender(gender domain.Gender) oidc.Gender {
 	switch gender {
-	case user_model.GenderFemale:
+	case domain.GenderFemale:
 		return "female"
-	case user_model.GenderMale:
+	case domain.GenderMale:
 		return "male"
-	case user_model.GenderDiverse:
+	case domain.GenderDiverse:
 		return "diverse"
 	}
 	return ""

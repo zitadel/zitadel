@@ -2,123 +2,79 @@ package user
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/domain"
-	user_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func UserQueriesToModel(queries []*user_pb.SearchQuery) []*user_model.UserSearchQuery {
-	q := make([]*user_model.UserSearchQuery, len(queries))
+func UserQueriesToQuery(queries []*user_pb.SearchQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i] = UserQueryToModel(query)
+		q[i], err = UserQueryToQuery(query)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return q
+	return q, nil
 }
 
-func UserQueryToModel(query *user_pb.SearchQuery) *user_model.UserSearchQuery {
+func UserQueryToQuery(query *user_pb.SearchQuery) (query.SearchQuery, error) {
 	switch q := query.Query.(type) {
 	case *user_pb.SearchQuery_UserNameQuery:
-		return UserNameQueryToModel(q.UserNameQuery)
+		return UserNameQueryToQuery(q.UserNameQuery)
 	case *user_pb.SearchQuery_FirstNameQuery:
-		return FirstNameQueryToModel(q.FirstNameQuery)
+		return FirstNameQueryToQuery(q.FirstNameQuery)
 	case *user_pb.SearchQuery_LastNameQuery:
-		return LastNameQueryToModel(q.LastNameQuery)
+		return LastNameQueryToQuery(q.LastNameQuery)
 	case *user_pb.SearchQuery_NickNameQuery:
-		return NickNameQueryToModel(q.NickNameQuery)
+		return NickNameQueryToQuery(q.NickNameQuery)
 	case *user_pb.SearchQuery_DisplayNameQuery:
-		return DisplayNameQueryToModel(q.DisplayNameQuery)
+		return DisplayNameQueryToQuery(q.DisplayNameQuery)
 	case *user_pb.SearchQuery_EmailQuery:
-		return EmailQueryToModel(q.EmailQuery)
+		return EmailQueryToQuery(q.EmailQuery)
 	case *user_pb.SearchQuery_StateQuery:
-		return StateQueryToModel(q.StateQuery)
+		return StateQueryToQuery(q.StateQuery)
 	case *user_pb.SearchQuery_TypeQuery:
-		return TypeQueryToModel(q.TypeQuery)
+		return TypeQueryToQuery(q.TypeQuery)
 	case *user_pb.SearchQuery_ResourceOwner:
-		return ResourceOwnerQueryToModel(q.ResourceOwner)
+		return ResourceOwnerQueryToQuery(q.ResourceOwner)
 	default:
-		return nil
+		return nil, errors.ThrowInvalidArgument(nil, "GRPC-vR9nC", "List.Query.Invalid")
 	}
 }
 
-func UserNameQueryToModel(q *user_pb.UserNameQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyUserName,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.UserName,
-	}
+func UserNameQueryToQuery(q *user_pb.UserNameQuery) (query.SearchQuery, error) {
+	return query.NewUserUsernameSearchQuery(q.UserName, object.TextMethodToQuery(q.Method))
 }
 
-func FirstNameQueryToModel(q *user_pb.FirstNameQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyFirstName,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.FirstName,
-	}
+func FirstNameQueryToQuery(q *user_pb.FirstNameQuery) (query.SearchQuery, error) {
+	return query.NewUserFirstNameSearchQuery(q.FirstName, object.TextMethodToQuery(q.Method))
 }
 
-func LastNameQueryToModel(q *user_pb.LastNameQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyLastName,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.LastName,
-	}
+func LastNameQueryToQuery(q *user_pb.LastNameQuery) (query.SearchQuery, error) {
+	return query.NewUserLastNameSearchQuery(q.LastName, object.TextMethodToQuery(q.Method))
 }
 
-func NickNameQueryToModel(q *user_pb.NickNameQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyNickName,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.NickName,
-	}
+func NickNameQueryToQuery(q *user_pb.NickNameQuery) (query.SearchQuery, error) {
+	return query.NewUserNickNameSearchQuery(q.NickName, object.TextMethodToQuery(q.Method))
 }
 
-func DisplayNameQueryToModel(q *user_pb.DisplayNameQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyDisplayName,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.DisplayName,
-	}
+func DisplayNameQueryToQuery(q *user_pb.DisplayNameQuery) (query.SearchQuery, error) {
+	return query.NewUserDisplayNameSearchQuery(q.DisplayName, object.TextMethodToQuery(q.Method))
 }
 
-func EmailQueryToModel(q *user_pb.EmailQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyEmail,
-		Method: object.TextMethodToModel(q.Method),
-		Value:  q.EmailAddress,
-	}
+func EmailQueryToQuery(q *user_pb.EmailQuery) (query.SearchQuery, error) {
+	return query.NewUserEmailSearchQuery(q.EmailAddress, object.TextMethodToQuery(q.Method))
 }
 
-func StateQueryToModel(q *user_pb.StateQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyState,
-		Method: domain.SearchMethodEquals,
-		Value:  q.State,
-	}
+func StateQueryToQuery(q *user_pb.StateQuery) (query.SearchQuery, error) {
+	return query.NewUserStateSearchQuery(int32(q.State))
 }
 
-func TypeQueryToModel(q *user_pb.TypeQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyType,
-		Method: domain.SearchMethodEquals,
-		Value:  UserTypeToModel(q.Type),
-	}
+func TypeQueryToQuery(q *user_pb.TypeQuery) (query.SearchQuery, error) {
+	return query.NewUserTypeSearchQuery(int32(q.Type))
 }
 
-func UserTypeToModel(t user_pb.Type) string {
-	switch t {
-	case user_pb.Type_TYPE_HUMAN:
-		return "human"
-	case user_pb.Type_TYPE_MACHINE:
-		return "machine"
-	default:
-		return ""
-	}
-}
-
-func ResourceOwnerQueryToModel(q *user_pb.ResourceOwnerQuery) *user_model.UserSearchQuery {
-	return &user_model.UserSearchQuery{
-		Key:    user_model.UserSearchKeyResourceOwner,
-		Method: domain.SearchMethodEquals,
-		Value:  q.OrgID,
-	}
+func ResourceOwnerQueryToQuery(q *user_pb.ResourceOwnerQuery) (query.SearchQuery, error) {
+	return query.NewUserResourceOwnerSearchQuery(q.OrgID, query.TextEquals)
 }

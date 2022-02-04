@@ -207,6 +207,7 @@ RegistrationUser:
   LanguageLabel: Language
   German: Deutsch
   English: English
+  Italian: Italiano
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -234,6 +235,7 @@ ExternalRegistrationUserOverview:
   LanguageLabel: Language
   German: Deutsch
   English: English
+  Italian: Italiano
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -258,7 +260,7 @@ RegistrationOrg:
   TosLinkText: TOS
   TosConfirmAnd: and the
   PrivacyLinkText: privacy policy
-  SaveButtonText: save
+  SaveButtonText: Create organization
 
 LoginSuccess:
   Title: Login successful
@@ -287,6 +289,9 @@ ExternalNotFoundOption:
   TosLinkText: TOS
   TosConfirmAnd: and the
   PrivacyLinkText: privacy policy
+  German: Deutsch
+  English: English
+  Italian: Italiano
 
 Footer:
   PoweredBy: Powered By

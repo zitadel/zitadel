@@ -74,9 +74,10 @@ type OPStorage struct {
 	signingKeyRotationCheck           time.Duration
 	signingKeyGracefulPeriod          time.Duration
 	locker                            crdb.Locker
+	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) op.OpenIDProvider {
+func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, assetAPIPrefix string) op.OpenIDProvider {
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
 	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, keyConfig.EncryptionConfig.EncryptionKeyID)
@@ -94,7 +95,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
 	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es, projections, keyChan)
+	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es, projections, keyChan, assetAPIPrefix)
 	logging.Log("OIDC-Jdg2k").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create storage")
 	provider, err := op.NewOpenIDProvider(
 		ctx,
@@ -119,7 +120,7 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	return provider
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) (*OPStorage, error) {
+func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
 	encAlg, err := crypto.NewAESCrypto(keyConfig.EncryptionConfig)
 	if err != nil {
 		return nil, err
@@ -144,6 +145,7 @@ func newStorage(config StorageConfig, command *command.Commands, query *query.Qu
 		signingKeyRotationCheck:           keyConfig.SigningKeyRotationCheck.Duration,
 		locker:                            crdb.NewLocker(sqlClient, locksTable, signingKey),
 		keyChan:                           keyChan,
+		assetAPIPrefix:                    assetAPIPrefix,
 	}, nil
 }
 
