@@ -8,13 +8,13 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/api/assets"
 	"github.com/caos/zitadel/internal/config"
 )
 
 var (
-	directory  = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
-	assetsDocs = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	directory   = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
+	assetsDocs  = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	assetPrefix = flag.String("handler-prefix", "/assets/v1", "prefix of the handler paths")
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
 	docs, err := os.OpenFile(*assetsDocs, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
 	logging.Log("ASSETS-Dfvsd").OnError(err).Fatal("cannot open docs file")
-	GenerateAssetHandler(configFile, authz, router, docs)
+	GenerateAssetHandler(configFile, *assetPrefix, authz, router, docs)
 }
 
 type Method struct {
@@ -98,7 +98,7 @@ type Service struct {
 	Methods map[string]Method
 }
 
-func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) {
+func GenerateAssetHandler(configFilePath, handlerPrefix string, authz, router, docs io.Writer) {
 	conf := new(struct {
 		Services Services
 	})
@@ -118,7 +118,7 @@ func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) 
 	}{
 		GoPkgName: "assets",
 		Name:      "AssetsService",
-		Prefix:    assets.HandlerPrefix,
+		Prefix:    handlerPrefix,
 		Services:  conf.Services,
 	}
 	err = tmplAuthz.Execute(authz, data)
