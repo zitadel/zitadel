@@ -51,6 +51,7 @@ export class FeaturesComponent implements OnDestroy {
     ActionsAllowed.ACTIONS_ALLOWED_MAX,
     ActionsAllowed.ACTIONS_ALLOWED_UNLIMITED,
   ];
+  public ActionsAllowed: any = ActionsAllowed;
 
   constructor(
     private route: ActivatedRoute,
