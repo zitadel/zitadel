@@ -3,12 +3,9 @@ package main
 import (
 	"context"
 	"flag"
-	"io/ioutil"
 	"time"
 
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
-
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
@@ -23,6 +20,9 @@ import (
 type E2EConfig struct {
 	Org                            string
 	MachineKeyPath                 string
+	ZitadelProjectResourceID       string
+	APIURL                         string
+	IssuerURL                      string
 	OrgOwnerPassword               string
 	OrgOwnerViewerPassword         string
 	OrgProjectCreatorPassword      string
@@ -38,6 +38,10 @@ type setupConfig struct {
 	Eventstore     types.SQL
 	SystemDefaults sd.SystemDefaults
 	InternalAuthZ  internal_authz.Config
+}
+
+type user struct {
+	desc, role, pw string
 }
 
 var (
@@ -70,116 +74,35 @@ func startE2ESetup(configPaths []string) {
 	)
 	logging.Log("MAIN-54MLq").OnError(err).Fatal("cannot start command side")
 
-	err = execute(ctx, commands, conf.E2E)
-	logging.Log("MAIN-cgZ3p").OnError(err).Errorf("failed to execute commands steps")
-}
-
-func execute(ctx context.Context, commands *command.Commands, cfg E2EConfig) error {
-
-	orgOwner := newHuman("org_owner", cfg.OrgOwnerPassword)
-
-	org, err := commands.SetUpOrg(ctx, &domain.Org{
-		Name:    cfg.Org,
-		Domains: []*domain.OrgDomain{{Domain: "localhost"}},
-	}, orgOwner, nil, false)
-	if err != nil {
-		return err
-	}
-
-	// Avoids the MFA nudge
-	if _, err = commands.AddLoginPolicy(ctx, org.ResourceOwner, &domain.LoginPolicy{
-		AllowUsernamePassword: true,
-	}); err != nil {
-		return err
-	}
-
-	// Avoids the change password screen
-	if _, err = commands.ChangePassword(ctx, org.ResourceOwner, orgOwner.AggregateID, cfg.OrgOwnerPassword, cfg.OrgOwnerPassword, ""); err != nil {
-		return err
-	}
-
-	sa, err := commands.AddMachine(ctx, org.ResourceOwner, &domain.Machine{
-		Username:    "e2e",
-		Name:        "e2e",
-		Description: "User who calls the ZITADEL API for preparing end-to-end tests",
-	})
-	if err != nil {
-		return err
-	}
-
-	if _, err = commands.AddOrgMember(ctx, domain.NewMember(org.ResourceOwner, sa.AggregateID, domain.RoleOrgOwner)); err != nil {
-		return err
-	}
-
-	key, err := commands.AddUserMachineKey(ctx, &domain.MachineKey{
-		ObjectRoot: models.ObjectRoot{
-			AggregateID: sa.AggregateID,
-		},
-		ExpirationDate: time.Now().Add(30 * 24 * time.Hour),
-		Type:           domain.AuthNKeyTypeJSON,
-	}, org.ResourceOwner)
-	if err != nil {
-		return err
-	}
-
-	json, err := key.MarshalJSON()
-	if err != nil {
-		return err
-	}
-
-	if err = ioutil.WriteFile(cfg.MachineKeyPath, json, 0600); err != nil {
-		return err
-	}
-
-	for _, user := range []struct{ desc, role, pw string }{{
+	users := []user{{
+		desc: "org_owner",
+		pw:   conf.E2E.OrgOwnerPassword,
+		role: domain.RoleOrgOwner,
+	}, {
 		desc: "org_owner_viewer",
-		pw:   cfg.OrgOwnerViewerPassword,
+		pw:   conf.E2E.OrgOwnerViewerPassword,
 		role: domain.RoleOrgOwner,
 	}, {
 		desc: "org_project_creator",
-		pw:   cfg.OrgProjectCreatorPassword,
+		pw:   conf.E2E.OrgProjectCreatorPassword,
 		role: domain.RoleOrgProjectCreator,
 	}, {
 		desc: "login_policy_user",
-		pw:   cfg.LoginPolicyUserPassword,
+		pw:   conf.E2E.LoginPolicyUserPassword,
 	}, {
 		desc: "password_complexity_user",
-		pw:   cfg.PasswordComplexityUserPassword,
-	}} {
+		pw:   conf.E2E.PasswordComplexityUserPassword,
+	}}
 
-		newHuman, err := commands.AddHuman(ctx, org.ResourceOwner, newHuman(user.desc, user.pw))
-		if err != nil {
-			return err
-		}
+	err = execute(ctx, commands, conf.E2E, users)
+	logging.Log("MAIN-cgZ3p").OnError(err).Errorf("failed to execute commands steps")
 
-		// Avoids the change password screen
-		if _, err = commands.ChangePassword(ctx, org.ResourceOwner, newHuman.AggregateID, user.pw, user.pw, ""); err != nil {
-			return err
-		}
-
-		if user.role != "" {
-			if _, err = commands.AddOrgMember(ctx, domain.NewMember(org.ResourceOwner, newHuman.AggregateID, user.role)); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func newHuman(desc, pw string) *domain.Human {
-	return &domain.Human{
-		Username: desc + "_user_name",
-		Profile: &domain.Profile{
-			FirstName: desc + "_first_name",
-			LastName:  desc + "_last_name",
-		},
-		Password: &domain.Password{
-			SecretString:   pw,
-			ChangeRequired: false,
-		},
-		Email: &domain.Email{
-			EmailAddress:    desc + ".e2e@caos.ch",
-			IsEmailVerified: true,
-		},
-	}
+	eventualConsistencyCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+	err = awaitConsistency(
+		eventualConsistencyCtx,
+		conf.E2E,
+		users,
+	)
+	logging.Log("MAIN-cgZ3p").OnError(err).Errorf("failed to await consistency")
 }
