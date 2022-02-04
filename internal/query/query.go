@@ -46,21 +46,6 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-//
-//var DefaultConfig = ConfigV2{
-//	Eventstore: types.SQLUser2{
-//		User:            queryUser,
-//		Password:        os.Getenv(keyQueriesPassword),
-//		MaxOpenConns:    2,
-//		MaxConnLifetime: types.Duration{Duration: 30 * time.Minute},
-//		MaxConnIdleTime: types.Duration{Duration: 30 * time.Minute},
-//		SSL: types.SSLUser{
-//			Cert: os.Getenv(keyQueriesCert),
-//			Key:  os.Getenv(keyQueriesKey),
-//		},
-//	},
-//}
-
 func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
