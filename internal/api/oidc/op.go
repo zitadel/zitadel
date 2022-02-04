@@ -25,6 +25,10 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 )
 
+const (
+	HandlerPrefix = "/oauth/v2"
+)
+
 type Config struct {
 	Issuer                            string
 	CodeMethodS256                    bool

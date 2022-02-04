@@ -21,6 +21,10 @@ import (
 	"github.com/caos/zitadel/internal/static"
 )
 
+const (
+	HandlerPrefix = "/assets/v1"
+)
+
 type Handler struct {
 	errorHandler    ErrorHandler
 	storage         static.Storage

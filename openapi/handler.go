@@ -8,6 +8,10 @@ import (
 	_ "github.com/caos/zitadel/openapi/statik"
 )
 
+const (
+	HandlerPrefix = "/openapi/v2/swagger"
+)
+
 func Start() (http.Handler, error) {
 	statikFS, err := fs.NewWithNamespace("swagger")
 	if err != nil {

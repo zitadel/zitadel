@@ -65,7 +65,7 @@ type Config struct {
 	Eventstore types.SQLUser
 }
 
-func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo authz_repo.Repository, keyConfig *crypto.KeyConfig) (repo *Commands, err error) {
+func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo authz_repo.Repository, keyConfig *crypto.KeyConfig, webAuthN webauthn_helper.Config) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
 		static:             staticStore,
@@ -121,7 +121,7 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZC
 	}
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
-	web, err := webauthn_helper.StartServer(defaults.WebAuthN)
+	web, err := webauthn_helper.StartServer(webAuthN)
 	if err != nil {
 		return nil, err
 	}

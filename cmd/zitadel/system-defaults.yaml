@@ -143,11 +143,6 @@ SystemDefaults:
         Greeting: 'DomainClaimed.Greeting'
         Text: 'DomainClaimed.Text'
         ButtonText: 'DomainClaimed.ButtonText'
-  WebAuthN:
-    ID: $ZITADEL_DEFAULT_DOMAIN
-    OriginLogin: $ZITADEL_ACCOUNTS
-    OriginConsole: $ZITADEL_CONSOLE
-    DisplayName: ZITADEL
   KeyConfig:
     Size: 2048
     PrivateKeyLifetime: 6h

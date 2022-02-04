@@ -28,7 +28,6 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/management"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
-	middlewareV2 "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/oidc"
 	"github.com/caos/zitadel/internal/api/ui/console"
 	"github.com/caos/zitadel/internal/api/ui/login"
@@ -41,7 +40,6 @@ import (
 	"github.com/caos/zitadel/internal/config"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
-	types_v1 "github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -51,6 +49,7 @@ import (
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/static"
 	static_config "github.com/caos/zitadel/internal/static/config"
+	"github.com/caos/zitadel/internal/webauthn"
 	"github.com/caos/zitadel/openapi"
 )
 
@@ -63,7 +62,7 @@ const (
 var version = "dev-v2"
 
 type startConfig struct {
-	BaseDomain     string
+	Domain         string
 	Commands       types.SQLUser
 	Queries        types.SQLUser
 	Projections    projectionConfig
@@ -78,6 +77,7 @@ type startConfig struct {
 	Login          login.Config
 	Console        console.Config
 	Notification   notification.Config
+	WebAuthN       webauthn.Config
 }
 
 type projectionConfig struct {
@@ -102,7 +102,7 @@ const (
 	queryMaxConnLifetime     = 30 * time.Minute
 	queryMaxConnIdleTime     = 30 * time.Minute
 
-	envBaseDomain          = "ZITADEL_BASE_DOMAIN"
+	envDomain              = "ZITADEL_DOMAIN"
 	envEventstoreHost      = "ZITADEL_EVENTSTORE_HOST"
 	envEventstorePort      = "ZITADEL_EVENTSTORE_PORT"
 	envEventstoreSSLMode   = "CR_SSL_MODE"
@@ -120,9 +120,6 @@ const (
 	envOIDCKey             = "ZITADEL_OIDC_KEYS_ID"
 	envSentryUsage         = "SENTRY_USAGE"
 	envSentryEnvironment   = "SENTRY_ENVIRONMENT"
-
-	pathOAuthV2  = "/oauth/v2"
-	pathAssetAPI = "/assets/v1"
 
 	defaultPort = "8080"
 )
@@ -157,8 +154,8 @@ func main() {
 	switch arg {
 	case cmdStart:
 		startZitadel()
-	case cmdSetup:
-		//startSetup()
+	//case cmdSetup:
+	//startSetup()
 	default:
 		logging.Log("MAIN-afEQ2").Fatal("please provide an valid argument [start, setup]")
 	}
@@ -187,7 +184,7 @@ func startZitadel() {
 
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands)
 	logging.Log("MAIN-iRCMm").OnError(err).Fatal("cannot start eventstore for commands")
-	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, storage, authZRepo, conf.OIDC.KeyConfig)
+	commands, err := command.StartCommands(esCommands, conf.SystemDefaults, conf.InternalAuthZ, storage, authZRepo, conf.OIDC.KeyConfig, conf.WebAuthN)
 	logging.Log("MAIN-bmNiJ").OnError(err).Fatal("cannot start commands")
 
 	if *notificationEnabled {
@@ -224,38 +221,38 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if *adminEnabled {
 		adminRepo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, commands, store, *localDevMode)
 		logging.Log("MAIN-D42tq").OnError(err).Fatal("error starting auth repo")
-		apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, pathAssetAPI))
+		apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, assets.HandlerPrefix))
 	}
 	if *managementEnabled {
-		apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, pathAssetAPI))
+		apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, assets.HandlerPrefix))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, pathAssetAPI))
+		apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, assets.HandlerPrefix))
 	}
 
 	if *assetsEnabled {
 		assetsHandler := assets.NewHandler(commands, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, store, queries)
-		apis.RegisterHandler(pathAssetAPI, assetsHandler)
+		apis.RegisterHandler(assets.HandlerPrefix, assetsHandler)
 	}
 
 	if *oidcEnabled {
-		oidcProvider := oidc.NewProvider(ctx, conf.OIDC, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, eventstore, projectionsDB, keyChan, pathAssetAPI, conf.BaseDomain)
-		apis.RegisterHandler(pathOAuthV2, oidcProvider.HttpHandler())
+		oidcProvider := oidc.NewProvider(ctx, conf.OIDC, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, eventstore, projectionsDB, keyChan, assets.HandlerPrefix, conf.Domain)
+		apis.RegisterHandler(oidc.HandlerPrefix, oidcProvider.HttpHandler())
 	}
 
 	openAPIHandler, err := openapi.Start()
 	logging.Log("MAIN-8pRk1").OnError(err).Fatal("Unable to start openapi handler")
-	apis.RegisterHandler("/openapi/v2/swagger", cors.AllowAll().Handler(openAPIHandler))
+	apis.RegisterHandler(openapi.HandlerPrefix, cors.AllowAll().Handler(openAPIHandler))
 
 	if *consoleEnabled {
 		consoleID, err := consoleClientID(ctx, queries)
 		logging.Log("MAIN-Dgfqs").OnError(err).Fatal("unable to get client_id for console")
-		c, err := console.Start(conf.Console, local(conf.BaseDomain), url(local(conf.BaseDomain)), conf.OIDC.Issuer, consoleID)
+		c, err := console.Start(conf.Console, local(conf.Domain), url(local(conf.Domain)), conf.OIDC.Issuer, consoleID)
 		apis.RegisterHandler(console.HandlerPrefix, c)
 	}
 
 	if *loginEnabled {
-		l := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode, conf.BaseDomain, console.HandlerPrefix)
+		l := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode, conf.Domain, console.HandlerPrefix)
 		apis.RegisterHandler(login.HandlerPrefix, l.Handler())
 	}
 }
@@ -308,7 +305,7 @@ func enableSentry() {
 
 func defaultStartConfig() *startConfig {
 	return &startConfig{
-		BaseDomain:     os.Getenv(envBaseDomain),
+		Domain:         os.Getenv(envDomain),
 		EventstoreBase: eventstoreConfig(),
 		Commands:       defaultCommandConfig(),
 		Queries:        defaultQueryConfig(),
@@ -322,6 +319,15 @@ func defaultStartConfig() *startConfig {
 		Auth:           auth_es.Config{},                   //remove later; until then, read from startup.yaml
 		AssetStorage:   static_config.AssetStorageConfig{}, //TODO: default config?
 		Admin:          admin_es.Config{},                  //remove later; until then, read from startup.yaml
+		WebAuthN:       defaultWebAuthNConfig(),
+	}
+}
+
+func defaultWebAuthNConfig() webauthn.Config {
+	return webauthn.Config{
+		ID:          os.Getenv(envDomain),
+		Origin:      url(local(os.Getenv(envDomain))),
+		DisplayName: "ZITADEL",
 	}
 }
 
@@ -376,8 +382,8 @@ func defaultQueryConfig() types.SQLUser {
 func defaultProjectionConfig() projectionConfig {
 	return projectionConfig{
 		Config: projection.Config{
-			RequeueEvery:     types_v1.Duration{Duration: 10 * time.Second},
-			RetryFailedAfter: types_v1.Duration{Duration: 1 * time.Second},
+			RequeueEvery:     types.Duration{Duration: 10 * time.Second},
+			RetryFailedAfter: types.Duration{Duration: 1 * time.Second},
 			MaxFailureCount:  5,
 			BulkLimit:        200,
 			MaxIterators:     1,
@@ -413,8 +419,8 @@ func defaultProjectionConfig() projectionConfig {
 
 func defaultOIDCConfig() oidc.Config {
 	return oidc.Config{
-		Issuer:                            url(local(os.Getenv(envBaseDomain)) + pathOAuthV2), //TODO: BaseDomain/oauth/v2/ ??
-		DefaultLogoutRedirectURI:          login.HandlerPrefix + "/logout/done",               //TODO: still config?
+		Issuer:                            url(local(os.Getenv(envDomain)) + oidc.HandlerPrefix), //TODO: Domain/oauth/v2/ ??
+		DefaultLogoutRedirectURI:          login.HandlerPrefix + "/logout/done",                  //TODO: still config?
 		CodeMethodS256:                    true,
 		AuthMethodPost:                    true,
 		AuthMethodPrivateKeyJWT:           true,
@@ -428,8 +434,8 @@ func defaultOIDCConfig() oidc.Config {
 		DefaultRefreshTokenExpiration:     types.Duration{Duration: 2160 * time.Hour}, // 90 days
 		UserAgentCookieConfig:             defaultUserAgentCookieConfig(),
 		Cache: &middleware.CacheConfig{
-			MaxAge:       types_v1.Duration{Duration: 12 * time.Hour},
-			SharedMaxAge: types_v1.Duration{Duration: 168 * time.Hour}, // 7 days
+			MaxAge:       types.Duration{Duration: 12 * time.Hour},
+			SharedMaxAge: types.Duration{Duration: 168 * time.Hour}, // 7 days
 		},
 		KeyConfig: &crypto.KeyConfig{
 			EncryptionKeyID: os.Getenv(envOIDCKey),
@@ -454,8 +460,8 @@ func url(url string) string {
 
 func defaultLoginConfig() login.Config {
 	return login.Config{
-		OidcAuthCallbackURL: pathOAuthV2 + "/authorize/callback?id=", //TODO: provide from op
-		LanguageCookieName:  "zitadel.login.lang",                    //TODO: constant? (console might need it as well)
+		OidcAuthCallbackURL: oidc.HandlerPrefix + "/authorize/callback?id=", //TODO: provide from op
+		LanguageCookieName:  "zitadel.login.lang",                           //TODO: constant? (console might need it as well)
 		CSRF: login.CSRF{
 			CookieName: "zitadel.login.csrf", //TODO: constant?
 			Key: &crypto.KeyConfig{
@@ -484,20 +490,20 @@ func defaultConsoleConfig() console.Config {
 
 func defaultShortCacheConfig() middleware.CacheConfig {
 	return middleware.CacheConfig{
-		MaxAge:       types_v1.Duration{Duration: 5 * time.Minute},
-		SharedMaxAge: types_v1.Duration{Duration: 15 * time.Minute},
+		MaxAge:       types.Duration{Duration: 5 * time.Minute},
+		SharedMaxAge: types.Duration{Duration: 15 * time.Minute},
 	}
 }
 
 func defaultCacheConfig() middleware.CacheConfig {
 	return middleware.CacheConfig{
-		MaxAge:       types_v1.Duration{Duration: 12 * time.Hour},
-		SharedMaxAge: types_v1.Duration{Duration: 168 * time.Hour}, // 7 days
+		MaxAge:       types.Duration{Duration: 12 * time.Hour},
+		SharedMaxAge: types.Duration{Duration: 168 * time.Hour}, // 7 days
 	}
 }
 
-func defaultUserAgentCookieConfig() *middlewareV2.UserAgentCookieConfig {
-	return &middlewareV2.UserAgentCookieConfig{
+func defaultUserAgentCookieConfig() *middleware.UserAgentCookieConfig {
+	return &middleware.UserAgentCookieConfig{
 		Name: "zitadel.useragent", //TODO: constant?
 		Key: &crypto.KeyConfig{
 			EncryptionKeyID: os.Getenv(envCookieKey),

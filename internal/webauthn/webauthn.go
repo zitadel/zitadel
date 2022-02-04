@@ -3,40 +3,36 @@ package webauthn
 import (
 	"bytes"
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 type WebAuthN struct {
-	webLogin   *webauthn.WebAuthn
-	webConsole *webauthn.WebAuthn
+	webAuthN *webauthn.WebAuthn
 }
 
-func StartServer(sd systemdefaults.WebAuthN) (*WebAuthN, error) {
-	webLogin, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: sd.DisplayName,
-		RPID:          sd.ID,
-		RPOrigin:      sd.OriginLogin,
-	})
-	if err != nil {
-		return nil, err
-	}
-	webConsole, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: sd.DisplayName,
-		RPID:          sd.ID,
-		RPOrigin:      sd.OriginConsole,
+type Config struct {
+	ID          string
+	Origin      string
+	DisplayName string
+}
+
+func StartServer(config Config) (*WebAuthN, error) {
+	webAuthN, err := webauthn.New(&webauthn.Config{
+		RPDisplayName: config.DisplayName,
+		RPID:          config.ID,
+		RPOrigin:      config.Origin,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &WebAuthN{
-		webLogin:   webLogin,
-		webConsole: webConsole,
+		webAuthN: webAuthN,
 	}, err
 }
 
@@ -78,7 +74,7 @@ func (w *WebAuthN) BeginRegistration(user *domain.Human, accountName string, aut
 			CredentialID: cred.ID,
 		}
 	}
-	credentialOptions, sessionData, err := w.web(isLoginUI).BeginRegistration(
+	credentialOptions, sessionData, err := w.webAuthN.BeginRegistration(
 		&webUser{
 			Human:       user,
 			accountName: accountName,
@@ -115,7 +111,7 @@ func (w *WebAuthN) FinishRegistration(user *domain.Human, webAuthN *domain.WebAu
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
-	credential, err := w.web(isLoginUI).CreateCredential(
+	credential, err := w.webAuthN.CreateCredential(
 		&webUser{
 			Human: user,
 		},
@@ -135,7 +131,7 @@ func (w *WebAuthN) FinishRegistration(user *domain.Human, webAuthN *domain.WebAu
 }
 
 func (w *WebAuthN) BeginLogin(user *domain.Human, userVerification domain.UserVerificationRequirement, isLoginUI bool, webAuthNs ...*domain.WebAuthNToken) (*domain.WebAuthNLogin, error) {
-	assertion, sessionData, err := w.web(isLoginUI).BeginLogin(&webUser{
+	assertion, sessionData, err := w.webAuthN.BeginLogin(&webUser{
 		Human:       user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}, webauthn.WithUserVerification(UserVerificationFromDomain(userVerification)))
@@ -163,7 +159,7 @@ func (w *WebAuthN) FinishLogin(user *domain.Human, webAuthN *domain.WebAuthNLogi
 		Human:       user,
 		credentials: WebAuthNsToCredentials(webAuthNs),
 	}
-	credential, err := w.web(isLoginUI).ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
+	credential, err := w.webAuthN.ValidateLogin(webUser, WebAuthNLoginToSessionData(webAuthN), assertionData)
 	if err != nil {
 		return nil, 0, caos_errs.ThrowInternal(err, "WEBAU-3M9si", "Errors.User.WebAuthN.ValidateLoginFailed")
 	}
@@ -172,11 +168,4 @@ func (w *WebAuthN) FinishLogin(user *domain.Human, webAuthN *domain.WebAuthNLogi
 		return credential.ID, credential.Authenticator.SignCount, caos_errs.ThrowInternal(err, "WEBAU-4M90s", "Errors.User.WebAuthN.CloneWarning")
 	}
 	return credential.ID, credential.Authenticator.SignCount, nil
-}
-
-func (w *WebAuthN) web(isLoginUI bool) *webauthn.WebAuthn {
-	if isLoginUI {
-		return w.webLogin
-	}
-	return w.webConsole
 }
