@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/oidc/pkg/op"
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -75,7 +74,7 @@ type startConfig struct {
 	Auth           auth_es.Config
 	AssetStorage   static_config.AssetStorageConfig
 	Admin          admin_es.Config
-	OIDC           oidc.OPHandlerConfig
+	OIDC           oidc.Config
 	Login          login.Config
 	Console        console.Config
 	Notification   notification.Config
@@ -89,6 +88,7 @@ type projectionConfig struct {
 
 const (
 	eventstoreDB             = "eventstore"
+	projectionDB             = "zitadel"
 	queryUser                = "queries"
 	commandUser              = "eventstore"
 	projectionSchema         = "projections"
@@ -123,9 +123,8 @@ const (
 
 	pathOAuthV2  = "/oauth/v2"
 	pathAssetAPI = "/assets/v1"
-	projectionDB = "zitadel"
 
-	defaultPort = "50002" //TODO: change to 80?
+	defaultPort = "8080"
 )
 
 var (
@@ -251,7 +250,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if *consoleEnabled {
 		consoleID, err := consoleClientID(ctx, queries)
 		logging.Log("MAIN-Dgfqs").OnError(err).Fatal("unable to get client_id for console")
-		c, err := console.Start(conf.Console, localURL(conf.BaseDomain), conf.OIDC.OPConfig.Issuer, consoleID)
+		c, err := console.Start(conf.Console, local(conf.BaseDomain), url(local(conf.BaseDomain)), conf.OIDC.Issuer, consoleID)
 		apis.RegisterHandler(console.HandlerPrefix, c)
 	}
 
@@ -259,8 +258,6 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		l := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, *localDevMode, conf.BaseDomain, console.HandlerPrefix)
 		apis.RegisterHandler(login.HandlerPrefix, l.Handler())
 	}
-
-	apis.Router()
 }
 
 func listen(ctx context.Context, router *mux.Router) {
@@ -414,28 +411,22 @@ func defaultProjectionConfig() projectionConfig {
 	}
 }
 
-func defaultOIDCConfig() oidc.OPHandlerConfig {
-	return oidc.OPHandlerConfig{
-		OPConfig: &op.Config{
-			Issuer:                   "http://" + localURL(os.Getenv(envBaseDomain)) + pathOAuthV2, //TODO: BaseDomain/oauth/v2/ ??
-			CryptoKey:                [32]byte{},                                                   //TODO: change config type?
-			DefaultLogoutRedirectURI: login.HandlerPrefix + "/logout/done",                         //TODO: still config?
-			CodeMethodS256:           true,
-			AuthMethodPost:           true,
-			AuthMethodPrivateKeyJWT:  true,
-			GrantTypeRefreshToken:    true,
-			RequestObjectSupported:   true,
-			SupportedUILocales:       nil, //TODO: change config type?
-		},
-		StorageConfig: oidc.StorageConfig{
-			DefaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID), //TODO: still config?
-			SigningKeyAlgorithm:               "RS256",
-			DefaultAccessTokenLifetime:        types.Duration{Duration: 12 * time.Hour},
-			DefaultIdTokenLifetime:            types.Duration{Duration: 12 * time.Hour},
-			DefaultRefreshTokenIdleExpiration: types.Duration{Duration: 720 * time.Hour},  // 30 days
-			DefaultRefreshTokenExpiration:     types.Duration{Duration: 2160 * time.Hour}, // 90 days
-		},
-		UserAgentCookieConfig: defaultUserAgentCookieConfig(),
+func defaultOIDCConfig() oidc.Config {
+	return oidc.Config{
+		Issuer:                            url(local(os.Getenv(envBaseDomain)) + pathOAuthV2), //TODO: BaseDomain/oauth/v2/ ??
+		DefaultLogoutRedirectURI:          login.HandlerPrefix + "/logout/done",               //TODO: still config?
+		CodeMethodS256:                    true,
+		AuthMethodPost:                    true,
+		AuthMethodPrivateKeyJWT:           true,
+		GrantTypeRefreshToken:             true,
+		RequestObjectSupported:            true,
+		DefaultLoginURL:                   fmt.Sprintf("%s%s?%s=", login.HandlerPrefix, login.EndpointLogin, login.QueryAuthRequestID), //TODO: still config?
+		SigningKeyAlgorithm:               "RS256",
+		DefaultAccessTokenLifetime:        types.Duration{Duration: 12 * time.Hour},
+		DefaultIdTokenLifetime:            types.Duration{Duration: 12 * time.Hour},
+		DefaultRefreshTokenIdleExpiration: types.Duration{Duration: 720 * time.Hour},  // 30 days
+		DefaultRefreshTokenExpiration:     types.Duration{Duration: 2160 * time.Hour}, // 90 days
+		UserAgentCookieConfig:             defaultUserAgentCookieConfig(),
 		Cache: &middleware.CacheConfig{
 			MaxAge:       types_v1.Duration{Duration: 12 * time.Hour},
 			SharedMaxAge: types_v1.Duration{Duration: 168 * time.Hour}, // 7 days
@@ -447,11 +438,18 @@ func defaultOIDCConfig() oidc.OPHandlerConfig {
 	}
 }
 
-func localURL(host string) string {
+func local(host string) string {
 	if *localDevMode {
-		host = host + ":" + *port
+		return host + ":" + *port
 	}
 	return host
+}
+
+func url(url string) string {
+	if *localDevMode {
+		return "http://" + url
+	}
+	return "https://" + url
 }
 
 func defaultLoginConfig() login.Config {

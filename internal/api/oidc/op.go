@@ -23,25 +23,26 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-type OPHandlerConfig struct {
-	OPConfig              *op.Config
-	StorageConfig         StorageConfig
-	UserAgentCookieConfig *middleware.UserAgentCookieConfig
-	Cache                 *middleware.CacheConfig
-	KeyConfig             *crypto.KeyConfig
-	CustomEndpoints       *EndpointConfig
-}
-
-type StorageConfig struct {
-	DefaultLoginURL                   string
+type Config struct {
+	Issuer                            string
+	CodeMethodS256                    bool
+	AuthMethodPost                    bool
+	AuthMethodPrivateKeyJWT           bool
+	GrantTypeRefreshToken             bool
+	RequestObjectSupported            bool
 	SigningKeyAlgorithm               string
+	DefaultLoginURL                   string
+	DefaultLogoutRedirectURI          string
 	DefaultAccessTokenLifetime        types.Duration
 	DefaultIdTokenLifetime            types.Duration
 	DefaultRefreshTokenIdleExpiration types.Duration
 	DefaultRefreshTokenExpiration     types.Duration
+	UserAgentCookieConfig             *middleware.UserAgentCookieConfig
+	Cache                             *middleware.CacheConfig
+	KeyConfig                         *crypto.KeyConfig
+	CustomEndpoints                   *EndpointConfig
 }
 
 type EndpointConfig struct {
@@ -79,40 +80,71 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix, baseDomain string) op.OpenIDProvider {
-	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, baseDomain, id.SonyFlakeGenerator, localDevMode)
-	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
-	tokenKey, err := crypto.LoadKey(config.KeyConfig, config.KeyConfig.EncryptionKeyID)
+func NewProvider(ctx context.Context, config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix, baseDomain string) op.OpenIDProvider {
+	opConfig, err := createOPConfig(config)
+	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot create op config")
+	storage, err := newStorage(config, command, query, repo, keyConfig, config.KeyConfig, es, projections, keyChan, assetAPIPrefix)
+	logging.Log("OIDC-Jdg2k").OnError(err).Panic("cannot create storage")
+	options, err := createOptions(config, baseDomain, localDevMode)
+	logging.Log("OIDC-Jdg2k").OnError(err).Panic("cannot create options")
+	provider, err := op.NewOpenIDProvider(
+		ctx,
+		opConfig,
+		storage,
+		options...,
+	)
+	logging.Log("OIDC-asf13").OnError(err).Panic("cannot create provider")
+	return provider
+}
+
+func createOPConfig(config Config) (*op.Config, error) {
+	supportedLanguages, err := getSupportedLanguages()
+	if err != nil {
+		return nil, err
+	}
+	opConfig := &op.Config{
+		Issuer:                   config.Issuer,
+		DefaultLogoutRedirectURI: config.DefaultLogoutRedirectURI,
+		CodeMethodS256:           config.CodeMethodS256,
+		AuthMethodPost:           config.AuthMethodPost,
+		AuthMethodPrivateKeyJWT:  config.AuthMethodPrivateKeyJWT,
+		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
+		RequestObjectSupported:   config.RequestObjectSupported,
+		SupportedUILocales:       supportedLanguages,
+	}
+	cryptoKey(opConfig, config.KeyConfig)
+	return opConfig, nil
+}
+
+func cryptoKey(config *op.Config, keyConfig *crypto.KeyConfig) {
+	tokenKey, err := crypto.LoadKey(keyConfig, keyConfig.EncryptionKeyID)
 	logging.Log("OIDC-ADvbv").OnError(err).Panic("cannot load OP crypto key")
 	cryptoKey := []byte(tokenKey)
 	if len(cryptoKey) != 32 {
 		logging.Log("OIDC-Dsfds").Panic("OP crypto key must be exactly 32 bytes")
 	}
-	copy(config.OPConfig.CryptoKey[:], cryptoKey)
-	supportedLanguages, err := getSupportedLanguages()
-	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
-	config.OPConfig.SupportedUILocales = supportedLanguages
-	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
-	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, config.KeyConfig, es, projections, keyChan, assetAPIPrefix)
-	logging.Log("OIDC-Jdg2k").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create storage")
-	options := []op.Option{
-		op.WithHttpInterceptors(
-			middleware.MetricsHandler(metricTypes),
-			middleware.TelemetryHandler(),
-			middleware.NoCacheInterceptor,
-			cookieHandler,
-			http_utils.CopyHeadersToContext,
-		),
+	copy(config.CryptoKey[:], cryptoKey)
+}
+
+func createOptions(config Config, baseDomain string, localDevMode bool) ([]op.Option, error) {
+	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, baseDomain, id.SonyFlakeGenerator, localDevMode)
+	if err != nil {
+		return nil, err
 	}
-	options = append(options, customEndpoints(config.CustomEndpoints)...)
-	provider, err := op.NewOpenIDProvider(
-		ctx,
-		config.OPConfig,
-		storage,
-		options...,
+	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
+
+	interceptor := op.WithHttpInterceptors(
+		middleware.MetricsHandler(metricTypes),
+		middleware.TelemetryHandler(),
+		middleware.NoCacheInterceptor,
+		cookieHandler,
+		http_utils.CopyHeadersToContext,
 	)
-	logging.Log("OIDC-asf13").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create provider")
-	return provider
+	endpoints := customEndpoints(config.CustomEndpoints)
+	if len(endpoints) == 0 {
+		return []op.Option{interceptor}, nil
+	}
+	return append(endpoints, interceptor), nil
 }
 
 func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
@@ -144,7 +176,7 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	return options
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
 	encAlg, err := crypto.NewAESCrypto(c)
 	if err != nil {
 		return nil, err

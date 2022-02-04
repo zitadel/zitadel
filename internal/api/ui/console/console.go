@@ -50,8 +50,8 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config, domain, issuer, clientID string) (http.Handler, error) {
-	environmentJSON, err := createEnvironmentJSON(domain, issuer, clientID)
+func Start(config Config, domain, url, issuer, clientID string) (http.Handler, error) {
+	environmentJSON, err := createEnvironmentJSON(url, issuer, clientID)
 	logging.Log("CONSO-tMAsY").OnError(err).Fatal("unable to marshal env")
 
 	consoleDir := consoleDefaultDir
@@ -89,7 +89,7 @@ func csp(zitadelDomain string) *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(domain, issuer, clientID string) ([]byte, error) {
+func createEnvironmentJSON(url, issuer, clientID string) ([]byte, error) {
 	environment := struct {
 		AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
 		MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
@@ -99,11 +99,11 @@ func createEnvironmentJSON(domain, issuer, clientID string) ([]byte, error) {
 		Issuer                 string `json:"issuer,omitempty"`
 		ClientID               string `json:"clientid,omitempty"`
 	}{
-		AuthServiceUrl:         domain,
-		MgmtServiceUrl:         domain,
-		AdminServiceUrl:        domain,
-		SubscriptionServiceUrl: domain,
-		AssetServiceUrl:        domain,
+		AuthServiceUrl:         url,
+		MgmtServiceUrl:         url,
+		AdminServiceUrl:        url,
+		SubscriptionServiceUrl: url,
+		AssetServiceUrl:        url,
 		Issuer:                 issuer,
 		ClientID:               clientID,
 	}

@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
@@ -10,31 +11,23 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 
-	"github.com/caos/zitadel/internal/authz/repository"
-
 	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
-	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/query"
-
 	http_util "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/api/oidc"
+	"github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-type Config struct {
-	OIDC oidc.OPHandlerConfig
-}
-
 type API struct {
-	port           string
-	grpcServer     *grpc.Server
-	gatewayHandler *server.GatewayHandler
-	verifier       *internal_authz.TokenVerifier
-	health         health
-	router         *mux.Router
+	port       string
+	grpcServer *grpc.Server
+	verifier   *internal_authz.TokenVerifier
+	health     health
+	router     *mux.Router
 }
 
 type health interface {
@@ -55,29 +48,25 @@ func New(ctx context.Context, port string, router *mux.Router, repo *struct {
 		router:   router,
 	}
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
-	api.gatewayHandler = server.CreateGatewayHandler(port)
+	api.routeGRPC()
 
 	//api.RegisterHandler("", api.healthHandler())
 
 	return api
 }
 
-func (a *API) RegisterServer(ctx context.Context, server server.Server) {
-	server.RegisterServer(a.grpcServer)
-	a.gatewayHandler.RegisterGateway(ctx, server)
-	a.verifier.RegisterServer(server.AppName(), server.MethodPrefix(), server.AuthMethods())
+func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) {
+	grpcServer.RegisterServer(a.grpcServer)
+	handler, prefix := server.CreateGateway(ctx, grpcServer, a.port)
+	a.RegisterHandler(prefix, handler)
+	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {
+	prefix = strings.TrimSuffix(prefix, "/")
 	sentryHandler := sentryhttp.New(sentryhttp.Options{})
 	subRouter := a.router.PathPrefix(prefix).Subrouter()
 	subRouter.PathPrefix("/").Handler(http.StripPrefix(prefix, sentryHandler.Handle(handler)))
-}
-
-func (a *API) Router() *mux.Router {
-	a.routeGRPC()
-	a.routeHTTP()
-	return a.router
 }
 
 func (a *API) routeGRPC() {
@@ -88,11 +77,6 @@ func (a *API) routeGRPC() {
 		Subrouter()
 	http2Route.Headers("Content-Type", "application/grpc").Handler(a.grpcServer)
 	a.router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcweb.WrapServer(a.grpcServer))
-}
-
-func (a *API) routeHTTP() {
-	a.router.PathPrefix("/").Handler(a.gatewayHandler.Router())
-	//http1Router.PathPrefix("/").Handler(http.StripPrefix("/", a.gatewayHandler.Router()))
 }
 
 func (a *API) healthHandler() http.Handler {

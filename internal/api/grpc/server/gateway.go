@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -59,35 +58,7 @@ type Gateway interface {
 
 type GatewayFunc func(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error
 
-type GatewayHandler struct {
-	mux  *mux.Router
-	port string
-}
-
-func CreateGatewayHandler(port string) *GatewayHandler {
-	return &GatewayHandler{
-		port: port,
-		mux:  mux.NewRouter(),
-	}
-}
-
-//RegisterGateway registers a handler (Gateway interface) on defined port
-func (g *GatewayHandler) RegisterGateway(ctx context.Context, gateway Gateway) {
-	handler := createGateway(ctx, gateway, g.port)
-	prefix := gateway.GatewayPathPrefix()
-	g.RegisterHandler(prefix, handler)
-}
-
-func (g *GatewayHandler) RegisterHandler(prefix string, handler http.Handler) {
-	gw := g.mux.PathPrefix(prefix).Subrouter()
-	gw.PathPrefix("/").Handler(http.StripPrefix(prefix, handler))
-}
-
-func (g *GatewayHandler) Router() http.Handler {
-	return g.mux
-}
-
-func createGateway(ctx context.Context, g Gateway, port string, customHeaders ...string) http.Handler {
+func CreateGateway(ctx context.Context, g Gateway, port string) (http.Handler, string) {
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -95,7 +66,7 @@ func createGateway(ctx context.Context, g Gateway, port string, customHeaders ..
 	}
 	err := g.RegisterGateway()(ctx, runtimeMux, "localhost"+http_util.Endpoint(port), opts)
 	logging.Log("SERVE-7B7G0E").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("failed to register grpc gateway")
-	return addInterceptors(runtimeMux)
+	return addInterceptors(runtimeMux), g.GatewayPathPrefix()
 }
 
 func addInterceptors(handler http.Handler) http.Handler {
