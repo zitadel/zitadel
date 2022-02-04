@@ -756,7 +756,16 @@
       "CUSTOMTEXTMESSAGE": "Benutzerdefinierte Benachrichtigungstexte",
       "PRIVACYPOLICY": "Benutzerdefinierte Datenschutzrichtlinie und AGB",
       "METADATAUSER": "User Metadata",
-      "FLOWS": "Aktionen und Abläufe"
+      "FLOWS": "Aktionen und Abläufe",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Nicht erlaubt",
+          "1": "Limitierte Anzahl",
+          "2": "Unlimitiert"
+        },
+        "TYPE": "Verwendungsart",
+        "COUNT": "Anzahl"
+      }
     },
     "TIERSTATES": {
       "0": "Aktiv",

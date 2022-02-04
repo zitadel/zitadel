@@ -17,10 +17,10 @@
   .title {
     font-size: 14px;
     color: var(--grey);
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 
     a {
-      margin-left: .5rem;
+      margin-left: 0.5rem;
       cursor: pointer;
     }
   }
@@ -30,19 +30,19 @@
     align-items: center;
 
     a {
-      margin-left: .5rem;
+      margin-left: 0.5rem;
     }
   }
 
   img {
     height: 15px;
     width: auto;
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
 .spinner {
-  margin: .5rem;
+  margin: 0.5rem;
 }
 
 .error {
@@ -60,8 +60,8 @@
   height: 1px;
   width: 100%;
   background-color: var(--grey);
-  opacity: .5;
-  margin: .5rem 0;
+  opacity: 0.5;
+  margin: 0.5rem 0;
   display: block;
 }
 
@@ -80,7 +80,7 @@
   .row {
     display: flex;
     align-items: center;
-    padding: .3rem 0;
+    padding: 0.3rem 0;
 
     .featureavatar {
       margin-right: 1rem;
@@ -137,7 +137,7 @@
     }
 
     .left-desc {
-      font-size: .9rem;
+      font-size: 0.9rem;
       margin-right: 1rem;
     }
 
@@ -148,6 +148,18 @@
     .length-wrapper {
       display: flex;
       align-items: center;
+    }
+
+    .flow-select {
+      flex-shrink: 1;
+      min-width: 150px;
+      margin-left: 1rem;
+    }
+
+    .flow-count {
+      flex-shrink: 1;
+      width: 50px;
+      margin-left: 1rem;
     }
   }
 }

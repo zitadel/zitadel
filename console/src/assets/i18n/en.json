@@ -756,7 +756,16 @@
       "CUSTOMTEXTMESSAGE": "Custom notification mail texts",
       "PRIVACYPOLICY": "Custom Privacy Policy and TOS Links",
       "METADATAUSER": "User Metadata",
-      "FLOWS": "Actions and Flows"
+      "FLOWS": "Actions and Flows",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Not allowed",
+          "1": "Limited Count",
+          "2": "Unlimited"
+        },
+        "TYPE": "Type of use",
+        "COUNT": "Anzahl"
+      }
     },
     "TIERSTATES": {
       "0": "Active",

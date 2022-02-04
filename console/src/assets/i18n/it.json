@@ -756,7 +756,16 @@
       "CUSTOMTEXTMESSAGE": "Testi email personalizzati",
       "PRIVACYPOLICY": "Link personalizzati all'informativa sulla privacy e ai TOS",
       "METADATAUSER": "Metadati utente",
-      "FLOWS": "Azioni e processi"
+      "FLOWS": "Azioni e processi",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Non abilitato",
+          "1": "Numero limitato",
+          "2": "Illimitato"
+        },
+        "COUNT": "Anzahl",
+        "TYPE": "Tipo di utilizzo"
+      }
     },
     "TIERSTATES": {
       "0": "Attivo",
