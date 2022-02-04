@@ -228,22 +228,11 @@ services:
       retries: 5
       start_period: 20s
  
-  e2e-setup:
-    profiles: ['e2e']
-    depends_on:
-      db:
-        condition: service_healthy
-      backend-setup:
-        condition: service_completed_successfully
-    build:
-      context: ../../
-      dockerfile: build/local/Dockerfile.e2esetup
-
-  await-e2e-setup:
-    profiles: ['e2e']
+  await-frontend:
+    profiles: ['frontend']
     depends_on:
       e2e-setup:
-        condition: service_completed_successfully
+        condition: service_healthy
     image: alpine:latest
 
 networks:
