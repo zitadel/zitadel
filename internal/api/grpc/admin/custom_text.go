@@ -45,6 +45,20 @@ func (s *Server) SetDefaultInitMessageText(ctx context.Context, req *admin_pb.Se
 	}, nil
 }
 
+func (s *Server) ResetCustomInitMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomInitMessageTextToDefaultRequest) (*admin_pb.ResetCustomInitMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveIAMMessageTexts(ctx, domain.InitCodeMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomInitMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) GetDefaultPasswordResetMessageText(ctx context.Context, req *admin_pb.GetDefaultPasswordResetMessageTextRequest) (*admin_pb.GetDefaultPasswordResetMessageTextResponse, error) {
 	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.PasswordResetMessageType, req.Language)
 	if err != nil {
@@ -71,6 +85,20 @@ func (s *Server) SetDefaultPasswordResetMessageText(ctx context.Context, req *ad
 		return nil, err
 	}
 	return &admin_pb.SetDefaultPasswordResetMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomPasswordResetMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomPasswordResetMessageTextToDefaultRequest) (*admin_pb.ResetCustomPasswordResetMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveIAMMessageTexts(ctx, domain.PasswordResetMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomPasswordResetMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.EventDate,
@@ -113,6 +141,20 @@ func (s *Server) SetDefaultVerifyEmailMessageText(ctx context.Context, req *admi
 	}, nil
 }
 
+func (s *Server) ResetCustomVerifyEmailMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomVerifyEmailMessageTextToDefaultRequest) (*admin_pb.ResetCustomVerifyEmailMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveIAMMessageTexts(ctx, domain.VerifyEmailMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomVerifyEmailMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) GetDefaultVerifyPhoneMessageText(ctx context.Context, req *admin_pb.GetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.GetDefaultVerifyPhoneMessageTextResponse, error) {
 	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.VerifyPhoneMessageType, req.Language)
 	if err != nil {
@@ -139,6 +181,20 @@ func (s *Server) SetDefaultVerifyPhoneMessageText(ctx context.Context, req *admi
 		return nil, err
 	}
 	return &admin_pb.SetDefaultVerifyPhoneMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomVerifyPhoneMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomVerifyPhoneMessageTextToDefaultRequest) (*admin_pb.ResetCustomVerifyPhoneMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveIAMMessageTexts(ctx, domain.VerifyPhoneMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomVerifyPhoneMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.EventDate,
@@ -181,6 +237,20 @@ func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *ad
 	}, nil
 }
 
+func (s *Server) ResetCustomDomainClaimedMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomDomainClaimedMessageTextToDefaultRequest) (*admin_pb.ResetCustomDomainClaimedMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveIAMMessageTexts(ctx, domain.DomainClaimedMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomDomainClaimedMessageTextToDefaultResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
 func (s *Server) GetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *admin_pb.GetDefaultPasswordlessRegistrationMessageTextRequest) (*admin_pb.GetDefaultPasswordlessRegistrationMessageTextResponse, error) {
 	msg, err := s.query.DefaultMessageTextByTypeAndLanguageFromFileSystem(domain.PasswordlessRegistrationMessageType, req.Language)
 	if err != nil {
@@ -207,6 +277,20 @@ func (s *Server) SetDefaultPasswordlessRegistrationMessageText(ctx context.Conte
 		return nil, err
 	}
 	return &admin_pb.SetDefaultPasswordlessRegistrationMessageTextResponse{
+		Details: object.ChangeToDetailsPb(
+			result.Sequence,
+			result.EventDate,
+			result.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) ResetCustomPasswordlessRegistrationMessageTextToDefault(ctx context.Context, req *admin_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) (*admin_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse, error) {
+	result, err := s.command.RemoveIAMMessageTexts(ctx, domain.PasswordlessRegistrationMessageType, language.Make(req.Language))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse{
 		Details: object.ChangeToDetailsPb(
 			result.Sequence,
 			result.EventDate,
