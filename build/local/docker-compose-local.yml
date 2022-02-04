@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    profiles: ['backend', 'storage', 'e2e']
+    profiles: ['backend', 'storage']
     restart: always
     networks:
       - zitadel
@@ -20,7 +20,7 @@ services:
 
 # schema changes on the database
   db-migrations:
-    profiles: ['backend', 'storage', 'e2e']
+    profiles: ['backend', 'storage']
     restart: on-failure
     networks:
       - zitadel
@@ -42,7 +42,7 @@ services:
 
 # minio is used to store assets
   minio:
-    profiles: ['backend', 'storage', 'e2e']
+    profiles: ['backend', 'storage']
     image: minio/minio:RELEASE.2021-06-14T01-29-23Z
     restart: on-failure
     networks:
@@ -65,7 +65,7 @@ services:
 # this container generates the required keys
 # and stores them into zitadel/.keys
   keys:
-    profiles: ['backend', 'backend-stub', 'e2e']
+    profiles: ['backend', 'backend-stub']
     restart: on-failure
     networks:
       - zitadel
@@ -83,7 +83,7 @@ services:
 # setup steps, because of this fact it's recommended to rerun the setup
 # on each restart, at least after a new version got released
   backend-setup:
-    profiles: ['backend', 'e2e']
+    profiles: ['backend']
     restart: on-failure
     networks:
       - zitadel
@@ -117,7 +117,7 @@ services:
 # Port 50002 serves the REST API
 # Port 50003 serves the login GUI
   backend-run:
-    profiles: ['backend', 'e2e']
+    profiles: ['backend']
     restart: on-failure
     networks:
       - zitadel
@@ -165,7 +165,7 @@ services:
 # GRPC web calls to GRPC
 # it's used in console (frontend) for example
   grpc-web-gateway:
-    profiles: ['backend', 'e2e']
+    profiles: ['backend']
     restart: on-failure
     depends_on:
       backend-run:
@@ -184,7 +184,7 @@ services:
 # It curl's the client id of console and writes it to 
 # the environment.json
   client-id:
-    profiles: ['frontend', 'console-stub', 'e2e']
+    profiles: ['frontend', 'console-stub' ]
     depends_on:
       backend-run:
         condition: service_healthy
@@ -202,7 +202,7 @@ services:
 
 # starts console in development mode
   frontend-run:
-    profiles: ['frontend', 'e2e']
+    profiles: ['frontend' ]
     networks:
     - zitadel 
     depends_on:
@@ -229,8 +229,9 @@ services:
       start_period: 20s
  
   await-frontend:
+    profiles: [ "await-frontend" ]
     depends_on:
-      e2e-setup:
+      frontend-run:
         condition: service_healthy
     image: alpine:latest
 
