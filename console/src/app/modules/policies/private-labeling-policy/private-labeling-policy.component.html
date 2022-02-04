@@ -121,7 +121,6 @@
 
           <div class="part">
             <span class="label">Icon</span>
-            <!-- <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner> -->
             <container [ngSwitch]="theme">
               <div class="logo-view" *ngSwitchCase="Theme.DARK">
                 <div class="img-wrapper" *ngIf="previewData.iconUrlDark">
@@ -131,7 +130,6 @@
                 </div>
                 <span class="fill-space"></span>
                 <div class="img-wrapper" *ngIf="data.iconUrlDark">
-                  <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.CURRENT)">remove_circle</mat-icon> -->
                   <img matTooltip="Current" class="curr" [src]="data.iconUrlDark" alt="dark icon" />
                 </div>
               </div>
@@ -143,7 +141,6 @@
                 </div>
                 <span class="fill-space"></span>
                 <div class="img-wrapper" *ngIf="data.iconUrl">
-                  <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.CURRENT)">remove_circle</mat-icon> -->
                   <img matTooltip="Current" class="curr" [src]="data.iconUrl" alt="icon" />
                 </div>
               </div>
