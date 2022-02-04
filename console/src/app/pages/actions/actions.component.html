@@ -2,6 +2,9 @@
   <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
   <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
 
+  <cnsl-info-section class="max-actions" *ngIf="maxActions">{{'FLOWS.ACTIONSMAX' | translate: ({value: maxActions}) }}
+  </cnsl-info-section>
+
   <cnsl-info-section *ngIf="(['actions'] | hasFeature | async) === false" [featureLink]="['/org/features']" class="info"
     [type]="InfoSectionType.WARN">
     <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'actions'})"></span>

@@ -564,6 +564,7 @@
     "FLOWTYPE": "Tipo processo",
     "TRIGGERTYPE": "Tipo trigger",
     "ACTIONS": "Azioni",
+    "ACTIONSMAX": "In base al tuo tier, hai a disposizione un numero limitato di azioni ({{value}}). Assicurati di disattivare quelli di cui non hai bisogno o considera di fare un upgrade.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Crea azione"
@@ -581,7 +582,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Azioni salvate!"
+      "ACTIONSSET": "Azioni salvate!",
+      "ACTIONREACTIVATED": "Azioni riattivati con successo",
+      "ACTIONDEACTIVATED": "Azioni disattivati con successo"
     }
   },
   "IAM": {

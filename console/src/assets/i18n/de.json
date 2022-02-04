@@ -564,6 +564,7 @@
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",
     "ACTIONS": "Aktionen",
+    "ACTIONSMAX": "Basierend auf Ihrem Tier steht Ihnen eine begrenzte Anzahl von Aktionen ({{value}}) zur Verfügung. Stellen Sie sicher, dass Sie diejenigen deaktivieren, die Sie nicht benötigen, oder erwägen Sie ein Upgrade.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Aktion erstellen"
@@ -581,7 +582,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Aktionen gesetzt"
+      "ACTIONSSET": "Aktionen gesetzt",
+      "ACTIONREACTIVATED": "Aktionen erfolgreich reaktiviert",
+      "ACTIONDEACTIVATED": "Aktionen erfolgreich deaktiviert"
     }
   },
   "IAM": {
@@ -760,7 +763,7 @@
       "FLOW": {
         "ACTIONSALLOWED": {
           "0": "Nicht erlaubt",
-          "1": "Limitierte Anzahl",
+          "1": "Limitierte Aktionen",
           "2": "Unlimitiert"
         },
         "TYPE": "Verwendungsart",

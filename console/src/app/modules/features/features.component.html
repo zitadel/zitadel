@@ -287,9 +287,9 @@
         </mat-select>
       </cnsl-form-field>
 
-      <cnsl-form-field class="flow-count">
+      <cnsl-form-field *ngIf="features.actionsAllowed === ActionsAllowed.ACTIONS_ALLOWED_MAX" class="flow-count">
         <cnsl-label>{{ 'FEATURES.DATA.FLOW.COUNT' | translate }}</cnsl-label>
-        <input cnslInput [(ngModel)]="features.maxActions" ngDefaultControl />
+        <input cnslInput type="number" [(ngModel)]="features.maxActions" ngDefaultControl />
       </cnsl-form-field>
     </div>
   </div>
