@@ -36,6 +36,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 		userID          string
 		resourceOwner   string
 		expirationDate  time.Time
+		scopes          []string
 		allowedUserType domain.UserType
 	}
 	type res struct {
@@ -60,6 +61,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				ctx:            context.Background(),
 				userID:         "user1",
 				resourceOwner:  "org1",
+				scopes:         []string{"openid"},
 				expirationDate: time.Time{},
 			},
 			res{
@@ -88,6 +90,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				userID:          "user1",
 				resourceOwner:   "org1",
 				expirationDate:  time.Time{},
+				scopes:          []string{"openid"},
 				allowedUserType: domain.UserTypeHuman,
 			},
 			res{
@@ -118,6 +121,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				userID:         "user1",
 				resourceOwner:  "org1",
 				expirationDate: time.Now().Add(-24 * time.Hour),
+				scopes:         []string{"openid"},
 			},
 			res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -160,6 +164,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				userID:         "user1",
 				resourceOwner:  "org1",
 				expirationDate: time.Time{},
+				scopes:         []string{"openid"},
 			},
 			res{
 				want: &domain.Token{
@@ -181,7 +186,7 @@ func TestCommands_AddPersonalAccessToken(t *testing.T) {
 				idGenerator:  tt.fields.idGenerator,
 				keyAlgorithm: tt.fields.keyAlgorithm,
 			}
-			got, token, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.expirationDate, tt.args.allowedUserType)
+			got, token, err := c.AddPersonalAccessToken(tt.args.ctx, tt.args.userID, tt.args.resourceOwner, tt.args.expirationDate, tt.args.scopes, tt.args.allowedUserType)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
