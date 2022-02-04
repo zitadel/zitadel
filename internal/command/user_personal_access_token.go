@@ -4,15 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/oidc/pkg/oidc"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddPersonalAccessToken(ctx context.Context, userID, resourceOwner string, expirationDate time.Time, allowedUserType domain.UserType) (*domain.Token, string, error) {
+func (c *Commands) AddPersonalAccessToken(ctx context.Context, userID, resourceOwner string, expirationDate time.Time, scopes []string, allowedUserType domain.UserType) (*domain.Token, string, error) {
 	userWriteModel, err := c.userWriteModelByID(ctx, userID, resourceOwner)
 	if err != nil {
 		return nil, "", err
@@ -44,7 +42,7 @@ func (c *Commands) AddPersonalAccessToken(ctx context.Context, userID, resourceO
 			UserAggregateFromWriteModel(&tokenWriteModel.WriteModel),
 			tokenID,
 			expirationDate,
-			[]string{oidc.ScopeOpenID},
+			scopes,
 		),
 	)
 	if err != nil {

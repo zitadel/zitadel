@@ -229,7 +229,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	return scopes, nil
 }
 
-func (o *OPStorage) assertScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
+func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
 	token.Audience = append(token.Audience, clientID)
 	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {

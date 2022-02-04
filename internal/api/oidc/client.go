@@ -164,7 +164,7 @@ func (o *OPStorage) SetIntrospectionFromToken(ctx context.Context, introspection
 		return errors.ThrowPermissionDenied(nil, "OIDC-Adfg5", "client not found")
 	}
 	if token.IsPAT {
-		err = o.assertScopesForPAT(ctx, token, clientID)
+		err = o.assertClientScopesForPAT(ctx, token, clientID)
 		if err != nil {
 			return errors.ThrowPreconditionFailed(err, "OIDC-AGefw", "Errors.Internal")
 		}
