@@ -377,6 +377,7 @@ Errors:
     NotFound: Action not found
     NotActive: Action is not active
     NotInactive: Action is not inactive
+    MaxAllowed: No additional active Actions allowed
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Flow is already empty

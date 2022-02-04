@@ -2,7 +2,12 @@
 
 @import '~codemirror/lib/codemirror';
 @import './component-themes';
+@import './styles/lato-font.scss';
 @import '@angular/material/theming';
+
+$material-design-icons-font-directory-path: '~material-design-icons-iconfont/dist/fonts/';
+
+@import '~material-design-icons-iconfont/src/material-design-icons';
 
 // Plus imports for other components in your app.
 

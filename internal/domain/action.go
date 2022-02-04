@@ -37,3 +37,11 @@ func (s ActionState) Valid() bool {
 func (s ActionState) Exists() bool {
 	return s != ActionStateUnspecified && s != ActionStateRemoved
 }
+
+type ActionsAllowed int32
+
+const (
+	ActionsNotAllowed ActionsAllowed = iota
+	ActionsMaxAllowed
+	ActionsAllowedUnlimited
+)

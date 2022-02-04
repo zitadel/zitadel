@@ -168,7 +168,7 @@ func checkFeatures(features *query.Features, requiredFeatures ...string) error {
 			continue
 		}
 		if requiredFeature == domain.FeatureActions {
-			if !features.Actions {
+			if features.ActionsAllowed == domain.ActionsNotAllowed {
 				return MissingFeatureErr(requiredFeature)
 			}
 			continue
