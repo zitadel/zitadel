@@ -55,9 +55,39 @@ jobs:
       working-directory: ./console
 
     - name: Setup Test Environment
-      run: docker compose -f ./build/local/docker-compose-local.yml --profile frontend --profile backend up
+      run: docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend --profile await-profile up --detach
+
+    - run: docker compose -f ./build/local/docker-compose-local.yml logs
+      if: failure()
+
+    - name: Generate Backend gRPC
+      run: docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
+
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '1.17.6'
+
+    - name: Setup E2E Org
+      run: ./scripts/e2e-setup.sh
 
     - name: Run Tests
       working-directory: ./console
       run: npm run e2e
 
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-videos
+        path: ./console/cypress/videos
+
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-snapshots
+        path: ./console/cypress/snapshots
+
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-mochawesome
+        path: ./console/cypress/results
