@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -62,6 +61,12 @@ type orgFeatureChecker interface {
 	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
+type OrgFeatureCheckerFunc func(ctx context.Context, orgID string, requiredFeatures ...string) error
+
+func (o OrgFeatureCheckerFunc) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
+	return o(ctx, orgID, requiredFeatures...)
+}
+
 type Config struct {
 	Eventstore types.SQLUser
 }
@@ -71,7 +76,7 @@ func StartCommands(
 	defaults sd.SystemDefaults,
 	authZConfig authz.Config,
 	staticStore static.Storage,
-	authZRepo *authz_repo.EsRepository,
+	authZRepo orgFeatureChecker,
 ) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,

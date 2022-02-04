@@ -1,13 +1,44 @@
-FROM cypress/base:17.3.0
-WORKDIR /console
+FROM golang:1.17-alpine3.13
 
-COPY console/package.json console/package-lock.json ./
-RUN npm install --loglevel verbose
+ENV PROTOC_ARCH=x86_64
+ARG PROTOC_VERSION=3.18.0
+ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
+ARG GATEWAY_VERSION=2.6.0
+ARG VALIDATOR_VERSION=0.6.2
 
-COPY console/cypress-setup.json console/cypress.sh console/tsconfig.json ./
-COPY console/cypress/ cypress/
-COPY ./build/local/e2e-setup.env .
+WORKDIR /proto
 
-ENV NODE_OPTIONS=--openssl-legacy-provider
+RUN apk add tar curl gcompat \
+    && curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/$PROTOC_ZIP \
+    && unzip -o $PROTOC_ZIP -d /usr/local bin/protoc \
+    && unzip -o $PROTOC_ZIP -d /proto include/* \
+    && rm -f $PROTOC_ZIP \
+    && curl https://raw.githubusercontent.com/envoyproxy/protoc-gen-validate/v${VALIDATOR_VERSION}/validate/validate.proto --create-dirs -o include/validate/validate.proto  \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v${GATEWAY_VERSION}/protoc-gen-openapiv2/options/annotations.proto --create-dirs -o include/protoc-gen-openapiv2/options/annotations.proto \
+    && curl https://raw.githubusercontent.com/grpc-ecosystem/grpc-gateway/v${GATEWAY_VERSION}/protoc-gen-openapiv2/options/openapiv2.proto --create-dirs -o include/protoc-gen-openapiv2/options/openapiv2.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/annotations.proto --create-dirs -o include/google/api/annotations.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/http.proto --create-dirs -o include/google/api/http.proto \
+    && curl https://raw.githubusercontent.com/googleapis/googleapis/master/google/api/field_behavior.proto --create-dirs -o include/google/api/field_behavior.proto
 
-CMD ./cypress.sh run e2e-setup.env --config-file cypress-setup.json
+RUN ls -la /usr/local
+RUN ls -la /usr/local/bin
+
+#zitadel protos
+COPY proto/ include/.
+
+WORKDIR /go/src/github.com/caos/zitadel
+
+#download modules
+COPY ./go.* ./
+RUN go mod download
+
+COPY ./build/local/local.env ./build/local/e2e.env ./build/local/e2e-setup.sh ./build/local/
+COPY ./cmd/zitadel/authz.yaml ./cmd/zitadel/system-defaults.yaml ./cmd/zitadel/setup.yaml ./cmd/zitadel/
+COPY ./cmd/e2e-setup/ ./cmd/e2e-setup/
+COPY ./internal ./internal
+COPY ./pkg ./pkg
+
+COPY build/zitadel/generate-grpc.sh build/zitadel/generate-grpc.sh
+RUN build/zitadel/generate-grpc.sh
+
+CMD go run ./cmd/e2e-setup/* --setup-files "./cmd/zitadel/authz.yaml" --setup-files "./cmd/zitadel/system-defaults.yaml" --setup-files "./cmd/zitadel/setup.yaml"

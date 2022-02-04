@@ -124,7 +124,7 @@ export function username(withoutDomain: string, project?: string): string {
 function credentials(user: User, pw?: string) {
     const isAdmin = user == User.IAMAdminUser
     return {
-        username: username(isAdmin ? user : `${user}_user_name`, isAdmin ? 'caos-ag' : 'caos-demo'),
+        username: username(isAdmin ? user : `${user}_user_name`, isAdmin ? 'caos-ag' : Cypress.env('org')),
         password: pw ? pw : Cypress.env(`${user}_password`)
     }
 }

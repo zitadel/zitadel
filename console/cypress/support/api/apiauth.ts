@@ -10,7 +10,7 @@ export function apiAuth(): Cypress.Chainable<apiCallProperties> {
     const issuerUrl = Cypress.env('issuerUrl')
     const zitadelProjectResourceID = (<string>Cypress.env('zitadelProjectResourceId')).replace('bignumber-', '')
 
-    const key = Cypress.env("serviceAccountKey")
+    const key = Cypress.env("parsedServiceAccountKey")
 
     const now = new Date().getTime()
     const iat = Math.floor(now / 1000)

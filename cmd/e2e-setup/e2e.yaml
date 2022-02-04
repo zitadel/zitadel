@@ -1,0 +1,8 @@
+E2E:
+  Org: $E2E_ORG
+  MachineKeyPath: $E2E_SERVICEACCOUNT_KEY_PATH
+  OrgOwnerPassword: $E2E_ORG_OWNER_PW
+  OrgOwnerViewerPassword: $E2E_ORG_OWNER_VIEWER_PW
+  OrgProjectCreatorPassword: $E2E_ORG_PROJECT_CREATOR_PW
+  PasswordComplexityUserPassword: $E2E_PASSWORD_COMPLEXITY_USER_PW
+  LoginPolicyUserPassword: $E2E_LOGIN_POLICY_USER_PW
