@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/caos/zitadel/internal/command"
@@ -60,6 +62,10 @@ func execute(ctx context.Context, commands *command.Commands, cfg E2EConfig, use
 
 	json, err := key.MarshalJSON()
 	if err != nil {
+		return err
+	}
+
+	if err = os.MkdirAll(filepath.Dir(cfg.MachineKeyPath), 0700); err != nil {
 		return err
 	}
 
