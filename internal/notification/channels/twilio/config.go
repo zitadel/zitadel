@@ -5,3 +5,7 @@ type TwilioConfig struct {
 	Token string
 	From  string
 }
+
+func (t *TwilioConfig) IsValid() bool {
+	return t.SID != "" && t.Token != "" && t.From != ""
+}
