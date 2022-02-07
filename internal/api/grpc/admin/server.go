@@ -22,10 +22,7 @@ type Server struct {
 	admin.UnimplementedAdminServiceServer
 	command         *command.Commands
 	query           *query.Queries
-	iam             repository.IAMRepository
 	administrator   repository.AdministratorRepository
-	repo            repository.Repository
-	users           repository.UserRepository
 	iamDomain       string
 	assetsAPIDomain string
 }
@@ -38,10 +35,7 @@ func CreateServer(command *command.Commands, query *query.Queries, repo reposito
 	return &Server{
 		command:         command,
 		query:           query,
-		iam:             repo,
 		administrator:   repo,
-		repo:            repo,
-		users:           repo,
 		iamDomain:       iamDomain,
 		assetsAPIDomain: assetsAPIDomain,
 	}

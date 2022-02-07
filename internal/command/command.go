@@ -5,15 +5,15 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	"github.com/caos/zitadel/internal/api/http"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository"
+	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/action"
-
-	"github.com/caos/zitadel/internal/api/http"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/id"
+	"github.com/caos/zitadel/internal/repository/action"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -76,7 +76,7 @@ func StartCommands(
 	defaults sd.SystemDefaults,
 	authZConfig authz.Config,
 	staticStore static.Storage,
-	authZRepo orgFeatureChecker,
+	authZRepo authz_repo.Repository,
 ) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,

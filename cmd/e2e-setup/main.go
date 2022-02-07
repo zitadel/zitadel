@@ -5,6 +5,9 @@ import (
 	"flag"
 	"time"
 
+	authz_repo "github.com/caos/zitadel/internal/authz/repository"
+
+	"github.com/caos/zitadel/internal/authz"
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/logging"
@@ -23,6 +26,14 @@ func main() {
 	startE2ESetup(e2eSetupPaths.Values())
 }
 
+type dummyAuthZRepo struct {
+	authz_repo.Repository
+}
+
+func (d dummyAuthZRepo) CheckOrgFeatures(_ context.Context, _ string, _ ...string) error {
+	return nil
+}
+
 func startE2ESetup(configPaths []string) {
 
 	conf := new(setupConfig)
@@ -37,12 +48,17 @@ func startE2ESetup(configPaths []string) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-wjQ8G").OnError(err).Fatal("cannot start eventstore")
 
+	authZRepo, err := authz.Start(authz.Config{}, conf.SystemDefaults, nil)
+	dummy := dummyAuthZRepo{
+		authZRepo,
+	}
+
 	commands, err := command.StartCommands(
 		es,
 		conf.SystemDefaults,
 		conf.InternalAuthZ,
 		nil,
-		command.OrgFeatureCheckerFunc(func(_ context.Context, _ string, _ ...string) error { return nil }),
+		dummy,
 	)
 	logging.Log("MAIN-54MLq").OnError(err).Fatal("cannot start command side")
 

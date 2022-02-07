@@ -6,9 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
@@ -89,6 +87,11 @@ func listIDPsToModel(req *admin_pb.ListIDPsRequest) (*query.IDPSearchQueries, er
 	if err != nil {
 		return nil, err
 	}
+	iamQuery, err := query.NewIDPResourceOwnerSearchQuery(domain.IAMID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, iamQuery)
 	return &query.IDPSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset:        offset,
@@ -123,30 +126,21 @@ func idpQueryToModel(idpQuery *admin_pb.IDPQuery) (query.SearchQuery, error) {
 	}
 }
 
-func idpProviderViewsToDomain(idps []*iam_model.IDPProviderView) []*domain.IDPProvider {
+func idpsToDomain(idps []*query.IDP) []*domain.IDPProvider {
 	idpProvider := make([]*domain.IDPProvider, len(idps))
 	for i, idp := range idps {
 		idpProvider[i] = &domain.IDPProvider{
 			ObjectRoot: models.ObjectRoot{
-				AggregateID: idp.AggregateID,
+				AggregateID: idp.ResourceOwner,
 			},
-			IDPConfigID: idp.IDPConfigID,
-			Type:        idpConfigTypeToDomain(idp.IDPProviderType),
+			IDPConfigID: idp.ID,
+			Type:        idp.OwnerType,
 		}
 	}
 	return idpProvider
 }
 
-func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityProviderType {
-	switch idpType {
-	case iam_model.IDPProviderTypeOrg:
-		return domain.IdentityProviderTypeOrg
-	default:
-		return domain.IdentityProviderTypeSystem
-	}
-}
-
-func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.UserIDPLink {
+func idpUserLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
 	externalIDPs := make([]*domain.UserIDPLink, len(idps))
 	for i, idp := range idps {
 		externalIDPs[i] = &domain.UserIDPLink{
@@ -154,9 +148,9 @@ func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.User
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,
 			},
-			IDPConfigID:    idp.IDPConfigID,
-			ExternalUserID: idp.ExternalUserID,
-			DisplayName:    idp.UserDisplayName,
+			IDPConfigID:    idp.IDPID,
+			ExternalUserID: idp.ProvidedUserID,
+			DisplayName:    idp.ProvidedUsername,
 		}
 	}
 	return externalIDPs

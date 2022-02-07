@@ -79,6 +79,16 @@ func (wm *CustomMessageTextReadModel) Reduce() error {
 				wm.FooterText = ""
 			}
 		case *policy.CustomTextTemplateRemovedEvent:
+			if wm.Language != e.Language {
+				continue
+			}
+			wm.Subject = ""
+			wm.Title = ""
+			wm.PreHeader = ""
+			wm.Text = ""
+			wm.Greeting = ""
+			wm.ButtonText = ""
+			wm.FooterText = ""
 			wm.State = domain.PolicyStateRemoved
 		}
 	}

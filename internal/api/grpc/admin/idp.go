@@ -6,6 +6,7 @@ import (
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 )
 
@@ -22,7 +23,7 @@ func (s *Server) ListIDPs(ctx context.Context, req *admin_pb.ListIDPsRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchIDPs(ctx, domain.IAMID, queries)
+	resp, err := s.query.IDPs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -93,15 +94,29 @@ func (s *Server) ReactivateIDP(ctx context.Context, req *admin_pb.ReactivateIDPR
 }
 
 func (s *Server) RemoveIDP(ctx context.Context, req *admin_pb.RemoveIDPRequest) (*admin_pb.RemoveIDPResponse, error) {
-	idpProviders, err := s.iam.IDPProvidersByIDPConfigID(ctx, req.IdpId)
+	providerQuery, err := query.NewIDPIDSearchQuery(req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, req.IdpId)
+	idps, err := s.query.IDPs(ctx, &query.IDPSearchQueries{
+		Queries: []query.SearchQuery{providerQuery},
+	})
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpProviderViewsToDomain(idpProviders), externalIDPViewsToDomain(externalIDPs)...)
+
+	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
+	if err != nil {
+		return nil, err
+	}
+	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
+		Queries: []query.SearchQuery{idpQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	objectDetails, err := s.command.RemoveDefaultIDPConfig(ctx, req.IdpId, idpsToDomain(idps.IDPs), idpUserLinksToDomain(userLinks.Links)...)
 	if err != nil {
 		return nil, err
 	}

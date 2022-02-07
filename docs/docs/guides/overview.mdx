@@ -2,8 +2,8 @@
 title: Overview
 ---
 
-import {ListElement, ListWrapper, ICONTYPE} from '../../src/components/list';
-import Column from '../../src/components/column';
+import { ListElement, ListWrapper, ICONTYPE } from "../../src/components/list";
+import Column from "../../src/components/column";
 
 With our guides you will learn everything you need to know about specific topics. You get step-by-step instructions for certain tasks and have a knowledge check at the end.
 
@@ -13,22 +13,94 @@ When you are familiar with the ZITADEL usage, you can choose to stay on [zitadel
 
 <Column>
   <ListWrapper title="Get to know ZITADEL">
-    <ListElement link="/docs/guides/basics/get-started" type={ICONTYPE.START} title="Get started" description="Try out zitadel.ch" />
-    <ListElement link="/docs/guides/basics/organizations" type={ICONTYPE.START} title="Organizations" description="Learn how ZITADEL ist organized" />
-    <ListElement link="/docs/guides/basics/projects" type={ICONTYPE.START} title="Projects" description="Understand projects and grants" />
+    <ListElement
+      link="/docs/guides/basics/get-started"
+      type={ICONTYPE.START}
+      title="Get started"
+      description="Try out zitadel.ch"
+    />
+    <ListElement
+      link="/docs/guides/basics/organizations"
+      type={ICONTYPE.START}
+      title="Organizations"
+      description="Learn how ZITADEL ist organized"
+    />
+    <ListElement
+      link="/docs/guides/basics/projects"
+      type={ICONTYPE.START}
+      title="Projects"
+      description="Understand projects and grants"
+    />
+  </ListWrapper>
+  <ListWrapper title="Integrations">
+    <ListElement
+      link="./integrations/authenticated-mongodb-charts"
+      iconClasses="lab la-mdb"
+      roundClasses="rounded rounded-service"
+      title="Authenticated MongoDB Charts"
+      description=""
+    />
   </ListWrapper>
   <ListWrapper title="Authentication">
-    <ListElement link="/docs/guides/authentication/login-users" type={ICONTYPE.LOGIN} title="Login users" description="Authenticate users in ZITADEL" />
-    <ListElement link="/docs/guides/authentication/identity-brokering" type={ICONTYPE.LOGIN} title="Identity Brokering" description="Identity Brokering and Federated Identities" />
+    <ListElement
+      link="/docs/guides/authentication/login-users"
+      type={ICONTYPE.LOGIN}
+      title="Login users"
+      description="Authenticate users in ZITADEL"
+    />
+    <ListElement
+      link="/docs/guides/authentication/identity-brokering"
+      type={ICONTYPE.LOGIN}
+      title="Identity Brokering"
+      description="Identity Brokering and Federated Identities"
+    />
   </ListWrapper>
   <ListWrapper title="APIs">
-    <ListElement link="/docs/guides/api/access-zitadel-apis" type={ICONTYPE.APIS} title="APIs" description="Authorize Service Users to access ZITADEL APIs" />
+    <ListElement
+      link="/docs/guides/api/access-zitadel-apis"
+      type={ICONTYPE.APIS}
+      title="APIs"
+      description="Authorize Service Users to access ZITADEL APIs"
+    />
   </ListWrapper>
   <ListWrapper title="Customization">
-    <ListElement link="/docs/guides/customization/branding" type={ICONTYPE.PRIVATELABELING} title="Private Labeling" description="Customize your organization to your brand" />
-    <ListElement link="/docs/guides/customization/texts" type={ICONTYPE.TEXTS} title="Texts" description="Login interface texts and notification texts" />
+    <ListElement
+      link="/docs/guides/customization/branding"
+      type={ICONTYPE.PRIVATELABELING}
+      title="Private Labeling"
+      description="Customize your organization to your brand"
+    />
+    <ListElement
+      link="/docs/guides/customization/texts"
+      type={ICONTYPE.TEXTS}
+      title="Texts"
+      description="Login interface texts and notification texts"
+    />
+  </ListWrapper>
+  <ListWrapper title="Solution Scenarios">
+    <ListElement
+      link="./solution-scenarios/b2c"
+      iconClasses="las la-paragraph"
+      roundClasses="rounded rounded-service"
+      label="B2C"
+      title="Business to Consumer"
+      description=""
+    />
+    <ListElement
+      link="./solution-scenarios/b2b"
+      iconClasses="las la-paragraph"
+      roundClasses="rounded rounded-login"
+      label="B2B"
+      title="Business to Business"
+      description=""
+    />
   </ListWrapper>
   <ListWrapper title="Installation">
-    <ListElement link="/docs/guides/installation/shared-cloud" type={ICONTYPE.SYSTEM} title="Managed" description="Shared ZITADEL Cloud or Dedicated Instance" />
+    <ListElement
+      link="/docs/guides/installation/shared-cloud"
+      type={ICONTYPE.SYSTEM}
+      title="Managed"
+      description="Shared ZITADEL Cloud or Dedicated Instance"
+    />
   </ListWrapper>
 </Column>

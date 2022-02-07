@@ -37,20 +37,6 @@ func (p *PasswordAgePolicy) Changes(changed *PasswordAgePolicy) map[string]inter
 	return changes
 }
 
-func (i *IAM) appendAddPasswordAgePolicyEvent(event *es_models.Event) error {
-	i.DefaultPasswordAgePolicy = new(PasswordAgePolicy)
-	err := i.DefaultPasswordAgePolicy.SetData(event)
-	if err != nil {
-		return err
-	}
-	i.DefaultPasswordAgePolicy.ObjectRoot.CreationDate = event.CreationDate
-	return nil
-}
-
-func (i *IAM) appendChangePasswordAgePolicyEvent(event *es_models.Event) error {
-	return i.DefaultPasswordAgePolicy.SetData(event)
-}
-
 func (p *PasswordAgePolicy) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {

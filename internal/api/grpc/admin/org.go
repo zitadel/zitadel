@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
-	usr_model "github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	obj_pb "github.com/caos/zitadel/pkg/grpc/object"
 )
@@ -63,20 +63,19 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain string) ([]string, error) {
-	users, err := s.users.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: []*usr_model.UserSearchQuery{
-			{
-				Key:    usr_model.UserSearchKeyPreferredLoginName,
-				Method: domain.SearchMethodEndsWithIgnoreCase,
-				Value:  "@" + orgDomain,
-			},
-		},
-	})
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(users.Result))
-	for i, user := range users.Result {
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: []query.SearchQuery{loginName}})
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil

@@ -95,7 +95,7 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 			HumanLastNameCol.identifier(),
 			HumanDisplayNameCol.identifier(),
 			MachineNameCol.identifier(),
-			HumanAvaterURLCol.identifier(),
+			HumanAvatarURLCol.identifier(),
 			countColumn.identifier(),
 		).From(orgMemberTable.identifier()).
 			LeftJoin(join(HumanUserIDCol, OrgMemberUserID)).
@@ -110,9 +110,9 @@ func prepareOrgMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Members, erro
 
 			for rows.Next() {
 				member := new(Member)
-				roles := pq.StringArray{}
 
 				var (
+					roles              = pq.StringArray{}
 					preferredLoginName = sql.NullString{}
 					email              = sql.NullString{}
 					firstName          = sql.NullString{}

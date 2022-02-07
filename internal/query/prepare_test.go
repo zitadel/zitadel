@@ -3,7 +3,6 @@ package query
 import (
 	"database/sql"
 	"database/sql/driver"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -13,7 +12,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	sq "github.com/Masterminds/squirrel"
-	"github.com/nsf/jsondiff"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -58,8 +57,7 @@ func assertPrepare(t *testing.T, prepareFunc, expectedObject interface{}, sqlExp
 		return false
 	}
 
-	if !reflect.DeepEqual(object, expectedObject) {
-		prettyPrintDiff(t, expectedObject, object)
+	if !assert.Equal(t, expectedObject, object) {
 		return false
 	}
 
@@ -314,20 +312,4 @@ func TestValidatePrepare(t *testing.T) {
 			}
 		})
 	}
-}
-
-func prettyPrintDiff(t *testing.T, expected, gotten interface{}) {
-	t.Helper()
-
-	expectedMarshalled, _ := json.Marshal(expected)
-	objectMarshalled, _ := json.Marshal(gotten)
-	_, diff := jsondiff.Compare(
-		expectedMarshalled,
-		objectMarshalled,
-		&jsondiff.Options{
-			SkipMatches:      true,
-			Indent:           "  ",
-			ChangedSeparator: " is expected, got ",
-		})
-	t.Errorf("unexpected object: want %T, got %T, difference:\n%s", expected, gotten, diff)
 }

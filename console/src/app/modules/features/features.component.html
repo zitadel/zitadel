@@ -265,6 +265,8 @@
       </mat-slide-toggle>
     </div>
 
+    <p class="feature-section">{{'FEATURES.HEADERS.FLOWS' | translate}}</p>
+
     <div class="row">
       <div class="featureavatar pink">
         <i class="icon las la-exchange-alt"></i>
@@ -272,9 +274,25 @@
       <span class="left-desc">{{'FEATURES.DATA.FLOWS' | translate}}</span>
       <span class="fill-space"></span>
       <template [ngTemplateOutlet]="templateRef" [ngTemplateOutletContext]="{active: features.actions}"></template>
-      <mat-slide-toggle class="toggle" color="primary" name="hasNumber" ngDefaultControl [(ngModel)]="features.actions"
-        *ngIf="(['iam.features.write'] | hasRole | async)">
-      </mat-slide-toggle>
+    </div>
+
+    <div class="row">
+      <span class="fill-space"></span>
+      <cnsl-form-field class="flow-select">
+        <cnsl-label>{{ 'FEATURES.DATA.FLOW.TYPE' | translate }}</cnsl-label>
+        <mat-select [(ngModel)]="features.actionsAllowed"
+          [disabled]="(['iam.features.write'] | hasRole | async) === false">
+          <mat-option *ngFor="let allowedType of actionsSelection" [value]="allowedType">
+            {{ 'FEATURES.DATA.FLOW.ACTIONSALLOWED.'+allowedType | translate}}
+          </mat-option>
+        </mat-select>
+      </cnsl-form-field>
+
+      <cnsl-form-field *ngIf="features.actionsAllowed === ActionsAllowed.ACTIONS_ALLOWED_MAX" class="flow-count">
+        <cnsl-label>{{ 'FEATURES.DATA.FLOW.COUNT' | translate }}</cnsl-label>
+        <input cnslInput type="number" [(ngModel)]="features.maxActions"
+          [disabled]="(['iam.features.write'] | hasRole | async) === false" ngDefaultControl />
+      </cnsl-form-field>
     </div>
   </div>
 
