@@ -23,6 +23,7 @@ describe('applications', () => {
             })
 
             it('add app', () => {
+                cy.get('mat-spinner').should('not.exist')
                 cy.get('[data-e2e=app-card-add]').click()
                 cy.get('[formcontrolname^=name]').type(testAppName)
                 // select webapp
@@ -39,8 +40,9 @@ describe('applications', () => {
                     cy.get('[id*=overlay]').should('exist')
                 }) 
                 //TODO: check client ID/Secret
+                cy.contains('Project not found', {timeout: 4_000}).should('not.exist')
                 cy.get('button').filter(':contains("Close")').should('exist').click()
-                cy.contains('arrow_back').click({ force: true })
+                cy.contains('arrow_back').click()
                 cy.contains('[data-e2e=app-card]', testAppName)
             })
         })
