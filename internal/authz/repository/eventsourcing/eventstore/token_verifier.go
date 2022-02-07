@@ -63,38 +63,38 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	return model.TokenViewToModel(token), nil
 }
 
-func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, err error) {
+func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, creationDate time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	tokenData, err := base64.RawURLEncoding.DecodeString(tokenString)
 	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
+		return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(nil, "APP-ASdgg", "invalid token")
 	}
 	tokenIDSubject, err := repo.TokenVerificationKey.DecryptString(tokenData, repo.TokenVerificationKey.EncryptionKeyID())
 	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
+		return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(nil, "APP-8EF0zZ", "invalid token")
 	}
 
 	splittedToken := strings.Split(tokenIDSubject, ":")
 	if len(splittedToken) != 2 {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
+		return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(nil, "APP-GDg3a", "invalid token")
 	}
 	token, err := repo.tokenByID(ctx, splittedToken[0], splittedToken[1])
 	if err != nil {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
+		return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(err, "APP-BxUSiL", "invalid token")
 	}
 	if !token.Expiration.After(time.Now().UTC()) {
-		return "", "", "", "", "", caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
+		return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(err, "APP-k9KS0", "invalid token")
 	}
 	if token.IsPAT {
 		return token.UserID, "", "", "", token.ResourceOwner, nil
 	}
 	for _, aud := range token.Audience {
 		if verifierClientID == aud || projectID == aud {
-			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, nil
+			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, token.CreationDate, nil
 		}
 	}
-	return "", "", "", "", "", caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
+	return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")
 }
 
 func (repo *TokenVerifierRepo) ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error) {

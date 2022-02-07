@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"testing"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -21,8 +22,8 @@ var (
 
 type verifierMock struct{}
 
-func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
-	return "", "", "", "", "", nil
+func (v *verifierMock) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, time.Time, error) {
+	return "", "", "", "", "", time.Time{}, nil
 }
 func (v *verifierMock) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
 	return nil, nil

@@ -2,6 +2,7 @@ package authz
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/api/grpc"
 	http_util "github.com/caos/zitadel/internal/api/http"
@@ -24,6 +25,7 @@ type CtxData struct {
 	AgentID           string
 	PreferredLanguage string
 	ResourceOwner     string
+	TokenCreation     time.Time
 }
 
 func (ctxData CtxData) IsZero() bool {
@@ -62,7 +64,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	userID, clientID, agentID, prefLang, resourceOwner, err := verifyAccessToken(ctx, token, t, method)
+	userID, clientID, agentID, prefLang, resourceOwner, creationDate, err := verifyAccessToken(ctx, token, t, method)
 	if err != nil {
 		return CtxData{}, err
 	}
@@ -98,6 +100,7 @@ func VerifyTokenAndCreateCtxData(ctx context.Context, token, orgID string, t *To
 		AgentID:           agentID,
 		PreferredLanguage: prefLang,
 		ResourceOwner:     resourceOwner,
+		TokenCreation:     creationDate,
 	}, nil
 
 }

@@ -193,8 +193,8 @@ type testVerifier struct {
 	features []string
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, error) {
-	return "userID", "agentID", "clientID", "de", "orgID", nil
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID string) (string, string, string, string, string, time.Time, error) {
+	return "userID", "agentID", "clientID", "de", "orgID", time.Now().Add(-1 * time.Minute), nil
 }
 func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*authz.Membership, error) {
 	return nil, nil

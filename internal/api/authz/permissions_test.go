@@ -3,6 +3,7 @@ package authz
 import (
 	"context"
 	"testing"
+	"time"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
@@ -15,8 +16,8 @@ type testVerifier struct {
 	memberships []*Membership
 }
 
-func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, error) {
-	return "userID", "agentID", "clientID", "de", "orgID", nil
+func (v *testVerifier) VerifyAccessToken(ctx context.Context, token, clientID, projectID string) (string, string, string, string, string, time.Time, error) {
+	return "userID", "agentID", "clientID", "de", "orgID", time.Now().Add(-1 * time.Minute), nil
 }
 func (v *testVerifier) SearchMyMemberships(ctx context.Context) ([]*Membership, error) {
 	return v.memberships, nil
