@@ -24,6 +24,7 @@ describe('applications', () => {
 
             it('add app', () => {
                 cy.get('mat-spinner').should('not.exist')
+                cy.pause()
                 cy.get('[data-e2e=app-card-add]').click()
                 cy.get('[formcontrolname^=name]').type(testAppName)
                 // select webapp

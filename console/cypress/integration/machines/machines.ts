@@ -1,6 +1,6 @@
 import { apiAuth } from "../../support/api/apiauth";
 import { ensureMachineUserExists, ensureUserDoesntExist } from "../../support/api/users";
-import { login, User } from "../../support/login/users";
+import { login, User, username } from "../../support/login/users";
 
 // NEEDS TO BE DISABLED!!!!!! this is just for testing
 /*
@@ -46,6 +46,8 @@ describe('machines', () => {
                     cy.get('button').filter(':contains("Create")').should('be.visible').click()
                     cy.contains('User created successfully')
                     cy.visit(machinesPath);
+                    cy.wait(5_000) // TODO: eventual consistency ftw
+                    cy.contains('button', 'refresh').click()
                     cy.contains("tr", testMachineUserName)
                 })
             })
@@ -71,7 +73,11 @@ describe('machines', () => {
                         .find('button')
                         .contains('Delete')
                         .click()
+                    cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testMachineUserName, Cypress.env('org')))
+                    cy.contains('mat-dialog-container button', 'Delete').click()    
                     cy.contains('User deleted successfully')
+                    cy.wait(5_000) // TODO: eventual consistency ftw
+                    cy.contains('button', 'refresh').click()
                     cy.get(`[text*=${testMachineUserName}]`).should('not.exist');
                 })
             })
