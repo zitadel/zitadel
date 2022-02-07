@@ -58,7 +58,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               const bread: Breadcrumb = {
@@ -73,7 +73,7 @@ export class PasswordLockoutPolicyComponent implements OnDestroy {
 
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);

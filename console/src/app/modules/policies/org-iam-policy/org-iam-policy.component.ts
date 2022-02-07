@@ -59,7 +59,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
 
             const iambread = new Breadcrumb({
               type: BreadcrumbType.IAM,
-              name: 'IAM',
+              name: 'System',
               routerLink: ['/system'],
             });
             const bread: Breadcrumb = {

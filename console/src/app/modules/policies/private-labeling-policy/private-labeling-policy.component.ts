@@ -99,12 +99,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     breadcrumbService: BreadcrumbService,
   ) {
-    const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
-
-    if (org) {
-      this.org = org;
-    }
-
     this.route.data
       .pipe(
         takeUntil(this.destroy$),
@@ -115,9 +109,14 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             case PolicyComponentServiceType.MGMT:
               this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
+              const org: Org.AsObject | null = this.storageService.getItem(StorageKey.organization, StorageLocation.session);
+
+              if (org) {
+                this.org = org;
+              }
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               const bread: Breadcrumb = {
@@ -131,7 +130,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
 
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);

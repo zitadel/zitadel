@@ -61,7 +61,7 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               const bread: Breadcrumb = {
@@ -71,6 +71,13 @@ export class PasswordComplexityPolicyComponent implements OnDestroy {
               breadcrumbService.setBreadcrumb([iambread, bread]);
               break;
             case PolicyComponentServiceType.ADMIN:
+              const iamBread = new Breadcrumb({
+                type: BreadcrumbType.IAM,
+                name: 'System',
+                routerLink: ['/system'],
+              });
+              breadcrumbService.setBreadcrumb([iamBread]);
+
               this.service = this.injector.get(AdminService as Type<AdminService>);
               break;
           }

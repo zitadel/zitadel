@@ -429,7 +429,7 @@ export class MessageTextsComponent implements OnDestroy {
 
               const iambread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               const bread: Breadcrumb = {
@@ -447,7 +447,7 @@ export class MessageTextsComponent implements OnDestroy {
 
               const iamBread = new Breadcrumb({
                 type: BreadcrumbType.IAM,
-                name: 'IAM',
+                name: 'System',
                 routerLink: ['/system'],
               });
               breadcrumbService.setBreadcrumb([iamBread]);
