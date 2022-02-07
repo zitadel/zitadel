@@ -31,11 +31,11 @@ The services are configured to restart if an error occurs.
 
 In the following script the basic setup of the database is executed before ZITADEL starts. Execute the statement from the root of ZITADEL.
 
-You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the frontend compiled successfully. Initially it takes several minutes to start all containers.
+You can connect to [ZITADEL on localhost:4200](http://localhost:4203) after the frontend compiled successfully. Initially it takes several minutes to start all containers.
 
 <a name="compose-services"></a>
 ```bash
-$ docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up
+$ docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --detach
 ```
 
 ## Developing ZITADEL
@@ -49,18 +49,15 @@ Additionally to the prerequsites described [above](#prerequisites), the end-to-e
 * NodeJS, Version 14.17.6
 * NPM, Version 6.14.15
 
-### Preparing For End-to-End Tests
-
-Instead of the profiles backend and frondend as described [above](#compose-services), use the profile e2e and detach from containers. The e2e profile includes the backend and frontend profiles plus adds the e2e-setup service which prepares the environment for end-to-end tests. Setting everything up takes about 15 minutes.
-
-<a name="compose-e2e"></a>
-```bash
-$ docker compose -f ./build/local/docker-compose-local.yml --profile e2e up -d
-```
-
 ### Running End-to-End Tests
 
-Ater the *e2e-setup* container exited successfully, you are finally ready to launch the Cypress test suite:
+The following command creates all objects in your local ZITADEL needed to run the end-to-end tests. The command may take several minutes because it awaits eventual consistency but you only have to execute it once. 
+
+```bash
+$ ./scripts/e2e-setup.sh
+```
+
+Now you are ready to actually run the test suite.
 
 ```bash
 $ # Change directory to ./console
@@ -70,10 +67,10 @@ $ # Install dev dependencies if you haven't done so already
 $ npm install --only development
 
 $ # Run all end-to-end tests
-$ ./cypress.sh open local_local.env
+$ npm run e2e
 
 $ # Or open the end-to-end test suite interactively
-$ ./cypress.sh open local_local.env
+$ npm run e2e:open
 ```
 
 ### Redeploying a Service
