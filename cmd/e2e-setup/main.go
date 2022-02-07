@@ -7,7 +7,6 @@ import (
 
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 
-	"github.com/caos/zitadel/internal/authz"
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/logging"
@@ -48,17 +47,12 @@ func startE2ESetup(configPaths []string) {
 	es, err := eventstore.Start(conf.Eventstore)
 	logging.Log("MAIN-wjQ8G").OnError(err).Fatal("cannot start eventstore")
 
-	authZRepo, err := authz.Start(authz.Config{}, conf.SystemDefaults, nil)
-	dummy := dummyAuthZRepo{
-		authZRepo,
-	}
-
 	commands, err := command.StartCommands(
 		es,
 		conf.SystemDefaults,
 		conf.InternalAuthZ,
 		nil,
-		dummy,
+		dummyAuthZRepo{},
 	)
 	logging.Log("MAIN-54MLq").OnError(err).Fatal("cannot start command side")
 

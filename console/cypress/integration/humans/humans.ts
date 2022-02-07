@@ -36,6 +36,8 @@ describe('humans', () => {
                     cy.get('button').filter(':contains("Create")').should('be.visible').click()
                     cy.contains('User created successfully')
                     cy.visit(humansPath);
+                    cy.wait(5_000) // TODO: eventual consistency ftw
+                    cy.contains('button', 'refresh').click()
                     cy.contains("tr", testHumanUserName)
                 })        
             })
@@ -61,7 +63,11 @@ describe('humans', () => {
                         .find('button')
                         .contains('Delete')
                         .click()
+                    cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testHumanUserName, Cypress.env('org')))
+                    cy.contains('mat-dialog-container button', 'Delete').click()
                     cy.contains('User deleted successfully')
+                    cy.wait(5_000) // TODO: eventual consistency ftw
+                    cy.contains('button', 'refresh').click()
                     cy.get(`[text*=${testHumanUserName}]`).should('not.exist');                    
                 })
             })
