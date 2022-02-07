@@ -15,6 +15,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { AuthConfig, OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { QuicklinkModule } from 'ngx-quicklink';
 import { from, Observable } from 'rxjs';
+import { InfoOverlayModule } from 'src/app/modules/info-overlay/info-overlay.module';
 import { AssetService } from 'src/app/services/asset.service';
 import { SubscriptionService } from 'src/app/services/subscription.service';
 
@@ -99,6 +100,7 @@ const authConfig: AuthConfig = {
     MatNativeDateModule,
     QuicklinkModule,
     HasRoleModule,
+    InfoOverlayModule,
     BrowserAnimationsModule,
     HttpClientModule,
     MatIconModule,

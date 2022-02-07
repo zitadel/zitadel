@@ -14,7 +14,6 @@ import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
-import { InfoOverlayModule } from '../info-overlay/info-overlay.module';
 import { SharedModule } from '../shared/shared.module';
 import { NavComponent } from './nav.component';
 
@@ -24,7 +23,6 @@ import { NavComponent } from './nav.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    InfoOverlayModule,
     TranslateModule,
     MatIconModule,
     RouterModule,

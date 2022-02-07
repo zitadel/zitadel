@@ -4,7 +4,7 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
   {
     id: 'orgswitcher',
     origin: 'orgswitchbutton',
-    toHighlight: ['orgswitchbutton'],
+    toHighlight: ['orgswitchbutton', 'orglink'],
     content: {
       i18nText: 'OVERLAYS.ORGSWITCHER.TEXT',
     },
@@ -31,5 +31,12 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
       i18nText: 'OVERLAYS.PROFILE.TEXT',
     },
   },
-  // { id: 'mainnav', origin: 'orgswitchbutton' },
+  {
+    id: 'mainnav',
+    origin: 'mainnav',
+    toHighlight: ['mainnav'],
+    content: {
+      i18nText: 'OVERLAYS.NAV.TEXT',
+    },
+  },
 ];

@@ -4,7 +4,7 @@
       <cnsl-header *ngIf="user" [org]="org" [user]="user" [isDarkTheme]="componentCssClass === 'dark-theme'"
         [labelpolicy]="labelpolicy" (changedActiveOrg)="changedOrg($event)"></cnsl-header>
 
-      <cnsl-nav class="nav" [ngClass]="{ 'shadow': yoffset > 60}" *ngIf="user" [org]="org" [user]="user"
+      <cnsl-nav id="mainnav" class="nav" [ngClass]="{ 'shadow': yoffset > 60}" *ngIf="user" [org]="org" [user]="user"
         [isDarkTheme]="componentCssClass === 'dark-theme'" [labelpolicy]="labelpolicy"></cnsl-nav>
       <div class="router-container" [@routeAnimations]="prepareRoute(outlet)">
         <div class="outlet">

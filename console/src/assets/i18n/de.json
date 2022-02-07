@@ -136,6 +136,9 @@
     },
     "PROFILE": {
       "TEXT": "Hier können Sie zwischen Ihren Benutzerkonten wechseln und Ihre Sessions und Ihr Profil verwalten."
+    },
+    "NAV": {
+      "TEXT": "Diese Navigation ändert sich basierend auf den Breadcrumbs darüber."
     }
   },
   "FILTER": {

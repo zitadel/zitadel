@@ -1,4 +1,4 @@
-import { ConnectionPositionPair, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
+import { ConnectedPosition, ConnectionPositionPair, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { ComponentRef, Injectable, Injector } from '@angular/core';
 
@@ -23,24 +23,14 @@ export class OverlayService {
   constructor(private overlay: Overlay, private injector: Injector) {}
 
   public open(overlay: CnslOverlay) {
-    // Override default configuration
     const dialogConfig: InfoOverlayConfig = { ...DEFAULT_CONFIG, ...overlay };
-    console.log(dialogConfig);
-
-    // Returns an OverlayRef which is a PortalHost
     const overlayRef = this.createOverlay(dialogConfig);
 
-    // Instantiate remote control
     const dialogRef = new CnslOverlayRef(overlayRef);
 
-    // Create ComponentPortal that can be attached to a PortalHost
-    // const filePreviewPortal = new ComponentPortal(InfoOverlayComponent);
     const overlayComponent = this.attachOverlayContainer(overlayRef, dialogConfig, overlayRef);
 
     overlayRef.backdropClick().subscribe((_) => dialogRef.close());
-
-    // Attach ComponentPortal to PortalHost
-    // overlayRef.attach(filePreviewPortal);
 
     return dialogRef;
   }
@@ -70,24 +60,23 @@ export class OverlayService {
 
   private getOverlayConfig(config: InfoOverlayConfig): OverlayConfig {
     // const positionStrategy = this.overlay.position().global().centerHorizontally().centerVertically();
-    const positions = [
-      new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }),
-      new ConnectionPositionPair({ originX: 'start', originY: 'top' }, { overlayX: 'start', overlayY: 'bottom' }),
-    ];
 
     const htmlOrigin: HTMLElement | null = document.getElementById(config.origin);
 
+    const positions: ConnectedPosition[] = [
+      new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
+      new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+    ];
+
     let positionStrategy;
     if (htmlOrigin) {
-      console.log(`use html origin: ${config.origin}`);
       positionStrategy = this.overlay
         .position()
         .flexibleConnectedTo(htmlOrigin)
         .withPositions(positions)
-        .withFlexibleDimensions(false)
+        .withFlexibleDimensions(true)
         .withPush(false);
     } else {
-      console.log(`use central position strategy`);
       positionStrategy = this.overlay.position().global().centerHorizontally().centerVertically();
     }
 

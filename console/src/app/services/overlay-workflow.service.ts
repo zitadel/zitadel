@@ -1,5 +1,4 @@
 import { MediaMatcher } from '@angular/cdk/layout';
-import { Overlay } from '@angular/cdk/overlay';
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 
@@ -35,23 +34,25 @@ export class OverlayWorkflowService implements OnDestroy {
   );
   public destroy$: Subject<void> = new Subject();
 
-  public openRef!: CnslOverlayRef;
+  public openRef: CnslOverlayRef | null = null;
   public highlightedIds: { [id: string]: number } = {};
-  constructor(private mediaMatcher: MediaMatcher, private overlayService: OverlayService, private overlay: Overlay) {
-    const media: string = '(max-width: 500px)';
-    const small = this.mediaMatcher.matchMedia(media).matches;
-    if (small) {
-    }
+  public callback: Function | null = null;
+  constructor(private mediaMatcher: MediaMatcher, overlayService: OverlayService) {
+    // const media: string = '(max-width: 500px)';
+    // const small = this.mediaMatcher.matchMedia(media).matches;
+    // if (small) {
+    // }
 
     this.currentWorkflow$.pipe(takeUntil(this.destroy$)).subscribe((workflow) => {
       if (this.openRef) {
         this.openRef.close();
+        this.openRef = null;
       }
 
       Object.keys(this.highlightedIds).forEach((id) => {
         const element = document.getElementById(id);
         if (element) {
-          element.style.zIndex = `${this.highlightedIds[id]}`;
+          element.style.removeProperty('z-index');
           delete this.highlightedIds[id];
         }
       });
@@ -65,7 +66,6 @@ export class OverlayWorkflowService implements OnDestroy {
           if (element) {
             const oldZ = element.style.zIndex;
             this.highlightedIds[id] = Number(oldZ);
-
             element.style.zIndex = '1001';
           }
         });
@@ -75,6 +75,10 @@ export class OverlayWorkflowService implements OnDestroy {
 
   public reset(): void {
     this.currentWorkflow$.next(null);
+    console.log('execute cb here');
+    if (this.callback) {
+      this.callback();
+    }
   }
 
   public ngOnDestroy(): void {
@@ -82,7 +86,8 @@ export class OverlayWorkflowService implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public startWorkflow(overlays: CnslOverlay[]): void {
+  public startWorkflow(overlays: CnslOverlay[], cb: Function): void {
+    this.callback = cb;
     this.currentWorkflow$.next({ overlays, currentIndex: 0 });
   }
 
@@ -91,8 +96,13 @@ export class OverlayWorkflowService implements OnDestroy {
     if (this.nextPossible && currentWorkflow) {
       const nextIndex = currentWorkflow?.currentIndex + 1;
       this.currentWorkflow$.next({ ...currentWorkflow, currentIndex: nextIndex });
+      console.log('next');
     } else {
       this.currentWorkflow$.next(null);
+      console.log('finished, execute cb here');
+      if (this.callback) {
+        this.callback();
+      }
     }
   }
 
@@ -109,7 +119,20 @@ export class OverlayWorkflowService implements OnDestroy {
 
     if (currentWorkflow) {
       const nextIndex = currentWorkflow?.currentIndex + 1;
-      if (nextIndex <= currentWorkflow?.overlays.length) {
+      if (nextIndex < currentWorkflow?.overlays.length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public get isLast(): boolean {
+    const currentWorkflow = this.currentWorkflow$.value;
+
+    if (currentWorkflow) {
+      const currentIndex = currentWorkflow?.currentIndex;
+
+      if (currentIndex == currentWorkflow?.overlays.length - 1) {
         return true;
       }
     }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="((['iam.read$','iam.write$'] | hasRole)) as iamuser$">
-  <div class="nav-col" id="mainnav" [ngClass]="{'is-admin': (iamuser$ | async)}">
+  <div class="nav-col" [ngClass]="{'is-admin': (iamuser$ | async)}">
 
     <ng-container
       *ngIf="breadcrumbService.breadcrumbsExtended$ && (breadcrumbService.breadcrumbsExtended$ | async) as breadc">
@@ -148,10 +148,6 @@
             </div>
           </ng-container>
         </div>
-
-        <!-- <cnsl-info-overlay [workflowStepId]="'mainnav'" [idsToHighlight]="['mainnav']" inset="55px auto auto 0">
-          <p>This is the main navigation. It changes depending on your current page.</p>
-        </cnsl-info-overlay> -->
       </ng-container>
     </ng-container>
   </div>

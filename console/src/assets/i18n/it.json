@@ -136,6 +136,9 @@
     },
     "PROFILE": {
       "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
+    },
+    "NAV": {
+      "TEXT": "Questa navigazione cambia in base ai breadcrumb sopra."
     }
   },
   "FILTER": {

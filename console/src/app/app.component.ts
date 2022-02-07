@@ -17,7 +17,7 @@ import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
 import { OverlayWorkflowService } from './services/overlay-workflow.service';
-import { OverlayService } from './services/overlay.service';
+import { StorageLocation, StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
 import { IntroWorkflowOverlays } from './services/workflows';
@@ -66,10 +66,10 @@ export class AppComponent implements OnInit, OnDestroy {
     public matIconRegistry: MatIconRegistry,
     public domSanitizer: DomSanitizer,
     private router: Router,
-    private overlayService: OverlayService,
     update: UpdateService,
     private activatedRoute: ActivatedRoute,
     private workflowService: OverlayWorkflowService,
+    private storageService: StorageService,
     @Inject(DOCUMENT) private document: Document,
   ) {
     console.log(
@@ -209,7 +209,14 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     setTimeout(() => {
-      this.workflowService.startWorkflow(IntroWorkflowOverlays);
+      const cb = () => {
+        console.log('callback yeah');
+        this.storageService.setItem('intro-dismissed', true, StorageLocation.local);
+      };
+      const dismissed = this.storageService.getItem('intro-dismissed', StorageLocation.local);
+      if (!dismissed) {
+        this.workflowService.startWorkflow(IntroWorkflowOverlays, cb);
+      }
     }, 1000);
   }
 

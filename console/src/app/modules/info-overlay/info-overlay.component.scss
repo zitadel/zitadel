@@ -14,7 +14,7 @@
 
   .cnsl-overlay-backdrop {
     background-color: if($is-dark-theme, #00000080, #ffffff80);
-    backdrop-filter: blur(1px);
+    backdrop-filter: blur(2px);
   }
 
   .cnsl-overlay-panel {
@@ -25,7 +25,7 @@
     border-radius: 6px;
     padding: 1rem;
     font-size: 14px;
-    max-width: 300px;
+    width: 300px;
     border: 1px solid if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
     &::before {
@@ -63,10 +63,10 @@
       }
     }
 
-    .info-row {
+    .overlay-info-row {
       display: flex;
       justify-content: space-between;
-      margin: -1rem -1rem 0 0;
+      margin: -1rem -1rem 0.5rem 0;
       align-items: center;
 
       .info {
