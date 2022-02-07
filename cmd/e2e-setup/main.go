@@ -5,10 +5,6 @@ import (
 	"flag"
 	"time"
 
-	internal_authz "github.com/caos/zitadel/internal/api/authz"
-
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/logging"
@@ -17,36 +13,9 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-type E2EConfig struct {
-	Org                            string
-	MachineKeyPath                 string
-	ZitadelProjectResourceID       string
-	APIURL                         string
-	IssuerURL                      string
-	OrgOwnerPassword               string
-	OrgOwnerViewerPassword         string
-	OrgProjectCreatorPassword      string
-	PasswordComplexityUserPassword string
-	LoginPolicyUserPassword        string
-}
-
-type setupConfig struct {
-	E2E E2EConfig
-
-	Log logging.Config
-
-	Eventstore     types.SQL
-	SystemDefaults sd.SystemDefaults
-	InternalAuthZ  internal_authz.Config
-}
-
 type user struct {
 	desc, role, pw string
 }
-
-var (
-	e2eSetupPaths = config.NewArrayFlags("authz.yaml", "system-defaults.yaml", "setup.yaml", "e2e.yaml")
-)
 
 func main() {
 	flag.Var(e2eSetupPaths, "setup-files", "paths to the setup files")
@@ -59,6 +28,9 @@ func startE2ESetup(configPaths []string) {
 	conf := new(setupConfig)
 	err := config.Read(conf, configPaths...)
 	logging.Log("MAIN-EAWlt").OnError(err).Fatal("cannot read config")
+
+	err = conf.E2E.validate()
+	logging.Log("MAIN-NoZIV").OnError(err).Fatal("validating e2e config failed")
 
 	ctx := context.Background()
 
