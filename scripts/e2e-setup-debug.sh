@@ -2,6 +2,8 @@
 
 set -ex
 
+projectRoot="."
+
 set -a
 source ./build/local/local.env
 source ./console/e2e.env

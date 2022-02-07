@@ -6,11 +6,13 @@ ENVFILE=$2
 shift
 shift
 
+projectRoot=".."
+
 set -a; source $ENVFILE; set +a
 
 NPX=""
 if ! command -v cypress &> /dev/null; then
-    NPX="npx" 
+    NPX="npx"
 fi
 
 $NPX cypress $ACTION \
