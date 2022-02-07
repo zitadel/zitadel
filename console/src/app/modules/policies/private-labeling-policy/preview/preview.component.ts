@@ -16,7 +16,6 @@ export class PreviewComponent implements OnInit, OnDestroy {
   @Input() preview: Preview = Preview.PREVIEW;
   @Input() policy!: LabelPolicy.AsObject;
   @Input() label: string = 'PREVIEW';
-  @Input() images: { [imagekey: string]: any } = {};
   @Input() theme: Theme = Theme.DARK;
   @Input() refresh: Observable<void> = of();
   private destroyed$: Subject<void> = new Subject();

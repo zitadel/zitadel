@@ -2,6 +2,10 @@ td,
 th {
   padding: 0 1rem;
 
+  .action-state-btn {
+    margin-left: 0.5rem;
+  }
+
   &:first-child {
     padding-left: 0;
     padding-right: 1rem;

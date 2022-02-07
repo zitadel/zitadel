@@ -80,13 +80,16 @@ export class AssetService {
   }
 
   private async getServiceUrl(): Promise<string> {
-    const url = await this.http.get('./assets/environment.json')
-      .toPromise().then((data: any) => {
+    const url = await this.http
+      .get('./assets/environment.json')
+      .toPromise()
+      .then((data: any) => {
         if (data && data.assetServiceUrl) {
           console.log(data.assetServiceUrl);
           return data.assetServiceUrl;
         }
-      }).catch(error => {
+      })
+      .catch((error) => {
         console.error(error);
       });
 
@@ -103,29 +106,11 @@ export class AssetService {
     }
 
     return this.serviceUrl.then((url) =>
-      this.http.post(`${url}/assets/v1/${endpoint}`,
-        body,
-        {
+      this.http
+        .post(`${url}/assets/v1/${endpoint}`, body, {
           headers: headers,
-        }).toPromise(),
-    );
-  }
-
-  public load(endpoint: string, orgId?: string): Promise<any> {
-    const headers: any = {
-      [authorizationKey]: `${bearerPrefix} ${this.accessToken}`,
-    };
-
-    if (orgId) {
-      headers[orgKey] = `${orgId}`;
-    }
-
-    return this.serviceUrl.then((url) =>
-      this.http.get(`${url}/assets/v1/${endpoint}`,
-        {
-          responseType: 'blob',
-          headers: headers,
-        }).toPromise(),
+        })
+        .toPromise(),
     );
   }
 }

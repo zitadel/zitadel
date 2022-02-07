@@ -1,6 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, EventEmitter, Injector, OnDestroy, OnInit, Type } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { switchMap, take, takeUntil } from 'rxjs/operators';
@@ -67,8 +66,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public previewData!: LabelPolicy.AsObject;
   public data!: LabelPolicy.AsObject;
 
-  public images: { [key: string]: any } = {};
-
   public panelOpenState: boolean = false;
   public isHoveringOverDarkLogo: boolean = false;
   public isHoveringOverDarkIcon: boolean = false;
@@ -87,7 +84,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public AssetType: any = AssetType;
 
   public refreshPreview: EventEmitter<void> = new EventEmitter();
-  public loadingImages: boolean = false;
   public org!: Org.AsObject;
   public currentPolicy: GridPolicy = PRIVATELABEL_POLICY;
   public InfoSectionType: any = InfoSectionType;
@@ -99,7 +95,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     private toast: ToastService,
     private injector: Injector,
     private assetService: AssetService,
-    private sanitizer: DomSanitizer,
     private storageService: StorageService,
     private themeService: ThemeService,
     breadcrumbService: BreadcrumbService,
@@ -224,11 +219,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         .then(() => {
           this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
           setTimeout(() => {
-            this.loadingImages = true;
             this.getPreviewData().then((data) => {
               if (data.policy) {
                 this.previewData = data.policy;
-                this.loadPreviewImages();
               }
             });
           }, 1000);
@@ -249,11 +242,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         .then(() => {
           this.toast.showInfo('POLICY.TOAST.DELETESUCCESS', true);
           setTimeout(() => {
-            this.loadingImages = true;
             this.getPreviewData().then((data) => {
               if (data.policy) {
                 this.previewData = data.policy;
-                this.loadPreviewImages();
               }
             });
           }, 1000);
@@ -362,11 +353,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       .then(() => {
         this.toast.showInfo('POLICY.TOAST.UPLOADSUCCESS', true);
         setTimeout(() => {
-          this.loadingImages = true;
           this.getPreviewData().then((data) => {
             if (data.policy) {
               this.previewData = data.policy;
-              this.loadPreviewImages();
             }
           });
         }, 1000);
@@ -392,14 +381,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             if (data.policy) {
               this.previewData = data.policy;
               this.loading = false;
-
-              if (
-                (canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
-                this.serviceType === PolicyComponentServiceType.ADMIN
-              ) {
-                this.loadingImages = true;
-                this.loadPreviewImages();
-              }
             }
           })
           .catch((error) => {
@@ -411,108 +392,12 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
             if (data.policy) {
               this.data = data.policy;
               this.loading = false;
-
-              if (
-                (canUse === true && this.serviceType === PolicyComponentServiceType.MGMT) ||
-                this.serviceType === PolicyComponentServiceType.ADMIN
-              ) {
-                this.loadImages();
-              }
             }
           })
           .catch((error) => {
             this.toast.showError(error);
           });
       });
-  }
-
-  private loadImages(): void {
-    const promises: Promise<any>[] = [];
-    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      if (this.data.logoUrlDark) {
-        promises.push(this.loadAsset('darkLogo', AssetEndpoint.IAMDARKLOGO));
-      }
-      if (this.data.iconUrlDark) {
-        promises.push(this.loadAsset('darkIcon', AssetEndpoint.IAMDARKICON));
-      }
-      if (this.data.logoUrl) {
-        promises.push(this.loadAsset('logo', AssetEndpoint.IAMLOGO));
-      }
-      if (this.data.iconUrl) {
-        promises.push(this.loadAsset('icon', AssetEndpoint.IAMICON));
-      }
-    } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      if (this.data.logoUrlDark) {
-        promises.push(this.loadAsset('darkLogo', AssetEndpoint.MGMTDARKLOGO));
-      }
-      if (this.data.iconUrlDark) {
-        promises.push(this.loadAsset('darkIcon', AssetEndpoint.MGMTDARKICON));
-      }
-      if (this.data.logoUrl) {
-        promises.push(this.loadAsset('logo', AssetEndpoint.MGMTLOGO));
-      }
-      if (this.data.iconUrl) {
-        promises.push(this.loadAsset('icon', AssetEndpoint.MGMTICON));
-      }
-    }
-
-    if (promises.length) {
-      Promise.all(promises)
-        .then(() => {
-          this.loadingImages = false;
-          this.refreshPreview.emit();
-        })
-        .catch((error) => {
-          this.loadingImages = false;
-        });
-    } else {
-      this.loadingImages = false;
-    }
-  }
-
-  private loadPreviewImages(): void {
-    const promises: Promise<any>[] = [];
-
-    if (this.serviceType === PolicyComponentServiceType.ADMIN) {
-      if (this.previewData.logoUrlDark) {
-        promises.push(this.loadAsset('previewDarkLogo', AssetEndpoint.IAMDARKLOGOPREVIEW));
-      }
-      if (this.previewData.iconUrlDark) {
-        promises.push(this.loadAsset('previewDarkIcon', AssetEndpoint.IAMDARKICONPREVIEW));
-      }
-      if (this.previewData.logoUrl) {
-        promises.push(this.loadAsset('previewLogo', AssetEndpoint.IAMLOGOPREVIEW));
-      }
-      if (this.previewData.iconUrl) {
-        promises.push(this.loadAsset('previewIcon', AssetEndpoint.IAMICONPREVIEW));
-      }
-    } else if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      if (this.previewData.logoUrlDark) {
-        promises.push(this.loadAsset('previewDarkLogo', AssetEndpoint.MGMTDARKLOGOPREVIEW));
-      }
-      if (this.previewData.iconUrlDark) {
-        promises.push(this.loadAsset('previewDarkIcon', AssetEndpoint.MGMTDARKICONPREVIEW));
-      }
-      if (this.previewData.logoUrl) {
-        promises.push(this.loadAsset('previewLogo', AssetEndpoint.MGMTLOGOPREVIEW));
-      }
-      if (this.previewData.iconUrl) {
-        promises.push(this.loadAsset('previewIcon', AssetEndpoint.MGMTICONPREVIEW));
-      }
-    }
-
-    if (promises.length) {
-      Promise.all(promises)
-        .then(() => {
-          this.loadingImages = false;
-          this.refreshPreview.emit();
-        })
-        .catch((error) => {
-          this.loadingImages = false;
-        });
-    } else {
-      this.loadingImages = false;
-    }
   }
 
   public ngOnDestroy(): void {
@@ -549,19 +434,6 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadAsset(imagekey: string, url: string): Promise<any> {
-    return this.assetService
-      .load(`${url}`, this.org.id)
-      .then((data) => {
-        const objectURL = URL.createObjectURL(data);
-        this.images[imagekey] = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-        this.refreshPreview.emit();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
-  }
-
   public removePolicy(): void {
     if (this.service instanceof ManagementService) {
       this.service
@@ -581,11 +453,9 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public savePolicy(): Promise<any> {
     const reloadPolicy = () => {
       setTimeout(() => {
-        this.loadingImages = true;
         this.getData().then((data) => {
           if (data.policy) {
             this.data = data.policy;
-            this.loadImages();
           }
         });
       }, 500);
@@ -670,12 +540,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVATELABELING.ACTIVATED', true);
             setTimeout(() => {
-              this.loadingImages = true;
               this.getData().then((data) => {
                 if (data.policy) {
                   this.data = data.policy;
                   this.applyToConsole(data.policy);
-                  this.loadImages();
                 }
               });
             }, 1000);
@@ -689,12 +557,10 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
           .then(() => {
             this.toast.showInfo('POLICY.PRIVATELABELING.ACTIVATED', true);
             setTimeout(() => {
-              this.loadingImages = true;
               this.getData().then((data) => {
                 if (data.policy) {
                   this.data = data.policy;
                   this.applyToConsole(data.policy);
-                  this.loadImages();
                 }
               });
             }, 1000);

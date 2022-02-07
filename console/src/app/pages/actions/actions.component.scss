@@ -73,15 +73,24 @@ h1 {
         flex: 1;
       }
 
-      .action-wrapper {
+      .flow-action-wrapper {
         padding: 0 0.5rem;
+        margin: 0;
 
-        .action {
+        .flow-action {
           display: flex;
           align-items: center;
           font-size: 14px;
           padding: 0.5rem 0;
           cursor: move;
+
+          .flow-action-name {
+            margin-right: 1rem;
+          }
+
+          .fill-space {
+            flex: 1;
+          }
 
           i {
             margin-right: 0.5rem;

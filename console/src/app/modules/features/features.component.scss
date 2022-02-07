@@ -150,6 +150,18 @@
       display: flex;
       align-items: center;
     }
+
+    .flow-select {
+      flex-shrink: 1;
+      min-width: 150px;
+      margin-left: 1rem;
+    }
+
+    .flow-count {
+      flex-shrink: 1;
+      width: 70px;
+      margin-left: 1rem;
+    }
   }
 }
 

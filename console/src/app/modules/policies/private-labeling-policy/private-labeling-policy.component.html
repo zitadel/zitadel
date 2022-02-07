@@ -22,20 +22,17 @@
       <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-
-    <div class="privatelabeling-top-row">
+    <div class="top-row">
       <div>
         <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
         <div class="theme-changer">
           <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}"
             class="light" [ngClass]="{'active': theme === Theme.LIGHT}">
-            <i class="icon las la-sun"></i>
-            <i class="edit-icon las la-edit"></i>
+            <i class="icon las la-edit"></i>
           </button>
           <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark"
             [ngClass]="{'active': theme === Theme.DARK}">
-            <i class="icon las la-moon"></i>
-            <i class="edit-icon las la-edit"></i>
+            <i class="icon las la-edit"></i>
           </button>
         </div>
       </div>
@@ -78,93 +75,89 @@
           <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
           </cnsl-info-section>
 
+          <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           <div class="logo-setup-wrapper">
             <div class="part">
-              <span class="label cnsl-secondary-text">Logo</span>
-              <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
+              <span class="label">Logo</span>
+              <!-- <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner> -->
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <div class="img-wrapper mat-elevation-z2" *ngIf="images['previewDarkLogo']">
+                  <div class="img-wrapper mat-elevation-z3" *ngIf="previewData.logoUrlDark">
                     <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
                       (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="images['previewDarkLogo']" alt="dark logo preview" />
+                    <img matTooltip="Preview" class="prev" [src]="previewData.logoUrlDark" alt="dark logo preview" />
                   </div>
                   <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="images['darkLogo']">
-                    <img matTooltip="Current" class="curr" [src]="images['darkLogo']" alt="dark logo" />
+                  <div class="img-wrapper" *ngIf="data.logoUrlDark">
+                    <img matTooltip="Current" class="curr" [src]="data.logoUrlDark" alt="dark logo" />
                   </div>
                 </div>
                 <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                  <div class="img-wrapper" *ngIf="images['previewLogo']">
+                  <div class="img-wrapper" *ngIf="previewData.logoUrl">
                     <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
                       (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="images['previewLogo']" alt="logo preview" />
+                    <img matTooltip="Preview" class="prev" [src]="previewData.logoUrl" alt="logo preview" />
                   </div>
                   <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="images['logo']">
-                    <img matTooltip="Current" class="curr" [src]="images['logo']" alt="logo" />
+                  <div class="img-wrapper" *ngIf="data.logoUrl">
+                    <img matTooltip="Current" class="curr" [src]="data.logoUrl" alt="logo" />
                   </div>
                 </div>
               </container>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverLogo(theme, $event)"
                 (dropped)="onDropLogo(theme, $event)" [class.hovering]="isHoveringOverDarkLogo">
                 <label class="file-label">
-                  <i class="icon cnsl-secondary-text las la-image"></i>
-                  <span class="cnsl-secondary-text">{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' |
-                    translate):
+                  <i class="icon las la-image"></i>
+                  <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
                     ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                   <input #selectedFile style="display: none;" class="file-input" type="file"
                     (change)="onDropLogo(theme, $any($event.target).files)">
                   <a class="btn"
                     *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                    (click)="$event.preventDefault(); selectedFile.click();">{{'POLICY.PRIVATELABELING.BTN' |
-                    translate}}</a>
+                    (click)="$event.preventDefault(); selectedFile.click();">
+                    {{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
               </div>
             </div>
 
             <div class="part">
               <span class="label cnsl-secondary-text">Icon</span>
-              <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner>
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <div class="img-wrapper" *ngIf="images['previewDarkIcon']">
+                  <div class="img-wrapper" *ngIf="previewData.iconUrlDark">
                     <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
                       (click)="deleteAsset(AssetType.ICON, theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="images['previewDarkIcon']" alt="dark icon preview" />
+                    <img matTooltip="Preview" class="prev" [src]="previewData.iconUrlDark" alt="dark icon preview" />
                   </div>
                   <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="images['darkIcon']">
-                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.CURRENT)">remove_circle</mat-icon> -->
-                    <img matTooltip="Current" class="curr" [src]="images['darkIcon']" alt="dark icon" />
+                  <div class="img-wrapper" *ngIf="data.iconUrlDark">
+                    <img matTooltip="Current" class="curr" [src]="data.iconUrlDark" alt="dark icon" />
                   </div>
                 </div>
                 <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                  <div class="img-wrapper" *ngIf="images['previewIcon']">
+                  <div class="img-wrapper" *ngIf="previewData.iconUrl">
                     <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
                       (click)="deleteAsset(AssetType.ICON,theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="images['previewIcon']" alt="icon preview" />
+                    <img matTooltip="Preview" class="prev" [src]="previewData.iconUrl" alt="icon preview" />
                   </div>
                   <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="images['icon']">
-                    <!-- <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn" (click)="deleteAsset(AssetType.ICON,theme, Preview.CURRENT)">remove_circle</mat-icon> -->
-                    <img matTooltip="Current" class="curr" [src]="images['icon']" alt="icon" />
+                  <div class="img-wrapper" *ngIf="data.iconUrl">
+                    <img matTooltip="Current" class="curr" [src]="data.iconUrl" alt="icon" />
                   </div>
                 </div>
               </container>
               <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
                 (dropped)="onDropIcon(theme, $event)" [class.hovering]="isHoveringOverDarkIcon">
                 <label class="file-label">
-                  <i class="icon cnsl-secondary-text las la-image"></i>
-                  <span class="cnsl-secondary-text">{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' |
-                    translate):
+                  <i class="icon las la-image"></i>
+                  <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
                     ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
                   <input #selectedFileIcon style="display: none;" class="file-input" type="file"
                     (change)="onDropIcon(theme, $any($event.target).files)">
                   <a class="btn"
                     *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                    (click)="$event.preventDefault(); selectedFileIcon.click();">{{'POLICY.PRIVATELABELING.BTN' |
-                    translate}}</a>
+                    (click)="$event.preventDefault(); selectedFileIcon.click();">
+                    {{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
                 </label>
               </div>
             </div>
@@ -254,7 +247,7 @@
           <div class="fonts">
             <cnsl-info-section class="info-section">{{'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate}}
             </cnsl-info-section>
-            <div class="font-preview mat-elevation-z2"
+            <div class="font-preview mat-elevation-z3"
               *ngIf="preview === Preview.PREVIEW && previewData.fontUrl || preview === Preview.CURRENT && data.fontUrl">
               <mat-icon class="icon">text_fields</mat-icon>
               <span>ABC • abc • 123</span>
@@ -271,8 +264,7 @@
               [class.hovering]="isHoveringOverFont">
               <label class="file-label">
                 <i class="icon las la-file"></i>
-                <span class="cnsl-secondary-text">{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' |
-                  translate):
+                <span>{{isHoveringOverFont ? ('POLICY.PRIVATELABELING.RELEASEFONT' | translate):
                   ('POLICY.PRIVATELABELING.DROPFONT' | translate)}}</span>
                 <input #selectedFontFile style="display: none;" class="file-input" type="file"
                   (change)="onDropFont($any($event.target).files)">
@@ -334,10 +326,10 @@
                 [ngClass]="{'strong': preview === Preview.CURRENT}">C</span></span>
           </button>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [images]="images"
-            [preview]="preview" [theme]="theme" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [refresh]="refreshPreview" [images]="images"
-            [preview]="preview" [theme]="theme" class="prev" label="PREVIEW" [policy]="previewData"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [preview]="preview"
+            [theme]="theme" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
+          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [refresh]="refreshPreview" [preview]="preview"
+            [theme]="theme" class="prev" label="PREVIEW" [policy]="previewData"></cnsl-preview>
         </div>
       </div>
     </div>

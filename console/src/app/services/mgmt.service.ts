@@ -74,6 +74,8 @@ import {
   ClearFlowResponse,
   CreateActionRequest,
   CreateActionResponse,
+  DeactivateActionRequest,
+  DeactivateActionResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -238,6 +240,8 @@ import {
   ListUserMetadataResponse,
   ListUsersRequest,
   ListUsersResponse,
+  ReactivateActionRequest,
+  ReactivateActionResponse,
   ReactivateAppRequest,
   ReactivateAppResponse,
   ReactivateOrgIDPRequest,
@@ -919,6 +923,18 @@ export class ManagementService {
     const req = new DeleteActionRequest();
     req.setId(id);
     return this.grpcService.mgmt.deleteAction(req, null).then((resp) => resp.toObject());
+  }
+
+  public deactivateAction(id: string): Promise<DeactivateActionResponse.AsObject> {
+    const req = new DeactivateActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.deactivateAction(req, null).then((resp) => resp.toObject());
+  }
+
+  public reactivateAction(id: string): Promise<ReactivateActionResponse.AsObject> {
+    const req = new ReactivateActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.reactivateAction(req, null).then((resp) => resp.toObject());
   }
 
   public listActions(

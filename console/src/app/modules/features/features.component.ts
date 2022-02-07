@@ -7,7 +7,7 @@ import {
   SetDefaultFeaturesRequest,
   SetOrgFeaturesRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Features } from 'src/app/proto/generated/zitadel/features_pb';
+import { ActionsAllowed, Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { GetFeaturesResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -45,6 +45,13 @@ export class FeaturesComponent implements OnDestroy {
   public stripeLoading: boolean = false;
   public stripeURL: string = '';
   public stripeCustomer!: StripeCustomer;
+
+  public actionsSelection: any = [
+    ActionsAllowed.ACTIONS_ALLOWED_NOT_ALLOWED,
+    ActionsAllowed.ACTIONS_ALLOWED_MAX,
+    ActionsAllowed.ACTIONS_ALLOWED_UNLIMITED,
+  ];
+  public ActionsAllowed: any = ActionsAllowed;
 
   constructor(
     private route: ActivatedRoute,
@@ -185,7 +192,8 @@ export class FeaturesComponent implements OnDestroy {
         req.setPrivacyPolicy(this.features.privacyPolicy);
         req.setMetadataUser(this.features.metadataUser);
         req.setLockoutPolicy(this.features.lockoutPolicy);
-        req.setActions(this.features.actions);
+        req.setActionsAllowed(this.features.actionsAllowed);
+        req.setMaxActions(this.features.maxActions);
 
         this.adminService
           .setOrgFeatures(req)
@@ -213,7 +221,8 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setCustomTextMessage(this.features.customTextMessage);
         dreq.setMetadataUser(this.features.metadataUser);
         dreq.setLockoutPolicy(this.features.lockoutPolicy);
-        dreq.setActions(this.features.actions);
+        dreq.setActionsAllowed(this.features.actionsAllowed);
+        dreq.setMaxActions(this.features.maxActions);
 
         this.adminService
           .setDefaultFeatures(dreq)
