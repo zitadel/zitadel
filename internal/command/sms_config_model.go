@@ -1,7 +1,8 @@
 package command
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
+	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/iam"
@@ -10,7 +11,8 @@ import (
 type IAMSMSConfigWriteModel struct {
 	eventstore.WriteModel
 
-	Twilio TwilioConfig
+	ID     string
+	Twilio *TwilioConfig
 	State  domain.SMSConfigState
 }
 
@@ -20,42 +22,58 @@ type TwilioConfig struct {
 	From  string
 }
 
-func NewIAMSMSConfigWriteModel() *IAMSMSConfigWriteModel {
+func NewIAMSMSConfigWriteModel(id string) *IAMSMSConfigWriteModel {
 	return &IAMSMSConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   domain.IAMID,
 			ResourceOwner: domain.IAMID,
 		},
+		ID: id,
 	}
 }
 
 func (wm *IAMSMSConfigWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *iam.SMSConfigAddedEvent:
-			wm.TLS = e.TLS
-			wm.FromAddress = e.FromAddress
-			wm.FromName = e.FromName
-			wm.SMSHost = e.SMSHost
-			wm.SMSUser = e.SMSUser
-			wm.SMSPassword = e.SMSPassword
+		case *iam.SMSConfigTwilioAddedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.Twilio = &TwilioConfig{
+				SID:   e.SID,
+				Token: e.Token,
+				From:  e.From,
+			}
+			wm.State = domain.SMSConfigStateInactive
+		case *iam.SMSConfigTwilioChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			if e.SID != nil {
+				wm.Twilio.SID = *e.SID
+			}
+			if e.Token != nil {
+				wm.Twilio.Token = *e.Token
+			}
+			if e.From != nil {
+				wm.Twilio.From = *e.From
+			}
+		case *iam.SMSConfigTwilioActivatedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
 			wm.State = domain.SMSConfigStateActive
-		case *iam.SMSConfigChangedEvent:
-			if e.TLS != nil {
-				wm.TLS = *e.TLS
+		case *iam.SMSConfigTwilioDeactivatedEvent:
+			if wm.ID != e.ID {
+				continue
 			}
-			if e.FromAddress != nil {
-				wm.FromAddress = *e.FromAddress
+			wm.State = domain.SMSConfigStateInactive
+		case *iam.SMSConfigTwilioRemovedEvent:
+			if wm.ID != e.ID {
+				continue
 			}
-			if e.FromName != nil {
-				wm.FromName = *e.FromName
-			}
-			if e.SMSHost != nil {
-				wm.SMSHost = *e.SMSHost
-			}
-			if e.SMSUser != nil {
-				wm.SMSUser = *e.SMSUser
-			}
+			wm.Twilio = nil
+			wm.State = domain.SMSConfigStateRemoved
 		}
 	}
 	return wm.WriteModel.Reduce()
@@ -67,36 +85,32 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			iam.SMSConfigAddedEventType,
-			iam.SMSConfigChangedEventType,
-			iam.SMSConfigPasswordChangedEventType).
+			iam.SMSConfigTwilioAddedEventType,
+			iam.SMSConfigTwilioChangedEventType,
+			iam.SMSConfigTwilioActivatedEventType,
+			iam.SMSConfigTwilioDeactivatedEventType,
+			iam.SMSConfigTwilioRemovedEventType).
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, tls bool, fromAddress, fromName, smtpHost, smtpUser string) (*iam.SMSConfigChangedEvent, bool, error) {
-	changes := make([]iam.SMSConfigChanges, 0)
+func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, token, from string) (*iam.SMSConfigTwilioChangedEvent, bool, error) {
+	changes := make([]iam.SMSConfigTwilioChanges, 0)
 	var err error
 
-	if wm.TLS != tls {
-		changes = append(changes, iam.ChangeSMSConfigTLS(tls))
+	if wm.Twilio.SID != sid {
+		changes = append(changes, iam.ChangeSMSConfigTwilioSID(sid))
 	}
-	if wm.FromAddress != fromAddress {
-		changes = append(changes, iam.ChangeSMSConfigFromAddress(fromAddress))
+	if wm.Twilio.Token != token {
+		changes = append(changes, iam.ChangeSMSConfigTwilioToken(token))
 	}
-	if wm.FromName != fromName {
-		changes = append(changes, iam.ChangeSMSConfigFromName(fromName))
-	}
-	if wm.SMSHost != smtpHost {
-		changes = append(changes, iam.ChangeSMSConfigSMSHost(smtpHost))
-	}
-	if wm.SMSUser != smtpUser {
-		changes = append(changes, iam.ChangeSMSConfigSMSUser(smtpUser))
+	if wm.Twilio.From != from {
+		changes = append(changes, iam.ChangeSMSConfigTwilioFrom(from))
 	}
 
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := iam.NewSMSConfigChangeEvent(ctx, aggregate, changes)
+	changeEvent, err := iam.NewSMSConfigTwilioChangedEvent(ctx, aggregate, id, changes)
 	if err != nil {
 		return nil, false, err
 	}
