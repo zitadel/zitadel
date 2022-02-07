@@ -22,17 +22,19 @@
       <mat-spinner diameter="30" *ngIf="loading" color="primary"></mat-spinner>
     </div>
 
-    <div class="top-row">
+    <div class="privatelabeling-top-row">
       <div>
         <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
         <div class="theme-changer">
           <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}"
             class="light" [ngClass]="{'active': theme === Theme.LIGHT}">
-            <i class="icon las la-edit"></i>
+            <i class="icon las la-sun"></i>
+            <i class="edit-icon las la-edit"></i>
           </button>
           <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark"
             [ngClass]="{'active': theme === Theme.DARK}">
-            <i class="icon las la-edit"></i>
+            <i class="icon las la-moon"></i>
+            <i class="edit-icon las la-edit"></i>
           </button>
         </div>
       </div>
@@ -75,11 +77,9 @@
           <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
           </cnsl-info-section>
 
-          <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
           <div class="logo-setup-wrapper">
             <div class="part">
               <span class="label">Logo</span>
-              <!-- <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner> -->
               <container [ngSwitch]="theme">
                 <div class="logo-view" *ngSwitchCase="Theme.DARK">
                   <div class="img-wrapper mat-elevation-z3" *ngIf="previewData.logoUrlDark">
