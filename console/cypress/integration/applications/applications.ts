@@ -40,7 +40,7 @@ describe('applications', () => {
                 }) 
                 //TODO: check client ID/Secret
                 cy.get('button').filter(':contains("Close")').should('exist').click()
-                cy.contains('arrow_back').click()
+                cy.contains('arrow_back').click({ force: true })
                 cy.contains('[data-e2e=app-card]', testAppName)
             })
         })
