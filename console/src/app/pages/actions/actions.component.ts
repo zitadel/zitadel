@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { Action, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
+import { Action, ActionState, Flow, FlowType, TriggerType } from 'src/app/proto/generated/zitadel/action_pb';
 import { ActionsAllowed } from 'src/app/proto/generated/zitadel/features_pb';
 import { SetTriggerActionsRequest } from 'src/app/proto/generated/zitadel/management_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -28,6 +28,7 @@ export class ActionsComponent {
   public selection: Action.AsObject[] = [];
   public InfoSectionType: any = InfoSectionType;
   public maxActions: number | null = null;
+  public ActionState: any = ActionState;
 
   constructor(private mgmtService: ManagementService, private dialog: MatDialog, private toast: ToastService) {
     this.mgmtService.getFeatures().then((featuresResp) => {
@@ -47,6 +48,7 @@ export class ActionsComponent {
   private loadFlow() {
     this.mgmtService.getFlow(this.flowType).then((flowResponse) => {
       if (flowResponse.flow) this.flow = flowResponse.flow;
+      console.log(this.flow);
     });
   }
 

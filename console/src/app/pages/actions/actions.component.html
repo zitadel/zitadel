@@ -47,11 +47,15 @@
           <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
           <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
           <span class="fill-space"></span>
-          <div class="action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
-            <div cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".action-wrapper" class="action"
+          <div class="flow-action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
+            <div cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".action-wrapper" class="flow-action"
               *ngFor="let action of trigger.actionsList">
               <i class="las la-code"></i>
-              <span>{{action.name}}</span>
+              <span class="flow-action-name">{{action.name}}</span>
+              <span class="fill-space"></span>
+              <span class="state"
+                [ngClass]="{'active': action.state === ActionState.ACTION_STATE_ACTIVE,'inactive': action.state === ActionState.ACTION_STATE_INACTIVE }">
+                {{'FLOWS.STATES.'+action.state | translate}}</span>
             </div>
           </div>
         </div>

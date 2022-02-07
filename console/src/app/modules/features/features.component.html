@@ -280,7 +280,8 @@
       <span class="fill-space"></span>
       <cnsl-form-field class="flow-select">
         <cnsl-label>{{ 'FEATURES.DATA.FLOW.TYPE' | translate }}</cnsl-label>
-        <mat-select [(ngModel)]="features.actionsAllowed">
+        <mat-select [(ngModel)]="features.actionsAllowed"
+          [disabled]="(['iam.features.write'] | hasRole | async) === false">
           <mat-option *ngFor="let allowedType of actionsSelection" [value]="allowedType">
             {{ 'FEATURES.DATA.FLOW.ACTIONSALLOWED.'+allowedType | translate}}
           </mat-option>
@@ -289,7 +290,8 @@
 
       <cnsl-form-field *ngIf="features.actionsAllowed === ActionsAllowed.ACTIONS_ALLOWED_MAX" class="flow-count">
         <cnsl-label>{{ 'FEATURES.DATA.FLOW.COUNT' | translate }}</cnsl-label>
-        <input cnslInput type="number" [(ngModel)]="features.maxActions" ngDefaultControl />
+        <input cnslInput type="number" [(ngModel)]="features.maxActions"
+          [disabled]="(['iam.features.write'] | hasRole | async) === false" ngDefaultControl />
       </cnsl-form-field>
     </div>
   </div>
