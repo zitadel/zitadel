@@ -16,9 +16,11 @@ import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb'
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { ManagementService } from './services/mgmt.service';
+import { OverlayWorkflowService } from './services/overlay-workflow.service';
 import { OverlayService } from './services/overlay.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
+import { IntroWorkflowOverlays } from './services/workflows';
 
 @Component({
   selector: 'cnsl-root',
@@ -67,6 +69,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private overlayService: OverlayService,
     update: UpdateService,
     private activatedRoute: ActivatedRoute,
+    private workflowService: OverlayWorkflowService,
     @Inject(DOCUMENT) private document: Document,
   ) {
     console.log(
@@ -204,6 +207,10 @@ export class AppComponent implements OnInit, OnDestroy {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
+
+    setTimeout(() => {
+      this.workflowService.startWorkflow(IntroWorkflowOverlays);
+    }, 1000);
   }
 
   public ngOnInit(): void {

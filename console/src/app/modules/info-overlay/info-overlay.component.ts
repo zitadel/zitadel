@@ -1,11 +1,13 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Inject, InjectionToken, Input, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
-import { OverlayService } from 'src/app/services/overlay.service';
+import { OverlayWorkflowService } from 'src/app/services/overlay-workflow.service';
 
 export enum InfoOverlayArrowType {
   TOP_LEFT,
   TOP_RIGHT,
 }
+
+export const OVERLAY_DATA = new InjectionToken<any>('OVERLAY_DATA');
 
 @Component({
   selector: 'cnsl-info-overlay',
@@ -25,7 +27,8 @@ export class InfoOverlayComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   private previousZIndex: string = 'auto';
 
-  constructor(public overlayService: OverlayService) {
+  constructor(public workflowService: OverlayWorkflowService, @Inject(OVERLAY_DATA) public data: any) {
+    console.log(data);
     // this.overlayService.currentOverlayId$.pipe(takeUntil(this.destroy$)).subscribe((overlayStepId) => {
     //   console.log(overlayStepId);
     //   if (this.workflowStepId && this.workflowStepId === overlayStepId) {

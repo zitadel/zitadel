@@ -1,132 +1,100 @@
-import { MediaMatcher } from '@angular/cdk/layout';
 import { ConnectionPositionPair, Overlay, OverlayConfig, OverlayRef } from '@angular/cdk/overlay';
-import { ComponentPortal } from '@angular/cdk/portal';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
+import { ComponentRef, Injectable, Injector } from '@angular/core';
 
-import { InfoOverlayComponent } from '../modules/info-overlay/info-overlay.component';
-import { StorageLocation, StorageService } from './storage.service';
+import { InfoOverlayComponent, OVERLAY_DATA } from '../modules/info-overlay/info-overlay.component';
+import { CnslOverlayRef } from './overlay-ref';
+import { CnslOverlay } from './overlay-workflow.service';
 
-interface CnslOverlay {
-  id: string;
-  requirements?: {
-    media?: string;
-    permission?: string[];
-    feature?: string[];
-  };
+interface InfoOverlayConfig extends CnslOverlay {
+  backdropClass?: string;
+  panelClass?: string;
 }
 
-interface InfoOverlayConfig {}
-
-const DEFAULT_CONFIG: InfoOverlayConfig = {
-  backdropClass: 'dark-backdrop',
-  panelClass: 'tm-file-preview-dialog-panel',
+const DEFAULT_CONFIG: Partial<InfoOverlayConfig> = {
+  backdropClass: 'cnsl-overlay-backdrop',
+  panelClass: 'cnsl-overlay-panel',
 };
-
-export const IntroWorkflowOverlays: CnslOverlay[] = [
-  { id: 'orgswitcher', requirements: { permission: ['org.read'] } },
-  { id: 'systembutton', requirements: { permission: ['iam.read'] } },
-  { id: 'profilebutton' },
-  { id: 'mainnav' },
-];
 
 @Injectable({
   providedIn: 'root',
 })
 export class OverlayService {
-  public readonly currentWorkflow$: BehaviorSubject<CnslOverlay[]> = new BehaviorSubject<CnslOverlay[]>([]);
-  // public readonly currentOverlayId$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  public readonly nextExists$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public readonly previousExists$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  constructor(private overlay: Overlay, private injector: Injector) {}
 
-  private currentIndex: number | null = null;
+  public open(overlay: CnslOverlay) {
+    // Override default configuration
+    const dialogConfig: InfoOverlayConfig = { ...DEFAULT_CONFIG, ...overlay };
+    console.log(dialogConfig);
 
-  constructor(private mediaMatcher: MediaMatcher, private storageService: StorageService, private overlay: Overlay) {
-    const media: string = '(max-width: 500px)';
-    const small = this.mediaMatcher.matchMedia(media).matches;
-    if (small) {
-    }
+    // Returns an OverlayRef which is a PortalHost
+    const overlayRef = this.createOverlay(dialogConfig);
 
-    setTimeout(() => {
-      const introDismissed = storageService.getItem('intro-dismissed', StorageLocation.local);
-      if (!introDismissed) {
-        console.log('launch intro');
-        // this.currentWorkflow$.next(IntroWorkflowOverlays);
-        // this.currentIndex = 0;
-        // this.currentOverlayId$.next(IntroWorkflowOverlays[this.currentIndex].id);
-        // this.nextExists$.next(this.currentIndex < IntroWorkflowOverlays.length - 1);
-        // this.previousExists$.next(false);
-        const element: HTMLElement | null = document.getElementById('orgswitchbutton');
-        if (element) {
-          console.log(this.overlay);
+    // Instantiate remote control
+    const dialogRef = new CnslOverlayRef(overlayRef);
 
-          // const overlayRef = this.overlay.create();
-          // this.overlay.position().global().centerHorizontally().centerVertically();
-          // .flexibleConnectedTo(element)
-          // .setOrigin(element)
-          // .withDefaultOffsetY(100)
-          // .withDefaultOffsetX(50);
-          // const infoOverlayPortal = new ComponentPortal(InfoOverlayComponent);
-          // overlayRef.attach(infoOverlayPortal);
+    // Create ComponentPortal that can be attached to a PortalHost
+    // const filePreviewPortal = new ComponentPortal(InfoOverlayComponent);
+    const overlayComponent = this.attachOverlayContainer(overlayRef, dialogConfig, overlayRef);
 
-          const overlayRef = this.createOverlay(element);
-          const overlayPortal = new ComponentPortal(InfoOverlayComponent);
-          overlayRef.attach(overlayPortal);
-        }
-        // overlayRef.detach();
-      }
-    }, 1000);
+    overlayRef.backdropClick().subscribe((_) => dialogRef.close());
+
+    // Attach ComponentPortal to PortalHost
+    // overlayRef.attach(filePreviewPortal);
+
+    return dialogRef;
   }
 
-  public triggerPrevious(): void {
-    if (this.currentIndex && this.currentIndex > 0) {
-      this.currentIndex--;
-      // this.currentOverlayId$.next(this.currentWorkflow$.value[this.currentIndex].id);
-      this.nextExists$.next(this.currentIndex < this.currentWorkflow$.value.length - 1);
-      this.previousExists$.next(this.currentIndex > 0);
-    }
+  private attachOverlayContainer(overlayRef: OverlayRef, config: InfoOverlayConfig, dialogRef: OverlayRef) {
+    const injector = this.createInjector(config, dialogRef);
+
+    const containerPortal = new ComponentPortal(InfoOverlayComponent, null, injector);
+    const containerRef: ComponentRef<InfoOverlayComponent> = overlayRef.attach(containerPortal);
+
+    return containerRef.instance;
   }
 
-  public triggerNext(): void {
-    if (this.currentIndex !== null && this.currentIndex < this.currentWorkflow$.value.length) {
-      this.currentIndex++;
-      // this.currentOverlayId$.next(this.currentWorkflow$.value[this.currentIndex].id);
-      this.nextExists$.next(this.currentIndex < this.currentWorkflow$.value.length - 1);
-      this.previousExists$.next(this.currentIndex > 0);
-    }
+  private createInjector(config: InfoOverlayConfig, dialogRef: OverlayRef): PortalInjector {
+    const injectionTokens = new WeakMap();
+
+    injectionTokens.set(OverlayRef, dialogRef);
+    injectionTokens.set(OVERLAY_DATA, config.content);
+
+    return new PortalInjector(this.injector, injectionTokens);
   }
 
-  public complete(): void {
-    this.currentIndex = null;
-    // this.currentOverlayId$.next('');
-    this.currentWorkflow$.next([]);
-  }
-
-  private createOverlay(element: HTMLElement): OverlayRef {
-    // Returns an OverlayConfig
-    const overlayConfig = this.getOverlayConfig(element);
-
-    // Returns an OverlayRef
+  private createOverlay(config: InfoOverlayConfig): OverlayRef {
+    const overlayConfig = this.getOverlayConfig(config);
     return this.overlay.create(overlayConfig);
   }
 
-  private getOverlayConfig(element: HTMLElement): OverlayConfig {
+  private getOverlayConfig(config: InfoOverlayConfig): OverlayConfig {
     // const positionStrategy = this.overlay.position().global().centerHorizontally().centerVertically();
     const positions = [
       new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }),
       new ConnectionPositionPair({ originX: 'start', originY: 'top' }, { overlayX: 'start', overlayY: 'bottom' }),
     ];
-    const positionStrategy = this.overlay
-      .position()
-      .flexibleConnectedTo(element)
-      .withPositions(positions)
-      .withFlexibleDimensions(false)
-      .withPush(false);
+
+    const htmlOrigin: HTMLElement | null = document.getElementById(config.origin);
+
+    let positionStrategy;
+    if (htmlOrigin) {
+      console.log(`use html origin: ${config.origin}`);
+      positionStrategy = this.overlay
+        .position()
+        .flexibleConnectedTo(htmlOrigin)
+        .withPositions(positions)
+        .withFlexibleDimensions(false)
+        .withPush(false);
+    } else {
+      console.log(`use central position strategy`);
+      positionStrategy = this.overlay.position().global().centerHorizontally().centerVertically();
+    }
 
     const overlayConfig = new OverlayConfig({
       hasBackdrop: true,
-      backdropClass: 'cnsl-overlay-backdrop',
-      panelClass: 'cnsl-overlay-panel',
+      backdropClass: config.backdropClass,
+      panelClass: config.panelClass,
       scrollStrategy: this.overlay.scrollStrategies.block(),
       positionStrategy,
     });

@@ -14,6 +14,7 @@
 
   .cnsl-overlay-backdrop {
     background-color: if($is-dark-theme, #00000080, #ffffff80);
+    backdrop-filter: blur(1px);
   }
 
   .cnsl-overlay-panel {
@@ -44,6 +45,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    color: map-get($foreground, base);
 
     &.top-left {
       &::before {

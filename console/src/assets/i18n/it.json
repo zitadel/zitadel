@@ -127,6 +127,17 @@
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti"
   },
+  "OVERLAYS": {
+    "ORGSWITCHER": {
+      "TEXT": "Tutte le impostazioni e le tabelle dell'organizzazione si basano su un'organizzazione selezionata. Fai clic sul pulsante per cambiare organizzazione o crearne una nuova."
+    },
+    "SYSTEM": {
+      "TEXT": "Clicca qui per accedere alle impostazioni di sistema. Tieni presente che hai accesso solo se disponi di autorizzazioni avanzate."
+    },
+    "PROFILE": {
+      "TEXT": "Qui puoi passare da un account utente all'altro e gestire le sessioni e il profilo."
+    }
+  },
   "FILTER": {
     "TITLE": "Filter",
     "DISPLAYNAME": "Display Name",
