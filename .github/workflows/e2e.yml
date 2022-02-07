@@ -58,7 +58,7 @@ jobs:
       run: mkdir ./.keys
 
     - name: Setup Test Environment
-      run: docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend --profile await-profile up --detach
+      run: docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --detach
 
     - run: docker compose -f ./build/local/docker-compose-local.yml logs
       if: failure()
