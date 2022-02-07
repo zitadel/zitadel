@@ -59,7 +59,7 @@ func (c *Commands) checkAdditionalActionAllowed(ctx context.Context, resourceOwn
 			activeActions = append(activeActions, existingAction)
 		}
 	}
-	if len(activeActions) < features.MaxActions {
+	if features.ActionsAllowed == domain.ActionsAllowedUnlimited || len(activeActions) < features.MaxActions {
 		return nil
 	}
 	return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dfwg2", "Errors.Action.MaxAllowed")
