@@ -10,13 +10,13 @@ import (
 )
 
 const (
-	smsConfigPrefix                     = "sms.config"
-	smsConfigTwilioPrefix               = "twilio."
-	SMSConfigTwilioAddedEventType       = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "added"
-	SMSConfigTwilioChangedEventType     = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "changed"
-	SMSConfigTwilioActivatedEventType   = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "activated"
-	SMSConfigTwilioDeactivatedEventType = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "deactivated"
-	SMSConfigTwilioRemovedEventType     = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "removed"
+	smsConfigPrefix                 = "sms.config"
+	smsConfigTwilioPrefix           = "twilio."
+	SMSConfigTwilioAddedEventType   = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "added"
+	SMSConfigTwilioChangedEventType = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "changed"
+	SMSConfigActivatedEventType     = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "activated"
+	SMSConfigDeactivatedEventType   = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "deactivated"
+	SMSConfigRemovedEventType       = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "removed"
 )
 
 type SMSConfigTwilioAddedEvent struct {
@@ -141,7 +141,7 @@ func SMSConfigTwilioChangedEventMapper(event *repository.Event) (eventstore.Even
 	return smsConfigChanged, nil
 }
 
-type SMSConfigTwilioActivatedEvent struct {
+type SMSConfigActivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	ID                   string `json:"id,omitempty"`
 }
@@ -150,27 +150,27 @@ func NewSMSConfigTwilioActivatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-) *SMSConfigTwilioActivatedEvent {
-	return &SMSConfigTwilioActivatedEvent{
+) *SMSConfigActivatedEvent {
+	return &SMSConfigActivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			SMSConfigTwilioActivatedEventType,
+			SMSConfigActivatedEventType,
 		),
 		ID: id,
 	}
 }
 
-func (e *SMSConfigTwilioActivatedEvent) Data() interface{} {
+func (e *SMSConfigActivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *SMSConfigTwilioActivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigActivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func SMSConfigTwilioActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	smsConfigActivated := &SMSConfigTwilioActivatedEvent{
+func SMSConfigActivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	smsConfigActivated := &SMSConfigActivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, smsConfigActivated)
@@ -181,36 +181,36 @@ func SMSConfigTwilioActivatedEventMapper(event *repository.Event) (eventstore.Ev
 	return smsConfigActivated, nil
 }
 
-type SMSConfigTwilioDeactivatedEvent struct {
+type SMSConfigDeactivatedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	ID                   string `json:"id,omitempty"`
 }
 
-func NewSMSConfigTwilioDeactivatedEvent(
+func NewSMSConfigDeactivatedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-) *SMSConfigTwilioDeactivatedEvent {
-	return &SMSConfigTwilioDeactivatedEvent{
+) *SMSConfigDeactivatedEvent {
+	return &SMSConfigDeactivatedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			SMSConfigTwilioDeactivatedEventType,
+			SMSConfigDeactivatedEventType,
 		),
 		ID: id,
 	}
 }
 
-func (e *SMSConfigTwilioDeactivatedEvent) Data() interface{} {
+func (e *SMSConfigDeactivatedEvent) Data() interface{} {
 	return e
 }
 
-func (e *SMSConfigTwilioDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigDeactivatedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func SMSConfigTwilioDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	smsConfigDeactivated := &SMSConfigTwilioDeactivatedEvent{
+func SMSConfigDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	smsConfigDeactivated := &SMSConfigDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, smsConfigDeactivated)
@@ -221,41 +221,41 @@ func SMSConfigTwilioDeactivatedEventMapper(event *repository.Event) (eventstore.
 	return smsConfigDeactivated, nil
 }
 
-type SMSConfigTwilioRemovedEvent struct {
+type SMSConfigRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 	ID                   string `json:"id,omitempty"`
 }
 
-func NewSMSConfigTwilioRemovedEvent(
+func NewSMSConfigRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	id string,
-) *SMSConfigTwilioRemovedEvent {
-	return &SMSConfigTwilioRemovedEvent{
+) *SMSConfigRemovedEvent {
+	return &SMSConfigRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			SMSConfigTwilioRemovedEventType,
+			SMSConfigRemovedEventType,
 		),
 		ID: id,
 	}
 }
 
-func (e *SMSConfigTwilioRemovedEvent) Data() interface{} {
+func (e *SMSConfigRemovedEvent) Data() interface{} {
 	return e
 }
 
-func (e *SMSConfigTwilioRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *SMSConfigRemovedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func SMSConfigTwilioRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	smsConfigRemoved := &SMSConfigTwilioRemovedEvent{
+func SMSConfigRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	smsConfigRemoved := &SMSConfigRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 	err := json.Unmarshal(event.Data, smsConfigRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config password changed")
+		return nil, errors.ThrowInternal(err, "IAM-99iNF", "unable to unmarshal sms config removed")
 	}
 
 	return smsConfigRemoved, nil

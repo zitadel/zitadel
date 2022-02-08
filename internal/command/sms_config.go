@@ -120,7 +120,7 @@ func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, id string) (*d
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTwilioDeactivatedEvent(
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigDeactivatedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -147,7 +147,7 @@ func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, id string) (*domai
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTwilioRemovedEvent(
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigRemovedEvent(
 		ctx,
 		iamAgg,
 		id))

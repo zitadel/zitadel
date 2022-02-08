@@ -58,17 +58,17 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			if e.From != nil {
 				wm.Twilio.From = *e.From
 			}
-		case *iam.SMSConfigTwilioActivatedEvent:
+		case *iam.SMSConfigActivatedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.State = domain.SMSConfigStateActive
-		case *iam.SMSConfigTwilioDeactivatedEvent:
+		case *iam.SMSConfigDeactivatedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.State = domain.SMSConfigStateInactive
-		case *iam.SMSConfigTwilioRemovedEvent:
+		case *iam.SMSConfigRemovedEvent:
 			if wm.ID != e.ID {
 				continue
 			}

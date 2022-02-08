@@ -424,7 +424,7 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigTwilioDeactivatedEvent(
+								iam.NewSMSConfigDeactivatedEvent(
 									context.Background(),
 									&iam.NewAggregate().Aggregate,
 									"providerid",
@@ -532,7 +532,7 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								iam.NewSMSConfigTwilioRemovedEvent(
+								iam.NewSMSConfigRemovedEvent(
 									context.Background(),
 									&iam.NewAggregate().Aggregate,
 									"providerid",
