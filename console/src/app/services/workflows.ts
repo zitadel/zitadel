@@ -20,6 +20,7 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
       i18nText: 'OVERLAYS.SYSTEM.TEXT',
     },
     requirements: {
+      media: '(min-width: 600px)',
       permission: ['iam.read'],
     },
   },
@@ -37,6 +38,23 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
     toHighlight: ['mainnav'],
     content: {
       i18nText: 'OVERLAYS.NAV.TEXT',
+    },
+    requirements: {
+      permission: ['org.read'],
+    },
+  },
+];
+
+export const OrgContextChangedWorkflowOverlays: CnslOverlay[] = [
+  {
+    id: 'orgswitcher',
+    origin: 'orgswitchbutton',
+    toHighlight: ['orgswitchbutton', 'orglink'],
+    content: {
+      i18nText: 'OVERLAYS.CONTEXTCHANGED.TEXT',
+    },
+    requirements: {
+      permission: ['org.read'],
     },
   },
 ];

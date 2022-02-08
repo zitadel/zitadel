@@ -12,7 +12,7 @@
       "PP": "Privacy Policy"
     },
     "THEME": {
-      "DARK": "Dunklel",
+      "DARK": "Dunkel",
       "LIGHT": "Hell"
     }
   },
@@ -110,6 +110,7 @@
     "REMOVE": "Entfernen",
     "VERIFY": "Verifizieren",
     "FINISH": "Abschliessen",
+    "FINISHED": "Fertig",
     "CHANGE": "Ändern",
     "REACTIVATE": "Aktivieren",
     "DEACTIVATE": "Deaktivieren",
@@ -139,6 +140,9 @@
     },
     "NAV": {
       "TEXT": "Diese Navigation ändert sich basierend auf den Breadcrumbs darüber."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Achtung! Soeben wurde die Organisation gewechselt."
     }
   },
   "FILTER": {

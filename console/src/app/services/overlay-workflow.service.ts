@@ -1,7 +1,8 @@
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, switchMap, take, takeUntil, zip } from 'rxjs';
 
+import { GrpcAuthService } from './grpc-auth.service';
 import { CnslOverlayRef } from './overlay-ref';
 import { OverlayService } from './overlay.service';
 
@@ -37,7 +38,7 @@ export class OverlayWorkflowService implements OnDestroy {
   public openRef: CnslOverlayRef | null = null;
   public highlightedIds: { [id: string]: number } = {};
   public callback: Function | null = null;
-  constructor(private mediaMatcher: MediaMatcher, overlayService: OverlayService) {
+  constructor(private mediaMatcher: MediaMatcher, overlayService: OverlayService, private authService: GrpcAuthService) {
     // const media: string = '(max-width: 500px)';
     // const small = this.mediaMatcher.matchMedia(media).matches;
     // if (small) {
@@ -59,18 +60,72 @@ export class OverlayWorkflowService implements OnDestroy {
 
       const overlay = workflow?.overlays[workflow.currentIndex];
       if (overlay) {
-        this.openRef = overlayService.open(overlay);
+        console.log('check req', overlay);
+        this.meetsRequirements(overlay)
+          .pipe(take(1))
+          .subscribe((can) => {
+            if (can) {
+              this.openRef = overlayService.open(overlay);
 
-        overlay.toHighlight.forEach((id) => {
-          const element = document.getElementById(id);
-          if (element) {
-            const oldZ = element.style.zIndex;
-            this.highlightedIds[id] = Number(oldZ);
-            element.style.zIndex = '1001';
-          }
-        });
+              overlay.toHighlight.forEach((id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                  const oldZ = element.style.zIndex;
+                  this.highlightedIds[id] = Number(oldZ);
+                  element.style.zIndex = '1001';
+                }
+              });
+            } else {
+              this.nextStep();
+              console.log('skip overlay');
+            }
+          });
       }
     });
+  }
+
+  public meetsRequirements(overlay: CnslOverlay): Observable<boolean> {
+    return zip([
+      this.meetsMediaRequirements(overlay),
+      this.meetsPermissionRequirements(overlay),
+      this.meetsFeatureRequirements(overlay),
+    ] as Observable<boolean>[]).pipe(
+      switchMap(([media, permission, feature]) => {
+        return of(media && permission && feature);
+      }),
+    );
+  }
+
+  public meetsMediaRequirements(overlay: CnslOverlay): Observable<boolean> {
+    const media = overlay.requirements?.media;
+    if (media) {
+      const matches = this.mediaMatcher.matchMedia(media).matches;
+      if (!matches) {
+        return of(false);
+      } else {
+        return of(true);
+      }
+    } else {
+      return of(true);
+    }
+  }
+
+  public meetsPermissionRequirements(overlay: CnslOverlay): Observable<boolean> {
+    const regexArray = overlay.requirements?.permission;
+    if (regexArray && regexArray.length) {
+      return this.authService.isAllowed(regexArray);
+    } else {
+      return of(true);
+    }
+  }
+
+  public meetsFeatureRequirements(overlay: CnslOverlay): Observable<boolean> {
+    const regexArray = overlay.requirements?.feature;
+    if (regexArray && regexArray.length) {
+      return this.authService.canUseFeature(regexArray);
+    } else {
+      return of(true);
+    }
   }
 
   public reset(): void {
@@ -86,8 +141,10 @@ export class OverlayWorkflowService implements OnDestroy {
     this.destroy$.complete();
   }
 
-  public startWorkflow(overlays: CnslOverlay[], cb: Function): void {
-    this.callback = cb;
+  public startWorkflow(overlays: CnslOverlay[], cb: Function | null): void {
+    if (cb) {
+      this.callback = cb;
+    }
     this.currentWorkflow$.next({ overlays, currentIndex: 0 });
   }
 

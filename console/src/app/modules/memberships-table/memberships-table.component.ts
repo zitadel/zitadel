@@ -4,11 +4,15 @@ import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { OverlayWorkflowService } from 'src/app/services/overlay-workflow.service';
+import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { OrgContextChangedWorkflowOverlays } from 'src/app/services/workflows';
 
 import { getColor } from '../avatar/avatar.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
@@ -44,6 +48,8 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     private adminService: AdminService,
     private toast: ToastService,
     private router: Router,
+    private workflowService: OverlayWorkflowService,
+    private storageService: StorageService,
   ) {
     this.dataSource = new MembershipsDataSource(this.authService, this.mgmtService);
 
@@ -114,20 +120,36 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   }
 
   public goto(membership: Membership.AsObject): void {
+    const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+
     if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
-      this.authService.getActiveOrg(membership.orgId).then(() => {
-        this.router.navigate(['/org/members']);
+      this.authService.getActiveOrg(membership.orgId).then((membershipOrg) => {
+        this.router.navigate(['/org/members']).then(() => {
+          this.startOrgContextWorkflow(membershipOrg, org);
+        });
       });
     } else if (membership.projectGrantId && membership.details?.resourceOwner) {
-      this.authService.getActiveOrg(membership.details?.resourceOwner).then(() => {
-        this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]);
+      this.authService.getActiveOrg(membership.details?.resourceOwner).then((membershipOrg) => {
+        this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]).then(() => {
+          this.startOrgContextWorkflow(membershipOrg, org);
+        });
       });
     } else if (membership.projectId && membership.details?.resourceOwner) {
-      this.authService.getActiveOrg(membership.details?.resourceOwner).then(() => {
-        this.router.navigate(['/projects', membership.projectId, 'members']);
+      this.authService.getActiveOrg(membership.details?.resourceOwner).then((membershipOrg) => {
+        this.router.navigate(['/projects', membership.projectId, 'members']).then(() => {
+          this.startOrgContextWorkflow(membershipOrg, org);
+        });
       });
     } else if (membership.iam) {
       this.router.navigate(['/system/members']);
+    }
+  }
+
+  private startOrgContextWorkflow(membershipOrg: Org.AsObject, currentOrg?: Org.AsObject | null): void {
+    if (!currentOrg || (membershipOrg.id && currentOrg.id && currentOrg.id !== membershipOrg.id)) {
+      setTimeout(() => {
+        this.workflowService.startWorkflow(OrgContextChangedWorkflowOverlays, null);
+      }, 1000);
     }
   }
 
@@ -229,50 +251,4 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-  // public updateRoles(membership: Membership.AsObject, selectionChange: MatSelectChange): void {
-  //   console.log(membership, selectionChange);
-  //   if (membership.orgId) {
-  //     console.log('org member', membership.userId, selectionChange.value);
-  //     this.mgmtService
-  //       .updateOrgMember(membership.userId, selectionChange.value)
-  //       .then(() => {
-  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-  //         this.changePage(this.paginator);
-  //       })
-  //       .catch((error) => {
-  //         this.toastService.showError(error);
-  //       });
-  //   } else if (membership.projectGrantId) {
-  //     this.mgmtService
-  //       .updateProjectGrantMember(membership.projectId, membership.projectGrantId, membership.userId, selectionChange.value)
-  //       .then(() => {
-  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-  //         this.changePage(this.paginator);
-  //       })
-  //       .catch((error) => {
-  //         this.toastService.showError(error);
-  //       });
-  //   } else if (membership.projectId) {
-  //     this.mgmtService
-  //       .updateProjectMember(membership.projectId, membership.userId, selectionChange.value)
-  //       .then(() => {
-  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-  //         this.changePage(this.paginator);
-  //       })
-  //       .catch((error) => {
-  //         this.toastService.showError(error);
-  //       });
-  //   } else if (membership.iam) {
-  //     this.adminService
-  //       .updateIAMMember(membership.userId, selectionChange.value)
-  //       .then(() => {
-  //         this.toast.showInfo('USER.MEMBERSHIPS.UPDATED', true);
-  //         this.changePage(this.paginator);
-  //       })
-  //       .catch((error) => {
-  //         this.toastService.showError(error);
-  //       });
-  //   }
-  // }
 }

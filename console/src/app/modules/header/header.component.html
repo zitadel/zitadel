@@ -98,12 +98,12 @@
 
     <div class="system-rel">
       <a id="systembutton" *ngIf="!isOnSystem && (['iam.read$','iam.write$'] | hasRole | async)"
-        [routerLink]="[ '/system']" class="iam-settings" mat-stroked-button>
+        [routerLink]="[ '/system']" class="iam-settings cnsl-action-button" mat-stroked-button>
         <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>
         <i class="las la-cog"></i>
       </a>
       <a id="orgbutton" *ngIf="isOnSystem && (['org.read'] | hasRole | async)" [routerLink]="[ '/org']"
-        class="org-settings" mat-stroked-button>
+        class="org-settings  cnsl-action-button" mat-stroked-button>
         <span class="iam-label">{{'MENU.ORGANIZATION' | translate}}</span>
         <i class="las la-cog"></i>
       </a>

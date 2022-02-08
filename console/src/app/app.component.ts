@@ -196,6 +196,8 @@ export class AppComponent implements OnInit, OnDestroy {
       if (authenticated) {
         this.authService.getActiveOrg().then((org) => {
           this.org = org;
+
+          this.startIntroWorkflow();
         });
       }
     });
@@ -207,7 +209,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.document.documentElement.lang = language.lang;
       this.language = language.lang;
     });
+  }
 
+  private startIntroWorkflow(): void {
     setTimeout(() => {
       const cb = () => {
         console.log('callback yeah');

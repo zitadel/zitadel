@@ -110,6 +110,7 @@
     "REMOVE": "Remove",
     "VERIFY": "Verify",
     "FINISH": "Finish",
+    "FINISHED": "Close",
     "CHANGE": "Change",
     "REACTIVATE": "Reactivate",
     "DEACTIVATE": "Deactivate",
@@ -139,6 +140,9 @@
     },
     "NAV": {
       "TEXT": "This navigation changes based on the breadcrumbs above."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Attention! The organization context has changed."
     }
   },
   "FILTER": {

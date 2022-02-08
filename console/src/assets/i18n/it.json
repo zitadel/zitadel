@@ -109,7 +109,8 @@
     "DELETE": "Elimina",
     "REMOVE": "Rimuovi",
     "VERIFY": "Verifica",
-    "FINISH": "Crea",
+    "FINISH": "Chiudi",
+    "FINISHED": "Chiudi",
     "CHANGE": "Cambia",
     "REACTIVATE": "Riattiva",
     "DEACTIVATE": "Disattiva",
@@ -139,6 +140,9 @@
     },
     "NAV": {
       "TEXT": "Questa navigazione cambia in base ai breadcrumb sopra."
+    },
+    "CONTEXTCHANGED": {
+      "TEXT": "Attenzione! L'organizzazione è appena stata cambiata."
     }
   },
   "FILTER": {

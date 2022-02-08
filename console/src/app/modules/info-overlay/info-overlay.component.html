@@ -8,14 +8,14 @@
   </div>
   <p>{{data.i18nText | translate}}</p>
   <div class="overlay-actions">
-    <button (click)="workflowService.previousStep()" *ngIf="workflowService.previousPossible"
-      mat-stroked-button>{{'ACTIONS.PREVIOUS' | translate}}</button>
+    <!-- <button (click)="workflowService.previousStep()" *ngIf="workflowService.previousPossible"
+      mat-stroked-button>{{'ACTIONS.PREVIOUS' | translate}}</button> -->
 
     <button (click)="workflowService.nextStep()" *ngIf="workflowService.nextPossible && !workflowService.isLast"
       mat-stroked-button>{{'ACTIONS.NEXT' | translate}}</button>
 
     <button *ngIf="workflowService.isLast" (click)="workflowService.nextStep()" color="primary"
-      mat-raised-button>{{'ACTIONS.FINISH' |
+      mat-raised-button>{{'ACTIONS.FINISHED' |
       translate}}</button>
   </div>
 </div>
