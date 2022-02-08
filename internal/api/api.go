@@ -36,10 +36,16 @@ type health interface {
 	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
-func New(ctx context.Context, port string, router *mux.Router, repo *struct {
-	repository.Repository
-	*query.Queries
-}, authZ internal_authz.Config, sd systemdefaults.SystemDefaults) *API {
+func New(
+	port string,
+	router *mux.Router,
+	repo *struct {
+		repository.Repository
+		*query.Queries
+	},
+	authZ internal_authz.Config,
+	sd systemdefaults.SystemDefaults,
+) *API {
 	verifier := internal_authz.Start(repo)
 	api := &API{
 		port:     port,
@@ -50,7 +56,7 @@ func New(ctx context.Context, port string, router *mux.Router, repo *struct {
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.routeGRPC()
 
-	//api.RegisterHandler("", api.healthHandler())
+	api.RegisterHandler("", api.healthHandler()) //TODO: do we need a prefix?
 
 	return api
 }
@@ -105,7 +111,7 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
-	handler.HandleFunc("/clientID", a.handleClientID)
+	handler.HandleFunc("/clientID", a.handleClientID) //TODO: remove?
 
 	return handler
 }
@@ -117,23 +123,23 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		errors := validate(r.Context(), checks)
-		if len(errors) == 0 {
+		errs := validate(r.Context(), checks)
+		if len(errs) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, nil, errors[0], http.StatusPreconditionFailed)
+		http_util.MarshalJSON(w, nil, errs[0], http.StatusPreconditionFailed)
 	}
 }
 
 func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		errors := validate(r.Context(), checks)
-		if len(errors) == 0 {
+		errs := validate(r.Context(), checks)
+		if len(errs) == 0 {
 			http_util.MarshalJSON(w, "ok", nil, http.StatusOK)
 			return
 		}
-		http_util.MarshalJSON(w, errors, nil, http.StatusOK)
+		http_util.MarshalJSON(w, errs, nil, http.StatusOK)
 	}
 }
 
@@ -149,12 +155,12 @@ func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
 type ValidationFunction func(ctx context.Context) error
 
 func validate(ctx context.Context, validations []ValidationFunction) []error {
-	errors := make([]error, 0)
+	errs := make([]error, 0)
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
 			logging.Log("API-vf823").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Error("validation failed")
-			errors = append(errors, err)
+			errs = append(errs, err)
 		}
 	}
-	return errors
+	return errs
 }

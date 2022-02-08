@@ -214,7 +214,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(ctx, *port, router, &repo, conf.InternalAuthZ, conf.SystemDefaults)
+	apis := api.New(*port, router, &repo, conf.InternalAuthZ, conf.SystemDefaults)
 
 	authRepo, err := auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries, conf.OIDC.KeyConfig)
 	logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
@@ -275,7 +275,7 @@ func listen(ctx context.Context, router *mux.Router) {
 		logging.Log("MAIN-SWE2A").WithError(shutdownErr).Panic("graceful server shutdown failed")
 	}
 
-	logging.Log("MAIN-dsGra").Info("server close")
+	logging.Log("MAIN-dsGra").Info("server closed")
 }
 
 func enableSentry() {
