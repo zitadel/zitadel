@@ -1,0 +1,362 @@
+package query
+
+import (
+	"database/sql"
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"regexp"
+	"testing"
+
+	"github.com/caos/zitadel/internal/domain"
+	errs "github.com/caos/zitadel/internal/errors"
+)
+
+var (
+	expectedSMSConfigQuery = regexp.QuoteMeta(`SELECT zitadel.projections.sms_configs.id,` +
+		` zitadel.projections.sms_configs.aggregate_id,` +
+		` zitadel.projections.sms_configs.creation_date,` +
+		` zitadel.projections.sms_configs.change_date,` +
+		` zitadel.projections.sms_configs.resource_owner,` +
+		` zitadel.projections.sms_configs.state,` +
+		` zitadel.projections.sms_configs.sequence,` +
+
+		// twilio config
+		` zitadel.projections.sms_configs_twilio.sms_id,` +
+		` zitadel.projections.sms_configs_twilio.sid,` +
+		` zitadel.projections.sms_configs_twilio.token,` +
+		` zitadel.projections.sms_configs_twilio.from` +
+		` FROM zitadel.projections.sms_configs` +
+		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
+	expectedSMSConfigssQuery = regexp.QuoteMeta(`SELECT zitadel.projections.sms_configs.id,` +
+		` zitadel.projections.sms_configs.aggregate_id,` +
+		` zitadel.projections.sms_configs.creation_date,` +
+		` zitadel.projections.sms_configs.change_date,` +
+		` zitadel.projections.sms_configs.resource_owner,` +
+		` zitadel.projections.sms_configs.state,` +
+		` zitadel.projections.sms_configs.sequence,` +
+
+		// twilio config
+		` zitadel.projections.sms_configs_twilio.sms_id,` +
+		` zitadel.projections.sms_configs_twilio.sid,` +
+		` zitadel.projections.sms_configs_twilio.token,` +
+		` zitadel.projections.sms_configs_twilio.from` +
+		` COUNT(*) OVER ()` +
+		` FROM zitadel.projections.sms_configs` +
+		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
+
+	smsConfigCols = []string{
+		"id",
+		"aggregate_id",
+		"creation_date",
+		"change_date",
+		"resource_owner",
+		"state",
+		"sequence",
+		// twilio config
+		"sms_id",
+		"sid",
+		"token",
+		"from",
+	}
+	smsConfigsCols = append(smsConfigCols, "count")
+)
+
+func Test_SMSConfigssPrepare(t *testing.T) {
+	type want struct {
+		sqlExpectations sqlExpectation
+		err             checkErr
+	}
+	tests := []struct {
+		name    string
+		prepare interface{}
+		want    want
+		object  interface{}
+	}{
+		{
+			name:    "prepareSMSConfigsQuery no result",
+			prepare: prepareSMSConfigsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppsQuery,
+					nil,
+					nil,
+				),
+			},
+			object: &SMSConfigs{Configs: []*SMSConfig{}},
+		},
+		{
+			name:    "prepareSMSConfigsQuery only sms",
+			prepare: prepareSMSConfigsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppsQuery,
+					smsConfigCols,
+					[][]driver.Value{
+						{
+							"sms-id",
+							"agg-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.SMSConfigStateInactive,
+							uint64(20211109),
+							// oidc config
+							nil,
+							nil,
+							nil,
+							nil,
+						},
+					},
+				),
+			},
+			object: &SMSConfigs{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Configs: []*SMSConfig{
+					{
+						ID:            "sms-id",
+						AggregateID:   "agg-id",
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						ResourceOwner: "ro",
+						State:         domain.SMSConfigStateInactive,
+						Sequence:      20211109,
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareSMSQuery twilio config",
+			prepare: prepareSMSConfigsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppsQuery,
+					appsCols,
+					[][]driver.Value{
+						{
+							"sms-id",
+							"agg-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.SMSConfigStateInactive,
+							uint64(20211109),
+							// api config
+							"sms-id",
+							"sid",
+							"token",
+							"from",
+						},
+					},
+				),
+			},
+			object: &SMSConfigs{
+				SearchResponse: SearchResponse{
+					Count: 1,
+				},
+				Configs: []*SMSConfig{
+					{
+						ID:            "sms-id",
+						AggregateID:   "agg-id",
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						ResourceOwner: "ro",
+						State:         domain.SMSConfigStateInactive,
+						Sequence:      20211109,
+						TwilioConfig: &Twilio{
+							SID:   "sid",
+							Token: "token",
+							From:  "from",
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareSMSConfigsQuery multiple result",
+			prepare: prepareSMSConfigsQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppsQuery,
+					appsCols,
+					[][]driver.Value{
+						{
+							"sms-id",
+							"agg-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// twilio config
+							"sms-id",
+							"sid",
+							"token",
+							"from",
+						},
+						{
+							"sms-id2",
+							"agg-id",
+							testNow,
+							testNow,
+							"ro",
+							domain.AppStateActive,
+							uint64(20211109),
+							// twilio config
+							"sms-id2",
+							"sid2",
+							"token2",
+							"from2",
+						},
+					},
+				),
+			},
+			object: &SMSConfigs{
+				SearchResponse: SearchResponse{
+					Count: 2,
+				},
+				Configs: []*SMSConfig{
+					{
+						ID:            "sms-id",
+						AggregateID:   "agg-id",
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						ResourceOwner: "ro",
+						State:         domain.SMSConfigStateInactive,
+						Sequence:      20211109,
+						TwilioConfig: &Twilio{
+							SID:   "sid",
+							Token: "token",
+							From:  "from",
+						},
+					},
+					{
+						ID:            "sms-id2",
+						AggregateID:   "agg-id",
+						CreationDate:  testNow,
+						ChangeDate:    testNow,
+						ResourceOwner: "ro",
+						State:         domain.SMSConfigStateInactive,
+						Sequence:      20211109,
+						TwilioConfig: &Twilio{
+							SID:   "sid2",
+							Token: "token2",
+							From:  "from2",
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "prepareSMSConfigsQuery sql err",
+			prepare: prepareSMSConfigsQuery,
+			want: want{
+				sqlExpectations: mockQueryErr(
+					expectedAppsQuery,
+					sql.ErrConnDone,
+				),
+				err: func(err error) (error, bool) {
+					if !errors.Is(err, sql.ErrConnDone) {
+						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+		})
+	}
+}
+
+func Test_SMSConfigPrepare(t *testing.T) {
+	type want struct {
+		sqlExpectations sqlExpectation
+		err             checkErr
+	}
+	tests := []struct {
+		name    string
+		prepare interface{}
+		want    want
+		object  interface{}
+	}{
+		{
+			name:    "prepareSMSConfigQuery no result",
+			prepare: prepareSMSConfigQuery,
+			want: want{
+				sqlExpectations: mockQueries(
+					expectedAppQuery,
+					nil,
+					nil,
+				),
+				err: func(err error) (error, bool) {
+					if !errs.IsNotFound(err) {
+						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: (*App)(nil),
+		},
+		{
+			name:    "prepareSMSConfigQuery found",
+			prepare: prepareSMSConfigQuery,
+			want: want{
+				sqlExpectations: mockQuery(
+					expectedSMSConfigQuery,
+					appCols,
+					[]driver.Value{
+						"sms-id",
+						"agg-id",
+						testNow,
+						testNow,
+						"ro",
+						domain.SMSConfigStateInactive,
+						uint64(20211109),
+						// twilio config
+						"sms-id",
+						"sid",
+						"token",
+						"from",
+					},
+				),
+			},
+			object: &SMSConfig{
+				ID:            "sms-id",
+				AggregateID:   "agg-id",
+				CreationDate:  testNow,
+				ChangeDate:    testNow,
+				ResourceOwner: "ro",
+				State:         domain.SMSConfigStateInactive,
+				Sequence:      20211109,
+			},
+		},
+		{
+			name:    "prepareSMSConfigQuery sql err",
+			prepare: prepareSMSConfigQuery,
+			want: want{
+				sqlExpectations: mockQueryErr(
+					expectedSMSConfigQuery,
+					sql.ErrConnDone,
+				),
+				err: func(err error) (error, bool) {
+					if !errors.Is(err, sql.ErrConnDone) {
+						return fmt.Errorf("err should be sql.ErrConnDone got: %w", err), false
+					}
+					return nil, true
+				},
+			},
+			object: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assertPrepare(t, tt.prepare, tt.object, tt.want.sqlExpectations, tt.want.err)
+		})
+	}
+}
