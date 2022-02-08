@@ -100,9 +100,6 @@ $ cd ./console
 $ # Install dev dependencies if you haven't done so already
 $ npm install
 
-$ # Get the environment.json from the docker compose environment
-$ curl http://localhost:4200/assets/environment.json > ./src/assets/environment.json
-
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
 
