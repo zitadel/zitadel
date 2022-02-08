@@ -98,7 +98,7 @@ func PersonalAccessTokenRemovedEventMapper(event *repository.Event) (eventstore.
 	}
 	err := json.Unmarshal(event.Data, tokenRemoved)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "USER-Dbneg", "unable to unmarshal token added")
+		return nil, errors.ThrowInternal(err, "USER-Dbneg", "unable to unmarshal token removed")
 	}
 
 	return tokenRemoved, nil
