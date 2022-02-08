@@ -66,8 +66,11 @@ Errors:
     Machine:
       Key:
         NotFound: Maschinen Key nicht gefunden
+    PAT:
+      NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
+    WrongType: Für diesen Benutzertyp nicht erlaubt
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Username:
       AlreadyExists: Benutzername ist bereits vergeben
