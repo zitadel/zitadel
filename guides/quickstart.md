@@ -94,23 +94,20 @@ $ npm run e2e
 You can switch to `ng serve` for better development experience.
 
 ```
-$ # Change directory to the root directory 
-$ cd ..
-
-$ # Generate the grpc web stubs
-$ docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
-
-$ # Change directory to ./console
-$ cd ./console
-
 $ # Install dev dependencies if you haven't done so already
 $ npm install
+
+$ # Reuse the environment.json file from the still running frontend container
+$ curl http://localhost:4200/assets/environment.json > ./src/assets/environment.json
 
 $ # Change directory to the root directory 
 $ cd ..
 
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
+
+$ # Generate the grpc web stubs
+$ docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
 
 $ # Change directory to ./console
 $ cd ./console

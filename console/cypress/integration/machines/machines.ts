@@ -46,7 +46,7 @@ describe('machines', () => {
                     cy.get('button').filter(':contains("Create")').should('be.visible').click()
                     cy.contains('User created successfully')
                     cy.visit(machinesPath);
-                    cy.wait(5_000) // TODO: eventual consistency ftw
+                    cy.wait(10_000) // TODO: eventual consistency ftw
                     cy.contains('button', 'refresh').click()
                     cy.contains("tr", testMachineUserName)
                 })
@@ -76,7 +76,7 @@ describe('machines', () => {
                     cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testMachineUserName, Cypress.env('org')))
                     cy.contains('mat-dialog-container button', 'Delete').click()    
                     cy.contains('User deleted successfully')
-                    cy.wait(5_000) // TODO: eventual consistency ftw
+                    cy.wait(10_000) // TODO: eventual consistency ftw
                     cy.contains('button', 'refresh').click()
                     cy.get(`[text*=${testMachineUserName}]`).should('not.exist');
                 })

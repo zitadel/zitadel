@@ -30,8 +30,8 @@
     </div>
 
     <ng-template cnslHasRole [hasRole]="['project.app.write']">
-        <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']" [attr.data-e2e]="'app-card-add'">
-            <cnsl-app-card class="grid-card add" matRipple>
+        <div class="app-wrap" *ngIf="!disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']">
+            <cnsl-app-card class="grid-card add" matRipple [attr.data-e2e]="'app-card-add'">
                 <mat-icon>add</mat-icon>
             </cnsl-app-card>
             <span class="name">{{ 'ACTIONS.NEW' | translate }}</span>

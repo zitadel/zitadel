@@ -1,0 +1,3 @@
+# environment.json should be dynamically fetched
+# e.g. curl http://localhost:4200/assets/environment.json > ./src/assets/environment.json
+environment.json
