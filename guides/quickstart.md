@@ -1,5 +1,7 @@
 # Quickstart with docker compose
 
+We strongly recommend to go from top to bottom in this guide so all commands work seemlessly.
+
 ## Prerequisites
 
 The commands in this guide are known to work with the following prerequisites: 
