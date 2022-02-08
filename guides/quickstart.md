@@ -31,7 +31,7 @@ The services are configured to restart if an error occurs.
 
 In the following script the basic setup of the database is executed before ZITADEL starts. Execute the statement from the root of ZITADEL.
 
-You can connect to [ZITADEL on localhost:4200](http://localhost:4203) after the frontend compiled successfully. Initially it takes several minutes to start all containers.
+You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the frontend compiled successfully. Initially it takes several minutes to start all containers.
 
 <a name="compose-services"></a>
 ```bash
@@ -102,7 +102,7 @@ $ # Install dev dependencies if you haven't done so already
 $ npm install
 
 $ # Get the environment.json from the docker compose environment
-$ curl http://localhost:4203/assets/environment.json > ./src/assets/environment.json
+$ curl http://localhost:4200/assets/environment.json > ./src/assets/environment.json
 
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop

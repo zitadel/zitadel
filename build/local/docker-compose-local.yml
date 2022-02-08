@@ -220,7 +220,7 @@ services:
       - ./environment.json:/console/src/assets/environment.json
     command: sh -c "ng serve --host 0.0.0.0 --disable-host-check"
     ports:
-    - 4203:4203
+    - 4200:4200
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4200"]
       interval: 10s
