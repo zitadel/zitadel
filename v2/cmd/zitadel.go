@@ -18,7 +18,7 @@ var (
 	defaultConfig []byte
 )
 
-func NewZitadelCMD(out io.Writer, in io.Reader, args []string) *cobra.Command {
+func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	rootCMD := &cobra.Command{
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI let's you interact with ZITADEL",

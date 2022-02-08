@@ -9,6 +9,6 @@ import (
 
 func main() {
 	args := os.Args[1:]
-	rootCmd := cmd.NewZitadelCMD(os.Stdout, os.Stdin /*, int(os.Stdin.Fd())*/, args)
+	rootCmd := cmd.New(os.Stdout, os.Stdin /*, int(os.Stdin.Fd())*/, args)
 	cobra.CheckErr(rootCmd.Execute())
 }
