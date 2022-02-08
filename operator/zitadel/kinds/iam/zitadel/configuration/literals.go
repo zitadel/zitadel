@@ -32,6 +32,12 @@ func literalsConfigMap(
 		tls = "FALSE"
 	}
 
+	crSSL := dbConn.SSL()
+	sslMode := "disable"
+	if crSSL.RootCert {
+		sslMode = "verify-full"
+	}
+
 	literalsConfigMap := map[string]string{
 		"GOOGLE_APPLICATION_CREDENTIALS": secretPath + "/" + googleServiceAccountJSONPath,
 		"ZITADEL_KEY_PATH":               secretPath + "/" + zitadelKeysPath,
@@ -40,7 +46,7 @@ func literalsConfigMap(
 		"ZITADEL_MIGRATE_ES_V1":          strconv.FormatBool(desired.MigrateEventStoreV1),
 		"SMTP_TLS":                       tls,
 		"CAOS_OIDC_DEV":                  "true",
-		"CR_SSL_MODE":                    "require",
+		"CR_SSL_MODE":                    sslMode, //"require",
 		"CR_HOST":                        dbConn.Host(),
 		"CR_PORT":                        dbConn.Port(),
 		"CR_USER":                        dbConn.User(),
