@@ -50,9 +50,10 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.sms_configs (id, creation_date, change_date, resource_owner, state, sequence) VALUES ($1, $2, $3, $4, $5, $6)",
+							expectedStmt: "INSERT INTO zitadel.projections.sms_configs (id, aggregate_id, creation_date, change_date, resource_owner, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"id",
+								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",

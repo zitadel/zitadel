@@ -61,6 +61,7 @@ func (p *SMSConfigProjection) reducers() []handler.AggregateReducer {
 
 const (
 	SMSColumnID            = "id"
+	SMSColumnAggregateID   = "aggregate_id"
 	SMSColumnCreationDate  = "creation_date"
 	SMSColumnChangeDate    = "change_date"
 	SMSColumnResourceOwner = "resource_owner"
@@ -86,6 +87,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(SMSColumnID, e.ID),
+				handler.NewCol(SMSColumnAggregateID, e.Aggregate().ID),
 				handler.NewCol(SMSColumnCreationDate, e.CreationDate()),
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 				handler.NewCol(SMSColumnResourceOwner, e.Aggregate().ResourceOwner),
