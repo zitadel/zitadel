@@ -1,0 +1,20 @@
+<span class="title" mat-dialog-title>{{'USER.PERSONALACCESSTOKEN.ADDED.TITLE' | translate}}</span>
+<div mat-dialog-content>
+  <p class="desc"> {{'USER.PERSONALACCESSTOKEN.ADDED.DESCRIPTION' | translate}}</p>
+  <ng-container *ngIf="tokenResponse">
+    <div class="row">
+      <p class="left">{{'USER.PERSONALACCESSTOKEN.ID' | translate}}</p>
+      <p class="right">{{$any(tokenResponse)?.tokenId}}</p>
+    </div>
+
+    <div class="row">
+      <p class="left">{{'USER.PERSONALACCESSTOKEN.TOKEN' | translate}}</p>
+      <p class="right">{{$any(tokenResponse)?.token}}</p>
+    </div>
+  </ng-container>
+</div>
+<div mat-dialog-actions class="action">
+  <button color="primary" mat-raised-button class="ok-button" (click)="closeDialog()">
+    {{'ACTIONS.CLOSE' | translate}}
+  </button>
+</div>

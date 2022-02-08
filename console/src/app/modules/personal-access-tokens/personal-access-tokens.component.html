@@ -28,11 +28,6 @@
         <td mat-cell *matCellDef="let key"> {{key?.id}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.TYPE' | translate }} </th>
-        <td mat-cell *matCellDef="let key"> {{'USER.MACHINE.KEYTYPES.'+key?.type | translate}} </td>
-      </ng-container>
-
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
         <td mat-cell *matCellDef="let key">

@@ -8,12 +8,13 @@ import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AddKeyDialogComponent } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
 import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
-import { ListMachineKeysResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { ListPersonalAccessTokensResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { PersonalAccessToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { AddTokenDialogComponent } from '../add-token-dialog/add-token-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
+import { ShowTokenDialogComponent } from '../show-token-dialog/show-token-dialog.component';
 
 @Component({
   selector: 'cnsl-personal-access-tokens',
@@ -24,14 +25,18 @@ export class PersonalAccessTokensComponent implements OnInit {
   @Input() userId!: string;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  public dataSource: MatTableDataSource<Key.AsObject> = new MatTableDataSource<Key.AsObject>();
-  public selection: SelectionModel<Key.AsObject> = new SelectionModel<Key.AsObject>(true, []);
-  public keyResult!: ListMachineKeysResponse.AsObject;
+  public dataSource: MatTableDataSource<PersonalAccessToken.AsObject> =
+    new MatTableDataSource<PersonalAccessToken.AsObject>();
+  public selection: SelectionModel<PersonalAccessToken.AsObject> = new SelectionModel<PersonalAccessToken.AsObject>(
+    true,
+    [],
+  );
+  public keyResult!: ListPersonalAccessTokensResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate', 'actions'];
+  @Input() public displayedColumns: string[] = ['select', 'id', 'creationDate', 'expirationDate', 'actions'];
 
-  @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
+  @Output() public changedSelection: EventEmitter<Array<PersonalAccessToken.AsObject>> = new EventEmitter();
 
   constructor(
     public translate: TranslateService,
@@ -64,7 +69,7 @@ export class PersonalAccessTokensComponent implements OnInit {
 
   public deleteKey(key: Key.AsObject): void {
     this.mgmtService
-      .removeMachineToken(key.id, this.userId)
+      .removePersonalAccessToken(key.id, this.userId)
       .then(() => {
         this.selection.clear();
         this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
@@ -99,14 +104,14 @@ export class PersonalAccessTokensComponent implements OnInit {
 
         if (type) {
           this.mgmtService
-            .addMachineToken(this.userId, date)
+            .addPersonalAccessToken(this.userId, date)
             .then((response) => {
               if (response) {
                 setTimeout(() => {
                   this.refreshPage();
                 }, 1000);
 
-                this.dialog.open(AddTokenDialogComponent, {
+                this.dialog.open(ShowTokenDialogComponent, {
                   data: {
                     key: response,
                   },
@@ -127,7 +132,7 @@ export class PersonalAccessTokensComponent implements OnInit {
 
     if (this.userId) {
       this.mgmtService
-        .listMachineKeys(this.userId, limit, offset)
+        .listPersonalAccessTokens(this.userId, limit, offset)
         .then((resp) => {
           this.keyResult = resp;
           if (resp.resultList) {

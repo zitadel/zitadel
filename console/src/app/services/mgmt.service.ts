@@ -990,7 +990,7 @@ export class ManagementService {
     return this.grpcService.mgmt.setTriggerActions(req, null).then((resp) => resp.toObject());
   }
 
-  public addMachineToken(userId: string, date?: Timestamp): Promise<AddPersonalAccessTokenResponse.AsObject> {
+  public addPersonalAccessToken(userId: string, date?: Timestamp): Promise<AddPersonalAccessTokenResponse.AsObject> {
     const req = new AddPersonalAccessTokenRequest();
     req.setUserId(userId);
     if (date) {
@@ -999,14 +999,14 @@ export class ManagementService {
     return this.grpcService.mgmt.addPersonalAccessToken(req, null).then((resp) => resp.toObject());
   }
 
-  public removeMachineToken(tokenId: string, userId: string): Promise<RemovePersonalAccessTokenResponse.AsObject> {
+  public removePersonalAccessToken(tokenId: string, userId: string): Promise<RemovePersonalAccessTokenResponse.AsObject> {
     const req = new RemovePersonalAccessTokenRequest();
     req.setTokenId(tokenId);
     req.setUserId(userId);
     return this.grpcService.mgmt.removePersonalAccessToken(req, null).then((resp) => resp.toObject());
   }
 
-  public listMachineTokens(
+  public listPersonalAccessTokens(
     userId: string,
     limit?: number,
     offset?: number,
