@@ -73,13 +73,50 @@ $ # Or open the end-to-end test suite interactively
 $ npm run e2e:open
 ```
 
-### Redeploying a Service
-
-Make changes to a service as you wish and rebuild and deploy it using the following command from the project root directory:
+### Developing the Backend
 
 ```bash
-$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build <compose service>
+$ # Generate grpc stubs if you haven't done so already
+$ docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
+
+$ # Make changes to the backend, then rebuild and redeploy it 
+$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build backend-run
+
+$ # Rerun the end-to-end test
+$ cd ./console
+$ npm run e2e
 ```
+
+### Developing the Frontend
+
+You can switch to `ng serve` for better development experience.
+
+```
+$ # Generate the grpc web stubs
+$ docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
+
+$ # Change directory to ./console
+$ cd ./console
+
+$ # Install dev dependencies if you haven't done so already
+$ npm install
+
+$ # Get the environment.json from the docker compose environment
+$ curl http://localhost:4203/assets/environment.json > ./src/assets/environment.json
+
+$ # Stop the frontend container
+$ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
+
+$ # Run the local server
+$ ng serve
+
+$ # Run all end-to-end tests
+$ npm run e2e:dev
+
+$ # Or open the end-to-end test suite interactively
+$ npm run e2e:dev:open
+```
+
 
 ## FAQ
 

@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     profiles: ['backend', 'storage']
@@ -216,11 +218,11 @@ services:
         ENV: dev
     volumes:
       - ./environment.json:/console/src/assets/environment.json
-    command: sh -c "ng serve --host 0.0.0.0 --port 4203 --disable-host-check"
+    command: sh -c "ng serve --host 0.0.0.0 --disable-host-check"
     ports:
     - 4203:4203
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4203"]
+      test: ["CMD", "curl", "-f", "http://localhost:4200"]
       interval: 10s
       timeout: 30s
       retries: 5
