@@ -1,5 +1,6 @@
 package zitadel
 
+/*
 import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
@@ -64,3 +65,4 @@ func migrations(
 	}
 	return nil
 }
+*/
