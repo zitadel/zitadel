@@ -34,7 +34,7 @@
     "SECURITYANDPRIVACY": "Datenschutz und Personalisierung",
     "SECURITYANDPRIVACY_DESC": "Verwalte Deine Informationen und Sicherheitseinstellungen.",
     "SECURITYANDPRIVACY_BUTTON": "Daten verwalten und personalisieren",
-    "CHANGE_PWD": "Password ändern",
+    "CHANGE_PWD": "Passwort ändern",
     "PROTECTION": "Organisationsrichtlinien",
     "PROTECTION_DESC": "Verwalte Deine Organisationsrichtlinien und entdecke die vorgefertigte Lösungen, die Zeit sparen und Sicherheit gewährleisten.",
     "PROTECTION_BUTTON": "Erkunden",
@@ -194,8 +194,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "User löschen",
+      "DELETE_SELF_TITLE": "Eigenen User löschen",
       "DELETE_DESCRIPTION": "Sie sind im Begriff einen Benutzer endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "DELETE_SELF_DESCRIPTION": "Sie sind im Begriff Ihren eigenen Benutzer endgültig zu löschen. Dadurch werden Sie ausgeloggt und Ihr Account wird gelöscht. Diese Aktion kann nicht rückgängig gemacht werden!",
       "DELETE_AUTH_DESCRIPTION": "Sie sind im Begriff Ihren Account endgültig zu löschen. Wollen Sie dies wirklich tun?",
+      "TYPEUSERNAME": "Wiederholen Sie '{{value}}', um den Benutzer zu löschen.",
       "DELETE_BTN": "Entgültig löschen"
     },
     "SENDEMAILDIALOG": {
@@ -230,7 +233,7 @@
       "U2F": "Authentifikator hinzufügen",
       "U2F_DIALOG_TITLE": "Authentifikator hinzufügen",
       "U2F_DIALOG_DESCRIPTION": "Gib einen Namen für den von dir verwendeten Login an.",
-      "U2F_SUCCESS": "Passwordless erfolgreich erstellt!",
+      "U2F_SUCCESS": "Passwortlos erfolgreich erstellt!",
       "U2F_ERROR": "Ein Fehler ist aufgetreten!",
       "U2F_NAME": "Authentifikator Name",
       "TYPE": {
@@ -245,17 +248,17 @@
         "3": "Gelöscht"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Passwordless entfernen",
+        "DELETE_TITLE": "Passwortlos entfernen",
         "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
         "ADD_TITLE": "Passwortlose Authentifizierung",
-        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwordlosen Authentifizierungsmethode.",
+        "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
         "SEND_DESCRIPTION": "Senden Sie sich einen Registrierungslink an Ihre email adresse.",
         "SEND": "Registrierungslink senden",
         "SENT": "Die email wurde erfolgreich zugestellt. Kontrollieren Sie Ihr Postfach um mit dem Setup forzufahren.",
         "QRCODE_DESCRIPTION": "QR-Code zum scannen mit einem anderen Gerät generieren.",
         "QRCODE": "QR-Code generieren",
         "QRCODE_SCAN": "Scannen Sie diesen QR Code um mit dem Setup auf Ihrem Gerät forzufahren.",
-        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um Passwordless aufzusetzen.",
+        "NEW_DESCRIPTION": "Verwenden Sie dieses Gerät um Passwortlos aufzusetzen.",
         "NEW": "Hinzufügen"
       }
     },
@@ -398,14 +401,14 @@
     },
     "PASSWORD": {
       "TITLE": "Passwort",
-      "DESCRIPTION": "Gebe das neue PassworT unter Einhaltung der Richtlinie für die Komplexität ein.",
+      "DESCRIPTION": "Gebe das neue Passwort unter Einhaltung der Richtlinie für die Komplexität ein.",
       "OLD": "Aktuelles Passwort",
       "NEW": "Neues Passwort",
       "CONFIRM": "Neues Passwort wiederholen",
       "NEWINITIAL": "Passwort",
-      "CONFIRMINITIAL": "PassworT wiederholen",
+      "CONFIRMINITIAL": "Passwort wiederholen",
       "RESET": "Passwort zurücksetzen",
-      "SET": "PassworT neu setzen",
+      "SET": "Passwort neu setzen",
       "RESENDNOTIFICATION": "Link für das Zurücksetzen des Passworts senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
@@ -461,12 +464,12 @@
       "INVALIDPATTERN": "Das Passwort erfüllt nicht die vorgegebenen Regeln.",
       "NOTANEMAIL": "Der eingegebene Wert ist keine E-Mail Adresse.",
       "REQUIRED": "Das Eingagefeld ist leer.",
-      "MINLENGTH": "Das Password muss mindestens {{requiredLength}} Zeichen lang sein.",
+      "MINLENGTH": "Das Passwort muss mindestens {{requiredLength}} Zeichen lang sein.",
       "NOEMAIL": "Benutzername darf keine E-Mail-Adresse sein.",
-      "UPPERCASEMISSING": "Password muss einen Grossbuchstaben beinhalten.",
-      "LOWERCASEMISSING": "Password muss einen Kleinbuchstaben beinhalten.",
-      "SYMBOLERROR": "Das Password muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Password muss eine Ziffer beinhalten."
+      "UPPERCASEMISSING": "Passwort muss einen Grossbuchstaben beinhalten.",
+      "LOWERCASEMISSING": "Passwort muss einen Kleinbuchstaben beinhalten.",
+      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten."
     },
     "STATE": {
       "0": "Unbekannt",
@@ -501,7 +504,7 @@
       "EMAILVERIFICATIONSENT": "Bestätigungscode per E-Mail gesendet.",
       "OTPREMOVED": "OTP entfernt.",
       "U2FREMOVED": "U2F entfernt.",
-      "PASSWORDLESSREMOVED": "Passwordless entfernt.",
+      "PASSWORDLESSREMOVED": "Passwortlos entfernt.",
       "INITIALPASSWORDSET": "Initiales Passwort gesetzt.",
       "PASSWORDNOTIFICATIONSENT": "Passwortänderung mittgeteilt.",
       "PASSWORDCHANGED": "Passwort geändert.",
@@ -563,6 +566,7 @@
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",
     "ACTIONS": "Aktionen",
+    "ACTIONSMAX": "Basierend auf Ihrem Tier steht Ihnen eine begrenzte Anzahl von Aktionen ({{value}}) zur Verfügung. Stellen Sie sicher, dass Sie diejenigen deaktivieren, die Sie nicht benötigen, oder erwägen Sie ein Upgrade.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Aktion erstellen"
@@ -580,7 +584,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Aktionen gesetzt"
+      "ACTIONSSET": "Aktionen gesetzt",
+      "ACTIONREACTIVATED": "Aktionen erfolgreich reaktiviert",
+      "ACTIONDEACTIVATED": "Aktionen erfolgreich deaktiviert"
     }
   },
   "IAM": {
@@ -670,8 +676,8 @@
       "SELECTORGTOOLTIP": "Diese Organisation auswählen",
       "PRIMARYDOMAIN": "Primäre Domain",
       "STATE": "Status",
-      "USEPASSWORD": "Initiales Password setzen",
-      "USEPASSWORDDESC": "Der Nutzer muss das Password bei der Initalisierung nicht setzen."
+      "USEPASSWORD": "Initiales Passwort setzen",
+      "USEPASSWORDDESC": "Der Nutzer muss das Passwort bei der Initalisierung nicht setzen."
     },
     "DOMAINS": {
       "NEW": "Domain hinzufügen",
@@ -755,7 +761,16 @@
       "CUSTOMTEXTMESSAGE": "Benutzerdefinierte Benachrichtigungstexte",
       "PRIVACYPOLICY": "Benutzerdefinierte Datenschutzrichtlinie und AGB",
       "METADATAUSER": "User Metadata",
-      "FLOWS": "Aktionen und Abläufe"
+      "FLOWS": "Aktionen und Abläufe",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Nicht erlaubt",
+          "1": "Limitierte Aktionen",
+          "2": "Unlimitiert"
+        },
+        "TYPE": "Verwendungsart",
+        "COUNT": "Anzahl"
+      }
     },
     "TIERSTATES": {
       "0": "Aktiv",
@@ -772,9 +787,9 @@
     "PWD_COMPLEXITY": {
       "TITLE": "Passwortkomplexität",
       "DESCRIPTION": "Stellt sicher, dass alle festgelegten Passwörter einem bestimmten Muster entsprechen.",
-      "SYMBOLANDNUMBERERROR": "Das Password muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
-      "SYMBOLERROR": "Das Password muss ein Symbol/Satzzeichen beinhalten.",
-      "NUMBERERROR": "Das Password muss eine Ziffer beinhalten.",
+      "SYMBOLANDNUMBERERROR": "Das Passwort muss ein Symbol/Satzzeichen und eine Ziffer beinhalten.",
+      "SYMBOLERROR": "Das Passwort muss ein Symbol/Satzzeichen beinhalten.",
+      "NUMBERERROR": "Das Passwort muss eine Ziffer beinhalten.",
       "PATTERNERROR": "Das Passwort erfüllt nicht die vorgeschriebene Richtlinie."
     },
     "PRIVATELABELING": {
@@ -872,7 +887,7 @@
         "initMfaPromptText": "MFA Einrichtungsaufforderung",
         "initMfaU2fText": "Universeller Zweitfaktor Initialisierung",
         "initPasswordDoneText": "Passwort Initialisierung erfolgreich",
-        "initPasswordText": "Password Initialisierung",
+        "initPasswordText": "Passwort Initialisierung",
         "initializeDoneText": "Benutzereinrichtung erfolgreich",
         "initializeUserText": "Benutzereinrichtung",
         "linkingUserDoneText": "Benutzerverlinkung erfolgreich",
@@ -892,10 +907,10 @@
         "usernameChangeText": "Benutzernamenwechsel",
         "verifyMfaOtpText": "OTP Verifikation",
         "verifyMfaU2fText": "Universeller Zweitfaktor Verifikation",
-        "passwordlessPromptText": "Passwordless Aufforderung",
-        "passwordlessRegistrationDoneText": "Passwordless setzen erfolgreich",
-        "passwordlessRegistrationText": "Passwordless Registrierung",
-        "passwordlessText": "Passwordless",
+        "passwordlessPromptText": "Passwortlos Aufforderung",
+        "passwordlessRegistrationDoneText": "Passwortlos setzen erfolgreich",
+        "passwordlessRegistrationText": "Passwortlos Registrierung",
+        "passwordlessText": "Passwortlos",
         "externalRegistrationUserOverviewText": "Externe Registrierung Benutzer Übersicht"
       }
     },
@@ -906,9 +921,9 @@
         "INIT": "Initialisierung",
         "VE": "Emailverifikation",
         "VP": "Telefonnummerverifikation",
-        "PR": "Password Wiederherstellung",
+        "PR": "Passwort Wiederherstellung",
         "DC": "Domainbeanspruchung",
-        "PL": "Passwordless"
+        "PL": "Passwortlos"
       },
       "CHIPS": {
         "firstname": "Vorname",
@@ -946,7 +961,7 @@
       "EXPIREWARNDAYS": "Ablauf Warnung nach Tagen",
       "MAXAGEDAYS": "Maximale Gültigkeit in Tagen",
       "USERLOGINMUSTBEDOMAIN": "Benutzer-Login muss eine Domain sein",
-      "ALLOWUSERNAMEPASSWORD": "Benutzername Password erlaubt",
+      "ALLOWUSERNAMEPASSWORD": "Benutzername Passwort erlaubt",
       "ALLOWEXTERNALIDP": "Externer IDP erlaubt",
       "ALLOWREGISTER": "Registrieren erlaubt",
       "ALLOWUSERNAMEPASSWORD_DESC": "Der konventionelle Login mit Benutzername und Passwort wird erlaubt.",
@@ -1336,7 +1351,7 @@
       "DESCRIPTION": "Sie können vordefinierte oder selbsterstellten Provider auswählen",
       "SELECTIDPS": "Identity Provider"
     },
-    "PASSWORDLESS": "Passwordloser Login",
+    "PASSWORDLESS": "Passwortloser Login",
     "PASSWORDLESSTYPE": {
       "0": "Nicht erlaubt",
       "1": "Erlaubt"

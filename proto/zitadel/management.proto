@@ -668,7 +668,7 @@ service ManagementService {
         };
     }
 
-    // Removed a machine key
+    // Removes a machine key
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
@@ -718,6 +718,53 @@ service ManagementService {
     rpc RemoveMachineToken(RemoveMachineTokenRequest) returns (RemoveMachineTokenResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/tokens/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Returns a personal access token of a (machine) user
+    rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/pats/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Returns all personal access tokens of a (machine) user which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/pats/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Generates a new personal access token for a machine user, details should be stored after return
+    rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/pats"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removes a personal access token
+    rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/pats/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2840,30 +2887,29 @@ service ManagementService {
         };
     }
 
-//TODO: enable in next release
-//    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_deactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
-//
-//    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_reactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
+    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
+
+    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
 
     rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
         option (google.api.http) = {
@@ -2979,7 +3025,9 @@ message ListUserChangesRequest {
 }
 
 message ListUserChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3443,27 +3491,27 @@ message RemoveMachineKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetMachineTokenByIDsRequest {
+message GetPersonalAccessTokenByIDsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetMachineTokenByIDsResponse {
-    zitadel.user.v1.MachineToken token = 1;
+message GetPersonalAccessTokenByIDsResponse {
+    zitadel.user.v1.PersonalAccessToken token = 1;
 }
 
-message ListMachineTokensRequest {
+message ListPersonalAccessTokensRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
     zitadel.v1.ListQuery query = 2;
 }
 
-message ListMachineTokensResponse {
+message ListPersonalAccessTokensResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.user.v1.MachineToken result = 2;
+    repeated zitadel.user.v1.PersonalAccessToken result = 2;
 }
 
-message AddMachineTokenRequest {
+message AddPersonalAccessTokenRequest {
     string user_id = 1 [(validate.rules).string.min_len = 1];
     google.protobuf.Timestamp expiration_date = 2 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -3473,18 +3521,18 @@ message AddMachineTokenRequest {
     ];
 }
 
-message AddMachineTokenResponse {
+message AddPersonalAccessTokenResponse {
     string token_id = 1;
     string token = 2;
     zitadel.v1.ObjectDetails details = 3;
 }
 
-message RemoveMachineTokenRequest {
+message RemovePersonalAccessTokenRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message RemoveMachineTokenResponse {
+message RemovePersonalAccessTokenResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3540,7 +3588,9 @@ message ListOrgChangesRequest {
 }
 
 message ListOrgChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3727,7 +3777,9 @@ message ListProjectChangesRequest {
 }
 
 message ListProjectChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3934,7 +3986,9 @@ message ListAppChangesRequest {
 }
 
 message ListAppChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 

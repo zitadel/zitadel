@@ -9,7 +9,6 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
-	"gopkg.in/square/go-jose.v2"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
@@ -199,16 +198,6 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 	return oidc.ErrServerError().WithParent(err)
 }
 
-func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
-	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm)
-}
-
-func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	return o.repo.GetKeySet(ctx)
-}
-
 func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
@@ -240,7 +229,7 @@ func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string
 	return scopes, nil
 }
 
-func (o *OPStorage) assertScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
+func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
 	token.Audience = append(token.Audience, clientID)
 	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
 	if err != nil {

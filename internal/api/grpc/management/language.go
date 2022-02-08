@@ -8,7 +8,7 @@ import (
 )
 
 func (s *Server) GetSupportedLanguages(ctx context.Context, req *mgmt_pb.GetSupportedLanguagesRequest) (*mgmt_pb.GetSupportedLanguagesResponse, error) {
-	langs, err := s.org.Languages(ctx)
+	langs, err := s.query.Languages(ctx)
 	if err != nil {
 		return nil, err
 	}

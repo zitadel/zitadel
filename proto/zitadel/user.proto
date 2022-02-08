@@ -572,7 +572,7 @@ message RefreshToken {
 }
 
 
-message MachineToken {
+message PersonalAccessToken {
     string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"69629023906488334\"";
@@ -706,6 +706,7 @@ message UserGrantQuery {
         UserGrantOrgDomainQuery org_domain_query = 11;
         UserGrantProjectNameQuery project_name_query = 12;
         UserGrantDisplayNameQuery display_name_query = 13;
+        UserGrantUserTypeQuery user_type_query = 14;
     }
 }
 
@@ -871,6 +872,15 @@ message UserGrantDisplayNameQuery {
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which equality method is used";
+        }
+    ];
+}
+
+message UserGrantUserTypeQuery {
+    Type type = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "type of user"
+            example: "\"TYPE_HUMAN\"";
         }
     ];
 }

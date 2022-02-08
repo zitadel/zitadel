@@ -13,8 +13,11 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/i18n"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
@@ -58,18 +61,26 @@ type OPStorage struct {
 	repo                              repository.Repository
 	command                           *command.Commands
 	query                             *query.Queries
+	eventstore                        *eventstore.Eventstore
 	defaultLoginURL                   string
 	defaultAccessTokenLifetime        time.Duration
 	defaultIdTokenLifetime            time.Duration
 	signingKeyAlgorithm               string
 	defaultRefreshTokenIdleExpiration time.Duration
 	defaultRefreshTokenExpiration     time.Duration
+	encAlg                            crypto.EncryptionAlgorithm
+	keyChan                           <-chan interface{}
+	currentKey                        query.PrivateKey
+	signingKeyRotationCheck           time.Duration
+	signingKeyGracefulPeriod          time.Duration
+	locker                            crdb.Locker
+	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig *crypto.KeyConfig, localDevMode bool) op.OpenIDProvider {
+func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, localDevMode bool, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, assetAPIPrefix string) op.OpenIDProvider {
 	cookieHandler, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, id.SonyFlakeGenerator, localDevMode)
 	logging.Log("OIDC-sd4fd").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot user agent handler")
-	tokenKey, err := crypto.LoadKey(keyConfig, keyConfig.EncryptionKeyID)
+	tokenKey, err := crypto.LoadKey(keyConfig.EncryptionConfig, keyConfig.EncryptionConfig.EncryptionKeyID)
 	logging.Log("OIDC-ADvbv").OnError(err).Panic("cannot load OP crypto key")
 	cryptoKey := []byte(tokenKey)
 	if len(cryptoKey) != 32 {
@@ -84,10 +95,12 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	logging.Log("OIDC-GBd3t").OnError(err).Panic("cannot get supported languages")
 	config.OPConfig.SupportedUILocales = supportedLanguages
 	metricTypes := []metrics.MetricType{metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode, metrics.MetricTypeTotalCount}
+	storage, err := newStorage(config.StorageConfig, command, query, repo, keyConfig, es, projections, keyChan, assetAPIPrefix)
+	logging.Log("OIDC-Jdg2k").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("cannot create storage")
 	provider, err := op.NewOpenIDProvider(
 		ctx,
 		config.OPConfig,
-		newStorage(config.StorageConfig, command, query, repo),
+		storage,
 		op.WithHttpInterceptors(
 			middleware.MetricsHandler(metricTypes),
 			middleware.TelemetryHandler(),
@@ -107,18 +120,33 @@ func NewProvider(ctx context.Context, config OPHandlerConfig, command *command.C
 	return provider
 }
 
-func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository) *OPStorage {
+func newStorage(config StorageConfig, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, assetAPIPrefix string) (*OPStorage, error) {
+	encAlg, err := crypto.NewAESCrypto(keyConfig.EncryptionConfig)
+	if err != nil {
+		return nil, err
+	}
+	sqlClient, err := projections.Start()
+	if err != nil {
+		return nil, err
+	}
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
 		query:                             query,
+		eventstore:                        es,
 		defaultLoginURL:                   config.DefaultLoginURL,
 		signingKeyAlgorithm:               config.SigningKeyAlgorithm,
 		defaultAccessTokenLifetime:        config.DefaultAccessTokenLifetime.Duration,
 		defaultIdTokenLifetime:            config.DefaultIdTokenLifetime.Duration,
 		defaultRefreshTokenIdleExpiration: config.DefaultRefreshTokenIdleExpiration.Duration,
 		defaultRefreshTokenExpiration:     config.DefaultRefreshTokenExpiration.Duration,
-	}
+		encAlg:                            encAlg,
+		signingKeyGracefulPeriod:          keyConfig.SigningKeyGracefulPeriod.Duration,
+		signingKeyRotationCheck:           keyConfig.SigningKeyRotationCheck.Duration,
+		locker:                            crdb.NewLocker(sqlClient, locksTable, signingKey),
+		keyChan:                           keyChan,
+		assetAPIPrefix:                    assetAPIPrefix,
+	}, nil
 }
 
 func (o *OPStorage) Health(ctx context.Context) error {

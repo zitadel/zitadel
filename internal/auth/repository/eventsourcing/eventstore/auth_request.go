@@ -24,7 +24,6 @@ import (
 	user_model "github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type AuthRequestRepo struct {
@@ -104,7 +103,7 @@ type orgViewProvider interface {
 
 type userGrantProvider interface {
 	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
-	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
+	UserGrantsByProjectAndUserID(string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
@@ -818,17 +817,19 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 	if err != nil {
 		return nil, err
 	}
-	users := make([]domain.UserSelection, len(userSessions))
-	for i, session := range userSessions {
-		users[i] = domain.UserSelection{
-			UserID:            session.UserID,
-			DisplayName:       session.DisplayName,
-			UserName:          session.UserName,
-			LoginName:         session.LoginName,
-			ResourceOwner:     session.ResourceOwner,
-			AvatarKey:         session.AvatarKey,
-			UserSessionState:  model.UserSessionStateToDomain(session.State),
-			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+	users := make([]domain.UserSelection, 0)
+	for _, session := range userSessions {
+		if request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner {
+			users = append(users, domain.UserSelection{
+				UserID:            session.UserID,
+				DisplayName:       session.DisplayName,
+				UserName:          session.UserName,
+				LoginName:         session.LoginName,
+				ResourceOwner:     session.ResourceOwner,
+				AvatarKey:         session.AvatarKey,
+				UserSessionState:  model.UserSessionStateToDomain(session.State),
+				SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+			})
 		}
 	}
 	return users, nil

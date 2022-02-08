@@ -623,60 +623,60 @@ Generates a new machine key, details should be stored after return
 > **rpc** RemoveMachineKey([RemoveMachineKeyRequest](#removemachinekeyrequest))
 [RemoveMachineKeyResponse](#removemachinekeyresponse)
 
-Removed a machine key
+Removes a machine key
 
 
 
     DELETE: /users/{user_id}/keys/{key_id}
 
 
-### GetMachineTokenByIDs
+### GetPersonalAccessTokenByIDs
 
-> **rpc** GetMachineTokenByIDs([GetMachineTokenByIDsRequest](#getmachinetokenbyidsrequest))
-[GetMachineTokenByIDsResponse](#getmachinetokenbyidsresponse)
+> **rpc** GetPersonalAccessTokenByIDs([GetPersonalAccessTokenByIDsRequest](#getpersonalaccesstokenbyidsrequest))
+[GetPersonalAccessTokenByIDsResponse](#getpersonalaccesstokenbyidsresponse)
 
-Returns a machine key of a (machine) user
-
-
-
-    GET: /users/{user_id}/tokens/{token_id}
+Returns a personal access token of a (machine) user
 
 
-### ListMachineTokens
 
-> **rpc** ListMachineTokens([ListMachineTokensRequest](#listmachinetokensrequest))
-[ListMachineTokensResponse](#listmachinetokensresponse)
+    GET: /users/{user_id}/pats/{token_id}
 
-Returns all machine keys of a (machine) user which match the query
+
+### ListPersonalAccessTokens
+
+> **rpc** ListPersonalAccessTokens([ListPersonalAccessTokensRequest](#listpersonalaccesstokensrequest))
+[ListPersonalAccessTokensResponse](#listpersonalaccesstokensresponse)
+
+Returns all personal access tokens of a (machine) user which match the query
 Limit should always be set, there is a default limit set by the service
 
 
 
-    POST: /users/{user_id}/tokens/_search
+    POST: /users/{user_id}/pats/_search
 
 
-### AddMachineToken
+### AddPersonalAccessToken
 
-> **rpc** AddMachineToken([AddMachineTokenRequest](#addmachinetokenrequest))
-[AddMachineTokenResponse](#addmachinetokenresponse)
+> **rpc** AddPersonalAccessToken([AddPersonalAccessTokenRequest](#addpersonalaccesstokenrequest))
+[AddPersonalAccessTokenResponse](#addpersonalaccesstokenresponse)
 
-Generates a new machine key, details should be stored after return
-
-
-
-    POST: /users/{user_id}/tokens
-
-
-### RemoveMachineToken
-
-> **rpc** RemoveMachineToken([RemoveMachineTokenRequest](#removemachinetokenrequest))
-[RemoveMachineTokenResponse](#removemachinetokenresponse)
-
-Removed a machine key
+Generates a new personal access token for a machine user, details should be stored after return
 
 
 
-    DELETE: /users/{user_id}/tokens/{token_id}
+    POST: /users/{user_id}/pats
+
+
+### RemovePersonalAccessToken
+
+> **rpc** RemovePersonalAccessToken([RemovePersonalAccessTokenRequest](#removepersonalaccesstokenrequest))
+[RemovePersonalAccessTokenResponse](#removepersonalaccesstokenresponse)
+
+Removes a personal access token
+
+
+
+    DELETE: /users/{user_id}/pats/{token_id}
 
 
 ### ListHumanLinkedIDPs
@@ -2807,6 +2807,30 @@ Change JWT identity provider configuration of the organisation
     PUT: /actions/{id}
 
 
+### DeactivateAction
+
+> **rpc** DeactivateAction([DeactivateActionRequest](#deactivateactionrequest))
+[DeactivateActionResponse](#deactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_deactivate
+
+
+### ReactivateAction
+
+> **rpc** ReactivateAction([ReactivateActionRequest](#reactivateactionrequest))
+[ReactivateActionResponse](#reactivateactionresponse)
+
+
+
+
+
+    POST: /actions/{id}/_reactivate
+
+
 ### DeleteAction
 
 > **rpc** DeleteAction([DeleteActionRequest](#deleteactionrequest))
@@ -3477,6 +3501,31 @@ This is an empty request
 | details |  zitadel.v1.ObjectDetails | - |  |
 | link |  string | - |  |
 | expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### AddPersonalAccessTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### AddPersonalAccessTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token_id |  string | - |  |
+| token |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -4889,6 +4938,29 @@ This is an empty request
 
 
 
+### GetPersonalAccessTokenByIDsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetPersonalAccessTokenByIDsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token |  zitadel.user.v1.PersonalAccessToken | - |  |
+
+
+
+
 ### GetPreviewLabelPolicyRequest
 This is an empty request
 
@@ -5276,8 +5348,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5574,8 +5645,7 @@ This is an empty response
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5671,6 +5741,30 @@ This is an empty request
 
 
 
+### ListPersonalAccessTokensRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListPersonalAccessTokensResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.PersonalAccessToken | - |  |
+
+
+
+
 ### ListProjectChangesRequest
 
 
@@ -5689,8 +5783,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -5880,8 +5973,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.change.v1.Change | - |  |
+| result | repeated zitadel.change.v1.Change | zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos) |  |
 
 
 
@@ -6639,6 +6731,29 @@ This is an empty response
 
 
 ### RemoveOrgMemberResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemovePersonalAccessTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemovePersonalAccessTokenResponse
 
 
 

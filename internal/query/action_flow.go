@@ -67,13 +67,14 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 	return scan(rows)
 }
 
-func (q *Queries) GetActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) ([]*Action, error) {
+func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flowType domain.FlowType, triggerType domain.TriggerType, orgID string) ([]*Action, error) {
 	stmt, scan := prepareTriggerActionsQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
 			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
+			ActionColumnState.identifier():                domain.ActionStateActive,
 		},
 	).ToSql()
 	if err != nil {
@@ -135,7 +136,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 			ActionColumnCreationDate.identifier(),
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
-			//ActionColumnState.identifier(),
+			ActionColumnState.identifier(),
 			ActionColumnSequence.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
@@ -152,7 +153,7 @@ func prepareTriggerActionsQuery() (sq.SelectBuilder, func(*sql.Rows) ([]*Action,
 					&action.CreationDate,
 					&action.ChangeDate,
 					&action.ResourceOwner,
-					//&action.State, //TODO: state in next release
+					&action.State,
 					&action.Sequence,
 					&action.Name,
 					&action.Script,
@@ -177,7 +178,7 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 			ActionColumnCreationDate.identifier(),
 			ActionColumnChangeDate.identifier(),
 			ActionColumnResourceOwner.identifier(),
-			//ActionColumnState.identifier(),
+			ActionColumnState.identifier(),
 			ActionColumnSequence.identifier(),
 			ActionColumnName.identifier(),
 			ActionColumnScript.identifier(),
@@ -199,6 +200,7 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 					actionCreationDate  pq.NullTime
 					actionChangeDate    pq.NullTime
 					actionResourceOwner sql.NullString
+					actionState         sql.NullInt32
 					actionSequence      sql.NullInt64
 					actionName          sql.NullString
 					actionScript        sql.NullString
@@ -212,7 +214,7 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 					&actionCreationDate,
 					&actionChangeDate,
 					&actionResourceOwner,
-					//&action.State, //TODO: state in next release
+					&actionState,
 					&actionSequence,
 					&actionName,
 					&actionScript,
@@ -232,6 +234,7 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 					CreationDate:  actionCreationDate.Time,
 					ChangeDate:    actionChangeDate.Time,
 					ResourceOwner: actionResourceOwner.String,
+					State:         domain.ActionState(actionState.Int32),
 					Sequence:      uint64(actionSequence.Int64),
 					Name:          actionName.String,
 					Script:        actionScript.String,

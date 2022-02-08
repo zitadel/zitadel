@@ -100,7 +100,7 @@ func keyWriteModelToMachineKey(wm *MachineKeyWriteModel) *domain.MachineKey {
 	}
 }
 
-func machineTokenWriteModelToToken(wm *MachineTokenWriteModel, algorithm crypto.EncryptionAlgorithm) (*domain.Token, string, error) {
+func personalTokenWriteModelToToken(wm *PersonalAccessTokenWriteModel, algorithm crypto.EncryptionAlgorithm) (*domain.Token, string, error) {
 	encrypted, err := algorithm.Encrypt([]byte(wm.TokenID + ":" + wm.AggregateID))
 	if err != nil {
 		return nil, "", err

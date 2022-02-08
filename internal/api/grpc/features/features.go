@@ -31,7 +31,9 @@ func ModelFeaturesToPb(features *query.Features) *features_pb.Features {
 		CustomTextLogin:          features.CustomTextLogin,
 		MetadataUser:             features.MetadataUser,
 		LockoutPolicy:            features.LockoutPolicy,
-		Actions:                  features.Actions,
+		Actions:                  features.ActionsAllowed != domain.ActionsNotAllowed,
+		ActionsAllowed:           ActionsAllowedToPb(features.ActionsAllowed),
+		MaxActions:               features.MaxActions,
 		Details: object_grpc.ChangeToDetailsPb(
 			features.Sequence,
 			features.ChangeDate,
@@ -76,5 +78,31 @@ func FeaturesStateToDomain(status features_pb.FeaturesState) domain.FeaturesStat
 		return domain.FeaturesStateGrandfathered
 	default:
 		return -1
+	}
+}
+
+func ActionsAllowedToDomain(allowed features_pb.ActionsAllowed) domain.ActionsAllowed {
+	switch allowed {
+	case features_pb.ActionsAllowed_ACTIONS_ALLOWED_NOT_ALLOWED:
+		return domain.ActionsNotAllowed
+	case features_pb.ActionsAllowed_ACTIONS_ALLOWED_MAX:
+		return domain.ActionsMaxAllowed
+	case features_pb.ActionsAllowed_ACTIONS_ALLOWED_UNLIMITED:
+		return domain.ActionsAllowedUnlimited
+	default:
+		return domain.ActionsNotAllowed
+	}
+}
+
+func ActionsAllowedToPb(allowed domain.ActionsAllowed) features_pb.ActionsAllowed {
+	switch allowed {
+	case domain.ActionsNotAllowed:
+		return features_pb.ActionsAllowed_ACTIONS_ALLOWED_NOT_ALLOWED
+	case domain.ActionsMaxAllowed:
+		return features_pb.ActionsAllowed_ACTIONS_ALLOWED_MAX
+	case domain.ActionsAllowedUnlimited:
+		return features_pb.ActionsAllowed_ACTIONS_ALLOWED_UNLIMITED
+	default:
+		return features_pb.ActionsAllowed_ACTIONS_ALLOWED_NOT_ALLOWED
 	}
 }

@@ -96,6 +96,7 @@ import { StorageKey, StorageLocation, StorageService } from './storage.service';
 export class GrpcAuthService {
   private _activeOrgChanged: Subject<Org.AsObject> = new Subject();
   public user!: Observable<User.AsObject | undefined>;
+  public userSubject: BehaviorSubject<User.AsObject | undefined> = new BehaviorSubject<User.AsObject | undefined>(undefined);
   private zitadelPermissions: BehaviorSubject<string[]> = new BehaviorSubject(['user.resourceowner']);
   private zitadelFeatures: BehaviorSubject<string[]> = new BehaviorSubject(['']);
 
@@ -136,6 +137,8 @@ export class GrpcAuthService {
         this.loadFeatures();
       }),
     );
+
+    this.user.subscribe(this.userSubject);
 
     this.activeOrgChanged.subscribe(() => {
       this.loadPermissions();

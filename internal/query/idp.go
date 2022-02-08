@@ -7,11 +7,12 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+	
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type IDP struct {
@@ -198,28 +199,17 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 	return scan(row)
 }
 
-//SearchIDPs searches executes the query in the context of the resource owner and IAM
-func (q *Queries) SearchIDPs(ctx context.Context, resourceOwner string, queries *IDPSearchQueries) (idps *IDPs, err error) {
+//IDPs searches idps matching the query
+func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
 	query, scan := prepareIDPsQuery()
-	query = queries.toQuery(query)
-	query = query.Where(
-		sq.Or{
-			sq.Eq{
-				IDPResourceOwnerCol.identifier(): resourceOwner,
-			},
-			sq.Eq{
-				IDPResourceOwnerCol.identifier(): q.iamID,
-			},
-		},
-	)
 	stmt, args, err := queries.toQuery(query).ToSql()
 	if err != nil {
-		return nil, errors.ThrowInvalidArgument(err, "QUERY-zC6gk", "Errors.Query.InvalidRequest")
+		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}
 
 	rows, err := q.client.QueryContext(ctx, stmt, args...)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "QUERY-YTug9", "Errors.Internal")
+		return nil, errors.ThrowInternal(err, "QUERY-xPlVH", "Errors.Internal")
 	}
 	idps, err = scan(rows)
 	if err != nil {
@@ -244,6 +234,18 @@ func NewIDPOwnerTypeSearchQuery(ownerType domain.IdentityProviderType) (SearchQu
 
 func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, error) {
 	return NewTextQuery(IDPNameCol, value, method)
+}
+
+func NewIDPResourceOwnerSearchQuery(value string) (SearchQuery, error) {
+	return NewTextQuery(IDPResourceOwnerCol, value, TextEquals)
+}
+
+func NewIDPResourceOwnerListSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(IDPResourceOwnerCol, list, ListIn)
 }
 
 func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {

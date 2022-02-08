@@ -1,0 +1,23 @@
+[build]
+  command = "npm run build"
+
+[[redirects]]
+  from = "/proxy/js/script.js"
+  to = "https://plausible.io/js/plausible.js"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/proxy/api/event"
+  to = "https://plausible.io/api/event"
+  status = 202
+  force = true
+  
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = '''
+	  max-age=31536000;
+	  includeSubDomains;
+	  preload'''
+    

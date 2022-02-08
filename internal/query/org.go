@@ -157,6 +157,14 @@ func NewOrgNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 	return NewTextQuery(OrgColumnName, value, method)
 }
 
+func NewOrgIDsSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(OrgColumnID, list, ListIn)
+}
+
 func prepareOrgsQuery() (sq.SelectBuilder, func(*sql.Rows) (*Orgs, error)) {
 	return sq.Select(
 			OrgColumnID.identifier(),

@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) ListIAMMemberRoles(ctx context.Context, req *admin_pb.ListIAMMemberRolesRequest) (*admin_pb.ListIAMMemberRolesResponse, error) {
-	roles := s.iam.GetIAMMemberRoles()
+	roles := s.query.GetIAMMemberRoles()
 	return &admin_pb.ListIAMMemberRolesResponse{
 		Roles:   roles,
 		Details: object.ToListDetails(uint64(len(roles)), 0, time.Now()),

@@ -7,7 +7,7 @@
 [![release](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![codecov](https://codecov.io/gh/caos/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
-[![discord](https://badgen.net/discord/online-members/Mqprc23v)](https://discord.gg/Mqprc23v)  
+[![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)  
 [![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
 
 ## What Is ZITADEL
@@ -48,12 +48,13 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 * [Go](https://github.com/caos/zitadel-go) client library
 * [.NET](https://github.com/caos/zitadel-net) client library
 * [Dart](https://github.com/caos/zitadel-dart) client library
+* [Elixir](https://github.com/jshmrtn/zitadel_api) client library (maintained by [jshmrtn]([jshmrtn](https://github.com/jshmrtn)))
 
 ## Help and Documentation
 
 * [Documentation](https://docs.zitadel.ch)
 * [Say hello](https://zitadel.ch/contact/)
-* [Join our Discord channel](https://discord.gg/Mqprc23v)
+* [Join our Discord channel](https://discord.gg/erh5Brh7jE)
 
 ## How To Contribute
 
