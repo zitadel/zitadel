@@ -218,6 +218,7 @@ type UserTokenAddedEvent struct {
 	Audience          []string  `json:"audience"`
 	Scopes            []string  `json:"scopes"`
 	Expiration        time.Time `json:"expiration"`
+	AuthTime          time.Time `json:"authTime"`
 	PreferredLanguage string    `json:"preferredLanguage"`
 }
 
@@ -239,7 +240,8 @@ func NewUserTokenAddedEvent(
 	refreshTokenID string,
 	audience,
 	scopes []string,
-	expiration time.Time,
+	expiration,
+	authTime time.Time,
 ) *UserTokenAddedEvent {
 	return &UserTokenAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -254,6 +256,7 @@ func NewUserTokenAddedEvent(
 		Audience:          audience,
 		Scopes:            scopes,
 		Expiration:        expiration,
+		AuthTime:          authTime,
 		PreferredLanguage: preferredLanguage,
 	}
 }

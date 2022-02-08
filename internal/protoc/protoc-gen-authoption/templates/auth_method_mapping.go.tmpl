@@ -4,10 +4,9 @@ package {{.File.GoPkg.Name}}
 
 
 import (
-    "google.golang.org/grpc"
-    
+    "time"
+
 	"github.com/caos/zitadel/internal/api/authz"
-	"github.com/caos/zitadel/internal/api/grpc/server/middleware"
 )
 
 {{ range $s := .File.Services }}
@@ -26,6 +25,7 @@ var {{$s.Name}}_AuthMethods = authz.MethodMapping {
                 Permission: "{{$mAuthOpt.Permission}}",
                 CheckParam: "{{$mAuthOpt.CheckFieldName}}",
                 Feature:    "{{$mAuthOpt.Feature}}",
+                MaxAge:     {{duration $mAuthOpt.MaxAge}},
             },
         {{end}}
     {{ end}}

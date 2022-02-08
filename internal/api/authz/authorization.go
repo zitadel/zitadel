@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -20,6 +21,10 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 
 	ctxData, err := VerifyTokenAndCreateCtxData(ctx, token, orgID, verifier, method)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = CheckMaxAge(ctxData.AuthTime, requiredAuthOption.MaxAge); err != nil {
 		return nil, err
 	}
 
@@ -54,6 +59,16 @@ func CheckUserAuthorization(ctx context.Context, req interface{}, token, orgID s
 		parent = context.WithValue(parent, requestPermissionsKey, requestedPermissions)
 		return parent
 	}, nil
+}
+
+func CheckMaxAge(authTime time.Time, maxAge time.Duration) error {
+	if maxAge == 0 {
+		return nil
+	}
+	if time.Now().Sub(authTime) < maxAge {
+		return nil
+	}
+	return errors.ThrowPermissionDeniedf(nil, "AUTH-adf3t", "authentication must less than %s ago", maxAge.String())
 }
 
 func CheckOrgFeatures(ctx context.Context, t *TokenVerifier, orgID string, requiredFeatures ...string) error {

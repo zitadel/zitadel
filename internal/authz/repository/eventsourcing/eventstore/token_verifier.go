@@ -63,7 +63,7 @@ func (repo *TokenVerifierRepo) tokenByID(ctx context.Context, tokenID, userID st
 	return model.TokenViewToModel(token), nil
 }
 
-func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, creationDate time.Time, err error) {
+func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenString, verifierClientID, projectID string) (userID string, agentID string, clientID, prefLang, resourceOwner string, authTime time.Time, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	tokenData, err := base64.RawURLEncoding.DecodeString(tokenString)
@@ -91,7 +91,7 @@ func (repo *TokenVerifierRepo) VerifyAccessToken(ctx context.Context, tokenStrin
 	}
 	for _, aud := range token.Audience {
 		if verifierClientID == aud || projectID == aud {
-			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, token.CreationDate, nil
+			return token.UserID, token.UserAgentID, token.ApplicationID, token.PreferredLanguage, token.ResourceOwner, token.AuthTime, nil
 		}
 	}
 	return "", "", "", "", "", time.Time{}, caos_errs.ThrowUnauthenticated(nil, "APP-Zxfako", "invalid audience")

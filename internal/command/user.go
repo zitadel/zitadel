@@ -222,12 +222,12 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 	return writeModelToObjectDetails(&existingUser.WriteModel), nil
 }
 
-func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration) (*domain.Token, error) {
+func (c *Commands) AddUserToken(ctx context.Context, orgID, agentID, clientID, userID string, audience, scopes []string, lifetime time.Duration, authTime time.Time) (*domain.Token, error) {
 	if userID == "" { //do not check for empty orgID (JWT Profile requests won't provide it, so service user requests fail)
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Dbge4", "Errors.IDMissing")
 	}
 	userWriteModel := NewUserWriteModel(userID, orgID)
-	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, lifetime)
+	event, accessToken, err := c.addUserToken(ctx, userWriteModel, agentID, clientID, "", audience, scopes, lifetime, authTime)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +254,7 @@ func (c *Commands) RevokeAccessToken(ctx context.Context, userID, orgID, tokenID
 	return writeModelToObjectDetails(&accessTokenWriteModel.WriteModel), nil
 }
 
-func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes []string, lifetime time.Duration) (*user.UserTokenAddedEvent, *domain.Token, error) {
+func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteModel, agentID, clientID, refreshTokenID string, audience, scopes []string, lifetime time.Duration, authTime time.Time) (*user.UserTokenAddedEvent, *domain.Token, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, userWriteModel)
 	if err != nil {
 		return nil, nil, err
@@ -277,7 +277,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 	}
 
 	userAgg := UserAggregateFromWriteModel(&userWriteModel.WriteModel)
-	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, expiration),
+	return user.NewUserTokenAddedEvent(ctx, userAgg, tokenID, clientID, agentID, preferredLanguage, refreshTokenID, audience, scopes, expiration, authTime),
 		&domain.Token{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID: userWriteModel.AggregateID,
@@ -289,6 +289,7 @@ func (c *Commands) addUserToken(ctx context.Context, userWriteModel *UserWriteMo
 			Audience:          audience,
 			Scopes:            scopes,
 			Expiration:        expiration,
+			AuthTime:          authTime,
 			PreferredLanguage: preferredLanguage,
 		}, nil
 }

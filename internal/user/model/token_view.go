@@ -17,6 +17,7 @@ type TokenView struct {
 	UserAgentID       string
 	Audience          []string
 	Expiration        time.Time
+	AuthTime          time.Time
 	Scopes            []string
 	Sequence          uint64
 	PreferredLanguage string

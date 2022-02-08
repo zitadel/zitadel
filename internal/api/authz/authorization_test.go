@@ -2,6 +2,9 @@ package authz
 
 import (
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/caos/zitadel/internal/errors"
 )
@@ -272,6 +275,56 @@ func Test_GetPermissionCtxIDs(t *testing.T) {
 			result := GetAllPermissionCtxIDs(tt.args.perms)
 			if !equalStringArray(result, tt.result) {
 				t.Errorf("got wrong result, expecting: %v, actual: %v ", tt.result, result)
+			}
+		})
+	}
+}
+
+func TestCheckMaxAge(t *testing.T) {
+	type args struct {
+		authTime time.Time
+		maxAge   time.Duration
+	}
+	tests := []struct {
+		name string
+		args args
+		err  func(error) bool
+	}{
+		{
+			"no max age, ok",
+			args{
+				authTime: time.Time{},
+				maxAge:   0,
+			},
+			nil,
+		},
+		{
+			"max age, younger authTime, ok",
+			args{
+
+				authTime: time.Now().Add(-1 * time.Minute),
+				maxAge:   5 * time.Minute,
+			},
+			nil,
+		},
+		{
+			"max age to old, err",
+			args{
+
+				authTime: time.Now().Add(-10 * time.Minute),
+				maxAge:   5 * time.Minute,
+			},
+			errors.IsPermissionDenied,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := CheckMaxAge(tt.args.authTime, tt.args.maxAge)
+			if tt.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.err != nil && !tt.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 		})
 	}

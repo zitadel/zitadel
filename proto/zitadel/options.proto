@@ -15,4 +15,5 @@ message AuthOption {
     string permission = 1;
     string check_field_name = 2;
     string feature = 3;
+    string max_age = 4;
 }

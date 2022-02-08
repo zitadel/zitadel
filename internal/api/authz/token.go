@@ -21,7 +21,7 @@ type TokenVerifier struct {
 }
 
 type authZRepo interface {
-	VerifyAccessToken(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, creationDate time.Time, err error)
+	VerifyAccessToken(ctx context.Context, token, verifierClientID, projectID string) (userID, agentID, clientID, prefLang, resourceOwner string, authTime time.Time, err error)
 	VerifierClientID(ctx context.Context, name string) (clientID, projectID string, err error)
 	SearchMyMemberships(ctx context.Context) ([]*Membership, error)
 	ProjectIDAndOriginsByClientID(ctx context.Context, clientID string) (projectID string, origins []string, err error)
@@ -33,13 +33,13 @@ func Start(authZRepo authZRepo) (v *TokenVerifier) {
 	return &TokenVerifier{authZRepo: authZRepo}
 }
 
-func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, creationDate time.Time, err error) {
+func (v *TokenVerifier) VerifyAccessToken(ctx context.Context, token string, method string) (userID, clientID, agentID, prefLang, resourceOwner string, authTime time.Time, err error) {
 	verifierClientID, projectID, err := v.clientIDAndProjectIDFromMethod(ctx, method)
 	if err != nil {
 		return "", "", "", "", "", time.Time{}, err
 	}
-	userID, agentID, clientID, prefLang, resourceOwner, creationDate, err = v.authZRepo.VerifyAccessToken(ctx, token, verifierClientID, projectID)
-	return userID, clientID, agentID, prefLang, resourceOwner, creationDate, err
+	userID, agentID, clientID, prefLang, resourceOwner, authTime, err = v.authZRepo.VerifyAccessToken(ctx, token, verifierClientID, projectID)
+	return userID, clientID, agentID, prefLang, resourceOwner, authTime, err
 }
 
 type client struct {

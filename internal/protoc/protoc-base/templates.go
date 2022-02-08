@@ -23,6 +23,13 @@ type BaseTemplateData struct {
 
 var templateFuncs = map[string]interface{}{
 	"option": getOption,
+	"duration": func(s string) interface{} {
+		d, _ := time.ParseDuration(s)
+		if d == 0 {
+			return 0
+		}
+		return fmt.Sprintf("time.Duration(%d)", d.Nanoseconds())
+	},
 }
 
 func RegisterTmplFunc(name string, f interface{}) {

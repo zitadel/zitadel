@@ -16,6 +16,7 @@ type Token struct {
 	RefreshTokenID    string
 	Audience          []string
 	Expiration        time.Time
+	AuthTime          time.Time
 	Scopes            []string
 	PreferredLanguage string
 }

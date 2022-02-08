@@ -36,6 +36,7 @@ type TokenView struct {
 	Audience          pq.StringArray `json:"audience" gorm:"column:audience"`
 	Scopes            pq.StringArray `json:"scopes" gorm:"column:scopes"`
 	Expiration        time.Time      `json:"expiration" gorm:"column:expiration"`
+	AuthTime          time.Time      `json:"authTime" gorm:"column:auth_time"`
 	Sequence          uint64         `json:"-" gorm:"column:sequence"`
 	PreferredLanguage string         `json:"preferredLanguage" gorm:"column:preferred_language"`
 	RefreshTokenID    string         `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
@@ -55,6 +56,7 @@ func TokenViewToModel(token *TokenView) *usr_model.TokenView {
 		Audience:          token.Audience,
 		Scopes:            token.Scopes,
 		Expiration:        token.Expiration,
+		AuthTime:          token.AuthTime,
 		Sequence:          token.Sequence,
 		PreferredLanguage: token.PreferredLanguage,
 		RefreshTokenID:    token.RefreshTokenID,

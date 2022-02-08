@@ -82,13 +82,15 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	var userAgentID, applicationID, userOrgID string
+	authTime := time.Now()
 	authReq, ok := req.(*AuthRequest)
 	if ok {
 		userAgentID = authReq.AgentID
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
+		authTime = authReq.AuthTime
 	}
-	resp, err := o.command.AddUserToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime, authTime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}

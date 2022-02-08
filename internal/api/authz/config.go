@@ -1,5 +1,7 @@
 package authz
 
+import "time"
+
 type Config struct {
 	RolePermissionMappings []RoleMapping
 }
@@ -15,6 +17,7 @@ type Option struct {
 	Permission string
 	CheckParam string
 	Feature    string
+	MaxAge     time.Duration
 }
 
 func (a *Config) getPermissionsFromRole(role string) []string {
