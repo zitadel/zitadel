@@ -78,6 +78,9 @@ $ npm run e2e:open
 ### Developing the Backend
 
 ```bash
+$ # Change directory to the root directory 
+$ cd ..
+
 $ # Make changes to the backend, then rebuild and redeploy it 
 $ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build backend-run
 
@@ -91,6 +94,9 @@ $ npm run e2e
 You can switch to `ng serve` for better development experience.
 
 ```
+$ # Change directory to the root directory 
+$ cd ..
+
 $ # Generate the grpc web stubs
 $ docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
 
@@ -100,17 +106,23 @@ $ cd ./console
 $ # Install dev dependencies if you haven't done so already
 $ npm install
 
+$ # Change directory to the root directory 
+$ cd ..
+
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
+
+$ # Change directory to ./console
+$ cd ./console
 
 $ # Run the local server
 $ ng serve
 
 $ # Run all end-to-end tests
-$ npm run e2e:dev
+$ npm run e2e
 
 $ # Or open the end-to-end test suite interactively
-$ npm run e2e:dev:open
+$ npm run e2e:open
 ```
 
 
