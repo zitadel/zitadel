@@ -28,6 +28,7 @@ type API struct {
 	verifier   *internal_authz.TokenVerifier
 	health     health
 	router     *mux.Router
+	localMode  bool
 }
 
 type health interface {
@@ -45,18 +46,20 @@ func New(
 	},
 	authZ internal_authz.Config,
 	sd systemdefaults.SystemDefaults,
+	localMode bool,
 ) *API {
 	verifier := internal_authz.Start(repo)
 	api := &API{
-		port:     port,
-		verifier: verifier,
-		health:   repo,
-		router:   router,
+		port:      port,
+		verifier:  verifier,
+		health:    repo,
+		router:    router,
+		localMode: localMode,
 	}
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.routeGRPC()
 
-	api.RegisterHandler("", api.healthHandler()) //TODO: do we need a prefix?
+	api.RegisterHandler("/debug", api.healthHandler()) //TODO: do we need a prefix?
 
 	return api
 }
@@ -76,13 +79,22 @@ func (a *API) RegisterHandler(prefix string, handler http.Handler) {
 }
 
 func (a *API) routeGRPC() {
-	http2Route := a.router.Methods(http.MethodPost). //TODO: grpc-web is called with http/1.1
-								MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
+	http2Route := a.router.Methods(http.MethodPost).
+		MatcherFunc(func(r *http.Request, _ *mux.RouteMatch) bool {
 			return r.ProtoMajor == 2
 		}).
 		Subrouter()
 	http2Route.Headers("Content-Type", "application/grpc").Handler(a.grpcServer)
-	a.router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcweb.WrapServer(a.grpcServer))
+
+	if a.localMode {
+		a.routeGRPCWeb(a.router)
+		return
+	}
+	a.routeGRPCWeb(http2Route)
+}
+
+func (a *API) routeGRPCWeb(router *mux.Router) {
+	router.NewRoute().HeadersRegexp("Content-Type", "application/grpc-web.*").Handler(grpcweb.WrapServer(a.grpcServer))
 }
 
 func (a *API) healthHandler() http.Handler {
