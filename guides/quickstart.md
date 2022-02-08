@@ -33,7 +33,6 @@ In the following script the basic setup of the database is executed before ZITAD
 
 You can connect to [ZITADEL on localhost:4200](http://localhost:4200) after the frontend compiled successfully. Initially it takes several minutes to start all containers.
 
-<a name="compose-services"></a>
 ```bash
 $ docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --detach
 ```
@@ -51,9 +50,12 @@ Additionally to the prerequsites described [above](#prerequisites), the end-to-e
 
 ### Running End-to-End Tests
 
-The following command creates all objects in your local ZITADEL needed to run the end-to-end tests. The command may take several minutes because it awaits eventual consistency but you only have to execute it once. 
+Create all objects in your local ZITADEL needed to run the end-to-end tests. The setup command may take several minutes because it awaits eventual consistency but you only have to execute it once. 
 
 ```bash
+$ # Generate grpc stubs if you haven't done so already
+$ docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
+
 $ ./scripts/e2e-setup.sh
 ```
 
@@ -76,9 +78,6 @@ $ npm run e2e:open
 ### Developing the Backend
 
 ```bash
-$ # Generate grpc stubs if you haven't done so already
-$ docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
-
 $ # Make changes to the backend, then rebuild and redeploy it 
 $ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build backend-run
 
