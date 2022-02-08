@@ -1,0 +1,1 @@
+ALTER TABLE auth.tokens ADD COLUMN auth_time TIMESTAMPTZ;
