@@ -1,0 +1,4 @@
+Log:
+  Level: $ZITADEL_LOG_LEVEL
+  Formatter:
+    Format: text

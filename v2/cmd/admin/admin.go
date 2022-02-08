@@ -20,9 +20,11 @@ func New() *cobra.Command {
 		},
 	}
 
-	adminCMD.AddCommand(initialise.New())
-	adminCMD.AddCommand(setup.New())
-	adminCMD.AddCommand(start.New())
+	adminCMD.AddCommand(
+		initialise.New(),
+		setup.New(),
+		start.New(),
+	)
 
 	return adminCMD
 }

@@ -12,24 +12,29 @@ import (
 )
 
 var (
-	configPath string
+	configFiles []string
 
 	//go:embed defaults.yaml
 	defaultConfig []byte
 )
 
-func NewZitadelCMD(out io.Writer, in io.ReadWriter, args []string) *cobra.Command {
+func NewZitadelCMD(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	rootCMD := &cobra.Command{
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI let's you interact with ZITADEL",
 		Long:  `The ZITADEL CLI let's you interact with ZITADEL`,
 		Run: func(cmd *cobra.Command, args []string) {
-			logging.Log("ADMIN-t7pjR").Info("hello world")
+			logging.Log("CMD-t7pjR").Info("hello world")
 		},
 	}
 
+	viper.AutomaticEnv()
+	viper.SetConfigType("yaml")
+	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
+	logging.Log("CMD-5NgGF").OnError(err).Fatal("unable to read default config")
+
 	cobra.OnInitialize(initConfig)
-	rootCMD.PersistentFlags().StringVar(&configPath, "config", "", "path to config file to overwrite system defaults")
+	rootCMD.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
 
 	rootCMD.AddCommand(admin.New())
 
@@ -37,16 +42,9 @@ func NewZitadelCMD(out io.Writer, in io.ReadWriter, args []string) *cobra.Comman
 }
 
 func initConfig() {
-	viper.SetConfigType("yaml")
-	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.Log("ADMIN-5NgGF").OnError(err).Fatal("unable to read default config")
-
-	if configPath != "" {
-		viper.SetConfigFile(configPath)
-	}
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err != nil {
-		logging.Log("ADMIN-SX5sF").Info("using default config")
+	for _, file := range configFiles {
+		viper.SetConfigFile(file)
+		err := viper.MergeInConfig()
+		logging.LogWithFields("CMD-N76SC", "file", file).OnError(err).Warn("unable to read config file")
 	}
 }
