@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -65,6 +66,11 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	forceMFA,
 	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
+	passwordCheckLifetime,
+	externalLoginCheckLifetime,
+	mfaInitSkipLifetime,
+	secondFactorCheckLifetime,
+	multiFactorCheckLifetime time.Duration,
 ) (*iam.LoginPolicyChangedEvent, bool) {
 
 	changes := make([]policy.LoginPolicyChanges, 0)
@@ -85,6 +91,21 @@ func (wm *IAMLoginPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.HidePasswordReset != hidePasswordReset {
 		changes = append(changes, policy.ChangeHidePasswordReset(hidePasswordReset))
+	}
+	if wm.PasswordCheckLifetime != passwordCheckLifetime {
+		changes = append(changes, policy.ChangePasswordCheckLifetime(passwordCheckLifetime))
+	}
+	if wm.ExternalLoginCheckLifetime != externalLoginCheckLifetime {
+		changes = append(changes, policy.ChangeExternalLoginCheckLifetime(externalLoginCheckLifetime))
+	}
+	if wm.MFAInitSkipLifetime != mfaInitSkipLifetime {
+		changes = append(changes, policy.ChangeMFAInitSkipLifetime(mfaInitSkipLifetime))
+	}
+	if wm.SecondFactorCheckLifetime != secondFactorCheckLifetime {
+		changes = append(changes, policy.ChangeSecondFactorCheckLifetime(secondFactorCheckLifetime))
+	}
+	if wm.MultiFactorCheckLifetime != multiFactorCheckLifetime {
+		changes = append(changes, policy.ChangeMultiFactorCheckLifetime(multiFactorCheckLifetime))
 	}
 	if len(changes) == 0 {
 		return nil, false

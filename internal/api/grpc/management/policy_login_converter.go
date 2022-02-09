@@ -10,23 +10,33 @@ import (
 
 func addLoginPolicyToDomain(p *mgmt_pb.AddCustomLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
-		AllowUsernamePassword: p.AllowUsernamePassword,
-		AllowRegister:         p.AllowRegister,
-		AllowExternalIDP:      p.AllowExternalIdp,
-		ForceMFA:              p.ForceMfa,
-		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
-		HidePasswordReset:     p.HidePasswordReset,
+		AllowUsernamePassword:      p.AllowUsernamePassword,
+		AllowRegister:              p.AllowRegister,
+		AllowExternalIDP:           p.AllowExternalIdp,
+		ForceMFA:                   p.ForceMfa,
+		PasswordlessType:           policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:          p.HidePasswordReset,
+		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
+		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),
+		MFAInitSkipLifetime:        p.MfaInitSkipLifetime.AsDuration(),
+		SecondFactorCheckLifetime:  p.SecondFactorCheckLifetime.AsDuration(),
+		MultiFactorCheckLifetime:   p.MultiFactorCheckLifetime.AsDuration(),
 	}
 }
 
 func updateLoginPolicyToDomain(p *mgmt_pb.UpdateCustomLoginPolicyRequest) *domain.LoginPolicy {
 	return &domain.LoginPolicy{
-		AllowUsernamePassword: p.AllowUsernamePassword,
-		AllowRegister:         p.AllowRegister,
-		AllowExternalIDP:      p.AllowExternalIdp,
-		ForceMFA:              p.ForceMfa,
-		PasswordlessType:      policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
-		HidePasswordReset:     p.HidePasswordReset,
+		AllowUsernamePassword:      p.AllowUsernamePassword,
+		AllowRegister:              p.AllowRegister,
+		AllowExternalIDP:           p.AllowExternalIdp,
+		ForceMFA:                   p.ForceMfa,
+		PasswordlessType:           policy_grpc.PasswordlessTypeToDomain(p.PasswordlessType),
+		HidePasswordReset:          p.HidePasswordReset,
+		PasswordCheckLifetime:      p.PasswordCheckLifetime.AsDuration(),
+		ExternalLoginCheckLifetime: p.ExternalLoginCheckLifetime.AsDuration(),
+		MFAInitSkipLifetime:        p.MfaInitSkipLifetime.AsDuration(),
+		SecondFactorCheckLifetime:  p.SecondFactorCheckLifetime.AsDuration(),
+		MultiFactorCheckLifetime:   p.MultiFactorCheckLifetime.AsDuration(),
 	}
 }
 

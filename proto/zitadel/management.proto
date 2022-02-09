@@ -4396,6 +4396,11 @@ message AddCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
+    google.protobuf.Duration password_check_lifetime = 7;
+    google.protobuf.Duration external_login_check_lifetime = 8;
+    google.protobuf.Duration mfa_init_skip_lifetime = 9;
+    google.protobuf.Duration second_factor_check_lifetime = 10;
+    google.protobuf.Duration multi_factor_check_lifetime = 11;
 }
 
 message AddCustomLoginPolicyResponse {
@@ -4409,6 +4414,11 @@ message UpdateCustomLoginPolicyRequest {
     bool force_mfa = 4;
     zitadel.policy.v1.PasswordlessType passwordless_type = 5 [(validate.rules).enum = {defined_only: true}];
     bool hide_password_reset = 6;
+    google.protobuf.Duration password_check_lifetime = 7;
+    google.protobuf.Duration external_login_check_lifetime = 8;
+    google.protobuf.Duration mfa_init_skip_lifetime = 9;
+    google.protobuf.Duration second_factor_check_lifetime = 10;
+    google.protobuf.Duration multi_factor_check_lifetime = 11;
 }
 
 message UpdateCustomLoginPolicyResponse {
