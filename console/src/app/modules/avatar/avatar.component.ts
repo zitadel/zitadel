@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ThemeService } from 'src/app/services/theme.service';
 
 interface Color {
   200: string;
@@ -23,7 +24,7 @@ export class AvatarComponent implements OnInit {
   @Input() avatarUrl: string = '';
   @Input() isMachine: boolean = false;
 
-  constructor() {}
+  constructor(public themeService: ThemeService) {}
 
   ngOnInit(): void {
     if (!this.credentials && this.forColor) {
