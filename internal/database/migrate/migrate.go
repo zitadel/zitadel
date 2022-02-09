@@ -2,4 +2,4 @@ package migrate
 
 import "database/sql"
 
-func New(*sql.DB)
+func New(*sql.DB) {}
