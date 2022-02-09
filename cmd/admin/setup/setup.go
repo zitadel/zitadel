@@ -15,7 +15,7 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logging.Log("SETUP-e88M6").Info("hello world")
+			logging.New().Info("hello world")
 			return nil
 		},
 	}

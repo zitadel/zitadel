@@ -15,7 +15,7 @@ func New() *cobra.Command {
 Prereqesits:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			logging.Log("INIT-nn2r8").Info("hello world")
+			logging.New().Info("hello world")
 			return nil
 		},
 	}

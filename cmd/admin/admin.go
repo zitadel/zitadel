@@ -16,7 +16,7 @@ func New() *cobra.Command {
 		Short: "The ZITADEL admin CLI let's you interact with your instance",
 		Long:  `The ZITADEL admin CLI let's you interact with your instance`,
 		Run: func(cmd *cobra.Command, args []string) {
-			logging.Log("ADMIN-t7pjR").Info("hello world")
+			logging.New().Info("hello world")
 		},
 	}
 

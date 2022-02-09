@@ -24,14 +24,14 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 		Short: "The ZITADEL CLI let's you interact with ZITADEL",
 		Long:  `The ZITADEL CLI let's you interact with ZITADEL`,
 		Run: func(cmd *cobra.Command, args []string) {
-			logging.Log("CMD-t7pjR").Info("hello world")
+			logging.New().Info("hello world")
 		},
 	}
 
 	viper.AutomaticEnv()
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.Log("CMD-5NgGF").OnError(err).Fatal("unable to read default config")
+	logging.New().OnError(err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
@@ -45,6 +45,6 @@ func initConfig() {
 	for _, file := range configFiles {
 		viper.SetConfigFile(file)
 		err := viper.MergeInConfig()
-		logging.LogWithFields("CMD-N76SC", "file", file).OnError(err).Warn("unable to read config file")
+		logging.WithFields("file", file).OnError(err).Warn("unable to read config file")
 	}
 }

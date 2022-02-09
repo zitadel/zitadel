@@ -17,7 +17,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.21.0
 	github.com/boombuler/barcode v1.0.1
-	github.com/caos/logging v0.0.2
+	github.com/caos/logging v0.1.0
 	github.com/caos/oidc v1.0.1
 	github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
