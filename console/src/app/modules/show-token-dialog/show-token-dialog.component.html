@@ -6,12 +6,12 @@
   <ng-container *ngIf="tokenResponse">
     <div class="row">
       <p class="left">{{'USER.PERSONALACCESSTOKEN.ID' | translate}}</p>
-      <p class="right">{{$any(tokenResponse)?.tokenId}}</p>
+      <p class="right">{{tokenResponse.tokenId}}</p>
     </div>
 
     <div class="row">
       <p class="left">{{'USER.PERSONALACCESSTOKEN.TOKEN' | translate}}</p>
-      <p class="right">{{$any(tokenResponse)?.token}}</p>
+      <p class="right">{{tokenResponse.token}}</p>
     </div>
   </ng-container>
 </div>

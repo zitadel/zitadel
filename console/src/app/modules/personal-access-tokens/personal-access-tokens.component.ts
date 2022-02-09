@@ -6,7 +6,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
+import { Key } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 import { ListPersonalAccessTokensResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PersonalAccessToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -102,8 +102,6 @@ export class PersonalAccessTokensComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
-        const type: KeyType = resp.type;
-
         let date: Timestamp | undefined;
 
         if (resp.date as Moment) {
@@ -116,27 +114,25 @@ export class PersonalAccessTokensComponent implements OnInit {
           date = ts;
         }
 
-        if (type) {
-          this.mgmtService
-            .addPersonalAccessToken(this.userId, date)
-            .then((response) => {
-              if (response) {
-                setTimeout(() => {
-                  this.refreshPage();
-                }, 1000);
+        this.mgmtService
+          .addPersonalAccessToken(this.userId, date)
+          .then((response) => {
+            if (response) {
+              setTimeout(() => {
+                this.refreshPage();
+              }, 1000);
 
-                this.dialog.open(ShowTokenDialogComponent, {
-                  data: {
-                    key: response,
-                  },
-                  width: '400px',
-                });
-              }
-            })
-            .catch((error: any) => {
-              this.toast.showError(error);
-            });
-        }
+              this.dialog.open(ShowTokenDialogComponent, {
+                data: {
+                  token: response,
+                },
+                width: '400px',
+              });
+            }
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
       }
     });
   }
