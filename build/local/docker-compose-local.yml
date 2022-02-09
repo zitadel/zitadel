@@ -194,6 +194,7 @@ services:
 
   e2e-setup:
     profiles: ['backend']
+    user: ${UID}:${GID}
     restart: on-failure
     build:
       context: ../..
@@ -236,7 +237,7 @@ services:
         UID: $UID
         GID: $GID
     volumes:
-      - ../../console/:/dest
+      - ../../:/dest
 
 # starts console in development mode
   frontend-run:
