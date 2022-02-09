@@ -9,9 +9,17 @@
       <p class="right">{{tokenResponse.tokenId}}</p>
     </div>
 
-    <div class="row">
+    <div class="row" *ngIf="tokenResponse.token">
       <p class="left">{{'USER.PERSONALACCESSTOKEN.TOKEN' | translate}}</p>
-      <p class="right">{{tokenResponse.token}}</p>
+      <div class="right">
+        <button class="ctc" [disabled]="copied === tokenResponse.token"
+          [matTooltip]="(copied !== tokenResponse.token ? 'ACTIONS.COPY' : 'ACTIONS.COPIED' ) | translate"
+          cnslCopyToClipboard [valueToCopy]="tokenResponse.token" (copiedValue)="copied = $event" mat-icon-button>
+          <i *ngIf="copied !== tokenResponse.token" class="las la-clipboard"></i>
+          <i *ngIf="copied === tokenResponse.token" class="las la-clipboard-check"></i>
+        </button>
+        <span>{{tokenResponse.token}}</span>
+      </div>
     </div>
   </ng-container>
 </div>

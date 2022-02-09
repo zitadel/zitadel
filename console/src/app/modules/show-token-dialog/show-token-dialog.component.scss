@@ -25,7 +25,6 @@
   .left,
   .right {
     font-size: 14px;
-    flex: 1 0 auto;
   }
 
   .left {
@@ -39,5 +38,11 @@
     margin-top: 0;
     margin-bottom: 1rem;
     overflow: auto;
+    display: flex;
+    align-items: center;
+
+    .ctc {
+      margin-right: 1rem;
+    }
   }
 }

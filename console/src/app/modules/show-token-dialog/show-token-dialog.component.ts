@@ -11,6 +11,7 @@ import { InfoSectionType } from '../info-section/info-section.component';
 })
 export class ShowTokenDialogComponent {
   public tokenResponse!: AddPersonalAccessTokenResponse.AsObject;
+  public copied: string = '';
   InfoSectionType: any = InfoSectionType;
 
   constructor(public dialogRef: MatDialogRef<ShowTokenDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {

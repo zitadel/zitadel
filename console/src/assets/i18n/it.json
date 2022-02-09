@@ -538,7 +538,7 @@
     },
     "PERSONALACCESSTOKEN": {
       "ID": "ID",
-      "TOKENID": "Token",
+      "TOKEN": "Token",
       "ADD": {
         "TITLE": "Genera un nuovo token",
         "DESCRIPTION": "Definisci la data di scadenza del token",
