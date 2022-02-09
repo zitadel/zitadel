@@ -67,6 +67,7 @@ services:
   keys:
     profiles: ['backend', 'backend-stub']
     restart: on-failure
+    user: $UID:$GID
     networks:
       - zitadel
     build:
@@ -181,6 +182,7 @@ services:
 
   go-copy:
     profiles: ['backend']
+    user: $UID:$GID
     restart: on-failure
     build:
       context: ../..
@@ -189,12 +191,26 @@ services:
     volumes:
       - ../../:/dest
 
+  e2e-setup:
+    profiles: ['backend']
+    user: $UID:$GID
+    restart: on-failure
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.e2esetup
+    depends_on:
+      backend-run:
+        condition: service_healthy
+      go-copy:
+        condition: service_completed_successfully
+
 # this service generates the environemnt.json
 # needed in console.
 # It curl's the client id of console and writes it to 
 # the environment.json
   client-id:
     profiles: ['frontend', 'console-stub' ]
+    user: $UID:$GID
     depends_on:
       backend-run:
         condition: service_healthy
@@ -212,6 +228,7 @@ services:
 
   npm-copy:
     profiles: ['frontend']
+    user: $UID:$GID
     restart: on-failure
     build:
       context: ../..
@@ -247,15 +264,20 @@ services:
       timeout: 30s
       retries: 5
       start_period: 20s
- 
+
+  await-setup:
+    profiles: [ "backend" ]
+    depends_on:
+      e2e-setup:
+        condition: service_completed_successfully
+    image: alpine:latest
+
   await-frontend:
     profiles: [ "frontend" ]
     depends_on:
       frontend-run:
         condition: service_healthy
     image: alpine:latest
-
-
 
 networks:
   zitadel: {}
