@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/caos/zitadel/v2/cmd"
+	"github.com/caos/zitadel/cmd"
 	"github.com/spf13/cobra"
 )
 

@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/v2/cmd/admin"
+	"github.com/caos/zitadel/cmd/admin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -19,7 +19,7 @@ var (
 )
 
 func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
-	rootCMD := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "zitadel",
 		Short: "The ZITADEL CLI let's you interact with ZITADEL",
 		Long:  `The ZITADEL CLI let's you interact with ZITADEL`,
@@ -34,11 +34,11 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	logging.Log("CMD-5NgGF").OnError(err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
-	rootCMD.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
+	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
 
-	rootCMD.AddCommand(admin.New())
+	cmd.AddCommand(admin.New())
 
-	return rootCMD
+	return cmd
 }
 
 func initConfig() {

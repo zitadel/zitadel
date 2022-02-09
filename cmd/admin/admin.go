@@ -4,9 +4,9 @@ import (
 	_ "embed"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/v2/cmd/admin/initialise"
-	"github.com/caos/zitadel/v2/cmd/admin/setup"
-	"github.com/caos/zitadel/v2/cmd/admin/start"
+	"github.com/caos/zitadel/cmd/admin/initialise"
+	"github.com/caos/zitadel/cmd/admin/setup"
+	"github.com/caos/zitadel/cmd/admin/start"
 	"github.com/spf13/cobra"
 )
 
