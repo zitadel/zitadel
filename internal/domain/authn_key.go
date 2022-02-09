@@ -1,27 +1,16 @@
 package domain
 
 import (
-	"time"
-
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 )
 
-var (
-	//most of us won't survive until 12-31-9999 23:59:59, maybe ZITADEL does
-	defaultExpDate = time.Date(9999, time.December, 31, 23, 59, 59, 0, time.UTC)
-)
-
-type AuthNKey interface {
-}
-
 type authNKey interface {
 	setPublicKey([]byte)
 	setPrivateKey([]byte)
-	expirationDate() time.Time
-	setExpirationDate(time.Time)
+	expiration
 }
 
 type AuthNKeyType int32
@@ -47,16 +36,6 @@ func (key *MachineKey) GenerateNewMachineKeyPair(keySize int) error {
 		return err
 	}
 	key.PrivateKey = crypto.PrivateKeyToBytes(privateKey)
-	return nil
-}
-
-func EnsureValidExpirationDate(key authNKey) error {
-	if key.expirationDate().IsZero() {
-		key.setExpirationDate(defaultExpDate)
-	}
-	if key.expirationDate().Before(time.Now()) {
-		return errors.ThrowInvalidArgument(nil, "AUTHN-dv3t5", "Errors.AuthNKey.ExpireBeforeNow")
-	}
 	return nil
 }
 
