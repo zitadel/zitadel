@@ -5,11 +5,7 @@
 
 .desc {
   color: rgb(201, 51, 71);
-  font-size: .9rem;
-}
-
-.form-field {
-  width: 100%;
+  font-size: 0.9rem;
 }
 
 .action {
@@ -17,7 +13,7 @@
   justify-content: flex-end;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
@@ -36,7 +32,7 @@
     color: var(--grey);
     margin-right: 1rem;
     margin-top: 0;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
   }
 
   .right {
@@ -44,8 +40,4 @@
     margin-bottom: 1rem;
     overflow: auto;
   }
-}
-
-.download-button {
-  margin-bottom: 1rem;
 }

@@ -6,15 +6,16 @@ import { TranslateService } from '@ngx-translate/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { Moment } from 'moment';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AddKeyDialogComponent } from 'src/app/modules/add-key-dialog/add-key-dialog.component';
 import { Key, KeyType } from 'src/app/proto/generated/zitadel/auth_n_key_pb';
 import { ListPersonalAccessTokensResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { PersonalAccessToken } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
+import { AddTokenDialogComponent } from '../add-token-dialog/add-token-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ShowTokenDialogComponent } from '../show-token-dialog/show-token-dialog.component';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
   selector: 'cnsl-personal-access-tokens',
@@ -68,20 +69,33 @@ export class PersonalAccessTokensComponent implements OnInit {
   }
 
   public deleteKey(key: Key.AsObject): void {
-    this.mgmtService
-      .removePersonalAccessToken(key.id, this.userId)
-      .then(() => {
-        this.selection.clear();
-        this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
-        this.getData(10, 0);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'USER.PERSONALACCESSTOKEN.DELETE.TITLE',
+        descriptionKey: 'USER.PERSONALACCESSTOKEN.DELETE.DESCRIPTION',
+      },
+      width: '400px',
+    });
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.mgmtService
+          .removePersonalAccessToken(key.id, this.userId)
+          .then(() => {
+            this.selection.clear();
+            this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
+            this.getData(10, 0);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 
   public openAddKey(): void {
-    const dialogRef = this.dialog.open(AddKeyDialogComponent, {
+    const dialogRef = this.dialog.open(AddTokenDialogComponent, {
       data: {},
       width: '400px',
     });

@@ -20,7 +20,8 @@ import { CardModule } from '../card/card.module';
 import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
-import { ShowKeyDialogModule } from '../show-key-dialog/show-key-dialog.module';
+import { ShowTokenDialogModule } from '../show-token-dialog/show-token-dialog.module';
+import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { PersonalAccessTokensComponent } from './personal-access-tokens.component';
 
 @NgModule({
@@ -45,7 +46,8 @@ import { PersonalAccessTokensComponent } from './personal-access-tokens.componen
     TranslateModule,
     RefreshTableModule,
     InputModule,
-    ShowKeyDialogModule,
+    ShowTokenDialogModule,
+    WarnDialogModule,
     AddTokenDialogModule,
   ],
   exports: [PersonalAccessTokensComponent],

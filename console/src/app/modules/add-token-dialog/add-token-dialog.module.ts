@@ -10,6 +10,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 
+import { InfoSectionModule } from '../info-section/info-section.module';
 import { AddTokenDialogComponent } from './add-token-dialog.component';
 
 @NgModule({
@@ -18,6 +19,7 @@ import { AddTokenDialogComponent } from './add-token-dialog.component';
     CommonModule,
     TranslateModule,
     MatButtonModule,
+    InfoSectionModule,
     InputModule,
     MatSelectModule,
     MatIconModule,

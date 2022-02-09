@@ -1,6 +1,8 @@
 <span class="title" mat-dialog-title>{{'USER.PERSONALACCESSTOKEN.ADDED.TITLE' | translate}}</span>
 <div mat-dialog-content>
-  <p class="desc"> {{'USER.PERSONALACCESSTOKEN.ADDED.DESCRIPTION' | translate}}</p>
+  <cnsl-info-section [type]="InfoSectionType.WARN"> {{'USER.PERSONALACCESSTOKEN.ADDED.DESCRIPTION' | translate}}
+  </cnsl-info-section>
+
   <ng-container *ngIf="tokenResponse">
     <div class="row">
       <p class="left">{{'USER.PERSONALACCESSTOKEN.ID' | translate}}</p>

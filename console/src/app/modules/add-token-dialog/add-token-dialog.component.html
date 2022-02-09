@@ -1,14 +1,14 @@
-<span class="title" mat-dialog-title>{{'USER.MACHINE.ADD.TITLE' | translate}}</span>
+<span class="title" mat-dialog-title>{{'USER.PERSONALACCESSTOKEN.ADD.TITLE' | translate}}</span>
 <div mat-dialog-content>
-  <p class="desc"> {{'USER.MACHINE.ADD.DESCRIPTION' | translate}}</p>
+  <cnsl-info-section class="desc"> {{'USER.PERSONALACCESSTOKEN.ADD.DESCRIPTION' | translate}}</cnsl-info-section>
 
   <cnsl-form-field class="form-field" appearance="outline">
-    <cnsl-label>{{'USER.MACHINE.CHOOSEEXPIRY' | translate}} (optional)</cnsl-label>
+    <cnsl-label>{{'USER.PERSONALACCESSTOKEN.ADD.CHOOSEEXPIRY' | translate}} (optional)</cnsl-label>
     <input cnslInput [matDatepicker]="picker" [min]="startDate" [formControl]="dateControl">
     <mat-datepicker-toggle style="top: 0;" cnslSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker startView="year" [startAt]="startDate"></mat-datepicker>
     <span cnsl-error *ngIf="dateControl?.errors?.matDatepickerMin?.min">
-      {{'USER.MACHINE.CHOOSEDATEAFTER' | translate}}:
+      {{'USER.PERSONALACCESSTOKEN.ADD.CHOOSEDATEAFTER' | translate}}:
       {{dateControl?.errors?.matDatepickerMin.min.toDate() | localizedDate: 'EEE dd. MMM'}}
     </span>
   </cnsl-form-field>

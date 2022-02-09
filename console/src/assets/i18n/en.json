@@ -535,6 +535,24 @@
         "PROJECT": "Project",
         "GRANTEDPROJECT": "Granted Project"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKENID": "Token",
+      "ADD": {
+        "TITLE": "Generate new Personal Access Token",
+        "DESCRIPTION": "Define a custom expiration for the token.",
+        "CHOOSEEXPIRY": "Select an expiration date",
+        "CHOOSEDATEAFTER": "Enter a valid expiration after"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Make sure to copy your personal access token. You won't be able to see it again!"
+      },
+      "DELETE": {
+        "TITLE": "Delete Token",
+        "DESCRIPTION": "You are about to delete the personal access token. Are you sure?"
+      }
     }
   },
   "FLOWS": {
