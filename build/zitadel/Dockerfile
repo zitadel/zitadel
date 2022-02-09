@@ -136,7 +136,10 @@ RUN apk add rsync
 
 COPY --from=go-copy / /src
 
-CMD [ "rsync", "-a", "/src/", "/dest" ]
+ENV UID=1000
+ENV GID=1000
+
+CMD [ "rsync", "-a", "--chown", "$UID:$GID", "/src/", "/dest" ]
 
 #######################
 ## Go test

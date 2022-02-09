@@ -67,7 +67,6 @@ services:
   keys:
     profiles: ['backend', 'backend-stub']
     restart: on-failure
-    user: $UID:$GID
     networks:
       - zitadel
     build:
@@ -182,7 +181,6 @@ services:
 
   go-copy:
     profiles: ['backend']
-    user: $UID:$GID
     restart: on-failure
     build:
       context: ../..
@@ -190,10 +188,12 @@ services:
       target: merge-go-copy
     volumes:
       - ../../:/dest
+    environment:
+      UID: ${UID}
+      GID: $GID
 
   e2e-setup:
     profiles: ['backend']
-    user: $UID:$GID
     restart: on-failure
     build:
       context: ../..
@@ -210,7 +210,6 @@ services:
 # the environment.json
   client-id:
     profiles: ['frontend', 'console-stub' ]
-    user: $UID:$GID
     depends_on:
       backend-run:
         condition: service_healthy
@@ -228,7 +227,6 @@ services:
 
   npm-copy:
     profiles: ['frontend']
-    user: $UID:$GID
     restart: on-failure
     build:
       context: ../..
@@ -236,6 +234,9 @@ services:
       target: merge-npm-copy
     volumes:
       - ../../console/:/dest
+    environment:
+      UID: ${UID}
+      GID: $GID
 
 # starts console in development mode
   frontend-run:
