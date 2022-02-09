@@ -1,0 +1,4 @@
+Log:
+  Level: debug
+  Formatter:
+    Format: text
