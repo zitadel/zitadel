@@ -75,10 +75,13 @@ RUN apk add rsync
 
 COPY --from=npm-copy / /src
 
-ENV UID=1000
-ENV GID=1000
+ARG UID=1000
+ARG GID=1000
 
-CMD [ "rsync", "-a", "--chown", "$UID:$GID", "/src/", "/dest" ]
+# Create a group and user
+RUN addgroup -S tmpgroup -g $GID && adduser -S tmpuser -G tmpgroup -u $UID
+
+CMD [ "rsync", "-a", "--chown", "tmpuser:tmpgroup", "/src/", "/dest" ]
 
 #######################
 ## angular dev build

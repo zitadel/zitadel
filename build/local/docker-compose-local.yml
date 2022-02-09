@@ -186,11 +186,11 @@ services:
       context: ../..
       dockerfile: build/zitadel/Dockerfile
       target: merge-go-copy
+      args:
+        UID: $UID
+        GID: $GID
     volumes:
       - ../../:/dest
-    environment:
-      UID: ${UID}
-      GID: $GID
 
   e2e-setup:
     profiles: ['backend']
@@ -232,11 +232,11 @@ services:
       context: ../..
       dockerfile: build/console/Dockerfile
       target: merge-npm-copy
+      args:
+        UID: $UID
+        GID: $GID
     volumes:
       - ../../console/:/dest
-    environment:
-      UID: ${UID}
-      GID: $GID
 
 # starts console in development mode
   frontend-run:
