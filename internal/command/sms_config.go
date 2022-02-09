@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
@@ -19,14 +20,22 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *twilio.Twilio
 		return "", nil, err
 	}
 
+	var token *crypto.CryptoValue
+	if config.Token != "" {
+		token, err = crypto.Encrypt([]byte(config.Token), c.smsCrypto)
+		if err != nil {
+			return "", nil, err
+		}
+	}
+
 	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTwilioAddedEvent(
 		ctx,
 		iamAgg,
 		id,
 		config.SID,
-		config.Token,
-		config.From))
+		config.From,
+		token))
 	if err != nil {
 		return "", nil, err
 	}
@@ -55,7 +64,6 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, id string, config 
 		iamAgg,
 		id,
 		config.SID,
-		config.Token,
 		config.From)
 	if err != nil {
 		return nil, err
@@ -64,6 +72,34 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, id string, config 
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-jf9wk", "Errors.NoChangesFound")
 	}
 	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(smsConfigWriteModel, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&smsConfigWriteModel.WriteModel), nil
+}
+
+func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, id, token string) (*domain.ObjectDetails, error) {
+	smsConfigWriteModel, err := c.getSMSConfig(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	newtoken, err := crypto.Encrypt([]byte(token), c.smsCrypto)
+	if err != nil {
+		return nil, err
+	}
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTokenChangedEvent(
+		ctx,
+		iamAgg,
+		id,
+		newtoken))
 	if err != nil {
 		return nil, err
 	}

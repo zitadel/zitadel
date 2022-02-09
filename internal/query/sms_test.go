@@ -28,7 +28,7 @@ var (
 		` zitadel.projections.sms_configs_twilio.from` +
 		` FROM zitadel.projections.sms_configs` +
 		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
-	expectedSMSConfigssQuery = regexp.QuoteMeta(`SELECT zitadel.projections.sms_configs.id,` +
+	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.sms_configs.id,` +
 		` zitadel.projections.sms_configs.aggregate_id,` +
 		` zitadel.projections.sms_configs.creation_date,` +
 		` zitadel.projections.sms_configs.change_date,` +
@@ -78,7 +78,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			prepare: prepareSMSConfigsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					expectedAppsQuery,
+					expectedSMSConfigsQuery,
 					nil,
 					nil,
 				),
@@ -90,7 +90,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			prepare: prepareSMSConfigsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					expectedAppsQuery,
+					expectedSMSConfigsQuery,
 					smsConfigCols,
 					[][]driver.Value{
 						{
@@ -132,7 +132,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			prepare: prepareSMSConfigsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					expectedAppsQuery,
+					expectedSMSConfigsQuery,
 					appsCols,
 					[][]driver.Value{
 						{

@@ -32,6 +32,66 @@ Returns the default languages
     GET: /languages
 
 
+### ListSMSProviderConfigs
+
+> **rpc** ListSMSProviderConfigs([ListSMSProviderConfigsRequest](#listsmsproviderconfigsrequest))
+[ListSMSProviderConfigsResponse](#listsmsproviderconfigsresponse)
+
+Set the default language
+
+
+
+    POST: /sms/_search
+
+
+### GetSMSProviderConfig
+
+> **rpc** GetSMSProviderConfig([GetSMSProviderConfigRequest](#getsmsproviderconfigrequest))
+[GetSMSProviderConfigResponse](#getsmsproviderconfigresponse)
+
+Set the default language
+
+
+
+    GET: /sms/{id}
+
+
+### AddSMSProviderConfigTwilio
+
+> **rpc** AddSMSProviderConfigTwilio([AddSMSProviderConfigTwilioRequest](#addsmsproviderconfigtwiliorequest))
+[AddSMSProviderConfigTwilioResponse](#addsmsproviderconfigtwilioresponse)
+
+Update secret generator configuration
+
+
+
+    POST: /sms/twilio
+
+
+### UpdateSMSProviderConfigTwilio
+
+> **rpc** UpdateSMSProviderConfigTwilio([UpdateSMSProviderConfigTwilioRequest](#updatesmsproviderconfigtwiliorequest))
+[UpdateSMSProviderConfigTwilioResponse](#updatesmsproviderconfigtwilioresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /sms/twilio/{id}
+
+
+### UpdateSMSProviderConfigTwilioToken
+
+> **rpc** UpdateSMSProviderConfigTwilioToken([UpdateSMSProviderConfigTwilioTokenRequest](#updatesmsproviderconfigtwiliotokenrequest))
+[UpdateSMSProviderConfigTwilioTokenResponse](#updatesmsproviderconfigtwiliotokenresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /sms/twilio/{id}/token
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1272,6 +1332,31 @@ This is an empty request
 
 
 
+### AddSMSProviderConfigTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddSMSProviderConfigTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -1899,6 +1984,28 @@ This is an empty request
 
 
 
+### GetSMSProviderConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProviderConfig | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -2129,6 +2236,29 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSMSProviderConfigsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProviderConfigsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProviderConfig | - |  |
 
 
 
@@ -3154,6 +3284,53 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioTokenResponse
 
 
 

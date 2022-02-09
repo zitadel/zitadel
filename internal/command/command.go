@@ -33,6 +33,7 @@ type Commands struct {
 	zitadelRoles []authz.RoleMapping
 
 	idpConfigSecretCrypto crypto.EncryptionAlgorithm
+	smsCrypto             crypto.EncryptionAlgorithm
 
 	userPasswordAlg             crypto.HashAlgorithm
 	initializeUserCode          crypto.Generator
@@ -71,6 +72,7 @@ func StartCommands(
 	authZConfig authz.Config,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
+	smsHashAlg crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
@@ -81,6 +83,7 @@ func StartCommands(
 		keySize:            defaults.KeyConfig.Size,
 		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
 		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
+		smsCrypto:          smsHashAlg,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)

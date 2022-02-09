@@ -20,6 +20,7 @@ type SystemDefaults struct {
 	SecretGenerators         SecretGenerators
 	UserVerificationKey      *crypto.KeyConfig
 	IDPConfigVerificationKey *crypto.KeyConfig
+	SMSVerificationKey       *crypto.KeyConfig
 	Multifactors             MultifactorConfig
 	VerificationLifetimes    VerificationLifetimes
 	DomainVerification       DomainVerification

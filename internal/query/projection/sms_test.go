@@ -36,7 +36,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
-						"token": "token",
+						"token": {
+							"cryptoType": 0,
+							"algorithm": "RSA-265",
+							"keyId": "key-id"
+						},
 						"from": "from"
 					}`),
 				), iam.SMSConfigTwilioAddedEventMapper),
@@ -66,7 +70,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"id",
 								"sid",
-								"token",
+								anyArg{},
 								"from",
 							},
 						},
@@ -83,7 +87,6 @@ func TestSMSProjection_reduces(t *testing.T) {
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
-						"token": "token",
 						"from": "from"
 					}`),
 				), iam.SMSConfigTwilioChangedEventMapper),
@@ -97,10 +100,9 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs_twilio SET (sid, token, from) = ($1, $2, $3) WHERE (sms_id = $4)",
+							expectedStmt: "UPDATE zitadel.projections.sms_configs_twilio SET (sid, from) = ($1, $2) WHERE (sms_id = $3)",
 							expectedArgs: []interface{}{
 								&sid,
-								&token,
 								&from,
 								"id",
 							},

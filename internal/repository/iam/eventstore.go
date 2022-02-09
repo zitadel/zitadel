@@ -12,6 +12,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(UniqueConstraintsMigratedEventType, MigrateUniqueConstraintEventMapper).
 		RegisterFilterEventMapper(SMSConfigTwilioAddedEventType, SMSConfigTwilioAddedEventMapper).
 		RegisterFilterEventMapper(SMSConfigTwilioChangedEventType, SMSConfigTwilioChangedEventMapper).
+		RegisterFilterEventMapper(SMSConfigTwilioTokenChangedEventType, SMSConfigTwilioTokenChangedEventMapper).
 		RegisterFilterEventMapper(SMSConfigActivatedEventType, SMSConfigActivatedEventMapper).
 		RegisterFilterEventMapper(SMSConfigDeactivatedEventType, SMSConfigDeactivatedEventMapper).
 		RegisterFilterEventMapper(SMSConfigRemovedEventType, SMSConfigRemovedEventMapper).

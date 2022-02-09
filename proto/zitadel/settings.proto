@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+
+package zitadel.settings.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/settings";
+
+message SMSProviderConfig {
+	zitadel.v1.ObjectDetails details = 1;
+	string id = 2;
+	SMSProviderConfigState state = 3;
+
+	oneof config {
+		TwilioConfig twilio = 4;
+	}
+}
+
+message TwilioConfig {
+	string sid = 1;
+	string from = 2;
+}
+
+
+enum SMSProviderConfigState {
+	SMS_PROVIDER_CONFIG_STATE_UNSPECIFIED = 0;
+	SMS_PROVIDER_CONFIG_ACTIVE = 1;
+	SMS_PROVIDER_CONFIG_INACTIVE = 2;
+}

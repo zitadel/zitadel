@@ -6,6 +6,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
@@ -160,6 +161,66 @@ service AdminService {
             permission: "iam.read";
         };
     }
+
+    // Set the default language
+    rpc ListSMSProviderConfigs(ListSMSProviderConfigsRequest) returns (ListSMSProviderConfigsResponse) {
+        option (google.api.http) = {
+            post: "/sms/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Set the default language
+    rpc GetSMSProviderConfig(GetSMSProviderConfigRequest) returns (GetSMSProviderConfigResponse) {
+        option (google.api.http) = {
+            get: "/sms/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Update secret generator configuration
+    rpc AddSMSProviderConfigTwilio(AddSMSProviderConfigTwilioRequest) returns (AddSMSProviderConfigTwilioResponse) {
+        option (google.api.http) = {
+            post: "/sms/twilio";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update secret generator configuration
+    rpc UpdateSMSProviderConfigTwilio(UpdateSMSProviderConfigTwilioRequest) returns (UpdateSMSProviderConfigTwilioResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update secret generator configuration
+    rpc UpdateSMSProviderConfigTwilioToken(UpdateSMSProviderConfigTwilioTokenRequest) returns (UpdateSMSProviderConfigTwilioTokenResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}/token";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
 
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
@@ -2188,6 +2249,54 @@ message GetSupportedLanguagesRequest {}
 
 message GetSupportedLanguagesResponse {
     repeated string languages = 1;
+}
+
+message ListSMSProviderConfigsRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListSMSProviderConfigsResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.SMSProviderConfig result = 3;
+}
+
+message GetSMSProviderConfigRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetSMSProviderConfigResponse {
+    zitadel.settings.v1.SMSProviderConfig config = 1;
+}
+
+message AddSMSProviderConfigTwilioRequest {
+    string sid = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string from = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddSMSProviderConfigTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSMSProviderConfigTwilioRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sid = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string from = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderConfigTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMSProviderConfigTwilioTokenRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderConfigTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 // if name or domain is already in use, org is not unique

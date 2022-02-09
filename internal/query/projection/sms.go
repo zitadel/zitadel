@@ -117,9 +117,6 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 	if e.SID != nil {
 		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSID, e.SID))
 	}
-	if e.Token != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnToken, e.Token))
-	}
 	if e.From != nil {
 		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnFrom, e.From))
 	}

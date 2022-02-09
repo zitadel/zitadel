@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/iam"
@@ -18,7 +19,7 @@ type IAMSMSConfigWriteModel struct {
 
 type TwilioConfig struct {
 	SID   string
-	Token string
+	Token *crypto.CryptoValue
 	From  string
 }
 
@@ -52,12 +53,14 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			if e.SID != nil {
 				wm.Twilio.SID = *e.SID
 			}
-			if e.Token != nil {
-				wm.Twilio.Token = *e.Token
-			}
 			if e.From != nil {
 				wm.Twilio.From = *e.From
 			}
+		case *iam.SMSConfigTwilioTokenChangedEvent:
+			if wm.ID != e.ID {
+				continue
+			}
+			wm.Twilio.Token = e.Token
 		case *iam.SMSConfigActivatedEvent:
 			if wm.ID != e.ID {
 				continue
@@ -87,21 +90,19 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.SMSConfigTwilioAddedEventType,
 			iam.SMSConfigTwilioChangedEventType,
-			iam.SMSConfigTwilioActivatedEventType,
-			iam.SMSConfigTwilioDeactivatedEventType,
-			iam.SMSConfigTwilioRemovedEventType).
+			iam.SMSConfigTwilioTokenChangedEventType,
+			iam.SMSConfigActivatedEventType,
+			iam.SMSConfigDeactivatedEventType,
+			iam.SMSConfigRemovedEventType).
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, token, from string) (*iam.SMSConfigTwilioChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, from string) (*iam.SMSConfigTwilioChangedEvent, bool, error) {
 	changes := make([]iam.SMSConfigTwilioChanges, 0)
 	var err error
 
 	if wm.Twilio.SID != sid {
 		changes = append(changes, iam.ChangeSMSConfigTwilioSID(sid))
-	}
-	if wm.Twilio.Token != token {
-		changes = append(changes, iam.ChangeSMSConfigTwilioToken(token))
 	}
 	if wm.Twilio.From != from {
 		changes = append(changes, iam.ChangeSMSConfigTwilioFrom(from))

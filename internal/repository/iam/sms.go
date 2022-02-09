@@ -4,28 +4,30 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 const (
-	smsConfigPrefix                 = "sms.config"
-	smsConfigTwilioPrefix           = "twilio."
-	SMSConfigTwilioAddedEventType   = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "added"
-	SMSConfigTwilioChangedEventType = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "changed"
-	SMSConfigActivatedEventType     = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "activated"
-	SMSConfigDeactivatedEventType   = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "deactivated"
-	SMSConfigRemovedEventType       = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "removed"
+	smsConfigPrefix                      = "sms.config"
+	smsConfigTwilioPrefix                = "twilio."
+	SMSConfigTwilioAddedEventType        = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "added"
+	SMSConfigTwilioChangedEventType      = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "changed"
+	SMSConfigTwilioTokenChangedEventType = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "token.changed"
+	SMSConfigActivatedEventType          = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "activated"
+	SMSConfigDeactivatedEventType        = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "deactivated"
+	SMSConfigRemovedEventType            = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "removed"
 )
 
 type SMSConfigTwilioAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID    string `json:"id,omitempty"`
-	SID   string `json:"sid,omitempty"`
-	Token string `json:"token,omitempty"`
-	From  string `json:"from,omitempty"`
+	ID    string              `json:"id,omitempty"`
+	SID   string              `json:"sid,omitempty"`
+	Token *crypto.CryptoValue `json:"token,omitempty"`
+	From  string              `json:"from,omitempty"`
 }
 
 func NewSMSConfigTwilioAddedEvent(
@@ -33,8 +35,8 @@ func NewSMSConfigTwilioAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	sid,
-	token,
 	from string,
+	token *crypto.CryptoValue,
 ) *SMSConfigTwilioAddedEvent {
 	return &SMSConfigTwilioAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -72,10 +74,9 @@ func SMSConfigTwilioAddedEventMapper(event *repository.Event) (eventstore.Event,
 type SMSConfigTwilioChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID    string  `json:"id,omitempty"`
-	SID   *string `json:"sid,omitempty"`
-	Token *string `json:"token,omitempty"`
-	From  *string `json:"from,omitempty"`
+	ID   string  `json:"id,omitempty"`
+	SID  *string `json:"sid,omitempty"`
+	From *string `json:"from,omitempty"`
 }
 
 func NewSMSConfigTwilioChangedEvent(
@@ -109,12 +110,6 @@ func ChangeSMSConfigTwilioSID(sid string) func(event *SMSConfigTwilioChangedEven
 	}
 }
 
-func ChangeSMSConfigTwilioToken(token string) func(event *SMSConfigTwilioChangedEvent) {
-	return func(e *SMSConfigTwilioChangedEvent) {
-		e.Token = &token
-	}
-}
-
 func ChangeSMSConfigTwilioFrom(from string) func(event *SMSConfigTwilioChangedEvent) {
 	return func(e *SMSConfigTwilioChangedEvent) {
 		e.From = &from
@@ -139,6 +134,50 @@ func SMSConfigTwilioChangedEventMapper(event *repository.Event) (eventstore.Even
 	}
 
 	return smsConfigChanged, nil
+}
+
+type SMSConfigTwilioTokenChangedEvent struct {
+	eventstore.BaseEvent `json:"-"`
+
+	ID    string              `json:"id,omitempty"`
+	Token *crypto.CryptoValue `json:"password,omitempty"`
+}
+
+func NewSMSConfigTokenChangedEvent(
+	ctx context.Context,
+	aggregate *eventstore.Aggregate,
+	id string,
+	token *crypto.CryptoValue,
+) *SMSConfigTwilioTokenChangedEvent {
+	return &SMSConfigTwilioTokenChangedEvent{
+		BaseEvent: *eventstore.NewBaseEventForPush(
+			ctx,
+			aggregate,
+			SMSConfigTwilioTokenChangedEventType,
+		),
+		ID:    id,
+		Token: token,
+	}
+}
+
+func (e *SMSConfigTwilioTokenChangedEvent) Data() interface{} {
+	return e
+}
+
+func (e *SMSConfigTwilioTokenChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+	return nil
+}
+
+func SMSConfigTwilioTokenChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	smtpConfigTokenChagned := &SMSConfigTwilioTokenChangedEvent{
+		BaseEvent: *eventstore.BaseEventFromRepo(event),
+	}
+	err := json.Unmarshal(event.Data, smtpConfigTokenChagned)
+	if err != nil {
+		return nil, errors.ThrowInternal(err, "IAM-fi9Wf", "unable to unmarshal sms config token changed")
+	}
+
+	return smtpConfigTokenChagned, nil
 }
 
 type SMSConfigActivatedEvent struct {
