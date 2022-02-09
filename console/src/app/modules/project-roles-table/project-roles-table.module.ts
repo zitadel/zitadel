@@ -20,6 +20,7 @@ import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/local
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
 import { ActionKeysModule } from '../action-keys/action-keys.module';
+import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
 import { ProjectRolesTableComponent } from './project-roles-table.component';
 
 @NgModule({
@@ -27,6 +28,7 @@ import { ProjectRolesTableComponent } from './project-roles-table.component';
   imports: [
     CommonModule,
     MatButtonModule,
+    ProjectRoleChipModule,
     HasRoleModule,
     MatTableModule,
     PaginatorModule,

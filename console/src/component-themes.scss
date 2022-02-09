@@ -44,6 +44,7 @@
 @import 'src/app/modules/shortcuts/shortcuts.component.scss';
 @import 'src/app/modules/idp-create/idp-type-radio/idp-type-radio.component.scss';
 @import 'src/app/pages/actions/add-action-dialog/add-action-dialog.component';
+@import 'src/app/modules/project-role-chip/project-role-chip.component';
 @import 'src/app/pages/home/home.component.scss';
 @import 'src/app/modules/policies/login-policy/login-policy-idps/login-policy-idps.component.scss';
 @import 'src/app/modules/policies/login-policy/mfa-table/mfa-table.component.scss';
@@ -61,6 +62,7 @@
   @include idp-type-radio-theme($theme);
   @include info-overlay-theme($theme);
   @include app-auth-method-radio-theme($theme);
+  @include project-role-chips-theme($theme);
   @include card-theme($theme);
   @include footer-theme($theme);
   @include table-theme($theme);

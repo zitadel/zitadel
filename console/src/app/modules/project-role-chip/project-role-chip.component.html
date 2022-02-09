@@ -1,0 +1,4 @@
+<div class="project-role-chip" [style.background]="role.color.isLight ? (role.color.hex+'20') :(role.color.hex+'40')"
+  [style.color]="role.color.isLight ? role.color.darker : role.color.lighter" [style.borderColor]="role.color.hex+'30'">
+  <ng-content></ng-content>
+</div>

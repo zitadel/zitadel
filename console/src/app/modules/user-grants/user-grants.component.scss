@@ -34,6 +34,10 @@
   }
 }
 
+.no-break {
+  white-space: nowrap;
+}
+
 .user {
   text-decoration: none;
   color: inherit;
@@ -61,17 +65,7 @@ th {
   display: flex;
   flex-direction: row;
   max-width: 400px;
-
-  .role {
-    display: flex;
-    flex-direction: column;
-    margin: 0.25rem;
-    font-size: 14px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    justify-items: center;
-    align-self: center;
-  }
+  align-items: center;
 
   .fill-space {
     flex: 1;

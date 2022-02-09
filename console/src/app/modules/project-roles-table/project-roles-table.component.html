@@ -30,7 +30,12 @@
 
       <ng-container matColumnDef="key">
         <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.KEY' | translate }} </th>
-        <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role"> {{role.key}} </td>
+        <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
+          <div class="role-key">
+            <cnsl-project-role-chip [roleName]="role.key">{{ role.key }}
+            </cnsl-project-role-chip>
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="displayname">

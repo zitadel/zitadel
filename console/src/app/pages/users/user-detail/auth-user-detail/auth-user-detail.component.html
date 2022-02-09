@@ -106,7 +106,7 @@
           <cnsl-card *ngIf="user?.id" title="{{ 'GRANTS.USER.TITLE' | translate }}"
             description="{{'GRANTS.USER.DESCRIPTION' | translate }}">
             <cnsl-user-grants [userId]="user.id" [context]="USERGRANTCONTEXT"
-              [displayedColumns]="['select', 'projectId', 'dates', 'roleNamesList']"
+              [displayedColumns]="['select', 'projectId', 'creationDate','changeDate', 'roleNamesList']"
               [disableWrite]="((['user.grant.write$'] | hasRole) | async) === false"
               [disableDelete]="((['user.grant.delete$'] | hasRole) | async) === false">
             </cnsl-user-grants>
