@@ -21,6 +21,7 @@ export class AccountsCardComponent implements OnInit {
     this.userService
       .listMyUserSessions()
       .then((sessions) => {
+        console.log(sessions);
         this.sessions = sessions.resultList;
         const index = this.sessions.findIndex((user) => user.loginName === this.user.preferredLoginName);
         if (index > -1) {

@@ -66,22 +66,8 @@ th {
   flex-direction: row;
   max-width: 400px;
   align-items: center;
-
-  .fill-space {
-    flex: 1;
-  }
-
-  // button {
-  //   margin: 0.5rem 0;
-  //   display: block;
-  //   max-width: 120px;
-  //   box-sizing: border-box;
-
-  //   i {
-  //     font-size: 1.2rem;
-  //     margin-bottom: 5px;
-  //   }
-  // }
+  flex-wrap: wrap;
+  padding: 3px 0;
 }
 
 .row-form {
@@ -99,6 +85,10 @@ th {
 
 .role-data {
   min-width: 180px;
+}
+
+.user-grants-tr-actions {
+  width: 50px;
 }
 
 .date-block {

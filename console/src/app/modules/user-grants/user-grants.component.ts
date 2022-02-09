@@ -89,6 +89,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     'creationDate',
     'changeDate',
     'roleNamesList',
+    'actions',
   ];
 
   public ngOnInit(): void {

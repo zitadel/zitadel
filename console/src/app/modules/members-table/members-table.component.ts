@@ -10,9 +10,9 @@ import {
   ProjectGrantMembersDataSource,
 } from 'src/app/pages/projects/owned-projects/project-grant-detail/project-grant-members-datasource';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
+import { getMembershipColor } from 'src/app/utils/color';
 
 import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
-import { getColor } from '../avatar/avatar.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
 
@@ -66,7 +66,7 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   }
 
   public getColor(role: string) {
-    return getColor(role);
+    return getMembershipColor(role)[500];
   }
 
   public removeRole(member: Member.AsObject, role: string) {

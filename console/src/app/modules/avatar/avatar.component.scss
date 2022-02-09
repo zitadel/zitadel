@@ -18,7 +18,7 @@
     color: white;
     font-weight: bold;
     font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
-    box-shadow: 0 0 3px #0000001a;
+    // box-shadow: 0 0 3px #0000001a;
 
     img {
       width: 100%;
@@ -27,11 +27,13 @@
       object-fit: cover;
       object-position: center;
       box-sizing: border-box;
+      position: absolute;
+      left: 0;
+      top: 0;
     }
 
     .machine-icon {
       font-size: 1.2rem;
-      color: mat.get-color-from-palette($primary, default-contrast);
     }
   }
 }

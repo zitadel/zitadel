@@ -3,7 +3,7 @@
     <h1>{{ 'GRANTS.TITLE' | translate }}</h1>
     <p class="desc cnsl-secondary-text">{{'GRANTS.DESC' | translate }}</p>
     <cnsl-user-grants *ngIf="grantContext === UserGrantContext.NONE"
-      [displayedColumns]="['select', 'user', 'org', 'projectId','type', 'creationDate','changeDate', 'roleNamesList']"
+      [displayedColumns]="['select', 'user', 'org', 'projectId','type', 'creationDate','changeDate', 'roleNamesList', 'actions']"
       [disableWrite]="((['user.grant.write$'] | hasRole) | async) === false"
       [disableDelete]="((['user.grant.delete$'] | hasRole) | async) === false"
       [refreshOnPreviousRoutes]="['/grant-create']">

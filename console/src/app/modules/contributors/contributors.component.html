@@ -9,11 +9,11 @@
             [ngStyle]="{'z-index': 20 - i}">
             <cnsl-avatar *ngIf="member && member.displayName && member.firstName && member.lastName; else cog"
               class="contributor-avatar dontcloseonclick" [avatarUrl]="member.avatarUrl|| ''"
-              [forColor]="member.preferredLoginName"
-              [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)" [size]="32">
+              [name]="member.displayName ? member.displayName : (member.firstName + ' '+ member.lastName)"
+              [forColor]="member.preferredLoginName" [size]="32">
             </cnsl-avatar>
             <ng-template #cog>
-              <cnsl-avatar [isMachine]="true">
+              <cnsl-avatar [forColor]="member.preferredLoginName" [isMachine]="true">
                 <i class="las la-robot"></i>
               </cnsl-avatar>
             </ng-template>

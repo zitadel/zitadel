@@ -42,13 +42,12 @@
             [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + row?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + row?.id] : []) | hasRole | async))"
             color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
             [checked]="selection.isSelected(row)">
-            <cnsl-avatar
-              *ngIf="context !== UserGrantContext.USER && row && row?.displayName && row.firstName && row.lastName; else cog"
-              class="avatar" [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''"
-              [forColor]="row?.preferredLoginName" [size]="32">
+            <cnsl-avatar *ngIf="row && row?.displayName && row.firstName && row.lastName; else cog" class="avatar"
+              [name]="row.displayName" [avatarUrl]="row.avatarUrl || ''" [forColor]="row?.preferredLoginName"
+              [size]="32">
             </cnsl-avatar>
             <ng-template #cog>
-              <cnsl-avatar class="avatar" [isMachine]="true" [size]="32">
+              <cnsl-avatar class="avatar" [isMachine]="true" [forColor]="row.preferredLoginName" [size]="32">
               </cnsl-avatar>
             </ng-template>
           </mat-checkbox>
@@ -119,18 +118,7 @@
             <div class="flex-row">
               <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.roleKeysList">{{ role }}
               </cnsl-project-role-chip>
-              <span class="fill-space"></span>
-              <div class="cnsl-table-action-wrapper">
-                <div class="cnsl-table-action">
-                  <button mat-icon-button *ngIf="grant.id ? grantToEdit !== grant.id : grantToEdit !== grant.id"
-                    [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
-                    (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
-                    <i class="las la-edit"></i>
-                  </button>
-                  <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteGrant(grant)"
-                    mat-icon-button><i class="las la-trash"></i></button>
-                </div>
-              </div>
+
             </div>
           </ng-container>
 
@@ -172,6 +160,24 @@
             </ng-container>
           </div>
         </td>
+
+        <ng-container matColumnDef="actions" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef class="user-tr-actions"> </th>
+          <td mat-cell class="user-tr-actions" *matCellDef="let grant; let i = index">
+            <div *ngIf="grant.id ? grantToEdit !== grant.id : grantToEdit !== grant.id"
+              class="cnsl-table-action-wrapper">
+              <div class="cnsl-table-action">
+                <button mat-icon-button
+                  [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
+                  (click)="loadGrantOptions(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
+                  <i class="las la-edit"></i>
+                </button>
+                <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteGrant(grant)"
+                  mat-icon-button><i class="las la-trash"></i></button>
+              </div>
+            </div>
+          </td>
+        </ng-container>
 
       </ng-container>
 

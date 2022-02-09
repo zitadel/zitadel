@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-
-import { getColor } from '../avatar/avatar.component';
+import { getMembershipColor } from 'src/app/utils/color';
 
 @Component({
   selector: 'cnsl-add-member-roles-dialog',
@@ -35,6 +34,6 @@ export class AddMemberRolesDialogComponent {
   }
 
   public getColor(role: string) {
-    return getColor(role);
+    return getMembershipColor(role)[500];
   }
 }

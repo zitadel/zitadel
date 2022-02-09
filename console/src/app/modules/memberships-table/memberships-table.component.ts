@@ -13,8 +13,8 @@ import { OverlayWorkflowService } from 'src/app/services/overlay-workflow.servic
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { OrgContextChangedWorkflowOverlays } from 'src/app/services/workflows';
+import { getMembershipColor } from 'src/app/utils/color';
 
-import { getColor } from '../avatar/avatar.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { MembershipsDataSource } from './memberships-datasource';
 
@@ -197,8 +197,9 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     );
   }
 
-  public getColor(role: string) {
-    return getColor(role);
+  public getColor(role: string): string {
+    const color = getMembershipColor(role);
+    return color[500];
   }
 
   public removeRole(membership: Membership.AsObject, role: string): void {
