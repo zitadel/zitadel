@@ -84,7 +84,7 @@ export class PersonalAccessTokensComponent implements OnInit {
           .removePersonalAccessToken(key.id, this.userId)
           .then(() => {
             this.selection.clear();
-            this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
+            this.toast.showInfo('USER.PERSONALACCESSTOKEN.DELETED', true);
             this.getData(10, 0);
           })
           .catch((error) => {

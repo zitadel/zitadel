@@ -552,7 +552,8 @@
       "DELETE": {
         "TITLE": "Delete Token",
         "DESCRIPTION": "You are about to delete the personal access token. Are you sure?"
-      }
+      },
+      "DELETED": "Token deleted with success."
     }
   },
   "FLOWS": {

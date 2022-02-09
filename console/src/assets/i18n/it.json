@@ -552,7 +552,8 @@
       "DELETE": {
         "TITLE": "Elimina Token",
         "DESCRIPTION": "Stai per eliminare il token di accesso. Sei sicuro di voler continuare?"
-      }
+      },
+      "DELETED": "Token eliminato con successo."
     }
   },
   "FLOWS": {

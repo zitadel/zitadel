@@ -552,7 +552,8 @@
       "DELETE": {
         "TITLE": "Token löschen",
         "DESCRIPTION": "Sie sind im Begriff das Token unwiederruflich zu löschen. Wollen Sie dies wirklich tun?"
-      }
+      },
+      "DELETED": "Personal Access Token gelöscht."
     }
   },
   "FLOWS": {
