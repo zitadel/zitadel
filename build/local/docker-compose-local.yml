@@ -194,11 +194,13 @@ services:
 
   e2e-setup:
     profiles: ['backend']
-    user: ${UID}:${GID}
     restart: on-failure
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.e2esetup
+      args:
+        UID: $UID
+        GID: $GID
     depends_on:
       backend-run:
         condition: service_healthy

@@ -8,4 +8,12 @@ RUN go mod download
 
 COPY . .
 
-CMD ./build/local/e2e-setup.sh
+ARG UID=1000
+ARG GID=1000
+
+# Create a group and user
+RUN addgroup -S tmpgroup -g $GID && adduser -S tmpuser -G tmpgroup -u $UID
+
+RUN chown -R tmpuser:tmpgroup .
+
+CMD [ "su", "-", "tmpuser", "-c", "./build/local/e2e-setup.sh" ]
