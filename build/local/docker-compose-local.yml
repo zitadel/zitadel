@@ -179,6 +179,16 @@ services:
     ports:
       - '50000:8080'
 
+  go-copy:
+    profiles: ['backend']
+    restart: on-failure
+    build:
+      context: ../..
+      dockerfile: build/zitadel/Dockerfile
+      target: merge-go-copy
+    volumes:
+      - ../../:/dest
+
 # this service generates the environemnt.json
 # needed in console.
 # It curl's the client id of console and writes it to 
@@ -199,6 +209,16 @@ services:
     environment:
       - HOST=backend-run
       - PORT=50002
+
+  npm-copy:
+    profiles: ['frontend']
+    restart: on-failure
+    build:
+      context: ../..
+      dockerfile: build/console/Dockerfile
+      target: merge-npm-copy
+    volumes:
+      - ../../console/:/dest
 
 # starts console in development mode
   frontend-run:
@@ -234,6 +254,8 @@ services:
       frontend-run:
         condition: service_healthy
     image: alpine:latest
+
+
 
 networks:
   zitadel: {}

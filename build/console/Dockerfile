@@ -66,6 +66,17 @@ RUN build/console/generate-grpc.sh
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
+######################
+## Output generated files by running a container from this target mounting the target dir to /dest
+######################
+FROM base as merge-npm-copy
+
+RUN apk add rsync
+
+COPY --from=npm-copy / /src
+
+CMD [ "rsync", "-a", "/src/", "/dest" ]
+
 #######################
 ## angular dev build
 #######################

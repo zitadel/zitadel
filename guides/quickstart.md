@@ -108,9 +108,6 @@ $ cd ..
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
 
-$ # Generate the grpc web stubs
-$ docker build -f build/console/Dockerfile . -t zitadel:gen-fe --target npm-copy -o .
-
 $ # Change directory to ./console
 $ cd ./console
 
@@ -122,6 +119,19 @@ $ npm run e2e
 
 $ # Or open the end-to-end test suite interactively
 $ npm run e2e:open
+```
+
+
+### Regenerating gRPC Stubs
+
+When you created your environment using docker compose, the stubs were already initially generated. If you need to change .proto files, ensure you regenerate the stubs using the following commands
+
+```bash
+$ # Backend
+$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build go-copy
+
+$ # Frontend
+$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build npm-copy
 ```
 
 
