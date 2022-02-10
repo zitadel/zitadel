@@ -2,3 +2,17 @@ Log:
   Level: debug
   Formatter:
     Format: text
+
+database:
+  host: free-tier7.aws-eu-west-1.cockroachlabs.cloud
+  port: 26257
+  user: zitadel2
+  database: zitadel
+  password: Test11111111!
+  maxOpenConns: 3
+  ssl:
+    mode: verify-full
+    rootCert: /Users/adlerhurst/.postgresql/root.crt
+  options: --cluster=silvan-test-855 
+  # MaxConnLifetime: 30m
+  # MaxConnIdleTime: 30m
