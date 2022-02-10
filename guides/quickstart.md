@@ -48,17 +48,20 @@ $ docker compose -f ./build/local/docker-compose-local.yml --profile backend --p
 
 If you want to make changes to ZITADEL, we recommend running the end-to-end tests against it. 
 
-### Test Prerequisites
+### Prerequisites
 
-Additionally to the prerequsites described [above](#prerequisites), the end-to-end tests are know to work with the following dependencies:
+Additionally to the prerequsites described [above](#prerequisites), the end-to-end tests are known to work with the following dependencies:
 
 * NodeJS, Version 14.17.6
 * NPM, Version 6.14.15
 
-### Running End-to-End Tests
+### Developing the Backend
 
 ```bash
-$ # Change directory to ./console
+$ # Make changes to the backend, then rebuild and redeploy it 
+$ docker compose -f ../build/local/docker-compose-local.yml up -d --no-deps --build backend-run
+
+$ # Change to the console directory
 $ cd ./console
 
 $ # Run all end-to-end tests
@@ -68,38 +71,18 @@ $ # Or open the end-to-end test suite interactively
 $ npm run e2e:open
 ```
 
-### Developing the Backend
-
-```bash
-$ # Change directory to the project root 
-$ cd ..
-
-$ # Make changes to the backend, then rebuild and redeploy it 
-$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build backend-run
-
-$ # Rerun the end-to-end test
-$ cd ./console
-$ npm run e2e
-```
-
 ### Developing the Frontend
 
 You can switch to `ng serve` for better development experience.
 
 ```
-$ # Install dev dependencies if you haven't done so already
-$ npm install
-
 $ # Reuse the environment.json file from the still running frontend container
-$ curl http://localhost:4200/assets/environment.json > ./src/assets/environment.json
-
-$ # Change directory to the project root
-$ cd ..
+$ curl http://localhost:4200/assets/environment.json > ./console/src/assets/environment.json
 
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
 
-$ # Change directory to ./console
+$ # Change to the console directory
 $ cd ./console
 
 $ # Run the local server
