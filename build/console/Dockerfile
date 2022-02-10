@@ -69,11 +69,12 @@ COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/ge
 ######################
 ## Output generated files by running a container from this target mounting the target dir to /dest
 ######################
-FROM base as merge-npm-copy
+FROM base as init-dev
 
 RUN apk add rsync
 
-COPY --from=npm-copy / /src
+COPY --from=npm-base /console/node_modules /src/console/node_modules
+COPY --from=npm-base /console/src/app/proto/generated /src/console/src/app/proto/generated
 
 ARG UID=1000
 ARG GID=1000

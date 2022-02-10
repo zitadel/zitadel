@@ -61,9 +61,6 @@ Additionally to the prerequsites described [above](#prerequisites), the end-to-e
 $ # Change directory to ./console
 $ cd ./console
 
-$ # Install dev dependencies if you haven't done so already
-$ npm install --only development
-
 $ # Run all end-to-end tests
 $ npm run e2e
 

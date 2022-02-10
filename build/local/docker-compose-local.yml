@@ -234,13 +234,13 @@ services:
       - HOST=backend-run
       - PORT=50002
 
-  npm-copy:
+  init-frontend-dev:
     profiles: ['frontend']
     restart: on-failure
     build:
       context: ../..
       dockerfile: build/console/Dockerfile
-      target: merge-npm-copy
+      target: init-dev
       args:
         UID: $UID
         GID: $GID
@@ -288,6 +288,14 @@ services:
       frontend-run:
         condition: service_healthy
     image: alpine:latest
+
+  await-init-frontend-dev:
+    profiles: [ "frontend" ]
+    depends_on:
+      init-frontend-dev:
+        condition: service_healthy
+    image: alpine:latest
+
 
 networks:
   zitadel: {}
