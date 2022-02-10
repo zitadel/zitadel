@@ -10,6 +10,8 @@ export class ProjectGrantIllustrationComponent implements OnInit {
   @Input() public grantedProject!: GrantedProject.AsObject;
   @Input() public projectRoleOptions: Role.AsObject[] = [];
   @Output() public roleRemoved: EventEmitter<string> = new EventEmitter();
+  @Output() public editRoleClicked: EventEmitter<void> = new EventEmitter();
+
   constructor() {}
 
   ngOnInit(): void {}

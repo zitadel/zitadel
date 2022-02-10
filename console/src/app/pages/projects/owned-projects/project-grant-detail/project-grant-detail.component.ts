@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute } from '@angular/router';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
+import { UserGrantRoleDialogComponent } from 'src/app/modules/user-grant-role-dialog/user-grant-role-dialog.component';
 import { Member } from 'src/app/proto/generated/zitadel/member_pb';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
@@ -240,5 +241,29 @@ export class ProjectGrantDetailComponent {
           this.toast.showError(error);
         });
     }
+  }
+
+  public editRoles(): void {
+    const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
+      data: {
+        projectId: this.grant.projectId,
+        // grantId: this.grant.grantId,
+        selectedRoleKeysList: this.grant.grantedRoleKeysList,
+      },
+      width: '600px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp && resp.roles) {
+        this.mgmtService
+          .updateProjectGrant(this.grant.grantId, this.grant.projectId, resp.roles)
+          .then(() => {
+            this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 }

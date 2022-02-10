@@ -9,7 +9,7 @@
   </p>
 
   <cnsl-project-grant-illustration *ngIf="grant" [grantedProject]="grant" [projectRoleOptions]="projectRoleOptions"
-    (roleRemoved)="removeRole($event)">
+    (roleRemoved)="removeRole($event)" (editRoleClicked)="editRoles()">
   </cnsl-project-grant-illustration>
 
   <div class="master-row">

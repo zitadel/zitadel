@@ -24,8 +24,8 @@
         <cnsl-project-role-chip [showRemove]="true" (removed)="removeRole(role)" [roleName]="role"
           *ngFor="let role of grantedProject.grantedRoleKeysList">{{role}}
         </cnsl-project-role-chip>
-        <button mat-icon-button>
-          <mat-icon>add</mat-icon>
+        <button mat-icon-button (click)="editRoleClicked.emit()">
+          <i class="las la-pen"></i>
         </button>
         <span class="fill-space"></span>
         <span class="pgi-label-sec cnsl-secondary-text">granted roles</span>

@@ -19,6 +19,7 @@ import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
 import { ProjectRoleChipModule } from 'src/app/modules/project-role-chip/project-role-chip.module';
+import { UserGrantRoleDialogModule } from 'src/app/modules/user-grant-role-dialog/user-grant-role-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ProjectGrantDetailRoutingModule } from './project-grant-detail-routing.module';
@@ -39,6 +40,7 @@ import {
     MatChipsModule,
     MatButtonModule,
     MatCheckboxModule,
+    UserGrantRoleDialogModule,
     MatIconModule,
     MatTableModule,
     MatPaginatorModule,
