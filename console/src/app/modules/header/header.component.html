@@ -1,7 +1,7 @@
 <mat-toolbar class="header-wrapper">
   <div class="header-content">
     <ng-container *ngIf="labelpolicy">
-      <a class="title" [routerLink]="['/']">
+      <a class="title" [routerLink]="['/']" *ngIf="!labelpolicy.disableWatermark; else customHome">
         <img class="logo" alt="zitadel logo" *ngIf="isDarkTheme; else lighttheme"
           src="/assets/images/zitadel-logo-solo-light.svg" />
         <ng-template #lighttheme>
@@ -10,21 +10,18 @@
       </a>
     </ng-container>
 
-    <!-- <ng-template #customHome>
+    <ng-template #customHome>
       <a class="title" [routerLink]="['/']">
         <img class="logo" alt="home logo" *ngIf="isDarkTheme; else customlighttheme"
-          [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : '/assets/images/zitadel-logo-solo-light.svg'" />
+          [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : '/assets/images/zitadel-logo-solo-light.svg'"
+          onerror="this.src='/assets/images/zitadel-logo-solo-light.svg';this.onerror='';" />
         <ng-template #customlighttheme>
           <img alt="home logo" class="logo"
-            [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : '/assets/images/zitadel-logo-solo-dark.svg'" />
+            [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : '/assets/images/zitadel-logo-solo-dark.svg'"
+            onerror="this.src='/assets/images/zitadel-logo-solo-dark.svg';this.onerror='';" />
         </ng-template>
       </a>
-
-      <svg class="slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-        stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
-        <path d="M16.88 3.549L7.12 20.451"></path>
-      </svg>
-    </ng-template> -->
+    </ng-template>
 
     <ng-container *ngFor="let bread of (breadcrumbService.breadcrumbs$ | async) as bc; index as i">
       <ng-container *ngIf="bread.type === BreadcrumbType.IAM">
