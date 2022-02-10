@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 
 @Component({
@@ -6,7 +6,7 @@ import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated
   templateUrl: './project-grant-illustration.component.html',
   styleUrls: ['./project-grant-illustration.component.scss'],
 })
-export class ProjectGrantIllustrationComponent implements OnInit {
+export class ProjectGrantIllustrationComponent {
   @Input() public grantedProject!: GrantedProject.AsObject;
   @Input() public projectRoleOptions: Role.AsObject[] = [];
   @Output() public roleRemoved: EventEmitter<string> = new EventEmitter();
@@ -14,8 +14,6 @@ export class ProjectGrantIllustrationComponent implements OnInit {
 
   ProjectGrantState: any = ProjectGrantState;
   constructor() {}
-
-  ngOnInit(): void {}
 
   public removeRole(roleKey: string): void {
     this.roleRemoved.emit(roleKey);

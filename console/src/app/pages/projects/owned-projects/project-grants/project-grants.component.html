@@ -78,16 +78,10 @@
               <th mat-header-cell *matHeaderCellDef class="role-row"> {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
               </th>
               <td class="pointer role-row" mat-cell *matCellDef="let grant">
-                <cnsl-form-field class="form-field" appearance="outline" *ngIf="grant.roleKeysList">
-                  <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-                  <mat-select [(ngModel)]="grant.roleKeysList" multiple
-                    [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
-                    (selectionChange)="updateRoles(grant, $event)">
-                    <mat-option *ngFor="let role of memberRoleOptions" [value]="role.key">
-                      {{role.key}}
-                    </mat-option>
-                  </mat-select>
-                </cnsl-form-field>
+                <div class="flex-row">
+                  <cnsl-project-role-chip [roleName]="role" *ngFor="let role of grant.grantedRoleKeysList">{{ role }}
+                  </cnsl-project-role-chip>
+                </div>
               </td>
             </ng-container>
 

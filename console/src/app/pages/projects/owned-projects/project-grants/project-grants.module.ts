@@ -11,6 +11,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
+import { ProjectRoleChipModule } from 'src/app/modules/project-role-chip/project-role-chip.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
@@ -30,6 +31,7 @@ import { ProjectGrantsComponent } from './project-grants.component';
     MatCheckboxModule,
     RefreshTableModule,
     LocalizedDatePipeModule,
+    ProjectRoleChipModule,
     MatButtonModule,
     HasRolePipeModule,
     MatIconModule,

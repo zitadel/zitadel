@@ -34,7 +34,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   public dataSource!: ProjectGrantsDataSource;
   public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
   public memberRoleOptions: Role.AsObject[] = [];
-  public displayedColumns: string[] = ['grantedOrgName', 'state', 'creationDate', 'changeDate', 'actions'];
+  public displayedColumns: string[] = ['grantedOrgName', 'state', 'creationDate', 'changeDate', 'roleNamesList', 'actions'];
 
   ProjectGrantState: any = ProjectGrantState;
 
