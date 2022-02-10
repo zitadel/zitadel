@@ -23,6 +23,7 @@ import { ToastService } from 'src/app/services/toast.service';
 
 import { ActionKeysType } from '../action-keys/action-keys.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
+import { UserGrantRoleDialogComponent } from '../user-grant-role-dialog/user-grant-role-dialog.component';
 import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { UserGrantContext, UserGrantsDataSource } from './user-grants-datasource';
 
@@ -59,7 +60,6 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   @Input() grantId: string = '';
   @ViewChild('input') public filter!: MatInput;
 
-  public grantRoleOptions: string[] = [];
   public projectRoleOptions: Role.AsObject[] = [];
   public routerLink: any = [''];
 
@@ -74,7 +74,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
 
   constructor(
     private userService: ManagementService,
-    private mgmtService: ManagementService,
+    // private mgmtService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
@@ -98,14 +98,14 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     switch (this.context) {
       case UserGrantContext.OWNED_PROJECT:
         if (this.projectId) {
-          this.getProjectRoleOptions(this.projectId);
+          // this.getProjectRoleOptions(this.projectId);
           this.routerLink = ['/grant-create', 'project', this.projectId];
         }
         break;
       case UserGrantContext.GRANTED_PROJECT:
         if (this.grantId) {
           this.routerLink = ['/grant-create', 'project', this.projectId, 'grant', this.grantId];
-          this.getGrantRoleOptions(this.grantId, this.projectId);
+          // this.getGrantRoleOptions(this.grantId, this.projectId);
         }
         break;
       case UserGrantContext.USER:
@@ -204,34 +204,27 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
       : this.dataSource.grantsSubject.value.forEach((row) => this.selection.select(row));
   }
 
-  public loadGrantOptions(grant: UserGrant.AsObject): void {
-    this.grantToEdit = grant.id;
-    if (grant.projectGrantId && grant.projectId) {
-      this.getGrantRoleOptions(grant.projectGrantId, grant.projectId);
-    } else if (grant.projectId) {
-      this.getProjectRoleOptions(grant.projectId);
-    }
-  }
+  public openEditDialog(grant: UserGrant.AsObject): void {
+    const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
+      data: {
+        grant,
+      },
+      width: '600px',
+    });
 
-  private getGrantRoleOptions(id: string, projectId: string): void {
-    this.mgmtService
-      .getGrantedProjectByID(projectId, id)
-      .then((resp) => {
-        if (resp.grantedProject) {
-          this.loadedId = projectId;
-          this.grantRoleOptions = resp.grantedProject?.grantedRoleKeysList;
-        }
-      })
-      .catch((error) => {
-        this.grantToEdit = '';
-        this.toast.showError(error);
-      });
-  }
-
-  private getProjectRoleOptions(projectId: string): void {
-    this.mgmtService.listProjectRoles(projectId, 100, 0).then((resp) => {
-      this.loadedProjectId = projectId;
-      this.projectRoleOptions = resp.resultList;
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp && resp.roles) {
+        console.log(resp.roles);
+        this.userService
+          .updateUserGrant(grant.id, grant.userId, resp.roles)
+          .then(() => {
+            this.toast.showInfo('GRANTS.TOAST.UPDATED', true);
+            grant.roleKeysList = resp.roles;
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
     });
   }
 

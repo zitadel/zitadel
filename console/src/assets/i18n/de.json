@@ -1637,6 +1637,9 @@
       "TITLE": "Autorisierung erstellen",
       "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
     },
+    "EDIT": {
+      "TITLE": "Autorisierung bearbeiten"
+    },
     "DETAIL": {
       "TITLE": "Autorisierungsdetails",
       "DESCRIPTION": ""

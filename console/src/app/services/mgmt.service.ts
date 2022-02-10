@@ -189,6 +189,8 @@ import {
   ListAppKeysResponse,
   ListAppsRequest,
   ListAppsResponse,
+  ListGrantedProjectRolesRequest,
+  ListGrantedProjectRolesResponse,
   ListGrantedProjectsRequest,
   ListGrantedProjectsResponse,
   ListHumanAuthFactorsRequest,
@@ -2069,6 +2071,32 @@ export class ManagementService {
       req.setQueriesList(queryList);
     }
     return this.grpcService.mgmt.listProjectRoles(req, null).then((resp) => resp.toObject());
+  }
+
+  public listGrantedProjectRoles(
+    projectId: string,
+    grantId: string,
+    limit?: number,
+    offset?: number,
+    queryList?: RoleQuery[],
+  ): Promise<ListGrantedProjectRolesResponse.AsObject> {
+    const req = new ListGrantedProjectRolesRequest();
+    req.setProjectId(projectId);
+    req.setGrantId(grantId);
+
+    const query = new ListQuery();
+    if (limit) {
+      query.setLimit(limit);
+    }
+    if (offset) {
+      query.setOffset(offset);
+    }
+
+    req.setQuery(query);
+    if (queryList) {
+      req.setQueriesList(queryList);
+    }
+    return this.grpcService.mgmt.listGrantedProjectRoles(req, null).then((resp) => resp.toObject());
   }
 
   public bulkAddProjectRoles(

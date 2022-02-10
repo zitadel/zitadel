@@ -1,0 +1,16 @@
+<span class="title" mat-dialog-title>{{'GRANTS.EDIT.TITLE' | translate}}</span>
+<div mat-dialog-content>
+  <cnsl-project-roles-table class="role-table" *ngIf="grant"
+    [displayedColumns]="['select', 'key', 'displayname', 'group']" (changedSelection)="selectRoles($event)"
+    [projectId]="grant.projectId" [grantId]="grant.projectGrantId" [selectedKeys]="grant.roleKeysList">
+  </cnsl-project-roles-table>
+</div>
+<div mat-dialog-actions class="action">
+  <button mat-stroked-button (click)="closeDialog()">
+    {{'ACTIONS.CANCEL' | translate}}
+  </button>
+  <span class="fill-space"></span>
+  <button mat-raised-button color="primary" class="ok-button" (click)="closeDialogWithSuccess()">
+    {{'ACTIONS.CHANGE' | translate}}
+  </button>
+</div>

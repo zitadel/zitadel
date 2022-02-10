@@ -20,8 +20,10 @@ import { ProjectRolesDataSource } from './project-roles-table-datasource';
 })
 export class ProjectRolesTableComponent implements OnInit {
   @Input() public projectId: string = '';
+  @Input() public grantId: string = '';
   @Input() public disabled: boolean = false;
   @Input() public actionsVisible: boolean = false;
+  @Input() public selectedKeys: string[] = [];
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<Role.AsObject>;
   public dataSource!: ProjectRolesDataSource;
@@ -43,7 +45,13 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.dataSource.loadRoles(this.projectId, 0, 25, 'asc');
+    this.dataSource.loadRoles(this.projectId, this.grantId, 0, 25, 'asc');
+
+    this.dataSource.rolesSubject.subscribe((roles) => {
+      const selectedRoles: Role.AsObject[] = roles.filter((role) => this.selectedKeys.includes(role.key));
+      this.selection.select(...selectedRoles);
+      console.log(this.selectedKeys, this.dataSource.rolesSubject.getValue(), selectedRoles);
+    });
 
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
@@ -56,7 +64,7 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   private loadRolesPage(): void {
-    this.dataSource.loadRoles(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
+    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator.pageIndex, this.paginator.pageSize);
   }
 
   public changePage(): void {
@@ -113,7 +121,7 @@ export class ProjectRolesTableComponent implements OnInit {
   }
 
   public refreshPage(): void {
-    this.dataSource.loadRoles(this.projectId, this.paginator.pageIndex, this.paginator.pageSize);
+    this.dataSource.loadRoles(this.projectId, this.grantId, this.paginator.pageIndex, this.paginator.pageSize);
   }
 
   public get selectionAllowed(): boolean {

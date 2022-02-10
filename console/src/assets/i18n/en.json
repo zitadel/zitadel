@@ -501,7 +501,7 @@
       "FOUND": "Found"
     },
     "TARGET": {
-      "SELF": "If you want to grant a user of an other organization access",
+      "SELF": "If you want to grant a user of an other organization",
       "EXTERNAL": "To grant a user of your organization access",
       "CLICKHERE": "click here"
     },
@@ -1636,6 +1636,9 @@
     "CREATE": {
       "TITLE": "Create authorization",
       "DESCRIPTION": "Search for the orgnanisation, the project, and the corresponding roles."
+    },
+    "EDIT": {
+      "TITLE": "Change authorization"
     },
     "DETAIL": {
       "TITLE": "Authorization Detail",

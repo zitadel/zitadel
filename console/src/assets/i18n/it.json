@@ -1637,6 +1637,9 @@
       "TITLE": "Creare autorizzazione",
       "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli corrispondenti."
     },
+    "EDIT": {
+      "TITLE": "Modifica autorizzazione"
+    },
     "DETAIL": {
       "TITLE": "Dettaglio dell'autorizzazione",
       "DESCRIPTION": "Qui potete vedere tutti i dettagli dell'autorizzazione."
