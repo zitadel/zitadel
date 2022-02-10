@@ -290,7 +290,7 @@ services:
     profiles: [ "frontend" ]
     depends_on:
       init-frontend-dev:
-        condition: service_healthy
+        condition: service_completed_successfully
     image: alpine:latest
 
 
