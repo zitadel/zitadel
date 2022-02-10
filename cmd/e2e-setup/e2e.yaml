@@ -4,6 +4,7 @@ E2E:
   ZitadelProjectResourceID: $E2E_ZITADEL_PROJECT_RESOURCE_ID
   APIURL: $E2E_API_URL
   IssuerURL: $E2E_ISSUER_URL
+  Audience: $E2E_AUDIENCE
   OrgOwnerPassword: $E2E_ORG_OWNER_PW
   OrgOwnerViewerPassword: $E2E_ORG_OWNER_VIEWER_PW
   OrgProjectCreatorPassword: $E2E_ORG_PROJECT_CREATOR_PW

@@ -32,6 +32,7 @@ type E2EConfig struct {
 	ZitadelProjectResourceID       string
 	APIURL                         string
 	IssuerURL                      string
+	Audience                       string
 	OrgOwnerPassword               string
 	OrgOwnerViewerPassword         string
 	OrgProjectCreatorPassword      string

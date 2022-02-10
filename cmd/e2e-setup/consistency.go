@@ -2,15 +2,9 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strings"
+	"github.com/caos/logging"
 	"time"
-
-	"github.com/golang-jwt/jwt/v4"
 )
 
 func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []user) (err error) {
@@ -25,10 +19,10 @@ func awaitConsistency(ctx context.Context, cfg E2EConfig, expectUsers []user) (e
 		case <-retry:
 			err = checkCondition(ctx, cfg, expectUsers)
 			if err == nil {
-				fmt.Println("setup is consistent")
+				logging.Log("AWAIT-QIOOJ").Info("setup is consistent")
 				return nil
 			}
-			fmt.Printf("setup is not consistent yet, retrying in a second: %s\n", err)
+			logging.Log("AWAIT-VRk3Y").Info("setup is not consistent yet, retrying in a second: ", err)
 			time.Sleep(time.Second)
 			go func() {
 				retry <- struct{}{}
@@ -67,104 +61,4 @@ expectLoop:
 		return fmt.Errorf("users %v are not consistent yet", awaitingUsers)
 	}
 	return nil
-}
-
-func listUsers(ctx context.Context, apiUrl, token string) ([]string, error) {
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, apiUrl+"/management/v1/users/_search", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	unmarshalledResp := struct {
-		Result []struct {
-			UserName string `json:"userName"`
-		}
-	}{}
-
-	if err = json.Unmarshal(bodyBytes, &unmarshalledResp); err != nil {
-		return nil, err
-	}
-
-	users := make([]string, len(unmarshalledResp.Result))
-	for i := range unmarshalledResp.Result {
-		users[i] = unmarshalledResp.Result[i].UserName
-	}
-
-	return users, nil
-}
-
-func newToken(cfg E2EConfig) (string, error) {
-
-	keyBytes, err := os.ReadFile(cfg.MachineKeyPath)
-	if err != nil {
-		return "", err
-	}
-
-	key := struct {
-		UserId, KeyId string
-		Key           string
-	}{}
-	if err := json.Unmarshal(keyBytes, &key); err != nil {
-		return "", err
-	}
-
-	now := time.Now()
-	iat := now.Unix()
-	exp := now.Add(55 * time.Minute).Unix()
-
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"iss": key.UserId,
-		"sub": key.UserId,
-		"aud": cfg.IssuerURL,
-		"iat": iat,
-		"exp": exp,
-	})
-
-	token.Header["alg"] = "RS256"
-	token.Header["kid"] = key.KeyId
-
-	rsaKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(key.Key))
-	if err != nil {
-		return "", err
-	}
-
-	tokenString, err := token.SignedString(rsaKey)
-	if err != nil {
-		return "", err
-	}
-
-	resp, err := http.PostForm(fmt.Sprintf("%s/oauth/v2/token", cfg.APIURL), map[string][]string{
-		"grant_type": {"urn:ietf:params:oauth:grant-type:jwt-bearer"},
-		"scope":      {fmt.Sprintf("openid urn:zitadel:iam:org:project:id:%s:aud", strings.TrimPrefix(cfg.ZitadelProjectResourceID, "bignumber-"))},
-		"assertion":  {tokenString},
-	})
-	if err != nil {
-		return "", err
-	}
-
-	tokenBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	tokenResp := struct {
-		AccessToken string `json:"access_token"`
-	}{}
-
-	return tokenResp.AccessToken, json.Unmarshal(tokenBody, &tokenResp)
 }

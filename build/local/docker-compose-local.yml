@@ -195,17 +195,23 @@ services:
   e2e-setup:
     profiles: ['backend']
     restart: on-failure
+    networks:
+      - zitadel
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.e2esetup
       args:
         UID: $UID
         GID: $GID
+    user: $UID:$GID
     depends_on:
       backend-run:
         condition: service_healthy
       go-copy:
         condition: service_completed_successfully
+    volumes:
+      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+
 
 # this service generates the environemnt.json
 # needed in console.

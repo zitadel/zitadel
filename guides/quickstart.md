@@ -57,17 +57,6 @@ Additionally to the prerequsites described [above](#prerequisites), the end-to-e
 
 ### Running End-to-End Tests
 
-Create all objects in your local ZITADEL needed to run the end-to-end tests. The setup command may take several minutes because it awaits eventual consistency but you only have to execute it once. 
-
-```bash
-$ # Generate grpc stubs if you haven't done so already
-$ docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
-
-$ ./scripts/e2e-setup.sh
-```
-
-Now you are ready to actually run the test suite.
-
 ```bash
 $ # Change directory to ./console
 $ cd ./console
@@ -85,7 +74,7 @@ $ npm run e2e:open
 ### Developing the Backend
 
 ```bash
-$ # Change directory to the root directory 
+$ # Change directory to the project root 
 $ cd ..
 
 $ # Make changes to the backend, then rebuild and redeploy it 
@@ -107,7 +96,7 @@ $ npm install
 $ # Reuse the environment.json file from the still running frontend container
 $ curl http://localhost:4200/assets/environment.json > ./src/assets/environment.json
 
-$ # Change directory to the root directory 
+$ # Change directory to the project root
 $ cd ..
 
 $ # Stop the frontend container

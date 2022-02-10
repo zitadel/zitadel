@@ -1,19 +1,24 @@
-FROM golang:1.17-alpine3.13
+FROM golang:1.17
+
+RUN curl https://binaries.cockroachdb.com/cockroach-v21.2.5.linux-amd64.tgz | tar -xz
+RUN cp -i cockroach-v21.2.5.linux-amd64/cockroach /usr/local/bin/ 
 
 WORKDIR /go/src/github.com/caos/zitadel
+
+ARG UID=1000
+ARG GID=1000
+
+# Create a group and user
+RUN addgroup --system --gid $GID tmpgroup && \
+    adduser --system --gid $GID --uid $UID tmpuser && \
+    chown tmpuser:tmpgroup /usr/local/bin/cockroach
 
 #download modules
 COPY ./go.* ./
 RUN go mod download
 
 COPY . .
-
-ARG UID=1000
-ARG GID=1000
-
-# Create a group and user
-RUN addgroup -S tmpgroup -g $GID && adduser -S tmpuser -G tmpgroup -u $UID
-
 RUN chown -R tmpuser:tmpgroup .
 
-CMD [ "su", "-", "tmpuser", "-c", "./build/local/e2e-setup.sh" ]
+CMD [ "./build/local/e2e-setup.sh" ]
+#MD ["sleep", "99999"]

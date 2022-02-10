@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+	"gopkg.in/yaml.v3"
 	"time"
 
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
@@ -21,8 +23,9 @@ type user struct {
 
 func main() {
 	flag.Var(e2eSetupPaths, "setup-files", "paths to the setup files")
+	debug := flag.Bool("debug", false, "print information that is helpful for debugging")
 	flag.Parse()
-	startE2ESetup(e2eSetupPaths.Values())
+	startE2ESetup(e2eSetupPaths.Values(), *debug)
 }
 
 type dummyAuthZRepo struct {
@@ -33,12 +36,19 @@ func (d dummyAuthZRepo) CheckOrgFeatures(_ context.Context, _ string, _ ...strin
 	return nil
 }
 
-func startE2ESetup(configPaths []string) {
+func startE2ESetup(configPaths []string, debug bool) {
 
 	conf := new(setupConfig)
 	err := config.Read(conf, configPaths...)
 	logging.Log("MAIN-EAWlt").OnError(err).Fatal("cannot read config")
 
+	if debug {
+		printConfig("e2e", conf.E2E)
+		printConfig("system defaults", conf.SystemDefaults)
+		printConfig("authz", conf.InternalAuthZ)
+		printConfig("eventstore", conf.Eventstore)
+		printConfig("log", conf.Log)
+	}
 	err = conf.E2E.validate()
 	logging.Log("MAIN-NoZIV").OnError(err).Fatal("validating e2e config failed")
 
@@ -87,4 +97,12 @@ func startE2ESetup(configPaths []string) {
 		users,
 	)
 	logging.Log("MAIN-cgZ3p").OnError(err).Errorf("failed to await consistency")
+}
+
+func printConfig(desc string, cfg interface{}) {
+	bytes, err := yaml.Marshal(cfg)
+	logging.Log("MAIN-JYmQq").OnError(err).Fatal("cannot marshal config")
+
+	logging.Log("MAIN-7u4dZ").Info("got the following ", desc, " config")
+	fmt.Println(string(bytes))
 }
