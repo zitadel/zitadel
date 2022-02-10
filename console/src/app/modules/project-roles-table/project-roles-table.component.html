@@ -76,7 +76,7 @@
               <button mat-icon-button
                 [disabled]="disabled || (['project.role.write', 'project.role.write:' + projectId] | hasRole | async) === false"
                 (click)="openDetailDialog(role)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
-                <i class="las la-edit"></i>
+                <i class="las la-pen"></i>
               </button>
               <button
                 [disabled]="disabled || (['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"

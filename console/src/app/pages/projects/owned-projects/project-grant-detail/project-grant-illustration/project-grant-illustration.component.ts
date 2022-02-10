@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { GrantedProject, Role } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 
 @Component({
   selector: 'cnsl-project-grant-illustration',
@@ -12,6 +12,7 @@ export class ProjectGrantIllustrationComponent implements OnInit {
   @Output() public roleRemoved: EventEmitter<string> = new EventEmitter();
   @Output() public editRoleClicked: EventEmitter<void> = new EventEmitter();
 
+  ProjectGrantState: any = ProjectGrantState;
   constructor() {}
 
   ngOnInit(): void {}

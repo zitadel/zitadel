@@ -8,31 +8,35 @@
     </a>
   </p>
 
-  <cnsl-project-grant-illustration *ngIf="grant" [grantedProject]="grant" [projectRoleOptions]="projectRoleOptions"
-    (roleRemoved)="removeRole($event)" (editRoleClicked)="editRoles()">
-  </cnsl-project-grant-illustration>
+  <div actions>
+    <button class="actions-trigger-desk" mat-raised-button color="primary" [matMenuTriggerFor]="actions">
+      <span>{{'ACTIONS.ACTIONS' | translate}}</span>
+      <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+    </button>
+    <button class="actions-trigger-mob" matTooltip="{{'ACTIONS.ACTIONS' | translate}}" mat-icon-button
+      [matMenuTriggerFor]="actions">
+      <i class="las la-ellipsis-v"></i>
+    </button>
+  </div>
+
+  <mat-menu #actions="matMenu" xPosition="before">
+    <button mat-menu-item *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
+      (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
+      translate}}</button>
+    <button mat-menu-item *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
+      (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' |
+      translate}}</button>
+  </mat-menu>
 
   <div class="master-row">
     <div>
-      <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
-        (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
-        translate}}</button>
-      <button mat-stroked-button color="warn" *ngIf="grant?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
-        (click)="changeState(ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE)">{{'USER.PAGES.REACTIVATE' |
-        translate}}</button>
+
     </div>
   </div>
 
-  <cnsl-form-field class="grant-detail-roles" appearance="outline" *ngIf="grant && grant.grantedRoleKeysList">
-    <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="grant.grantedRoleKeysList" multiple (selectionChange)="updateRoles($event.value)">
-      <mat-option *ngFor="let role of projectRoleOptions" [value]="role.key">
-        {{role.key}}
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
-
-  <div class="divider"></div>
+  <cnsl-project-grant-illustration *ngIf="grant" [grantedProject]="grant" [projectRoleOptions]="projectRoleOptions"
+    (roleRemoved)="removeRole($event)" (editRoleClicked)="editRoles()">
+  </cnsl-project-grant-illustration>
 
   <h2 class="project-grant-h2">{{ 'PROJECT.GRANT.DETAIL.MEMBERTITLE' | translate }}</h2>
   <p class="desc max-width-description">{{ 'PROJECT.GRANT.DETAIL.MEMBERDESC' | translate }}</p>

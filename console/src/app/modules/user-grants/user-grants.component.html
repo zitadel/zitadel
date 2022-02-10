@@ -132,7 +132,7 @@
                 <button mat-icon-button
                   [disabled]="disableWrite || !((['user.grant.write$'] | hasRole | async) || ((context === UserGrantContext.OWNED_PROJECT ? ['user.grant.write:' + grant?.projectId] : context === UserGrantContext.GRANTED_PROJECT ? ['user.grant.write:' + grant?.id] : []) | hasRole | async))"
                   (click)="openEditDialog(grant)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
-                  <i class="las la-edit"></i>
+                  <i class="las la-pen"></i>
                 </button>
                 <button matTooltip="{{'ACTIONS.REMOVE' | translate}}" color="warn" (click)="deleteGrant(grant)"
                   mat-icon-button><i class="las la-trash"></i></button>

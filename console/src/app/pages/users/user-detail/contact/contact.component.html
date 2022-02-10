@@ -10,7 +10,7 @@
     <div class="right">
       <a matTooltip="{{'USER.PASSWORD.SET' | translate}}" [disabled]="!canWrite" [routerLink]="['password']"
         mat-icon-button>
-        <i class="las la-edit"></i>
+        <i class="las la-pen"></i>
       </a>
     </div>
   </div>
@@ -38,7 +38,7 @@
       <button matTooltip="{{'ACTIONS.EDIT' | translate}}"
         [disabled]="!canWrite || state === UserState.USER_STATE_INITIAL" (click)="openEditDialog(EditDialogType.EMAIL)"
         mat-icon-button>
-        <i class="las la-edit"></i>
+        <i class="las la-pen"></i>
       </button>
     </div>
   </div>
@@ -72,7 +72,7 @@
       </button>
       <button matTooltip="{{'ACTIONS.EDIT' | translate}}" [disabled]="!canWrite"
         (click)="openEditDialog(EditDialogType.PHONE)" mat-icon-button>
-        <i class="las la-edit"></i>
+        <i class="las la-pen"></i>
       </button>
     </div>
   </div>

@@ -98,7 +98,7 @@
                   <div class="cnsl-table-action">
                     <a mat-icon-button [routerLink]="['/projects',grant.projectId,'projectgrants', grant.grantId]"
                       [disabled]="(['project.grant.read', 'project.grant.read:' + projectId] | hasRole | async) === false">
-                      <i class="las la-edit"></i>
+                      <i class="las la-pen"></i>
                     </a>
                     <button
                       [disabled]="(['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"

@@ -11,6 +11,30 @@
   }
 }
 
+.actions-trigger-desk {
+  margin-top: 0.25rem;
+  display: none;
+  align-items: center;
+  margin-right: 2rem;
+
+  @media only screen and (min-width: 700px) {
+    display: flex;
+  }
+
+  .icon {
+    margin-left: 0.25rem;
+    margin-right: -0.5rem;
+  }
+}
+
+.actions-trigger-mob {
+  display: inline;
+
+  @media only screen and (min-width: 700px) {
+    display: none;
+  }
+}
+
 .master-row {
   display: flex;
   flex-wrap: wrap;
@@ -44,13 +68,6 @@
   display: block;
   width: 100%;
   max-width: 400px;
-}
-
-.divider {
-  height: 1px;
-  background-color: #8795a140;
-  margin-bottom: 1.5rem;
-  display: block;
 }
 
 .project-grant-h2 {

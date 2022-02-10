@@ -102,7 +102,7 @@
               <p class="setting-desc">
                 <span>{{'PROJECT.PAGES.PRIVATELABEL.'+project.privateLabelingSetting+'.TITLE' | translate}}</span>
                 <button [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
-                  (click)="openPrivateLabelingDialog()" mat-icon-button><i class="las la-edit"></i></button>
+                  (click)="openPrivateLabelingDialog()" mat-icon-button><i class="las la-pen"></i></button>
               </p>
             </div>
             <mat-checkbox [(ngModel)]="project.projectRoleAssertion"

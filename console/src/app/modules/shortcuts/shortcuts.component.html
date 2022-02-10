@@ -4,7 +4,7 @@
       <h2>{{'HOME.SHORTCUTS.SHORTCUTS' | translate}}</h2>
       <button [matTooltip]="(editState ? 'ACTIONS.CLOSE' : 'ACTIONS.EDIT') | translate" class="shortcut-btn"
         (click)="editState = !editState" mat-icon-button>
-        <i *ngIf="!editState" class=" las la-edit"></i>
+        <i *ngIf="!editState" class=" las la-pen"></i>
         <mat-icon *ngIf="editState">close</mat-icon>
       </button>
       <button matTooltip="{{'ACTIONS.RESETDEFAULT' | translate}}" (click)="reset()" *ngIf="editState" mat-icon-button>

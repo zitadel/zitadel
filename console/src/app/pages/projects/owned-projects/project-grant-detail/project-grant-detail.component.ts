@@ -259,6 +259,7 @@ export class ProjectGrantDetailComponent {
           .updateProjectGrant(this.grant.grantId, this.grant.projectId, resp.roles)
           .then(() => {
             this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
+            this.grant.grantedRoleKeysList = resp.roles;
           })
           .catch((error) => {
             this.toast.showError(error);
