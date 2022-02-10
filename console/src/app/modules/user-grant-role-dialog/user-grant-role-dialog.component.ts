@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import { UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
 
 @Component({
   selector: 'cnsl-user-grant-role-dialog',
@@ -9,11 +8,16 @@ import { UserGrant } from 'src/app/proto/generated/zitadel/user_pb';
   styleUrls: ['./user-grant-role-dialog.component.scss'],
 })
 export class UserGrantRoleDialogComponent {
-  public grant!: UserGrant.AsObject;
+  public projectId: string = '';
+  public grantId: string = '';
+  public selectedRoleKeysList: string[] = [];
+
   public selectedRoles: Role.AsObject[] = [];
 
   constructor(public dialogRef: MatDialogRef<UserGrantRoleDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {
-    this.grant = data.grant;
+    this.projectId = data.projectId;
+    this.grantId = data.grantId;
+    this.selectedRoleKeysList = data.selectedRoleKeysList;
   }
 
   public selectRoles(selected: any): void {

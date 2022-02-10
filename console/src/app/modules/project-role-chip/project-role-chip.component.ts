@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ThemeService } from 'src/app/services/theme.service';
 import { getColorHash } from 'src/app/utils/color';
 
@@ -31,10 +31,16 @@ export class CnslProjectRole {
 })
 export class ProjectRoleChipComponent implements OnInit {
   @Input() roleName: string = '';
+  @Output() removed: EventEmitter<void> = new EventEmitter();
+  @Input() showRemove: boolean = false;
   public role!: CnslProjectRole;
   constructor(public themeService: ThemeService) {}
 
   public ngOnInit(): void {
     this.role = new CnslProjectRole(this.roleName);
+  }
+
+  public emitRemove(): void {
+    this.removed.emit();
   }
 }

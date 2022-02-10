@@ -1,0 +1,37 @@
+<div class="pgi" *ngIf="grantedProject">
+  <div class="pgi-org-wrapper">
+    <span class="pgi-label">{{grantedProject.projectOwnerName}}</span>
+    <div class="pgi-project-wrapper fill-space">
+      <span class="pgi-label">{{grantedProject.projectName}}</span>
+      <div class="pgi-role-wrapper fill-space">
+        <cnsl-project-role-chip [roleName]="role.key" *ngFor="let role of projectRoleOptions">{{role.key}}
+        </cnsl-project-role-chip>
+        <span class="fill-space"></span>
+        <span class="pgi-label-sec cnsl-secondary-text">roles</span>
+      </div>
+      <span class="pgi-label-sec cnsl-secondary-text">project</span>
+    </div>
+    <span class="pgi-label-sec cnsl-secondary-text">org</span>
+  </div>
+
+  <i class="pgi-arrow las la-long-arrow-alt-right"></i>
+
+  <div class="pgi-org-wrapper">
+    <span class="pgi-label">{{grantedProject.grantedOrgName}}</span>
+    <div class="pgi-project-wrapper fill-space">
+      <span class="pgi-label">{{grantedProject.projectName}} (grant)</span>
+      <div class="pgi-role-wrapper fill-space">
+        <cnsl-project-role-chip [showRemove]="true" (removed)="removeRole(role)" [roleName]="role"
+          *ngFor="let role of grantedProject.grantedRoleKeysList">{{role}}
+        </cnsl-project-role-chip>
+        <button mat-icon-button>
+          <mat-icon>add</mat-icon>
+        </button>
+        <span class="fill-space"></span>
+        <span class="pgi-label-sec cnsl-secondary-text">granted roles</span>
+      </div>
+      <span class="pgi-label-sec cnsl-secondary-text">granted project</span>
+    </div>
+    <span class="pgi-label-sec cnsl-secondary-text">granted org</span>
+  </div>
+</div>

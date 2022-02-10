@@ -7,14 +7,7 @@
       <cnsl-refresh-table [loading]="dataSource?.loading$ | async" *ngIf="projectId" (refreshed)="loadGrantsPage()"
         [dataSize]="dataSource.totalResult" [selection]="selection" [timestamp]="dataSource?.viewTimestamp"
         (refreshed)="getRoleOptions(projectId)">
-        <ng-template cnslHasRole [hasRole]="['project.grant.member.delete:'+projectId, 'project.grant.member.delete']"
-          actions>
-          <button (click)="deleteSelectedGrants()"
-            [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
-            mat-icon-button *ngIf="selection.hasValue()" color="warn">
-            <i class="las la-trash"></i>
-          </button>
-        </ng-template>
+
         <div actions>
           <a [disabled]="((['project.grant.write$', 'project.grant.write:'+ projectId]| hasRole | async)) === false"
             color="primary" class="cnsl-action-button" mat-raised-button
@@ -95,6 +88,26 @@
                     </mat-option>
                   </mat-select>
                 </cnsl-form-field>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions" stickyEnd>
+              <th mat-header-cell *matHeaderCellDef class="role-table-actions"></th>
+              <td mat-cell *matCellDef="let grant" class="role-table-actions">
+                <div class="cnsl-table-action-wrapper">
+                  <div class="cnsl-table-action">
+                    <a mat-icon-button [routerLink]="['/projects',grant.projectId,'projectgrants', grant.grantId]"
+                      [disabled]="(['project.grant.read', 'project.grant.read:' + projectId] | hasRole | async) === false">
+                      <i class="las la-edit"></i>
+                    </a>
+                    <button
+                      [disabled]="(['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"
+                      mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}"
+                      (click)="deleteGrant(grant)">
+                      <i class="las la-trash"></i>
+                    </button>
+                  </div>
+                </div>
               </td>
             </ng-container>
 

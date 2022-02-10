@@ -31,6 +31,21 @@
     box-sizing: border-box;
     font-size: 13px;
     font-weight: 600;
-    box-shadow: 0 0 3px #0000001a;
+
+    .role-rm {
+      height: 1rem;
+      width: 1rem;
+      line-height: 1rem;
+      margin-left: 4px;
+      margin-right: -0.5rem;
+
+      .role-rm-icon {
+        font-size: 1rem;
+        height: 1rem;
+        width: 1rem;
+        line-height: 1rem;
+        transform: translateY(-2px);
+      }
+    }
   }
 }

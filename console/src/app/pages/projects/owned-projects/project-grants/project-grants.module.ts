@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -25,6 +26,7 @@ import { ProjectGrantsComponent } from './project-grants.component';
     FormsModule,
     ProjectGrantsRoutingModule,
     TimestampToDatePipeModule,
+    MatTooltipModule,
     MatCheckboxModule,
     RefreshTableModule,
     LocalizedDatePipeModule,

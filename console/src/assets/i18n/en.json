@@ -1213,6 +1213,7 @@
       "EDITDESCRIPTION": "Enter the new data for the role.",
       "DELETE": "Delete Role",
       "CREATIONDATE": "Created",
+      "CHANGEDATE": "Last Modified",
       "SELECTGROUPTOOLTIP": "Select all Roles of the group {{group}}.",
       "OPTIONS": "Options",
       "ASSERTION": "Assert Roles on Authentication",
@@ -1645,8 +1646,9 @@
       "DESCRIPTION": "Here you can see all the details of the authorization."
     },
     "TOAST": {
-      "UPDATED": "Grant updated.",
-      "BULKREMOVED": "Grants removed."
+      "UPDATED": "Authorization updated.",
+      "REMOVED": "Authorization removed",
+      "BULKREMOVED": "Authorizations removed."
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete authorization",

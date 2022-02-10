@@ -224,4 +224,21 @@ export class ProjectGrantDetailComponent {
         this.toast.showError(error);
       });
   }
+
+  removeRole(role: string): void {
+    const index = this.grant.grantedRoleKeysList.findIndex((r) => r === role);
+    console.log(role, index);
+    if (index > -1) {
+      this.grant.grantedRoleKeysList.splice(index, 1);
+
+      this.mgmtService
+        .updateProjectGrant(this.grant.grantId, this.grant.projectId, this.grant.grantedRoleKeysList)
+        .then(() => {
+          this.toast.showInfo('PROJECT.GRANT.TOAST.PROJECTGRANTUPDATED', true);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
+    }
+  }
 }

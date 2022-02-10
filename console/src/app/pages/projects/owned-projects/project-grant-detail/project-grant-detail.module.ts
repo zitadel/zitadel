@@ -18,16 +18,18 @@ import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module
 import { DetailLayoutModule } from 'src/app/modules/detail-layout/detail-layout.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { MembersTableModule } from 'src/app/modules/members-table/members-table.module';
+import { ProjectRoleChipModule } from 'src/app/modules/project-role-chip/project-role-chip.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { ProjectGrantDetailRoutingModule } from './project-grant-detail-routing.module';
 import { ProjectGrantDetailComponent } from './project-grant-detail.component';
+import { ProjectGrantIllustrationComponent } from './project-grant-illustration/project-grant-illustration.component';
 import {
   ProjectGrantMembersCreateDialogModule,
 } from './project-grant-members-create-dialog/project-grant-members-create-dialog.module';
 
 @NgModule({
-  declarations: [ProjectGrantDetailComponent],
+  declarations: [ProjectGrantDetailComponent, ProjectGrantIllustrationComponent],
   imports: [
     CommonModule,
     ProjectGrantDetailRoutingModule,
@@ -45,6 +47,7 @@ import {
     ReactiveFormsModule,
     MatProgressSpinnerModule,
     ActionKeysModule,
+    ProjectRoleChipModule,
     FormsModule,
     TranslateModule,
     MatSelectModule,

@@ -1213,6 +1213,7 @@
       "EDITDESCRIPTION": "Gebe die Daten für die zu ändernde Rolle ein.",
       "DELETE": "Rolle löschen",
       "CREATIONDATE": "Erstelldatum",
+      "CHANGEDATE": "Letzte Änderung",
       "SELECTGROUPTOOLTIP": "Wähle alle Rollen der Gruppe {{group}} aus.",
       "OPTIONS": "Optionen",
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
@@ -1646,6 +1647,7 @@
     },
     "TOAST": {
       "UPDATED": "Berechtigung geändert.",
+      "REMOVED": "Berechtigung entfernt.",
       "BULKREMOVED": "Berechtigungen entfernt."
     },
     "DIALOG": {

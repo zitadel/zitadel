@@ -1,8 +1,8 @@
 <span class="title" mat-dialog-title>{{'GRANTS.EDIT.TITLE' | translate}}</span>
 <div mat-dialog-content>
-  <cnsl-project-roles-table class="role-table" *ngIf="grant"
+  <cnsl-project-roles-table class="role-table" *ngIf="projectId"
     [displayedColumns]="['select', 'key', 'displayname', 'group']" (changedSelection)="selectRoles($event)"
-    [projectId]="grant.projectId" [grantId]="grant.projectGrantId" [selectedKeys]="grant.roleKeysList">
+    [projectId]="projectId" [grantId]="grantId" [selectedKeys]="selectedRoleKeysList">
   </cnsl-project-roles-table>
 </div>
 <div mat-dialog-actions class="action">

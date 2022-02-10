@@ -30,7 +30,7 @@
 
       <ng-container matColumnDef="key">
         <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.KEY' | translate }} </th>
-        <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
+        <td class="pointer" (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
           <div class="role-key">
             <cnsl-project-role-chip [roleName]="role.key">{{ role.key }}
             </cnsl-project-role-chip>
@@ -40,34 +40,51 @@
 
       <ng-container matColumnDef="displayname">
         <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.DISPLAY_NAME' | translate }} </th>
-        <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role"> {{role.displayName}} </td>
+        <td class="pointer" (click)="openDetailDialog(role)" mat-cell *matCellDef="let role"> {{role.displayName}} </td>
       </ng-container>
 
       <ng-container matColumnDef="group">
         <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.GROUP' | translate }} </th>
-        <td mat-cell *matCellDef="let role">
+        <td mat-cell *matCellDef="let role" class="pointer">
           <span class="role state" [ngClass]="{'no-selection': !selectionAllowed}" *ngIf="role.group"
-            (click)="selectionAllowed ? selectAllOfGroup(role.group) : null"
+            (click)="selectionAllowed ? selectAllOfGroup(role.group) : openDetailDialog(role)"
             [matTooltip]="selectionAllowed ? ('PROJECT.ROLE.SELECTGROUPTOOLTIP' | translate: role) : null">{{role.group}}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CREATIONDATE' | translate }} </th>
-        <td (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
+        <td class="pointer" (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
           <span *ngIf="role?.details?.creationDate">{{role.details.creationDate | timestampToDate |
             localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="changeDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CHANGEDATE' | translate }} </th>
+        <td class="pointer" (click)="openDetailDialog(role)" mat-cell *matCellDef="let role">
+          <span *ngIf="role?.details?.changeDate">{{role.details.changeDate | timestampToDate |
+            localizedDate: 'dd. MMM, HH:mm' }}</span>
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="actions" stickyEnd>
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let role">
-          <button
-            [disabled]="disabled || (['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"
-            mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteRole(role)">
-            <i class="las la-trash"></i>
-          </button>
+        <th mat-header-cell *matHeaderCellDef class="role-table-actions"></th>
+        <td mat-cell *matCellDef="let role" class="role-table-actions">
+          <div class="cnsl-table-action-wrapper">
+            <div class="cnsl-table-action">
+              <button mat-icon-button
+                [disabled]="disabled || (['project.role.write', 'project.role.write:' + projectId] | hasRole | async) === false"
+                (click)="openDetailDialog(role)" matTooltip="{{'ACTIONS.CHANGE' | translate}}">
+                <i class="las la-edit"></i>
+              </button>
+              <button
+                [disabled]="disabled || (['project.role.delete', 'project.role.delete:' + projectId] | hasRole | async) === false"
+                mat-icon-button color="warn" matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteRole(role)">
+                <i class="las la-trash"></i>
+              </button>
+            </div>
+          </div>
         </td>
       </ng-container>
 

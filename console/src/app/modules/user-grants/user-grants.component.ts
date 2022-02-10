@@ -207,14 +207,15 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public openEditDialog(grant: UserGrant.AsObject): void {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
-        grant,
+        projectId: grant.projectId,
+        grantId: grant.projectGrantId,
+        selectedRoleKeysList: grant.roleKeysList,
       },
       width: '600px',
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
       if (resp && resp.roles) {
-        console.log(resp.roles);
         this.userService
           .updateUserGrant(grant.id, grant.userId, resp.roles)
           .then(() => {
@@ -246,8 +247,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         cancelKey: 'ACTIONS.CANCEL',
         titleKey: 'GRANTS.DIALOG.DELETE_TITLE',
         descriptionKey: 'GRANTS.DIALOG.DELETE_DESCRIPTION',
-        width: '400px',
       },
+      width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp) => {

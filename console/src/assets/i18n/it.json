@@ -1213,6 +1213,7 @@
       "EDITDESCRIPTION": "Inserisci i nuovi dati per il ruolo.",
       "DELETE": "Rimuovi ruolo",
       "CREATIONDATE": "Creato",
+      "CHANGEDATE": "Ultima modifica",
       "SELECTGROUPTOOLTIP": "Seleziona tutti i ruoli del gruppo {{group}}.",
       "OPTIONS": "Opzioni",
       "ASSERTION": "Includi ruoli con autenticazione",
@@ -1645,8 +1646,9 @@
       "DESCRIPTION": "Qui potete vedere tutti i dettagli dell'autorizzazione."
     },
     "TOAST": {
-      "UPDATED": "Sovvenzione aggiornata.",
-      "BULKREMOVED": "Sussidi rimossi."
+      "UPDATED": "Autorizzazione aggiornata.",
+      "REMOVED": "Autorizzazione rimossa con successo.",
+      "BULKREMOVED": "Autorizzazioni rimossi con successo."
     },
     "DIALOG": {
       "DELETE_TITLE": "Elima autorizzazione",

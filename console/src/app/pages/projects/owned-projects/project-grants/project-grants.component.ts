@@ -34,7 +34,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   public dataSource!: ProjectGrantsDataSource;
   public selection: SelectionModel<GrantedProject.AsObject> = new SelectionModel<GrantedProject.AsObject>(true, []);
   public memberRoleOptions: Role.AsObject[] = [];
-  public displayedColumns: string[] = ['grantedOrgName', 'state', 'creationDate', 'changeDate'];
+  public displayedColumns: string[] = ['grantedOrgName', 'state', 'creationDate', 'changeDate', 'actions'];
 
   ProjectGrantState: any = ProjectGrantState;
 
@@ -117,14 +117,11 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  deleteSelectedGrants(): void {
-    const promises = this.selection.selected.map((grant) => {
-      return this.mgmtService.removeProjectGrant(grant.grantId, grant.projectId);
-    });
-
-    Promise.all(promises)
+  public deleteGrant(grant: GrantedProject.AsObject): Promise<void> {
+    return this.mgmtService
+      .removeProjectGrant(grant.grantId, grant.projectId)
       .then(() => {
-        this.toast.showInfo('GRANTS.TOAST.BULKREMOVED', true);
+        this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
         const data = this.dataSource.grantsSubject.getValue();
         this.selection.selected.forEach((item) => {
           const index = data.findIndex((i) => i.grantId === item.grantId);

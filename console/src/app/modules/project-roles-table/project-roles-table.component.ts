@@ -29,7 +29,7 @@ export class ProjectRolesTableComponent implements OnInit {
   public dataSource!: ProjectRolesDataSource;
   public selection: SelectionModel<Role.AsObject> = new SelectionModel<Role.AsObject>(true, []);
   @Output() public changedSelection: EventEmitter<Array<Role.AsObject>> = new EventEmitter();
-  @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'actions'];
+  @Input() public displayedColumns: string[] = ['key', 'displayname', 'group', 'creationDate', 'changeDate', 'actions'];
 
   constructor(
     private mgmtService: ManagementService,
