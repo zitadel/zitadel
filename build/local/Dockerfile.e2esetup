@@ -5,13 +5,7 @@ RUN cp -i cockroach-v21.2.5.linux-amd64/cockroach /usr/local/bin/
 
 WORKDIR /go/src/github.com/caos/zitadel
 
-#ARG UID=1000
-#ARG GID=1000
-
-# Create a group and user
-#RUN addgroup --system --gid $GID tmpgroup && \
-#    adduser --system --gid $GID --uid $UID tmpuser && \
-#    chown tmpuser:tmpgroup /usr/local/bin/cockroach
+RUN mkdir /.cache && chmod 777 /.cache
 
 #download modules
 COPY ./go.* ./

@@ -200,9 +200,6 @@ services:
     build:
       context: ../..
       dockerfile: build/local/Dockerfile.e2esetup
-      args:
-        UID: $UID
-        GID: $GID
     user: $UID:$GID
     depends_on:
       backend-run:
