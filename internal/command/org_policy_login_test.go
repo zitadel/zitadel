@@ -18,6 +18,14 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+var (
+	duration10 = time.Hour * 10
+	duration20 = time.Hour * 20
+	duration30 = time.Hour * 30
+	duration40 = time.Hour * 40
+	duration50 = time.Hour * 50
+)
+
 func TestCommandSide_AddLoginPolicy(t *testing.T) {
 	type fields struct {
 		eventstore    *eventstore.Eventstore
@@ -499,11 +507,11 @@ func TestCommandSide_ChangeLoginPolicy(t *testing.T) {
 									false,
 									false,
 									domain.PasswordlessTypeNotAllowed,
-									time.Hour*10,
-									time.Hour*20,
-									time.Hour*30,
-									time.Hour*40,
-									time.Hour*50,
+									&duration10,
+									&duration20,
+									&duration30,
+									&duration40,
+									&duration50,
 								),
 							),
 						},
@@ -1861,22 +1869,33 @@ func TestCommandSide_RemoveMultiFactorLoginPolicy(t *testing.T) {
 
 func newLoginPolicyChangedEvent(ctx context.Context, orgID string, usernamePassword, register, externalIDP, mfa, passwordReset bool,
 	passwordlessType domain.PasswordlessType,
-	passwordLifetime, externalLoginLifetime, mfaInitSkipLifetime, secondFactorLifetime, multiFactorLifetime time.Duration) *org.LoginPolicyChangedEvent {
+	passwordLifetime, externalLoginLifetime, mfaInitSkipLifetime, secondFactorLifetime, multiFactorLifetime *time.Duration) *org.LoginPolicyChangedEvent {
+	changes := []policy.LoginPolicyChanges{
+		policy.ChangeAllowUserNamePassword(usernamePassword),
+		policy.ChangeAllowRegister(register),
+		policy.ChangeAllowExternalIDP(externalIDP),
+		policy.ChangeForceMFA(mfa),
+		policy.ChangeHidePasswordReset(passwordReset),
+		policy.ChangePasswordlessType(passwordlessType),
+	}
+	if passwordLifetime != nil {
+		changes = append(changes, policy.ChangePasswordCheckLifetime(*passwordLifetime))
+	}
+	if externalLoginLifetime != nil {
+		changes = append(changes, policy.ChangeExternalLoginCheckLifetime(*externalLoginLifetime))
+	}
+	if mfaInitSkipLifetime != nil {
+		changes = append(changes, policy.ChangeMFAInitSkipLifetime(*mfaInitSkipLifetime))
+	}
+	if secondFactorLifetime != nil {
+		changes = append(changes, policy.ChangeSecondFactorCheckLifetime(*secondFactorLifetime))
+	}
+	if multiFactorLifetime != nil {
+		changes = append(changes, policy.ChangeMultiFactorCheckLifetime(*multiFactorLifetime))
+	}
 	event, _ := org.NewLoginPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
-		[]policy.LoginPolicyChanges{
-			policy.ChangeAllowUserNamePassword(usernamePassword),
-			policy.ChangeAllowRegister(register),
-			policy.ChangeAllowExternalIDP(externalIDP),
-			policy.ChangeForceMFA(mfa),
-			policy.ChangeHidePasswordReset(passwordReset),
-			policy.ChangePasswordlessType(passwordlessType),
-			policy.ChangePasswordCheckLifetime(passwordLifetime),
-			policy.ChangeExternalLoginCheckLifetime(externalLoginLifetime),
-			policy.ChangeMFAInitSkipLifetime(mfaInitSkipLifetime),
-			policy.ChangeSecondFactorCheckLifetime(secondFactorLifetime),
-			policy.ChangeMultiFactorCheckLifetime(multiFactorLifetime),
-		},
+		changes,
 	)
 	return event
 }
