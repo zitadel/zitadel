@@ -210,7 +210,7 @@ services:
       go-copy:
         condition: service_completed_successfully
     volumes:
-      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+      - ../..:/go/src/github.com/caos/zitadel/
 
 
 # this service generates the environemnt.json

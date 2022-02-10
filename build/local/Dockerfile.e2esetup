@@ -5,20 +5,16 @@ RUN cp -i cockroach-v21.2.5.linux-amd64/cockroach /usr/local/bin/
 
 WORKDIR /go/src/github.com/caos/zitadel
 
-ARG UID=1000
-ARG GID=1000
+#ARG UID=1000
+#ARG GID=1000
 
 # Create a group and user
-RUN addgroup --system --gid $GID tmpgroup && \
-    adduser --system --gid $GID --uid $UID tmpuser && \
-    chown tmpuser:tmpgroup /usr/local/bin/cockroach
+#RUN addgroup --system --gid $GID tmpgroup && \
+#    adduser --system --gid $GID --uid $UID tmpuser && \
+#    chown tmpuser:tmpgroup /usr/local/bin/cockroach
 
 #download modules
 COPY ./go.* ./
 RUN go mod download
 
-COPY . .
-RUN chown -R tmpuser:tmpgroup .
-
 CMD [ "./build/local/e2e-setup.sh" ]
-#MD ["sleep", "99999"]
