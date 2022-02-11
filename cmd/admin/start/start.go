@@ -237,7 +237,7 @@ func listen(ctx context.Context, router *mux.Router, port uint16) error {
 	http1Server := &http.Server{Handler: h2c.NewHandler(router, http2Server)}
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		return fmt.Errorf("cannot start tcp listener on %s: %w", port, err)
+		return fmt.Errorf("tcp listener on %d failed: %w", port, err)
 	}
 
 	errCh := make(chan error)
