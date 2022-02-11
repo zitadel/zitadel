@@ -1,9 +1,11 @@
 package initialise
 
 import (
+	"database/sql"
 	_ "embed"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -44,7 +46,7 @@ The user provided by flags needs priviledge to
 			if err := viper.Unmarshal(config); err != nil {
 				return err
 			}
-			return initialise(config)
+			return initialise(config, verifyUser, verifyDB, verifyGrant)
 		},
 	}
 
@@ -54,15 +56,38 @@ The user provided by flags needs priviledge to
 	cmd.PersistentFlags().StringVar(&user, userFlag, "", "(required) the user to check if the database, user and grants exists and create if not")
 	cmd.MarkPersistentFlagRequired(userFlag)
 
+	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
+
 	return cmd
 }
 
-func initialise(config *Config) error {
+func adminConfig(config database.Config) database.Config {
+	adminConfig := config
+	adminConfig.User = user
+	adminConfig.Password = password
+	adminConfig.SSL.Cert = sslCert
+	adminConfig.SSL.Key = sslKey
+
+	return adminConfig
+}
+
+func initialise(config *Config, steps ...func(*sql.DB, database.Config) error) error {
 	logging.Info("initialization started")
 
-	if err := prepareDB(config.Database, user, password, sslCert, sslKey); err != nil {
+	db, err := database.Connect(adminConfig(config.Database))
+	if err != nil {
 		return err
 	}
 
-	return prepareZitadel(config.Database)
+	for _, step := range steps {
+		if err = step(db, config.Database); err != nil {
+			return err
+		}
+	}
+
+	if err = db.Close(); err != nil {
+		return err
+	}
+
+	return verifyZitadel(config.Database)
 }
