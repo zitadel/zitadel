@@ -2,7 +2,6 @@ package initialise
 
 import (
 	_ "embed"
-	"fmt"
 
 	"github.com/caos/logging"
 	"github.com/spf13/cobra"
@@ -13,16 +12,33 @@ import (
 )
 
 var (
-	conn string
+	user     string
+	password string
+	sslCert  string
+	sslKey   string
+)
+
+const (
+	userFlag     = "user"
+	passwordFlag = "password"
+	sslCertFlag  = "ssl-cert"
+	sslKeyFlag   = "ssl-key"
 )
 
 func New() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "initialize ZITADEL instance",
-		Long: `init sets up the minimum requirements to start ZITADEL.
+		Long: `Sets up the minimum requirements to start ZITADEL.
+
 Prereqesits:
-- cockroachdb`,
+- cockroachdb
+
+The user provided by flags needs priviledge to 
+- create the database if it does not exist
+- see other users and create a new one if the user does not exist
+- grant all rights of the ZITADEL database to the user created if not yet set
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := new(Config)
 			if err := viper.Unmarshal(config); err != nil {
@@ -32,9 +48,11 @@ Prereqesits:
 		},
 	}
 
-	// cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")
-	//TODO(hust): simplify to multiple flags
-	cmd.PersistentFlags().StringVar(&conn, "connection", "", "connection string to connect with a user which is allowed to create the database and user")
+	cmd.PersistentFlags().StringVar(&password, passwordFlag, "", "password of the the provided user")
+	cmd.PersistentFlags().StringVar(&sslCert, sslCertFlag, "", "ssl cert from the provided user")
+	cmd.PersistentFlags().StringVar(&sslKey, sslKeyFlag, "", "ssl key from the provided user")
+	cmd.PersistentFlags().StringVar(&user, userFlag, "", "(required) the user to check if the database, user and grants exists and create if not")
+	cmd.MarkPersistentFlagRequired(userFlag)
 
 	return cmd
 }
@@ -42,11 +60,7 @@ Prereqesits:
 func initialise(config *Config) error {
 	logging.Info("initialization started")
 
-	if conn == "" {
-		return fmt.Errorf("connection not defined")
-	}
-
-	if err := prepareDB(config.Database); err != nil {
+	if err := prepareDB(config.Database, user, password, sslCert, sslKey); err != nil {
 		return err
 	}
 
