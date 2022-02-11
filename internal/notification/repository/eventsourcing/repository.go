@@ -5,13 +5,12 @@ import (
 	"net/http"
 
 	"github.com/caos/zitadel/internal/command"
-	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	"github.com/caos/zitadel/internal/query"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/notification/repository/eventsourcing/spooler"
 	noti_view "github.com/caos/zitadel/internal/notification/repository/eventsourcing/view"
+	"github.com/caos/zitadel/internal/query"
 )
 
 type Config struct {

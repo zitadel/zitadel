@@ -47,6 +47,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 
 func (l *Login) getStatic(ctx context.Context, bucketName, fileName string) ([]byte, *domain.AssetInfo, error) {
 	s := new(staticAsset)
+	//TODO: enable again when assets are implemented again
 	//key := bucketName + "-" + fileName
 	//err := l.staticCache.Get(key, s)
 	//if err == nil && s.Info != nil && (s.Info.Expiration.After(time.Now().Add(-1 * time.Minute))) { //TODO: config?

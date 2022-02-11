@@ -134,7 +134,7 @@ func (a *API) healthHandler() http.Handler {
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {
 	_, err := w.Write([]byte("ok"))
-	logging.Log("API-Hfss2").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(r.Context())).Error("error writing ok for health")
+	logging.WithFields("traceID", tracing.TraceIDFromCtx(r.Context())).OnError(err).Error("error writing ok for health")
 }
 
 func handleReadiness(checks []ValidationFunction) func(w http.ResponseWriter, r *http.Request) {
@@ -174,7 +174,7 @@ func validate(ctx context.Context, validations []ValidationFunction) []error {
 	errs := make([]error, 0)
 	for _, validation := range validations {
 		if err := validation(ctx); err != nil {
-			logging.Log("API-vf823").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Error("validation failed")
+			logging.WithFields("traceID", tracing.TraceIDFromCtx(ctx)).WithError(err).Error("validation failed")
 			errs = append(errs, err)
 		}
 	}

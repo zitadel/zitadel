@@ -21,11 +21,11 @@ func main() {
 	flag.Parse()
 	configFile := *directory + "asset.yaml"
 	authz, err := os.OpenFile(*directory+"../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
+	logging.New().OnError(err).Fatal("cannot open authz file")
 	router, err := os.OpenFile(*directory+"../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
+	logging.New().OnError(err).Fatal("cannot open router file")
 	docs, err := os.OpenFile(*assetsDocs, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-Dfvsd").OnError(err).Fatal("cannot open docs file")
+	logging.New().OnError(err).Fatal("cannot open docs file")
 	GenerateAssetHandler(configFile, *assetPrefix, authz, router, docs)
 }
 

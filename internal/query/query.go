@@ -3,19 +3,17 @@ package query
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"sync"
 
-	"github.com/caos/logging"
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/crypto"
-
 	"github.com/caos/zitadel/internal/api/authz"
-
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/repository/action"
@@ -48,10 +46,14 @@ type Config struct {
 
 func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
-	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start login statik dir")
+	if err != nil {
+		return nil, fmt.Errorf("unable to start login statik dir")
+	}
 
 	statikNotificationFS, err := fs.NewWithNamespace("notification")
-	logging.Log("CONFI-7usEW").OnError(err).Panic("unable to start notification statik dir")
+	if err != nil {
+		return nil, fmt.Errorf("unable to start notification statik dir")
+	}
 
 	repo = &Queries{
 		iamID:                               defaults.IamID,

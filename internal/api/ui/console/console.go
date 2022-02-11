@@ -2,6 +2,7 @@ package console
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -52,7 +53,9 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 
 func Start(config Config, domain, url, issuer, clientID string) (http.Handler, error) {
 	environmentJSON, err := createEnvironmentJSON(url, issuer, clientID)
-	logging.Log("CONSO-tMAsY").OnError(err).Fatal("unable to marshal env")
+	if err != nil {
+		return nil, fmt.Errorf("unable to marshal env for console: %w", err)
+	}
 
 	consoleDir := consoleDefaultDir
 	if config.ConsoleOverwriteDir != "" {
@@ -72,7 +75,7 @@ func Start(config Config, domain, url, issuer, clientID string) (http.Handler, e
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
 	handler.Handle(envRequestPath, cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write(environmentJSON)
-		logging.Log("CONSOLE-sdet2").OnError(err).Error("error serving environment.json")
+		logging.New().OnError(err).Error("error serving environment.json")
 	}))))
 	return handler, nil
 }
