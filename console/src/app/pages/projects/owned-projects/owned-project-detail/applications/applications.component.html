@@ -1,52 +1,50 @@
 <cnsl-refresh-table [loading]="dataSource.loading$ | async" [selection]="selection" (refreshed)="refreshPage()"
-    [dataSize]="dataSource.totalResult" [timestamp]="dataSource?.viewTimestamp">
-    <ng-template cnslHasRole [hasRole]="['project.app.write']" actions>
-        <a [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']" color="primary"
-            mat-raised-button>
-            <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
-        </a>
-    </ng-template>
+  [dataSize]="dataSource.totalResult" [timestamp]="dataSource?.viewTimestamp">
+  <ng-template cnslHasRole [hasRole]="['project.app.write']" actions>
+    <a [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'apps', 'create']" color="primary"
+      mat-raised-button>
+      <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
+    </a>
+  </ng-template>
 
-    <div class="table-wrapper">
-        <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements">
-            <ng-container matColumnDef="select">
-                <th class="selection" mat-header-cell *matHeaderCellDef>
-                    <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
-                        [checked]="selection.hasValue() && isAllSelected()"
-                        [indeterminate]="selection.hasValue() && !isAllSelected()">
-                    </mat-checkbox>
-                </th>
-                <td class="selection" mat-cell *matCellDef="let row">
-                    <mat-checkbox color="primary" (click)="$event.stopPropagation()"
-                        (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
-                    </mat-checkbox>
-                </td>
-            </ng-container>
+  <div class="table-wrapper">
+    <table [dataSource]="dataSource" mat-table class="table" aria-label="Elements">
+      <ng-container matColumnDef="select">
+        <th class="selection" mat-header-cell *matHeaderCellDef>
+          <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()">
+          </mat-checkbox>
+        </th>
+        <td class="selection" mat-cell *matCellDef="let row">
+          <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+          </mat-checkbox>
+        </td>
+      </ng-container>
 
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> {{ 'APP.NAME' | translate }} </th>
-                <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell
-                    *matCellDef="let app">
-                    {{app.name}} </td>
-            </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> {{ 'APP.NAME' | translate }} </th>
+        <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell *matCellDef="let app">
+          {{app.name}} </td>
+      </ng-container>
 
-            <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> {{ 'APP.TYPE' | translate }} </th>
-                <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell
-                    *matCellDef="let app">
-                    <span *ngIf="app?.oidcConfig?.appType !== undefined && app?.oidcConfig?.appType !== null">
-                        {{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType | translate}}
-                    </span>
-                    <span *ngIf="app.apiConfig">API</span>
-                </td>
-            </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> {{ 'APP.TYPE' | translate }} </th>
+        <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell *matCellDef="let app">
+          <span *ngIf="app?.oidcConfig?.appType !== undefined && app?.oidcConfig?.appType !== null">
+            {{'APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType | translate}}
+          </span>
+          <span *ngIf="app.apiConfig">API</span>
+        </td>
+      </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
 
-        <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="25"
-            [pageSizeOptions]="[25, 50, 100, 250]">
-        </cnsl-paginator>
-    </div>
+  <cnsl-paginator class="paginator" #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult"
+    [pageSize]="25" [pageSizeOptions]="[25, 50, 100, 250]">
+  </cnsl-paginator>
 </cnsl-refresh-table>

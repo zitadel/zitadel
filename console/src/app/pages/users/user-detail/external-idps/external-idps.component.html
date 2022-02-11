@@ -45,10 +45,14 @@
         <ng-container matColumnDef="actions" stickyEnd>
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let idp">
-            <button color="warn" mat-icon-button matTooltip="{{'ACTIONS.REMOVE' | translate}}"
-              (click)="removeExternalIdp(idp)">
-              <i class="las la-trash"></i>
-            </button>
+            <div class="cnsl-table-action-wrapper">
+              <div class="cnsl-table-action">
+                <button color="warn" mat-icon-button matTooltip="{{'ACTIONS.REMOVE' | translate}}"
+                  (click)="removeExternalIdp(idp)">
+                  <i class="las la-trash"></i>
+                </button>
+              </div>
+            </div>
           </td>
         </ng-container>
 
@@ -57,8 +61,9 @@
         </tr>
 
       </table>
-      <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0"
-        [pageSize]="20" [pageSizeOptions]="[10, 20, 50, 100]" (page)="changePage($event)"></cnsl-paginator>
     </div>
+
+    <cnsl-paginator #paginator class="paginator" [timestamp]="viewTimestamp" [length]="totalResult || 0" [pageSize]="20"
+      [pageSizeOptions]="[10, 20, 50, 100]" (page)="changePage($event)"></cnsl-paginator>
   </cnsl-refresh-table>
 </cnsl-card>

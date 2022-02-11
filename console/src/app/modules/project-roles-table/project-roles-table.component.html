@@ -91,14 +91,14 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
-    <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
-      <i class="las la-exclamation"></i>
-      <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
-    </div>
-
-    <cnsl-paginator #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="50"
-      (page)="changePage()" [pageSizeOptions]="[25, 50, 100, 250]">
-    </cnsl-paginator>
   </div>
+
+  <div *ngIf="(dataSource.loading$ | async) === false && !dataSource?.totalResult" class="no-content-row">
+    <i class="las la-exclamation"></i>
+    <span>{{'PROJECT.ROLE.EMPTY' | translate}}</span>
+  </div>
+
+  <cnsl-paginator #paginator [timestamp]="dataSource?.viewTimestamp" [length]="dataSource.totalResult" [pageSize]="50"
+    (page)="changePage()" [pageSizeOptions]="[25, 50, 100, 250]">
+  </cnsl-paginator>
 </cnsl-refresh-table>

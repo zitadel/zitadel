@@ -58,7 +58,7 @@ export function getColor(toGen: string): string {
 
 export function getMembershipColor(role: string): Color {
   const hash = hashCode(role);
-  let color = COLORS[hash];
+  let color = COLORS[hash % COLORS.length];
 
   switch (role) {
     case 'IAM_OWNER':
@@ -104,6 +104,10 @@ export function getMembershipColor(role: string): Color {
       break;
     case 'PROJECT_OWNER_VIEWER_GLOBAL':
       color = COLORS[12];
+      break;
+
+    default:
+      color = COLORS[hash % COLORS.length];
       break;
 
     // case 'PROJECT_OWNER': color =  COLORS[0]; break;
