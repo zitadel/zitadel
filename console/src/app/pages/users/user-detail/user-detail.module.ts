@@ -28,6 +28,7 @@ import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
+import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -81,6 +82,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
   imports: [
     ChangesModule,
     CommonModule,
+    SidenavModule,
     MatTabsModule,
     FormsModule,
     ReactiveFormsModule,

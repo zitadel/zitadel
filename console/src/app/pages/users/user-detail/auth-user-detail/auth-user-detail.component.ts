@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Email, Gender, Phone, Profile, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
@@ -14,12 +15,6 @@ import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 
 import { EditDialogComponent, EditDialogType } from './edit-dialog/edit-dialog.component';
-
-interface UserSetting {
-  id: string;
-  i18nKey: string;
-  featureRequired: string[] | false;
-}
 
 @Component({
   selector: 'cnsl-auth-user-detail',
@@ -42,7 +37,7 @@ export class AuthUserDetailComponent implements OnDestroy {
   public USERGRANTCONTEXT: UserGrantContext = UserGrantContext.USER;
   public refreshChanges$: EventEmitter<void> = new EventEmitter();
 
-  public settingsList: UserSetting[] = [
+  public settingsList: SidenavSetting[] = [
     { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false },
     { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false },
     { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false },
@@ -51,7 +46,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false },
     { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] },
   ];
-  public currentSetting: UserSetting | undefined = this.settingsList[0];
+  public currentSetting: string | undefined = this.settingsList[0].id;
 
   constructor(
     public translate: TranslateService,
@@ -84,7 +79,7 @@ export class AuthUserDetailComponent implements OnDestroy {
     if (small) {
       this.currentSetting = undefined;
     } else {
-      this.currentSetting = this.currentSetting === undefined ? this.settingsList[0] : this.currentSetting;
+      this.currentSetting = this.currentSetting === undefined ? this.settingsList[0].id : this.currentSetting;
     }
   }
 

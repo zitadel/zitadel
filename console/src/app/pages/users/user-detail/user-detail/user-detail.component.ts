@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { take } from 'rxjs/operators';
 import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { UserGrantContext } from 'src/app/modules/user-grants/user-grants-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { SendHumanResetPasswordNotificationRequest, UnlockUserRequest } from 'src/app/proto/generated/zitadel/management_pb';
@@ -19,20 +20,14 @@ import { ToastService } from 'src/app/services/toast.service';
 import { EditDialogComponent, EditDialogType } from '../auth-user-detail/edit-dialog/edit-dialog.component';
 import { ResendEmailDialogComponent } from '../auth-user-detail/resend-email-dialog/resend-email-dialog.component';
 
-interface UserSetting {
-  id: string;
-  i18nKey: string;
-  featureRequired?: string[];
-}
-
-const GENERAL = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL' };
-const GRANTS = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS' };
-const METADATA = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] };
-const IDP = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false };
-const PASSWORDLESS = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false };
-const MFA = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false };
-const KEYS = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false };
-const MEMBERSHIPS = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false };
+const GENERAL: SidenavSetting = { id: 'general', i18nKey: 'USER.SETTINGS.GENERAL', featureRequired: false };
+const GRANTS: SidenavSetting = { id: 'grants', i18nKey: 'USER.SETTINGS.USERGRANTS', featureRequired: false };
+const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METADATA', featureRequired: ['metadata.user'] };
+const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false };
+const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false };
+const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false };
+const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false };
+const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false };
 
 @Component({
   selector: 'cnsl-user-detail',
@@ -58,7 +53,7 @@ export class UserDetailComponent implements OnInit {
 
   public error: string = '';
 
-  public settingsList: UserSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
+  public settingsList: SidenavSetting[] = [GENERAL, GRANTS, MEMBERSHIPS, METADATA];
   public currentSetting: string | undefined = 'general';
 
   constructor(

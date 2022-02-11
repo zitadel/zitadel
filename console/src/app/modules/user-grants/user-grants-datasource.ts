@@ -126,14 +126,12 @@ export class UserGrantsDataSource extends DataSource<UserGrant.AsObject> {
           if (resp.details?.viewTimestamp) {
             this.viewTimestamp = resp.details.viewTimestamp;
           }
-          console.log(resp.resultList);
           return resp.resultList;
         }),
         catchError(() => of([])),
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe((grants) => {
-        console.log(grants);
         this.grantsSubject.next(grants);
       });
   }

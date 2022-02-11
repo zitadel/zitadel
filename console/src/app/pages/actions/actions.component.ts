@@ -68,7 +68,6 @@ export class ActionsComponent {
   private loadFlow() {
     this.mgmtService.getFlow(this.flowType).then((flowResponse) => {
       if (flowResponse.flow) this.flow = flowResponse.flow;
-      console.log(this.flow);
     });
   }
 
