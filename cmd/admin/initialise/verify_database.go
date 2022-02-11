@@ -24,8 +24,8 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(Config)
-			if err := viper.Unmarshal(config); err != nil {
+			config := Config{}
+			if err := viper.Unmarshal(&config); err != nil {
 				return err
 			}
 			return initialise(config, verifyDB)

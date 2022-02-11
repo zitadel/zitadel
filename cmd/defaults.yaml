@@ -6,15 +6,19 @@ Log:
 database:
   host: localhost
   port: 26257
-  user: zitadel
   database: zitadel
   password: 
   maxOpenConns: 3
-  ssl:
-    mode: disable
-    rootCert: 
-    cert:
-    key:
   options: 
+  user:
+    username: zitadel
+    ssl:
+      mode: disable
+      rootCert: 
+      cert:
+      key:
   # MaxConnLifetime: 30m
   # MaxConnIdleTime: 30m
+
+adminUser:
+  username: root

@@ -24,8 +24,8 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(Config)
-			if err := viper.Unmarshal(config); err != nil {
+			config := Config{}
+			if err := viper.Unmarshal(&config); err != nil {
 				return err
 			}
 			return initialise(config, verifyUser)
@@ -43,12 +43,12 @@ func verifyUser(db *sql.DB, config database.Config) error {
 }
 
 func existsUser(db *sql.DB, config database.Config) (exists bool, err error) {
-	row := db.QueryRow("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", config.User)
+	row := db.QueryRow("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", config.Username)
 	err = row.Scan(&exists)
 	return exists, err
 }
 
 func createUser(db *sql.DB, config database.Config) error {
-	_, err := db.Exec("CREATE USER $1 WITH PASSWORD $2", config.User, &sql.NullString{String: config.Password, Valid: config.Password != ""})
+	_, err := db.Exec("CREATE USER $1 WITH PASSWORD $2", config.Username, &sql.NullString{String: config.Password, Valid: config.Password != ""})
 	return err
 }

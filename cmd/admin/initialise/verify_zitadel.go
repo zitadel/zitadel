@@ -29,7 +29,7 @@ Prereqesits:
 			if err := viper.Unmarshal(config); err != nil {
 				return err
 			}
-			return initialise(config, verifyUser)
+			return verifyZitadel(config.Database)
 		},
 	}
 }
@@ -40,68 +40,58 @@ func verifyZitadel(config database.Config) error {
 		return err
 	}
 
-	if err := verifySchema(db, config, projectionsSchema); err != nil {
+	if err := verifySchema(db, projectionsSchema); err != nil {
 		return err
 	}
 
-	if err := verifySchema(db, config, eventstoreSchema); err != nil {
+	if err := verifySchema(db, eventstoreSchema); err != nil {
 		return err
 	}
 
-	if err := verifyEvents(db, config); err != nil {
+	if err := verifyEvents(db); err != nil {
 		return err
 	}
 
 	return db.Close()
 }
 
-func verifySchema(db *sql.DB, config database.Config, schema string) error {
+func verifySchema(db *sql.DB, schema string) error {
 	logging.WithFields("schema", schema).Info("verify schema")
-	exists, err := existsSchema(db, config, schema)
+	exists, err := existsSchema(db, schema)
 	if exists || err != nil {
 		return err
 	}
-	return createSchema(db, config, schema)
+	return createSchema(db, schema)
 }
 
-func existsSchema(db *sql.DB, config database.Config, schema string) (exists bool, err error) {
+func existsSchema(db *sql.DB, schema string) (exists bool, err error) {
 	row := db.QueryRow("SELECT EXISTS(SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1)", schema)
 	err = row.Scan(&exists)
 	return exists, err
 }
 
-func createSchema(db *sql.DB, config database.Config, schema string) error {
+func createSchema(db *sql.DB, schema string) error {
 	_, err := db.Exec("CREATE SCHEMA " + schema)
 	return err
 }
 
-func verifyEvents(db *sql.DB, config database.Config) error {
+func verifyEvents(db *sql.DB) error {
 	logging.Info("verify events table")
 
-	exists, err := existsEvents(db, config)
+	exists, err := existsEvents(db)
 	if exists || err != nil {
 		return err
 	}
-	return createEvents(db, config)
+	return createEvents(db)
 }
 
-func existsEvents(db *sql.DB, config database.Config) (exists bool, err error) {
+func existsEvents(db *sql.DB) (exists bool, err error) {
 	row := db.QueryRow("SELECT EXISTS(SELECT table_name FROM [SHOW TABLES] WHERE table_name = $1)", eventsTable)
 	err = row.Scan(&exists)
 	return exists, err
 }
 
-func createEvents(db *sql.DB, config database.Config) error {
-	tx, err := db.Begin()
-	if err != nil {
-		return err
-	}
-	if _, err = tx.Exec("SET experimental_enable_hash_sharded_indexes = on"); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	stmt := `CREATE TABLE eventstore.events (
+const createEventsStmt = `CREATE TABLE eventstore.events (
 	id UUID DEFAULT gen_random_uuid()
 	, event_type TEXT NOT NULL
 	, aggregate_type TEXT NOT NULL
@@ -126,7 +116,18 @@ func createEvents(db *sql.DB, config database.Config) error {
 	, CONSTRAINT previous_sequence_unique UNIQUE (previous_aggregate_sequence DESC)
 	, CONSTRAINT prev_agg_type_seq_unique UNIQUE(previous_aggregate_type_sequence)
 )`
-	if _, err = tx.Exec(stmt); err != nil {
+
+func createEvents(db *sql.DB) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	if _, err = tx.Exec("SET experimental_enable_hash_sharded_indexes = on"); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if _, err = tx.Exec(createEventsStmt); err != nil {
 		tx.Rollback()
 		return err
 	}
