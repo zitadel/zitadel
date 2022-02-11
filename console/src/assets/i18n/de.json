@@ -1394,6 +1394,7 @@
     "LIST": "Apps",
     "COMPLIANCE": "OIDC Einhaltung",
     "URLS": "Urls",
+    "CONFIGURATION": "Konfiguration",
     "PAGES": {
       "TITLE": "Anwendung",
       "ID": "ID",

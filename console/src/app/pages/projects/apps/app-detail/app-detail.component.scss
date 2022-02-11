@@ -7,6 +7,7 @@
   $warn-color: map-get($warn, 500);
   $button-text-color: map-get($foreground, text);
   $button-disabled-text-color: map-get($foreground, disabled-button);
+  $divider-color: map-get($foreground, dividers);
 
   .app-top {
     border-bottom: 1px solid map-get($foreground, divider);
@@ -97,134 +98,103 @@
     font-size: 14px;
   }
 
-  .app-divider {
-    flex-basis: 100%;
-    margin: 1.5rem 0;
-    height: 1px;
-    background-color: map-get($foreground, dividers);
+  .dev-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .devmode {
+      margin: 1rem 0 0.5rem 0;
+    }
   }
 
-  .app-expandables {
-    padding-top: 1rem;
+  .app-desc {
+    font-size: 14px;
+    margin: 0;
+  }
 
-    .app-expandable {
-      display: block;
-      width: 100%;
+  .app-input {
+    width: 100%;
+  }
 
-      .title {
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-size: 14px;
+  .app-info-row {
+    display: flex;
+    flex-direction: column;
+    margin: 0 -0.5rem;
+
+    @media only screen and (min-width: 500px) {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .app-info-wrapper {
+      display: flex;
+      flex-direction: column;
+      margin: 0 0.5rem;
+      flex: 1;
+      align-items: flex-start;
+      box-sizing: border-box;
+
+      &:not(.width) {
+        min-width: 100px;
       }
 
-      .dev-col {
+      .app-info-row-title {
+        font-size: 12px;
+        margin: 0;
+      }
+
+      .app-info-row-desc {
+        margin: 0;
+        font-size: 14px;
+        padding: 2px 0;
+      }
+
+      .app-copy-row {
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-
-        .devmode {
-          margin: 1rem 0 0.5rem 0;
-        }
-      }
-
-      .content {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        margin: 0 -0.5rem;
-        padding-bottom: 2rem;
-
-        .redirect-section {
-          flex: 1;
-          margin: 0 0.5rem;
-        }
-      }
-
-      .desc {
-        font-size: 14px;
-        margin: 0;
-      }
-
-      .input {
         width: 100%;
-      }
+        align-items: stretch;
 
-      .app-info-row {
-        display: flex;
-        flex-direction: column;
-        margin: 0 -0.5rem;
+        button {
+          transition: opacity 0.15s ease-in-out;
+          background-color: #8795a110;
+          border: 1px solid #8795a160;
+          border-radius: 4px;
+          padding: 0.25rem 1rem;
+          margin: 0.25rem 0;
+          color: $button-text-color;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          cursor: copy;
 
-        @media only screen and (min-width: 500px) {
-          flex-direction: row;
-          flex-wrap: wrap;
+          &[disabled] {
+            color: $button-disabled-text-color;
+          }
         }
 
-        .app-info-wrapper {
+        .environment {
           display: flex;
           flex-direction: column;
-          margin: 0 0.5rem;
-          flex: 1;
-          align-items: flex-start;
-          box-sizing: border-box;
+          width: 100%;
+          margin: 0.25rem 0;
 
-          &:not(.width) {
-            min-width: 100px;
-          }
-
-          .app-info-row-title {
-            font-size: 12px;
-            margin: 0;
-          }
-
-          .app-info-row-desc {
-            margin: 0;
+          .key {
             font-size: 14px;
-            padding: 2px 0;
-          }
-
-          .app-copy-row {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            align-items: stretch;
-
-            button {
-              transition: opacity 0.15s ease-in-out;
-              background-color: #8795a110;
-              border: 1px solid #8795a160;
-              border-radius: 4px;
-              padding: 0.25rem 1rem;
-              margin: 0.25rem 0;
-              color: $button-text-color;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              cursor: copy;
-
-              &[disabled] {
-                color: $button-disabled-text-color;
-              }
-            }
-
-            .environment {
-              display: flex;
-              flex-direction: column;
-              width: 100%;
-              margin: 0.25rem 0;
-
-              .key {
-                font-size: 14px;
-              }
-            }
           }
         }
       }
     }
   }
+
+  .app-main-content {
+    border-top: 1px solid $divider-color;
+    margin-top: 1.5rem;
+  }
 }
 
 .compliance {
-  .title {
+  .compliance-title {
     margin: 2rem 0 1rem 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;

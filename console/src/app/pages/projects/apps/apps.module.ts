@@ -30,6 +30,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { LinksModule } from 'src/app/modules/links/links.module';
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { NameDialogModule } from 'src/app/modules/name-dialog/name-dialog.module';
+import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
 import { OriginPipeModule } from 'src/app/pipes/origin-pipe/origin-pipe.module';
 import { RedirectPipeModule } from 'src/app/pipes/redirect-pipe/redirect-pipe.module';
 
@@ -63,6 +64,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     MatMenuModule,
     ReactiveFormsModule,
     HasRoleModule,
+    SidenavModule,
     MatMenuModule,
     MatChipsModule,
     ClientKeysModule,
@@ -89,4 +91,4 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
   ],
   exports: [TranslateModule],
 })
-export class AppsModule { }
+export class AppsModule {}

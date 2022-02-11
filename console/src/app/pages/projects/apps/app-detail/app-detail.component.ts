@@ -16,6 +16,7 @@ import { ChangeType } from 'src/app/modules/changes/changes.component';
 import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { CnslLinks } from 'src/app/modules/links/links.component';
 import { NameDialogComponent } from 'src/app/modules/name-dialog/name-dialog.component';
+import { SidenavSetting } from 'src/app/modules/sidenav/sidenav.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import {
   APIAuthMethodType,
@@ -65,10 +66,6 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public errorMessage: string = '';
   public removable: boolean = true;
   public addOnBlur: boolean = true;
-
-  public showAdditionalOrigins: boolean = false;
-  public showRedirects: boolean = false;
-  public showUrls: boolean = false;
 
   public readonly separatorKeysCodes: number[] = [ENTER, COMMA, SPACE];
 
@@ -129,6 +126,9 @@ export class AppDetailComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
   public copied: string = '';
 
+  public settingsList: SidenavSetting[] = [{ id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false }];
+  public currentSetting: string | undefined = this.settingsList[0].id;
+
   constructor(
     public translate: TranslateService,
     private route: ActivatedRoute,
@@ -173,6 +173,10 @@ export class AppDetailComponent implements OnInit, OnDestroy {
 
   public formatClockSkewLabel(seconds: number): string {
     return seconds + 's';
+  }
+
+  public additionalOriginsListChanged(origins: string[]): void {
+    this.additionalOriginsList = origins;
   }
 
   public openNameDialog(): void {
@@ -276,6 +280,13 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               if (this.app.oidcConfig) {
                 this.getAuthMethodOptions('OIDC');
 
+                this.settingsList = [
+                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
+                  { id: 'redirect-uris', i18nKey: 'APP.OIDC.REDIRECTSECTIONTITLE', featureRequired: false },
+                  { id: 'additional-origins', i18nKey: 'APP.ADDITIONALORIGINS', featureRequired: false },
+                  { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+                ];
+
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ oidc: this.app.oidcConfig });
                 this.currentAuthMethod = this.initialAuthMethod;
                 if (this.initialAuthMethod === CUSTOM_METHOD.key) {
@@ -287,6 +298,11 @@ export class AppDetailComponent implements OnInit, OnDestroy {
                 }
               } else if (this.app.apiConfig) {
                 this.getAuthMethodOptions('API');
+
+                this.settingsList = [
+                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
+                  { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+                ];
 
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
                 this.currentAuthMethod = this.initialAuthMethod;

@@ -15,15 +15,24 @@
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   input[type='radio'] {
     appearance: none;
     opacity: 0;
     display: none;
+    box-sizing: border-box;
+
+    &:focus {
+      border: 1px solid if($is-dark-theme, white, black);
+    }
   }
 
   input:checked + label {
-    border-color: if($is-dark-theme, white, var(--grey));
+    border-color: $primary-color;
+    border-width: 2px;
+    box-shadow: 0 0 6px rgb(0 0 0 / 10%);
 
     .cnsl-radio-header span {
       color: if($is-dark-theme, white, white);
@@ -33,14 +42,15 @@
   .cnsl-radio-button {
     margin: 0.5rem;
     border-radius: 0.5rem;
-    border: 1px solid if($is-dark-theme, var(--grey), white);
+    border: 1px solid $border-color;
     display: flex;
     flex-direction: column;
+    background-color: map-get($background, card);
     flex: 0 1 230px;
+    box-sizing: border-box;
     cursor: pointer;
     position: relative;
     padding-bottom: 1rem;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 
     &.first {
       margin-left: 0;
@@ -62,6 +72,7 @@
       padding: 3px 1rem;
       box-shadow: 0 0 6px rgb(0 0 0 / 10%);
       white-space: nowrap;
+      border: 1px solid $border-color;
 
       &.not {
         background: rgb(144 75 75);
@@ -75,8 +86,8 @@
       justify-content: center;
       flex-direction: column;
       background: rgb(80, 110, 110);
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
       position: relative;
 
       .current {
@@ -85,7 +96,7 @@
         left: 50%;
         transform: translateX(-50%);
         display: block;
-        color: #ffffff60;
+        color: #ffffff90;
         white-space: nowrap;
         font-size: 12px;
       }
