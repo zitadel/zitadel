@@ -87,6 +87,10 @@ RUN ./tools/install.sh
 #######################
 ## generates static files
 #######################
+
+## TODO Embed the console
+COPY --from=angular-build /console/dist/console .
+
 COPY internal/ui/login/static internal/ui/login/static
 COPY internal/ui/login/statik internal/ui/login/statik
 COPY internal/notification/static internal/notification/static
