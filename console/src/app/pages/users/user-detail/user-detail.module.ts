@@ -25,8 +25,10 @@ import { MachineKeysModule } from 'src/app/modules/machine-keys/machine-keys.mod
 import { MetaLayoutModule } from 'src/app/modules/meta-layout/meta-layout.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { PasswordComplexityViewModule } from 'src/app/modules/password-complexity-view/password-complexity-view.module';
+import { PersonalAccessTokensModule } from 'src/app/modules/personal-access-tokens/personal-access-tokens.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { ShowTokenDialogModule } from 'src/app/modules/show-token-dialog/show-token-dialog.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
@@ -94,11 +96,13 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     WarnDialogModule,
     MatDialogModule,
     QrCodeModule,
+    ShowTokenDialogModule,
     MetaLayoutModule,
     MatCheckboxModule,
     HasRolePipeModule,
     UserGrantsModule,
     MatButtonModule,
+    PersonalAccessTokensModule,
     MatIconModule,
     CardModule,
     MatProgressSpinnerModule,
