@@ -74,9 +74,12 @@ jobs:
           file: ./build/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          target: go-output
           outputs: type=local,dest=/tmp/zitadel
           build-args: |
             VERSION=${{ needs.refs.outputs.version }}
+            GOOS=${{ matrix.goos }}
+            GOARCH=${{ matrix.goarch }}
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel
