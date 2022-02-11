@@ -6,11 +6,11 @@ Log:
 Domain: localhost
 Port: 8080
 
-Eventstore:
+Database:
   Host: localhost
   Port: 26257
-  Database: zitadel
   User: zitadel
+  Database: zitadel
   Password: ""
   MaxOpenConns: 3
   MaxConnLifetime: 30m
