@@ -82,10 +82,10 @@ func applyCustomConfig(config crdb.StatementHandlerConfig, customConfig CustomCo
 		config.MaxFailureCount = *customConfig.MaxFailureCount
 	}
 	if customConfig.RequeueEvery != nil {
-		config.RequeueEvery = customConfig.RequeueEvery.Duration
+		config.RequeueEvery = *customConfig.RequeueEvery
 	}
 	if customConfig.RetryFailedAfter != nil {
-		config.RetryFailedAfter = customConfig.RetryFailedAfter.Duration
+		config.RetryFailedAfter = *customConfig.RetryFailedAfter
 	}
 
 	return config
