@@ -12,7 +12,7 @@ Database:
   User: zitadel
   Database: zitadel
   Password: ""
-  MaxOpenConns: 3
+  MaxOpenConns: 20
   MaxConnLifetime: 30m
   MaxConnIdleTime: 30m
   Options: ""

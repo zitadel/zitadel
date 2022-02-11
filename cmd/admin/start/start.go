@@ -21,44 +21,35 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
-	static_config "github.com/caos/zitadel/internal/static/config"
-
-	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/query/projection"
-
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/notification"
-	"github.com/caos/zitadel/internal/webauthn"
-
-	http_util "github.com/caos/zitadel/internal/api/http"
-
-	"github.com/caos/zitadel/internal/api/http/middleware"
-
+	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/api"
 	"github.com/caos/zitadel/internal/api/assets"
+	internal_authz "github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/admin"
 	"github.com/caos/zitadel/internal/api/grpc/auth"
 	"github.com/caos/zitadel/internal/api/grpc/management"
+	http_util "github.com/caos/zitadel/internal/api/http"
+	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/api/oidc"
 	"github.com/caos/zitadel/internal/api/ui/console"
 	"github.com/caos/zitadel/internal/api/ui/login"
+	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/zitadel/internal/database"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
-	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/openapi"
-
-	"github.com/caos/zitadel/internal/api/oidc"
-
-	"github.com/caos/zitadel/internal/authz"
-
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/domain"
-
-	admin_es "github.com/caos/zitadel/internal/admin/repository/eventsourcing"
-	internal_authz "github.com/caos/zitadel/internal/api/authz"
-	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
+	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/query/projection"
+	"github.com/caos/zitadel/internal/static"
+	static_config "github.com/caos/zitadel/internal/static/config"
+	"github.com/caos/zitadel/internal/webauthn"
+	"github.com/caos/zitadel/openapi"
 )
 
 func New() *cobra.Command {
@@ -106,7 +97,7 @@ type startConfig struct {
 	Log             *logging.Config
 	Domain          string
 	Port            uint16
-	Eventstore      types.SQL
+	Database        database.Config
 	Projections     projectionConfig
 	AuthZ           authz.Config
 	Auth            auth_es.Config
@@ -130,7 +121,7 @@ func startZitadel(config *startConfig, localDev bool) error {
 	ctx := context.Background()
 	keyChan := make(chan interface{})
 
-	dbClient, err := config.Eventstore.Start()
+	dbClient, err := database.Connect(config.Database)
 	if err != nil {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
