@@ -17,7 +17,7 @@ env:
 jobs:
   refs:
     name: Prepare CI Vars
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     outputs:
       sha_short: ${{ steps.refs.outputs.sha_short }}
       short_ref: ${{ steps.refs.outputs.short_ref }}
@@ -58,7 +58,7 @@ jobs:
   zitadel:
     name: Build ZITADEL Binary
     needs: refs
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         goos: [darwin, linux, windows]
@@ -71,7 +71,7 @@ jobs:
       - uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./build/Dockerfile
+          file: ./build/zitadel/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: go-output
@@ -82,13 +82,13 @@ jobs:
             GOARCH=${{ matrix.goarch }}
       - uses: actions/upload-artifact@v2
         with:
-          name: zitadel
+          name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
           path: /tmp/zitadel/
 
   zitadel-codecov:
     name: Upload ZITADEL Codecov
     needs: [refs, zitadel]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -98,7 +98,6 @@ jobs:
         with:
           context: .
           file: ./build/zitadel/Dockerfile
-          platforms: linux/amd64
           target: go-codecov
           cache-from: type=gha,scope=${{ github.workflow }}
           outputs: type=local,dest=/tmp/zitadel
