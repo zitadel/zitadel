@@ -7,8 +7,14 @@ import (
 	"github.com/caos/zitadel/internal/database"
 )
 
-func prepareDB(config database.Config) error {
-	db, err := sql.Open("postgres", conn)
+func prepareDB(config database.Config, user, password, sslCert, sslKey string) error {
+	adminConfig := config
+	adminConfig.User = user
+	adminConfig.Password = password
+	adminConfig.SSL.Cert = sslCert
+	adminConfig.SSL.Key = sslKey
+
+	db, err := database.Connect(adminConfig)
 	if err != nil {
 		return err
 	}
