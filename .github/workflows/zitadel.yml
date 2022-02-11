@@ -12,8 +12,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  OPERATOR_IMAGE_NAME: ${{ github.repository }}-operator
-  CRDB_IMAGE_NAME: ${{ github.repository }}-crbackup
   ARTIFACTS_FOLDER: './artifacts'
 
 jobs:
@@ -158,140 +156,10 @@ jobs:
           push: true
           cache-from: type=gha,scope=${{ github.workflow }}
           cache-to: type=gha,scope=${{ github.workflow }},mode=max
-
-  zitadel-operator:
-    name: Build ZITADEL Operator ${{ matrix.goos }}-${{ matrix.goarch }}
-    needs: refs
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        goos: [ 'linux', 'darwin', 'windows' ]
-        goarch: [ 'amd64' ]
-    steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/operator/Dockerfile
-          platforms: linux/amd64
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          cache-to: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }},mode=max
-          outputs: type=local,dest=/tmp/operator
-          build-args: |
-            OS=${{ matrix.goos }}
-            ARCH=${{ matrix.goarch }}
-            VERSION=${{ needs.refs.outputs.version }}
-            GITHUBOAUTHCLIENTID=${{ secrets.GITHUBOAUTHCLIENTID }}
-            GITHUBOAUTHCLIENTSECRET=${{ secrets.GITHUBOAUTHCLIENTSECRET }}
-      - shell: bash
-        run: |
-          mv /tmp/operator/zitadelctl /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-      - uses: actions/upload-artifact@v2
-        with:
-          name: zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: /tmp/operator/zitadelctl-${{ matrix.goos }}-${{ matrix.goarch }}
-
-  zitadel-operator-codecov:
-    name: Upload ZITADEL Operator Codecov ${{ matrix.goos }}-${{ matrix.goarch }}
-    needs: [refs, zitadel-operator]
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        goos: [ 'linux' ]
-        goarch: [ 'amd64' ]
-    steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/operator/Dockerfile
-          platforms: linux/amd64
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          target: go-codecov
-          outputs: type=local,dest=/tmp/operator
-      - uses: codecov/codecov-action@v1
-        with:
-          files: /tmp/operator/profile.cov
-          name: codecov-go
-
-  zitadel-operator-image:
-    name: Package ZITADEL Operator Image ${{ matrix.goos }}-${{ matrix.goarch }}
-    needs: [refs, zitadel-operator]
-    runs-on: ubuntu-18.04
-    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
-    strategy:
-      matrix:
-        goos: [ 'linux' ]
-        goarch: [ 'amd64' ]
-    steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ${{ env.REGISTRY }}
-      - uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./build/operator/Dockerfile
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.OPERATOR_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: true
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          build-args: |
-            OS=${{ matrix.goos }}
-            ARCH=${{ matrix.goarch }}
-            VERSION=${{ needs.refs.outputs.version }}
-
-  crdb-image:
-    name: Package ZITADEL CockroachDB Image
-    needs: refs
-    runs-on: ubuntu-18.04
-    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
-    steps:
-      - name: Source checkout
-        uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: ${{ env.REGISTRY }}
-      - uses: docker/build-push-action@v2
-        name: buildandpush
-        with:
-          context: .
-          file: ./build/cr-backup/Dockerfile
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ env.CRDB_IMAGE_NAME }}:${{ needs.refs.outputs.short_ref }}
-          push: true
-          cache-from: type=gha,scope=${{ github.workflow }}
-          cache-to: type=gha,scope=${{ github.workflow }}
-
   release:
     name: Semantic Release Images and Artifacts
     runs-on: ubuntu-18.04
-    needs: [ refs, zitadel-image, zitadel-operator-image, crdb-image ]
+    needs: [ refs, zitadel-image ]
     if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     env:
       DOCKER_USERNAME: ${{ github.repository_owner }}
@@ -307,10 +175,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
       - name: Docker Pull ZITADEL Image
         run: docker pull $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }}
-      - name: Docker Pull ZITADEL Operator Image
-        run: docker pull $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
-      - name: Docker Pull CockroachDB Image
-        run: docker pull $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }}
       - name: Download zitadelctl Artifacts
         uses: actions/download-artifact@v2
         with:
@@ -338,39 +202,27 @@ jobs:
       - name: Docker Tag Version
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
         if: steps.semantic.outputs.new_release_published == 'true'
       - name: Docker Tag Latest
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:latest
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:latest
         if: steps.semantic.outputs.new_release_published == 'true'
       - name: Docker Push Version
         run: |
           docker push $REGISTRY/$GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }}
-          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
-          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ steps.semantic.outputs.new_release_version }}
         if: steps.semantic.outputs.new_release_published == 'true'
       - name: Docker Push Latest
         run: |
           docker push $REGISTRY/$GITHUB_REPOSITORY:latest
-          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:latest
-          docker push $REGISTRY/$CRDB_IMAGE_NAME:latest
         if: steps.semantic.outputs.new_release_published == 'true'
 
       - name: Docker Tag Version
         run: |
           docker tag $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.sha_short }} $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
-          docker tag $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-          docker tag $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.sha_short }} $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
       - name: Docker Push Version
         run: |
           docker push $REGISTRY/$GITHUB_REPOSITORY:${{ needs.refs.outputs.short_ref }}
-          docker push $REGISTRY/$OPERATOR_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
-          docker push $REGISTRY/$CRDB_IMAGE_NAME:${{ needs.refs.outputs.short_ref }}
         if: steps.semantic.outputs.new_release_published != 'true' && needs.refs.outputs.short_ref != 'main' && needs.refs.outputs.short_ref != ''
       - name: Development Release
         id: create_release
@@ -398,4 +250,4 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           version: zitadel-${{ needs.refs.outputs.version }}
-          projects: "console database-operator zitadel zitadel-operator zitadelctl"
+          projects: "console zitadel zitadelctl"
