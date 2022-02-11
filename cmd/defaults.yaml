@@ -2,3 +2,19 @@ Log:
   Level: debug
   Formatter:
     Format: text
+
+database:
+  host: localhost
+  port: 26257
+  user: zitadel
+  database: zitadel
+  password: 
+  maxOpenConns: 3
+  ssl:
+    mode: disable
+    rootCert: 
+    cert:
+    key:
+  options: 
+  # MaxConnLifetime: 30m
+  # MaxConnIdleTime: 30m
