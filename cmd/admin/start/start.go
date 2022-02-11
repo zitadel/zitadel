@@ -200,8 +200,8 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 		return err
 	}
 
-	issuer := oidc.Issuer(conf.Domain, conf.Port, true) //TODO: ?
-	oidcProvider, err := oidc.NewProvider(ctx, conf.OIDC, issuer, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, userAgentInterceptor)
+	issuer := oidc.Issuer(conf.Domain, conf.Port, true)
+	oidcProvider, err := oidc.NewProvider(ctx, conf.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -223,7 +223,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, console.HandlerPrefix, conf.Domain, oidc.AuthCallback, userAgentInterceptor)
+	l, err := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, console.HandlerPrefix, conf.Domain, oidc.AuthCallback, localDevMode, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

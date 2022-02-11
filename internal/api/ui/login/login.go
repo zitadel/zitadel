@@ -49,17 +49,17 @@ type Config struct {
 }
 
 type CSRF struct {
-	CookieName  string
-	Key         *crypto.KeyConfig
-	Development bool
+	CookieName string
+	Key        *crypto.KeyConfig
 }
 
 const (
-	login         = "LOGIN"
-	HandlerPrefix = "/ui/login"
+	login                = "LOGIN"
+	HandlerPrefix        = "/ui/login"
+	DefaultLoggedOutPath = HandlerPrefix + EndpointLogoutDone
 )
 
-func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, zitadelURL, domain, oidcAuthCallbackURL string, userAgentCookie mux.MiddlewareFunc) (*Login, error) {
+func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, zitadelURL, domain, oidcAuthCallbackURL string, localDevMode bool, userAgentCookie mux.MiddlewareFunc) (*Login, error) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, fmt.Errorf("error create new aes crypto: %w", err)
@@ -85,7 +85,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
 	}
 
-	csrfInterceptor, err := createCSRFInterceptor(config.CSRF, login.csrfErrorHandler())
+	csrfInterceptor, err := createCSRFInterceptor(config.CSRF, localDevMode, login.csrfErrorHandler())
 	if err != nil {
 		return nil, fmt.Errorf("unable to create csrfInterceptor: %w", err)
 	}
@@ -108,15 +108,15 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createCSRFInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
+func createCSRFInterceptor(config CSRF, localDevMode bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
 	csrfKey, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err
 	}
 	path := "/"
 	return csrf.Protect([]byte(csrfKey),
-		csrf.Secure(!config.Development),
-		csrf.CookieName(http_utils.SetCookiePrefix(config.CookieName, "", path, !config.Development)),
+		csrf.Secure(!localDevMode),
+		csrf.CookieName(http_utils.SetCookiePrefix(config.CookieName, "", path, !localDevMode)),
 		csrf.Path(path),
 		csrf.ErrorHandler(errorHandler),
 	), nil

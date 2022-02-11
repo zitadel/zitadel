@@ -8,14 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
-
-type Config struct {
-	Connection types.SQL
-}
 
 type AuthRequestCache struct {
 	client *sql.DB

@@ -12,7 +12,6 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -38,10 +37,6 @@ type Queries struct {
 	NotificationTranslationFileContents map[string][]byte
 	supportedLangs                      []language.Tag
 	zitadelRoles                        []authz.RoleMapping
-}
-
-type Config struct {
-	Eventstore types.SQLUser
 }
 
 func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {

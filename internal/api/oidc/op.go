@@ -12,11 +12,9 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/assets"
-
-	"github.com/caos/zitadel/internal/api/ui/login"
-
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/api/ui/login"
 	"github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
@@ -34,14 +32,12 @@ const (
 )
 
 type Config struct {
-	CodeMethodS256          bool
-	AuthMethodPost          bool
-	AuthMethodPrivateKeyJWT bool
-	GrantTypeRefreshToken   bool
-	RequestObjectSupported  bool
-	SigningKeyAlgorithm     string
-	//DefaultLoginURL                   string
-	//DefaultLogoutRedirectURI          string
+	CodeMethodS256                    bool
+	AuthMethodPost                    bool
+	AuthMethodPrivateKeyJWT           bool
+	GrantTypeRefreshToken             bool
+	RequestObjectSupported            bool
+	SigningKeyAlgorithm               string
 	DefaultAccessTokenLifetime        time.Duration
 	DefaultIdTokenLifetime            time.Duration
 	DefaultRefreshTokenIdleExpiration time.Duration
@@ -87,8 +83,8 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config Config, issuer string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
-	opConfig, err := createOPConfig(config, issuer)
+func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create op config: %w", err)
 	}
@@ -116,20 +112,20 @@ func Issuer(domain string, port uint16, localDevMode bool) string {
 	return http_utils.BuildHTTP(domain, port, localDevMode) + HandlerPrefix
 }
 
-func createOPConfig(config Config, issuer string) (*op.Config, error) {
+func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string) (*op.Config, error) {
 	supportedLanguages, err := getSupportedLanguages()
 	if err != nil {
 		return nil, err
 	}
 	opConfig := &op.Config{
-		Issuer: issuer,
-		//DefaultLogoutRedirectURI: config.DefaultLogoutRedirectURI,
-		CodeMethodS256:          config.CodeMethodS256,
-		AuthMethodPost:          config.AuthMethodPost,
-		AuthMethodPrivateKeyJWT: config.AuthMethodPrivateKeyJWT,
-		GrantTypeRefreshToken:   config.GrantTypeRefreshToken,
-		RequestObjectSupported:  config.RequestObjectSupported,
-		SupportedUILocales:      supportedLanguages,
+		Issuer:                   issuer,
+		DefaultLogoutRedirectURI: defaultLogoutRedirectURI,
+		CodeMethodS256:           config.CodeMethodS256,
+		AuthMethodPost:           config.AuthMethodPost,
+		AuthMethodPrivateKeyJWT:  config.AuthMethodPrivateKeyJWT,
+		GrantTypeRefreshToken:    config.GrantTypeRefreshToken,
+		RequestObjectSupported:   config.RequestObjectSupported,
+		SupportedUILocales:       supportedLanguages,
 	}
 	if err := cryptoKey(opConfig, config.KeyConfig); err != nil {
 		return nil, err

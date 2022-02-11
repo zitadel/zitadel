@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/api/http"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -59,10 +58,6 @@ type Commands struct {
 
 type orgFeatureChecker interface {
 	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
-}
-
-type Config struct {
-	Eventstore types.SQLUser
 }
 
 func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo authz_repo.Repository, keyConfig *crypto.KeyConfig, webAuthN webauthn_helper.Config) (repo *Commands, err error) {

@@ -112,6 +112,7 @@ Notification:
       FailureCountUntilSkip: 5
       Handlers:
 
+#TODO: configure as soon as possible
 #AssetStorage:
 #  Type: $ZITADEL_ASSET_STORAGE_TYPE
 #  Config:
@@ -123,6 +124,7 @@ Notification:
 #    BucketPrefix: $ZITADEL_ASSET_STORAGE_BUCKET_PREFIX
 #    MultiDelete: $ZITADEL_ASSET_STORAGE_MULTI_DELETE
 
+#TODO: remove as soon as possible
 SystemDefaults:
   #  DefaultLanguage: 'en'
   Domain: $ZITADEL_DEFAULT_DOMAIN

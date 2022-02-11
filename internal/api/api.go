@@ -34,7 +34,6 @@ type API struct {
 type health interface {
 	Health(ctx context.Context) error
 	IAMByID(ctx context.Context, id string) (*query.IAM, error)
-	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
 func New(
@@ -59,7 +58,7 @@ func New(
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.routeGRPC()
 
-	api.RegisterHandler("/debug", api.healthHandler()) //TODO: do we need a prefix?
+	api.RegisterHandler("/debug", api.healthHandler())
 
 	return api
 }
@@ -127,7 +126,6 @@ func (a *API) healthHandler() http.Handler {
 	handler.HandleFunc("/healthz", handleHealth)
 	handler.HandleFunc("/ready", handleReadiness(checks))
 	handler.HandleFunc("/validate", handleValidate(checks))
-	handler.HandleFunc("/clientID", a.handleClientID) //TODO: remove?
 
 	return handler
 }
@@ -157,15 +155,6 @@ func handleValidate(checks []ValidationFunction) func(w http.ResponseWriter, r *
 		}
 		http_util.MarshalJSON(w, errs, nil, http.StatusOK)
 	}
-}
-
-func (a *API) handleClientID(w http.ResponseWriter, r *http.Request) {
-	id, _, err := a.health.VerifierClientID(r.Context(), "Zitadel Console")
-	if err != nil {
-		http_util.MarshalJSON(w, nil, err, http.StatusPreconditionFailed)
-		return
-	}
-	http_util.MarshalJSON(w, id, nil, http.StatusOK)
 }
 
 type ValidationFunction func(ctx context.Context) error
