@@ -1,5 +1,6 @@
 ARG NODE_VERSION=14
 ARG GO_VERSION=1.17
+ARG PLATFROM
 
 #######################
 ## These steps set platform / arch type specific variables
@@ -62,35 +63,23 @@ COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
 #######################
-## copy for local dev
+## angular lint workspace and prod build
+#######################
+RUN npm install -g @angular/cli
+RUN npm run lint
+RUN npm run prodbuild
+
+#######################
+## Stage to export the generated proto files
 #######################
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
 #######################
-## angular dev build
-#######################
-FROM npm-base as dev-angular-build
-RUN npm install -g @angular/cli
-
-#######################
-## angular lint workspace and prod build
-#######################
-FROM npm-base as prod-angular-build
-RUN npm run lint
-RUN npm run prodbuild
-
-#######################
-## Only Copy Assets
-#######################
-FROM scratch as prod-angular-export
-COPY --from=prod-angular-build /console/dist/console .
-
-#######################
 ## Go dependencies
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
-FROM golang:${GO_VERSION} as go-dep
+FROM golang:${GO_VERSION} as go-base
 RUN mkdir -p src/github.com/caos/zitadel
 WORKDIR /go/src/github.com/caos/zitadel
 
@@ -105,7 +94,6 @@ RUN ./tools/install.sh
 #######################
 ## generates static files
 #######################
-FROM go-dep AS go-static
 COPY internal/ui/login/static internal/ui/login/static
 COPY internal/ui/login/statik internal/ui/login/statik
 COPY internal/notification/static internal/notification/static
@@ -121,7 +109,6 @@ RUN go generate internal/ui/login/statik/generate.go \
 #######################
 ## generates grpc stub
 #######################
-FROM go-static AS go-stub
 COPY --from=base /proto /proto
 COPY --from=base /usr/local/bin /usr/local/bin/.
 
@@ -140,86 +127,47 @@ RUN build/zitadel/generate-grpc.sh \
 #######################
 ## Go base build
 #######################
-FROM go-stub as go-base
 # copy remaining zitadel files
 COPY . .
 
 #######################
-## copy for local dev
-#######################
-FROM scratch as go-copy
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/ui/login/statik/statik.go internal/ui/login/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
-
-COPY --from=go-stub /go/src/github.com/caos/zitadel/pkg/grpc pkg/grpc
-COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/v2/zitadel openapi/v2/zitadel
-COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/proto docs/docs/apis/proto
-COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/assets docs/docs/apis/assets
-
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
-
-#######################
 ## Go test
 #######################
-FROM go-base as go-test
-
 # Migrations for cockroach-secure
 RUN go install github.com/rakyll/statik \
     && go test -race -v -coverprofile=profile.cov $(go list ./... | grep -v /operator/)
 
 #######################
+## Go prod build
+#######################
+ARG VERSION=""
+
+RUN echo goos=$TARGETOS goarch=$TARGETARC
+
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-$TARGETOS-$TARGETARCH main.go
+
+#######################
 ## Go test results
 #######################
 FROM scratch as go-codecov
-COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
+COPY --from=go-base /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 #######################
-## Go prod build
+## Stage to export the generated proto files
 #######################
-FROM go-test as prod-go-build
-ARG BUILDARCH
-ARG VERSION=""
+FROM scratch as go-copy
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/ui/login/statik/statik.go internal/ui/login/statik/statik.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-linux-${BUILDARCH} main.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/pkg/grpc pkg/grpc
+COPY --from=go-base /go/src/github.com/caos/zitadel/openapi/v2/zitadel openapi/v2/zitadel
+COPY --from=go-base /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/templates.gen.go internal/protoc/protoc-gen-authoption/templates.gen.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/protoc/protoc-gen-authoption/authoption/options.pb.go internal/protoc/protoc-gen-authoption/authoption/options.pb.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/docs/apis/proto docs/docs/apis/proto
+COPY --from=go-base /go/src/github.com/caos/zitadel/docs/apis/assets docs/docs/apis/assets
 
-#######################
-## Go dev build
-#######################
-FROM go-base as dev-go-build
-ENTRYPOINT [ "go", "run", "main.go" ]
-
-#######################
-## Only Copy Assets
-#######################
-FROM scratch as prod-go-export
-ARG BUILDARCH
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-${BUILDARCH} .
-
-#######################
-## Final Production Image
-#######################
-FROM alpine:3 as artifact
-ARG BUILDARCH
-RUN adduser -D zitadel
-RUN ls -la
-COPY cmd/defaults.yaml /app/
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-${BUILDARCH} /app/zitadel
-RUN chmod a+x /app/zitadel
-
-#######################
-## Scratch Image
-#######################
-FROM  scratch as final
-COPY --from=artifact /etc/passwd /etc/passwd
-COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
-COPY --from=artifact /app /
-
-USER zitadel
-HEALTHCHECK NONE
-ENTRYPOINT ["/zitadel"]
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
+COPY --from=go-base /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
