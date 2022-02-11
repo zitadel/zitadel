@@ -23,7 +23,6 @@ ARG GRPC_WEB_VERSION=1.3.0
 # no arm specific version available and x86 works fine at the moment:
 ARG GRPC_WEB=protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64
 
-RUN apk add tar curl
 WORKDIR /proto
 
 #protoc
@@ -53,7 +52,7 @@ FROM node:${NODE_VERSION} as angular-build
 WORKDIR /console
 
 COPY console/package.json console/package-lock.json ./
-RUN npm install
+RUN npm ci
 
 COPY console .
 COPY --from=base /proto /proto
@@ -64,9 +63,9 @@ RUN build/console/generate-grpc.sh
 #######################
 ## angular lint workspace and prod build
 #######################
-RUN npm install -g @angular/cli
-RUN npm run lint
-RUN npm run prodbuild
+RUN npm install -g @angular/cli \
+    && npm run lint \
+    && npm run prodbuild
 
 #######################
 ## Go dependencies
@@ -140,7 +139,6 @@ RUN go install github.com/rakyll/statik \
 ARG GOOS=linux
 ARG GOARCH=amd64
 ARG VERSION=""
-RUN echo goos=${GOOS} goarch=${GOARCH}
 
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-${GOOS}-${GOARCH} main.go
 
