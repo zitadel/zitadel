@@ -145,6 +145,12 @@ RUN echo goos=${GOOS} goarch=${GOARCH}
 RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-${GOOS}-${GOARCH} main.go
 
 #######################
+## Go dev build
+#######################
+FROM go-build as dev-go-build
+ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
+
+#######################
 ## Stage to export ZITADEL Binary
 #######################
 FROM scratch as go-output

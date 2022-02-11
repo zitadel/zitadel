@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   db:
-    profiles: ['backend', 'storage']
     restart: always
     networks:
       - zitadel
@@ -23,7 +22,6 @@ services:
 # Port 50002 serves the REST API
 # Port 50003 serves the login GUI
   backend-run:
-    profiles: ['backend']
     restart: on-failure
     networks:
       - zitadel
@@ -36,33 +34,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      minio: 
-        condition: service_healthy
-      backend-setup:
-        condition: service_completed_successfully
     build:
       context: ../..
       dockerfile: build/zitadel/Dockerfile
       target: dev-go-build
-      args:
-        ENV: dev
-    volumes:
-      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
-      - ../../.notifications:/go/src/github.com/caos/zitadel/.notifications
-    env_file:
-      - ./local.env
     environment:
       - ZITADEL_EVENTSTORE_HOST=db
     ports:
       - 50001:50001
-      - 50002:50002
-      - 50003:50003
     command:
       [
-        '-console=false',
-        '-localDevMode=true',
-        '-config-files=cmd/zitadel/startup.yaml',
-        '-config-files=cmd/zitadel/system-defaults.yaml',
-        '-config-files=cmd/zitadel/authz.yaml',
         'start',
       ]
