@@ -18,7 +18,7 @@ func PersonalAccessTokensToPb(tokens []*query.PersonalAccessToken) []*user.Perso
 func PersonalAccessTokenToPb(token *query.PersonalAccessToken) *user.PersonalAccessToken {
 	return &user.PersonalAccessToken{
 		Id:             token.ID,
-		Details:        object.ChangeToDetailsPb(token.Sequence, token.ChangeDate, token.ResourceOwner),
+		Details:        object.ToViewDetailsPb(token.Sequence, token.CreationDate, token.ChangeDate, token.ResourceOwner),
 		ExpirationDate: timestamppb.New(token.Expiration),
 		Scopes:         token.Scopes,
 	}
