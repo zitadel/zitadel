@@ -134,6 +134,6 @@ jobs:
         with:
           context: .
           file: ./build/Dockerfile
-          platforms: platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: ${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.sha_short }},${{ env.REGISTRY }}/${{ github.repository }}:${{ needs.refs.outputs.short_ref }}
           push: false ## TODO change to true
