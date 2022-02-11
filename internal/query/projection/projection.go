@@ -23,8 +23,8 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 			HandlerConfig: handler.HandlerConfig{
 				Eventstore: es,
 			},
-			RequeueEvery:     config.RequeueEvery.Duration,
-			RetryFailedAfter: config.RetryFailedAfter.Duration,
+			RequeueEvery:     config.RequeueEvery,
+			RetryFailedAfter: config.RetryFailedAfter,
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,

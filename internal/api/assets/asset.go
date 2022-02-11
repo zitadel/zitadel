@@ -70,14 +70,7 @@ func DefaultErrorHandler(w http.ResponseWriter, r *http.Request, err error, code
 	http.Error(w, err.Error(), code)
 }
 
-func NewHandler(
-	commands *command.Commands,
-	verifier *authz.TokenVerifier,
-	authConfig authz.Config,
-	idGenerator id.Generator,
-	storage static.Storage,
-	queries *query.Queries,
-) http.Handler {
+func NewHandler(commands *command.Commands, verifier *authz.TokenVerifier, authConfig authz.Config, idGenerator id.Generator, storage static.Storage, queries *query.Queries) http.Handler {
 	h := &Handler{
 		commands:        commands,
 		errorHandler:    DefaultErrorHandler,

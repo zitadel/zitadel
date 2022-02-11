@@ -23,7 +23,7 @@ import (
 )
 
 type API struct {
-	port       string
+	port       uint16
 	grpcServer *grpc.Server
 	verifier   *internal_authz.TokenVerifier
 	health     health
@@ -38,7 +38,7 @@ type health interface {
 }
 
 func New(
-	port string,
+	port uint16,
 	router *mux.Router,
 	repo *struct {
 		repository.Repository
@@ -64,11 +64,15 @@ func New(
 	return api
 }
 
-func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) {
+func (a *API) RegisterServer(ctx context.Context, grpcServer server.Server) error {
 	grpcServer.RegisterServer(a.grpcServer)
-	handler, prefix := server.CreateGateway(ctx, grpcServer, a.port)
+	handler, prefix, err := server.CreateGateway(ctx, grpcServer, a.port)
+	if err != nil {
+		return err
+	}
 	a.RegisterHandler(prefix, handler)
 	a.verifier.RegisterServer(grpcServer.AppName(), grpcServer.MethodPrefix(), grpcServer.AuthMethods())
+	return nil
 }
 
 func (a *API) RegisterHandler(prefix string, handler http.Handler) {

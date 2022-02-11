@@ -3,9 +3,9 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"time"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
@@ -36,7 +36,7 @@ type userAgentHandler struct {
 type UserAgentCookieConfig struct {
 	Name   string
 	Key    *crypto.KeyConfig
-	MaxAge types.Duration
+	MaxAge time.Duration
 }
 
 func NewUserAgentHandler(config *UserAgentCookieConfig, domain string, idGenerator id.Generator, localDevMode bool) (func(http.Handler) http.Handler, error) {

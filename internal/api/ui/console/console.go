@@ -61,10 +61,10 @@ func Start(config Config, domain, url, issuer, clientID string) (http.Handler, e
 	consoleHTTPDir := http.Dir(consoleDir)
 
 	cache := assetsCacheInterceptorIgnoreManifest(
-		config.ShortCache.MaxAge.Duration,
-		config.ShortCache.SharedMaxAge.Duration,
-		config.LongCache.MaxAge.Duration,
-		config.LongCache.SharedMaxAge.Duration,
+		config.ShortCache.MaxAge,
+		config.ShortCache.SharedMaxAge,
+		config.LongCache.MaxAge,
+		config.LongCache.SharedMaxAge,
 	)
 	security := middleware.SecurityHeaders(csp(domain), nil)
 

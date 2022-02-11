@@ -3,6 +3,7 @@ package types
 import (
 	"database/sql"
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
 
@@ -22,10 +23,10 @@ type SQL struct {
 	Schema          string
 	SSL             *SSL
 	MaxOpenConns    uint32
-	MaxConnLifetime Duration
-	MaxConnIdleTime Duration
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
 
-	//Additional options to be appended as options=<Options>
+	//Additional options to be appended as options=<Options>cd
 	//The value will be taken as is. So be sure to separate multiple options by a space
 	Options string
 }
@@ -37,8 +38,8 @@ type SQLBase struct {
 	Schema          string
 	SSL             SSLBase
 	MaxOpenConns    uint32
-	MaxConnLifetime Duration
-	MaxConnIdleTime Duration
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
 
 	//Additional options to be appended as options=<Options>
 	//The value will be taken as is. So be sure to separate multiple options by a space
@@ -51,8 +52,8 @@ type SQLBase2 struct {
 	Database        string
 	Schema          string
 	MaxOpenConns    uint32
-	MaxConnLifetime Duration
-	MaxConnIdleTime Duration
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
 	SSL             SSLBase
 
 	//Additional options to be appended as options=<Options>
@@ -65,8 +66,8 @@ type SQLUser struct {
 	Password        string
 	SSL             SSLUser
 	MaxOpenConns    uint32
-	MaxConnLifetime Duration
-	MaxConnIdleTime Duration
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
 }
 
 type SSL struct {
@@ -131,8 +132,8 @@ func (s *SQL) Start() (*sql.DB, error) {
 	// as we open many sql clients we set the max
 	// open cons deep. now 3(maxconn) * 8(clients) = max 24 conns per pod
 	client.SetMaxOpenConns(int(s.MaxOpenConns))
-	client.SetConnMaxLifetime(s.MaxConnLifetime.Duration)
-	client.SetConnMaxIdleTime(s.MaxConnIdleTime.Duration)
+	client.SetConnMaxLifetime(s.MaxConnLifetime)
+	client.SetConnMaxIdleTime(s.MaxConnIdleTime)
 
 	return client, nil
 }

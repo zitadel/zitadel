@@ -1,9 +1,10 @@
 package systemdefaults
 
 import (
+	"time"
+
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/channels/chat"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
@@ -55,11 +56,11 @@ type OTPConfig struct {
 }
 
 type VerificationLifetimes struct {
-	PasswordCheck      types.Duration
-	ExternalLoginCheck types.Duration
-	MFAInitSkip        types.Duration
-	SecondFactorCheck  types.Duration
-	MultiFactorCheck   types.Duration
+	PasswordCheck      time.Duration
+	ExternalLoginCheck time.Duration
+	MFAInitSkip        time.Duration
+	SecondFactorCheck  time.Duration
+	MultiFactorCheck   time.Duration
 }
 
 type DomainVerification struct {
@@ -100,8 +101,8 @@ type TemplateData struct {
 
 type KeyConfig struct {
 	Size                     int
-	PrivateKeyLifetime       types.Duration
-	PublicKeyLifetime        types.Duration
-	SigningKeyRotationCheck  types.Duration
-	SigningKeyGracefulPeriod types.Duration
+	PrivateKeyLifetime       time.Duration
+	PublicKeyLifetime        time.Duration
+	SigningKeyRotationCheck  time.Duration
+	SigningKeyGracefulPeriod time.Duration
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/command"
@@ -35,7 +36,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, apiDomain string) []queryv1.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string) []queryv1.Handler {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	if err != nil {
 		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
@@ -53,7 +54,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			systemDefaults,
 			aesCrypto,
 			dir,
-			apiDomain,
+			assetsPrefix,
 		),
 	}
 }

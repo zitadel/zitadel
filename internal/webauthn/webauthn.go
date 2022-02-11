@@ -7,7 +7,7 @@ import (
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
-	"github.com/caos/logging"
+	//"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"

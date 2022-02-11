@@ -17,7 +17,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.21.0
 	github.com/boombuler/barcode v1.0.1
-	github.com/caos/logging v0.1.0
+	github.com/caos/logging v0.2.1
 	github.com/caos/oidc v1.0.1
 	github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
@@ -42,8 +42,8 @@ require (
 	github.com/kevinburke/twilio-go v0.0.0-20210327194925-1623146bcf73
 	github.com/lib/pq v1.10.4
 	github.com/lucasb-eyer/go-colorful v1.2.0
-	github.com/manifoldco/promptui v0.9.0
 	github.com/minio/minio-go/v7 v7.0.20
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/muesli/gamut v0.2.0
 	github.com/nicksnyder/go-i18n/v2 v2.1.2
 	github.com/pkg/errors v0.9.1
@@ -110,10 +110,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/cloudflare/cfssl v0.0.0-20190726000631-633726f6bcb7 // indirect
-	github.com/cloudflare/cloudflare-go v0.23.0 // indirect
-	github.com/cloudscale-ch/cloudscale-go-sdk v1.7.1 // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -174,7 +171,6 @@ require (
 	github.com/minio/sha256-simd v0.1.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/moby/spdystream v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -207,9 +203,8 @@ require (
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
-	golang.org/x/sys v0.0.0-20220207234003-57398862261d // indirect
-	golang.org/x/term v0.0.0-20210503060354-a79de5458b56 // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
@@ -228,3 +223,5 @@ require (
 )
 
 replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
+
+replace github.com/caos/logging => /Users/livio/workspaces/go/src/github.com/caos/logging

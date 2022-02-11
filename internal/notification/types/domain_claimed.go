@@ -16,7 +16,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *query.LabelPolicy, apiDomain string) error {
+func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, colors *query.LabelPolicy, assetsPrefix string) error {
 	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
 	if err != nil {
 		return err
@@ -26,7 +26,7 @@ func SendDomainClaimed(mailhtml string, translator *i18n.Translator, user *view_
 	args["Domain"] = strings.Split(user.LastEmail, "@")[1]
 
 	domainClaimedData := &DomainClaimedData{
-		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.DomainClaimedMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, assetsPrefix, url, domain.DomainClaimedMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 	template, err := templates.GetParsedTemplate(mailhtml, domainClaimedData)

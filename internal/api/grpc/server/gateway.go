@@ -2,19 +2,17 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/caos/logging"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	client_middleware "github.com/caos/zitadel/internal/api/grpc/client/middleware"
-	http_util "github.com/caos/zitadel/internal/api/http"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
 const (
@@ -58,15 +56,17 @@ type Gateway interface {
 
 type GatewayFunc func(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error
 
-func CreateGateway(ctx context.Context, g Gateway, port string) (http.Handler, string) {
+func CreateGateway(ctx context.Context, g Gateway, port uint16) (http.Handler, string, error) {
 	runtimeMux := runtime.NewServeMux(serveMuxOptions...)
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(client_middleware.DefaultTracingClient()),
 	}
-	err := g.RegisterGateway()(ctx, runtimeMux, "localhost"+http_util.Endpoint(port), opts)
-	logging.Log("SERVE-7B7G0E").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Panic("failed to register grpc gateway")
-	return addInterceptors(runtimeMux), g.GatewayPathPrefix()
+	err := g.RegisterGateway()(ctx, runtimeMux, fmt.Sprintf("localhost:%d", port), opts)
+	if err != nil {
+		return nil, "", fmt.Errorf("failed to register grpc gateway: %w", err)
+	}
+	return addInterceptors(runtimeMux), g.GatewayPathPrefix(), nil
 }
 
 func addInterceptors(handler http.Handler) http.Handler {

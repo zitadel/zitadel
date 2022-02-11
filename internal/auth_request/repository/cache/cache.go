@@ -21,14 +21,10 @@ type AuthRequestCache struct {
 	client *sql.DB
 }
 
-func Start(conf Config) (*AuthRequestCache, error) {
-	client, err := conf.Connection.Start()
-	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "SQL-9qBtr", "unable to open database connection")
-	}
+func Start(dbClient *sql.DB) *AuthRequestCache {
 	return &AuthRequestCache{
-		client: client,
-	}, nil
+		client: dbClient,
+	}
 }
 
 func (c *AuthRequestCache) Health(ctx context.Context) error {

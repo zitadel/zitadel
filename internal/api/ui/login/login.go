@@ -2,10 +2,11 @@ package login
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
-	"github.com/caos/logging"
 	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -14,27 +15,24 @@ import (
 	_ "github.com/caos/zitadel/internal/api/ui/login/statik"
 	auth_repository "github.com/caos/zitadel/internal/auth/repository"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	"github.com/caos/zitadel/internal/cache"
-	cache_config "github.com/caos/zitadel/internal/cache/config"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/form"
-	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/static"
 )
 
 type Login struct {
-	endpoint            string
-	router              http.Handler
-	renderer            *Renderer
-	parser              *form.Parser
-	command             *command.Commands
-	query               *query.Queries
-	staticStorage       static.Storage
-	staticCache         cache.Cache
+	endpoint      string
+	router        http.Handler
+	renderer      *Renderer
+	parser        *form.Parser
+	command       *command.Commands
+	query         *query.Queries
+	staticStorage static.Storage
+	//staticCache         cache.Cache
 	authRepo            auth_repository.Repository
 	baseURL             string
 	zitadelURL          string
@@ -44,12 +42,10 @@ type Login struct {
 }
 
 type Config struct {
-	OidcAuthCallbackURL   string
-	LanguageCookieName    string
-	CSRF                  CSRF
-	UserAgentCookieConfig *middleware.UserAgentCookieConfig
-	Cache                 middleware.CacheConfig
-	StaticCache           cache_config.CacheConfig
+	LanguageCookieName string
+	CSRF               CSRF
+	Cache              middleware.CacheConfig
+	//StaticCache         cache_config.CacheConfig
 }
 
 type CSRF struct {
@@ -63,13 +59,13 @@ const (
 	HandlerPrefix = "/ui/login"
 )
 
-func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, localDevMode bool, baseDomain, zitadelURL string) *Login {
+func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, zitadelURL, domain, oidcAuthCallbackURL string, userAgentCookie mux.MiddlewareFunc) (*Login, error) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
-		logging.Log("HANDL-s90ew").WithError(err).Debug("error create new aes crypto")
+		return nil, fmt.Errorf("error create new aes crypto: %w", err)
 	}
 	login := &Login{
-		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
+		oidcAuthCallbackURL: oidcAuthCallbackURL,
 		baseURL:             HandlerPrefix,
 		zitadelURL:          zitadelURL,
 		command:             command,
@@ -77,25 +73,31 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		staticStorage:       staticStorage,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
-		iamDomain:           systemDefaults.Domain,
+		iamDomain:           domain,
 	}
-	login.staticCache, err = config.StaticCache.Config.NewCache()
-	logging.Log("CONFI-dgg31").OnError(err).Panic("unable to create storage cache")
+	//login.staticCache, err = config.StaticCache.Config.NewCache()
+	//if err != nil {
+	//	return nil, fmt.Errorf("unable to create storage cache: %w", err)
+	//}
 
 	statikFS, err := fs.NewWithNamespace("login")
-	logging.Log("CONFI-Ga21f").OnError(err).Panic("unable to create filesystem")
+	if err != nil {
+		return nil, fmt.Errorf("unable to create filesystem: %w", err)
+	}
 
-	csrf, err := csrfInterceptor(config.CSRF, login.csrfErrorHandler())
-	logging.Log("CONFI-dHR2a").OnError(err).Panic("unable to create csrfInterceptor")
-	cache, err := middleware.DefaultCacheInterceptor(EndpointResources, config.Cache.MaxAge.Duration, config.Cache.SharedMaxAge.Duration)
-	logging.Log("CONFI-BHq2a").OnError(err).Panic("unable to create cacheInterceptor")
+	csrfInterceptor, err := createCSRFInterceptor(config.CSRF, login.csrfErrorHandler())
+	if err != nil {
+		return nil, fmt.Errorf("unable to create csrfInterceptor: %w", err)
+	}
+	cacheInterceptor, err := middleware.DefaultCacheInterceptor(EndpointResources, config.Cache.MaxAge, config.Cache.SharedMaxAge)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create cacheInterceptor: %w", err)
+	}
 	security := middleware.SecurityHeaders(csp(), login.cspErrorHandler)
-	userAgentCookie, err := middleware.NewUserAgentHandler(config.UserAgentCookieConfig, baseDomain, id.SonyFlakeGenerator, localDevMode)
-	logging.Log("CONFI-Dvwf2").OnError(err).Panic("unable to create userAgentInterceptor")
-	login.router = CreateRouter(login, statikFS, csrf, cache, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
+	login.router = CreateRouter(login, statikFS, csrfInterceptor, cacheInterceptor, security, userAgentCookie, middleware.TelemetryHandler(EndpointResources))
 	login.renderer = CreateRenderer(HandlerPrefix, statikFS, staticStorage, config.LanguageCookieName, systemDefaults.DefaultLanguage)
 	login.parser = form.NewParser()
-	return login
+	return login, nil
 }
 
 func csp() *middleware.CSP {
@@ -106,7 +108,7 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func csrfInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
+func createCSRFInterceptor(config CSRF, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
 	csrfKey, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err

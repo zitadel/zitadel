@@ -73,8 +73,8 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZC
 		iamDomain:          defaults.Domain,
 		zitadelRoles:       authZConfig.RolePermissionMappings,
 		keySize:            defaults.KeyConfig.Size,
-		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
-		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
+		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime,
+		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
