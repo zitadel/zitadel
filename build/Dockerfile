@@ -1,6 +1,7 @@
 ARG NODE_VERSION=14
 ARG GO_VERSION=1.17
-ARG PLATFROM
+ARG TARGETOS
+ARG TARGETARCH
 
 #######################
 ## These steps set platform / arch type specific variables
@@ -142,15 +143,9 @@ RUN go install github.com/rakyll/statik \
 #######################
 ARG VERSION=""
 
-RUN echo goos=$TARGETOS goarch=$TARGETARC
+RUN echo goos=$TARGETOS goarch=$TARGETARCH
 
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-$TARGETOS-$TARGETARCH main.go
-
-#######################
-## Go test results
-#######################
-FROM scratch as go-codecov
-COPY --from=go-base /go/src/github.com/caos/zitadel/profile.cov profile.cov
 
 #######################
 ## Stage to export the generated proto files
