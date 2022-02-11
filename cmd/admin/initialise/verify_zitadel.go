@@ -5,6 +5,8 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/database"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -13,23 +15,39 @@ const (
 	eventsTable       = "events"
 )
 
-func prepareZitadel(config database.Config) error {
+func newZitadel() *cobra.Command {
+	return &cobra.Command{
+		Use:   "zitadel",
+		Short: "initialize ZITADEL internas",
+		Long: `initialize ZITADEL internas.
+
+Prereqesits:
+- cockroachdb with user and database
+`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			config := new(Config)
+			if err := viper.Unmarshal(config); err != nil {
+				return err
+			}
+			return initialise(config, verifyUser)
+		},
+	}
+}
+
+func verifyZitadel(config database.Config) error {
 	db, err := database.Connect(config)
 	if err != nil {
 		return err
 	}
 
-	logging.Info("verify projections schema")
 	if err := verifySchema(db, config, projectionsSchema); err != nil {
 		return err
 	}
 
-	logging.Info("verify eventstore schema")
 	if err := verifySchema(db, config, eventstoreSchema); err != nil {
 		return err
 	}
 
-	logging.Info("verify events table")
 	if err := verifyEvents(db, config); err != nil {
 		return err
 	}
@@ -38,6 +56,7 @@ func prepareZitadel(config database.Config) error {
 }
 
 func verifySchema(db *sql.DB, config database.Config, schema string) error {
+	logging.WithFields("schema", schema).Info("verify schema")
 	exists, err := existsSchema(db, config, schema)
 	if exists || err != nil {
 		return err
@@ -57,6 +76,8 @@ func createSchema(db *sql.DB, config database.Config, schema string) error {
 }
 
 func verifyEvents(db *sql.DB, config database.Config) error {
+	logging.Info("verify events table")
+
 	exists, err := existsEvents(db, config)
 	if exists || err != nil {
 		return err
