@@ -4,15 +4,17 @@ Log:
     Format: text
 
 database:
-  host: free-tier7.aws-eu-west-1.cockroachlabs.cloud
+  host: localhost
   port: 26257
-  user: zitadel2
+  user: zitadel
   database: zitadel
-  password: Test11111111!
+  password: 
   maxOpenConns: 3
   ssl:
-    mode: verify-full
-    rootCert: /Users/adlerhurst/.postgresql/root.crt
-  options: --cluster=silvan-test-855 
+    mode: disable
+    rootCert: 
+    cert:
+    key:
+  options: 
   # MaxConnLifetime: 30m
   # MaxConnIdleTime: 30m
