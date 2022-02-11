@@ -286,6 +286,7 @@ services:
       frontend-run:
         condition: service_healthy
     image: alpine:latest
+    command: sleep 30
 
   await-init-frontend-dev:
     profiles: [ "frontend" ]
