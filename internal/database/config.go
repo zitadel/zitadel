@@ -17,7 +17,7 @@ type Config struct {
 	User            string
 	Password        string
 	Database        string
-	SSL             *ssl
+	SSL             SSL
 	MaxOpenConns    uint32
 	MaxConnLifetime types.Duration
 	MaxConnIdleTime types.Duration
@@ -27,7 +27,7 @@ type Config struct {
 	Options string
 }
 
-type ssl struct {
+type SSL struct {
 	// type of connection security
 	Mode string
 	// RootCert Path to the CA certificate
@@ -39,8 +39,8 @@ type ssl struct {
 }
 
 func (s *Config) checkSSL() {
-	if s.SSL == nil || s.SSL.Mode == sslDisabledMode || s.SSL.Mode == "" {
-		s.SSL = &ssl{Mode: sslDisabledMode}
+	if s.SSL.Mode == sslDisabledMode || s.SSL.Mode == "" {
+		s.SSL = SSL{Mode: sslDisabledMode}
 		return
 	}
 	if s.SSL.RootCert == "" {
