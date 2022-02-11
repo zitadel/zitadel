@@ -67,14 +67,15 @@ FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
 ######################
-## Output generated files by running a container from this target mounting the target dir to /dest
+## Output generated files by running a container from this target mounting the console dir to /console and your ~/.cache dir to /cache
 ######################
 FROM base as init-dev
 
 RUN apk add rsync
 
-COPY --from=npm-base /console/node_modules /src/console/node_modules
-COPY --from=npm-base /console/src/app/proto/generated /src/console/src/app/proto/generated
+COPY --from=npm-base /console/node_modules /builtconsole/node_modules
+COPY --from=npm-base /console/src/app/proto/generated /builtconsole/src/app/proto/generated
+COPY --from=npm-base /root/.cache /builtcache
 
 ARG UID=1000
 ARG GID=1000
@@ -82,7 +83,8 @@ ARG GID=1000
 # Create a group and user
 RUN addgroup -S tmpgroup -g $GID && adduser -S tmpuser -G tmpgroup -u $UID
 
-CMD [ "rsync", "-a", "--chown", "tmpuser:tmpgroup", "/src/", "/dest" ]
+ENTRYPOINT [ "sh", "-c" ]
+CMD [ "rsync -a --chown tmpuser:tmpgroup /builtconsole/ /console && rsync -a --chown tmpuser:tmpgroup /builtcache/ /cache" ]
 
 #######################
 ## angular dev build
