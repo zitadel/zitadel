@@ -5,6 +5,7 @@ Log:
 
 Domain: localhost
 Port: 8080
+LocalDev: true
 
 Database:
   Host: localhost

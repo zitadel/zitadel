@@ -72,20 +72,14 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			localDev, _ := cmd.Flags().GetBool("localDev")
-			return startZitadel(config, localDev)
+			return startZitadel(config)
 		},
 	}
-	start.PersistentFlags().Bool("localDev", true, "description")
 	bindUint16Flag(start, "port", "port to run ZITADEL on")
 	bindStringFlag(start, "domain", "domain ZITADEL will be exposed on")
+	bindBoolFlag(start, "localDev", "start ZITADEL in local unsecure dev mode")
 
 	return start
-}
-
-func bindUint16Flag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().Uint16(name, uint16(viper.GetUint(name)), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
 }
 
 func bindStringFlag(cmd *cobra.Command, name, description string) {
@@ -93,10 +87,21 @@ func bindStringFlag(cmd *cobra.Command, name, description string) {
 	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
 }
 
+func bindUint16Flag(cmd *cobra.Command, name, description string) {
+	cmd.PersistentFlags().Uint16(name, uint16(viper.GetUint(name)), description)
+	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
+}
+
+func bindBoolFlag(cmd *cobra.Command, name, description string) {
+	cmd.PersistentFlags().Bool(name, viper.GetBool(name), description)
+	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
+}
+
 type startConfig struct {
 	Log             *logging.Config
 	Domain          string
 	Port            uint16
+	LocalDev        bool
 	Database        database.Config
 	Projections     projectionConfig
 	AuthZ           authz.Config
@@ -117,7 +122,7 @@ type projectionConfig struct {
 	KeyConfig *crypto.KeyConfig
 }
 
-func startZitadel(config *startConfig, localDev bool) error {
+func startZitadel(config *startConfig) error {
 	ctx := context.Background()
 	keyChan := make(chan interface{})
 
@@ -145,7 +150,7 @@ func startZitadel(config *startConfig, localDev bool) error {
 	}
 	webAuthNConfig := webauthn.Config{
 		ID:          config.Domain,
-		Origin:      http_util.BuildHTTP(config.Domain, config.Port, localDev),
+		Origin:      http_util.BuildHTTP(config.Domain, config.Port, config.LocalDev),
 		DisplayName: "ZITADEL",
 	}
 	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, webAuthNConfig)
@@ -156,14 +161,14 @@ func startZitadel(config *startConfig, localDev bool) error {
 	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix)
 
 	router := mux.NewRouter()
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo, localDev)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, conf *startConfig, store static.Storage, authZRepo authz_repo.Repository, localDevMode bool) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *startConfig, store static.Storage, authZRepo authz_repo.Repository) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -173,35 +178,35 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(conf.Port, router, &repo, conf.InternalAuthZ, conf.SystemDefaults, localDevMode)
+	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.SystemDefaults, config.LocalDev)
 
-	authRepo, err := auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries, dbClient, conf.OIDC.KeyConfig, assets.HandlerPrefix)
+	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(conf.Admin, conf.SystemDefaults, commands, store, dbClient, localDevMode)
+	adminRepo, err := admin_es.Start(config.Admin, config.SystemDefaults, commands, store, dbClient, config.LocalDev)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, conf.SystemDefaults.Domain, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, conf.SystemDefaults, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, conf.SystemDefaults, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix)); err != nil {
 		return err
 	}
 
-	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, store, queries))
+	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(conf.UserAgentCookie, conf.Domain, id.SonyFlakeGenerator, localDevMode)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, config.Domain, id.SonyFlakeGenerator, config.LocalDev)
 	if err != nil {
 		return err
 	}
 
-	issuer := oidc.Issuer(conf.Domain, conf.Port, true)
-	oidcProvider, err := oidc.NewProvider(ctx, conf.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, conf.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, userAgentInterceptor)
+	issuer := oidc.Issuer(config.Domain, config.Port, true)
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -217,13 +222,13 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("unable to get client_id for console: %w", err)
 	}
-	c, err := console.Start(conf.Console, conf.Domain, http_util.BuildHTTP(conf.Domain, conf.Port, localDevMode), issuer, consoleID)
+	c, err := console.Start(config.Console, config.Domain, http_util.BuildHTTP(config.Domain, config.Port, config.LocalDev), issuer, consoleID)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(conf.Login, commands, queries, authRepo, store, conf.SystemDefaults, console.HandlerPrefix, conf.Domain, oidc.AuthCallback, localDevMode, userAgentInterceptor)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.Domain, oidc.AuthCallback, config.LocalDev, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
