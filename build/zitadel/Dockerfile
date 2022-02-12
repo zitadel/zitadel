@@ -48,7 +48,7 @@ COPY proto/ include/.
 ## With this step we prepare all node_modules, this helps caching the build
 ## Speed up this step by mounting your local node_modules directory
 #######################
-FROM node:${NODE_VERSION} as angular-build
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION} as angular-build
 WORKDIR /console
 
 COPY console/package.json console/package-lock.json ./
