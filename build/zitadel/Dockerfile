@@ -150,10 +150,8 @@ ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 #######################
 ## Stage to export ZITADEL Binary
 #######################
-FROM scratch as go-output
-ARG GOOS=linux
-ARG GOARCH=amd64
-COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel-${GOOS}-${GOARCH} .
+FROM --platform=$BUILDPLATFORM scratch as go-output
+COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel-$TARGETOS-$TARGETARCH .
 
 #######################
 ## Stage to export the generated proto files
