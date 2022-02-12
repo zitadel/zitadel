@@ -49,6 +49,7 @@ COPY proto/ include/.
 ## Speed up this step by mounting your local node_modules directory
 #######################
 FROM --platform=$BUILDPLATFORM node:${NODE_VERSION} as angular-build
+RUN apk add bash
 WORKDIR /console
 
 COPY console/package.json console/package-lock.json ./
