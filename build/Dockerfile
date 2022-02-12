@@ -2,11 +2,9 @@
 ## Final Production Image
 #######################
 FROM alpine:3 as artifact
-ARG GOOS
-ARG GOARCH
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/
-COPY .download/zitadel/zitadel-${GOOS}-${GOARCH} /app/zitadel
+COPY .download/zitadel/zitadel-${TARGETOS}-${TARGETARCH} /app/zitadel
 RUN chmod a+x /app/zitadel
 
 #######################
