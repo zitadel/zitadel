@@ -99,7 +99,7 @@ jobs:
           context: .
           file: ./build/zitadel/Dockerfile
           target: go-codecov
-          cache-from: type=gha,mode=max
+          cache-to: type=gha,mode=max
           cache-from: type=gha
           outputs: type=local,dest=/tmp/zitadel
       - uses: codecov/codecov-action@v1
