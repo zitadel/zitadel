@@ -103,8 +103,8 @@ jobs:
           cache-from: type=gha
           outputs: type=local,dest=/tmp/zitadel
           build-args: |
-            GOOS=${{ matrix.goos }}
-            GOARCH=${{ matrix.goarch }}
+            GOOS=linux
+            GOARCH=amd64
       - uses: codecov/codecov-action@v1
         with:
           name: zitadel-codecov
