@@ -73,8 +73,6 @@ RUN npm install -g @angular/cli \
 #######################
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} as go-build
 ARG TARGETOS TARGETARCH
-RUN mkdir -p src/github.com/caos/zitadel
-WORKDIR /go/src/github.com/caos/zitadel
 
 #download modules
 COPY ./go.* .
@@ -150,9 +148,8 @@ ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 #######################
 ## Stage to export ZITADEL Binary
 #######################
-FROM --platform=$BUILDPLATFORM scratch as go-output
-ARG TARGETOS TARGETARCH
-COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel .
+FROM scratch as go-output
+COPY --from=go-build /go/ .
 
 #######################
 ## Stage to export the generated proto files
