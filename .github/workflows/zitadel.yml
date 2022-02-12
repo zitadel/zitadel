@@ -72,8 +72,8 @@ jobs:
         with:
           context: .
           file: ./build/zitadel/Dockerfile
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
           target: go-output
           outputs: type=local,dest=/tmp/zitadel
           build-args: |
@@ -99,7 +99,8 @@ jobs:
           context: .
           file: ./build/zitadel/Dockerfile
           target: go-codecov
-          cache-from: type=gha,scope=${{ github.workflow }}
+          cache-from: type=gha,mode=max
+          cache-from: type=gha
           outputs: type=local,dest=/tmp/zitadel
       - uses: codecov/codecov-action@v1
         with:
