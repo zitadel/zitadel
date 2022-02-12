@@ -1,6 +1,9 @@
 #######################
 ## Final Production Image
 #######################
+ARG TARGETOS
+ARG TARGETARCH
+
 FROM alpine:3 as artifact
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/
