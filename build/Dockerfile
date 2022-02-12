@@ -2,10 +2,11 @@
 ## Final Production Image
 #######################
 FROM alpine:3 as artifact
+ARG TARGETOS TARGETARCH
 RUN adduser -D zitadel
 COPY cmd/zitadel/*.yaml /app/
-RUN echo zitadel-${BUILDOS}-${BUILDARCH}
-COPY .download/zitadel/zitadel-${BUILDOS}-${BUILDARCH} /app/zitadel
+RUN echo zitadel-$TARGETOS-$TARGETARCH
+COPY .download/zitadel/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
 RUN chmod a+x /app/zitadel
 
 #######################
