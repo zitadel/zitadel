@@ -139,7 +139,7 @@ RUN go install github.com/rakyll/statik \
 #######################
 ARG VERSION=""
 
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-$TARGETOS-$TARGETARCH main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel main.go
 
 #######################
 ## Go dev build
@@ -152,7 +152,7 @@ ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 #######################
 FROM --platform=$BUILDPLATFORM scratch as go-output
 ARG TARGETOS TARGETARCH
-COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel-$TARGETOS-$TARGETARCH .
+COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel .
 
 #######################
 ## Stage to export the generated proto files
