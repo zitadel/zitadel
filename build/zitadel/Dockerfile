@@ -1,5 +1,5 @@
-ARG NODE_VERSION=14
-ARG GO_VERSION=1.17
+ARG NODE_VERSION=16-alpine
+ARG GO_VERSION=1.17-alpine
 
 #######################
 ## These steps set platform / arch type specific variables
@@ -73,6 +73,8 @@ RUN npm install -g @angular/cli \
 #######################
 FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} as go-build
 ARG TARGETOS TARGETARCH
+RUN mkdir -p src/github.com/caos/zitadel
+WORKDIR /go/src/github.com/caos/zitadel
 
 #download modules
 COPY ./go.* .
@@ -148,8 +150,9 @@ ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 #######################
 ## Stage to export ZITADEL Binary
 #######################
-FROM scratch as go-output
-COPY --from=go-build /go/ .
+FROM --platform=$BUILDPLATFORM scratch as go-output
+ARG TARGETOS TARGETARCH
+COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel .
 
 #######################
 ## Stage to export the generated proto files
