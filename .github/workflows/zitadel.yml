@@ -104,6 +104,9 @@ jobs:
           cache-to: type=gha,mode=max
           cache-from: type=gha
           outputs: type=local,dest=/tmp/zitadel
+          build-args: |
+            GOOS=${{ matrix.goos }}
+            GOARCH=${{ matrix.goarch }}
       - uses: codecov/codecov-action@v1
         with:
           name: zitadel-codecov
