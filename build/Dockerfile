@@ -4,7 +4,7 @@
 FROM alpine:3 as artifact
 ARG TARGETOS TARGETARCH
 RUN adduser -D zitadel
-COPY cmd/zitadel/*.yaml /app/
+COPY cmd/defaults.yaml /app/
 RUN echo zitadel-$TARGETOS-$TARGETARCH
 COPY .download/zitadel/zitadel-$TARGETOS-$TARGETARCH /app/zitadel
 RUN chmod a+x /app/zitadel

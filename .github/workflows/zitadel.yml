@@ -59,10 +59,6 @@ jobs:
     name: Build ZITADEL Binary
     needs: refs
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        goos: [darwin, linux, windows]
-        goarch: [amd64, arm64]
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -72,17 +68,15 @@ jobs:
         with:
           context: .
           file: ./build/zitadel/Dockerfile
-          cache-from: type=gha,scope=${{ matrix.goos }}-${{ matrix.goarch }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.goos }}-${{ matrix.goarch }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           target: go-output
           outputs: type=local,dest=/tmp/zitadel
           build-args: |
             VERSION=${{ needs.refs.outputs.version }}
-            GOOS=${{ matrix.goos }}
-            GOARCH=${{ matrix.goarch }}
       - uses: actions/upload-artifact@v2
         with:
-          name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
+          name: zitadel
           path: /tmp/zitadel/
 
   zitadel-codecov:

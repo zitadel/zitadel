@@ -71,7 +71,8 @@ RUN npm install -g @angular/cli \
 ## Go dependencies
 ## Speed up this step by mounting your local go mod pkg directory
 #######################
-FROM golang:${GO_VERSION} as go-build
+FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} as go-build
+ARG TARGETOS TARGETARCH
 RUN mkdir -p src/github.com/caos/zitadel
 WORKDIR /go/src/github.com/caos/zitadel
 
@@ -136,11 +137,9 @@ RUN go install github.com/rakyll/statik \
 #######################
 ## Go prod build
 #######################
-ARG GOOS=linux
-ARG GOARCH=amd64
 ARG VERSION=""
 
-RUN CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-${GOOS}-${GOARCH} main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-$TARGETOS-$TARGETARCH main.go
 
 #######################
 ## Go dev build
