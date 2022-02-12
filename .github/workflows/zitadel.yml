@@ -77,7 +77,7 @@ jobs:
             VERSION=${{ needs.refs.outputs.version }}
       - uses: actions/upload-artifact@v2
         with:
-          name: zitadel-binaries.zip
+          name: zitadel
           path: /tmp/zitadel/
 
   zitadel-codecov:

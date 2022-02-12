@@ -11,7 +11,7 @@ RUN chmod a+x /app/zitadel
 #######################
 ## Scratch Image
 #######################
-FROM  scratch as final
+FROM  --platform=$BUILDPLATFORM scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app /
