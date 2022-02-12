@@ -1,7 +1,7 @@
 #######################
 ## Final Production Image
 #######################
-FROM alpine:3 as artifact
+FROM --platform=$BUILDPLATFORM alpine:3 as artifact
 ARG TARGETOS TARGETARCH
 RUN adduser -D zitadel
 COPY cmd/defaults.yaml /app/

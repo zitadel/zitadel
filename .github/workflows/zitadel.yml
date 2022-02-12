@@ -68,6 +68,7 @@ jobs:
         with:
           context: .
           file: ./build/zitadel/Dockerfile
+          platforms: linux/amd64,linux/arm64,darwin/amd64,darwin/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: go-output
