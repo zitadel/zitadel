@@ -151,6 +151,7 @@ ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
 ## Stage to export ZITADEL Binary
 #######################
 FROM --platform=$BUILDPLATFORM scratch as go-output
+ARG TARGETOS TARGETARCH
 COPY --from=go-build /go/src/github.com/caos/zitadel/zitadel-$TARGETOS-$TARGETARCH .
 
 #######################

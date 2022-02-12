@@ -93,13 +93,11 @@ jobs:
         with:
           context: .
           file: ./build/zitadel/Dockerfile
+          platforms: linux/amd64
           target: go-codecov
           cache-to: type=gha,mode=max
           cache-from: type=gha
           outputs: type=local,dest=/tmp/zitadel
-          build-args: |
-            GOOS=linux
-            GOARCH=amd64
       - uses: codecov/codecov-action@v1
         with:
           name: zitadel-codecov
