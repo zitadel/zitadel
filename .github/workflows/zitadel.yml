@@ -80,9 +80,6 @@ jobs:
             VERSION=${{ needs.refs.outputs.version }}
             GOOS=${{ matrix.goos }}
             GOARCH=${{ matrix.goarch }}
-      - name: Add exe to windows artifacts
-        if: ${{ matrix.os == windows }}
-        run: mv zitadel-windows-amd64 zitadel-windows-amd64.exe && mv zitadel-windows-arm64 zitadel-windows-arm64.exe
       - uses: actions/upload-artifact@v2
         with:
           name: zitadel-${{ matrix.goos }}-${{ matrix.goarch }}
