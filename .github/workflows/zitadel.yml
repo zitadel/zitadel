@@ -105,6 +105,9 @@ jobs:
           build-args: |
             GOOS=linux
             GOARCH=amd64
+      - name: Add exe to windows artifacts
+        if: ${{ matrix.os == windows }}
+        run: mv zitadel-windows-amd64 zitadel-windows-amd64.exe && mv zitadel-windows-arm64 zitadel-windows-arm64.exe
       - uses: codecov/codecov-action@v1
         with:
           name: zitadel-codecov
