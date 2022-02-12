@@ -4,10 +4,10 @@ ARG GO_VERSION=1.17
 #######################
 ## These steps set platform / arch type specific variables
 #######################
-FROM alpine:3 AS arm64-base
+FROM --platform=$BUILDPLATFORM alpine:3 AS arm64-base
 ENV PROTOC_ARCH aarch_64
 
-FROM alpine:3 AS amd64-base
+FROM --platform=$BUILDPLATFORM alpine:3 AS amd64-base
 ENV PROTOC_ARCH x86_64
 
 #######################
