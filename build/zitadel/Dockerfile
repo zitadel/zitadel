@@ -45,8 +45,8 @@ RUN go generate internal/ui/login/statik/generate.go \
 ## generates grpc stub
 #######################
 FROM go-static AS go-stub
-COPY --from=base /proto /proto
-COPY --from=base /usr/local/bin /usr/local/bin/.
+COPY --from=zitadel-local/base:latest /proto /proto
+COPY --from=zitadel-local/base:latest /usr/local/bin /usr/local/bin/.
 
 COPY build/zitadel/generate-grpc.sh build/zitadel/generate-grpc.sh
 COPY internal/protoc internal/protoc

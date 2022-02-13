@@ -15,7 +15,7 @@ ENV PROTOC_ARCH x86_64
 ## downloads the protofiles,
 ## protoc and protoc-gen-grpc-web for later use
 #######################
-FROM ${BUILDARCH}-base AS base
+FROM ${BUILDARCH}-base
 ARG PROTOC_VERSION=3.13.0
 ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
 ARG GRPC_WEB_VERSION=1.3.0

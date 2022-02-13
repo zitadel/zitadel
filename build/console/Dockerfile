@@ -11,8 +11,8 @@ COPY console/package.json console/package-lock.json ./
 RUN npm ci
 
 COPY console .
-COPY --from=base /proto /proto
-COPY --from=base /usr/local/bin /usr/local/bin/.
+COPY --from=zzitadel-local/base:latest /proto /proto
+COPY --from=zitadel-local/base:latest /usr/local/bin /usr/local/bin/.
 COPY build/console build/console/
 RUN build/console/generate-grpc.sh
 
