@@ -36,4 +36,5 @@ jobs:
           args: release --snapshot --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker buildx build -f build/grpc/Dockerfile -t zitadel-local/base:latest .
       - run: docker images
