@@ -1,0 +1,25 @@
+project_name: ZITADEL
+before:
+  hooks:
+    - docker build -f build/grpc/Dockerfile -t base .
+    - docker build -f build/console/Dockerfile . -t npm-base --target npm-copy -o .
+    - docker build -f build/zitadel/Dockerfile . -t go-base --target go-copy -o .
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+- format: binary
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
