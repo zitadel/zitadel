@@ -7,7 +7,7 @@ release:
   prerelease: auto
 before:
   hooks:
-    - docker buildx build -f build/grpc/Dockerfile -t zitadel-local/base:latest .
+    - docker buildx build -f build/grpc/Dockerfile -t ghcr.io/caos/zitadel-base:latest .
     - docker buildx build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .
     - docker buildx build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .
     - docker buildx build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .
