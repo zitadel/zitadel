@@ -1,3 +1,5 @@
+ARG BUILDARCH=x86_64
+
 #######################
 ## These steps set platform / arch type specific variables
 #######################
