@@ -1,17 +1,14 @@
 #######################
 ## Final Production Image
 #######################
-FROM --platform=$BUILDPLATFORM alpine:3 as artifact
-ARG TARGETOS TARGETARCH
+FROM alpine:3 as artifact
+COPY zitadel /app/zitadel
 RUN adduser -D zitadel
-COPY cmd/defaults.yaml /app/
-COPY .download/zitadel/$TARGETOS_$TARGETARCH/zitadel /app/zitadel
-RUN chmod a+x /app/zitadel
 
 #######################
 ## Scratch Image
 #######################
-FROM  --platform=$BUILDPLATFORM scratch as final
+FROM  scratch as final
 COPY --from=artifact /etc/passwd /etc/passwd
 COPY --from=artifact /etc/ssl/certs /etc/ssl/certs
 COPY --from=artifact /app /

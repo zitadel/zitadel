@@ -101,25 +101,3 @@ RUN go install github.com/rakyll/statik \
 #######################
 FROM scratch as go-codecov
 COPY --from=go-test /go/src/github.com/caos/zitadel/profile.cov profile.cov
-
-#######################
-## Go prod build
-#######################
-FROM go-test as prod-go-build
-ARG BUILDARCH
-ARG VERSION=""
-
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=${BUILDARCH} go build -a -installsuffix cgo -ldflags "-X main.version=${VERSION:-'dev'} -extldflags \"-static\"" -o zitadel-linux-${BUILDARCH} cmd/zitadel/main.go
-
-#######################
-## Go dev build
-#######################
-FROM go-base as dev-go-build
-ENTRYPOINT [ "go", "run", "cmd/zitadel/main.go" ]
-
-#######################
-## Only Copy Assets
-#######################
-FROM scratch as prod-go-export
-ARG BUILDARCH
-COPY --from=prod-go-build /go/src/github.com/caos/zitadel/zitadel-linux-${BUILDARCH} .
