@@ -1,14 +1,14 @@
-name: goreleaser
+name: ZITADEL Release
 
 on:
-  pull_request:
+  #pull_request:
   push:
 
 permissions:
   contents: write
 
 jobs:
-  goreleaser:
+  Build:
     runs-on: ubuntu-20.04
     steps:
       - name: Source checkout
