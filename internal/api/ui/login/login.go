@@ -32,7 +32,7 @@ type Login struct {
 	command       *command.Commands
 	query         *query.Queries
 	staticStorage static.Storage
-	//staticCache         cache.Cache
+	//staticCache         cache.Cache //TODO: enable when storage is implemented again
 	authRepo            auth_repository.Repository
 	baseURL             string
 	zitadelURL          string
@@ -45,7 +45,7 @@ type Config struct {
 	LanguageCookieName string
 	CSRF               CSRF
 	Cache              middleware.CacheConfig
-	//StaticCache         cache_config.CacheConfig
+	//StaticCache         cache_config.CacheConfig //TODO: enable when storage is implemented again
 }
 
 type CSRF struct {
@@ -75,6 +75,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		IDPConfigAesCrypto:  aesCrypto,
 		iamDomain:           domain,
 	}
+	//TODO: enable when storage is implemented again
 	//login.staticCache, err = config.StaticCache.Config.NewCache()
 	//if err != nil {
 	//	return nil, fmt.Errorf("unable to create storage cache: %w", err)

@@ -38,6 +38,7 @@ func (l *Login) handleDynamicResources(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	//TODO: enable again when assets are implemented again
 	_ = asset
 	//w.Header().Set("content-length", strconv.FormatInt(info.Size, 10))
 	//w.Header().Set("content-type", info.ContentType)
@@ -82,6 +83,7 @@ func (l *Login) getStatic(ctx context.Context, bucketName, fileName string) ([]b
 	return s.Data, s.Info, nil
 }
 
+//TODO: enable again when assets are implemented again
 //
 //func (l *Login) cacheStatic(bucketName, fileName string, s *staticAsset) {
 //	key := bucketName + "-" + fileName
