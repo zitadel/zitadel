@@ -9,6 +9,6 @@ title: Libraries
 | .Net         | Authentication / Authorization library written in dotnet for the asp.net web application package. | [https://github.com/caos/zitadel-net](https://github.com/caos/zitadel-net)
 | Dart         | Dart library for ZITADEL, contains gRPC and API access elements.   | [https://github.com/caos/zitadel-dart](https://github.com/caos/zitadel-dart) |
 | Elixir       | API Client for the ZITADEL API. | [https://github.com/jshmrtn/zitadel_api](https://github.com/jshmrtn/zitadel_api) |
-| Rust       | Implementation of the ZITADEL gRPC API. Complemented with other useful elements such as Service Account auth. | [https://crates.io/crates/zitadel/1.0.0](https://crates.io/crates/zitadel/1.0.0) |
+| Rust       | Implementation of the ZITADEL gRPC API. Complemented with other useful elements such as Service Account auth. | [https://crates.io/crates/zitadel](https://crates.io/crates/zitadel) |
 
 
