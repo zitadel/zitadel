@@ -35,7 +35,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: false
-          tags: zitadel-base:latest
+          tags: zitadel-base:local
           load: true
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
