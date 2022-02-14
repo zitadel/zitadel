@@ -161,6 +161,76 @@ service AdminService {
         };
     }
 
+    // Get file system notification provider
+    rpc GetFileSystemNotificationProvider(GetFileSystemNotificationProviderRequest) returns (GetFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/file";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add filesystem notification provider
+    rpc AddFileSystemNotificationProvider(AddFileSystemNotificationProviderRequest) returns (AddFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            post: "/notification/provider/file";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update filesystem notification provider
+    rpc UpdateFileSystemNotificationProvider(UpdateFileSystemNotificationProviderRequest) returns (UpdateFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            put: "/notification/provider/file";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get log notification provider
+    rpc GetLogNotificationProvider(GetLogNotificationProviderRequest) returns (GetLogNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/log";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add log notification provider
+    rpc AddLogSystemNotificationProvider(AddLogSystemNotificationProviderRequest) returns (AddLogSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            post: "/notification/provider/log";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update filesystem notification provider
+    rpc UpdateLogSystemNotificationProvider(UpdateLogSystemNotificationProviderRequest) returns (UpdateLogSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            put: "/notification/provider/log";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
