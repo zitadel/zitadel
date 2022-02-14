@@ -54,5 +54,5 @@ jobs:
           path: .artifacts/console
       - uses: codecov/codecov-action@v1
         with:
-          files: /tmp/operator/profile.cov
-          name: .artifacts/codecov/profile.cov
+          files: .artifacts/codecov/profile.cov
+          name: go-codecov
