@@ -28,12 +28,12 @@ dockers:
   dockerfile: build/Dockerfile
   build_flag_templates:
   - "--platform=linux/amd64"
-- image_templates:
-  - "caos/zitadel:{{ .Version }}-arm64"
-  use: buildx
-  dockerfile: build/Dockerfile
-  build_flag_templates:
-  - "--platform=linux/arm64"
+# - image_templates:
+#   - "caos/zitadel:{{ .Version }}-arm64"
+#   use: buildx
+#   dockerfile: build/Dockerfile
+#   build_flag_templates:
+#   - "--platform=linux/arm64"
 archives:
 - format: binary
 gomod:
