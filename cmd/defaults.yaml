@@ -7,11 +7,11 @@ database:
   host: localhost
   port: 26257
   database: zitadel
-  password: 
   maxOpenConns: 3
   options: 
   user:
     username: zitadel
+    password: 
     ssl:
       mode: disable
       rootCert: 

@@ -41,9 +41,6 @@ The user provided by flags needs priviledge to
 	}
 
 	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
-
-	cmd.AddCommand(newZitadel(), newDatabase(), newUser(), newGrant())
-
 	return cmd
 }
 
