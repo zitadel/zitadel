@@ -7,8 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing/spooler"
 	admin_view "github.com/caos/zitadel/internal/admin/repository/eventsourcing/view"
-	"github.com/caos/zitadel/internal/command"
-	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/static"
@@ -24,7 +22,7 @@ type EsRepository struct {
 	eventstore.AdministratorRepo
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, static static.Storage, dbClient *sql.DB, localDevMode bool) (*EsRepository, error) {
+func Start(conf Config, static static.Storage, dbClient *sql.DB, loginPrefix string) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -34,7 +32,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, systemDefaults, command, static, localDevMode)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, static, loginPrefix)
 
 	return &EsRepository{
 		spooler: spool,

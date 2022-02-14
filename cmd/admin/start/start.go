@@ -76,8 +76,9 @@ Requirements:
 		},
 	}
 	bindUint16Flag(start, "port", "port to run ZITADEL on")
-	bindStringFlag(start, "domain", "domain ZITADEL will be exposed on")
-	bindBoolFlag(start, "localDev", "start ZITADEL in local unsecure dev mode")
+	bindStringFlag(start, "externalDomain", "domain ZITADEL will be exposed on")
+	bindStringFlag(start, "externalPort", "port ZITADEL will be exposed on")
+	bindBoolFlag(start, "externalSecure", "if ZITADEL will be served on HTTPS")
 
 	return start
 }
@@ -99,9 +100,10 @@ func bindBoolFlag(cmd *cobra.Command, name, description string) {
 
 type startConfig struct {
 	Log             *logging.Config
-	Domain          string
 	Port            uint16
-	LocalDev        bool
+	ExternalPort    uint16
+	ExternalDomain  string
+	ExternalSecure  bool
 	Database        database.Config
 	Projections     projectionConfig
 	AuthZ           authz.Config
@@ -150,8 +152,8 @@ func startZitadel(config *startConfig) error {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
 	webAuthNConfig := webauthn.Config{
-		ID:          config.Domain,
-		Origin:      http_util.BuildHTTP(config.Domain, config.Port, config.LocalDev),
+		ID:          config.ExternalDomain,
+		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
 		DisplayName: "ZITADEL",
 	}
 	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, webAuthNConfig)
@@ -179,13 +181,13 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.SystemDefaults, config.LocalDev)
+	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.SystemDefaults, config.ExternalSecure)
 
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
-	adminRepo, err := admin_es.Start(config.Admin, config.SystemDefaults, commands, store, dbClient, config.LocalDev)
+	adminRepo, err := admin_es.Start(config.Admin, store, dbClient, login.HandlerPrefix)
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
@@ -201,12 +203,12 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 
 	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, config.Domain, id.SonyFlakeGenerator, config.LocalDev)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
 		return err
 	}
 
-	issuer := oidc.Issuer(config.Domain, config.Port, true)
+	issuer := oidc.Issuer(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
@@ -223,13 +225,13 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("unable to get client_id for console: %w", err)
 	}
-	c, err := console.Start(config.Console, config.Domain, http_util.BuildHTTP(config.Domain, config.Port, config.LocalDev), issuer, consoleID)
+	c, err := console.Start(config.Console, config.ExternalDomain, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), issuer, consoleID)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.Domain, oidc.AuthCallback, config.LocalDev, userAgentInterceptor)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

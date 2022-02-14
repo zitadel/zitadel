@@ -108,8 +108,8 @@ func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedire
 	return provider, nil
 }
 
-func Issuer(domain string, port uint16, localDevMode bool) string {
-	return http_utils.BuildHTTP(domain, port, localDevMode) + HandlerPrefix
+func Issuer(domain string, port uint16, externalSecure bool) string {
+	return http_utils.BuildHTTP(domain, port, externalSecure) + HandlerPrefix
 }
 
 func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string) (*op.Config, error) {

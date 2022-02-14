@@ -39,7 +39,7 @@ type UserAgentCookieConfig struct {
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, domain string, idGenerator id.Generator, localDevMode bool) (func(http.Handler) http.Handler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
 	key, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func NewUserAgentHandler(config *UserAgentCookieConfig, domain string, idGenerat
 		http_utils.WithDomain(domain),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
 	}
-	if localDevMode {
+	if !externalSecure {
 		opts = append(opts, http_utils.WithUnsecure())
 	}
 	return func(handler http.Handler) http.Handler {

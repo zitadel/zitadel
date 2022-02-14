@@ -23,12 +23,12 @@ import (
 )
 
 type API struct {
-	port       uint16
-	grpcServer *grpc.Server
-	verifier   *internal_authz.TokenVerifier
-	health     health
-	router     *mux.Router
-	localMode  bool
+	port           uint16
+	grpcServer     *grpc.Server
+	verifier       *internal_authz.TokenVerifier
+	health         health
+	router         *mux.Router
+	externalSecure bool
 }
 
 type health interface {
@@ -45,15 +45,15 @@ func New(
 	},
 	authZ internal_authz.Config,
 	sd systemdefaults.SystemDefaults,
-	localMode bool,
+	externalSecure bool,
 ) *API {
 	verifier := internal_authz.Start(repo)
 	api := &API{
-		port:      port,
-		verifier:  verifier,
-		health:    repo,
-		router:    router,
-		localMode: localMode,
+		port:           port,
+		verifier:       verifier,
+		health:         repo,
+		router:         router,
+		externalSecure: externalSecure,
 	}
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
 	api.routeGRPC()
@@ -89,7 +89,7 @@ func (a *API) routeGRPC() {
 		Subrouter()
 	http2Route.Headers("Content-Type", "application/grpc").Handler(a.grpcServer)
 
-	if a.localMode {
+	if !a.externalSecure {
 		a.routeGRPCWeb(a.router)
 		return
 	}

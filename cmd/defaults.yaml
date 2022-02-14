@@ -3,9 +3,10 @@ Log:
   Formatter:
     Format: text
 
-Domain: localhost
 Port: 8080
-LocalDev: true
+ExternalPort: 8080
+ExternalDomain: localhost
+ExternalSecure: true
 
 Database:
   Host: localhost
