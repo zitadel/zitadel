@@ -8,9 +8,9 @@ release:
 before:
   hooks:
     - docker buildx build -f build/grpc/Dockerfile -t zitadel-base:local . --load
-    - docker buildx build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o . --load
-    - docker buildx build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o . --load
-    - docker buildx build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o . --load
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .
+    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .
 builds:
   - env:
       - CGO_ENABLED=0

@@ -9,7 +9,7 @@ RUN mkdir -p src/github.com/caos/zitadel
 WORKDIR /go/src/github.com/caos/zitadel
 
 #download modules
-COPY ./go.* .
+COPY . .
 RUN go mod download
 
 # install tools
