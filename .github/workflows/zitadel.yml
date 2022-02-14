@@ -32,14 +32,15 @@ jobs:
         with:
           driver: docker
           install: true
-      - run: docker buildx ls
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
-        continue-on-error: true
         with:
           distribution: goreleaser
           version: latest
           args: release --snapshot --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: docker images
+      - uses: actions/upload-artifact@v2
+        with:
+          name: goreleaser-dist
+          path: dist/
