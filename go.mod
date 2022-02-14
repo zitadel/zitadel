@@ -12,7 +12,7 @@ require (
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
 	github.com/boombuler/barcode v1.0.1
-	github.com/caos/logging v0.3.0
+	github.com/caos/logging v0.3.1
 	github.com/caos/oidc v1.0.1
 	github.com/cockroachdb/cockroach-go/v2 v2.2.4
 	github.com/dop251/goja v0.0.0-20211129110639-4739a1d10a51

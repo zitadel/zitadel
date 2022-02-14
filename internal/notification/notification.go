@@ -19,8 +19,8 @@ type Config struct {
 
 func Start(config Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string) {
 	statikFS, err := fs.NewWithNamespace("notification")
-	logging.New().OnError(err).Panic("unable to start listener")
+	logging.OnError(err).Panic("unable to start listener")
 
 	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, queries, dbClient, assetsPrefix)
-	logging.New().OnError(err).Panic("unable to start app")
+	logging.OnError(err).Panic("unable to start app")
 }

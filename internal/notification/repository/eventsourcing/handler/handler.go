@@ -36,7 +36,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string) []queryv1.Handler {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
-	logging.New().OnError(err).Fatal("error create new aes crypto")
+	logging.OnError(err).Fatal("error create new aes crypto")
 
 	return []queryv1.Handler{
 		newNotifyUser(

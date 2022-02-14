@@ -75,7 +75,7 @@ func Start(config Config, domain, url, issuer, clientID string) (http.Handler, e
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
 	handler.Handle(envRequestPath, cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write(environmentJSON)
-		logging.New().OnError(err).Error("error serving environment.json")
+		logging.OnError(err).Error("error serving environment.json")
 	}))))
 	return handler, nil
 }
