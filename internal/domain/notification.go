@@ -27,3 +27,12 @@ const (
 func (s NotificationProviderState) Exists() bool {
 	return s == NotificationProviderStateEnabled || s == NotificationProviderStateDisabled
 }
+
+type NotificationProviderType int32
+
+const (
+	NotificationProviderTypeFile NotificationProviderType = iota
+	NotificationProviderTypeLog
+
+	notificationProviderTypeCount
+)
