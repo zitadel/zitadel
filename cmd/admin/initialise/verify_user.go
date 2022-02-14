@@ -2,11 +2,18 @@ package initialise
 
 import (
 	"database/sql"
+	_ "embed"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	searchUser = "SELECT username FROM [show roles] WHERE username = $1"
+	//go:embed sql/user.sql
+	createUserStmt string
 )
 
 func newUser() *cobra.Command {
@@ -28,27 +35,17 @@ The user provided by flags needs priviledge to
 			if err := viper.Unmarshal(&config); err != nil {
 				return err
 			}
-			return initialise(config, verifyUser)
+			return initialise(config, verifyUser(config.Database))
 		},
 	}
 }
 
-func verifyUser(db *sql.DB, config database.Config) error {
-	logging.Info("verify user")
-	exists, err := existsUser(db, config)
-	if exists || err != nil {
-		return err
+func verifyUser(config database.Config) func(*sql.DB) error {
+	return func(db *sql.DB) error {
+		logging.WithFields("username", config.Username).Info("verify user")
+		return verify(db,
+			exists(searchUser, config.Username),
+			exec(createUserStmt, config.Username, &sql.NullString{String: config.Password, Valid: config.Password != ""}),
+		)
 	}
-	return createUser(db, config)
-}
-
-func existsUser(db *sql.DB, config database.Config) (exists bool, err error) {
-	row := db.QueryRow("SELECT EXISTS(SELECT username FROM [show roles] WHERE username = $1)", config.Username)
-	err = row.Scan(&exists)
-	return exists, err
-}
-
-func createUser(db *sql.DB, config database.Config) error {
-	_, err := db.Exec("CREATE USER $1 WITH PASSWORD $2", config.Username, &sql.NullString{String: config.Password, Valid: config.Password != ""})
-	return err
 }

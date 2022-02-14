@@ -2,11 +2,19 @@ package initialise
 
 import (
 	"database/sql"
+	_ "embed"
+	"fmt"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	searchGrant = "SELECT * FROM [SHOW GRANTS ON DATABASE %s] where grantee = $1 AND privilege_type = 'ALL'"
+	//go:embed sql/grant_user.sql
+	grantStmt string
 )
 
 func newGrant() *cobra.Command {
@@ -23,27 +31,17 @@ Prereqesits:
 			if err := viper.Unmarshal(&config); err != nil {
 				return err
 			}
-			return initialise(config, verifyGrant)
+			return initialise(config, verifyGrant(config.Database))
 		},
 	}
 }
 
-func verifyGrant(db *sql.DB, config database.Config) error {
-	logging.Info("verify grant")
-	exists, err := hasGrant(db, config)
-	if exists || err != nil {
-		return err
+func verifyGrant(config database.Config) func(*sql.DB) error {
+	return func(db *sql.DB) error {
+		logging.WithFields("user", config.Username).Info("verify grant")
+		return verify(db,
+			exists(fmt.Sprintf(searchGrant, config.Database), config.Username),
+			exec(fmt.Sprintf(grantStmt, config.Database, config.Username)),
+		)
 	}
-	return grant(db, config)
-}
-
-func hasGrant(db *sql.DB, config database.Config) (has bool, err error) {
-	row := db.QueryRow("SELECT EXISTS(SELECT * FROM [SHOW GRANTS ON DATABASE "+config.Database+"] where grantee = $1 AND privilege_type = 'ALL')", config.Username)
-	err = row.Scan(&has)
-	return has, err
-}
-
-func grant(db *sql.DB, config database.Config) error {
-	_, err := db.Exec("GRANT ALL ON DATABASE " + config.Database + " TO " + config.Username)
-	return err
 }

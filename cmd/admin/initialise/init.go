@@ -32,7 +32,11 @@ The user provided by flags needs priviledge to
 			if err := viper.Unmarshal(&config); err != nil {
 				return err
 			}
-			if err := initialise(config, verifyUser, verifyDB, verifyGrant); err != nil {
+			if err := initialise(config,
+				verifyUser(config.Database),
+				verifyDatabase(config.Database),
+				verifyGrant(config.Database),
+			); err != nil {
 				return err
 			}
 
@@ -44,7 +48,7 @@ The user provided by flags needs priviledge to
 	return cmd
 }
 
-func initialise(config Config, steps ...func(*sql.DB, database.Config) error) error {
+func initialise(config Config, steps ...func(*sql.DB) error) error {
 	logging.Info("initialization started")
 
 	db, err := database.Connect(adminConfig(config))
@@ -53,7 +57,7 @@ func initialise(config Config, steps ...func(*sql.DB, database.Config) error) er
 	}
 
 	for _, step := range steps {
-		if err = step(db, config.Database); err != nil {
+		if err = step(db); err != nil {
 			return err
 		}
 	}

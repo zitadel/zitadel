@@ -98,7 +98,7 @@ func Test_verifyUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := verifyUser(tt.args.db.db, tt.args.config); !errors.Is(err, tt.targetErr) {
+			if err := verifyUser(tt.args.config)(tt.args.db.db); !errors.Is(err, tt.targetErr) {
 				t.Errorf("verifyGrant() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {

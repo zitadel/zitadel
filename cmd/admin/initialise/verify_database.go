@@ -2,11 +2,19 @@ package initialise
 
 import (
 	"database/sql"
+	_ "embed"
+	"fmt"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	searchDatabase = "SELECT database_name FROM [show databases] WHERE database_name = $1"
+
+	//go:embed sql/database.sql
+	databaseStmt string
 )
 
 func newDatabase() *cobra.Command {
@@ -28,27 +36,16 @@ The user provided by flags needs priviledge to
 			if err := viper.Unmarshal(&config); err != nil {
 				return err
 			}
-			return initialise(config, verifyDB)
+			return initialise(config, verifyDatabase(config.Database))
 		},
 	}
 }
 
-func verifyDB(db *sql.DB, config database.Config) error {
-	logging.Info("verify database")
-	exists, err := existsDatabase(db, config)
-	if exists || err != nil {
-		return err
+func verifyDatabase(config database.Config) func(*sql.DB) error {
+	return func(db *sql.DB) error {
+		return verify(db,
+			exists(searchDatabase, config.Database),
+			exec(fmt.Sprintf(databaseStmt, config.Database)),
+		)
 	}
-	return createDatabase(db, config)
-}
-
-func existsDatabase(db *sql.DB, config database.Config) (exists bool, err error) {
-	row := db.QueryRow("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", config.Database)
-	err = row.Scan(&exists)
-	return exists, err
-}
-
-func createDatabase(db *sql.DB, config database.Config) error {
-	_, err := db.Exec("CREATE DATABASE " + config.Database)
-	return err
 }
