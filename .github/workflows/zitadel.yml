@@ -32,6 +32,16 @@ jobs:
         with:
           driver: docker
           install: true
+      - name: Prebuild and Cache gRPC Base Image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./build/grpc/Dockerfile
+          push: false
+          load: true
+          tags: zitadel-base:local
+          cache-from: type=gha
+          cache-to: type=gha,mode=max,scope=zitadel-base
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
