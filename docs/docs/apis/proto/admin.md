@@ -1929,7 +1929,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| config |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
 
 
 
@@ -2002,7 +2002,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| config |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
 
 
 

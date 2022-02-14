@@ -41,12 +41,13 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.notification_providers (aggregate_id, creation_date, change_date, sequence, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
+								"ro-id",
 								domain.NotificationProviderStateDisabled,
 								domain.NotificationProviderTypeFile,
 								true,
@@ -199,12 +200,13 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.notification_providers (aggregate_id, creation_date, change_date, sequence, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
+								"ro-id",
 								domain.NotificationProviderStateDisabled,
 								domain.NotificationProviderTypeLog,
 								true,

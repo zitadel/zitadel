@@ -81,13 +81,14 @@ func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateRedu
 }
 
 const (
-	DebugNotificationProviderIDCol           = "aggregate_id"
-	DebugNotificationProviderCreationDateCol = "creation_date"
-	DebugNotificationProviderChangeDateCol   = "change_date"
-	DebugNotificationProviderSequenceCol     = "sequence"
-	DebugNotificationProviderStateCol        = "state"
-	DebugNotificationProviderTypeCol         = "provider_type"
-	DebugNotificationProviderCompactCol      = "compact"
+	DebugNotificationProviderAggIDCol         = "aggregate_id"
+	DebugNotificationProviderCreationDateCol  = "creation_date"
+	DebugNotificationProviderChangeDateCol    = "change_date"
+	DebugNotificationProviderSequenceCol      = "sequence"
+	DebugNotificationProviderResourceOwnerCol = "resource_owner"
+	DebugNotificationProviderStateCol         = "state"
+	DebugNotificationProviderTypeCol          = "provider_type"
+	DebugNotificationProviderCompactCol       = "compact"
 )
 
 func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -106,10 +107,11 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 	}
 
 	return crdb.NewCreateStatement(&providerEvent, []handler.Column{
-		handler.NewCol(DebugNotificationProviderIDCol, providerEvent.Aggregate().ID),
+		handler.NewCol(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 		handler.NewCol(DebugNotificationProviderCreationDateCol, providerEvent.CreationDate()),
 		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
 		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
+		handler.NewCol(DebugNotificationProviderResourceOwnerCol, providerEvent.Aggregate().ResourceOwner),
 		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateDisabled),
 		handler.NewCol(DebugNotificationProviderTypeCol, providerType),
 		handler.NewCol(DebugNotificationProviderCompactCol, providerEvent.Compact),
@@ -143,7 +145,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		&providerEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(DebugNotificationProviderIDCol, providerEvent.Aggregate().ID),
+			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
 		},
 	), nil
@@ -174,7 +176,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderEna
 		&providerEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(DebugNotificationProviderIDCol, providerEvent.Aggregate().ID),
+			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
 		},
 	), nil
@@ -205,7 +207,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderDis
 		&providerEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(DebugNotificationProviderIDCol, providerEvent.Aggregate().ID),
+			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
 		},
 	), nil
@@ -229,7 +231,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderRem
 	return crdb.NewDeleteStatement(
 		&providerEvent,
 		[]handler.Condition{
-			handler.NewCond(DebugNotificationProviderIDCol, providerEvent.Aggregate().ID),
+			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
 			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
 		},
 	), nil

@@ -2358,7 +2358,7 @@ message GetSupportedLanguagesResponse {
 message GetFileSystemNotificationProviderRequest {}
 
 message GetFileSystemNotificationProviderResponse {
-    zitadel.settings.v1.DebugNotificationProvider config = 1;
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
 }
 
 message AddFileSystemNotificationProviderRequest {
@@ -2390,7 +2390,7 @@ message RemoveFileSystemNotificationProviderResponse {
 message GetLogNotificationProviderRequest {}
 
 message GetLogNotificationProviderResponse {
-    zitadel.settings.v1.DebugNotificationProvider config = 1;
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
 }
 
 message AddLogNotificationProviderRequest {
