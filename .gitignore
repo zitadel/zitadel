@@ -60,4 +60,4 @@ build/local/cloud.env
 migrations/cockroach/migrate_cloud.go
 .notifications
 
-dist/
+.artifacts

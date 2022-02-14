@@ -28,6 +28,7 @@ COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/ge
 FROM npm-base as angular-build
 RUN npm run lint
 RUN npm run prodbuild
+RUN ls -la /console/dist/console
 
 #######################
 ## Only Copy Assets

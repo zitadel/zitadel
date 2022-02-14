@@ -8,9 +8,10 @@ release:
 before:
   hooks:
     - docker build -f build/grpc/Dockerfile -t zitadel-base:local .
-    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .
-    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .
-    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-build -o .
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client
+    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/grpc/js-client
+    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console
 builds:
   - env:
       - CGO_ENABLED=0
@@ -21,6 +22,7 @@ builds:
     goarch:
       - amd64
       - arm64
+dist: .artifacts/goreleaser
 dockers:
 - image_templates:
   - "caos/zitadel:{{ .Version }}-amd64"
