@@ -45,10 +45,11 @@ See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) t
 
 ### Client libraries
 
-* [Go](https://github.com/caos/zitadel-go) client library
-* [.NET](https://github.com/caos/zitadel-net) client library
-* [Dart](https://github.com/caos/zitadel-dart) client library
-* [Elixir](https://github.com/jshmrtn/zitadel_api) client library (maintained by [jshmrtn]([jshmrtn](https://github.com/jshmrtn)))
+* [Go](https://github.com/caos/zitadel-go) 
+* [.NET](https://github.com/caos/zitadel-net) 
+* [Dart](https://github.com/caos/zitadel-dart)
+* [Elixir](https://github.com/jshmrtn/zitadel_api) (maintained by [jshmrtn]((https://github.com/jshmrtn)))
+* [Rust](https://crates.io/crates/zitadel/1.0.0) (maintained by [buehler](https://github.com/buehler))
 
 ## Help and Documentation
 
