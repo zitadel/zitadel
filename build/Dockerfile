@@ -2,12 +2,8 @@
 ## Final Production Image
 #######################
 FROM alpine:3 as artifact
-ARG BUILDARCH
+COPY zitadel /app/zitadel
 RUN adduser -D zitadel
-COPY cmd/zitadel/*.yaml /app/
-COPY .download/zitadel/zitadel-linux-${BUILDARCH} /app/zitadel
-COPY .download/zitadel/console /app/console/
-RUN chmod a+x /app/zitadel
 
 #######################
 ## Scratch Image
