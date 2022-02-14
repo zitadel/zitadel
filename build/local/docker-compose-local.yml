@@ -226,7 +226,7 @@ services:
       dockerfile: build/local/Dockerfile.clientid
       target: client-id
     volumes:
-      - ./environment.json:/environment.json
+      - ../../console/src/assets:/assets
     environment:
       - HOST=backend-run
       - PORT=50002
@@ -258,12 +258,10 @@ services:
     build:
       context: ../..
       dockerfile: build/console/Dockerfile
-      target: dev-angular-build
-      args:
-        ENV: dev
+      target: prod-angular-build
     volumes:
-      - ./environment.json:/console/src/assets/environment.json
-    command: sh -c "ng serve --host 0.0.0.0 --disable-host-check"
+      - ../../console/src/assets/environment.json:/console/dist/console/assets/environment.json
+    command: [ "-p", "4200" ]
     ports:
     - 4200:4200
     healthcheck:
@@ -286,7 +284,7 @@ services:
       frontend-run:
         condition: service_healthy
     image: alpine:latest
-    command: sleep 30
+    command: [ "sleep", "30" ]
 
   await-init-frontend-dev:
     profiles: [ "frontend" ]

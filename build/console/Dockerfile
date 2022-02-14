@@ -98,6 +98,11 @@ RUN npm install -g @angular/cli
 FROM npm-base as prod-angular-build
 RUN npm run lint
 RUN npm run prodbuild
+RUN cp /console/dist/console/index.html /console/dist/console/404.html
+
+RUN npm install --global angular-http-server
+
+ENTRYPOINT [ "angular-http-server", "--path", "/console/dist/console/" ]
 
 #######################
 ## Only Copy Assets

@@ -15,4 +15,12 @@ while [ -z $clientid ]; do
     fi
 done
 
-echo "$(jq ".clientid = $clientid" ./environment.json)" > ./environment.json
+cat << EOF > /assets/environment.json
+{
+  "authServiceUrl": "http://localhost:50000",
+  "mgmtServiceUrl": "http://localhost:50000",
+  "adminServiceUrl": "http://localhost:50000",
+  "issuer": "http://localhost:50002/oauth/v2",
+  "clientid": ${clientid}
+}
+EOF
