@@ -29,6 +29,8 @@ jobs:
         uses: docker/setup-buildx-action@v1
         with:
           driver: docker
+          install: true
+      - run: docker buildx ls
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         continue-on-error: true
