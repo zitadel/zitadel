@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+
+package zitadel.settings.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/settings";
+
+message DebugNotificationProvider {
+    zitadel.v1.ObjectDetails details = 1;
+    bool compact = 2;
+    bool enabled = 3;
+}

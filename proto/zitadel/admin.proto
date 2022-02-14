@@ -6,6 +6,7 @@ import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
@@ -196,6 +197,17 @@ service AdminService {
         };
     }
 
+    // Remove filesystem notification provider
+    rpc RemoveFileSystemNotificationProvider(RemoveFileSystemNotificationProviderRequest) returns (RemoveFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            delete: "/notification/provider/file";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
     // Get log notification provider
     rpc GetLogNotificationProvider(GetLogNotificationProviderRequest) returns (GetLogNotificationProviderResponse) {
         option (google.api.http) = {
@@ -208,7 +220,7 @@ service AdminService {
     }
 
     // Add log notification provider
-    rpc AddLogSystemNotificationProvider(AddLogSystemNotificationProviderRequest) returns (AddLogSystemNotificationProviderResponse) {
+    rpc AddLogNotificationProvider(AddLogNotificationProviderRequest) returns (AddLogNotificationProviderResponse) {
         option (google.api.http) = {
             post: "/notification/provider/log";
             body: "*"
@@ -220,7 +232,7 @@ service AdminService {
     }
 
     // Update filesystem notification provider
-    rpc UpdateLogSystemNotificationProvider(UpdateLogSystemNotificationProviderRequest) returns (UpdateLogSystemNotificationProviderResponse) {
+    rpc UpdateLogNotificationProvider(UpdateLogNotificationProviderRequest) returns (UpdateLogNotificationProviderResponse) {
         option (google.api.http) = {
             put: "/notification/provider/log";
             body: "*"
@@ -231,6 +243,16 @@ service AdminService {
         };
     }
 
+    // Remove filesystem notification provider
+    rpc RemoveLogNotificationProvider(RemoveLogNotificationProviderRequest) returns (RemoveLogNotificationProviderResponse) {
+        option (google.api.http) = {
+            delete: "/notification/provider/log";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -2330,6 +2352,70 @@ message GetSupportedLanguagesRequest {}
 
 message GetSupportedLanguagesResponse {
     repeated string languages = 1;
+}
+
+//This is an empty request
+message GetFileSystemNotificationProviderRequest {}
+
+message GetFileSystemNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider config = 1;
+}
+
+message AddFileSystemNotificationProviderRequest {
+    bool compact = 1;
+    bool enabled = 2;
+}
+
+message AddFileSystemNotificationProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateFileSystemNotificationProviderRequest {
+    bool compact = 1;
+    bool enabled = 2;
+}
+
+message UpdateFileSystemNotificationProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveFileSystemNotificationProviderRequest {}
+
+message RemoveFileSystemNotificationProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetLogNotificationProviderRequest {}
+
+message GetLogNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider config = 1;
+}
+
+message AddLogNotificationProviderRequest {
+    bool compact = 1;
+    bool enabled = 2;
+}
+
+message AddLogNotificationProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateLogNotificationProviderRequest {
+    bool compact = 1;
+    bool enabled = 2;
+}
+
+message UpdateLogNotificationProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message RemoveLogNotificationProviderRequest {}
+
+message RemoveLogNotificationProviderResponse {
+    zitadel.v1.ObjectDetails details = 1;
 }
 
 // if name or domain is already in use, org is not unique
