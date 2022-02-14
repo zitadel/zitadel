@@ -41,18 +41,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v2
+        name: Upload goreleaser dist
         with:
           name: goreleaser-dist
           path: .artifacts/goreleaser
       - uses: actions/upload-artifact@v2
+        name: Upload gRPC clients
         with:
           name: grpc-clients
           path: .artifacts/grpc
       - uses: actions/upload-artifact@v2
+        name: Upload compiled console
         with:
           name: console
           path: .artifacts/console
       - uses: codecov/codecov-action@v1
+        name: Upload go coverage
         with:
           files: .artifacts/codecov/profile.cov
           name: go-codecov
