@@ -43,4 +43,16 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: goreleaser-dist
-          path: dist/
+          path: .artifacts/goreleaser
+      - uses: actions/upload-artifact@v2
+        with:
+          name: grpc-clients
+          path: .artifacts/grpc
+      - uses: actions/upload-artifact@v2
+        with:
+          name: console
+          path: .artifacts/console
+      - uses: codecov/codecov-action@v1
+        with:
+          files: /tmp/operator/profile.cov
+          name: .artifacts/codecov/profile.cov
