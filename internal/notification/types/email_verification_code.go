@@ -16,7 +16,7 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
+func SendEmailVerificationCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func SendEmailVerificationCode(mailhtml string, translator *i18n.Translator, use
 	args["Code"] = codeString
 
 	emailCodeData := &EmailVerificationCodeData{
-		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.VerifyEmailMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, assetsPrefix, url, domain.VerifyEmailMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 

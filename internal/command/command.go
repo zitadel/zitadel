@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/api/http"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -61,17 +60,7 @@ type orgFeatureChecker interface {
 	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
-type Config struct {
-	Eventstore types.SQLUser
-}
-
-func StartCommands(
-	es *eventstore.Eventstore,
-	defaults sd.SystemDefaults,
-	authZConfig authz.Config,
-	staticStore static.Storage,
-	authZRepo authz_repo.Repository,
-) (repo *Commands, err error) {
+func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo authz_repo.Repository, keyConfig *crypto.KeyConfig, webAuthN webauthn_helper.Config) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
 		static:             staticStore,
@@ -79,8 +68,8 @@ func StartCommands(
 		iamDomain:          defaults.Domain,
 		zitadelRoles:       authZConfig.RolePermissionMappings,
 		keySize:            defaults.KeyConfig.Size,
-		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
-		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
+		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime,
+		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
@@ -127,13 +116,13 @@ func StartCommands(
 	}
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
-	web, err := webauthn_helper.StartServer(defaults.WebAuthN)
+	web, err := webauthn_helper.StartServer(webAuthN)
 	if err != nil {
 		return nil, err
 	}
 	repo.webauthn = web
 
-	keyAlgorithm, err := crypto.NewAESCrypto(defaults.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}

@@ -1,13 +1,14 @@
 package systemdefaults
 
 import (
-	"github.com/caos/zitadel/internal/notification/channels/log"
+	"time"
+
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/notification/channels/chat"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
+	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
@@ -25,7 +26,6 @@ type SystemDefaults struct {
 	DomainVerification       DomainVerification
 	IamID                    string
 	Notifications            Notifications
-	WebAuthN                 WebAuthN
 	KeyConfig                KeyConfig
 }
 
@@ -56,11 +56,11 @@ type OTPConfig struct {
 }
 
 type VerificationLifetimes struct {
-	PasswordCheck      types.Duration
-	ExternalLoginCheck types.Duration
-	MFAInitSkip        types.Duration
-	SecondFactorCheck  types.Duration
-	MultiFactorCheck   types.Duration
+	PasswordCheck      time.Duration
+	ExternalLoginCheck time.Duration
+	MFAInitSkip        time.Duration
+	SecondFactorCheck  time.Duration
+	MultiFactorCheck   time.Duration
 }
 
 type DomainVerification struct {
@@ -99,18 +99,10 @@ type TemplateData struct {
 	DomainClaimed templates.TemplateData
 }
 
-type WebAuthN struct {
-	ID            string
-	OriginLogin   string
-	OriginConsole string
-	DisplayName   string
-}
-
 type KeyConfig struct {
 	Size                     int
-	PrivateKeyLifetime       types.Duration
-	PublicKeyLifetime        types.Duration
-	EncryptionConfig         *crypto.KeyConfig
-	SigningKeyRotationCheck  types.Duration
-	SigningKeyGracefulPeriod types.Duration
+	PrivateKeyLifetime       time.Duration
+	PublicKeyLifetime        time.Duration
+	SigningKeyRotationCheck  time.Duration
+	SigningKeyGracefulPeriod time.Duration
 }

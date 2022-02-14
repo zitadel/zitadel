@@ -4,11 +4,13 @@ import (
 	"bytes"
 	_ "embed"
 	"io"
+	"strings"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/cmd/admin"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/caos/zitadel/cmd/admin"
 )
 
 var (
@@ -29,9 +31,11 @@ func New(out io.Writer, in io.Reader, args []string) *cobra.Command {
 	}
 
 	viper.AutomaticEnv()
+	viper.SetEnvPrefix("ZITADEL")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.SetConfigType("yaml")
 	err := viper.ReadConfig(bytes.NewBuffer(defaultConfig))
-	logging.New().OnError(err).Fatal("unable to read default config")
+	logging.OnError(err).Fatal("unable to read default config")
 
 	cobra.OnInitialize(initConfig)
 	cmd.PersistentFlags().StringArrayVar(&configFiles, "config", nil, "path to config file to overwrite system defaults")

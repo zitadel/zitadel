@@ -18,7 +18,7 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
+func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_m
 	args["Code"] = codeString
 
 	passwordResetData := &PasswordCodeData{
-		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.PasswordResetMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, assetsPrefix, url, domain.PasswordResetMessageType, user.PreferredLanguage, colors),
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		URL:          url,

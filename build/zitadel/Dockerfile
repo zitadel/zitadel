@@ -29,15 +29,15 @@ RUN rm -r cockroach-v21.2.5.linux-amd64
 ## generates static files
 #######################
 FROM go-dep AS go-static
-COPY internal/ui/login/static internal/ui/login/static
-COPY internal/ui/login/statik internal/ui/login/statik
+COPY internal/api/ui/login/static internal/api/ui/login/static
+COPY internal/api/ui/login/statik internal/api/ui/login/statik
 COPY internal/notification/static internal/notification/static
 COPY internal/notification/statik internal/notification/statik
 COPY internal/static internal/static
 COPY internal/statik internal/statik
 
-RUN go generate internal/ui/login/statik/generate.go \
-    && go generate internal/ui/login/static/generate.go \
+RUN go generate internal/api/ui/login/statik/generate.go \
+    && go generate internal/api/ui/login/static/generate.go \
     && go generate internal/notification/statik/generate.go \
     && go generate internal/statik/generate.go
 
@@ -71,7 +71,7 @@ COPY . .
 ## copy for local dev
 #######################
 FROM scratch as go-copy
-COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/ui/login/statik/statik.go internal/ui/login/statik/statik.go
+COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/ui/login/statik/statik.go internal/api/ui/login/statik/statik.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/notification/statik/statik.go internal/notification/statik/statik.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/statik/statik.go internal/statik/statik.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/openapi/statik/statik.go openapi/statik/statik.go
