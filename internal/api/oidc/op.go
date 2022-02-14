@@ -170,22 +170,22 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	if endpointConfig.Auth != nil {
 		options = append(options, op.WithCustomAuthEndpoint(op.NewEndpointWithURL(endpointConfig.Auth.Path, endpointConfig.Auth.URL)))
 	}
-	if endpointConfig.Auth != nil {
+	if endpointConfig.Token != nil {
 		options = append(options, op.WithCustomTokenEndpoint(op.NewEndpointWithURL(endpointConfig.Token.Path, endpointConfig.Token.URL)))
 	}
-	if endpointConfig.Auth != nil {
+	if endpointConfig.Introspection != nil {
 		options = append(options, op.WithCustomIntrospectionEndpoint(op.NewEndpointWithURL(endpointConfig.Introspection.Path, endpointConfig.Introspection.URL)))
 	}
-	if endpointConfig.Auth != nil {
+	if endpointConfig.Userinfo != nil {
 		options = append(options, op.WithCustomUserinfoEndpoint(op.NewEndpointWithURL(endpointConfig.Userinfo.Path, endpointConfig.Userinfo.URL)))
 	}
-	if endpointConfig.Auth != nil {
+	if endpointConfig.Revocation != nil {
 		options = append(options, op.WithCustomRevocationEndpoint(op.NewEndpointWithURL(endpointConfig.Revocation.Path, endpointConfig.Revocation.URL)))
 	}
-	if endpointConfig.Auth != nil {
+	if endpointConfig.EndSession != nil {
 		options = append(options, op.WithCustomEndSessionEndpoint(op.NewEndpointWithURL(endpointConfig.EndSession.Path, endpointConfig.EndSession.URL)))
 	}
-	if endpointConfig.Auth != nil {
+	if endpointConfig.Keys != nil {
 		options = append(options, op.WithCustomKeysEndpoint(op.NewEndpointWithURL(endpointConfig.Keys.Path, endpointConfig.Keys.URL)))
 	}
 	return options
