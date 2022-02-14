@@ -21,3 +21,16 @@ RUN build/console/generate-grpc.sh
 #######################
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
+
+#######################
+## angular lint workspace and prod build
+#######################
+FROM npm-base as angular-build
+RUN npm run lint
+RUN npm run prodbuild
+
+#######################
+## Only Copy Assets
+#######################
+FROM scratch as angular-export
+COPY --from=angular-build /console/dist/console .
