@@ -3,9 +3,9 @@ package middleware
 import (
 	"context"
 	"net/http"
+	"time"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
@@ -35,12 +35,11 @@ type userAgentHandler struct {
 
 type UserAgentCookieConfig struct {
 	Name   string
-	Domain string
 	Key    *crypto.KeyConfig
-	MaxAge types.Duration
+	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, idGenerator id.Generator, localDevMode bool) (func(http.Handler) http.Handler, error) {
+func NewUserAgentHandler(config *UserAgentCookieConfig, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
 	key, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
 	if err != nil {
 		return nil, err
@@ -48,10 +47,10 @@ func NewUserAgentHandler(config *UserAgentCookieConfig, idGenerator id.Generator
 	cookieKey := []byte(key)
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
-		http_utils.WithDomain(config.Domain),
+		http_utils.WithDomain(domain),
 		http_utils.WithMaxAge(int(config.MaxAge.Seconds())),
 	}
-	if localDevMode {
+	if !externalSecure {
 		opts = append(opts, http_utils.WithUnsecure())
 	}
 	return func(handler http.Handler) http.Handler {

@@ -25,7 +25,7 @@ type UrlData struct {
 	PasswordSet bool
 }
 
-func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
+func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.InitUserCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func SendUserInitCode(ctx context.Context, mailhtml string, translator *i18n.Tra
 	args["Code"] = codeString
 
 	initCodeData := &InitCodeEmailData{
-		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.InitCodeMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, assetsPrefix, url, domain.InitCodeMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 	template, err := templates.GetParsedTemplate(mailhtml, initCodeData)

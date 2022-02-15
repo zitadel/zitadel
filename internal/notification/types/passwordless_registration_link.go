@@ -19,7 +19,7 @@ type PasswordlessRegistrationLinkData struct {
 	URL string
 }
 
-func SendPasswordlessRegistrationLink(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *user.HumanPasswordlessInitCodeRequestedEvent, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, apiDomain string) error {
+func SendPasswordlessRegistrationLink(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *user.HumanPasswordlessInitCodeRequestedEvent, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func SendPasswordlessRegistrationLink(ctx context.Context, mailhtml string, tran
 	var args = mapNotifyUserToArgs(user)
 
 	emailCodeData := &PasswordlessRegistrationLinkData{
-		TemplateData: GetTemplateData(translator, args, apiDomain, url, domain.PasswordlessRegistrationMessageType, user.PreferredLanguage, colors),
+		TemplateData: GetTemplateData(translator, args, assetsPrefix, url, domain.PasswordlessRegistrationMessageType, user.PreferredLanguage, colors),
 		URL:          url,
 	}
 

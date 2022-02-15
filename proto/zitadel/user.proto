@@ -571,6 +571,28 @@ message RefreshToken {
     ];
 }
 
+
+message PersonalAccessToken {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\"";
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    google.protobuf.Timestamp expiration_date = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "the date the token will expire";
+            example: "\"3019-04-01T08:45:00.000000Z\"";
+        }
+    ];
+    repeated string scopes = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "scopes granted to the token";
+            example: "[\"openid\"]";
+        }
+    ];
+}
+
 message UserGrant {
     string id = 1 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {

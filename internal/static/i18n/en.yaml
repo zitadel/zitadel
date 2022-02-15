@@ -68,8 +68,11 @@ Errors:
     Machine:
       Key:
         NotFound: Machine key not found
+    PAT:
+      NotFound: Personal Access Token not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
+    WrongType: Not allowed for this user type
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
       AlreadyExists:  Username already taken
@@ -379,6 +382,7 @@ Errors:
     NotFound: Action not found
     NotActive: Action is not active
     NotInactive: Action is not inactive
+    MaxAllowed: No additional active Actions allowed
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Flow is already empty

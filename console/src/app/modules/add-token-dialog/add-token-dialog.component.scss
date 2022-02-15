@@ -1,0 +1,17 @@
+.title {
+  font-size: 1.2rem;
+  margin-top: 0;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+
+  .ok-button {
+    margin-left: 0.5rem;
+  }
+}

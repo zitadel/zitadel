@@ -4,6 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/caos/zitadel/internal/repository/features"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,7 +17,6 @@ import (
 	"github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/repository/action"
 	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCommands_AddAction(t *testing.T) {
@@ -54,9 +57,75 @@ func TestCommands_AddAction(t *testing.T) {
 			},
 		},
 		{
+			"no additional allowed, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewFeaturesSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									[]features.FeaturesChanges{
+										features.ChangeMaxActions(1),
+									},
+								)
+								return e
+							}(),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							action.NewAddedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								"name",
+								"name() {};",
+								0,
+								false,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx: context.Background(),
+				addAction: &domain.Action{
+					Name:   "name",
+					Script: "name() {};",
+				},
+				resourceOwner: "org1",
+			},
+			res{
+				err: errors.IsPreconditionFailed,
+			},
+		},
+		{
 			"unique constraint failed, error",
 			fields{
 				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewFeaturesSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									[]features.FeaturesChanges{
+										features.ChangeMaxActions(2),
+									},
+								)
+								return e
+							}(),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							action.NewAddedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								"name",
+								"name() {};",
+								0,
+								false,
+							),
+						),
+					),
 					expectPushFailed(
 						errors.ThrowPreconditionFailed(nil, "id", "name already exists"),
 						[]*repository.Event{
@@ -91,33 +160,57 @@ func TestCommands_AddAction(t *testing.T) {
 			"push ok",
 			fields{
 				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewFeaturesSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									[]features.FeaturesChanges{
+										features.ChangeMaxActions(2),
+									},
+								)
+								return e
+							}(),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							action.NewAddedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								"name",
+								"name() {};",
+								0,
+								false,
+							),
+						),
+					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
 								action.NewAddedEvent(context.Background(),
-									&action.NewAggregate("id1", "org1").Aggregate,
-									"name",
-									"name() {};",
+									&action.NewAggregate("id2", "org1").Aggregate,
+									"name2",
+									"name2() {};",
 									0,
 									false,
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name", "org1")),
+						uniqueConstraintsFromEventConstraint(action.NewAddActionNameUniqueConstraint("name2", "org1")),
 					),
 				),
-				idGenerator: mock.ExpectID(t, "id1"),
+				idGenerator: mock.ExpectID(t, "id2"),
 			},
 			args{
 				ctx: context.Background(),
 				addAction: &domain.Action{
-					Name:   "name",
-					Script: "name() {};",
+					Name:   "name2",
+					Script: "name2() {};",
 				},
 				resourceOwner: "org1",
 			},
 			res{
-				id: "id1",
+				id: "id2",
 				details: &domain.ObjectDetails{
 					ResourceOwner: "org1",
 				},
@@ -571,9 +664,93 @@ func TestCommands_ReactivateAction(t *testing.T) {
 			},
 		},
 		{
+			"no additional allowed, error",
+			fields{
+				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							action.NewAddedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								"name",
+								"name() {};",
+								0,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							action.NewDeactivatedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewFeaturesSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									[]features.FeaturesChanges{
+										features.ChangeMaxActions(1),
+									},
+								)
+								return e
+							}(),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							action.NewAddedEvent(context.Background(),
+								&action.NewAggregate("id2", "org1").Aggregate,
+								"name2",
+								"name2() {};",
+								0,
+								false,
+							),
+						),
+					),
+				),
+			},
+			args{
+				ctx:           context.Background(),
+				actionID:      "id1",
+				resourceOwner: "org1",
+			},
+			res{
+				err: errors.IsPreconditionFailed,
+			},
+		},
+		{
 			"reactivate ok",
 			fields{
 				eventstore: eventstoreExpect(t,
+					expectFilter(
+						eventFromEventPusher(
+							action.NewAddedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+								"name",
+								"name() {};",
+								0,
+								false,
+							),
+						),
+						eventFromEventPusher(
+							action.NewDeactivatedEvent(context.Background(),
+								&action.NewAggregate("id1", "org1").Aggregate,
+							),
+						),
+					),
+					expectFilter(
+						eventFromEventPusher(
+							func() eventstore.Command {
+								e, _ := org.NewFeaturesSetEvent(context.Background(),
+									&org.NewAggregate("org1", "org1").Aggregate,
+									[]features.FeaturesChanges{
+										features.ChangeMaxActions(1),
+									},
+								)
+								return e
+							}(),
+						),
+					),
 					expectFilter(
 						eventFromEventPusher(
 							action.NewAddedEvent(context.Background(),

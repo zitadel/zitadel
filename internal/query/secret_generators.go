@@ -7,7 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/caos/zitadel/internal/config/types"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query/projection"
 
@@ -101,7 +101,7 @@ func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType str
 	}
 	cryptoConfig := crypto.GeneratorConfig{
 		Length:              generatorConfig.Length,
-		Expiry:              types.Duration{Duration: generatorConfig.Expiry},
+		Expiry:              generatorConfig.Expiry,
 		IncludeLowerLetters: generatorConfig.IncludeLowerLetters,
 		IncludeUpperLetters: generatorConfig.IncludeUpperLetters,
 		IncludeDigits:       generatorConfig.IncludeDigits,
@@ -117,7 +117,7 @@ func (q *Queries) InitHashGenerator(ctx context.Context, generatorType string, a
 	}
 	cryptoConfig := crypto.GeneratorConfig{
 		Length:              generatorConfig.Length,
-		Expiry:              types.Duration{Duration: generatorConfig.Expiry},
+		Expiry:              generatorConfig.Expiry,
 		IncludeLowerLetters: generatorConfig.IncludeLowerLetters,
 		IncludeUpperLetters: generatorConfig.IncludeUpperLetters,
 		IncludeDigits:       generatorConfig.IncludeDigits,

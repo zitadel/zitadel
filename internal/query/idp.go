@@ -7,11 +7,12 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type IDP struct {
@@ -237,6 +238,14 @@ func NewIDPNameSearchQuery(method TextComparison, value string) (SearchQuery, er
 
 func NewIDPResourceOwnerSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(IDPResourceOwnerCol, value, TextEquals)
+}
+
+func NewIDPResourceOwnerListSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(IDPResourceOwnerCol, list, ListIn)
 }
 
 func (q *IDPSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {

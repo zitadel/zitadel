@@ -825,6 +825,19 @@ The Following Variables can be used:
     PUT: /text/message/init/{language}
 
 
+### ResetCustomInitMessageTextToDefault
+
+> **rpc** ResetCustomInitMessageTextToDefault([ResetCustomInitMessageTextToDefaultRequest](#resetcustominitmessagetexttodefaultrequest))
+[ResetCustomInitMessageTextToDefaultResponse](#resetcustominitmessagetexttodefaultresponse)
+
+Removes the custom init message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/init/{language}
+
+
 ### GetDefaultPasswordResetMessageText
 
 > **rpc** GetDefaultPasswordResetMessageText([GetDefaultPasswordResetMessageTextRequest](#getdefaultpasswordresetmessagetextrequest))
@@ -862,6 +875,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/passwordreset/{language}
+
+
+### ResetCustomPasswordResetMessageTextToDefault
+
+> **rpc** ResetCustomPasswordResetMessageTextToDefault([ResetCustomPasswordResetMessageTextToDefaultRequest](#resetcustompasswordresetmessagetexttodefaultrequest))
+[ResetCustomPasswordResetMessageTextToDefaultResponse](#resetcustompasswordresetmessagetexttodefaultresponse)
+
+Removes the custom password reset message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyemail/{language}
 
 
 ### GetDefaultVerifyEmailMessageText
@@ -903,6 +929,19 @@ The Following Variables can be used:
     PUT: /text/message/verifyemail/{language}
 
 
+### ResetCustomVerifyEmailMessageTextToDefault
+
+> **rpc** ResetCustomVerifyEmailMessageTextToDefault([ResetCustomVerifyEmailMessageTextToDefaultRequest](#resetcustomverifyemailmessagetexttodefaultrequest))
+[ResetCustomVerifyEmailMessageTextToDefaultResponse](#resetcustomverifyemailmessagetexttodefaultresponse)
+
+Removes the custom verify email message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyemail/{language}
+
+
 ### GetDefaultVerifyPhoneMessageText
 
 > **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
@@ -940,6 +979,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/verifyphone/{language}
+
+
+### ResetCustomVerifyPhoneMessageTextToDefault
+
+> **rpc** ResetCustomVerifyPhoneMessageTextToDefault([ResetCustomVerifyPhoneMessageTextToDefaultRequest](#resetcustomverifyphonemessagetexttodefaultrequest))
+[ResetCustomVerifyPhoneMessageTextToDefaultResponse](#resetcustomverifyphonemessagetexttodefaultresponse)
+
+Removes the custom verify phone text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyphone/{language}
 
 
 ### GetDefaultDomainClaimedMessageText
@@ -981,6 +1033,19 @@ The Following Variables can be used:
     PUT: /text/message/domainclaimed/{language}
 
 
+### ResetCustomDomainClaimedMessageTextToDefault
+
+> **rpc** ResetCustomDomainClaimedMessageTextToDefault([ResetCustomDomainClaimedMessageTextToDefaultRequest](#resetcustomdomainclaimedmessagetexttodefaultrequest))
+[ResetCustomDomainClaimedMessageTextToDefaultResponse](#resetcustomdomainclaimedmessagetexttodefaultresponse)
+
+Removes the custom domain claimed message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/domainclaimed/{language}
+
+
 ### GetDefaultPasswordlessRegistrationMessageText
 
 > **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
@@ -1018,6 +1083,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/passwordless_registration/{language}
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefault
+
+> **rpc** ResetCustomPasswordlessRegistrationMessageTextToDefault([ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest](#resetcustompasswordlessregistrationmessagetexttodefaultrequest))
+[ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse](#resetcustompasswordlessregistrationmessagetexttodefaultresponse)
+
+Removes the custom passwordless link message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/passwordless_registration/{language}
 
 
 ### GetDefaultLoginTexts
@@ -2562,6 +2640,50 @@ This is an empty request
 
 
 
+### ResetCustomDomainClaimedMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomDomainClaimedMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomInitMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomInitMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomLoginTextsToDefaultRequest
 
 
@@ -2596,6 +2718,94 @@ This is an empty request
 
 
 ### ResetCustomOrgIAMPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomPasswordResetMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordResetMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomVerifyEmailMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomVerifyEmailMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomVerifyPhoneMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomVerifyPhoneMessageTextToDefaultResponse
 
 
 
@@ -2740,6 +2950,8 @@ This is an empty request
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
 | actions |  bool | - |  |
+| actions_allowed |  zitadel.features.v1.ActionsAllowed | - |  |
+| max_actions |  int32 | - |  |
 
 
 
@@ -2952,6 +3164,8 @@ This is an empty request
 | custom_text_login |  bool | - |  |
 | lockout_policy |  bool | - |  |
 | actions |  bool | - |  |
+| actions_allowed |  zitadel.features.v1.ActionsAllowed | - |  |
+| max_actions |  int32 | - |  |
 
 
 

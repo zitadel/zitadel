@@ -1,16 +1,16 @@
 package admin
 
 import (
+	"google.golang.org/protobuf/types/known/durationpb"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	obj_grpc "github.com/caos/zitadel/internal/api/grpc/object"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/query"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
 	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func listSecretGeneratorToModel(req *admin_pb.ListSecretGeneratorsRequest) (*query.SecretGeneratorSearchQueries, error) {
@@ -52,7 +52,7 @@ func SecretGeneratorQueryToModel(apiQuery *settings_pb.SecretGeneratorQuery) (qu
 func UpdateSecretGeneratorToConfig(req *admin_pb.UpdateSecretGeneratorRequest) *crypto.GeneratorConfig {
 	return &crypto.GeneratorConfig{
 		Length:              uint(req.Length),
-		Expiry:              types.Duration{Duration: req.Expiry.AsDuration()},
+		Expiry:              req.Expiry.AsDuration(),
 		IncludeUpperLetters: req.IncludeUpperLetters,
 		IncludeLowerLetters: req.IncludeLowerLetters,
 		IncludeDigits:       req.IncludeDigits,

@@ -36,6 +36,7 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore
 	if err != nil {
 		return nil, nil, err
 	}
+
 	events := make([]eventstore.Command, 0)
 	if existingMessageText.Greeting != msg.Greeting {
 		if msg.Greeting != "" {
@@ -87,6 +88,29 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, iamAgg *eventstore
 		}
 	}
 	return events, existingMessageText, nil
+}
+
+func (c *Commands) RemoveIAMMessageTexts(ctx context.Context, messageTextType string, lang language.Tag) (*domain.ObjectDetails, error) {
+	if messageTextType == "" || lang == language.Und {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-fjw9b", "Errors.CustomMessageText.Invalid")
+	}
+	customText, err := c.defaultCustomMessageTextWriteModelByID(ctx, messageTextType, lang)
+	if err != nil {
+		return nil, err
+	}
+	if customText.State == domain.PolicyStateUnspecified || customText.State == domain.PolicyStateRemoved {
+		return nil, caos_errs.ThrowNotFound(nil, "Org-fju90", "Errors.CustomMessageText.NotFound")
+	}
+	iamAgg := IAMAggregateFromWriteModel(&customText.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewCustomTextTemplateRemovedEvent(ctx, iamAgg, messageTextType, lang))
+	if err != nil {
+		return nil, err
+	}
+	err = AppendAndReduce(customText, pushedEvents...)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
 func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*IAMCustomMessageTextReadModel, error) {

@@ -91,15 +91,11 @@ func listIDPsToModel(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (quer
 	if err != nil {
 		return nil, err
 	}
-	iamQuery, err := query.NewIDPIDSearchQuery(domain.IAMID)
+	resourceOwnerQuery, err := query.NewIDPResourceOwnerListSearchQuery(domain.IAMID, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	resourceOwnerQuery, err := query.NewIDPResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	q = append(q, resourceOwnerQuery, iamQuery)
+	q = append(q, resourceOwnerQuery)
 	return &query.IDPSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset:        offset,

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -39,7 +40,7 @@ type Notification struct {
 	AesCrypto      crypto.EncryptionAlgorithm
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
-	apiDomain      string
+	assetsPrefix   string
 	queries        *query.Queries
 }
 
@@ -50,7 +51,7 @@ func newNotification(
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
 	statikDir http.FileSystem,
-	apiDomain string,
+	assetsPrefix string,
 ) *Notification {
 	h := &Notification{
 		handler:        handler,
@@ -58,7 +59,7 @@ func newNotification(
 		systemDefaults: defaults,
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
-		apiDomain:      apiDomain,
+		assetsPrefix:   assetsPrefix,
 		queries:        query,
 	}
 
@@ -161,7 +162,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -199,7 +200,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -238,7 +239,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -304,7 +305,7 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.systemDefaults, n.getSMTPConfig, colors, n.apiDomain)
+	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.systemDefaults, n.getSMTPConfig, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -351,7 +352,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 
-	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.apiDomain)
+	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}

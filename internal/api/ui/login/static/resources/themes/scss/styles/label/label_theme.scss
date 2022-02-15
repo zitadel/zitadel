@@ -1,0 +1,15 @@
+@import '../theming/theming';
+@import 'label';
+
+@mixin lgn-label-theme() {
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'lgn-label') {
+      @include lgn-label-color();
+    // }
+}
+
+@mixin lgn-label-color() {
+
+    .lgn-label {
+      color: var(--zitadel-color-label);
+    }
+}
