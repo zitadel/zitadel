@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/query"
 )
 
-func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, apiDomain, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
+func GetTemplateData(translator *i18n.Translator, translateArgs map[string]interface{}, assetsPrefix, href, msgType, lang string, policy *query.LabelPolicy) templates.TemplateData {
 	templateData := templates.TemplateData{
 		Href:            href,
 		PrimaryColor:    templates.DefaultPrimaryColor,
@@ -30,17 +30,17 @@ func GetTemplateData(translator *i18n.Translator, translateArgs map[string]inter
 	if policy.Light.FontColor != "" {
 		templateData.FontColor = policy.Light.FontColor
 	}
-	if apiDomain == "" {
+	if assetsPrefix == "" {
 		return templateData
 	}
 	templateData.LogoURL = ""
 	if policy.Light.LogoURL != "" {
-		templateData.LogoURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.ID, policy.Light.LogoURL)
+		templateData.LogoURL = fmt.Sprintf("%s/%s/%s", assetsPrefix, policy.ID, policy.Light.LogoURL)
 	}
 	if policy.FontURL != "" {
 		split := strings.Split(policy.FontURL, "/")
 		templateData.FontFamily = split[len(split)-1] + "," + templates.DefaultFontFamily
-		templateData.FontURL = fmt.Sprintf("%s/assets/v1/%s/%s", apiDomain, policy.ID, policy.FontURL)
+		templateData.FontURL = fmt.Sprintf("%s/%s/%s", assetsPrefix, policy.ID, policy.FontURL)
 	}
 	return templateData
 }

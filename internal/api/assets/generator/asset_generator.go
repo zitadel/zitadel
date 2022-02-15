@@ -12,20 +12,21 @@ import (
 )
 
 var (
-	directory = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
-	assets    = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	directory   = flag.String("directory", "./", "working directory: asset.yaml must be in this directory, files will be generated into parent directory")
+	assetsDocs  = flag.String("assets", "../../../../docs/docs/apis/assets/assets.md", "path where the assets.md will be generated")
+	assetPrefix = flag.String("handler-prefix", "/assets/v1", "prefix of the handler paths")
 )
 
 func main() {
 	flag.Parse()
 	configFile := *directory + "asset.yaml"
 	authz, err := os.OpenFile(*directory+"../authz.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-Gn31f").OnError(err).Fatal("cannot open authz file")
+	logging.OnError(err).Fatal("cannot open authz file")
 	router, err := os.OpenFile(*directory+"../router.go", os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-ABen3").OnError(err).Fatal("cannot open router file")
-	docs, err := os.OpenFile(*assets, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
-	logging.Log("ASSETS-Dfvsd").OnError(err).Fatal("cannot open docs file")
-	GenerateAssetHandler(configFile, authz, router, docs)
+	logging.OnError(err).Fatal("cannot open router file")
+	docs, err := os.OpenFile(*assetsDocs, os.O_TRUNC|os.O_WRONLY|os.O_CREATE, 0755)
+	logging.OnError(err).Fatal("cannot open docs file")
+	GenerateAssetHandler(configFile, *assetPrefix, authz, router, docs)
 }
 
 type Method struct {
@@ -97,7 +98,7 @@ type Service struct {
 	Methods map[string]Method
 }
 
-func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) {
+func GenerateAssetHandler(configFilePath, handlerPrefix string, authz, router, docs io.Writer) {
 	conf := new(struct {
 		Services Services
 	})
@@ -117,7 +118,7 @@ func GenerateAssetHandler(configFilePath string, authz, router, docs io.Writer) 
 	}{
 		GoPkgName: "assets",
 		Name:      "AssetsService",
-		Prefix:    "/assets/v1",
+		Prefix:    handlerPrefix,
 		Services:  conf.Services,
 	}
 	err = tmplAuthz.Execute(authz, data)

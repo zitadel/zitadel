@@ -1,0 +1,12 @@
+@import 'header';
+
+@mixin lgn-header-theme() {
+    @include lgn-header-color();
+}
+
+@mixin lgn-header-color() {
+    .lgn-logo {
+        background-position: auto;
+        background-size: contain;
+    }
+}

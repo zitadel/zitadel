@@ -2,9 +2,9 @@ package database
 
 import (
 	"strings"
+	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/config/types"
 )
 
 const (
@@ -16,9 +16,8 @@ type Config struct {
 	Port            string
 	Database        string
 	MaxOpenConns    uint32
-	MaxConnLifetime types.Duration
-	MaxConnIdleTime types.Duration
-	User
+	MaxConnLifetime time.Duration
+	MaxConnIdleTime time.Duration
 
 	//Additional options to be appended as options=<Options>
 	//The value will be taken as is. Multiple options are space separated.

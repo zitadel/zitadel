@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/i18n"
 	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/i18n"
 )
 
 func (q *Queries) Languages(ctx context.Context) ([]language.Tag, error) {

@@ -2,6 +2,7 @@ package eventsourcing
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/spooler"
@@ -9,7 +10,6 @@ import (
 	"github.com/caos/zitadel/internal/auth_request/repository/cache"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_spol "github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -19,11 +19,6 @@ import (
 
 type Config struct {
 	SearchLimit uint64
-	Domain      string
-	APIDomain   string
-	Eventstore  v1.Config
-	AuthRequest cache.Config
-	View        types.SQL
 	Spooler     spooler.SpoolerConfig
 }
 
@@ -38,36 +33,26 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries) (*EsRepository, error) {
-	es, err := v1.Start(conf.Eventstore)
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig, assetsPrefix string) (*EsRepository, error) {
+	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
 	}
 
-	sqlClient, err := conf.View.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	keyAlgorithm, err := crypto.NewAESCrypto(systemDefaults.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}
 	idGenerator := id.SonyFlakeGenerator
 
-	assetsAPI := conf.APIDomain + "/assets/v1/"
-
-	view, err := auth_view.StartView(sqlClient, keyAlgorithm, queries, idGenerator, assetsAPI)
+	view, err := auth_view.StartView(dbClient, keyAlgorithm, queries, idGenerator, assetsPrefix)
 	if err != nil {
 		return nil, err
 	}
 
-	authReq, err := cache.Start(conf.AuthRequest)
-	if err != nil {
-		return nil, err
-	}
+	authReq := cache.Start(dbClient)
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, sqlClient, systemDefaults, queries)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, systemDefaults, queries)
 
 	userRepo := eventstore.UserRepo{
 		SearchLimit:     conf.SearchLimit,
@@ -75,7 +60,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 		View:            view,
 		Query:           queries,
 		SystemDefaults:  systemDefaults,
-		PrefixAvatarURL: assetsAPI,
+		PrefixAvatarURL: assetsPrefix,
 	}
 	//TODO: remove as soon as possible
 	queryView := queryViewWrapper{
@@ -106,11 +91,11 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			ProjectProvider:            queryView,
 			ApplicationProvider:        queries,
 			IdGenerator:                idGenerator,
-			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
-			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck.Duration,
-			MFAInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MFAInitSkip.Duration,
-			SecondFactorCheckLifeTime:  systemDefaults.VerificationLifetimes.SecondFactorCheck.Duration,
-			MultiFactorCheckLifeTime:   systemDefaults.VerificationLifetimes.MultiFactorCheck.Duration,
+			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck,
+			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck,
+			MFAInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MFAInitSkip,
+			SecondFactorCheckLifeTime:  systemDefaults.VerificationLifetimes.SecondFactorCheck,
+			MultiFactorCheckLifeTime:   systemDefaults.VerificationLifetimes.MultiFactorCheck,
 			IAMID:                      systemDefaults.IamID,
 		},
 		eventstore.TokenRepo{

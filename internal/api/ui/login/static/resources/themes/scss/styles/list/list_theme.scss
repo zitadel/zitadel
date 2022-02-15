@@ -1,0 +1,24 @@
+@import '../theming/theming';
+@import 'list';
+
+@mixin lgn-list-theme() {
+    @include lgn-list-color();
+}
+
+@mixin lgn-list-color() {
+    .lgn-list, ul {
+        li::before {
+            color: var(--zitadel-color-primary);
+        }
+    
+       li i {
+            &.lgn-warn {
+                color: var(--zitadel-color-warn);
+            }
+    
+            &.lgn-valid {
+                color: #85d996;
+            }
+        }
+    }
+}
