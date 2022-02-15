@@ -236,6 +236,7 @@ export class ProjectMembersComponent {
               this.toast.showInfo('PROJECT.TOAST.MEMBERSADDED', true);
             })
             .catch((error) => {
+              this.changePage.emit();
               this.toast.showError(error);
             });
         }

@@ -228,7 +228,6 @@ export class ProjectGrantDetailComponent {
 
   removeRole(role: string): void {
     const index = this.grant.grantedRoleKeysList.findIndex((r) => r === role);
-    console.log(role, index);
     if (index > -1) {
       this.grant.grantedRoleKeysList.splice(index, 1);
 

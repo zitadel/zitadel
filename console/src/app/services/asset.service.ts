@@ -85,7 +85,6 @@ export class AssetService {
       .toPromise()
       .then((data: any) => {
         if (data && data.assetServiceUrl) {
-          console.log(data.assetServiceUrl);
           return data.assetServiceUrl;
         }
       })

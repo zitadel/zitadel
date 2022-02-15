@@ -27,7 +27,6 @@ export class ProjectRolesDataSource extends DataSource<Role.AsObject> {
 
     this.loadingSubject.next(true);
     if (grantId && projectId) {
-      console.log(grantId, projectId);
       from(this.mgmtService.listGrantedProjectRoles(projectId, grantId, pageSize, offset))
         .pipe(
           map((resp) => {

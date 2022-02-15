@@ -86,7 +86,6 @@ export class ShortcutsComponent implements OnDestroy {
     }
 
     this.auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      console.log(org.name, org.id);
       this.loadShortcuts(org);
     });
   }

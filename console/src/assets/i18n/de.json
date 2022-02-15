@@ -500,7 +500,8 @@
       "4": "Gesperrt"
     },
     "SEARCH": {
-      "FOUND": "Gefunden"
+      "ADDITIONAL": "Benutzername (eigene Organisation)",
+      "ADDITIONAL-EXTERNAL": "Loginname (externe Organisation)"
     },
     "TARGET": {
       "SELF": "Um einen Benutzer aus einer anderen Organisation zu berechtigen, ",
@@ -1163,7 +1164,7 @@
         "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
         "SEL_ROLES": "Selektiere die gewünschten Rollen für das Erstellen der Berechtigung.",
         "SEL_PROJECT": "Suchen nach Projekt",
-        "SEL_USER": "Suchen nach Benutzer",
+        "SEL_USER": "Benutzer auswählen",
         "SEL_ORG": "Suchen nach Domain",
         "SEL_ORG_DESC": "Gebe die vollständige Domain ein, um Resultate zu erhalten.",
         "ORG_TITLE": "Organisation",

@@ -257,7 +257,6 @@ export class LoginTextsComponent implements OnDestroy {
     return this.getCurrentValues(reqCustomInit)
       .then((policy) => {
         if (policy) {
-          console.log(policy);
           this.totalCustomPolicy = policy;
           this.getCustomInitMessageTextMap$.next(policy[this.currentSubMap]);
         }

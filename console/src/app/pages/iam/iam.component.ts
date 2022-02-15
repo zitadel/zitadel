@@ -94,6 +94,9 @@ export class IamComponent {
             })
             .catch((error) => {
               this.toast.showError(error);
+              setTimeout(() => {
+                this.loadMembers();
+              }, 1000);
             });
         }
       }

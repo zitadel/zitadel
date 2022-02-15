@@ -122,7 +122,6 @@ export class FeaturesComponent implements OnDestroy {
 
     dialogRefPhone.afterClosed().subscribe((customer) => {
       if (customer) {
-        console.log(customer);
         this.stripeCustomer = customer;
         this.subService
           .setCustomer(this.org.id, customer)

@@ -59,15 +59,15 @@ export class PaymentInfoDialogComponent {
   public getLink(): void {
     if (this.orgId) {
       this.stripeLoading = true;
-      this.subService.getLink(this.orgId, window.location.href)
-        .then(payload => {
+      this.subService
+        .getLink(this.orgId, window.location.href)
+        .then((payload) => {
           this.stripeLoading = false;
-          console.log(payload);
           if (payload.redirect_url) {
             window.open(payload.redirect_url, '_blank');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           this.stripeLoading = false;
           console.error(error);
         });
@@ -75,7 +75,7 @@ export class PaymentInfoDialogComponent {
   }
 
   public changeCountry(selection: MatSelectChange): void {
-    const country = COUNTRIES.find(c => c.isoCode === selection.value);
+    const country = COUNTRIES.find((c) => c.isoCode === selection.value);
     if (country && country.phoneCode !== undefined && this.phone && this.phone.value !== `+${country.phoneCode}`) {
       this.phone.setValue(`+${country.phoneCode}`);
     }

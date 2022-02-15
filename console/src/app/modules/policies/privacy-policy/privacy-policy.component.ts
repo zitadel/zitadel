@@ -135,7 +135,6 @@ export class PrivacyPolicyComponent implements OnDestroy {
   }
 
   public saveCurrentMessage(): void {
-    console.log(this.form.get('privacyLink')?.value, this.form.get('tosLink')?.value);
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
       if ((this.privacyPolicy as PrivacyPolicy.AsObject).isDefault) {
         const req = new AddCustomPrivacyPolicyRequest();

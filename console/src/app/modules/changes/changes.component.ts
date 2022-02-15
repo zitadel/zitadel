@@ -190,8 +190,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
     key: string;
     values: any[];
   }[] {
-    console.log(changes);
-
     const splitted: { [editorId: string]: any[] } = {};
     changes.forEach((change) => {
       if (change.changeDate) {

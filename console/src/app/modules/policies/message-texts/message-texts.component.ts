@@ -535,7 +535,6 @@ export class MessageTextsComponent implements OnDestroy {
     return this.getCurrentValues(type, reqCustomInit)
       ?.then((data) => {
         this.getCustomInitMessageTextMap$.next(data);
-        console.log(data);
       })
       .catch((error) => {
         this.toast.showError(error);

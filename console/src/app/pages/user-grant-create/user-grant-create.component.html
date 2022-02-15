@@ -20,14 +20,13 @@
         <ng-container>
           <h2>{{'PROJECT.GRANT.CREATE.SEL_USER' | translate}}</h2>
 
-          <cnsl-search-user-autocomplete class="block" [singleOutput]="true" [users]="user ? [user] : []"
-            (selectionChanged)="selectUser($event)"
-            [target]="context === UserGrantContext.USER ? UserTarget.EXTERNAL : UserTarget.SELF">
+          <cnsl-search-user-autocomplete [editState]="context !== UserGrantContext.USER" class="block"
+            [users]="user ? [user] : []" (selectionChanged)="selectUsers($event)" [target]="UserTarget.SELF">
           </cnsl-search-user-autocomplete>
         </ng-container>
 
         <ng-container *ngIf="context && (context === UserGrantContext.USER || context === UserGrantContext.NONE)">
-          <h2>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
+          <h2 class="project-search">{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
 
           <cnsl-search-project-autocomplete class="block" [singleOutput]="true"
             (selectionChanged)="selectProject($event)">
@@ -62,8 +61,8 @@
 
       <div class="btn-container">
         <ng-container *ngIf="currentCreateStep === 1">
-          <button [disabled]="!org || !projectId || !userId" (click)="next()" color="primary" mat-raised-button
-            class="big-button" cdkFocusInitial>
+          <button [disabled]="!org || !projectId || userIds.length < 1" (click)="next()" color="primary"
+            mat-raised-button class="big-button" cdkFocusInitial>
             {{ 'ACTIONS.CONTINUE' | translate }}
           </button>
         </ng-container>

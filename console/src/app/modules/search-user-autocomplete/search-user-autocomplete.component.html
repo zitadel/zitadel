@@ -1,77 +1,82 @@
-<form>
-  <cnsl-form-field *ngIf="target && target === UserTarget.SELF" appearance="outline" class="full-width more-space">
-    <cnsl-label>Organizations User Loginname</cnsl-label>
+<div class="found" *ngIf="users.length > 0">
+  <!-- <span class="found-label cnsl-secondary-text">{{'USER.SEARCH.FOUND' | translate}}:</span> -->
+  <div class="found-user-row" *ngFor="let user of users; index as i">
+    <div class="circle">
+      <cnsl-avatar
+        *ngIf="user.human && user.human.profile && user.human.profile.displayName && user.human.profile.firstName && user.human.profile.lastName; else cog"
+        class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human.profile?.avatarUrl || ''"
+        [forColor]="user.preferredLoginName" [size]="32">
+      </cnsl-avatar>
+      <ng-template #cog>
+        <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32">
+        </cnsl-avatar>
+      </ng-template>
+    </div>
 
-    <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
-      [formControl]="myControl" [matAutocomplete]="auto" />
-
-    <mat-chip-list *ngIf="!singleOutput" #chipList aria-label="loginname selection">
-      <mat-chip class="chip" *ngFor="let selecteduser of users" [selectable]="selectable" [removable]="removable"
-        (removed)="remove(selecteduser)">
-        {{ (selecteduser.human && selecteduser.human.profile) ? (selecteduser.human.profile.displayName) :
-        selecteduser?.machine?.name}}
-        | <small>
-          {{selecteduser.preferredLoginName}}</small>
-        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-      </mat-chip>
-      <input cnslInput placeholder="{{'ORG_DETAIL.MEMBER.LOGINNAME' | translate}}" #usernameInput
-        [formControl]="myControl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
-        [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="addOnBlur"
-        (matChipInputTokenEnd)="add($event)" />
-    </mat-chip-list>
-
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
-      <mat-option *ngIf="isLoading" class="is-loading">
-        <mat-spinner diameter="30"></mat-spinner>
-      </mat-option>
-      <mat-option *ngFor="let user of filteredUsers" [value]="user">
-        {{(user.human && user.human.profile && user.human.profile.displayName) ? user.human.profile.displayName :
-        user.machine?.name}}
-        <small>{{user.preferredLoginName}}</small>
-      </mat-option>
-    </mat-autocomplete>
-
-    <span class="target-desc">
-      {{'USER.TARGET.SELF'| translate}}
-      <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-    </span>
-  </cnsl-form-field>
-
-  <div *ngIf="target && target === UserTarget.EXTERNAL" class="line">
-    <cnsl-form-field class="form-field" appearance="outline">
-      <cnsl-label>Global User Loginname</cnsl-label>
-      <input cnslInput type="text" [formControl]="globalLoginNameControl" />
-      <span class="target-desc">
-        {{(target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
-        <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
-      </span>
-    </cnsl-form-field>
-
-    <button color="primary" mat-icon-button (click)="getGlobalUser()">
-      <i class="las la-search"></i>
+    <div class="user-name-column" *ngIf="user.human">
+      <span>{{user.human?.profile?.displayName}}</span>
+      <span class="smaller cnsl-secondary-text">{{user.preferredLoginName}}</span>
+    </div>
+    <div class="user-name-column" *ngIf="user.machine">
+      <span>{{user.machine.name}}</span>
+      <span class="smaller cnsl-secondary-text">{{user.preferredLoginName}}</span>
+    </div>
+    <span class="fill-space"></span>
+    <button class="search-user-dl-btn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn">
+      <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
     </button>
   </div>
+  <div class="add-user-row" *ngIf="!editState">
+    <button (click)="editState = true" mat-icon-button>
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</div>
 
-  <div class="found" *ngIf="target === UserTarget.EXTERNAL && users.length > 0">
-    <span class="found-label cnsl-secondary-text">{{'USER.SEARCH.FOUND' | translate}}:</span>
-    <div class="found-user-row" *ngFor="let user of users; index as i">
-      <div class="circle">
-        <cnsl-avatar
-          *ngIf="user.human && user.human.profile && user.human.profile.displayName && user.human.profile.firstName && user.human.profile.lastName; else cog"
-          class="avatar" [name]="user.human.profile.displayName" [avatarUrl]="user.human.profile?.avatarUrl || ''"
-          [forColor]="user.preferredLoginName" [size]="32">
-        </cnsl-avatar>
-        <ng-template #cog>
-          <cnsl-avatar class="avatar" [forColor]="user.preferredLoginName" [isMachine]="true" [size]="32">
-          </cnsl-avatar>
-        </ng-template>
-      </div>
+<form *ngIf="editState">
+  <ng-container *ngIf="target && target === UserTarget.SELF">
+    <div class="line">
+      <cnsl-form-field class="user-create-form-field more-space">
+        <cnsl-label>{{'USER.SEARCH.ADDITIONAL' | translate}}</cnsl-label>
 
-      <span>{{user.preferredLoginName}}</span>
-      <span class="fill-space"></span>
-      <button class="search-user-dl-btn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" mat-icon-button color="warn">
-        <i class="las la-minus-circle" (click)="users.splice(i, 1)"></i>
+        <input cnslInput *ngIf="singleOutput" type="text" placeholder="Search for the user loginname" #usernameInput
+          [formControl]="myControl" [matAutocomplete]="auto" />
+
+        <input *ngIf="!singleOutput" cnslInput #usernameInput [formControl]="myControl" [matAutocomplete]="auto" />
+
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)" [displayWith]="displayFn">
+          <mat-option *ngIf="isLoading" class="is-loading">
+            <mat-spinner diameter="30"></mat-spinner>
+          </mat-option>
+          <mat-option *ngFor="let user of filteredUsers" [value]="user">
+            {{(user.human && user.human.profile && user.human.profile.displayName) ? user.human.profile.displayName :
+            user.machine?.name}}
+            <small>{{user.preferredLoginName}}</small>
+          </mat-option>
+        </mat-autocomplete>
+
+        <span class="target-desc">
+          {{'USER.TARGET.SELF'| translate}}
+          <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+        </span>
+      </cnsl-form-field>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="target && target === UserTarget.EXTERNAL">
+    <div class="line">
+      <cnsl-form-field class="user-create-form-field more-space">
+        <cnsl-label>{{'USER.SEARCH.ADDITIONAL-EXTERNAL' | translate}}</cnsl-label>
+        <input cnslInput type="text" [formControl]="globalLoginNameControl" placeholder="example@externaldomain.com" />
+        <span class="target-desc">
+          {{(target === UserTarget.SELF ? 'USER.TARGET.SELF' : 'USER.TARGET.EXTERNAL') | translate}}
+          <a (click)="changeTarget()">{{'USER.TARGET.CLICKHERE' | translate}}</a>
+        </span>
+      </cnsl-form-field>
+
+      <button color="primary" mat-icon-button (click)="getGlobalUser()">
+        <mat-icon>add</mat-icon>
       </button>
     </div>
-  </div>
+  </ng-container>
 </form>

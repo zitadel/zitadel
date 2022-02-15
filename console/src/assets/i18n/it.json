@@ -500,7 +500,8 @@
       "4": "Bloccato"
     },
     "SEARCH": {
-      "FOUND": "Trovato"
+      "ADDITIONAL": "Nome utente (organizzazione corrente)",
+      "ADDITIONAL-EXTERNAL": "Loginname (organizzazione esterna)"
     },
     "TARGET": {
       "SELF": "Se vuoi concedere l'accesso a un utente di un'altra organizzazione",
@@ -1163,7 +1164,7 @@
         "SEL_USERS": "Seleziona gli utenti a cui vuoi concedere l'accesso",
         "SEL_PROJECT": "Cerca un progetto",
         "SEL_ROLES": "Seleziona i ruoli che vuoi aggiungere",
-        "SEL_USER": "Cerca un utente",
+        "SEL_USER": "Seleziona utenti",
         "SEL_ORG": "Impostare il dominio",
         "SEL_ORG_DESC": "Inserisci il dominio completo per specificare l'organizzazione da concedere.",
         "ORG_TITLE": "Organizzazione",

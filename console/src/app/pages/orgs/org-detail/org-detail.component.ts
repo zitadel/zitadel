@@ -120,6 +120,9 @@ export class OrgDetailComponent implements OnInit {
               }, 1000);
             })
             .catch((error) => {
+              setTimeout(() => {
+                this.loadMembers();
+              }, 1000);
               this.toast.showError(error);
             });
         }

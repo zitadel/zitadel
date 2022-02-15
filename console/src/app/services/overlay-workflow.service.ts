@@ -60,7 +60,6 @@ export class OverlayWorkflowService implements OnDestroy {
 
       const overlay = workflow?.overlays[workflow.currentIndex];
       if (overlay) {
-        console.log('check req', overlay);
         this.meetsRequirements(overlay)
           .pipe(take(1))
           .subscribe((can) => {
@@ -77,7 +76,6 @@ export class OverlayWorkflowService implements OnDestroy {
               });
             } else {
               this.nextStep();
-              console.log('skip overlay');
             }
           });
       }
@@ -130,7 +128,6 @@ export class OverlayWorkflowService implements OnDestroy {
 
   public reset(): void {
     this.currentWorkflow$.next(null);
-    console.log('execute cb here');
     if (this.callback) {
       this.callback();
     }
@@ -153,10 +150,8 @@ export class OverlayWorkflowService implements OnDestroy {
     if (this.nextPossible && currentWorkflow) {
       const nextIndex = currentWorkflow?.currentIndex + 1;
       this.currentWorkflow$.next({ ...currentWorkflow, currentIndex: nextIndex });
-      console.log('next');
     } else {
       this.currentWorkflow$.next(null);
-      console.log('finished, execute cb here');
       if (this.callback) {
         this.callback();
       }

@@ -1,14 +1,7 @@
-.full-width {
-  width: 100%;
-}
-
-.more-space {
-  margin-bottom: 1rem;
-}
-
 .target-desc {
   font-size: 14px;
   display: block;
+  margin-top: 0.5rem;
 
   a {
     color: #4072b4;
@@ -21,13 +14,17 @@
   }
 }
 
-.line {
-  width: 100%;
-  display: flex;
+.user-create-form-field {
+  flex: 1;
 
-  .form-field {
-    flex: 1;
+  &.more-space {
+    margin-bottom: 1rem;
   }
+}
+
+.line {
+  display: flex;
+  max-width: 500px;
 
   button {
     margin-top: 30px;
@@ -41,14 +38,19 @@
 
 .found {
   margin: 0.5rem 0;
-  background: #4072b410;
   border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0rem;
+  max-width: 500px;
+  box-sizing: border-box;
+
+  .add-user-row {
+    margin-left: -4px;
+  }
 
   .found-user-row {
     display: flex;
     align-items: center;
-    min-height: 56px;
+    padding: 0.25rem 0;
 
     button {
       visibility: hidden;
@@ -63,6 +65,16 @@
 
   .found-label {
     font-size: 14px;
+  }
+
+  .user-name-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .smaller {
+      font-size: 13px;
+    }
   }
 
   .fill-space {

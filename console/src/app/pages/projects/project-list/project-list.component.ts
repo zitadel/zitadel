@@ -84,7 +84,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       }
 
       this.getData(type);
-      console.log('load');
     });
   }
 

@@ -500,11 +500,12 @@
       "4": "Locked"
     },
     "SEARCH": {
-      "FOUND": "Found"
+      "ADDITIONAL": "Username (selected organization)",
+      "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {
       "SELF": "If you want to grant a user of an other organization",
-      "EXTERNAL": "To grant a user of your organization access",
+      "EXTERNAL": "To grant a user of your organization",
       "CLICKHERE": "click here"
     },
     "SIGNEDOUT": "You are signed out. Click the button \"Sign In\" to sign in again.",
@@ -1163,7 +1164,7 @@
         "SEL_USERS": "Select the users you wish to grant access",
         "SEL_PROJECT": "Search for a project",
         "SEL_ROLES": "Select the roles you want to be added to the grant",
-        "SEL_USER": "Search for a user",
+        "SEL_USER": "Select users",
         "SEL_ORG": "Set the domain",
         "SEL_ORG_DESC": "Enter the complete domain to specify the organization to grant.",
         "ORG_TITLE": "Organization",

@@ -50,7 +50,6 @@ export class ProjectRolesTableComponent implements OnInit {
     this.dataSource.rolesSubject.subscribe((roles) => {
       const selectedRoles: Role.AsObject[] = roles.filter((role) => this.selectedKeys.includes(role.key));
       this.selection.select(...selectedRoles);
-      console.log(this.selectedKeys, this.dataSource.rolesSubject.getValue(), selectedRoles);
     });
 
     this.selection.changed.subscribe(() => {
