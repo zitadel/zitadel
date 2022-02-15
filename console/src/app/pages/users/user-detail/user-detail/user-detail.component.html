@@ -116,6 +116,15 @@
           </cnsl-card>
         </ng-container>
 
+        <ng-container *ngIf="currentSetting && currentSetting === 'pat'">
+          <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:'+user?.id]">
+            <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.TOKENSTITLE' | translate }}"
+              description="{{ 'USER.MACHINE.TOKENSDESC' | translate }}">
+              <cnsl-personal-access-tokens [userId]="user.id"></cnsl-personal-access-tokens>
+            </cnsl-card>
+          </ng-template>
+        </ng-container>
+
         <ng-container *ngIf="currentSetting && currentSetting === 'keys'">
           <ng-template cnslHasRole [hasRole]="['user.read$', 'user.read:'+user?.id]">
             <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"

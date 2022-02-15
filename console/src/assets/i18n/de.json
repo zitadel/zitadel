@@ -399,6 +399,8 @@
       "DESCRIPTION": "Beschreibung",
       "KEYSTITLE": "Schlüssel",
       "KEYSDESC": "Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Diese Access Tokens funktionieren wie gewöhnliche OAuth Access Tokens.",
       "ID": "Schlüssel-ID",
       "TYPE": "Typ",
       "EXPIRATIONDATE": "Ablaufdatum",
@@ -557,6 +559,25 @@
         "PROJECT": "Projekt",
         "GRANTEDPROJECT": "Berechtigtes Projekt"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Personal Access Token generieren",
+        "DESCRIPTION": "Definieren Sie das Ablaufdatum für das zu erstellende Token",
+        "CHOOSEEXPIRY": "Ablaufdatum",
+        "CHOOSEDATEAFTER": "Geben Sie ein valides Ablaufdatum an. Ab"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Kopieren Sie Ihr Access Token. Sie werden später nicht mehr darauf zugreifen können."
+      },
+      "DELETE": {
+        "TITLE": "Token löschen",
+        "DESCRIPTION": "Sie sind im Begriff das Token unwiederruflich zu löschen. Wollen Sie dies wirklich tun?"
+      },
+      "DELETED": "Personal Access Token gelöscht."
     }
   },
   "FLOWS": {

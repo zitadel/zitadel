@@ -399,6 +399,8 @@
       "DESCRIPTION": "Descrizione",
       "KEYSTITLE": "Chiavi",
       "KEYSDESC": "Definisci le tue chiavi e aggiungi una data di scadenza opzionale.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Questi Token d'accesso personali funzionano come i Access Token per OAuth.",
       "ID": "ID chiave",
       "TYPE": "Tipo",
       "EXPIRATIONDATE": "Data di scadenza",
@@ -557,6 +559,25 @@
         "PROJECT": "Progetto",
         "GRANTEDPROJECT": "Progetto concesso"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Genera un nuovo token",
+        "DESCRIPTION": "Definisci la data di scadenza del token",
+        "CHOOSEEXPIRY": "Seleziona una data di scadenza",
+        "CHOOSEDATEAFTER": "Inserisci una scadenza valida"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Copia il tuo token di accesso. Non sarà possibile recuperarlo in seguito."
+      },
+      "DELETE": {
+        "TITLE": "Elimina Token",
+        "DESCRIPTION": "Stai per eliminare il token di accesso. Sei sicuro di voler continuare?"
+      },
+      "DELETED": "Token eliminato con successo."
     }
   },
   "FLOWS": {

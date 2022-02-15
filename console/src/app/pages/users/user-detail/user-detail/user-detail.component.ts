@@ -26,7 +26,8 @@ const METADATA: SidenavSetting = { id: 'metadata', i18nKey: 'USER.SETTINGS.METAD
 const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRequired: false };
 const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false };
 const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false };
-const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false };
+const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT', featureRequired: false };
+const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.PAT', featureRequired: false };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false };
 
 @Component({
@@ -108,9 +109,9 @@ export class UserDetailComponent implements OnInit {
             this.user = resp.user;
 
             if (this.user.human) {
-              this.settingsList = [GENERAL, IDP, PASSWORDLESS, MFA, GRANTS, MEMBERSHIPS, METADATA];
+              this.settingsList = [GENERAL, MFA, PASSWORDLESS, IDP, GRANTS, MEMBERSHIPS, METADATA];
             } else if (this.user.machine) {
-              this.settingsList = [GENERAL, KEYS, GRANTS, MEMBERSHIPS, METADATA];
+              this.settingsList = [GENERAL, GRANTS, MEMBERSHIPS, PERSONALACCESSTOKEN, KEYS, METADATA];
             }
           }
         })
