@@ -1,5 +1,7 @@
 package client
 
+/* Deprecated in V2
+
 import (
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -97,7 +99,6 @@ EFcN1kvdg5WGK41+fYMdexPaLamjhDGN0e1vxJfAukWIAsBMwp8wfEWZvzA=
 -----END RSA PRIVATE KEY-----
 `
 )
-
 func TestClient_Adapt1(t *testing.T) {
 	monitor := mntr.Monitor{}
 	namespace := "testNs"
@@ -167,3 +168,6 @@ func TestClient_Adapt2(t *testing.T) {
 
 	assert.NoError(t, ensure(k8sClient))
 }
+
+
+*/

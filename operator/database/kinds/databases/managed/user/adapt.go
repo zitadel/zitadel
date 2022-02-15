@@ -1,5 +1,7 @@
 package user
 
+/* Deprecated in V2
+
 import (
 	"fmt"
 	"github.com/caos/zitadel/operator"
@@ -70,3 +72,4 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
 		nil
 }
+*/

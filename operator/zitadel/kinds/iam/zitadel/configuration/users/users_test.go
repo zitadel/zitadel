@@ -1,5 +1,7 @@
 package users
 
+/* Deprecated in V2
+
 import (
 	"testing"
 
@@ -59,3 +61,4 @@ func TestUsers_DeleteIfNotRequired(t *testing.T) {
 	err = function(k8sClient)
 	assert.NoError(t, err)
 }
+*/

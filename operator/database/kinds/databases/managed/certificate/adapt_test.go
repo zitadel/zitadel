@@ -1,5 +1,6 @@
 package certificate
 
+/* Deprecated in V2
 import (
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -303,3 +304,5 @@ func TestNode_AdaptCreateUser(t *testing.T) {
 
 	assert.NoError(t, ensure(k8sClient))
 }
+
+*/

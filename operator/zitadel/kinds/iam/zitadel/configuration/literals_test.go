@@ -9,8 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 var (
@@ -238,6 +236,8 @@ var (
 	}
 )
 
+/* Deprecated in V2
+
 func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 	certPath := "test"
 	secretPath := "test"
@@ -412,7 +412,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 
 	assert.EqualValues(t, equals, literals)
 }
-
+*/
 func TestConfiguration_LiteralsSecrets(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	googleSA := "sajson"

@@ -1,5 +1,7 @@
 package users
 
+/* Deprecated in V2
+
 import (
 	"testing"
 
@@ -126,3 +128,4 @@ func TestUsers_Adapt_DeleteMultiple(t *testing.T) {
 	err = ensure(client)
 	assert.NoError(t, err)
 }
+*/

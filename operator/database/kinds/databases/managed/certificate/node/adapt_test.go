@@ -1,5 +1,7 @@
 package node
 
+/* Deprecated in V2
+
 import (
 	"github.com/caos/orbos/mntr"
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
@@ -243,3 +245,6 @@ func TestNode_AdaptAlreadyExisting(t *testing.T) {
 	assert.NoError(t, ensure(k8sClient))
 
 }
+
+
+*/

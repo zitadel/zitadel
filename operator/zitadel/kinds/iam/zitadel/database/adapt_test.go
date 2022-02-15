@@ -1,5 +1,7 @@
 package database
 
+/* Deprecated in V2
+
 import (
 	"errors"
 	"testing"
@@ -120,3 +122,4 @@ func TestDatabase_AdaptFailUsers(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, current)
 }
+*/
