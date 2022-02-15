@@ -18,15 +18,16 @@ services:
       - 26257:26257
 
 # starts the backend (API's) of ZITADEL
-# Port 50001 serves the GRPC API
-# Port 50002 serves the REST API
-# Port 50003 serves the login GUI
-  backend-run:
-    restart: on-failure
+  zitadel:
     networks:
       - zitadel
+      # TODO: correct image?
+    image: ghcr.io/caos/zitadel:latest
+    # TODO: define commands maybe additional command to init + start
+    command: init && zitadel start
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:50002/management/v1/healthz"]
+      # TODO: ask livio for health check
+      test: ["CMD", "curl", "-f", "http://localhost:8080/_debug"]
       interval: 10s
       timeout: 30s
       retries: 5
@@ -34,15 +35,5 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    build:
-      context: ../..
-      dockerfile: build/zitadel/Dockerfile
-      target: dev-go-build
-    environment:
-      - ZITADEL_EVENTSTORE_HOST=db
     ports:
-      - 50001:50001
-    command:
-      [
-        'start',
-      ]
+      - 8080:8080

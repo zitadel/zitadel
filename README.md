@@ -1,3 +1,110 @@
+# ZITADEL
+
+The identity and access management (IAM) solution with the strongest change track built for the cloud era. Thanks to it's unique approach to store user activities as events, every change of an object can be traced. The modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and [**CockroachDB**](https://www.cockroachlabs.com/) forms a solid basic framework to build the IAM you are looking for.
+
+TODO: multi cloud / multi region / serverless?
+
+ZITADEL is more than just IAM. It's a superb open source TODO:plattform built for and from its community to handle secure user login and account management the simplest way possible.
+
+Zitadel is [OpenID Connect](https://openid.net/connect) certified, [oauth 2.0](https://datatracker.ietf.org/doc/html/rfc6749) and [saml 2.0](https://datatracker.ietf.org/doc/html/rfc7522) compliant to keep your authentication implementation efforts as low as possible.
+
+## Getting started
+
+If you want to try out ZITADEL you can choose to run it locally or simply use the [cloud offering](https://accounts.zitadel.ch/register/org) and create your organisation for free, no credit card required.
+
+To run ZITADEL locally it's recommended to run it and the database in docker but you can also run the executable.
+
+If you want to integrate ZITADEL in your app check out the clients section [TODO: link to clients section]
+
+### Run with docker compose
+
+Simply clone the repo and execute the following command in the folder:
+
+```bash
+COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose.yml up
+```
+
+### Run on your machine
+
+TODO: download/install zitadel
+
+TODO: add basic start-local-node command
+
+First of all you need to start the cockroach database [using their guide to start a cluster](https://www.cockroachlabs.com/docs/v21.2/start-a-local-cluster)
+
+After the database is up and running you need to initialize ZITADEL. This command sets up the basic requirements of ZITADEL:
+
+```bash
+zitadel init
+```
+
+After the successful initialization you can start ZITADEL by this command:
+
+TODO: insecure, should we write logs to a file?
+
+```bash
+zitadel start
+```
+
+TODO: what will be printed? is it possible to open the browser and show the login screen?
+
+## Key features
+
+- Authentication
+  - OpenID Connect 1.0 Protocol (OP)
+  - Username / Password
+  - Machine-to-machine (JWT profile)
+  - Passwordless with FIDO2
+  - Multifactor authentication with OTP, U2F
+  - Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
+  - Identity Brokering
+- Identity & Access Management
+  - B2C, B2B, B2E, M2M identities
+  - Authorization via Role Based Access Control (RBAC)
+  - Delegation of roles to other organizations for self-management
+  - Management roles
+  - User self-service workflows
+  - User register workflow
+- Strong audit trail for all IAM resources
+- Privatelabeling
+  - Custom branding
+  - Custom texts
+  - Hosted login
+  - Personal profile
+- Integration
+  - API-first
+  - Actions for custom code execution
+
+## Help and Documentation
+
+- [Documentation](https://docs.zitadel.ch)
+- [Say hello](https://zitadel.ch/contact/)
+- [Join our Discord channel](https://discord.gg/erh5Brh7jE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## License
+
+See the exact licensing terms [here](./LICENSE)
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+## Old
+
 <img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
 <img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
 
@@ -64,33 +171,6 @@ Details about how to contribute you can find in the [Contribution Guide](CONTRIB
 
 See the policy [here](./SECURITY.md)
 
-## Features of ZITADEL platform
-
-* Authentication
-  * OpenID Connect 1.0 Protocol (OP)
-  * Username / Password
-  * Machine-to-machine (JWT profile)
-  * Passwordless with FIDO2
-  * Multifactor authentication with OTP, U2F
-  * Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
-  * Identity Brokering
-* Identity & Access Management
-  * B2C, B2B, B2E, M2M identities
-  * Authorization via Role Based Access Control (RBAC)
-  * Delegation of roles to other organizations for self-management
-  * Management roles
-  * User self-service workflows
-  * User register workflow
-* Strong audit trail for all IAM resources
-* Privatelabeling
-  * Custom branding
-  * Custom texts
-  * Hosted login
-  * Personal profile
-* Integration
-  * API-first
-  * Actions for custom code execution
-
 ## Showcase
 
 ### Passwordless Login
@@ -134,8 +214,4 @@ Besides from errors that don't clearly come from misconfiguration or cli misuage
 
 We only ingest operational data. Your ZITADEL workload data from the IAM application itself is never sent anywhere unless you chose to integrate other systems yourself.
 
-## License
 
-See the exact licensing terms [here](./LICENSE)
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
