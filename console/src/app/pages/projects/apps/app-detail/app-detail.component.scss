@@ -63,8 +63,11 @@
         flex: 1;
       }
 
+      .regen-secret {
+        margin-right: 0.5rem;
+      }
+
       .actions-trigger-desk {
-        margin-top: 0.25rem;
         display: none;
         align-items: center;
 
@@ -195,10 +198,8 @@
 
 .compliance {
   .compliance-title {
-    margin: 2rem 0 1rem 0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 14px;
+    margin: 1rem 0 1rem 0;
+    font-size: 16px;
   }
 
   .problem {

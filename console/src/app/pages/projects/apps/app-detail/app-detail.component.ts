@@ -299,12 +299,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
               } else if (this.app.apiConfig) {
                 this.getAuthMethodOptions('API');
 
-                this.settingsList = [
-                  { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
-                  { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
-                ];
-
                 this.initialAuthMethod = this.authMethodFromPartialConfig({ api: this.app.apiConfig });
+
+                if (this.initialAuthMethod === 'BASIC') {
+                  this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS', featureRequired: false }];
+                  this.currentSetting = 'urls';
+                } else {
+                  this.settingsList = [
+                    { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
+                    { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+                  ];
+                }
                 this.currentAuthMethod = this.initialAuthMethod;
                 if (this.initialAuthMethod === CUSTOM_METHOD.key) {
                   if (!this.authMethods.includes(CUSTOM_METHOD)) {
@@ -584,6 +589,17 @@ export class AppDetailComponent implements OnInit, OnDestroy {
           if (this.app.apiConfig) {
             const config = { api: this.app.apiConfig };
             this.currentAuthMethod = this.authMethodFromPartialConfig(config);
+
+            if (this.currentAuthMethod === 'BASIC') {
+              this.settingsList = [{ id: 'urls', i18nKey: 'APP.URLS', featureRequired: false }];
+              this.currentSetting = 'urls';
+            } else {
+              this.settingsList = [
+                { id: 'configuration', i18nKey: 'APP.CONFIGURATION', featureRequired: false },
+                { id: 'urls', i18nKey: 'APP.URLS', featureRequired: false },
+              ];
+              this.currentSetting = 'configuration';
+            }
           }
           this.toast.showInfo('APP.TOAST.APIUPDATED', true);
         })

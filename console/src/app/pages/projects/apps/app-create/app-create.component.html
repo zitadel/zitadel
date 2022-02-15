@@ -32,7 +32,8 @@
 
         <cnsl-type-radio [types]="appTypes" (selectedType)="appType?.setValue($event)" [selected]="appType?.value">
         </cnsl-type-radio>
-        <div class="actions">
+        <div class="app-create-actions">
+          <span class="fill-space"></span>
           <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
             matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
         </div>
@@ -49,9 +50,10 @@
           [isOIDC]="appType?.value?.createType === AppCreateType.OIDC" (selectedMethod)="authMethod?.setValue($event)">
         </cnsl-auth-method-radio>
 
-        <div class="actions">
+        <div class="app-create-actions">
           <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |
             translate}}</button>
+          <span class="fill-space"></span>
           <button mat-raised-button color="primary" [disabled]="secondFormGroup.invalid"
             matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
         </div>
@@ -90,8 +92,9 @@
         [isNative]="oidcAppRequest.appType === OIDCAppType.OIDC_APP_TYPE_NATIVE">
       </cnsl-redirect-uris>
 
-      <div class="actions">
+      <div class="app-create-actions">
         <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+        <span class="fill-space"></span>
         <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
       </div>
     </mat-step>
@@ -187,8 +190,9 @@
         </div>
       </ng-container>
 
-      <div class="actions">
+      <div class="app-create-actions">
         <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
+        <span class="fill-space"></span>
         <button mat-raised-button color="primary" (click)="createApp()">{{'ACTIONS.CREATE' |
           translate}}</button>
       </div>

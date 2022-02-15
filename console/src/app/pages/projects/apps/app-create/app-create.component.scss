@@ -84,18 +84,12 @@ p.desc {
   }
 }
 
-.actions {
-  button[mat-stroked-button] {
-    float: left;
-    margin-top: 1rem;
-    border-radius: 0.5rem;
-  }
+.app-create-actions {
+  margin-top: 1rem;
+  display: flex;
 
-  button[mat-raised-button] {
-    float: right;
-    margin-top: 1rem;
-    border-radius: 0.5rem;
-    min-width: 100px;
+  .fill-space {
+    flex: 1;
   }
 }
 
