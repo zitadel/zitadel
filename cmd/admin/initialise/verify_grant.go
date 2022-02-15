@@ -13,7 +13,7 @@ import (
 
 var (
 	searchGrant = "SELECT * FROM [SHOW GRANTS ON DATABASE %s] where grantee = $1 AND privilege_type = 'ALL'"
-	//go:embed sql/grant_user.sql
+	//go:embed sql/03_grant_user.sql
 	grantStmt string
 )
 

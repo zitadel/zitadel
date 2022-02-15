@@ -12,7 +12,7 @@ import (
 
 var (
 	searchUser = "SELECT username FROM [show roles] WHERE username = $1"
-	//go:embed sql/user.sql
+	//go:embed sql/01_user.sql
 	createUserStmt string
 )
 

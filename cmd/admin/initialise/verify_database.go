@@ -13,7 +13,7 @@ import (
 var (
 	searchDatabase = "SELECT database_name FROM [show databases] WHERE database_name = $1"
 
-	//go:embed sql/database.sql
+	//go:embed sql/02_database.sql
 	databaseStmt string
 )
 

@@ -17,13 +17,13 @@ const (
 var (
 	searchEventsTable = "SELECT table_name FROM [SHOW TABLES] WHERE table_name = 'events'"
 	searchSchema      = "SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1"
-	//go:embed sql/enable_hash_sharded_indexes.sql
+	//go:embed sql/06_enable_hash_sharded_indexes.sql
 	enableHashShardedIdx string
-	//go:embed sql/events_table.sql
+	//go:embed sql/07_events_table.sql
 	createEventsStmt string
-	//go:embed sql/projections.sql
+	//go:embed sql/05_projections.sql
 	createProjectionsStmt string
-	//go:embed sql/eventstore.sql
+	//go:embed sql/04_eventstore.sql
 	createEventstoreStmt string
 )
 
