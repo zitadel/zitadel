@@ -2,7 +2,7 @@ import { apiAuth } from "../../support/api/apiauth";
 import { ensureHumanUserExists, ensureUserDoesntExist } from "../../support/api/users";
 import { login, User, username } from "../../support/login/users";
 
-describe('humans', () => {
+describe.skip('humans', () => {
 
     const humansPath = `${Cypress.env('consoleUrl')}/users/list/humans`
     const testHumanUserName = 'e2ehumanusername'

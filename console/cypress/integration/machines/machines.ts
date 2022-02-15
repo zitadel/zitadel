@@ -13,7 +13,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
  */
 // ###############################
 
-describe('machines', () => {
+describe.skip('machines', () => {
 
     const machinesPath = `${Cypress.env('consoleUrl')}/users/list/machines`
     const testMachineUserName = 'e2emachineusername'
