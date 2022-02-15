@@ -1,4 +1,4 @@
-<span class="title" mat-dialog-title>{{'GRANTS.EDIT.TITLE' | translate}}</span>
+<span class="title" mat-dialog-title>{{data.i18nTitle | translate}}</span>
 <div mat-dialog-content>
   <cnsl-project-roles-table class="role-table" *ngIf="projectId"
     [displayedColumns]="['select', 'key', 'displayname', 'group']" (changedSelection)="selectRoles($event)"

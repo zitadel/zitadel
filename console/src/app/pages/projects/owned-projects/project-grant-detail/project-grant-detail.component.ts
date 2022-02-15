@@ -247,8 +247,8 @@ export class ProjectGrantDetailComponent {
     const dialogRef = this.dialog.open(UserGrantRoleDialogComponent, {
       data: {
         projectId: this.grant.projectId,
-        // grantId: this.grant.grantId,
         selectedRoleKeysList: this.grant.grantedRoleKeysList,
+        i18nTitle: 'PROJECT.GRANT.EDITTITLE',
       },
       width: '600px',
     });

@@ -210,6 +210,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         projectId: grant.projectId,
         grantId: grant.projectGrantId,
         selectedRoleKeysList: grant.roleKeysList,
+        i18nTitle: 'GRANTS.EDIT.TITLE',
       },
       width: '600px',
     });

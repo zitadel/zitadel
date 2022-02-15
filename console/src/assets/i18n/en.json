@@ -53,7 +53,7 @@
     "DOMAINS": "Domains",
     "PROJECT": "Projects",
     "PROJECTOVERVIEW": "Overview",
-    "PROJECTGRANTS": "Granted Organizations",
+    "PROJECTGRANTS": "Grants",
     "ROLES": "Roles",
     "GRANTEDPROJECT": "Granted Projects",
     "HUMANUSERS": "Users",
@@ -1155,8 +1155,9 @@
     },
     "GRANT": {
       "EMPTY": "No granted organization.",
-      "TITLE": "Granted Organizations",
+      "TITLE": "Project Grants",
       "DESCRIPTION": "Allow an other organization to use your project.",
+      "EDITTITLE": "Edit roles",
       "CREATE": {
         "TITLE": "Create Organization Grant",
         "SEL_USERS": "Select the users you wish to grant access",
@@ -1173,7 +1174,7 @@
         "FOR_ORG": "The grant is created for:"
       },
       "DETAIL": {
-        "TITLE": "Granted Organization",
+        "TITLE": "Project Grant",
         "DESC": "You can select which roles can be used by the specified organization, and elect managers",
         "MEMBERTITLE": "Managers",
         "MEMBERDESC": "These are the managers of the granted organization. Add users here who should gain access to edit the data of the project.",

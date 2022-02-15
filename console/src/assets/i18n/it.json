@@ -53,9 +53,9 @@
     "DOMAINS": "Domini",
     "PROJECT": "Progetti",
     "PROJECTOVERVIEW": "Progetto",
-    "PROJECTGRANTS": "Organizzazioni concesse",
+    "PROJECTGRANTS": "Organizzazioni ammissibili",
     "ROLES": "Ruoli",
-    "GRANTEDPROJECT": "Progetti concessi",
+    "GRANTEDPROJECT": "Progetto delegato",
     "HUMANUSERS": "Utenti",
     "MACHINEUSERS": "Utenti di servizio",
     "LOGOUT": "Esci con tutti gli utenti",
@@ -557,7 +557,7 @@
         "UNKNOWN": "Sconosciuto",
         "ORG": "Organizzazione",
         "PROJECT": "Progetto",
-        "GRANTEDPROJECT": "Progetto concesso"
+        "GRANTEDPROJECT": "Progetto delegato"
       }
     },
     "PERSONALACCESSTOKEN": {
@@ -1077,9 +1077,9 @@
       "ZITADELPROJECT": "Questo appartiene al progetto ZITADEL. Attenzione: se fai delle modifiche ZITADEL potrebbe non comportarsi come previsto.",
       "TYPE": {
         "OWNED": "Progetti proprietari",
-        "GRANTED": "Progetti concessi",
+        "GRANTED": "Progetti delegati",
         "OWNED_SINGULAR": "Progetto proprietario",
-        "GRANTED_SINGULAR": "Progetto concesso"
+        "GRANTED_SINGULAR": "Progetto delegato"
       },
       "PRIVATELABEL": {
         "TITLE": "Impostazione Branding",
@@ -1133,8 +1133,8 @@
     "TYPE": {
       "TITLE": "Tipo",
       "0": "Tipo sconosciuto",
-      "1": "Progetto posseduto",
-      "2": "Progetto concesso"
+      "1": "Progetto proprio",
+      "2": "Progetto delegato"
     },
     "NAME": "Nome",
     "NAMEDIALOG": {
@@ -1154,9 +1154,10 @@
       "USERID": "ID utente"
     },
     "GRANT": {
-      "EMPTY": "Nessun organizzazione concessa.",
-      "TITLE": "Organizzazioni concesse",
+      "EMPTY": "Nessun organizzazione ammissibile.",
+      "TITLE": "Projetto delegato",
       "DESCRIPTION": "Permetti a un'altra organizzazione di usare il tuo progetto.",
+      "EDITTITLE": "Configura ruoli",
       "CREATE": {
         "TITLE": "Crea un org grant",
         "SEL_USERS": "Seleziona gli utenti a cui vuoi concedere l'accesso",
@@ -1173,12 +1174,12 @@
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
-        "TITLE": "Organizzazione concessa",
+        "TITLE": "Progetto delegato",
         "DESC": "Puoi definire quali ruoli possono essere usati e gestire i manager",
         "MEMBERTITLE": "Manager",
         "MEMBERDESC": "Questi sono i manager dell'org grant. Aggiungi qui gli utenti che devono ottenere l'accesso per modificare i dati del progetto.",
         "PROJECTNAME": "Nome del progetto",
-        "GRANTEDORG": "Organizzazione concessa",
+        "GRANTEDORG": "Organizzazione ammissibile",
         "RESOURCEOWNER": "Resource owner"
       },
       "STATE": "Stato",
@@ -1192,7 +1193,7 @@
       "MEMBERS": "Manager",
       "ORG": "Organizzazione",
       "PROJECTNAME": "Nome del progetto",
-      "GRANTEDORG": "Organizzazione concessa",
+      "GRANTEDORG": "Organizzazione ammissible",
       "GRANTEDORGDOMAIN": "Dominio",
       "RESOURCEOWNER": "Resource owner",
       "GRANTEDORGNAME": "Nome dell'organizzazione",
@@ -1634,7 +1635,7 @@
       "3": "IAM",
       "2": "Organizzazione",
       "0": "Progetto proprio",
-      "1": "Progetto concesso",
+      "1": "Progetto delegato",
       "4": "Progetto"
     },
     "EDITROLE": "Modifica ruoli",

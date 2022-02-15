@@ -1155,8 +1155,9 @@
     },
     "GRANT": {
       "EMPTY": "Noch keine Organisation berechtigt",
-      "TITLE": "Berechtigte Organisationen",
+      "TITLE": "Projektberechtigungen",
       "DESCRIPTION": "Gewähre einer anderen Organisation Zugriff auf dieses Projekt.",
+      "EDITTITLE": "Rollen editieren",
       "CREATE": {
         "TITLE": "Organisation berechtigen",
         "SEL_USERS": "Selektiere die gewünschten Benutzer für das Erstellen der Berechtigung.",
@@ -1173,7 +1174,7 @@
         "FOR_ORG": "Die Berechtigung wird erstellt für:"
       },
       "DETAIL": {
-        "TITLE": "Organisationsberechtigung",
+        "TITLE": "Projektberechtigung",
         "DESC": "Hier kannst Du die Eigenschaften der gewählten Organisationsberechtigung prüfen und Manager editieren.",
         "MEMBERTITLE": "Berechtigte Manager der Organisation",
         "MEMBERDESC": "Dies sind die Manager der berechtigten Organisation. Wähle die Benutzer, die Zugriff zum Bearbeiten der jeweiligen Zugänge erhalten sollen.",
