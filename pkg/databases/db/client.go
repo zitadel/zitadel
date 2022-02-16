@@ -21,9 +21,9 @@ type Client interface {
 
 const (
 	CertsSecret = "db-certficates"
-	RootCert    = "root.crt"
-	UserCert    = "user.crt"
-	UserKey     = "user.key"
+	RootCert    = "ca.crt"
+	UserCert    = "client.root.crt"
+	UserKey     = "client.root.key"
 )
 
 type Connection interface {

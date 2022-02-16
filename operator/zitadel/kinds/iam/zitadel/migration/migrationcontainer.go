@@ -64,7 +64,7 @@ func sslParams(ssl *db.SSL, certsDir string) string {
 	}
 
 	if ssl.UserCertAndKey {
-		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s%s", certsDir, db.UserCert, certsDir, db.UserKey)
+		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s", certsDir, db.UserCert, certsDir, db.UserKey)
 	}
 
 	return params

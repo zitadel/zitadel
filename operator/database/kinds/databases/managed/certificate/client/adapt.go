@@ -2,8 +2,6 @@ package client
 
 import (
 	"errors"
-	"strings"
-
 	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
@@ -32,16 +30,13 @@ func AdaptFunc(
 	namespace string,
 	componentLabels *labels.Component,
 ) (
-	func(client string) operator.QueryFunc,
-	func(client string) operator.DestroyFunc,
+	func(client, secretName, userCrtFilename, userKeyFilename string) operator.QueryFunc,
+	func(secretName string) operator.DestroyFunc,
 	error,
 ) {
 
-	return func(client string) operator.QueryFunc {
-			clientSecret := clientSecretPrefix + client
-			nameLabels := labels.MustForName(componentLabels, strings.ReplaceAll(clientSecret, "_", "-"))
-			clientCertKey := clientCertKeyPrefix + client + clientCertKeySuffix
-			clientPrivKeyKey := clientPrivKeyKeyPrefix + client + clientPrivKeyKeySuffix
+	return func(client, secretName, userCrtFilename, userKeyFilename string) operator.QueryFunc {
+			nameLabels := labels.MustForName(componentLabels, secretName)
 
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriers := make([]operator.QueryFunc, 0)
@@ -80,9 +75,9 @@ func AdaptFunc(
 				}
 
 				clientSecretData := map[string]string{
-					caCertKey:        string(pemCaCert),
-					clientPrivKeyKey: string(pemClientPrivKey),
-					clientCertKey:    string(pemClientCert),
+					db.RootCert:     string(pemCaCert),
+					userKeyFilename: string(pemClientPrivKey),
+					userCrtFilename: string(pemClientCert),
 				}
 
 				queryClientSecret, err := secret.AdaptFuncToEnsure(namespace, labels.AsSelectable(nameLabels), clientSecretData)
@@ -93,10 +88,9 @@ func AdaptFunc(
 
 				return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 			}
-		}, func(client string) operator.DestroyFunc {
-			clientSecret := clientSecretPrefix + client
+		}, func(secretName string) operator.DestroyFunc {
 
-			destroy, err := secret.AdaptFuncToDestroy(namespace, clientSecret)
+			destroy, err := secret.AdaptFuncToDestroy(namespace, secretName)
 			if err != nil {
 				return nil
 			}

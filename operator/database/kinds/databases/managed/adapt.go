@@ -109,11 +109,11 @@ func Adapter(
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
-		addRoot, err := addUser("root")
+		addRoot, err := addUser("root", db.CertsSecret, db.UserCert, db.UserKey)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
-		destroyRoot, err := deleteUser("root")
+		destroyRoot, err := deleteUser(db.CertsSecret)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}

@@ -22,8 +22,8 @@ func AdaptFunc(
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
-	func(user string) (operator.QueryFunc, error),
-	func(user string) (operator.DestroyFunc, error),
+	func(user, secretName, userCrtFilename, userKeyFilename string) (operator.QueryFunc, error),
+	func(secretName string) (operator.DestroyFunc, error),
 	//	func(k8sClient kubernetes.ClientInt) ([]string, error),
 	error,
 ) {
@@ -52,7 +52,7 @@ func AdaptFunc(
 			return operator.QueriersToEnsureFunc(cMonitor, false, queriers, k8sClient, queried)
 		},
 		operator.DestroyersToDestroyFunc(cMonitor, destroyers),
-		func(user string) (operator.QueryFunc, error) {
+		func(user, secretName, userCrtFilename, userKeyFilename string) (operator.QueryFunc, error) {
 			query, _, err := client.AdaptFunc(
 				cMonitor,
 				namespace,
@@ -61,7 +61,7 @@ func AdaptFunc(
 			if err != nil {
 				return nil, err
 			}
-			queryClient := query(user)
+			queryClient := query(user, secretName, userCrtFilename, userKeyFilename)
 
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				_, err := queryNode(k8sClient, queried)
@@ -72,7 +72,7 @@ func AdaptFunc(
 				return queryClient(k8sClient, queried)
 			}, nil
 		},
-		func(user string) (operator.DestroyFunc, error) {
+		func(secretName string) (operator.DestroyFunc, error) {
 			_, destroy, err := client.AdaptFunc(
 				cMonitor,
 				namespace,
@@ -82,7 +82,7 @@ func AdaptFunc(
 				return nil, err
 			}
 
-			return destroy(user), nil
+			return destroy(secretName), nil
 		},
 		/*		func(k8sClient kubernetes.ClientInt) ([]string, error) {
 				return client.QueryCertificates(namespace, labels.DeriveComponentSelector(componentLabels, false), k8sClient)
