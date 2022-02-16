@@ -15,9 +15,8 @@ import (
 
 func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.OIDCConfig == nil && config.JWTConfig == nil {
-		return nil, errors.ThrowInvalidArgument(nil, "IAM-eUpQU", "Errors.idp.config.notset")
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IDP-s8nn3", "Errors.IDPConfig.Invalid")
 	}
-
 	idpConfigID, err := c.idGenerator.Next()
 	if err != nil {
 		return nil, err

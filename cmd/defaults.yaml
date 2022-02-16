@@ -141,6 +141,8 @@ SystemDefaults:
     EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
   IDPConfigVerificationKey:
     EncryptionKeyID: $ZITADEL_IDP_CONFIG_VERIFICATION_KEY
+  SMTPPasswordVerificationKey:
+    EncryptionKeyID: $ZITADEL_SMTP_PASSWORD_VERIFICATION_KEY
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecretGenerator:
@@ -197,7 +199,6 @@ SystemDefaults:
     MFAInitSkip: 720h #30d
     SecondFactorCheck: 18h
     MultiFactorCheck: 12h
-  IamID: 'IAM'
   DomainVerification:
     VerificationKey:
       EncryptionKeyID: $ZITADEL_DOMAIN_VERIFICATION_KEY
@@ -240,42 +241,6 @@ SystemDefaults:
         Url: $CHAT_URL
         #        Compact: $CHAT_COMPACT
         SplitCount: 4000
-    TemplateData:
-      InitCode:
-        Title: 'InitCode.Title'
-        PreHeader: 'InitCode.PreHeader'
-        Subject: 'InitCode.Subject'
-        Greeting: 'InitCode.Greeting'
-        Text: 'InitCode.Text'
-        ButtonText: 'InitCode.ButtonText'
-      PasswordReset:
-        Title: 'PasswordReset.Title'
-        PreHeader: 'PasswordReset.PreHeader'
-        Subject: 'PasswordReset.Subject'
-        Greeting: 'PasswordReset.Greeting'
-        Text: 'PasswordReset.Text'
-        ButtonText: 'PasswordReset.ButtonText'
-      VerifyEmail:
-        Title: 'VerifyEmail.Title'
-        PreHeader: 'VerifyEmail.PreHeader'
-        Subject: 'VerifyEmail.Subject'
-        Greeting: 'VerifyEmail.Greeting'
-        Text: 'VerifyEmail.Text'
-        ButtonText: 'VerifyEmail.ButtonText'
-      VerifyPhone:
-        Title: 'VerifyPhone.Title'
-        PreHeader: 'VerifyPhone.PreHeader'
-        Subject: 'VerifyPhone.Subject'
-        Greeting: 'VerifyPhone.Greeting'
-        Text: 'VerifyPhone.Text'
-        ButtonText: 'VerifyPhone.ButtonText'
-      DomainClaimed:
-        Title: 'DomainClaimed.Title'
-        PreHeader: 'DomainClaimed.PreHeader'
-        Subject: 'DomainClaimed.Subject'
-        Greeting: 'DomainClaimed.Greeting'
-        Text: 'DomainClaimed.Text'
-        ButtonText: 'DomainClaimed.ButtonText'
   KeyConfig:
     Size: 2048
     PrivateKeyLifetime: 6h

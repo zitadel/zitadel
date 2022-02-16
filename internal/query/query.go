@@ -25,7 +25,6 @@ import (
 )
 
 type Queries struct {
-	iamID      string
 	eventstore *eventstore.Eventstore
 	client     *sql.DB
 
@@ -51,10 +50,9 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 	}
 
 	repo = &Queries{
-		iamID:                               defaults.IamID,
 		eventstore:                          es,
 		client:                              sqlClient,
-		DefaultLanguage:                     defaults.DefaultLanguage,
+		DefaultLanguage:                     language.Und,
 		LoginDir:                            statikLoginFS,
 		NotificationDir:                     statikNotificationFS,
 		LoginTranslationFileContents:        make(map[string][]byte),

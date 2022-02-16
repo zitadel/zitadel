@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -23,7 +24,7 @@ func (c *Commands) getHuman(ctx context.Context, userID, resourceowner string) (
 	return writeModelToHuman(human), nil
 }
 
-func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Human) (*domain.Human, error) {
+func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Human, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) (*domain.Human, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-XYFk9", "Errors.ResourceOwnerMissing")
 	}
@@ -35,7 +36,7 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
 	}
-	events, addedHuman, err := c.addHuman(ctx, orgID, human, orgIAMPolicy, pwPolicy)
+	events, addedHuman, err := c.addHuman(ctx, orgID, human, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +53,7 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 	return writeModelToHuman(addedHuman), nil
 }
 
-func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
+func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator, passwordlessCodeGenerator crypto.Generator) (_ *domain.Human, passwordlessCode *domain.PasswordlessInitCode, err error) {
 	if orgID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
 	}
@@ -64,7 +65,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	if err != nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexity.NotFound")
 	}
-	events, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, orgIAMPolicy, pwPolicy)
+	events, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -88,27 +89,27 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	return writeModelToHuman(addedHuman), passwordlessCode, nil
 }
 
-func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.Command, *HumanWriteModel, error) {
+func (c *Commands) addHuman(ctx context.Context, orgID string, human *domain.Human, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-67Ms8", "Errors.User.Invalid")
 	}
 	if human.Password != nil && human.SecretString != "" {
 		human.ChangeRequired = true
 	}
-	return c.createHuman(ctx, orgID, human, nil, false, false, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, nil, false, false, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 }
 
-func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
+func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.Human, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator, passwordlessCodeGenerator crypto.Generator) (events []eventstore.Command, humanWriteModel *HumanWriteModel, passwordlessCodeWriteModel *HumanPasswordlessInitCodeWriteModel, code string, err error) {
 	if orgID == "" || !human.IsValid() {
 		return nil, nil, nil, "", caos_errs.ThrowInvalidArgument(nil, "COMMAND-00p2b", "Errors.User.Invalid")
 	}
-	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, nil, false, passwordless, orgIAMPolicy, pwPolicy)
+	events, humanWriteModel, err = c.createHuman(ctx, orgID, human, nil, false, passwordless, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, nil, nil, "", err
 	}
 	if passwordless {
 		var codeEvent eventstore.Command
-		codeEvent, passwordlessCodeWriteModel, code, err = c.humanAddPasswordlessInitCode(ctx, human.AggregateID, orgID, true)
+		codeEvent, passwordlessCodeWriteModel, code, err = c.humanAddPasswordlessInitCode(ctx, human.AggregateID, orgID, true, passwordlessCodeGenerator)
 		if err != nil {
 			return nil, nil, nil, "", err
 		}
@@ -117,7 +118,7 @@ func (c *Commands) importHuman(ctx context.Context, orgID string, human *domain.
 	return events, humanWriteModel, passwordlessCodeWriteModel, code, nil
 }
 
-func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgMemberRoles []string) (*domain.Human, error) {
+func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgMemberRoles []string, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) (*domain.Human, error) {
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")
 	}
@@ -136,7 +137,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	if !loginPolicy.AllowRegister {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-SAbr3", "Errors.Org.LoginPolicy.RegistrationNotAllowed")
 	}
-	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, link, orgIAMPolicy, pwPolicy)
+	userEvents, registeredHuman, err := c.registerHuman(ctx, orgID, human, link, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	return writeModelToHuman(registeredHuman), nil
 }
 
-func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.Command, *HumanWriteModel, error) {
+func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
 	if human != nil && human.Username == "" {
 		human.Username = human.EmailAddress
 	}
@@ -180,10 +181,10 @@ func (c *Commands) registerHuman(ctx context.Context, orgID string, human *domai
 	if human.Password != nil && human.SecretString != "" {
 		human.ChangeRequired = false
 	}
-	return c.createHuman(ctx, orgID, human, link, true, false, orgIAMPolicy, pwPolicy)
+	return c.createHuman(ctx, orgID, human, link, true, false, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 }
 
-func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy) ([]eventstore.Command, *HumanWriteModel, error) {
+func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.Human, link *domain.UserIDPLink, selfregister, passwordless bool, orgIAMPolicy *domain.OrgIAMPolicy, pwPolicy *domain.PasswordComplexityPolicy, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator) ([]eventstore.Command, *HumanWriteModel, error) {
 	if err := human.CheckOrgIAMPolicy(orgIAMPolicy); err != nil {
 		return nil, nil, err
 	}
@@ -232,7 +233,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	if human.IsInitialState(passwordless, link != nil) {
-		initCode, err := domain.NewInitUserCode(c.initializeUserCode)
+		initCode, err := domain.NewInitUserCode(initCodeGenerator)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -244,7 +245,7 @@ func (c *Commands) createHuman(ctx context.Context, orgID string, human *domain.
 	}
 
 	if human.Phone != nil && human.PhoneNumber != "" && !human.IsPhoneVerified {
-		phoneCode, err := domain.NewPhoneCode(c.phoneVerificationCode)
+		phoneCode, err := domain.NewPhoneCode(phoneCodeGenerator)
 		if err != nil {
 			return nil, nil, err
 		}

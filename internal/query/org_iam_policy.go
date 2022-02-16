@@ -71,7 +71,7 @@ func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMP
 				OrgIAMColID.identifier(): orgID,
 			},
 			sq.Eq{
-				OrgIAMColID.identifier(): q.iamID,
+				OrgIAMColID.identifier(): domain.IAMID,
 			},
 		}).
 		OrderBy(OrgIAMColIsDefault.identifier()).
@@ -87,7 +87,7 @@ func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMP
 func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error) {
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgIAMColID.identifier(): q.iamID,
+		OrgIAMColID.identifier(): domain.IAMID,
 	}).
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()

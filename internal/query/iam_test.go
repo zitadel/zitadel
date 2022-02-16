@@ -10,6 +10,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
+	"golang.org/x/text/language"
 )
 
 func Test_IAMPrepares(t *testing.T) {
@@ -34,7 +35,8 @@ func Test_IAMPrepares(t *testing.T) {
 						` zitadel.projections.iam.global_org_id,`+
 						` zitadel.projections.iam.iam_project_id,`+
 						` zitadel.projections.iam.setup_started,`+
-						` zitadel.projections.iam.setup_done`+
+						` zitadel.projections.iam.setup_done,`+
+						` zitadel.projections.iam.default_language`+
 						` FROM zitadel.projections.iam`),
 					nil,
 					nil,
@@ -59,7 +61,8 @@ func Test_IAMPrepares(t *testing.T) {
 						` zitadel.projections.iam.global_org_id,`+
 						` zitadel.projections.iam.iam_project_id,`+
 						` zitadel.projections.iam.setup_started,`+
-						` zitadel.projections.iam.setup_done`+
+						` zitadel.projections.iam.setup_done,`+
+						` zitadel.projections.iam.default_language`+
 						` FROM zitadel.projections.iam`),
 					[]string{
 						"id",
@@ -69,6 +72,7 @@ func Test_IAMPrepares(t *testing.T) {
 						"iam_project_id",
 						"setup_started",
 						"setup_done",
+						"default_language",
 					},
 					[]driver.Value{
 						"id",
@@ -78,17 +82,19 @@ func Test_IAMPrepares(t *testing.T) {
 						"project-id",
 						domain.Step2,
 						domain.Step1,
+						"en",
 					},
 				),
 			},
 			object: &IAM{
-				ID:           "id",
-				ChangeDate:   testNow,
-				Sequence:     20211108,
-				GlobalOrgID:  "global-org-id",
-				IAMProjectID: "project-id",
-				SetupStarted: domain.Step2,
-				SetupDone:    domain.Step1,
+				ID:              "id",
+				ChangeDate:      testNow,
+				Sequence:        20211108,
+				GlobalOrgID:     "global-org-id",
+				IAMProjectID:    "project-id",
+				SetupStarted:    domain.Step2,
+				SetupDone:       domain.Step1,
+				DefaultLanguage: language.English,
 			},
 		},
 		{
@@ -102,7 +108,8 @@ func Test_IAMPrepares(t *testing.T) {
 						` zitadel.projections.iam.global_org_id,`+
 						` zitadel.projections.iam.iam_project_id,`+
 						` zitadel.projections.iam.setup_started,`+
-						` zitadel.projections.iam.setup_done`+
+						` zitadel.projections.iam.setup_done,`+
+						` zitadel.projections.iam.default_language`+
 						` FROM zitadel.projections.iam`),
 					sql.ErrConnDone,
 				),

@@ -1,10 +1,13 @@
 package types
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/templates"
 	"github.com/caos/zitadel/internal/query"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
@@ -18,7 +21,7 @@ type PasswordCodeData struct {
 	URL       string
 }
 
-func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
+func SendPasswordCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.PasswordCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -43,6 +46,6 @@ func SendPasswordCode(mailhtml string, translator *i18n.Translator, user *view_m
 	if code.NotificationType == int32(domain.NotificationTypeSms) {
 		return generateSms(user, passwordResetData.Text, systemDefaults.Notifications, false)
 	}
-	return generateEmail(user, passwordResetData.Subject, template, systemDefaults.Notifications, true)
+	return generateEmail(ctx, user, passwordResetData.Subject, template, systemDefaults.Notifications, smtpConfig, true)
 
 }

@@ -76,7 +76,7 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 				PrivacyColID.identifier(): orgID,
 			},
 			sq.Eq{
-				PrivacyColID.identifier(): q.iamID,
+				PrivacyColID.identifier(): domain.IAMID,
 			},
 		}).
 		OrderBy(PrivacyColIsDefault.identifier()).
@@ -92,7 +92,7 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		PrivacyColID.identifier(): q.iamID,
+		PrivacyColID.identifier(): domain.IAMID,
 	}).
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()

@@ -9,24 +9,23 @@ import (
 	"github.com/caos/zitadel/internal/notification/channels/chat"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
 	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
 )
 
 type SystemDefaults struct {
-	DefaultLanguage          language.Tag
-	Domain                   string
-	ZitadelDocs              ZitadelDocs
-	SecretGenerators         SecretGenerators
-	UserVerificationKey      *crypto.KeyConfig
-	IDPConfigVerificationKey *crypto.KeyConfig
-	Multifactors             MultifactorConfig
-	VerificationLifetimes    VerificationLifetimes
-	DomainVerification       DomainVerification
-	IamID                    string
-	Notifications            Notifications
-	KeyConfig                KeyConfig
+	DefaultLanguage             language.Tag
+	Domain                      string
+	ZitadelDocs                 ZitadelDocs
+	SecretGenerators            SecretGenerators
+	UserVerificationKey         *crypto.KeyConfig
+	IDPConfigVerificationKey    *crypto.KeyConfig
+	SMTPPasswordVerificationKey *crypto.KeyConfig
+	Multifactors                MultifactorConfig
+	VerificationLifetimes       VerificationLifetimes
+	DomainVerification          DomainVerification
+	Notifications               Notifications
+	KeyConfig                   KeyConfig
 }
 
 type ZitadelDocs struct {
@@ -35,15 +34,9 @@ type ZitadelDocs struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost         int
-	ClientSecretGenerator    crypto.GeneratorConfig
-	InitializeUserCode       crypto.GeneratorConfig
-	EmailVerificationCode    crypto.GeneratorConfig
-	PhoneVerificationCode    crypto.GeneratorConfig
-	PasswordVerificationCode crypto.GeneratorConfig
-	PasswordlessInitCode     crypto.GeneratorConfig
-	MachineKeySize           uint32
-	ApplicationKeySize       uint32
+	PasswordSaltCost   int
+	MachineKeySize     uint32
+	ApplicationKeySize uint32
 }
 
 type MultifactorConfig struct {
@@ -69,10 +62,9 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	DebugMode    bool
-	Endpoints    Endpoints
-	Providers    Channels
-	TemplateData TemplateData
+	DebugMode bool
+	Endpoints Endpoints
+	Providers Channels
 }
 
 type Endpoints struct {
@@ -85,7 +77,6 @@ type Endpoints struct {
 
 type Channels struct {
 	Chat       chat.ChatConfig
-	Email      smtp.EmailConfig
 	Twilio     twilio.TwilioConfig
 	FileSystem fs.FSConfig
 	Log        log.LogConfig

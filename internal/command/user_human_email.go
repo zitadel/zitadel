@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*domain.Email, error) {
+func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email, emailCodeGenerator crypto.Generator) (*domain.Email, error) {
 	if !email.IsValid() || email.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M9sf", "Errors.Email.Invalid")
 	}
@@ -38,7 +38,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*
 	if email.IsEmailVerified {
 		events = append(events, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 	} else {
-		emailCode, err := domain.NewEmailCode(c.emailVerificationCode)
+		emailCode, err := domain.NewEmailCode(emailCodeGenerator)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +56,7 @@ func (c *Commands) ChangeHumanEmail(ctx context.Context, email *domain.Email) (*
 	return writeModelToEmail(existingEmail), nil
 }
 
-func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string) (*domain.ObjectDetails, error) {
+func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceowner string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -73,7 +73,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.emailVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, emailCodeGenerator)
 	if err == nil {
 		pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanEmailVerifiedEvent(ctx, userAgg))
 		if err != nil {
@@ -91,7 +91,7 @@ func (c *Commands) VerifyHumanEmail(ctx context.Context, userID, code, resourceo
 	return nil, caos_errs.ThrowInvalidArgument(err, "COMMAND-Gdsgs", "Errors.User.Code.Invalid")
 }
 
-func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string) (*domain.ObjectDetails, error) {
+func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID, resourceOwner string, emailCodeGenerator crypto.Generator) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-4M0ds", "Errors.User.UserIDMissing")
 	}
@@ -110,7 +110,7 @@ func (c *Commands) CreateHumanEmailVerificationCode(ctx context.Context, userID,
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-3M9ds", "Errors.User.Email.AlreadyVerified")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingEmail.WriteModel)
-	emailCode, err := domain.NewEmailCode(c.emailVerificationCode)
+	emailCode, err := domain.NewEmailCode(emailCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
