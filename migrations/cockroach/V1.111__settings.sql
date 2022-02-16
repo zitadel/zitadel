@@ -1,7 +1,7 @@
 ALTER TABLE zitadel.projections.iam ADD COLUMN default_language TEXT DEFAULT '';
 
 CREATE TABLE zitadel.projections.secret_generators (
-    generator_type STRING NOT NULL
+    generator_type INT2 NOT NULL
     , aggregate_id STRING NOT NULL
     , creation_date TIMESTAMPTZ NOT NULL
     , change_date TIMESTAMPTZ NOT NULL
@@ -26,11 +26,11 @@ CREATE TABLE zitadel.projections.smtp_configs (
     , sequence INT8 NOT NULL
 
     , tls BOOLEAN NOT NULL
-    , from_address STRING NOT NULL
-    , from_name STRING NOT NULL
-    , smtp_host STRING NOT NULL
-    , smtp_user STRING NOT NULL
-    , client_secret JSONB
+    , sender_address STRING NOT NULL
+    , sender_name STRING NOT NULL
+    , host STRING NOT NULL
+    , user STRING NOT NULL DEFAULT ''
+    , password JSONB
 
     , PRIMARY KEY (aggregate_id)
 );

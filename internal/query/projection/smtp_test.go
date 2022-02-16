@@ -28,8 +28,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					iam.AggregateType,
 					[]byte(`{
 						"tls": true,
-						"fromAddress": "from",
-						"fromName": "name",
+						"senderAddress": "sender",
+						"senderName": "name",
 						"host": "host",
 						"user": "user"
 					}`,
@@ -45,12 +45,12 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.smtp_configs SET (change_date, sequence, tls, from_address, from_name, smtp_host, smtp_user) = ($1, $2, $3, $4, $5, $6, $7) WHERE (aggregate_id = $8)",
+							expectedStmt: "UPDATE zitadel.projections.smtp_configs SET (change_date, sequence, tls, sender_address, sender_name, host, user) = ($1, $2, $3, $4, $5, $6, $7) WHERE (aggregate_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
 								true,
-								"from",
+								"sender",
 								"name",
 								"host",
 								"user",
@@ -69,8 +69,8 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 					iam.AggregateType,
 					[]byte(`{
 						"tls": true,
-						"fromAddress": "from",
-						"fromName": "name",
+						"senderAddress": "sender",
+						"senderName": "name",
 						"host": "host",
 						"user": "user",
 						"password": {
@@ -90,7 +90,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.smtp_configs (aggregate_id, creation_date, change_date, resource_owner, sequence, tls, from_address, from_name, smtp_host, smtp_user, smtp_password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO zitadel.projections.smtp_configs (aggregate_id, creation_date, change_date, resource_owner, sequence, tls, sender_address, sender_name, host, user, password) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -98,7 +98,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 								"ro-id",
 								uint64(15),
 								true,
-								"from",
+								"sender",
 								"name",
 								"host",
 								"user",
@@ -133,7 +133,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.smtp_configs SET (change_date, sequence, smtp_password) = ($1, $2, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE zitadel.projections.smtp_configs SET (change_date, sequence, password) = ($1, $2, $3) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

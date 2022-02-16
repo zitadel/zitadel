@@ -18,7 +18,7 @@ const (
 type DefaultLanguageSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	DefaultLanguage language.Tag `json:"defaultLanguage"`
+	Language language.Tag `json:"defaultLanguage"`
 }
 
 func (e *DefaultLanguageSetEvent) Data() interface{} {
@@ -40,7 +40,7 @@ func NewDefaultLanguageSetEvent(
 			aggregate,
 			DefaultLanguageSetEventType,
 		),
-		DefaultLanguage: defaultLanguage,
+		Language: defaultLanguage,
 	}
 }
 

@@ -12,13 +12,13 @@ import (
 type IAMSMTPConfigWriteModel struct {
 	eventstore.WriteModel
 
-	FromAddress  string
-	FromName     string
-	TLS          bool
-	SMTPHost     string
-	SMTPUser     string
-	SMTPPassword *crypto.CryptoValue
-	State        domain.SMTPConfigState
+	SenderAddress string
+	SenderName    string
+	TLS           bool
+	Host          string
+	User          string
+	Password      *crypto.CryptoValue
+	State         domain.SMTPConfigState
 }
 
 func NewIAMSMTPConfigWriteModel() *IAMSMTPConfigWriteModel {
@@ -35,27 +35,27 @@ func (wm *IAMSMTPConfigWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *iam.SMTPConfigAddedEvent:
 			wm.TLS = e.TLS
-			wm.FromAddress = e.FromAddress
-			wm.FromName = e.FromName
-			wm.SMTPHost = e.SMTPHost
-			wm.SMTPUser = e.SMTPUser
-			wm.SMTPPassword = e.SMTPPassword
+			wm.SenderAddress = e.SenderAddress
+			wm.SenderName = e.SenderName
+			wm.Host = e.Host
+			wm.User = e.User
+			wm.Password = e.Password
 			wm.State = domain.SMTPConfigStateActive
 		case *iam.SMTPConfigChangedEvent:
 			if e.TLS != nil {
 				wm.TLS = *e.TLS
 			}
 			if e.FromAddress != nil {
-				wm.FromAddress = *e.FromAddress
+				wm.SenderAddress = *e.FromAddress
 			}
 			if e.FromName != nil {
-				wm.FromName = *e.FromName
+				wm.SenderName = *e.FromName
 			}
-			if e.SMTPHost != nil {
-				wm.SMTPHost = *e.SMTPHost
+			if e.Host != nil {
+				wm.Host = *e.Host
 			}
-			if e.SMTPUser != nil {
-				wm.SMTPUser = *e.SMTPUser
+			if e.User != nil {
+				wm.User = *e.User
 			}
 		}
 	}
@@ -82,16 +82,16 @@ func (wm *IAMSMTPConfigWriteModel) NewChangedEvent(ctx context.Context, aggregat
 	if wm.TLS != tls {
 		changes = append(changes, iam.ChangeSMTPConfigTLS(tls))
 	}
-	if wm.FromAddress != fromAddress {
+	if wm.SenderAddress != fromAddress {
 		changes = append(changes, iam.ChangeSMTPConfigFromAddress(fromAddress))
 	}
-	if wm.FromName != fromName {
+	if wm.SenderName != fromName {
 		changes = append(changes, iam.ChangeSMTPConfigFromName(fromName))
 	}
-	if wm.SMTPHost != smtpHost {
+	if wm.Host != smtpHost {
 		changes = append(changes, iam.ChangeSMTPConfigSMTPHost(smtpHost))
 	}
-	if wm.SMTPUser != smtpUser {
+	if wm.User != smtpUser {
 		changes = append(changes, iam.ChangeSMTPConfigSMTPUser(smtpUser))
 	}
 

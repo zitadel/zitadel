@@ -20,23 +20,23 @@ const (
 type SMTPConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FromAddress  string              `json:"fromAddress,omitempty"`
-	FromName     string              `json:"fromName,omitempty"`
-	TLS          bool                `json:"tls,omitempty"`
-	SMTPHost     string              `json:"host,omitempty"`
-	SMTPUser     string              `json:"user,omitempty"`
-	SMTPPassword *crypto.CryptoValue `json:"password,omitempty"`
+	SenderAddress string              `json:"senderAddress,omitempty"`
+	SenderName    string              `json:"senderName,omitempty"`
+	TLS           bool                `json:"tls,omitempty"`
+	Host          string              `json:"host,omitempty"`
+	User          string              `json:"user,omitempty"`
+	Password      *crypto.CryptoValue `json:"password,omitempty"`
 }
 
 func NewSMTPConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tls bool,
-	fromAddress,
-	fromName,
-	smtpHost,
-	smtpUser string,
-	smtpPassword *crypto.CryptoValue,
+	senderAddress,
+	senderName,
+	host,
+	user string,
+	password *crypto.CryptoValue,
 ) *SMTPConfigAddedEvent {
 	return &SMTPConfigAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -44,12 +44,12 @@ func NewSMTPConfigAddedEvent(
 			aggregate,
 			SMTPConfigAddedEventType,
 		),
-		TLS:          tls,
-		FromAddress:  fromAddress,
-		FromName:     fromName,
-		SMTPHost:     smtpHost,
-		SMTPUser:     smtpUser,
-		SMTPPassword: smtpPassword,
+		TLS:           tls,
+		SenderAddress: senderAddress,
+		SenderName:    senderName,
+		Host:          host,
+		User:          user,
+		Password:      password,
 	}
 }
 
@@ -76,11 +76,11 @@ func SMTPConfigAddedEventMapper(event *repository.Event) (eventstore.Event, erro
 type SMTPConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	FromAddress *string `json:"fromAddress,omitempty"`
-	FromName    *string `json:"fromName,omitempty"`
+	FromAddress *string `json:"senderAddress,omitempty"`
+	FromName    *string `json:"senderName,omitempty"`
 	TLS         *bool   `json:"tls,omitempty"`
-	SMTPHost    *string `json:"host,omitempty"`
-	SMTPUser    *string `json:"user,omitempty"`
+	Host        *string `json:"host,omitempty"`
+	User        *string `json:"user,omitempty"`
 }
 
 func (e *SMTPConfigChangedEvent) Data() interface{} {
@@ -120,27 +120,27 @@ func ChangeSMTPConfigTLS(tls bool) func(event *SMTPConfigChangedEvent) {
 	}
 }
 
-func ChangeSMTPConfigFromAddress(fromAddress string) func(event *SMTPConfigChangedEvent) {
+func ChangeSMTPConfigFromAddress(senderAddress string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
-		e.FromAddress = &fromAddress
+		e.FromAddress = &senderAddress
 	}
 }
 
-func ChangeSMTPConfigFromName(fromName string) func(event *SMTPConfigChangedEvent) {
+func ChangeSMTPConfigFromName(senderName string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
-		e.FromName = &fromName
+		e.FromName = &senderName
 	}
 }
 
 func ChangeSMTPConfigSMTPHost(smtpHost string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
-		e.SMTPHost = &smtpHost
+		e.Host = &smtpHost
 	}
 }
 
 func ChangeSMTPConfigSMTPUser(smtpUser string) func(event *SMTPConfigChangedEvent) {
 	return func(e *SMTPConfigChangedEvent) {
-		e.SMTPUser = &smtpUser
+		e.User = &smtpUser
 	}
 }
 
@@ -160,13 +160,13 @@ func SMTPConfigChangedEventMapper(event *repository.Event) (eventstore.Event, er
 type SMTPConfigPasswordChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	SMTPPassword *crypto.CryptoValue `json:"password,omitempty"`
+	Password *crypto.CryptoValue `json:"password,omitempty"`
 }
 
 func NewSMTPConfigPasswordChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	smtpPassword *crypto.CryptoValue,
+	password *crypto.CryptoValue,
 ) *SMTPConfigPasswordChangedEvent {
 	return &SMTPConfigPasswordChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -174,7 +174,7 @@ func NewSMTPConfigPasswordChangedEvent(
 			aggregate,
 			SMTPConfigPasswordChangedEventType,
 		),
-		SMTPPassword: smtpPassword,
+		Password: password,
 	}
 }
 

@@ -57,11 +57,11 @@ const (
 	SMTPConfigColumnResourceOwner = "resource_owner"
 	SMTPConfigColumnSequence      = "sequence"
 	SMTPConfigColumnTls           = "tls"
-	SMTPConfigColumnFromAddress   = "from_address"
-	SMTPConfigColumnFromName      = "from_name"
-	SMTPConfigColumnSMTPHost      = "smtp_host"
-	SMTPConfigColumnSMTPUser      = "smtp_user"
-	SMTPConfigColumnSMTPPassword  = "smtp_password"
+	SMTPConfigColumnFromAddress   = "sender_address"
+	SMTPConfigColumnFromName      = "sender_name"
+	SMTPConfigColumnSMTPHost      = "host"
+	SMTPConfigColumnSMTPUser      = "user"
+	SMTPConfigColumnSMTPPassword  = "password"
 )
 
 func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -79,11 +79,11 @@ func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 			handler.NewCol(SMTPConfigColumnTls, e.TLS),
-			handler.NewCol(SMTPConfigColumnFromAddress, e.FromAddress),
-			handler.NewCol(SMTPConfigColumnFromName, e.FromName),
-			handler.NewCol(SMTPConfigColumnSMTPHost, e.SMTPHost),
-			handler.NewCol(SMTPConfigColumnSMTPUser, e.SMTPUser),
-			handler.NewCol(SMTPConfigColumnSMTPPassword, e.SMTPPassword),
+			handler.NewCol(SMTPConfigColumnFromAddress, e.SenderAddress),
+			handler.NewCol(SMTPConfigColumnFromName, e.SenderName),
+			handler.NewCol(SMTPConfigColumnSMTPHost, e.Host),
+			handler.NewCol(SMTPConfigColumnSMTPUser, e.User),
+			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
 		},
 	), nil
 }
@@ -107,11 +107,11 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	if e.FromName != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnFromName, *e.FromName))
 	}
-	if e.SMTPHost != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPHost, *e.SMTPHost))
+	if e.Host != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPHost, *e.Host))
 	}
-	if e.SMTPUser != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPUser, *e.SMTPUser))
+	if e.User != nil {
+		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPUser, *e.User))
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -134,7 +134,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.
 		[]handler.Column{
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
-			handler.NewCol(SMTPConfigColumnSMTPPassword, e.SMTPPassword),
+			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
 		},
 		[]handler.Condition{
 			handler.NewCond(SMTPConfigColumnAggregateID, e.Aggregate().ID),

@@ -116,7 +116,7 @@ func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handl
 			handler.NewCol(IAMColumnID, e.Aggregate().ID),
 			handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 			handler.NewCol(IAMColumnSequence, e.Sequence()),
-			handler.NewCol(IAMColumnDefaultLanguage, e.DefaultLanguage.String()),
+			handler.NewCol(IAMColumnDefaultLanguage, e.Language.String()),
 		},
 	), nil
 }

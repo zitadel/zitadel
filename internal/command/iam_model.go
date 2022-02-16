@@ -35,7 +35,7 @@ func (wm *IAMWriteModel) Reduce() error {
 		case *iam.GlobalOrgSetEvent:
 			wm.GlobalOrgID = e.OrgID
 		case *iam.DefaultLanguageSetEvent:
-			wm.DefaultLanguage = e.DefaultLanguage
+			wm.DefaultLanguage = e.Language
 		case *iam.SetupStepEvent:
 			if e.Done {
 				wm.SetUpDone = e.Step
