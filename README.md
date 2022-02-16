@@ -1,12 +1,15 @@
+<a href="https://zitadel.ch#gh-light-mode-only"><img src="./docs/static/logos/zitadel-logo-dark@2x.png" alt="Zitadel Logo" height="70px" width="auto" align="right" /></a>
+<a href="https://zitadel.ch#gh-dark-mode-only"><img src="./docs/static/logos/zitadel-logo-light@2x.png" alt="Zitadel Logo" height="70px" width="auto" align="right" /></a>
+
 # ZITADEL
 
-The identity and access management (IAM) solution with the strongest change track built for the cloud era. Thanks to it's unique approach to store user activities as events, every change of an object can be traced. The modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and [**CockroachDB**](https://www.cockroachlabs.com/) forms a solid basic framework to build the IAM you are looking for.
+The identity and access management (IAM) solution with the **strongest change track** built for modern **global scale** cloud capabilities. Thanks to it's unique approach to store user **activities as events**, every change of an object can be traced
 
-TODO: multi cloud / multi region / serverless?
-
-ZITADEL is more than just IAM. It's a superb open source TODO:plattform built for and from its community to handle secure user login and account management the simplest way possible.
+ZITADEL is more than just IAM. It's a superb open source TODO:plattform built for and from its community to handle **secure user login and account management** the simplest way possible.
 
 Zitadel is [OpenID Connect](https://openid.net/connect) certified, [oauth 2.0](https://datatracker.ietf.org/doc/html/rfc6749) and [saml 2.0](https://datatracker.ietf.org/doc/html/rfc7522) compliant to keep your authentication implementation efforts as low as possible.
+
+The modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and [**CockroachDB**](https://www.cockroachlabs.com/) forms a solid basic framework to build the IAM you are looking for.
 
 ## Getting started
 
