@@ -14,7 +14,7 @@ The identity and access management (IAM) solution with the **strongest change tr
 
 ZITADEL is more than just IAM. It's a superb open source TODO:plattform built for and from its community to handle **secure user login and account management** the simplest way possible.
 
-Zitadel is [OpenID Connect](https://openid.net/connect) certified, [oauth 2.0](https://datatracker.ietf.org/doc/html/rfc6749) and [saml 2.0](https://datatracker.ietf.org/doc/html/rfc7522) compliant to keep your authentication implementation efforts as low as possible.
+Zitadel is [OpenID Connect](https://openid.net/connect) certified ([certification](https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL)), [oauth 2.0](https://datatracker.ietf.org/doc/html/rfc6749) and [saml 2.0](https://datatracker.ietf.org/doc/html/rfc7522) compliant to keep your authentication implementation efforts as low as possible.
 
 The modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and [**CockroachDB**](https://www.cockroachlabs.com/) forms a solid basic framework to build the IAM you are looking for.
 
@@ -24,6 +24,7 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.ch/docs/concepts/eventstore)
 - Actions to react on events with custom code
 - [Private labeling](https://docs.zitadel.ch/docs/guides/customization/branding) for a uniform user experience
+- [cockroach database](https://www.cockroachlabs.com/) is the only dependency
 
 ### Authentication
 
@@ -76,6 +77,23 @@ After the database is up and running you can start ZITADEL:
 ```bash
 zitadel start-with-init
 ```
+
+### Client libraries
+
+| Language | Client | ManagmentAPI | AdminAPI | AuthAPI | Thanks to the maintainers |
+|----------|--------|--------------|----------|---------|---------------------------|
+| .NET       | [zitadel-net](https://github.com/caos/zitadel-net) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+| Dart       | [zitadel-dart](https://github.com/caos/zitadel-dart) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+| Elixir     | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | ✔️ | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
+| Go         | [zitadel-go](https://github.com/caos/zitadel-go) | ✔️ | ✔️ | ✔️ | ZITADEL |
+| Rust       | [zitadel-rust](https://crates.io/crates/zitadel) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+
+
+- [Go](https://github.com/caos/zitadel-go) maintained by us
+- [.NET](https://github.com/caos/zitadel-net) maintained by our top library contributor [buehler](https://github.com/buehler)
+- [Dart](https://github.com/caos/zitadel-dart) maintained by our top library contributor [buehler](https://github.com/buehler)
+- [Elixir](https://github.com/jshmrtn/zitadel_api) maintained by our friends at [jshmrtn]((https://github.com/jshmrtn))
+- [Rust](https://crates.io/crates/zitadel) maintained by our top library contributor [buehler](https://github.com/buehler)
 
 ## Help and Documentation
 
