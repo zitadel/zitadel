@@ -56,7 +56,7 @@ const (
 	SMTPConfigColumnChangeDate    = "change_date"
 	SMTPConfigColumnResourceOwner = "resource_owner"
 	SMTPConfigColumnSequence      = "sequence"
-	SMTPConfigColumnTls           = "tls"
+	SMTPConfigColumnTLS           = "tls"
 	SMTPConfigColumnFromAddress   = "sender_address"
 	SMTPConfigColumnFromName      = "sender_name"
 	SMTPConfigColumnSMTPHost      = "host"
@@ -78,7 +78,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
-			handler.NewCol(SMTPConfigColumnTls, e.TLS),
+			handler.NewCol(SMTPConfigColumnTLS, e.TLS),
 			handler.NewCol(SMTPConfigColumnFromAddress, e.SenderAddress),
 			handler.NewCol(SMTPConfigColumnFromName, e.SenderName),
 			handler.NewCol(SMTPConfigColumnSMTPHost, e.Host),
@@ -99,7 +99,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 	columns = append(columns, handler.NewCol(SMTPConfigColumnChangeDate, e.CreationDate()),
 		handler.NewCol(SMTPConfigColumnSequence, e.Sequence()))
 	if e.TLS != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnTls, *e.TLS))
+		columns = append(columns, handler.NewCol(SMTPConfigColumnTLS, *e.TLS))
 	}
 	if e.FromAddress != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnFromAddress, *e.FromAddress))

@@ -145,7 +145,7 @@ func startZitadel(config *startConfig) error {
 	smtpPasswordCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMTPPasswordVerificationKey)
 	logging.Log("MAIN-en9ew").OnError(err).Fatal("cannot create smtp crypto")
 
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections.Config, config.SystemDefaults, config.Projections.KeyConfig, keyChan, config.InternalAuthZ.RolePermissionMappings, smtpPasswordCrypto)
+	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections.Config, config.SystemDefaults, config.Projections.KeyConfig, keyChan, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
@@ -164,7 +164,7 @@ func startZitadel(config *startConfig) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix)
+	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, smtpPasswordCrypto)
 
 	router := mux.NewRouter()
 	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo)
@@ -185,8 +185,11 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	verifier := internal_authz.Start(repo)
 
 	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure)
-
-	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix)
+	userEncryptionAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey)
+	if err != nil {
+		return nil
+	}
+	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix, userEncryptionAlgorithm)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
@@ -194,7 +197,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
 		return err
 	}
 	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix)); err != nil {

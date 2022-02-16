@@ -10,7 +10,7 @@ import (
 )
 
 func TranslationHandler(query *query.Queries) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	translator := newZitadelTranslator(query.GetDefaultLanguage(context.TODO()))
+	translator := newZitadelTranslator(query.GetDefaultLanguage(context.Background()))
 
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)

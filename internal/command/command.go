@@ -33,12 +33,9 @@ type Commands struct {
 	idpConfigSecretCrypto crypto.EncryptionAlgorithm
 	smtpPasswordCrypto    crypto.EncryptionAlgorithm
 
-	UserCodeAlg                 crypto.EncryptionAlgorithm
 	userPasswordAlg             crypto.HashAlgorithm
-	machineKeyAlg               crypto.EncryptionAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
-	PasswordHashAlg             crypto.HashAlgorithm
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
@@ -89,13 +86,8 @@ func StartCommands(
 	if err != nil {
 		return nil, err
 	}
-	userEncryptionAlgorithm, err := crypto.NewAESCrypto(defaults.UserVerificationKey)
-	if err != nil {
-		return nil, err
-	}
-	repo.UserCodeAlg = userEncryptionAlgorithm
+
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 
@@ -109,7 +101,6 @@ func StartCommands(
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
-	repo.PasswordHashAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 
 	repo.domainVerificationAlg, err = crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	if err != nil {

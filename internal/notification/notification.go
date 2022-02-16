@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/caos/zitadel/internal/command"
@@ -17,10 +18,10 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func Start(config Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string) {
+func Start(config Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm) {
 	statikFS, err := fs.NewWithNamespace("notification")
 	logging.OnError(err).Panic("unable to start listener")
 
-	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, queries, dbClient, assetsPrefix)
+	_, err = eventsourcing.Start(config.Repository, statikFS, systemDefaults, command, queries, dbClient, assetsPrefix, smtpPasswordEncAlg)
 	logging.OnError(err).Panic("unable to start app")
 }

@@ -36,10 +36,9 @@ type Queries struct {
 	NotificationTranslationFileContents map[string][]byte
 	supportedLangs                      []language.Tag
 	zitadelRoles                        []authz.RoleMapping
-	SmtpPasswordCrypto                  crypto.EncryptionAlgorithm
 }
 
-func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping, smtpPasswordEncAlg crypto.EncryptionAlgorithm) (repo *Queries, err error) {
+func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql.DB, projections projection.Config, defaults sd.SystemDefaults, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}, zitadelRoles []authz.RoleMapping) (repo *Queries, err error) {
 	statikLoginFS, err := fs.NewWithNamespace("login")
 	if err != nil {
 		return nil, fmt.Errorf("unable to start login statik dir")
@@ -59,7 +58,6 @@ func StartQueries(ctx context.Context, es *eventstore.Eventstore, sqlClient *sql
 		LoginTranslationFileContents:        make(map[string][]byte),
 		NotificationTranslationFileContents: make(map[string][]byte),
 		zitadelRoles:                        zitadelRoles,
-		SmtpPasswordCrypto:                  smtpPasswordEncAlg,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	usr_repo.RegisterEventMappers(repo.eventstore)

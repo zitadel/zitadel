@@ -34,7 +34,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string) []queryv1.Handler {
+func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm) []queryv1.Handler {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
 	logging.OnError(err).Fatal("error create new aes crypto")
 
@@ -51,6 +51,7 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			aesCrypto,
 			dir,
 			assetsPrefix,
+			smtpPasswordEncAlg,
 		),
 	}
 }

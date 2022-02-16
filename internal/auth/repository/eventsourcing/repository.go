@@ -33,7 +33,7 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig, assetsPrefix string) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig, assetsPrefix string, userCrypto *crypto.AESCrypto) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -80,6 +80,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			AuthRequests:               authReq,
 			View:                       view,
 			Eventstore:                 es,
+			UserCodeAlg:                userCrypto,
 			UserSessionViewProvider:    view,
 			UserViewProvider:           view,
 			UserCommandProvider:        command,

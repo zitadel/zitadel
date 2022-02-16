@@ -35,13 +35,14 @@ const (
 
 type Notification struct {
 	handler
-	command        *command.Commands
-	systemDefaults sd.SystemDefaults
-	AesCrypto      crypto.EncryptionAlgorithm
-	statikDir      http.FileSystem
-	subscription   *v1.Subscription
-	assetsPrefix   string
-	queries        *query.Queries
+	command            *command.Commands
+	systemDefaults     sd.SystemDefaults
+	AesCrypto          crypto.EncryptionAlgorithm
+	statikDir          http.FileSystem
+	subscription       *v1.Subscription
+	assetsPrefix       string
+	queries            *query.Queries
+	smtpPasswordCrypto crypto.EncryptionAlgorithm
 }
 
 func newNotification(
@@ -52,15 +53,17 @@ func newNotification(
 	aesCrypto crypto.EncryptionAlgorithm,
 	statikDir http.FileSystem,
 	assetsPrefix string,
+	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
 ) *Notification {
 	h := &Notification{
-		handler:        handler,
-		command:        command,
-		systemDefaults: defaults,
-		statikDir:      statikDir,
-		AesCrypto:      aesCrypto,
-		assetsPrefix:   assetsPrefix,
-		queries:        query,
+		handler:            handler,
+		command:            command,
+		systemDefaults:     defaults,
+		statikDir:          statikDir,
+		AesCrypto:          aesCrypto,
+		assetsPrefix:       assetsPrefix,
+		queries:            query,
+		smtpPasswordCrypto: smtpPasswordEncAlg,
 	}
 
 	h.subscribe()
@@ -419,27 +422,28 @@ func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, er
 	if err != nil {
 		return nil, err
 	}
-	password, err := crypto.Decrypt(config.SMTPPassword, n.queries.SmtpPasswordCrypto)
+	password, err := crypto.Decrypt(config.Password, n.smtpPasswordCrypto)
 	if err != nil {
 		return nil, err
 	}
 	return &smtp.EmailConfig{
-		From:     config.FromAddress,
-		FromName: config.FromName,
+		From:     config.SenderAddress,
+		FromName: config.SenderName,
 		SMTP: smtp.SMTP{
-			Host:     config.SMTPHost,
-			User:     config.SMTPUser,
+			Host:     config.Host,
+			User:     config.User,
 			Password: string(password),
 		},
 	}, nil
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(context.TODO())})
+	ctx := context.Background()
+	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(ctx)})
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.TODO()
+
 	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, domain.IAMID, textType)
 	if err != nil {
 		return translator, nil

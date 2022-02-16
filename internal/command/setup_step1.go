@@ -136,8 +136,8 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 					IsEmailVerified: true,
 				},
 			}, orgIAMPolicy, pwPolicy,
-			nil, //TODO: Code Generator missing!
-			nil, //TODO: Code Generator missing!
+			nil, //TODO: Code Generator missing! Should be setuped in step1 create iam
+			nil, //TODO: Code Generator missing! Should be setuped in step1 create iam
 			nil, false)
 		if err != nil {
 			return err

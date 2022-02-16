@@ -37,8 +37,8 @@ var (
 		name:  projection.SMTPConfigColumnSequence,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnTls = Column{
-		name:  projection.SMTPConfigColumnTls,
+	SMTPConfigColumnTLS = Column{
+		name:  projection.SMTPConfigColumnTLS,
 		table: smtpConfigsTable,
 	}
 	SMTPConfigColumnFromAddress = Column{
@@ -75,12 +75,12 @@ type SMTPConfig struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	TLS          bool
-	FromAddress  string
-	FromName     string
-	SMTPHost     string
-	SMTPUser     string
-	SMTPPassword *crypto.CryptoValue
+	TLS           bool
+	SenderAddress string
+	SenderName    string
+	Host          string
+	User          string
+	Password      *crypto.CryptoValue
 }
 
 func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID string) (*SMTPConfig, error) {
@@ -105,7 +105,7 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigColumnChangeDate.identifier(),
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
-			SMTPConfigColumnTls.identifier(),
+			SMTPConfigColumnTLS.identifier(),
 			SMTPConfigColumnFromAddress.identifier(),
 			SMTPConfigColumnFromName.identifier(),
 			SMTPConfigColumnSMTPHost.identifier(),
@@ -121,10 +121,10 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 				&config.ResourceOwner,
 				&config.Sequence,
 				&config.TLS,
-				&config.FromAddress,
-				&config.FromName,
-				&config.SMTPHost,
-				&config.SMTPUser,
+				&config.SenderAddress,
+				&config.SenderName,
+				&config.Host,
+				&config.User,
 				&password,
 			)
 			if err != nil {
@@ -133,7 +133,7 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-9k87F", "Errors.Internal")
 			}
-			config.SMTPPassword = password
+			config.Password = password
 			return config, nil
 		}
 }

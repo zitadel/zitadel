@@ -128,10 +128,10 @@ func UpdateSMTPToConfig(req *admin_pb.UpdateSMTPConfigRequest) *smtp.EmailConfig
 func SMTPConfigToPb(smtp *query.SMTPConfig) *settings_pb.SMTPConfig {
 	mapped := &settings_pb.SMTPConfig{
 		Tls:           smtp.TLS,
-		SenderAddress: smtp.FromAddress,
-		SenderName:    smtp.FromName,
-		Host:          smtp.SMTPHost,
-		User:          smtp.SMTPUser,
+		SenderAddress: smtp.SenderAddress,
+		SenderName:    smtp.SenderName,
+		Host:          smtp.Host,
+		User:          smtp.User,
 		Details:       obj_grpc.ToViewDetailsPb(smtp.Sequence, smtp.CreationDate, smtp.ChangeDate, smtp.AggregateID),
 	}
 	return mapped
