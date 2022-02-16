@@ -5,7 +5,16 @@ import (
 	"io"
 
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/go-oss/image/imageutil"
 )
+
+func (c *Commands) RemoveExif(file io.Reader) (io.Reader, error) {
+	file, err := imageutil.RemoveExif(file)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
+}
 
 func (c *Commands) UploadAsset(ctx context.Context, bucketName, objectName, contentType string, file io.Reader, size int64) (*domain.AssetInfo, error) {
 	return c.static.PutObject(ctx,
