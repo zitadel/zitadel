@@ -18,6 +18,7 @@ type Config struct {
 	MaxOpenConns    uint32
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
+	User
 
 	//Additional options to be appended as options=<Options>
 	//The value will be taken as is. Multiple options are space separated.
