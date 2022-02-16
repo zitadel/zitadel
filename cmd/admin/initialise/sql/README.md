@@ -1,6 +1,6 @@
 # SQL initialisation
 
-The sql-files in this folder initialize the ZITADEL database and user. These objects need to exist bevore ZITADEL is able to set and start up.
+The sql-files in this folder initialize the ZITADEL database and user. These objects need to exist before ZITADEL is able to set and start up.
 
 ## files
 
