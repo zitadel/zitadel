@@ -11,18 +11,22 @@ ExternalSecure: true
 Database:
   Host: localhost
   Port: 26257
-  User: zitadel
   Database: zitadel
-  Password: ""
   MaxOpenConns: 20
   MaxConnLifetime: 30m
   MaxConnIdleTime: 30m
   Options: ""
-  SSL:
-    Mode: diabled
-    RootCert: ""
-    Cert: ""
-    Key: ""
+  User:
+    Username: zitadel
+    Password: ""
+    SSL:
+      Mode: diabled
+      RootCert: ""
+      Cert: ""
+      Key: ""
+
+AdminUser:
+  Username: root
 
 Projections:
   Config:
