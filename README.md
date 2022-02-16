@@ -50,7 +50,7 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 
 Run it locally or [create your organisation within seconds online](https://accounts.zitadel.ch/register/org) for free, no credit card required.
 
-If you want to integrate ZITADEL in your app check out the clients section <!--  [TODO: link to clients section] -->
+If you want to integrate ZITADEL in your app check out the [clients section](###client-libraries)
 
 Locally it is recommended to run ZITADEL and the database using docker but you can also run the executable.
 
@@ -88,11 +88,27 @@ zitadel start-with-init
 | Go         | [zitadel-go](https://github.com/caos/zitadel-go) | ✔️ | ✔️ | ✔️ | ZITADEL |
 | Rust       | [zitadel-rust](https://crates.io/crates/zitadel) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
 
+### Quick starts
+
+To start developing your app as fast as possible check out our quick [star guides]((https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples in many languages.
+
+If your preferred language is missing please let us know [here](https://github.com/caos/zitadel/discussions/1717)
+
+<!-- TODO: add more quick starts, at least for the languages with client libraries -->
+
 ## Help and Documentation
 
-- [Documentation](https://docs.zitadel.ch)
-- [Say hello](https://zitadel.ch/contact/)
-- [Join our Discord channel](https://discord.gg/erh5Brh7jE)
+- Visit our [docs page](https://docs.zitadel.ch) for more detailed documentation
+- Join our the community on [Discord](https://discord.gg/erh5Brh7jE)
+- Get [in touch with us](https://zitadel.ch/contact/) through different channels
+
+## Contribute
+
+Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
+
+## Security
+
+See the policy [here](./SECURITY.md)
 
 ## License
 
@@ -138,25 +154,6 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 * **ZITADEL Cloud:** [**ZITADEL.ch**](https://zitadel.ch) is our shared cloud service hosted in Switzerland. [Get started](https://docs.zitadel.ch/docs/guides/basics/get-started) and try the free tier, including already unlimited users and all necessary security features.
 * **ZITADEL Dedicated:** We operate and support a dedicated instance of **ZITADEL** for you. [Get in touch!](https://zitadel.ch/contact/)
 
-## Start using ZITADEL
-
-### Quickstarts
-
-See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
-
-## Help and Documentation
-
-* [Documentation](https://docs.zitadel.ch)
-* [Say hello](https://zitadel.ch/contact/)
-* [Join our Discord channel](https://discord.gg/erh5Brh7jE)
-
-## How To Contribute
-
-Details about how to contribute you can find in the [Contribution Guide](CONTRIBUTING.md)
-
-## Security
-
-See the policy [here](./SECURITY.md)
 
 ## Showcase
 
