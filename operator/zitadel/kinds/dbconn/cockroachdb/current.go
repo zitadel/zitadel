@@ -39,7 +39,7 @@ func (c *Current) SSL() *db.SSL {
 
 func (c *Current) Options() string {
 	if c.Current.Cluster != "" {
-		return "--cluster%3D" + c.Current.Cluster
+		return "--cluster=" + c.Current.Cluster
 	}
 	return ""
 }

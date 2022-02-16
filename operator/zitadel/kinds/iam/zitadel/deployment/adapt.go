@@ -156,7 +156,7 @@ func deploymentDef(
 
 	chownedVolumeMount := corev1.VolumeMount{
 		Name:      "chowned-certs",
-		MountPath: "/chownedcerts",
+		MountPath: certPath,
 	}
 
 	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", RunAsUser, RunAsUser), corev1.VolumeMount{
@@ -208,7 +208,7 @@ func deploymentDef(
 							secretVarsName,
 							secretPasswordsName,
 							users,
-							dbSecrets,
+							chownedVolumeMount,
 							"start",
 							customImageRegistry,
 							dbConn,

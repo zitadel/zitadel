@@ -140,6 +140,16 @@ func jobDef(
 	dbConn db.Connection,
 ) *batchv1.Job {
 
+	chownedVolumeMount := corev1.VolumeMount{
+		Name:      "chowned-certs",
+		MountPath: certPath,
+	}
+
+	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
+		Name:      "certs",
+		MountPath: "/certificates",
+	}, chownedVolumeMount)
+
 	containers := []corev1.Container{
 		deployment.GetContainer(
 			containerName,
@@ -155,21 +165,11 @@ func jobDef(
 			secretVarsName,
 			secretPasswordsName,
 			users,
-			dbSecrets,
+			chownedVolumeMount,
 			"setup",
 			customImageRegistry,
 			dbConn,
 		)}
-
-	chownedVolumeMount := corev1.VolumeMount{
-		Name:      "chowned-certs",
-		MountPath: "/chownedcerts",
-	}
-
-	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
-		Name:      "certs",
-		MountPath: "certificates",
-	}, chownedVolumeMount)
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
