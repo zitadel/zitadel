@@ -18,6 +18,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { InputModule } from '../../modules/input/input.module';
 import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { AvatarModule } from '../avatar/avatar.module';
+import { FilterUserGrantsModule } from '../filter-user-grants/filter-user-grants.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
@@ -45,6 +46,7 @@ import { UserGrantsComponent } from './user-grants.component';
     MatSelectModule,
     TranslateModule,
     ActionKeysModule,
+    FilterUserGrantsModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,
     RefreshTableModule,

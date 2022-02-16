@@ -1,10 +1,6 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="totalResult"
   [hideRefresh]="true" [timestamp]="viewTimestamp" [selection]="selection"
   [emitRefreshOnPreviousRoutes]="refreshOnPreviousRoutes" [showBorder]="true">
-  <cnsl-form-field @appearfade *ngIf="userSearchKey !== undefined" actions class="filtername">
-    <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
-      [placeholder]="('USER.TABLE.FILTER.' + userSearchKey.toString()) | translate" #input>
-  </cnsl-form-field>
 
   <div leftActions class="user-table-left-actions">
     <button class="type-button" [ngClass]="{'active': type === Type.TYPE_HUMAN}"
@@ -159,10 +155,3 @@
       [timestamp]="viewTimestamp" [pageSizeOptions]="[10, 20, 50, 100]" (page)="changePage($event)"></cnsl-paginator>
   </div>
 </cnsl-refresh-table>
-
-<ng-template #templateRef let-key="key">
-  <button class="search-button" mat-icon-button (click)="setFilter(key)">
-    <mat-icon class="icon" *ngIf="this.userSearchKey !== key">search</mat-icon>
-    <mat-icon class="icon" *ngIf="this.userSearchKey === key">search_off</mat-icon>
-  </button>
-</ng-template>

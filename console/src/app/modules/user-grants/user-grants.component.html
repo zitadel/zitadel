@@ -10,19 +10,19 @@
       (click)="setType(Type.TYPE_MACHINE)">{{'USER.TABLE.TYPES.MACHINE' | translate}}</button>
   </div> -->
 
-  <cnsl-form-field @appearfade *ngIf="userGrantListSearchKey !== undefined" actions class="filtername">
-    <input class="filterinput" cnslInput (keyup)="applyFilter($event)"
-      [placeholder]="('USER.GRANTS.FILTER.' + userGrantListSearchKey.toString()) | translate" #input>
-  </cnsl-form-field>
-
   <button color="warn" matTooltip="{{'GRANTS.DELETE' | translate}}" class="cnsl-action-button" mat-raised-button actions
     (click)="deleteGrantSelection()" *ngIf="selection.hasValue() && disableDelete === false">
     <i class="las la-trash"></i>
     <span>{{'ACTIONS.DELETE' | translate}}</span>
     <cnsl-action-keys (actionTriggered)="deleteGrantSelection()" [type]="ActionKeysType.DELETE"></cnsl-action-keys>
   </button>
-  <a *ngIf="disableWrite === false && (selection.hasValue() === false)" matTooltip="{{'GRANTS.ADD' | translate}}"
-    actions color="primary" class="cnsl-action-button" mat-raised-button [routerLink]="routerLink">
+
+  <cnsl-filter-user-grants actions *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery($any($event))"
+    (filterOpen)="filterOpen = $event"></cnsl-filter-user-grants>
+
+  <a actions *ngIf="disableWrite === false && (selection.hasValue() === false)"
+    matTooltip="{{'GRANTS.ADD' | translate}}" color="primary" class="cnsl-action-button" mat-raised-button
+    [routerLink]="routerLink">
     <mat-icon class="icon">add</mat-icon>
     <span>{{ 'GRANTS.ADD_BTN' | translate }}</span>
     <cnsl-action-keys (actionTriggered)="gotoCreateLink(routerLink)" [type]="ActionKeysType.ADD"></cnsl-action-keys>
@@ -55,10 +55,7 @@
       </ng-container>
 
       <ng-container matColumnDef="user">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserGrantListSearchKey.DISPLAY_NAME}"></template>
-        </th>
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.USER' | translate }} </th>
         <td mat-cell *matCellDef="let grant">
           <a class="user" [routerLink]="['/users', grant.userId]">{{grant.displayName ? grant.displayName :
             grant.userName ? grant.userName : ''}}</a>
@@ -66,19 +63,13 @@
       </ng-container>
 
       <ng-container matColumnDef="org">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ORG' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserGrantListSearchKey.ORG_NAME}"></template>
-        </th>
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.ORG' | translate }} </th>
         <td mat-cell *matCellDef="let grant">
           {{grant.orgName}} </td>
       </ng-container>
 
       <ng-container matColumnDef="projectId">
-        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserGrantListSearchKey.PROJECT_NAME}"></template>
-        </th>
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.GRANT.PROJECTNAME' | translate }} </th>
         <td mat-cell *matCellDef="let grant">
           {{grant.projectName}} </td>
       </ng-container>
@@ -109,8 +100,6 @@
       <ng-container matColumnDef="roleNamesList">
         <th mat-header-cell *matHeaderCellDef class="role-data">
           {{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}
-          <template [ngTemplateOutlet]="templateRef"
-            [ngTemplateOutletContext]="{key: UserGrantListSearchKey.ROLE_KEY}"></template>
         </th>
         <td mat-cell *matCellDef="let grant; let i = index" class="role-data">
           <div class="flex-row">
@@ -153,10 +142,3 @@
   </cnsl-paginator>
 
 </cnsl-refresh-table>
-
-<ng-template #templateRef let-key="key">
-  <button class="search-button" mat-icon-button (click)="setFilter(key)">
-    <mat-icon class="icon" *ngIf="this.userGrantListSearchKey !== key">search</mat-icon>
-    <mat-icon class="icon" *ngIf="this.userGrantListSearchKey === key">search_off</mat-icon>
-  </button>
-</ng-template>

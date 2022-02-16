@@ -147,9 +147,11 @@
   },
   "FILTER": {
     "TITLE": "Filter",
-    "DISPLAYNAME": "Display Name",
+    "DISPLAYNAME": "User Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
+    "ORGNAME": "Organization Name",
+    "PROJECTNAME": "Project Name",
     "METHODS": {
       "5": "contains",
       "7": "ends with",

@@ -11,6 +11,7 @@ import {
 import { FilterComponent } from '../filter/filter.component';
 
 enum SubQuery {
+  STATE,
   DISPLAYNAME,
   EMAIL,
   USERNAME,
@@ -31,6 +32,16 @@ export class FilterUserComponent extends FilterComponent {
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
     if (event.checked) {
       switch (subquery) {
+        // case SubQuery.STATE:
+        //   const dnq = new DisplayNameQuery();
+        //   dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
+        //   dnq.setDisplayName('');
+
+        //   const dn_sq = new UserSearchQuery();
+        //   dn_sq.setDisplayNameQuery(dnq);
+
+        //   this.searchQueries.push(dn_sq);
+        //   break;
         case SubQuery.DISPLAYNAME:
           const dnq = new DisplayNameQuery();
           dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);

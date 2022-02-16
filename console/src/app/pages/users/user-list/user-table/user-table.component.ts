@@ -11,19 +11,7 @@ import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.componen
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
-import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import {
-  DisplayNameQuery,
-  EmailQuery,
-  FirstNameQuery,
-  LastNameQuery,
-  SearchQuery,
-  Type,
-  TypeQuery,
-  User,
-  UserNameQuery,
-  UserState,
-} from 'src/app/proto/generated/zitadel/user_pb';
+import { SearchQuery, Type, TypeQuery, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -165,72 +153,16 @@ export class UserTableComponent implements OnInit {
     this.router.navigate(rL);
   }
 
-  private async getData(
-    limit: number,
-    offset: number,
-    type: Type,
-    searchQueries?: SearchQuery[],
-    searchValue?: string,
-  ): Promise<void> {
+  private async getData(limit: number, offset: number, type: Type, searchQueries?: SearchQuery[]): Promise<void> {
     this.loadingSubject.next(true);
-
-    let query = new SearchQuery();
 
     let queryT = new SearchQuery();
     const typeQuery = new TypeQuery();
     typeQuery.setType(type);
     queryT.setTypeQuery(typeQuery);
 
-    if (searchValue && this.userSearchKey !== undefined) {
-      switch (this.userSearchKey) {
-        case UserListSearchKey.DISPLAY_NAME:
-          const dNQuery = new DisplayNameQuery();
-          dNQuery.setDisplayName(searchValue);
-          dNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-
-          query.setDisplayNameQuery(dNQuery);
-          break;
-        case UserListSearchKey.USER_NAME:
-          const uNQuery = new UserNameQuery();
-          uNQuery.setUserName(searchValue);
-          uNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-
-          query.setUserNameQuery(uNQuery);
-          break;
-        case UserListSearchKey.FIRST_NAME:
-          const fNQuery = new FirstNameQuery();
-          fNQuery.setFirstName(searchValue);
-          fNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-
-          query.setFirstNameQuery(fNQuery);
-          break;
-        case UserListSearchKey.LAST_NAME:
-          const lNQuery = new LastNameQuery();
-          lNQuery.setLastName(searchValue);
-          lNQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-
-          query.setLastNameQuery(lNQuery);
-          break;
-        case UserListSearchKey.EMAIL:
-          const eQuery = new EmailQuery();
-          eQuery.setEmailAddress(searchValue);
-          eQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-
-          query.setEmailQuery(eQuery);
-          break;
-      }
-    }
-
     this.userService
-      .listUsers(
-        limit,
-        offset,
-        searchQueries?.length
-          ? [queryT, ...searchQueries]
-          : searchValue && this.userSearchKey !== undefined
-          ? [query, queryT]
-          : [queryT],
-      )
+      .listUsers(limit, offset, searchQueries?.length ? [queryT, ...searchQueries] : [queryT])
       .then((resp) => {
         if (resp.details?.totalResult) {
           this.totalResult = resp.details?.totalResult;
@@ -253,28 +185,9 @@ export class UserTableComponent implements OnInit {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
   }
 
-  public applyFilter(event: Event): void {
-    this.selection.clear();
-    const filterValue = (event.target as HTMLInputElement).value;
-
-    this.getData(
-      this.paginator.pageSize,
-      this.paginator.pageIndex * this.paginator.pageSize,
-      this.type,
-      undefined,
-      filterValue,
-    );
-  }
-
   public applySearchQuery(searchQueries: SearchQuery[]): void {
     this.selection.clear();
-    this.getData(
-      this.paginator.pageSize,
-      this.paginator.pageIndex * this.paginator.pageSize,
-      this.type,
-      searchQueries,
-      undefined,
-    );
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, searchQueries);
   }
 
   public setFilter(key: UserListSearchKey): void {

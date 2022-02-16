@@ -7,17 +7,8 @@ import { MatTable } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
-import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { Role } from 'src/app/proto/generated/zitadel/project_pb';
-import {
-  Type,
-  UserGrant,
-  UserGrantDisplayNameQuery,
-  UserGrantOrgNameQuery,
-  UserGrantProjectNameQuery,
-  UserGrantQuery,
-  UserGrantRoleKeyQuery,
-} from 'src/app/proto/generated/zitadel/user_pb';
+import { Type, UserGrant, UserGrantQuery } from 'src/app/proto/generated/zitadel/user_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -72,9 +63,10 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
   public ActionKeysType: any = ActionKeysType;
   @Input() public type: Type | undefined = undefined;
 
+  public filterOpen: boolean = false;
+
   constructor(
     private userService: ManagementService,
-    // private mgmtService: ManagementService,
     private toast: ToastService,
     private dialog: MatDialog,
     private router: Router,
@@ -143,41 +135,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     this.router.navigate(rL);
   }
 
-  private loadGrantsPage(type: Type | undefined, filterValue?: string): void {
+  private loadGrantsPage(type: Type | undefined, searchQueries?: UserGrantQuery[]): void {
     let queries: UserGrantQuery[] = [];
-    if (this.userGrantListSearchKey !== undefined && filterValue) {
-      const query = new UserGrantQuery();
-      switch (this.userGrantListSearchKey) {
-        case UserGrantListSearchKey.DISPLAY_NAME:
-          const ugDnQ = new UserGrantDisplayNameQuery();
-          ugDnQ.setDisplayName(filterValue);
-          ugDnQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          query.setDisplayNameQuery(ugDnQ);
-          break;
-        case UserGrantListSearchKey.ORG_NAME:
-          const ugOnQ = new UserGrantOrgNameQuery();
-          ugOnQ.setOrgName(filterValue);
-          ugOnQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          query.setOrgNameQuery(ugOnQ);
-          break;
-        case UserGrantListSearchKey.PROJECT_NAME:
-          const ugPnQ = new UserGrantProjectNameQuery();
-          ugPnQ.setProjectName(filterValue);
-          ugPnQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          query.setProjectNameQuery(ugPnQ);
-          break;
-        case UserGrantListSearchKey.ROLE_KEY:
-          const ugRkQ = new UserGrantRoleKeyQuery();
-          ugRkQ.setRoleKey(filterValue);
-          ugRkQ.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-          query.setRoleKeyQuery(ugRkQ);
-          break;
-      }
-
-      // const typeQuery = new UserGrantQuery();
-      // typeQuery.set
-      queries = type ? [query] : [query];
-    }
 
     this.dataSource.loadGrants(
       this.context,
@@ -188,7 +147,7 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         grantId: this.grantId,
         userId: this.userId,
       },
-      queries,
+      searchQueries ? [...searchQueries, ...queries] : queries,
     );
   }
 
@@ -320,11 +279,9 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
     );
   }
 
-  public applyFilter(event: Event): void {
+  public applySearchQuery(searchQueries?: UserGrantQuery[]): void {
     this.selection.clear();
-    const filterValue = (event.target as HTMLInputElement).value;
-
-    this.loadGrantsPage(this.type, filterValue);
+    this.loadGrantsPage(this.type, searchQueries);
   }
 
   public setFilter(key: UserGrantListSearchKey): void {
