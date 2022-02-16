@@ -475,6 +475,9 @@
         "TITLE": "Create User Grant",
         "DESCRIPTION": "Search for the organization, the project and the corresponding project roles."
       },
+      "PROJECTNAME": "Project Name",
+      "PROJECT-OWNED": "Project",
+      "PROJECT-GRANTED": "Granted project",
       "FILTER": {
         "0": "filter for user",
         "1": "filter for domain",
@@ -500,7 +503,7 @@
       "4": "Locked"
     },
     "SEARCH": {
-      "ADDITIONAL": "Username (selected organization)",
+      "ADDITIONAL": "User Name (selected organization)",
       "ADDITIONAL-EXTERNAL": "Loginname (external organization)"
     },
     "TARGET": {

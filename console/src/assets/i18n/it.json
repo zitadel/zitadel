@@ -475,6 +475,9 @@
         "TITLE": "Crea User Grant",
         "DESCRIPTION": "Cerca l'organizzazione, il progetto e i ruoli di progetto corrispondenti."
       },
+      "PROJECTNAME": "Nome del progretto",
+      "PROJECT-OWNED": "Progetto",
+      "PROJECT-GRANTED": "Progetto delegato",
       "FILTER": {
         "0": "filtro per utente",
         "1": "filtro per il dominio",
@@ -500,7 +503,7 @@
       "4": "Bloccato"
     },
     "SEARCH": {
-      "ADDITIONAL": "Nome utente (organizzazione corrente)",
+      "ADDITIONAL": "Nome (organizzazione corrente)",
       "ADDITIONAL-EXTERNAL": "Loginname (organizzazione esterna)"
     },
     "TARGET": {

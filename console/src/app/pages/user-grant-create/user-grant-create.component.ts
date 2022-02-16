@@ -38,8 +38,6 @@ export class UserGrantCreateComponent implements OnDestroy {
 
   public UserGrantContext: any = UserGrantContext;
 
-  public grantedRoleKeysList: string[] = [];
-
   public user!: User.AsObject;
   public UserTarget: any = UserTarget;
 
@@ -93,9 +91,6 @@ export class UserGrantCreateComponent implements OnDestroy {
           .then((resp) => {
             if (resp.grantedProject) {
               this.project = resp.grantedProject;
-            }
-            if (resp.grantedProject?.grantedRoleKeysList) {
-              this.grantedRoleKeysList = resp.grantedProject?.grantedRoleKeysList;
             }
           })
           .catch((error: any) => {
@@ -198,8 +193,6 @@ export class UserGrantCreateComponent implements OnDestroy {
   public selectProject(project: Project.AsObject | GrantedProject.AsObject | any): void {
     this.project = project;
     this.projectId = project.id || project.projectId;
-
-    this.grantedRoleKeysList = project.grantedRoleKeysList ?? [];
   }
 
   public selectUsers(user: User.AsObject[]): void {

@@ -11,7 +11,7 @@
 
     <div class="user-grant-create-content">
       <ng-container *ngIf="currentCreateStep === 1">
-        <p class="cnsl-secondary-text">
+        <p class="user-grant-create-desc cnsl-secondary-text">
           {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION' | translate: org}}
           <br>
           {{'PROJECT.GRANT.CREATE.ORG_DESCRIPTION_DESC' | translate}}
@@ -28,35 +28,22 @@
         <ng-container *ngIf="context && (context === UserGrantContext.USER || context === UserGrantContext.NONE)">
           <h2 class="project-search">{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
 
-          <cnsl-search-project-autocomplete class="block" [singleOutput]="true"
-            (selectionChanged)="selectProject($event)">
+          <cnsl-search-project-autocomplete class="block" (selectionChanged)="selectProject($event)">
           </cnsl-search-project-autocomplete>
         </ng-container>
       </ng-container>
 
       <ng-container *ngIf="currentCreateStep === STEPS">
         <h1>{{'PROJECT.GRANT.CREATE.SEL_ROLES' | translate}}</h1>
-        <ng-container
-          *ngIf="$any(project)?.id && (context === UserGrantContext.OWNED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE)">
-          <cnsl-card>
-            <cnsl-project-roles-table
-              [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
-              (changedSelection)="selectRoles($event)" [projectId]="projectId">
-            </cnsl-project-roles-table>
-          </cnsl-card>
-        </ng-container>
 
-        <ng-container
-          *ngIf="$any(project)?.projectId && (context === UserGrantContext.GRANTED_PROJECT || context === UserGrantContext.USER || context === UserGrantContext.NONE) && grantedRoleKeysList">
-          <cnsl-form-field class="form-field" appearance="outline">
-            <cnsl-label>{{ 'PROJECT.GRANT.ROLENAMESLIST' | translate }}</cnsl-label>
-            <mat-select multiple (selectionChange)="rolesList = $event.value">
-              <mat-option *ngFor="let role of grantedRoleKeysList" [value]="role">
-                {{role}}
-              </mat-option>
-            </mat-select>
-          </cnsl-form-field>
-        </ng-container>
+        <cnsl-card>
+          <cnsl-project-roles-table
+            [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
+            (changedSelection)="selectRoles($event)"
+            [projectId]="$any(project)?.id ? $any(project)?.id : $any(project)?.projectId ? $any(project)?.projectId : ''"
+            [grantId]="$any(project)?.grantId ? $any(project)?.grantId : ''">
+          </cnsl-project-roles-table>
+        </cnsl-card>
       </ng-container>
 
       <div class="btn-container">

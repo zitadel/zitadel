@@ -18,6 +18,11 @@
 .user-grant-create-content {
   padding-left: 4.5rem;
 
+  .user-grant-create-desc {
+    max-width: 500px;
+    font-size: 14px;
+  }
+
   .block {
     display: block;
   }

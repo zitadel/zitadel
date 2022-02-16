@@ -17,7 +17,7 @@
 
     <ng-container *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED">
       <p>{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</p>
-      <cnsl-search-project-autocomplete class="block" [singleOutput]="true" (selectionChanged)="selectProject($event)"
+      <cnsl-search-project-autocomplete class="block" (selectionChanged)="selectProject($event)"
         [autocompleteType]="creationType === CreationType.PROJECT_OWNED ? ProjectAutocompleteType.PROJECT_OWNED : creationType === CreationType.PROJECT_GRANTED ? ProjectAutocompleteType.PROJECT_GRANTED : undefined">
       </cnsl-search-project-autocomplete>
     </ng-container>

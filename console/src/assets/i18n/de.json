@@ -475,6 +475,9 @@
         "TITLE": "Benutzerberechtigung erstellen",
         "DESCRIPTION": "Suche nach der Organisation, dem Projekt und den verfügbaren Rollen."
       },
+      "PROJECTNAME": "Projektname",
+      "PROJECT-OWNED": "Eigenes Projekt",
+      "PROJECT-GRANTED": "Delegiertes Projekt",
       "FILTER": {
         "0": "Nach User Anzeigename filtern",
         "1": "Nach Domain filtern",
@@ -500,7 +503,7 @@
       "4": "Gesperrt"
     },
     "SEARCH": {
-      "ADDITIONAL": "Benutzername (eigene Organisation)",
+      "ADDITIONAL": "Benutzer Name (eigene Organisation)",
       "ADDITIONAL-EXTERNAL": "Loginname (externe Organisation)"
     },
     "TARGET": {
@@ -1521,7 +1524,7 @@
       "REFRESHTOKEN": "Refresh Token",
       "GRANTTYPE": "Berechtigungstypen",
       "GRANT": {
-        "0": "Authorisation Code",
+        "0": "Authorization Code",
         "1": "Implicit",
         "2": "Refresh Token"
       },
