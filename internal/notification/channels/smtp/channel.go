@@ -6,12 +6,12 @@ import (
 	"net"
 	"net/smtp"
 
-	"github.com/caos/zitadel/internal/notification/messages"
-
 	"github.com/caos/logging"
+	"github.com/pkg/errors"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels"
-	"github.com/pkg/errors"
+	"github.com/caos/zitadel/internal/notification/messages"
 )
 
 var _ channels.NotificationChannel = (*Email)(nil)

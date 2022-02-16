@@ -5,10 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/config/types"
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -92,7 +91,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 				ctx: context.Background(),
 				generator: &crypto.GeneratorConfig{
 					Length:              4,
-					Expiry:              types.Duration{Duration: time.Hour * 1},
+					Expiry:              1 * time.Hour,
 					IncludeLowerLetters: true,
 					IncludeUpperLetters: true,
 					IncludeDigits:       true,
@@ -133,7 +132,7 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 				ctx: context.Background(),
 				generator: &crypto.GeneratorConfig{
 					Length:              4,
-					Expiry:              types.Duration{Duration: time.Hour * 1},
+					Expiry:              1 * time.Hour,
 					IncludeLowerLetters: true,
 					IncludeUpperLetters: true,
 					IncludeDigits:       true,
@@ -279,7 +278,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 				ctx: context.Background(),
 				generator: &crypto.GeneratorConfig{
 					Length:              4,
-					Expiry:              types.Duration{Duration: time.Hour * 1},
+					Expiry:              1 * time.Hour,
 					IncludeLowerLetters: true,
 					IncludeUpperLetters: true,
 					IncludeDigits:       true,
@@ -331,7 +330,7 @@ func TestCommandSide_ChangeSecretGenerator(t *testing.T) {
 				ctx: context.Background(),
 				generator: &crypto.GeneratorConfig{
 					Length:              8,
-					Expiry:              types.Duration{Duration: time.Hour * 2},
+					Expiry:              2 * time.Hour,
 					IncludeLowerLetters: false,
 					IncludeUpperLetters: false,
 					IncludeDigits:       false,
