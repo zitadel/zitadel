@@ -17,7 +17,7 @@ Database:
   MaxConnIdleTime: 30m
   Options: ""
   User:
-    User: zitadel
+    Username: zitadel
     Password: ""
     SSL:
       Mode: diabled
