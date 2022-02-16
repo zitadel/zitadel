@@ -34,13 +34,7 @@ type ZitadelDocs struct {
 }
 
 type SecretGenerators struct {
-	PasswordSaltCost int
-	//ClientSecretGenerator    crypto.GeneratorConfig
-	//InitializeUserCode       crypto.GeneratorConfig
-	//EmailVerificationCode    crypto.GeneratorConfig
-	//PhoneVerificationCode    crypto.GeneratorConfig
-	//PasswordVerificationCode crypto.GeneratorConfig
-	//PasswordlessInitCode     crypto.GeneratorConfig
+	PasswordSaltCost   int
 	MachineKeySize     uint32
 	ApplicationKeySize uint32
 }
@@ -82,8 +76,7 @@ type Endpoints struct {
 }
 
 type Channels struct {
-	Chat chat.ChatConfig
-	//Email      smtp.EmailConfig
+	Chat       chat.ChatConfig
 	Twilio     twilio.TwilioConfig
 	FileSystem fs.FSConfig
 	Log        log.LogConfig

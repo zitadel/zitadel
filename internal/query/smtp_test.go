@@ -103,7 +103,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 				ChangeDate:    testNow,
 				ResourceOwner: "ro",
 				Sequence:      20211108,
-				Tls:           true,
+				TLS:           true,
 				FromAddress:   "sender",
 				FromName:      "name",
 				SMTPHost:      "host",

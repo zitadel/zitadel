@@ -75,7 +75,7 @@ type SMTPConfig struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	Tls          bool
+	TLS          bool
 	FromAddress  string
 	FromName     string
 	SMTPHost     string
@@ -120,7 +120,7 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 				&config.ChangeDate,
 				&config.ResourceOwner,
 				&config.Sequence,
-				&config.Tls,
+				&config.TLS,
 				&config.FromAddress,
 				&config.FromName,
 				&config.SMTPHost,

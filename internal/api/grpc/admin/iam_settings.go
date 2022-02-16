@@ -69,7 +69,7 @@ func (s *Server) UpdateSMTPConfig(ctx context.Context, req *admin_pb.UpdateSMTPC
 }
 
 func (s *Server) UpdateSMTPConfigPassword(ctx context.Context, req *admin_pb.UpdateSMTPConfigPasswordRequest) (*admin_pb.UpdateSMTPConfigPasswordResponse, error) {
-	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.SmtpPassword)
+	details, err := s.command.ChangeSMTPConfigPassword(ctx, req.Password)
 	if err != nil {
 		return nil, err
 	}

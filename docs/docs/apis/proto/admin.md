@@ -3578,7 +3578,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| smtp_password |  string | - |  |
+| password |  string | - |  |
 
 
 
@@ -3600,11 +3600,11 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| from_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | tls |  bool | - |  |
-| smtp_host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
-| smtp_user |  string | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
 
 
 

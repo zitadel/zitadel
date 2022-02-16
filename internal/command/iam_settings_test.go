@@ -69,23 +69,6 @@ func TestCommandSide_AddSecretGenerator(t *testing.T) {
 							),
 						),
 					),
-					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internl"),
-						[]*repository.Event{
-							eventFromEventPusher(iam.NewSecretGeneratorAddedEvent(
-								context.Background(),
-								&iam.NewAggregate().Aggregate,
-								domain.SecretGeneratorTypeInitCode,
-								4,
-								time.Hour*1,
-								true,
-								true,
-								true,
-								true,
-							),
-							),
-						},
-						uniqueConstraintsFromEventConstraint(iam.NewAddSecretGeneratorTypeUniqueConstraint(domain.SecretGeneratorTypeInitCode)),
-					),
 				),
 			},
 			args: args{

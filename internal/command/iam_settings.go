@@ -18,6 +18,9 @@ func (c *Commands) AddSecretGeneratorConfig(ctx context.Context, generatorType d
 	if err != nil {
 		return nil, err
 	}
+	if generatorWriteModel.State == domain.SecretGeneratorStateActive {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-3n9ls", "Errors.SecretGenerator.AlreadyExists")
+	}
 	iamAgg := IAMAggregateFromWriteModel(&generatorWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSecretGeneratorAddedEvent(
 		ctx,

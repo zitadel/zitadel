@@ -2412,11 +2412,11 @@ message GetSMTPConfigResponse {
 }
 
 message UpdateSMTPConfigRequest {
-    string from_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string from_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_address = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     bool tls = 3;
-    string smtp_host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
-    string smtp_user = 5;
+    string host = 4 [(validate.rules).string = {min_len: 1, max_len: 500}];
+    string user = 5;
 }
 
 message UpdateSMTPConfigResponse {
@@ -2424,7 +2424,7 @@ message UpdateSMTPConfigResponse {
 }
 
 message UpdateSMTPConfigPasswordRequest {
-    string smtp_password = 1;
+    string password = 1;
 }
 
 message UpdateSMTPConfigPasswordResponse {
