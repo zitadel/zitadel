@@ -70,53 +70,32 @@ After the database is up and running you can start ZITADEL:
 zitadel start-with-init
 ```
 
-## Key features
-
-
-- Identity & Access Management
-  - B2C, B2B, B2E, M2M identities
-  - Authorization via Role Based Access Control (RBAC)
-  - Delegation of roles to other organizations for self-management
-  - Management roles
-  - User self-service workflows
-  - User register workflow
-- Strong audit trail for all IAM resources
-- Privatelabeling
-  - Custom branding
-  - Custom texts
-  - Hosted login
-  - Personal profile
-- Integration
-  - API-first
-  - Actions for custom code execution
-
 ## Help and Documentation
 
 - [Documentation](https://docs.zitadel.ch)
 - [Say hello](https://zitadel.ch/contact/)
 - [Join our Discord channel](https://discord.gg/erh5Brh7jE)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## License
 
 See the exact licensing terms [here](./LICENSE)
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Old
 
