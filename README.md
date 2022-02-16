@@ -144,13 +144,6 @@ You can run an automatically operated **ZITADEL** instance on a CNCF compliant K
 
 See our [Documentation](https://docs.zitadel.ch/docs/quickstarts/introduction) to get started with ZITADEL quickly. Let us know, if you are missing a language or framework in the [Q&A](https://github.com/caos/zitadel/discussions/1717).
 
-### Client libraries
-
-* [Go](https://github.com/caos/zitadel-go) client library
-* [.NET](https://github.com/caos/zitadel-net) client library
-* [Dart](https://github.com/caos/zitadel-dart) client library
-* [Elixir](https://github.com/jshmrtn/zitadel_api) client library (maintained by [jshmrtn]([jshmrtn](https://github.com/jshmrtn)))
-
 ## Help and Documentation
 
 * [Documentation](https://docs.zitadel.ch)
