@@ -37,7 +37,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						` zitadel.projections.smtp_configs.sender_address,`+
 						` zitadel.projections.smtp_configs.sender_name,`+
 						` zitadel.projections.smtp_configs.host,`+
-						` zitadel.projections.smtp_configs.user,`+
+						` zitadel.projections.smtp_configs.username,`+
 						` zitadel.projections.smtp_configs.password`+
 						` FROM zitadel.projections.smtp_configs`,
 					nil,
@@ -66,7 +66,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						` zitadel.projections.smtp_configs.sender_address,`+
 						` zitadel.projections.smtp_configs.sender_name,`+
 						` zitadel.projections.smtp_configs.host,`+
-						` zitadel.projections.smtp_configs.user,`+
+						` zitadel.projections.smtp_configs.username,`+
 						` zitadel.projections.smtp_configs.password`+
 						` FROM zitadel.projections.smtp_configs`),
 					[]string{
@@ -125,7 +125,7 @@ func Test_SMTPConfigsPrepares(t *testing.T) {
 						` zitadel.projections.smtp_configs.sender_address,`+
 						` zitadel.projections.smtp_configs.sender_name,`+
 						` zitadel.projections.smtp_configs.host,`+
-						` zitadel.projections.smtp_configs.user,`+
+						` zitadel.projections.smtp_configs.username,`+
 						` zitadel.projections.smtp_configs.password`+
 						` FROM zitadel.projections.smtp_configs`),
 					sql.ErrConnDone,
