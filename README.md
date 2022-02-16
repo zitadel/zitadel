@@ -11,6 +11,33 @@ Zitadel is [OpenID Connect](https://openid.net/connect) certified, [oauth 2.0](h
 
 The modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and [**CockroachDB**](https://www.cockroachlabs.com/) forms a solid basic framework to build the IAM you are looking for.
 
+## Why?
+
+- [API-first](https://docs.zitadel.ch/docs/apis/introduction)
+- Strong audit trail thanks to [event sourcing](https://docs.zitadel.ch/docs/concepts/eventstore)
+- Actions for custom code execution
+- [Private labeling](https://docs.zitadel.ch/docs/guides/customization/branding) for a uniform user experience
+
+### Authentication
+
+- Single Sign On (SSO)
+- Passwordless with FIDO2
+- Username / Password
+- Multifactor authentication with OTP, U2F
+- [Identity Brokering](https://docs.zitadel.ch/docs/guides/authentication/identity-brokering)
+- [Machine-to-machine (JWT profile)](https://docs.zitadel.ch/docs/guides/authentication/serviceusers)
+
+### Access Management
+
+- Role Based Access Control (RBAC)
+- Delegate role management to third-parties
+
+### Identity Management
+
+- Self-registration including verification
+- User self service
+- [Service Accounts](https://docs.zitadel.ch/docs/guides/authentication/serviceusers)
+
 ## Getting started
 
 Run it locally or [create your organisation within seconds online](https://accounts.zitadel.ch/register/org) for free, no credit card required.
@@ -45,14 +72,7 @@ zitadel start-with-init
 
 ## Key features
 
-- Authentication
-  - OpenID Connect 1.0 Protocol (OP)
-  - Username / Password
-  - Machine-to-machine (JWT profile)
-  - Passwordless with FIDO2
-  - Multifactor authentication with OTP, U2F
-  - Federation with OpenID Connect 1.0 Protocol (RP), OAuth 2.0 Protocol (RP)
-  - Identity Brokering
+
 - Identity & Access Management
   - B2C, B2B, B2E, M2M identities
   - Authorization via Role Based Access Control (RBAC)
