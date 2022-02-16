@@ -3,6 +3,13 @@
 
 # ZITADEL
 
+![stable version](https://badgen.net/github/release/caos/zitadel/stable)
+[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
+[![code coverage](https://badgen.net/codecov/c/github/caos/zitadel)](https://app.codecov.io/gh/caos/zitadel)
+![license](https://badgen.net/github/license/caos/zitadel)
+[![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)
+[![follow us](https://badgen.net/twitter/follow/zitadel_ch)](https://twitter.com/zitadel_ch)
+
 The identity and access management (IAM) solution with the **strongest change track** built for modern **global scale** cloud capabilities. Thanks to it's unique approach to store user **activities as events**, every change of an object can be traced
 
 ZITADEL is more than just IAM. It's a superb open source TODO:plattform built for and from its community to handle **secure user login and account management** the simplest way possible.
@@ -15,7 +22,7 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 
 - [API-first](https://docs.zitadel.ch/docs/apis/introduction)
 - Strong audit trail thanks to [event sourcing](https://docs.zitadel.ch/docs/concepts/eventstore)
-- Actions for custom code execution
+- Actions to react on events with custom code
 - [Private labeling](https://docs.zitadel.ch/docs/guides/customization/branding) for a uniform user experience
 
 ### Authentication
