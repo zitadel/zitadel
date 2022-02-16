@@ -6,7 +6,7 @@ The sql-files in this folder initialize the ZITADEL database and user. These obj
 
 - 01_user.sql: create the user zitadel uses to connect to the database
 - 02_database.sql: create the database for zitadel
-- 03_grant_user.sql: grants the user created bevore to have full access to it's database. The user needs full access to the database because zitadel makes ddl/dml on runtime
+- 03_grant_user.sql: grants the user created before to have full access to its database. The user needs full access to the database because zitadel makes ddl/dml on runtime
 - 04_eventstore.sql: creates the schema needed for eventsourcing
 - 05_projections.sql: creates the schema needed to read the data
 - files 06_enable_hash_sharded_indexes.sql and 07_events_table.sql must run in the same session
