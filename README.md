@@ -3,10 +3,10 @@
 
 # ZITADEL
 
-![stable version](https://badgen.net/github/release/caos/zitadel/stable)
+[![stable version](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![code coverage](https://badgen.net/codecov/c/github/caos/zitadel)](https://app.codecov.io/gh/caos/zitadel)
-![license](https://badgen.net/github/license/caos/zitadel)
+[![license](https://badgen.net/github/license/caos/zitadel)](#license)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)
 [![follow us](https://badgen.net/twitter/follow/zitadel_ch)](https://twitter.com/zitadel_ch)
 
