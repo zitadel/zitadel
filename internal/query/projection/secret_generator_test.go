@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -27,7 +28,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.SecretGeneratorRemovedEventType),
 					iam.AggregateType,
-					[]byte(`{"generatorType": "type"}`),
+					[]byte(`{"generatorType": 1}`),
 				), iam.SecretGeneratorRemovedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorRemoved,
@@ -42,7 +43,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 							expectedStmt: "DELETE FROM zitadel.projections.secret_generators WHERE (aggregate_id = $1) AND (generator_type = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								"type",
+								domain.SecretGeneratorTypeInitCode,
 							},
 						},
 					},
@@ -55,7 +56,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.SecretGeneratorChangedEventType),
 					iam.AggregateType,
-					[]byte(`{"generatorType": "type", "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
+					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
 				), iam.SecretGeneratorChangedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorChanged,
@@ -78,7 +79,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"agg-id",
-								"type",
+								domain.SecretGeneratorTypeInitCode,
 							},
 						},
 					},
@@ -91,7 +92,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.SecretGeneratorAddedEventType),
 					iam.AggregateType,
-					[]byte(`{"generatorType": "type", "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
+					[]byte(`{"generatorType": 1, "length": 4, "expiry": 10000000, "includeLowerLetters": true, "includeUpperLetters": true, "includeDigits": true, "includeSymbols": true}`),
 				), iam.SecretGeneratorAddedEventMapper),
 			},
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorAdded,
@@ -106,7 +107,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 							expectedStmt: "INSERT INTO zitadel.projections.secret_generators (aggregate_id, generator_type, creation_date, change_date, resource_owner, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
 							expectedArgs: []interface{}{
 								"agg-id",
-								"type",
+								domain.SecretGeneratorTypeInitCode,
 								anyArg{},
 								anyArg{},
 								"ro-id",

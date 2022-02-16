@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -80,7 +81,7 @@ type SecretGenerator struct {
 	ResourceOwner string
 	Sequence      uint64
 
-	GeneratorType       string
+	GeneratorType       domain.SecretGeneratorType
 	Length              uint
 	Expiry              time.Duration
 	IncludeLowerLetters bool
@@ -94,7 +95,7 @@ type SecretGeneratorSearchQueries struct {
 	Queries []SearchQuery
 }
 
-func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType string, algorithm crypto.EncryptionAlgorithm) (crypto.Generator, error) {
+func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType domain.SecretGeneratorType, algorithm crypto.EncryptionAlgorithm) (crypto.Generator, error) {
 	generatorConfig, err := q.SecretGeneratorByType(ctx, generatorType)
 	if err != nil {
 		return nil, err
@@ -110,7 +111,7 @@ func (q *Queries) InitEncryptionGenerator(ctx context.Context, generatorType str
 	return crypto.NewEncryptionGenerator(cryptoConfig, algorithm), nil
 }
 
-func (q *Queries) InitHashGenerator(ctx context.Context, generatorType string, algorithm crypto.HashAlgorithm) (crypto.Generator, error) {
+func (q *Queries) InitHashGenerator(ctx context.Context, generatorType domain.SecretGeneratorType, algorithm crypto.HashAlgorithm) (crypto.Generator, error) {
 	generatorConfig, err := q.SecretGeneratorByType(ctx, generatorType)
 	if err != nil {
 		return nil, err
@@ -126,7 +127,7 @@ func (q *Queries) InitHashGenerator(ctx context.Context, generatorType string, a
 	return crypto.NewHashGenerator(cryptoConfig, algorithm), nil
 }
 
-func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType string) (*SecretGenerator, error) {
+func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domain.SecretGeneratorType) (*SecretGenerator, error) {
 	stmt, scan := prepareSecretGeneratorQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecretGeneratorColumnGeneratorType.identifier(): generatorType,
@@ -164,6 +165,10 @@ func (q *SecretGeneratorSearchQueries) toQuery(query sq.SelectBuilder) sq.Select
 		query = q.toQuery(query)
 	}
 	return query
+}
+
+func NewSecretGeneratorTypeSearchQuery(value int32) (SearchQuery, error) {
+	return NewNumberQuery(SecretGeneratorColumnGeneratorType, value, NumberEquals)
 }
 
 func prepareSecretGeneratorQuery() (sq.SelectBuilder, func(*sql.Row) (*SecretGenerator, error)) {

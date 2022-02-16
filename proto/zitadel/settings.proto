@@ -10,11 +10,7 @@ package zitadel.settings.v1;
 option go_package ="github.com/caos/zitadel/pkg/grpc/settings";
 
 message SecretGenerator {
-  string generator_type = 1 [
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"type\"";
-    }
-  ];
+  SecretGeneratorType generator_type = 1;
   zitadel.v1.ObjectDetails details = 2;
   uint32 length = 3;
   google.protobuf.Duration  expiry   = 4;
@@ -34,18 +30,17 @@ message SecretGeneratorQuery {
 }
 
 message SecretGeneratorTypeQuery {
-  string generator_type = 1 [
-    (validate.rules).string = {max_len: 200},
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      example: "\"InitCode\""
-    }
-  ];
-  zitadel.v1.TextQueryMethod method = 2 [
-    (validate.rules).enum.defined_only = true,
-    (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-      description: "defines which text equality method is used"
-    }
-  ];
+  SecretGeneratorType generator_type = 1;
+}
+
+enum SecretGeneratorType {
+  SECRET_GENERATOR_TYPE_UNSPECIFIED = 0;
+  SECRET_GENERATOR_TYPE_INIT_CODE = 1;
+  SECRET_GENERATOR_TYPE_VERIFY_EMAIL_CODE = 2;
+  SECRET_GENERATOR_TYPE_VERIFY_PHONE_CODE = 3;
+  SECRET_GENERATOR_TYPE_PASSWORD_RESET_CODE = 4;
+  SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE = 5;
+  SECRET_GENERATOR_TYPE_APP_SECRET = 6;
 }
 
 message SMTPConfig {

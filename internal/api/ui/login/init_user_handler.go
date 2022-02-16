@@ -73,7 +73,7 @@ func (l *Login) checkUserInitCode(w http.ResponseWriter, r *http.Request, authRe
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.InitCodeGeneratorType, l.command.UserCodeAlg)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.command.UserCodeAlg)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, data.UserID, "", data.PasswordSet, err)
 		return
@@ -91,7 +91,7 @@ func (l *Login) resendUserInit(w http.ResponseWriter, r *http.Request, authReq *
 	if authReq != nil {
 		userOrgID = authReq.UserOrgID
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.InitCodeGeneratorType, l.command.UserCodeAlg)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.command.UserCodeAlg)
 	if err != nil {
 		l.renderInitUser(w, r, authReq, userID, "", showPassword, err)
 		return

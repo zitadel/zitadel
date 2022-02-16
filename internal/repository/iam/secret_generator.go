@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -18,35 +19,35 @@ const (
 	SecretGeneratorRemovedEventType = iamEventTypePrefix + secretGeneratorPrefix + "removed"
 )
 
-func NewAddSecretGeneratorTypeUniqueConstraint(generatorType string) *eventstore.EventUniqueConstraint {
+func NewAddSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.EventUniqueConstraint {
 	return eventstore.NewAddEventUniqueConstraint(
 		UniqueSecretGeneratorType,
-		generatorType,
+		string(generatorType),
 		"Errors.SecretGenerator.AlreadyExists")
 }
 
-func NewRemoveSecretGeneratorTypeUniqueConstraint(generatorType string) *eventstore.EventUniqueConstraint {
+func NewRemoveSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.EventUniqueConstraint {
 	return eventstore.NewRemoveEventUniqueConstraint(
 		UniqueSecretGeneratorType,
-		generatorType)
+		string(generatorType))
 }
 
 type SecretGeneratorAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	GeneratorType       string        `json:"generatorType"`
-	Length              uint          `json:"length,omitempty"`
-	Expiry              time.Duration `json:"expiry,omitempty"`
-	IncludeLowerLetters bool          `json:"includeLowerLetters,omitempty"`
-	IncludeUpperLetters bool          `json:"includeUpperLetters,omitempty"`
-	IncludeDigits       bool          `json:"includeDigits,omitempty"`
-	IncludeSymbols      bool          `json:"includeSymbols,omitempty"`
+	GeneratorType       domain.SecretGeneratorType `json:"generatorType"`
+	Length              uint                       `json:"length,omitempty"`
+	Expiry              time.Duration              `json:"expiry,omitempty"`
+	IncludeLowerLetters bool                       `json:"includeLowerLetters,omitempty"`
+	IncludeUpperLetters bool                       `json:"includeUpperLetters,omitempty"`
+	IncludeDigits       bool                       `json:"includeDigits,omitempty"`
+	IncludeSymbols      bool                       `json:"includeSymbols,omitempty"`
 }
 
 func NewSecretGeneratorAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	generatorType string,
+	generatorType domain.SecretGeneratorType,
 	length uint,
 	expiry time.Duration,
 	includeLowerLetters,
@@ -93,13 +94,13 @@ func SecretGeneratorAddedEventMapper(event *repository.Event) (eventstore.Event,
 type SecretGeneratorChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	GeneratorType       string         `json:"generatorType"`
-	Length              *uint          `json:"length,omitempty"`
-	Expiry              *time.Duration `json:"expiry,omitempty"`
-	IncludeLowerLetters *bool          `json:"includeLowerLetters,omitempty"`
-	IncludeUpperLetters *bool          `json:"includeUpperLetters,omitempty"`
-	IncludeDigits       *bool          `json:"includeDigits,omitempty"`
-	IncludeSymbols      *bool          `json:"includeSymbols,omitempty"`
+	GeneratorType       domain.SecretGeneratorType `json:"generatorType"`
+	Length              *uint                      `json:"length,omitempty"`
+	Expiry              *time.Duration             `json:"expiry,omitempty"`
+	IncludeLowerLetters *bool                      `json:"includeLowerLetters,omitempty"`
+	IncludeUpperLetters *bool                      `json:"includeUpperLetters,omitempty"`
+	IncludeDigits       *bool                      `json:"includeDigits,omitempty"`
+	IncludeSymbols      *bool                      `json:"includeSymbols,omitempty"`
 }
 
 func (e *SecretGeneratorChangedEvent) Data() interface{} {
@@ -113,7 +114,7 @@ func (e *SecretGeneratorChangedEvent) UniqueConstraints() []*eventstore.EventUni
 func NewSecretGeneratorChangeEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	generatorType string,
+	generatorType domain.SecretGeneratorType,
 	changes []SecretGeneratorChanges,
 ) (*SecretGeneratorChangedEvent, error) {
 	if len(changes) == 0 {
@@ -187,7 +188,7 @@ func SecretGeneratorChangedEventMapper(event *repository.Event) (eventstore.Even
 type SecretGeneratorRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	GeneratorType string `json:"generatorType"`
+	GeneratorType domain.SecretGeneratorType `json:"generatorType"`
 }
 
 func (e *SecretGeneratorRemovedEvent) Data() interface{} {
@@ -201,7 +202,7 @@ func (e *SecretGeneratorRemovedEvent) UniqueConstraints() []*eventstore.EventUni
 func NewSecretGeneratorRemovedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	generatorType string,
+	generatorType domain.SecretGeneratorType,
 ) *SecretGeneratorRemovedEvent {
 	return &SecretGeneratorRemovedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(

@@ -23,7 +23,7 @@ func (s *Server) ListSecretGenerators(ctx context.Context, req *admin_pb.ListSec
 }
 
 func (s *Server) GetSecretGenerator(ctx context.Context, req *admin_pb.GetSecretGeneratorRequest) (*admin_pb.GetSecretGeneratorResponse, error) {
-	generator, err := s.query.SecretGeneratorByType(ctx, req.GetGeneratorType())
+	generator, err := s.query.SecretGeneratorByType(ctx, SecretGeneratorTypeToDomain(req.GeneratorType))
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *Server) GetSecretGenerator(ctx context.Context, req *admin_pb.GetSecret
 }
 
 func (s *Server) UpdateSecretGenerator(ctx context.Context, req *admin_pb.UpdateSecretGeneratorRequest) (*admin_pb.UpdateSecretGeneratorResponse, error) {
-	details, err := s.command.ChangeSecretGeneratorConfig(ctx, req.GeneratorType, UpdateSecretGeneratorToConfig(req))
+	details, err := s.command.ChangeSecretGeneratorConfig(ctx, SecretGeneratorTypeToDomain(req.GeneratorType), UpdateSecretGeneratorToConfig(req))
 	if err != nil {
 		return nil, err
 	}

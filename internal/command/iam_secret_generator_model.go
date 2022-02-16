@@ -12,7 +12,7 @@ import (
 type IAMSecretGeneratorConfigWriteModel struct {
 	eventstore.WriteModel
 
-	GeneratorType       string
+	GeneratorType       domain.SecretGeneratorType
 	Length              uint
 	Expiry              time.Duration
 	IncludeLowerLetters bool
@@ -22,7 +22,7 @@ type IAMSecretGeneratorConfigWriteModel struct {
 	State               domain.SecretGeneratorState
 }
 
-func NewIAMSecretGeneratorConfigWriteModel(GeneratorType string) *IAMSecretGeneratorConfigWriteModel {
+func NewIAMSecretGeneratorConfigWriteModel(GeneratorType domain.SecretGeneratorType) *IAMSecretGeneratorConfigWriteModel {
 	return &IAMSecretGeneratorConfigWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   domain.IAMID,
@@ -100,7 +100,7 @@ func (wm *IAMSecretGeneratorConfigWriteModel) Query() *eventstore.SearchQueryBui
 func (wm *IAMSecretGeneratorConfigWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	generatorType string,
+	generatorType domain.SecretGeneratorType,
 	length uint,
 	expiry time.Duration,
 	includeLowerLetters,

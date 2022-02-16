@@ -27,7 +27,7 @@ func (s *Server) GetMyEmail(ctx context.Context, _ *auth_pb.GetMyEmailRequest) (
 }
 
 func (s *Server) SetMyEmail(ctx context.Context, req *auth_pb.SetMyEmailRequest) (*auth_pb.SetMyEmailResponse, error) {
-	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyEmailCodeGeneratorType, s.command.UserCodeAlg)
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.command.UserCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (s *Server) SetMyEmail(ctx context.Context, req *auth_pb.SetMyEmailRequest)
 }
 
 func (s *Server) VerifyMyEmail(ctx context.Context, req *auth_pb.VerifyMyEmailRequest) (*auth_pb.VerifyMyEmailResponse, error) {
-	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyEmailCodeGeneratorType, s.command.UserCodeAlg)
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.command.UserCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *Server) VerifyMyEmail(ctx context.Context, req *auth_pb.VerifyMyEmailRe
 
 func (s *Server) ResendMyEmailVerification(ctx context.Context, _ *auth_pb.ResendMyEmailVerificationRequest) (*auth_pb.ResendMyEmailVerificationResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.VerifyEmailCodeGeneratorType, s.command.UserCodeAlg)
+	emailCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyEmailCode, s.command.UserCodeAlg)
 	if err != nil {
 		return nil, err
 	}

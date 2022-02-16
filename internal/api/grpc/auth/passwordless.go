@@ -57,7 +57,7 @@ func (s *Server) AddMyPasswordless(ctx context.Context, _ *auth_pb.AddMyPassword
 
 func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPasswordlessLinkRequest) (*auth_pb.AddMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.command.UserCodeAlg)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *Server) AddMyPasswordlessLink(ctx context.Context, _ *auth_pb.AddMyPass
 
 func (s *Server) SendMyPasswordlessLink(ctx context.Context, _ *auth_pb.SendMyPasswordlessLinkRequest) (*auth_pb.SendMyPasswordlessLinkResponse, error) {
 	ctxData := authz.GetCtxData(ctx)
-	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.PasswordlessCodeGeneratorType, s.command.UserCodeAlg)
+	passwordlessInitCode, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, s.command.UserCodeAlg)
 	if err != nil {
 		return nil, err
 	}

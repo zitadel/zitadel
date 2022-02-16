@@ -163,7 +163,7 @@ service AdminService {
     }
 
     // Set the default language
-    rpc SetDefaultLanguages(SetDefaultLanguageRequest) returns (SetDefaultLanguageResponse) {
+    rpc SetDefaultLanguage(SetDefaultLanguageRequest) returns (SetDefaultLanguageResponse) {
         option (google.api.http) = {
             put: "/languages/default/{language}";
         };
@@ -174,7 +174,7 @@ service AdminService {
     }
 
     // Set the default language
-    rpc GetDefaultLanguages(GetDefaultLanguageRequest) returns (GetDefaultLanguageResponse) {
+    rpc GetDefaultLanguage(GetDefaultLanguageRequest) returns (GetDefaultLanguageResponse) {
         option (google.api.http) = {
             get: "/languages/default";
         };
@@ -196,7 +196,7 @@ service AdminService {
         };
     }
 
-    // Set the default language
+    // Get Secret Generator by type (e.g PasswordResetCode)
     rpc GetSecretGenerator(GetSecretGeneratorRequest) returns (GetSecretGeneratorResponse) {
         option (google.api.http) = {
             get: "/secretgenerators/{generator_type}";
@@ -219,7 +219,7 @@ service AdminService {
         };
     }
 
-    // Set the default language
+    // Get system smtp configuration
     rpc GetSMTPConfig(GetSMTPConfigRequest) returns (GetSMTPConfigResponse) {
         option (google.api.http) = {
             get: "/smtp";
@@ -230,7 +230,7 @@ service AdminService {
         };
     }
 
-    // Update secret generator configuration
+    // Update system smtp configuration
     rpc UpdateSMTPConfig(UpdateSMTPConfigRequest) returns (UpdateSMTPConfigResponse) {
         option (google.api.http) = {
             put: "/smtp";
@@ -242,7 +242,7 @@ service AdminService {
         };
     }
 
-    // Update secret generator configuration
+    // Update system smtp configuration password for host
     rpc UpdateSMTPConfigPassword(UpdateSMTPConfigPasswordRequest) returns (UpdateSMTPConfigPasswordResponse) {
         option (google.api.http) = {
             put: "/smtp/password";
@@ -2367,7 +2367,7 @@ message SetDefaultLanguageResponse {
 message GetDefaultLanguageRequest {}
 
 message GetDefaultLanguageResponse {
-    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 10}];
+    string language = 1;
 }
 
 message ListSecretGeneratorsRequest {
@@ -2383,7 +2383,7 @@ message ListSecretGeneratorsResponse {
 }
 
 message GetSecretGeneratorRequest {
-    string generator_type = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+    zitadel.settings.v1.SecretGeneratorType generator_type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
 }
 
 message GetSecretGeneratorResponse {
@@ -2391,7 +2391,7 @@ message GetSecretGeneratorResponse {
 }
 
 message UpdateSecretGeneratorRequest {
-    string generator_type = 1 [(validate.rules).string = {min_len: 1, max_len: 210}];
+    zitadel.settings.v1.SecretGeneratorType generator_type = 1 [(validate.rules).enum = {defined_only: true, not_in: [0]}];
     uint32 length = 2;
     google.protobuf.Duration  expiry   = 3;
     bool include_lower_letters = 4;

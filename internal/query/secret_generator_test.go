@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -85,7 +86,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"agg-id",
-							"type",
+							domain.SecretGeneratorTypeInitCode,
 							testNow,
 							testNow,
 							"ro",
@@ -107,7 +108,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 				SecretGenerators: []*SecretGenerator{
 					{
 						AggregateID:         "agg-id",
-						GeneratorType:       "type",
+						GeneratorType:       1,
 						CreationDate:        testNow,
 						ChangeDate:          testNow,
 						ResourceOwner:       "ro",
@@ -159,7 +160,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					[][]driver.Value{
 						{
 							"agg-id",
-							"type",
+							domain.SecretGeneratorTypeInitCode,
 							testNow,
 							testNow,
 							"ro",
@@ -173,7 +174,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 						},
 						{
 							"agg-id",
-							"type2",
+							domain.SecretGeneratorTypeVerifyEmailCode,
 							testNow,
 							testNow,
 							"ro",
@@ -195,7 +196,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 				SecretGenerators: []*SecretGenerator{
 					{
 						AggregateID:         "agg-id",
-						GeneratorType:       "type",
+						GeneratorType:       1,
 						CreationDate:        testNow,
 						ChangeDate:          testNow,
 						ResourceOwner:       "ro",
@@ -209,7 +210,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					},
 					{
 						AggregateID:         "agg-id",
-						GeneratorType:       "type2",
+						GeneratorType:       2,
 						CreationDate:        testNow,
 						ChangeDate:          testNow,
 						ResourceOwner:       "ro",
@@ -318,7 +319,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 					},
 					[]driver.Value{
 						"agg-id",
-						"type",
+						domain.SecretGeneratorTypeInitCode,
 						testNow,
 						testNow,
 						"ro",
@@ -334,7 +335,7 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			},
 			object: &SecretGenerator{
 				AggregateID:         "agg-id",
-				GeneratorType:       "type",
+				GeneratorType:       domain.SecretGeneratorTypeInitCode,
 				CreationDate:        testNow,
 				ChangeDate:          testNow,
 				ResourceOwner:       "ro",

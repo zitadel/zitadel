@@ -32,9 +32,9 @@ Returns the default languages
     GET: /languages
 
 
-### SetDefaultLanguages
+### SetDefaultLanguage
 
-> **rpc** SetDefaultLanguages([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
+> **rpc** SetDefaultLanguage([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
 [SetDefaultLanguageResponse](#setdefaultlanguageresponse)
 
 Set the default language
@@ -44,9 +44,9 @@ Set the default language
     PUT: /languages/default/{language}
 
 
-### GetDefaultLanguages
+### GetDefaultLanguage
 
-> **rpc** GetDefaultLanguages([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
+> **rpc** GetDefaultLanguage([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
 [GetDefaultLanguageResponse](#getdefaultlanguageresponse)
 
 Set the default language
@@ -73,7 +73,7 @@ Set the default language
 > **rpc** GetSecretGenerator([GetSecretGeneratorRequest](#getsecretgeneratorrequest))
 [GetSecretGeneratorResponse](#getsecretgeneratorresponse)
 
-Set the default language
+Get Secret Generator by type (e.g PasswordResetCode)
 
 
 
@@ -97,7 +97,7 @@ Update secret generator configuration
 > **rpc** GetSMTPConfig([GetSMTPConfigRequest](#getsmtpconfigrequest))
 [GetSMTPConfigResponse](#getsmtpconfigresponse)
 
-Set the default language
+Get system smtp configuration
 
 
 
@@ -109,7 +109,7 @@ Set the default language
 > **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
 [UpdateSMTPConfigResponse](#updatesmtpconfigresponse)
 
-Update secret generator configuration
+Update system smtp configuration
 
 
 
@@ -121,7 +121,7 @@ Update secret generator configuration
 > **rpc** UpdateSMTPConfigPassword([UpdateSMTPConfigPasswordRequest](#updatesmtpconfigpasswordrequest))
 [UpdateSMTPConfigPasswordResponse](#updatesmtpconfigpasswordresponse)
 
-Update secret generator configuration
+Update system smtp configuration password for host
 
 
 
@@ -1773,7 +1773,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+| language |  string | - |  |
 
 
 
@@ -2113,7 +2113,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| generator_type |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 
 
 
@@ -3626,7 +3626,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| generator_type |  string | - | string.min_len: 1<br /> string.max_len: 210<br />  |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
 | length |  uint32 | - |  |
 | expiry |  google.protobuf.Duration | - |  |
 | include_lower_letters |  bool | - |  |
