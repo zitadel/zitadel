@@ -13,15 +13,15 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 
 ## Getting started
 
-If you want to try out ZITADEL you can choose to run it locally or simply use the [cloud offering](https://accounts.zitadel.ch/register/org) and create your organisation for free, no credit card required.
+Run it locally or [create your organisation within seconds online](https://accounts.zitadel.ch/register/org) for free, no credit card required.
 
-To run ZITADEL locally it's recommended to run it and the database in docker but you can also run the executable.
+If you want to integrate ZITADEL in your app check out the clients section <!--  [TODO: link to clients section] -->
 
-If you want to integrate ZITADEL in your app check out the clients section [TODO: link to clients section]
+Locally it is recommended to run ZITADEL and the database using docker but you can also run the executable.
 
 ### Run with docker compose
 
-Simply clone the repo and execute the following command in the folder:
+Simply clone the repo and execute the following command in the cloned folder:
 
 ```bash
 COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/docker-compose.yml up
@@ -29,27 +29,19 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/doc
 
 ### Run on your machine
 
-TODO: download/install zitadel
+<!--  TODO: download/install zitadel  -->
 
-TODO: add basic start-local-node command
+<!--  TODO: add basic start-with-init command -->
+<!--  TODO: insecure, should we write logs to a file? -->
+<!-- TODO: what will be printed? is it possible to open the browser and show the login screen? -->
 
 First of all you need to start the cockroach database [using their guide to start a cluster](https://www.cockroachlabs.com/docs/v21.2/start-a-local-cluster)
 
-After the database is up and running you need to initialize ZITADEL. This command sets up the basic requirements of ZITADEL:
+After the database is up and running you can start ZITADEL:
 
 ```bash
-zitadel init
+zitadel start-with-init
 ```
-
-After the successful initialization you can start ZITADEL by this command:
-
-TODO: insecure, should we write logs to a file?
-
-```bash
-zitadel start
-```
-
-TODO: what will be printed? is it possible to open the browser and show the login screen?
 
 ## Key features
 
