@@ -139,12 +139,13 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
-		file, err = s.Commands().RemoveExif(file)
+		cleanedFile, cleanedSize, err := s.Commands().RemoveExif(file, size, contentType)
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("remove exif error: %v", err), http.StatusInternalServerError)
 			return
 		}
-		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, contentType, file, size)
+
+		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, contentType, cleanedFile, cleanedSize)
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
