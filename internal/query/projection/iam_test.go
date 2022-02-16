@@ -87,7 +87,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 				event: getEvent(testEvent(
 					repository.EventType(iam.DefaultLanguageSetEventType),
 					iam.AggregateType,
-					[]byte(`{"defaultLanguage": "en"}`),
+					[]byte(`{"language": "en"}`),
 				), iam.DefaultLanguageSetMapper),
 			},
 			reduce: (&IAMProjection{}).reduceDefaultLanguageSet,

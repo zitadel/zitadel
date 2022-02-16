@@ -18,7 +18,7 @@ const (
 type DefaultLanguageSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Language language.Tag `json:"defaultLanguage"`
+	Language language.Tag `json:"language"`
 }
 
 func (e *DefaultLanguageSetEvent) Data() interface{} {
@@ -32,7 +32,7 @@ func (e *DefaultLanguageSetEvent) UniqueConstraints() []*eventstore.EventUniqueC
 func NewDefaultLanguageSetEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	defaultLanguage language.Tag,
+	language language.Tag,
 ) *DefaultLanguageSetEvent {
 	return &DefaultLanguageSetEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
@@ -40,7 +40,7 @@ func NewDefaultLanguageSetEvent(
 			aggregate,
 			DefaultLanguageSetEventType,
 		),
-		Language: defaultLanguage,
+		Language: language,
 	}
 }
 

@@ -20,13 +20,18 @@ type Email struct {
 	BCC         []string
 	CC          []string
 	SenderEmail string
+	SenderName  string
 	Subject     string
 	Content     string
 }
 
 func (msg *Email) GetContent() string {
 	headers := make(map[string]string)
-	headers["From"] = msg.SenderEmail
+	from := msg.SenderEmail
+	if msg.SenderName != "" {
+		from = msg.SenderName + " " + from
+	}
+	headers["From"] = from
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
 

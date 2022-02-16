@@ -29,7 +29,7 @@ CREATE TABLE zitadel.projections.smtp_configs (
     , sender_address STRING NOT NULL
     , sender_name STRING NOT NULL
     , host STRING NOT NULL
-    , user STRING NOT NULL DEFAULT ''
+    , username STRING NOT NULL DEFAULT ''
     , password JSONB
 
     , PRIMARY KEY (aggregate_id)

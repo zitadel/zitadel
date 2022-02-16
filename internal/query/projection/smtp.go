@@ -60,7 +60,7 @@ const (
 	SMTPConfigColumnFromAddress   = "sender_address"
 	SMTPConfigColumnFromName      = "sender_name"
 	SMTPConfigColumnSMTPHost      = "host"
-	SMTPConfigColumnSMTPUser      = "user"
+	SMTPConfigColumnSMTPUser      = "username"
 	SMTPConfigColumnSMTPPassword  = "password"
 )
 
