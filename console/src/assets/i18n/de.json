@@ -147,6 +147,7 @@
   },
   "FILTER": {
     "TITLE": "Filter",
+    "STATE": "Status",
     "DISPLAYNAME": "Benutzer Display Name",
     "EMAIL": "Email",
     "USERNAME": "User Name",
@@ -501,8 +502,11 @@
     "STATE": {
       "0": "Unbekannt",
       "1": "Aktiv",
-      "2": "Abgelaufen",
-      "4": "Gesperrt"
+      "2": "Inaktiv",
+      "3": "Gelöscht",
+      "4": "Gesperrt",
+      "5": "Suspendiert",
+      "6": "Initialisiert"
     },
     "SEARCH": {
       "ADDITIONAL": "Benutzer Name (eigene Organisation)",

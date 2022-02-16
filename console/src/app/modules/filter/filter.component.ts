@@ -18,7 +18,7 @@ export class FilterComponent implements OnDestroy {
   @Output() public filterChanged: EventEmitter<FilterSearchQuery[] | undefined> = new EventEmitter();
   @Output() public filterOpen: EventEmitter<boolean> = new EventEmitter<boolean>(false);
 
-  @Output() public reset: EventEmitter<void> = new EventEmitter();
+  @Output() public resetted: EventEmitter<void> = new EventEmitter();
   @Output() public trigger: EventEmitter<void> = new EventEmitter();
 
   public filterCount$: BehaviorSubject<number> = new BehaviorSubject(0);

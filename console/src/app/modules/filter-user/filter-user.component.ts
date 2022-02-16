@@ -5,7 +5,9 @@ import {
   DisplayNameQuery,
   EmailQuery,
   SearchQuery as UserSearchQuery,
+  StateQuery,
   UserNameQuery,
+  UserState,
 } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
@@ -25,6 +27,15 @@ enum SubQuery {
 export class FilterUserComponent extends FilterComponent {
   public SubQuery: any = SubQuery;
   public searchQueries: UserSearchQuery[] = [];
+
+  public states: UserState[] = [
+    UserState.USER_STATE_ACTIVE,
+    UserState.USER_STATE_INACTIVE,
+    UserState.USER_STATE_DELETED,
+    UserState.USER_STATE_INITIAL,
+    UserState.USER_STATE_LOCKED,
+    UserState.USER_STATE_SUSPEND,
+  ];
   constructor() {
     super();
   }
@@ -32,16 +43,15 @@ export class FilterUserComponent extends FilterComponent {
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
     if (event.checked) {
       switch (subquery) {
-        // case SubQuery.STATE:
-        //   const dnq = new DisplayNameQuery();
-        //   dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-        //   dnq.setDisplayName('');
+        case SubQuery.STATE:
+          const sq = new StateQuery();
+          sq.setState(UserState.USER_STATE_ACTIVE);
 
-        //   const dn_sq = new UserSearchQuery();
-        //   dn_sq.setDisplayNameQuery(dnq);
+          const s_sq = new UserSearchQuery();
+          s_sq.setStateQuery(sq);
 
-        //   this.searchQueries.push(dn_sq);
-        //   break;
+          this.searchQueries.push(s_sq);
+          break;
         case SubQuery.DISPLAYNAME:
           const dnq = new DisplayNameQuery();
           dnq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
@@ -76,6 +86,12 @@ export class FilterUserComponent extends FilterComponent {
       }
     } else {
       switch (subquery) {
+        case SubQuery.STATE:
+          const index_s = this.searchQueries.findIndex((q) => (q as UserSearchQuery).toObject().stateQuery !== undefined);
+          if (index_s > -1) {
+            this.searchQueries.splice(index_s, 1);
+          }
+          break;
         case SubQuery.DISPLAYNAME:
           const index_dn = this.searchQueries.findIndex(
             (q) => (q as UserSearchQuery).toObject().displayNameQuery !== undefined,
@@ -103,17 +119,22 @@ export class FilterUserComponent extends FilterComponent {
   }
 
   public setValue(subquery: SubQuery, query: any, event: any) {
+    const value = event?.target?.value ?? event.value;
     switch (subquery) {
+      case SubQuery.STATE:
+        (query as StateQuery).setState(value);
+        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+        break;
       case SubQuery.DISPLAYNAME:
-        (query as DisplayNameQuery).setDisplayName(event?.target?.value);
+        (query as DisplayNameQuery).setDisplayName(value);
         this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
         break;
       case SubQuery.EMAIL:
-        (query as EmailQuery).setEmailAddress(event?.target?.value);
+        (query as EmailQuery).setEmailAddress(value);
         this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
         break;
       case SubQuery.USERNAME:
-        (query as UserNameQuery).setUserName(event?.target?.value);
+        (query as UserNameQuery).setUserName(value);
         this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
         break;
     }
@@ -123,6 +144,13 @@ export class FilterUserComponent extends FilterComponent {
 
   public getSubFilter(subquery: SubQuery): any {
     switch (subquery) {
+      case SubQuery.STATE:
+        const s = this.searchQueries.find((q) => (q as UserSearchQuery).toObject().stateQuery !== undefined);
+        if (s) {
+          return (s as UserSearchQuery).getStateQuery();
+        } else {
+          return undefined;
+        }
       case SubQuery.DISPLAYNAME:
         const dn = this.searchQueries.find((q) => (q as UserSearchQuery).toObject().displayNameQuery !== undefined);
         if (dn) {

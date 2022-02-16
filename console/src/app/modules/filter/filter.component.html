@@ -9,7 +9,7 @@
   </button>
   <div *ngIf="showFilter" class="filter-wrapper">
     <div class="filter-top">
-      <button mat-stroked-button (click)="reset.emit()">{{'ACTIONS.RESET' |
+      <button mat-stroked-button (click)="resetted.emit()">{{'ACTIONS.RESET' |
         translate}}</button>
       <span>{{'FILTER.TITLE' | translate}}</span>
       <button mat-raised-button color="primary" (click)="emitFilter()">{{'ACTIONS.FINISH' | translate}}</button>
