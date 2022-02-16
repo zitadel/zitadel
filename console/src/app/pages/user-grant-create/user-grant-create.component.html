@@ -28,7 +28,8 @@
         <ng-container *ngIf="context && (context === UserGrantContext.USER || context === UserGrantContext.NONE)">
           <h2 class="project-search">{{'PROJECT.GRANT.CREATE.SEL_PROJECT' | translate}}</h2>
 
-          <cnsl-search-project-autocomplete class="block" (selectionChanged)="selectProject($event)">
+          <cnsl-search-project-autocomplete class="block"
+            (selectionChanged)="selectProject($event.project, $event.type)">
           </cnsl-search-project-autocomplete>
         </ng-container>
       </ng-container>
@@ -40,7 +41,7 @@
           <cnsl-project-roles-table
             [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
             (changedSelection)="selectRoles($event)"
-            [projectId]="$any(project)?.id ? $any(project)?.id : $any(project)?.projectId ? $any(project)?.projectId : ''"
+            [projectId]="project?.id ? project.id : grantedProject?.projectId ? grantedProject.projectId : ''"
             [grantId]="$any(project)?.grantId ? $any(project)?.grantId : ''">
           </cnsl-project-roles-table>
         </cnsl-card>
@@ -48,8 +49,8 @@
 
       <div class="btn-container">
         <ng-container *ngIf="currentCreateStep === 1">
-          <button [disabled]="!org || !projectId || userIds.length < 1" (click)="next()" color="primary"
-            mat-raised-button class="big-button" cdkFocusInitial>
+          <button [disabled]="!org || !(project?.id || grantedProject?.projectId) || userIds.length < 1"
+            (click)="next()" color="primary" mat-raised-button class="big-button" cdkFocusInitial>
             {{ 'ACTIONS.CONTINUE' | translate }}
           </button>
         </ng-container>

@@ -10,6 +10,8 @@ import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
 import { GrantedProject, Project, ProjectNameQuery, ProjectQuery } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
+import { ProjectType } from '../project-members/project-members-datasource';
+
 export enum ProjectAutocompleteType {
   PROJECT_OWNED = 0,
   PROJECT_GRANTED = 1,
@@ -33,9 +35,10 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
   @ViewChild('nameInput') public nameInput!: ElementRef<HTMLInputElement>;
   @ViewChild('auto') public matAutocomplete!: MatAutocomplete;
   @Input() public autocompleteType!: ProjectAutocompleteType;
-  @Output() public selectionChanged: EventEmitter<
-    GrantedProject.AsObject[] | GrantedProject.AsObject | Project.AsObject | Project.AsObject[]
-  > = new EventEmitter();
+  @Output() public selectionChanged: EventEmitter<{
+    project: Project.AsObject | GrantedProject.AsObject;
+    type: ProjectType;
+  }> = new EventEmitter();
 
   private unsubscribed$: Subject<void> = new Subject();
   constructor(private mgmtService: ManagementService) {
@@ -132,6 +135,18 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
   }
 
   public selected(event: MatAutocompleteSelectedEvent): void {
-    this.selectionChanged.emit(event.option.value);
+    const p: Project.AsObject | GrantedProject.AsObject = event.option.value;
+    const type = (p as Project.AsObject).id
+      ? ProjectType.PROJECTTYPE_OWNED
+      : (p as GrantedProject.AsObject).projectId
+      ? ProjectType.PROJECTTYPE_GRANTED
+      : ProjectType.PROJECTTYPE_OWNED;
+
+    this.selectionChanged.emit({
+      project: p,
+      type: type,
+    });
+
+    console.log(p, type);
   }
 }
