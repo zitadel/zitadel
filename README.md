@@ -88,13 +88,6 @@ zitadel start-with-init
 | Go         | [zitadel-go](https://github.com/caos/zitadel-go) | ✔️ | ✔️ | ✔️ | ZITADEL |
 | Rust       | [zitadel-rust](https://crates.io/crates/zitadel) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
 
-
-- [Go](https://github.com/caos/zitadel-go) maintained by us
-- [.NET](https://github.com/caos/zitadel-net) maintained by our top library contributor [buehler](https://github.com/buehler)
-- [Dart](https://github.com/caos/zitadel-dart) maintained by our top library contributor [buehler](https://github.com/buehler)
-- [Elixir](https://github.com/jshmrtn/zitadel_api) maintained by our friends at [jshmrtn]((https://github.com/jshmrtn))
-- [Rust](https://crates.io/crates/zitadel) maintained by our top library contributor [buehler](https://github.com/buehler)
-
 ## Help and Documentation
 
 - [Documentation](https://docs.zitadel.ch)
@@ -123,24 +116,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 
 ## Old
-
-<img src="./docs/static/logos/zitadel-logo-dark@2x.png#gh-light-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
-<img src="./docs/static/logos/zitadel-logo-light@2x.png#gh-dark-mode-only" alt="Zitadel Logo" height="100px" width="auto" />
-
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Release](https://github.com/caos/zitadel/actions/workflows/zitadel.yml/badge.svg)](https://github.com/caos/zitadel/actions)
-[![license](https://badgen.net/github/license/caos/zitadel/)](https://github.com/caos/zitadel/blob/main/LICENSE)
-[![release](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
-[![codecov](https://codecov.io/gh/caos/zitadel/branch/main/graph/badge.svg)](https://codecov.io/gh/caos/zitadel)
-[![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)  
-[![OpenID Connect Certified](./docs/static/logos/oidc-cert.png)](https://openid.net/certification/#OPs)
-
-## What Is ZITADEL
-
-**ZITADEL** is a "Cloud Native Identity and Access Management" solution built for the cloud era. ZITADEL uses a modern software stack consisting of [**Golang**](https://golang.org/), [**Angular**](https://angular.io/) and  [**CockroachDB**](https://www.cockroachlabs.com/) as sole storage and follows an event sourced pattern.
-
-We built **ZITADEL** not only with the vision of becoming a great open source project but also as a superb platform to support developers building their applications, without need to handle secure user login and account management themselves.
 
 ## How Does It Work
 
