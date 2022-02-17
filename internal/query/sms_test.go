@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 )
@@ -40,7 +41,7 @@ var (
 		` zitadel.projections.sms_configs_twilio.sms_id,` +
 		` zitadel.projections.sms_configs_twilio.sid,` +
 		` zitadel.projections.sms_configs_twilio.token,` +
-		` zitadel.projections.sms_configs_twilio.sender_name` +
+		` zitadel.projections.sms_configs_twilio.sender_name,` +
 		` COUNT(*) OVER ()` +
 		` FROM zitadel.projections.sms_configs` +
 		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
@@ -57,7 +58,7 @@ var (
 		"sms_id",
 		"sid",
 		"token",
-		"from",
+		"sender-name",
 	}
 	smsConfigsCols = append(smsConfigCols, "count")
 )
@@ -86,48 +87,6 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			object: &SMSConfigs{Configs: []*SMSConfig{}},
 		},
 		{
-			name:    "prepareSMSConfigsQuery only sms",
-			prepare: prepareSMSConfigsQuery,
-			want: want{
-				sqlExpectations: mockQueries(
-					expectedSMSConfigsQuery,
-					smsConfigCols,
-					[][]driver.Value{
-						{
-							"sms-id",
-							"agg-id",
-							testNow,
-							testNow,
-							"ro",
-							domain.SMSConfigStateInactive,
-							uint64(20211109),
-							// oidc config
-							nil,
-							nil,
-							nil,
-							nil,
-						},
-					},
-				),
-			},
-			object: &SMSConfigs{
-				SearchResponse: SearchResponse{
-					Count: 1,
-				},
-				Configs: []*SMSConfig{
-					{
-						ID:            "sms-id",
-						AggregateID:   "agg-id",
-						CreationDate:  testNow,
-						ChangeDate:    testNow,
-						ResourceOwner: "ro",
-						State:         domain.SMSConfigStateInactive,
-						Sequence:      20211109,
-					},
-				},
-			},
-		},
-		{
 			name:    "prepareSMSQuery twilio config",
 			prepare: prepareSMSConfigsQuery,
 			want: want{
@@ -143,11 +102,11 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"ro",
 							domain.SMSConfigStateInactive,
 							uint64(20211109),
-							// api config
+							// twilio config
 							"sms-id",
 							"sid",
-							"token",
-							"from",
+							&crypto.CryptoValue{},
+							"sender-name",
 						},
 					},
 				),
@@ -166,9 +125,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
 						TwilioConfig: &Twilio{
-							SID:   "sid",
-							Token: "token",
-							From:  "from",
+							SID:        "sid",
+							Token:      &crypto.CryptoValue{},
+							SenderName: "sender-name",
 						},
 					},
 				},
@@ -193,8 +152,8 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							// twilio config
 							"sms-id",
 							"sid",
-							"token",
-							"from",
+							&crypto.CryptoValue{},
+							"sender-name",
 						},
 						{
 							"sms-id2",
@@ -207,8 +166,8 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							// twilio config
 							"sms-id2",
 							"sid2",
-							"token2",
-							"from2",
+							&crypto.CryptoValue{},
+							"sender-name2",
 						},
 					},
 				),
@@ -227,9 +186,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
 						TwilioConfig: &Twilio{
-							SID:   "sid",
-							Token: "token",
-							From:  "from",
+							SID:        "sid",
+							Token:      &crypto.CryptoValue{},
+							SenderName: "sender-name",
 						},
 					},
 					{
@@ -241,9 +200,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
 						TwilioConfig: &Twilio{
-							SID:   "sid2",
-							Token: "token2",
-							From:  "from2",
+							SID:        "sid2",
+							Token:      &crypto.CryptoValue{},
+							SenderName: "sender-name2",
 						},
 					},
 				},
@@ -322,7 +281,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						"sms-id",
 						"sid",
 						"token",
-						"from",
+						"sender-name",
 					},
 				),
 			},

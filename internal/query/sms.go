@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -30,9 +31,9 @@ type SMSConfig struct {
 }
 
 type Twilio struct {
-	SID   string
-	Token string
-	From  string
+	SID        string
+	Token      *crypto.CryptoValue
+	SenderName string
 }
 
 type SMSConfigsSearchQueries struct {
@@ -50,7 +51,7 @@ func (q *SMSConfigsSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuild
 
 var (
 	smsConfigsTable = table{
-		name: projection.AppProjectionTable,
+		name: projection.SMSConfigProjectionTable,
 	}
 	SMSConfigColumnID = Column{
 		name:  projection.SMSColumnID,
@@ -247,7 +248,7 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 type sqlTwilioConfig struct {
 	smsID      sql.NullString
 	sid        sql.NullString
-	token      sql.NullString
+	token      *crypto.CryptoValue
 	senderName sql.NullString
 }
 
@@ -256,8 +257,8 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 		return
 	}
 	smsConfig.TwilioConfig = &Twilio{
-		SID:   c.sid.String,
-		Token: c.token.String,
-		From:  c.senderName.String,
+		SID:        c.sid.String,
+		Token:      c.token,
+		SenderName: c.senderName.String,
 	}
 }

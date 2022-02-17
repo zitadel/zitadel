@@ -31,7 +31,7 @@ func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
 	return &settings_pb.SMSProvider_Twilio{
 		Twilio: &settings_pb.TwilioConfig{
 			Sid:  twilio.SID,
-			From: twilio.From,
+			From: twilio.SenderName,
 		},
 	}
 }
