@@ -6,11 +6,12 @@
 **[💬 chat](https://discord.gg/erh5Brh7jE) [📞 contact](https://zitadel.ch/contact/) [📋 guide](https://docs.zitadel.ch/docs/guides/overview) [🧑‍💻 api docs](https://docs.zitadel.ch/docs/apis/overview) [❓user manuals](https://docs.zitadel.ch/docs/manuals/introduction)**
 
 [![stable version](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases/latest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
-[![code coverage](https://badgen.net/codecov/c/github/caos/zitadel)](https://app.codecov.io/gh/caos/zitadel)
 [![license](https://badgen.net/github/license/caos/zitadel)](#license)
+[![code coverage](https://badgen.net/codecov/c/github/caos/zitadel)](https://app.codecov.io/gh/caos/zitadel)
+[![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)
 [![follow us](https://badgen.net/twitter/follow/zitadel_ch)](https://twitter.com/zitadel_ch)
+<a href="https://www.certification.openid.net/plan-detail.html?public=true&plan=w3ddtJcy0tpHL"><img src="./docs/static/logos/oidc-cert.png" alt="OpenID certification" height="35px" width="auto" /></a>
 
 ---
 
