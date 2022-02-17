@@ -1,17 +1,10 @@
 <div class="preview" *ngIf="policy">
-  <span class="label cnsl-secondary-text">{{label}}</span>
+  <!-- <span class="label cnsl-secondary-text">{{label}}</span> -->
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}"
     [style.background]="theme === Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper" [style.color]="theme === Theme.DARK ? policy.fontColorDark : policy.fontColor">
-      <ng-container *ngIf="preview === Preview.PREVIEW; else currentimgs">
-        <img *ngIf="policy.logoUrl && theme === Theme.LIGHT" [src]="policy.logoUrl" alt="logo-mock" />
-        <img *ngIf="policy.logoUrlDark && theme === Theme.DARK" [src]="policy.logoUrlDark" alt="logo-mock" />
-      </ng-container>
-
-      <ng-template #currentimgs>
-        <img *ngIf="policy.logoUrl  && theme === Theme.LIGHT" [src]="policy.logoUrl" alt="logo-mock" />
-        <img *ngIf="policy.logoUrlDark && theme === Theme.DARK" [src]="policy.logoUrlDark" alt="logo-mock" />
-      </ng-template>
+      <img *ngIf="policy.logoUrl && theme === Theme.LIGHT" [src]="policy.logoUrl" alt="logo-mock" />
+      <img *ngIf="policy.logoUrlDark && theme === Theme.DARK" [src]="policy.logoUrlDark" alt="logo-mock" />
 
       <h1 [style.color]="theme === Theme.DARK ? policy.fontColorDark : policy.fontColor">
         {{'POLICY.PRIVATELABELING.PREVIEW.TITLE' | translate}}</h1>

@@ -13,7 +13,6 @@ declare const tinycolor: any;
   styleUrls: ['./preview.component.scss'],
 })
 export class PreviewComponent implements OnInit, OnDestroy {
-  @Input() preview: Preview = Preview.PREVIEW;
   @Input() policy!: LabelPolicy.AsObject;
   @Input() label: string = 'PREVIEW';
   @Input() theme: Theme = Theme.DARK;

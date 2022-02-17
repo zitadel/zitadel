@@ -58,7 +58,6 @@ const MAX_ALLOWED_SIZE = 0.5 * 1024 * 1024;
 })
 export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public theme: Theme = Theme.LIGHT;
-  public preview: Preview = Preview.PREVIEW;
 
   public serviceType: PolicyComponentServiceType = PolicyComponentServiceType.MGMT;
   public service!: ManagementService | AdminService;

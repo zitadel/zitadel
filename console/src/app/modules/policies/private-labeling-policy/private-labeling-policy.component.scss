@@ -12,6 +12,7 @@
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
   $p-border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
+  $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   .privatelabeling-policy {
     .header {
@@ -63,74 +64,14 @@
         border-radius: 50%;
         align-self: flex-end;
       }
+    }
 
-      .theme-changer {
-        display: flex;
-        margin: 0 -0.25rem;
+    .theme-toggle {
+      display: flex;
+      align-items: center;
 
-        button {
-          height: 40px;
-          width: 40px;
-          border-radius: 6px;
-          border: 1px solid #81868a50;
-          margin: 0 0.25rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-
-          .icon {
-            visibility: hidden;
-          }
-
-          .edit-icon {
-            display: none;
-          }
-
-          &:hover:not(.active) {
-            .edit-icon {
-              display: inline;
-            }
-
-            .icon {
-              display: none;
-            }
-          }
-        }
-
-        .dark {
-          background-color: black;
-
-          &.active {
-            transform: scale(1.2);
-
-            .icon {
-              visibility: visible;
-              color: white;
-            }
-          }
-
-          .edit-icon {
-            color: #ffffff60;
-          }
-        }
-
-        .light {
-          background-color: white;
-
-          &.active {
-            transform: scale(1.1);
-
-            .icon {
-              visibility: visible;
-              color: black;
-            }
-          }
-
-          .edit-icon {
-            color: #00000060;
-          }
-        }
+      i {
+        margin-right: 0.5rem;
       }
     }
 
@@ -143,7 +84,6 @@
       .settings {
         flex: 1;
         margin: 0 1rem;
-        margin-bottom: 2rem;
 
         .expansion {
           box-shadow: none;
@@ -207,12 +147,11 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow:
-              if(
-                $is-dark-theme,
-                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-              );
+            box-shadow: if(
+              $is-dark-theme,
+              (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+              (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+            );
 
             .desc {
               color: if($is-dark-theme, white, black);
@@ -262,8 +201,7 @@
                   visibility: hidden;
                 }
 
-                .prev,
-                .curr {
+                .prev {
                   top: 0;
                   left: 0;
                   width: 80px;
@@ -373,29 +311,34 @@
         }
       }
 
+      .vertical-divider {
+        width: 1px;
+        background-color: map-get($foreground, divider);
+        margin: 0 1rem;
+      }
+
       .preview-wrapper {
         margin: 0 1rem;
         flex: 1;
+        position: relative;
+        background-color: #00000010;
+        border: 1px solid $border-color;
+        box-sizing: border-box;
 
         .col {
           display: flex;
           flex-direction: column;
+          justify-content: center;
           align-items: center;
           padding-bottom: 2rem;
-          position: relative;
+          position: sticky;
+          top: 0;
           min-height: 600px;
+          width: fit-content;
+          margin: auto;
 
-          .preview-changer {
-            position: absolute;
-            top: 0.5rem;
-            left: 0.5rem;
-            border-radius: 8px !important;
-            z-index: 1;
-
-            .strong {
-              font-weight: bold;
-              font-size: 18px;
-            }
+          .preview {
+            margin: 1rem;
           }
         }
       }

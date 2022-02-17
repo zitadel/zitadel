@@ -9,11 +9,9 @@
   $p-border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
   .preview {
-    position: absolute;
-    left: 0;
-    width: 100%;
     pointer-events: none;
-    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+    transform: scale(0.9);
 
     * {
       pointer-events: none;
@@ -22,13 +20,11 @@
     .label {
       font-size: 12px;
       position: absolute;
-      right: 1rem;
-      top: 1rem;
+      left: 0;
+      top: 0;
     }
 
     .dashed {
-      border: 2px dashed rgba(#697386, 0.5);
-      border-radius: 0.5rem;
       padding: 100px 20px;
 
       .login-wrapper {

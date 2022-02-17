@@ -25,18 +25,16 @@
     <div class="privatelabeling-top-row">
       <div>
         <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
-        <div class="theme-changer">
-          <button (click)="theme = Theme.LIGHT" matTooltip="{{'POLICY.PRIVATELABELING.LIGHT' | translate}}"
-            class="light" [ngClass]="{'active': theme === Theme.LIGHT}">
+        <mat-button-toggle-group [(ngModel)]="theme" name="theme" aria-label="Theme">
+          <mat-button-toggle class="theme-toggle" [value]="Theme.LIGHT">
             <i class="icon las la-sun"></i>
-            <i class="edit-icon las la-pen"></i>
-          </button>
-          <button (click)="theme = Theme.DARK" matTooltip="{{'POLICY.PRIVATELABELING.DARK' | translate}}" class="dark"
-            [ngClass]="{'active': theme === Theme.DARK}">
+            <span>{{'POLICY.PRIVATELABELING.LIGHT' | translate}}</span>
+          </mat-button-toggle>
+          <mat-button-toggle class="theme-toggle" [value]=" Theme.DARK">
             <i class="icon las la-moon"></i>
-            <i class="edit-icon las la-pen"></i>
-          </button>
-        </div>
+            <span> {{'POLICY.PRIVATELABELING.DARK' | translate}}</span>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
 
       <span class="fill-space"></span>
@@ -247,8 +245,7 @@
           <div class="fonts">
             <cnsl-info-section class="info-section">{{'POLICY.PRIVATELABELING.FONTINLOGINONLY' | translate}}
             </cnsl-info-section>
-            <div class="font-preview mat-elevation-z3"
-              *ngIf="preview === Preview.PREVIEW && previewData.fontUrl || preview === Preview.CURRENT && data.fontUrl">
+            <div class="font-preview mat-elevation-z3" *ngIf="previewData.fontUrl">
               <mat-icon class="icon">text_fields</mat-icon>
               <span>ABC • abc • 123</span>
 
@@ -315,21 +312,13 @@
         </mat-expansion-panel>
       </mat-accordion>
 
-      <div class="preview-wrapper">
-        <!-- <cnsl-preview class="prev" label="CURRENT CONFIG" [policy]="data"></cnsl-preview> -->
-        <div class="col">
-          <button color="primary" mat-raised-button class="preview-changer"
-            (click)="preview = preview === Preview.PREVIEW ? Preview.CURRENT : Preview.PREVIEW"
-            matTooltip="{{'POLICY.PRIVATELABELING.CHANGEVIEW' | translate}}"
-            [ngClass]="{'active': preview === Preview.PREVIEW}">
-            <span><span [ngClass]="{'strong': preview === Preview.PREVIEW}">P</span> / <span
-                [ngClass]="{'strong': preview === Preview.CURRENT}">C</span></span>
-          </button>
+      <div class="vertical-divider"></div>
 
-          <cnsl-preview *ngIf="preview === Preview.CURRENT" [refresh]="refreshPreview" [preview]="preview"
-            [theme]="theme" class="prev" label="CURRENT" [policy]="data"></cnsl-preview>
-          <cnsl-preview *ngIf="preview === Preview.PREVIEW" [refresh]="refreshPreview" [preview]="preview"
-            [theme]="theme" class="prev" label="PREVIEW" [policy]="previewData"></cnsl-preview>
+      <div class="preview-wrapper">
+        <div class="col">
+          <cnsl-preview [refresh]="refreshPreview" [theme]="theme" class="preview" label="PREVIEW"
+            [policy]="previewData">
+          </cnsl-preview>
         </div>
       </div>
     </div>
