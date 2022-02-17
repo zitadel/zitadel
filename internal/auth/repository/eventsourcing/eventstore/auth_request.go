@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -32,6 +33,7 @@ type AuthRequestRepo struct {
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 	Eventstore   v1.Eventstore
+	UserCodeAlg  crypto.EncryptionAlgorithm
 
 	LabelPolicyProvider       labelPolicyProvider
 	UserSessionViewProvider   userSessionViewProvider
@@ -54,8 +56,6 @@ type AuthRequestRepo struct {
 	MFAInitSkippedLifeTime     time.Duration
 	SecondFactorCheckLifeTime  time.Duration
 	MultiFactorCheckLifeTime   time.Duration
-
-	IAMID string
 }
 
 type labelPolicyProvider interface {
@@ -381,13 +381,21 @@ func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID
 func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType)
+	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, repo.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType, passwordlessInitCode)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData)
+	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData, passwordlessInitCode)
 	return err
 }
 
@@ -447,7 +455,15 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles)
+	initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}
@@ -519,7 +535,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, domain.IAMID, orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -534,7 +550,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = repo.IAMID
+		orgID = domain.IAMID
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)

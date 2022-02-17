@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string) (_ *domain.APIApp, err error) {
+func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.APIApp, err error) {
 	if application == nil || application.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-5m9E", "Errors.Application.Invalid")
 	}
@@ -23,7 +23,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 	}
 	addedApplication := NewAPIApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	events, stringPw, err := c.addAPIApplication(ctx, projectAgg, project, application, resourceOwner)
+	events, stringPw, err := c.addAPIApplication(ctx, projectAgg, project, application, resourceOwner, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *Commands) AddAPIApplication(ctx context.Context, application *domain.AP
 	return result, nil
 }
 
-func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string) (events []eventstore.Command, stringPW string, err error) {
+func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, apiAppApp *domain.APIApp, resourceOwner string, appSecretGenerator crypto.Generator) (events []eventstore.Command, stringPW string, err error) {
 	if !apiAppApp.IsValid() {
 		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-Bff2g", "Errors.Application.Invalid")
 	}
@@ -59,7 +59,7 @@ func (c *Commands) addAPIApplication(ctx context.Context, projectAgg *eventstore
 	if err != nil {
 		return nil, "", err
 	}
-	stringPw, err = domain.SetNewClientSecretIfNeeded(apiAppApp, c.applicationSecretGenerator)
+	stringPw, err = domain.SetNewClientSecretIfNeeded(apiAppApp, appSecretGenerator)
 	if err != nil {
 		return nil, "", err
 	}
@@ -113,7 +113,7 @@ func (c *Commands) ChangeAPIApplication(ctx context.Context, apiApp *domain.APIA
 	return apiWriteModelToAPIConfig(existingAPI), nil
 }
 
-func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.APIApp, error) {
+func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string, appSecretGenerator crypto.Generator) (*domain.APIApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
@@ -128,7 +128,7 @@ func (c *Commands) ChangeAPIApplicationSecret(ctx context.Context, projectID, ap
 	if !existingAPI.IsAPI() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-aeH4", "Errors.Project.App.IsNotAPI")
 	}
-	cryptoSecret, stringPW, err := domain.NewClientSecret(c.applicationSecretGenerator)
+	cryptoSecret, stringPW, err := domain.NewClientSecret(appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}

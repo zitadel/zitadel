@@ -46,7 +46,7 @@ func (c *Commands) SetPassword(ctx context.Context, orgID, userID, passwordStrin
 	return writeModelToObjectDetails(&existingPassword.WriteModel), nil
 }
 
-func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string) (err error) {
+func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID, code, passwordString, userAgentID string, passwordVerificationCode crypto.Generator) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
@@ -65,7 +65,7 @@ func (c *Commands) SetPasswordWithVerifyCode(ctx context.Context, orgID, userID,
 		return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9fs", "Errors.User.Code.NotFound")
 	}
 
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.passwordVerificationCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, passwordVerificationCode)
 	if err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func (c *Commands) changePassword(ctx context.Context, userAgentID string, passw
 	return user.NewHumanPasswordChangedEvent(ctx, userAgg, password.SecretCrypto, password.ChangeRequired, userAgentID), nil
 }
 
-func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner string, notifyType domain.NotificationType, passwordVerificationCode crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-M00oL", "Errors.User.UserIDMissing")
 	}
@@ -164,7 +164,7 @@ func (c *Commands) RequestSetPassword(ctx context.Context, userID, resourceOwner
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M9sd", "Errors.User.NotInitialised")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingHuman.WriteModel)
-	passwordCode, err := domain.NewPasswordCode(c.passwordVerificationCode)
+	passwordCode, err := domain.NewPasswordCode(passwordVerificationCode)
 	if err != nil {
 		return nil, err
 	}

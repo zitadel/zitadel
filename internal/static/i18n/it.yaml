@@ -27,6 +27,8 @@ Errors:
       RemoveFailed: L'oggetto non può essere rimosso
   Limit:
     ExceedsDefault: Il limite supera quello predefinito
+  Language:
+    NotParsed: Impossibile analizzare la lingua
   User:
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente
@@ -66,8 +68,11 @@ Errors:
     Machine:
       Key:
         NotFound: Machine Key non trovato
+    PAT:
+      NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
     NotMachine: L'utente deve essere tecnico
+    WrongType: Non consentito per questo tipo di utente
     NotAllowedToLink: L'utente non è autorizzato a collegarsi con un provider di accesso esterno
     Username:
       AlreadyExists: Nome utente già preso

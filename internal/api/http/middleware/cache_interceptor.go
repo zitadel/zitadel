@@ -8,7 +8,6 @@ import (
 	"time"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/config/types"
 )
 
 type Cache struct {
@@ -38,8 +37,8 @@ const (
 )
 
 type CacheConfig struct {
-	MaxAge       types.Duration
-	SharedMaxAge types.Duration
+	MaxAge       time.Duration
+	SharedMaxAge time.Duration
 }
 
 var (

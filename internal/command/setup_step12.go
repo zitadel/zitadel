@@ -2,8 +2,8 @@ package command
 
 import (
 	"context"
+	"time"
 
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 )
@@ -11,7 +11,7 @@ import (
 type Step12 struct {
 	TierName                 string
 	TierDescription          string
-	AuditLogRetention        types.Duration
+	AuditLogRetention        time.Duration
 	LoginPolicyFactors       bool
 	LoginPolicyIDP           bool
 	LoginPolicyPasswordless  bool
@@ -37,7 +37,7 @@ func (c *Commands) SetupStep12(ctx context.Context, step *Step12) error {
 			TierName:                 step.TierName,
 			TierDescription:          step.TierDescription,
 			State:                    domain.FeaturesStateActive,
-			AuditLogRetention:        step.AuditLogRetention.Duration,
+			AuditLogRetention:        step.AuditLogRetention,
 			LoginPolicyFactors:       step.LoginPolicyFactors,
 			LoginPolicyIDP:           step.LoginPolicyIDP,
 			LoginPolicyPasswordless:  step.LoginPolicyPasswordless,

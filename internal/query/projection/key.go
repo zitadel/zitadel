@@ -6,7 +6,6 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -27,13 +26,13 @@ const (
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 )
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
 	p := &KeyProjection{}
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.keyChan = keyChan
-	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig.EncryptionConfig)
+	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}

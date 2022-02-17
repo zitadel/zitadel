@@ -27,6 +27,8 @@ Errors:
       RemoveFailed: Object could not be removed
   Limit:
     ExceedsDefault: Limit exceeds default limit
+  Language:
+    NotParsed: Could not parse languge
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists
@@ -66,8 +68,11 @@ Errors:
     Machine:
       Key:
         NotFound: Machine key not found
+    PAT:
+      NotFound: Personal Access Token not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
+    WrongType: Not allowed for this user type
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
       AlreadyExists:  Username already taken

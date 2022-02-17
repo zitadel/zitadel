@@ -50,6 +50,8 @@ import {
   AddOrgOIDCIDPResponse,
   AddOrgRequest,
   AddOrgResponse,
+  AddPersonalAccessTokenRequest,
+  AddPersonalAccessTokenResponse,
   AddProjectGrantMemberRequest,
   AddProjectGrantMemberResponse,
   AddProjectGrantRequest,
@@ -74,6 +76,8 @@ import {
   ClearFlowResponse,
   CreateActionRequest,
   CreateActionResponse,
+  DeactivateActionRequest,
+  DeactivateActionResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -212,6 +216,8 @@ import {
   ListOrgMemberRolesResponse,
   ListOrgMembersRequest,
   ListOrgMembersResponse,
+  ListPersonalAccessTokensRequest,
+  ListPersonalAccessTokensResponse,
   ListProjectChangesRequest,
   ListProjectChangesResponse,
   ListProjectGrantMemberRolesRequest,
@@ -238,6 +244,8 @@ import {
   ListUserMetadataResponse,
   ListUsersRequest,
   ListUsersResponse,
+  ReactivateActionRequest,
+  ReactivateActionResponse,
   ReactivateAppRequest,
   ReactivateAppResponse,
   ReactivateOrgIDPRequest,
@@ -290,6 +298,8 @@ import {
   RemoveOrgIDPResponse,
   RemoveOrgMemberRequest,
   RemoveOrgMemberResponse,
+  RemovePersonalAccessTokenRequest,
+  RemovePersonalAccessTokenResponse,
   RemoveProjectGrantMemberRequest,
   RemoveProjectGrantMemberResponse,
   RemoveProjectGrantRequest,
@@ -919,6 +929,18 @@ export class ManagementService {
     return this.grpcService.mgmt.deleteAction(req, null).then((resp) => resp.toObject());
   }
 
+  public deactivateAction(id: string): Promise<DeactivateActionResponse.AsObject> {
+    const req = new DeactivateActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.deactivateAction(req, null).then((resp) => resp.toObject());
+  }
+
+  public reactivateAction(id: string): Promise<ReactivateActionResponse.AsObject> {
+    const req = new ReactivateActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.reactivateAction(req, null).then((resp) => resp.toObject());
+  }
+
   public listActions(
     limit?: number,
     offset?: number,
@@ -966,6 +988,44 @@ export class ManagementService {
     req.setFlowType(type);
     req.setTriggerType(triggerType);
     return this.grpcService.mgmt.setTriggerActions(req, null).then((resp) => resp.toObject());
+  }
+
+  public addPersonalAccessToken(userId: string, date?: Timestamp): Promise<AddPersonalAccessTokenResponse.AsObject> {
+    const req = new AddPersonalAccessTokenRequest();
+    req.setUserId(userId);
+    if (date) {
+      req.setExpirationDate(date);
+    }
+    return this.grpcService.mgmt.addPersonalAccessToken(req, null).then((resp) => resp.toObject());
+  }
+
+  public removePersonalAccessToken(tokenId: string, userId: string): Promise<RemovePersonalAccessTokenResponse.AsObject> {
+    const req = new RemovePersonalAccessTokenRequest();
+    req.setTokenId(tokenId);
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removePersonalAccessToken(req, null).then((resp) => resp.toObject());
+  }
+
+  public listPersonalAccessTokens(
+    userId: string,
+    limit?: number,
+    offset?: number,
+    asc?: boolean,
+  ): Promise<ListPersonalAccessTokensResponse.AsObject> {
+    const req = new ListPersonalAccessTokensRequest();
+    const metadata = new ListQuery();
+    req.setUserId(userId);
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (asc) {
+      metadata.setAsc(asc);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.mgmt.listPersonalAccessTokens(req, null).then((resp) => resp.toObject());
   }
 
   public getIAM(): Promise<GetIAMResponse.AsObject> {

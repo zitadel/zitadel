@@ -82,7 +82,8 @@ func (t *Token) EventQuery() (*es_models.SearchQuery, error) {
 
 func (t *Token) Reduce(event *es_models.Event) (err error) {
 	switch event.Type {
-	case user_es_model.UserTokenAdded:
+	case user_es_model.UserTokenAdded,
+		es_models.EventType(user_repo.PersonalAccessTokenAddedType):
 		token := new(view_model.TokenView)
 		err := token.AppendEvent(event)
 		if err != nil {
@@ -112,7 +113,8 @@ func (t *Token) Reduce(event *es_models.Event) (err error) {
 		user_es_model.UserDeactivated,
 		user_es_model.UserRemoved:
 		return t.view.DeleteUserTokens(event.AggregateID, event)
-	case es_models.EventType(user_repo.UserTokenRemovedType):
+	case es_models.EventType(user_repo.UserTokenRemovedType),
+		es_models.EventType(user_repo.PersonalAccessTokenRemovedType):
 		id, err := tokenIDFromRemovedEvent(event)
 		if err != nil {
 			return err

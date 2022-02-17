@@ -32,6 +32,102 @@ Returns the default languages
     GET: /languages
 
 
+### SetDefaultLanguage
+
+> **rpc** SetDefaultLanguage([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
+[SetDefaultLanguageResponse](#setdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    PUT: /languages/default/{language}
+
+
+### GetDefaultLanguage
+
+> **rpc** GetDefaultLanguage([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
+[GetDefaultLanguageResponse](#getdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    GET: /languages/default
+
+
+### ListSecretGenerators
+
+> **rpc** ListSecretGenerators([ListSecretGeneratorsRequest](#listsecretgeneratorsrequest))
+[ListSecretGeneratorsResponse](#listsecretgeneratorsresponse)
+
+Set the default language
+
+
+
+    POST: /secretgenerators/_search
+
+
+### GetSecretGenerator
+
+> **rpc** GetSecretGenerator([GetSecretGeneratorRequest](#getsecretgeneratorrequest))
+[GetSecretGeneratorResponse](#getsecretgeneratorresponse)
+
+Get Secret Generator by type (e.g PasswordResetCode)
+
+
+
+    GET: /secretgenerators/{generator_type}
+
+
+### UpdateSecretGenerator
+
+> **rpc** UpdateSecretGenerator([UpdateSecretGeneratorRequest](#updatesecretgeneratorrequest))
+[UpdateSecretGeneratorResponse](#updatesecretgeneratorresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /secretgenerators/{generator_type}
+
+
+### GetSMTPConfig
+
+> **rpc** GetSMTPConfig([GetSMTPConfigRequest](#getsmtpconfigrequest))
+[GetSMTPConfigResponse](#getsmtpconfigresponse)
+
+Get system smtp configuration
+
+
+
+    GET: /smtp
+
+
+### UpdateSMTPConfig
+
+> **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
+[UpdateSMTPConfigResponse](#updatesmtpconfigresponse)
+
+Update system smtp configuration
+
+
+
+    PUT: /smtp
+
+
+### UpdateSMTPConfigPassword
+
+> **rpc** UpdateSMTPConfigPassword([UpdateSMTPConfigPasswordRequest](#updatesmtpconfigpasswordrequest))
+[UpdateSMTPConfigPasswordResponse](#updatesmtpconfigpasswordresponse)
+
+Update system smtp configuration password for host
+
+
+
+    PUT: /smtp/password
+
+
 ### ListSMSProviderConfigs
 
 > **rpc** ListSMSProviderConfigs([ListSMSProviderConfigsRequest](#listsmsproviderconfigsrequest))
@@ -789,6 +885,19 @@ The Following Variables can be used:
     PUT: /text/message/init/{language}
 
 
+### ResetCustomInitMessageTextToDefault
+
+> **rpc** ResetCustomInitMessageTextToDefault([ResetCustomInitMessageTextToDefaultRequest](#resetcustominitmessagetexttodefaultrequest))
+[ResetCustomInitMessageTextToDefaultResponse](#resetcustominitmessagetexttodefaultresponse)
+
+Removes the custom init message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/init/{language}
+
+
 ### GetDefaultPasswordResetMessageText
 
 > **rpc** GetDefaultPasswordResetMessageText([GetDefaultPasswordResetMessageTextRequest](#getdefaultpasswordresetmessagetextrequest))
@@ -826,6 +935,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/passwordreset/{language}
+
+
+### ResetCustomPasswordResetMessageTextToDefault
+
+> **rpc** ResetCustomPasswordResetMessageTextToDefault([ResetCustomPasswordResetMessageTextToDefaultRequest](#resetcustompasswordresetmessagetexttodefaultrequest))
+[ResetCustomPasswordResetMessageTextToDefaultResponse](#resetcustompasswordresetmessagetexttodefaultresponse)
+
+Removes the custom password reset message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyemail/{language}
 
 
 ### GetDefaultVerifyEmailMessageText
@@ -867,6 +989,19 @@ The Following Variables can be used:
     PUT: /text/message/verifyemail/{language}
 
 
+### ResetCustomVerifyEmailMessageTextToDefault
+
+> **rpc** ResetCustomVerifyEmailMessageTextToDefault([ResetCustomVerifyEmailMessageTextToDefaultRequest](#resetcustomverifyemailmessagetexttodefaultrequest))
+[ResetCustomVerifyEmailMessageTextToDefaultResponse](#resetcustomverifyemailmessagetexttodefaultresponse)
+
+Removes the custom verify email message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyemail/{language}
+
+
 ### GetDefaultVerifyPhoneMessageText
 
 > **rpc** GetDefaultVerifyPhoneMessageText([GetDefaultVerifyPhoneMessageTextRequest](#getdefaultverifyphonemessagetextrequest))
@@ -904,6 +1039,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/verifyphone/{language}
+
+
+### ResetCustomVerifyPhoneMessageTextToDefault
+
+> **rpc** ResetCustomVerifyPhoneMessageTextToDefault([ResetCustomVerifyPhoneMessageTextToDefaultRequest](#resetcustomverifyphonemessagetexttodefaultrequest))
+[ResetCustomVerifyPhoneMessageTextToDefaultResponse](#resetcustomverifyphonemessagetexttodefaultresponse)
+
+Removes the custom verify phone text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/verifyphone/{language}
 
 
 ### GetDefaultDomainClaimedMessageText
@@ -945,6 +1093,19 @@ The Following Variables can be used:
     PUT: /text/message/domainclaimed/{language}
 
 
+### ResetCustomDomainClaimedMessageTextToDefault
+
+> **rpc** ResetCustomDomainClaimedMessageTextToDefault([ResetCustomDomainClaimedMessageTextToDefaultRequest](#resetcustomdomainclaimedmessagetexttodefaultrequest))
+[ResetCustomDomainClaimedMessageTextToDefaultResponse](#resetcustomdomainclaimedmessagetexttodefaultresponse)
+
+Removes the custom domain claimed message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/domainclaimed/{language}
+
+
 ### GetDefaultPasswordlessRegistrationMessageText
 
 > **rpc** GetDefaultPasswordlessRegistrationMessageText([GetDefaultPasswordlessRegistrationMessageTextRequest](#getdefaultpasswordlessregistrationmessagetextrequest))
@@ -982,6 +1143,19 @@ The Following Variables can be used:
 
 
     PUT: /text/message/passwordless_registration/{language}
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefault
+
+> **rpc** ResetCustomPasswordlessRegistrationMessageTextToDefault([ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest](#resetcustompasswordlessregistrationmessagetexttodefaultrequest))
+[ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse](#resetcustompasswordlessregistrationmessagetexttodefaultresponse)
+
+Removes the custom passwordless link message text of the system
+The default text from the translation file will trigger after
+
+
+
+    DELETE: /text/message/passwordless_registration/{language}
 
 
 ### GetDefaultLoginTexts
@@ -1672,6 +1846,23 @@ This is an empty response
 
 
 
+### GetDefaultLanguageRequest
+This is an empty request
+
+
+
+
+### GetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - |  |
+
+
+
+
 ### GetDefaultLoginTextsRequest
 
 
@@ -1984,6 +2175,45 @@ This is an empty request
 
 
 
+### GetSMTPConfigRequest
+This is an empty request
+
+
+
+
+### GetSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| smtp_config |  zitadel.settings.v1.SMTPConfig | - |  |
+
+
+
+
+### GetSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+
+
+
+
+### GetSecretGeneratorResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
+
+
+
+
 ### GetSMSProviderConfigRequest
 
 
@@ -2236,6 +2466,30 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSecretGeneratorsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.settings.v1.SecretGeneratorQuery | criterias the client is looking for |  |
+
+
+
+
+### ListSecretGeneratorsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SecretGenerator | - |  |
 
 
 
@@ -2516,6 +2770,50 @@ This is an empty request
 
 
 
+### ResetCustomDomainClaimedMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomDomainClaimedMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomInitMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomInitMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomLoginTextsToDefaultRequest
 
 
@@ -2550,6 +2848,94 @@ This is an empty request
 
 
 ### ResetCustomOrgIAMPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomPasswordResetMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordResetMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomVerifyEmailMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomVerifyEmailMessageTextToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### ResetCustomVerifyPhoneMessageTextToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomVerifyPhoneMessageTextToDefaultResponse
 
 
 
@@ -2730,6 +3116,28 @@ This is an empty request
 
 
 ### SetDefaultInitMessageTextResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### SetDefaultLanguageRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+
+
+
+
+### SetDefaultLanguageResponse
 
 
 
@@ -3284,6 +3692,82 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| length |  uint32 | - |  |
+| expiry |  google.protobuf.Duration | - |  |
+| include_lower_letters |  bool | - |  |
+| include_upper_letters |  bool | - |  |
+| include_digits |  bool | - |  |
+| include_symbols |  bool | - |  |
+
+
+
+
+### UpdateSecretGeneratorResponse
 
 
 

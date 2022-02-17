@@ -1,0 +1,18 @@
+@import 'a';
+
+@mixin lgn-a-theme() {
+
+    @include lgn-a-color();
+
+}
+
+@mixin lgn-a-color() {
+    a {
+      color: var(--zitadel-color-primary);
+
+      &:hover,
+      &:active {
+          color: var(--zitadel-color-primary-400);
+      }
+    }
+}

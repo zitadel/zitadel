@@ -8,7 +8,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
-	
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -186,7 +186,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 					IDPResourceOwnerCol.identifier(): resourceOwner,
 				},
 				sq.Eq{
-					IDPResourceOwnerCol.identifier(): q.iamID,
+					IDPResourceOwnerCol.identifier(): domain.IAMID,
 				},
 			},
 		},

@@ -227,6 +227,30 @@ func AddMachineKeyRequestToDomain(req *mgmt_pb.AddMachineKeyRequest) *domain.Mac
 	}
 }
 
+func ListPersonalAccessTokensRequestToQuery(ctx context.Context, req *mgmt_pb.ListPersonalAccessTokensRequest) (*query.PersonalAccessTokenSearchQueries, error) {
+	resourceOwner, err := query.NewPersonalAccessTokenResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	userID, err := query.NewPersonalAccessTokenUserIDSearchQuery(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	return &query.PersonalAccessTokenSearchQueries{
+		SearchRequest: query.SearchRequest{
+			Offset: offset,
+			Limit:  limit,
+			Asc:    asc,
+		},
+		Queries: []query.SearchQuery{
+			resourceOwner,
+			userID,
+		},
+	}, nil
+
+}
+
 func RemoveHumanLinkedIDPRequestToDomain(ctx context.Context, req *mgmt_pb.RemoveHumanLinkedIDPRequest) *domain.UserIDPLink {
 	return &domain.UserIDPLink{
 		ObjectRoot: models.ObjectRoot{

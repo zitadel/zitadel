@@ -378,6 +378,8 @@
       "DESCRIPTION": "Beschreibung",
       "KEYSTITLE": "Schlüssel",
       "KEYSDESC": "Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Diese Access Tokens funktionieren wie gewöhnliche OAuth Access Tokens.",
       "ID": "Schlüssel-ID",
       "TYPE": "Typ",
       "EXPIRATIONDATE": "Ablaufdatum",
@@ -533,6 +535,25 @@
         "PROJECT": "Projekt",
         "GRANTEDPROJECT": "Berechtigtes Projekt"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Personal Access Token generieren",
+        "DESCRIPTION": "Definieren Sie das Ablaufdatum für das zu erstellende Token",
+        "CHOOSEEXPIRY": "Ablaufdatum",
+        "CHOOSEDATEAFTER": "Geben Sie ein valides Ablaufdatum an. Ab"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Kopieren Sie Ihr Access Token. Sie werden später nicht mehr darauf zugreifen können."
+      },
+      "DELETE": {
+        "TITLE": "Token löschen",
+        "DESCRIPTION": "Sie sind im Begriff das Token unwiederruflich zu löschen. Wollen Sie dies wirklich tun?"
+      },
+      "DELETED": "Personal Access Token gelöscht."
     }
   },
   "FLOWS": {
@@ -564,6 +585,7 @@
     "FLOWTYPE": "Flow Typ",
     "TRIGGERTYPE": "Trigger Typ",
     "ACTIONS": "Aktionen",
+    "ACTIONSMAX": "Basierend auf Ihrem Tier steht Ihnen eine begrenzte Anzahl von Aktionen ({{value}}) zur Verfügung. Stellen Sie sicher, dass Sie diejenigen deaktivieren, die Sie nicht benötigen, oder erwägen Sie ein Upgrade.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Aktion erstellen"
@@ -581,7 +603,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Aktionen gesetzt"
+      "ACTIONSSET": "Aktionen gesetzt",
+      "ACTIONREACTIVATED": "Aktionen erfolgreich reaktiviert",
+      "ACTIONDEACTIVATED": "Aktionen erfolgreich deaktiviert"
     }
   },
   "IAM": {
@@ -756,7 +780,16 @@
       "CUSTOMTEXTMESSAGE": "Benutzerdefinierte Benachrichtigungstexte",
       "PRIVACYPOLICY": "Benutzerdefinierte Datenschutzrichtlinie und AGB",
       "METADATAUSER": "User Metadata",
-      "FLOWS": "Aktionen und Abläufe"
+      "FLOWS": "Aktionen und Abläufe",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Nicht erlaubt",
+          "1": "Limitierte Aktionen",
+          "2": "Unlimitiert"
+        },
+        "TYPE": "Verwendungsart",
+        "COUNT": "Anzahl"
+      }
     },
     "TIERSTATES": {
       "0": "Aktiv",

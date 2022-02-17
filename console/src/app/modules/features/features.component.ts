@@ -8,7 +8,7 @@ import {
   SetDefaultFeaturesRequest,
   SetOrgFeaturesRequest,
 } from 'src/app/proto/generated/zitadel/admin_pb';
-import { Features } from 'src/app/proto/generated/zitadel/features_pb';
+import { ActionsAllowed, Features } from 'src/app/proto/generated/zitadel/features_pb';
 import { GetFeaturesResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { AdminService } from 'src/app/services/admin.service';
@@ -46,6 +46,13 @@ export class FeaturesComponent implements OnDestroy {
   public stripeURL: string = '';
   public stripeCustomer!: StripeCustomer;
 
+  public actionsSelection: any = [
+    ActionsAllowed.ACTIONS_ALLOWED_NOT_ALLOWED,
+    ActionsAllowed.ACTIONS_ALLOWED_MAX,
+    ActionsAllowed.ACTIONS_ALLOWED_UNLIMITED,
+  ];
+  public ActionsAllowed: any = ActionsAllowed;
+
   constructor(
     private route: ActivatedRoute,
     private toast: ToastService,
@@ -60,27 +67,32 @@ export class FeaturesComponent implements OnDestroy {
     if (temporg) {
       this.org = temporg;
     }
-    this.sub = this.route.data.pipe(switchMap(data => {
-      this.serviceType = data.serviceType;
-      if (this.serviceType === FeatureServiceType.MGMT) {
-        this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
-      }
-      return this.route.params;
-    })).subscribe(_ => {
-      this.fetchData();
-    });
+    this.sub = this.route.data
+      .pipe(
+        switchMap((data) => {
+          this.serviceType = data.serviceType;
+          if (this.serviceType === FeatureServiceType.MGMT) {
+            this.managementService = this.injector.get(ManagementService as Type<ManagementService>);
+          }
+          return this.route.params;
+        }),
+      )
+      .subscribe((_) => {
+        this.fetchData();
+      });
 
     if (this.serviceType === FeatureServiceType.MGMT) {
       this.customerLoading = true;
-      this.subService.getCustomer(this.org.id)
-        .then(payload => {
+      this.subService
+        .getCustomer(this.org.id)
+        .then((payload) => {
           this.customerLoading = false;
           this.stripeCustomer = payload;
           if (this.customerValid) {
             this.getLinkToStripe();
           }
         })
-        .catch(error => {
+        .catch((error) => {
           this.customerLoading = false;
           console.error(error);
         });
@@ -99,13 +111,16 @@ export class FeaturesComponent implements OnDestroy {
       width: '400px',
     });
 
-    dialogRefPhone.afterClosed().subscribe(customer => {
+    dialogRefPhone.afterClosed().subscribe((customer) => {
       if (customer) {
         console.log(customer);
         this.stripeCustomer = customer;
-        this.subService.setCustomer(this.org.id, customer).then(() => {
-          this.getLinkToStripe();
-        }).catch(console.error);
+        this.subService
+          .setCustomer(this.org.id, customer)
+          .then(() => {
+            this.getLinkToStripe();
+          })
+          .catch(console.error);
       }
     });
   }
@@ -113,12 +128,13 @@ export class FeaturesComponent implements OnDestroy {
   public getLinkToStripe(): void {
     if (this.serviceType === FeatureServiceType.MGMT) {
       this.stripeLoading = true;
-      this.subService.getLink(this.org.id, window.location.href)
-        .then(payload => {
+      this.subService
+        .getLink(this.org.id, window.location.href)
+        .then((payload) => {
           this.stripeLoading = false;
           this.stripeURL = payload.redirect_url;
         })
-        .catch(error => {
+        .catch((error) => {
           this.stripeLoading = false;
           console.error(error);
         });
@@ -126,7 +142,7 @@ export class FeaturesComponent implements OnDestroy {
   }
 
   public fetchData(): void {
-    this.getData().then(resp => {
+    this.getData().then((resp) => {
       if (resp?.features) {
         this.features = resp.features;
       }
@@ -167,13 +183,18 @@ export class FeaturesComponent implements OnDestroy {
         req.setPrivacyPolicy(this.features.privacyPolicy);
         req.setMetadataUser(this.features.metadataUser);
         req.setLockoutPolicy(this.features.lockoutPolicy);
-        req.setActions(this.features.actions);
+        // req.setActions(this.features.actions);
+        req.setActionsAllowed(this.features.actionsAllowed);
+        req.setMaxActions(this.features.maxActions);
 
-        this.adminService.setOrgFeatures(req).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.adminService
+          .setOrgFeatures(req)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
       case FeatureServiceType.ADMIN:
         // update Default org iam policy?
@@ -192,27 +213,35 @@ export class FeaturesComponent implements OnDestroy {
         dreq.setCustomTextMessage(this.features.customTextMessage);
         dreq.setMetadataUser(this.features.metadataUser);
         dreq.setLockoutPolicy(this.features.lockoutPolicy);
-        dreq.setActions(this.features.actions);
+        // dreq.setActions(this.features.actions);
+        dreq.setActionsAllowed(this.features.actionsAllowed);
+        dreq.setMaxActions(this.features.maxActions);
 
-        this.adminService.setDefaultFeatures(dreq).then(() => {
-          this.toast.showInfo('POLICY.TOAST.SET', true);
-        }).catch(error => {
-          this.toast.showError(error);
-        });
+        this.adminService
+          .setDefaultFeatures(dreq)
+          .then(() => {
+            this.toast.showInfo('POLICY.TOAST.SET', true);
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
         break;
     }
   }
 
   public resetFeatures(): void {
     if (this.serviceType === FeatureServiceType.MGMT) {
-      this.adminService.resetOrgFeatures(this.org.id).then(() => {
-        this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
-        setTimeout(() => {
-          this.fetchData();
-        }, 1000);
-      }).catch(error => {
-        this.toast.showError(error);
-      });
+      this.adminService
+        .resetOrgFeatures(this.org.id)
+        .then(() => {
+          this.toast.showInfo('POLICY.TOAST.RESETSUCCESS', true);
+          setTimeout(() => {
+            this.fetchData();
+          }, 1000);
+        })
+        .catch((error) => {
+          this.toast.showError(error);
+        });
     }
   }
 
@@ -225,13 +254,15 @@ export class FeaturesComponent implements OnDestroy {
   }
 
   get customerValid(): boolean {
-    return !!this.stripeCustomer?.contact &&
+    return (
+      !!this.stripeCustomer?.contact &&
       !!this.stripeCustomer?.address &&
       !!this.stripeCustomer?.city &&
-      !!this.stripeCustomer?.postal_code;
+      !!this.stripeCustomer?.postal_code
+    );
   }
 
   get customerCountry(): Country | undefined {
-    return COUNTRIES.find(country => country.isoCode === this.stripeCustomer.country);
+    return COUNTRIES.find((country) => country.isoCode === this.stripeCustomer.country);
   }
 }

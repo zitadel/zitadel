@@ -1,6 +1,7 @@
 package management
 
 import (
+	"github.com/caos/zitadel/internal/crypto"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -19,18 +20,22 @@ var _ management.ManagementServiceServer = (*Server)(nil)
 
 type Server struct {
 	management.UnimplementedManagementServiceServer
-	command        *command.Commands
-	query          *query.Queries
-	systemDefaults systemdefaults.SystemDefaults
-	assetAPIPrefix string
+	command         *command.Commands
+	query           *query.Queries
+	systemDefaults  systemdefaults.SystemDefaults
+	assetAPIPrefix  string
+	PasswordHashAlg crypto.HashAlgorithm
+	UserCodeAlg     crypto.EncryptionAlgorithm
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, sd systemdefaults.SystemDefaults, assetAPIPrefix string) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, sd systemdefaults.SystemDefaults, assetAPIPrefix string, userCrypto *crypto.AESCrypto) *Server {
 	return &Server{
-		command:        command,
-		query:          query,
-		systemDefaults: sd,
-		assetAPIPrefix: assetAPIPrefix,
+		command:         command,
+		query:           query,
+		systemDefaults:  sd,
+		assetAPIPrefix:  assetAPIPrefix,
+		PasswordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
+		UserCodeAlg:     userCrypto,
 	}
 }
 

@@ -47,7 +47,7 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*La
 					LabelPolicyColID.identifier(): orgID,
 				},
 				sq.Eq{
-					LabelPolicyColID.identifier(): q.iamID,
+					LabelPolicyColID.identifier(): domain.IAMID,
 				},
 			},
 			sq.Eq{
@@ -73,7 +73,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 					LabelPolicyColID.identifier(): orgID,
 				},
 				sq.Eq{
-					LabelPolicyColID.identifier(): q.iamID,
+					LabelPolicyColID.identifier(): domain.IAMID,
 				},
 			},
 			sq.Eq{
@@ -93,7 +93,7 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LabelPolicyColID.identifier():    q.iamID,
+		LabelPolicyColID.identifier():    domain.IAMID,
 		LabelPolicyColState.identifier(): domain.LabelPolicyStateActive,
 	}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
@@ -109,7 +109,7 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, e
 func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LabelPolicyColID.identifier():    q.iamID,
+		LabelPolicyColID.identifier():    domain.IAMID,
 		LabelPolicyColState.identifier(): domain.LabelPolicyStatePreview,
 	}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).

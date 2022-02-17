@@ -1,0 +1,26 @@
+@import 'footer';
+
+@mixin lgn-footer-theme() {
+    // @include lgn-private-check-duplicate-theme-styles($theme, 'mat-button') {
+
+    @include lgn-footer-color();
+    // }
+}
+
+@mixin lgn-footer-color() {
+  
+    footer {
+      background-color: var(--zitadel-color-background);
+      border-top: 1px solid var(--zitadel-color-footer-line);
+
+      a {
+        color: var(--zitadel-color-primary);
+      }
+
+      .lgn-logo-watermark {
+          background: var(--zitadel-logo-powered-by) no-repeat;
+          background-position: center;
+          background-size: contain;
+      }
+    }
+}
