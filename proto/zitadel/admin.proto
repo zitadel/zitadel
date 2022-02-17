@@ -2512,7 +2512,7 @@ message GetSMSProviderResponse {
 message AddSMSProviderTwilioRequest {
     string sid = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string from = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message AddSMSProviderTwilioResponse {
@@ -2523,7 +2523,7 @@ message AddSMSProviderTwilioResponse {
 message UpdateSMSProviderTwilioRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string sid = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string from = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message UpdateSMSProviderTwilioResponse {

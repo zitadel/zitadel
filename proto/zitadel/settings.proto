@@ -64,7 +64,7 @@ message SMSProvider {
 
 message TwilioConfig {
   string sid = 1;
-  string from = 2;
+  string sender_number = 2;
 }
 
 

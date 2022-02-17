@@ -30,8 +30,8 @@ func SMSConfigToPb(app *query.SMSConfig) settings_pb.SMSConfig {
 func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
 	return &settings_pb.SMSProvider_Twilio{
 		Twilio: &settings_pb.TwilioConfig{
-			Sid:  twilio.SID,
-			From: twilio.SenderNumber,
+			Sid:          twilio.SID,
+			SenderNumber: twilio.SenderNumber,
 		},
 	}
 }
@@ -50,7 +50,7 @@ func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigStat
 func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderTwilioRequest) *twilio.TwilioConfig {
 	return &twilio.TwilioConfig{
 		SID:          req.Sid,
-		SenderNumber: req.From,
+		SenderNumber: req.SenderNumber,
 		Token:        req.Token,
 	}
 }
@@ -58,6 +58,6 @@ func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderTwilioRequest) *twil
 func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderTwilioRequest) *twilio.TwilioConfig {
 	return &twilio.TwilioConfig{
 		SID:          req.Sid,
-		SenderNumber: req.From,
+		SenderNumber: req.SenderNumber,
 	}
 }
