@@ -21,9 +21,9 @@ This Agreement has the following appendices. When you enter the Agreement with u
 
 The following policies complement the TOS. When accepting the TOS, you accept these policies.
 
-- [**Privacy Policy**](./privacy-policy) - How we process personal data on our websites and products
-- [**Acceptable Use Policy**](./acceptable-use-policy) - What we understand as acceptable and fair use of our Services
-- [**Rate Limit Policy**](./rate-limit-policy) - How we avoid overloads of our services
+- [**Privacy Policy**](../privacy-policy) - How we process personal data on our websites and products
+- [**Acceptable Use Policy**](../acceptable-use-policy) - What we understand as acceptable and fair use of our Services
+- [**Rate Limit Policy**](../rate-limit-policy) - How we avoid overloads of our services
 
 This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
 
