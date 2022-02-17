@@ -15,9 +15,9 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
-- [**Data Processing Agreement**](./data-processing-agreement) - How we process personal data on behalf of you
-- [**Service Level Description**](./service-level-description) - What service levels do we guarantee you
-- [**Support Service Descriptions**](./support-services) - How we provide support services to you
+- [**Data Processing Agreement**](../data-processing-agreement) - How we process personal data on behalf of you
+- [**Service Level Description**](../service-level-description) - What service levels do we guarantee you
+- [**Support Service Descriptions**](../support-services) - How we provide support services to you
 
 The following policies complement the TOS. When accepting the TOS, you accept these policies.
 
