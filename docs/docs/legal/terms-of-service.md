@@ -1,7 +1,8 @@
 ---
 title: Terms of Service Agreement
 custom_edit_url: null
---- 
+---
+
 ## General
 
 ### Introduction
@@ -14,20 +15,20 @@ The terms of service (**"TOS"**) outlined in this document establish the most im
 
 This Agreement has the following appendices. When you enter the Agreement with us, you accept these agreements.
 
-* [**Data Processing Agreement**](data-processing-agreement) - How we process personal data on behalf of you
-* [**Service Level Description**](service-level-description) - What service levels do we guarantee you
-* [**Support Service Descriptions**](support-services) - How we provide support services to you
+- [**Data Processing Agreement**](./data-processing-agreement) - How we process personal data on behalf of you
+- [**Service Level Description**](./service-level-description) - What service levels do we guarantee you
+- [**Support Service Descriptions**](./support-services) - How we provide support services to you
 
 The following policies complement the TOS. When accepting the TOS, you accept these policies.
 
-* [**Privacy Policy**](privacy-policy) - How we process personal data on our websites and products
-* [**Acceptable Use Policy**](acceptable-use-policy) - What we understand as acceptable and fair use of our Services
-* [**Rate Limit Policy**](rate-limit-policy) - How we avoid overloads of our services
+- [**Privacy Policy**](./privacy-policy) - How we process personal data on our websites and products
+- [**Acceptable Use Policy**](./acceptable-use-policy) - What we understand as acceptable and fair use of our Services
+- [**Rate Limit Policy**](./rate-limit-policy) - How we avoid overloads of our services
 
 This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
 
-* [**Dedicated Instance Terms**](terms-of-service-dedicated) - How we provide our services for a dedicated instance
-* [**Annex to the Dedicated Instance Terms**](dedicated-instance-annex) - Describe differences of services and guarantees with different providers
+- [**Dedicated Instance Terms**](./terms-of-service-dedicated) - How we provide our services for a dedicated instance
+- [**Annex to the Dedicated Instance Terms**](./dedicated-instance-annex) - Describe differences of services and guarantees with different providers
 
 ### Alterations
 
@@ -149,11 +150,11 @@ Any remaining credit shall automatically expire upon termination of the Framewor
 
 We are entitled to suspend and terminate services used by you if
 
-* Your credit has been used up by services and/or any applicable credit limit has been reached;
-* You are in default in the payment of open invoices and/or prompt payment seems unlikely (i.e. in the event of insolvency proceedings);
-* Your services were used illegally or in breach of contract, or if there is reasonable suspicion of such use (i.e. in the event of complaints or abuse reports);
-* Other customers' services are being negatively affected in breach of the fair use provision, including in the event of your services being subject to attacks by third parties (i.e. DoS/DDoS attacks);
-* We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
+- Your credit has been used up by services and/or any applicable credit limit has been reached;
+- You are in default in the payment of open invoices and/or prompt payment seems unlikely (i.e. in the event of insolvency proceedings);
+- Your services were used illegally or in breach of contract, or if there is reasonable suspicion of such use (i.e. in the event of complaints or abuse reports);
+- Other customers' services are being negatively affected in breach of the fair use provision, including in the event of your services being subject to attacks by third parties (i.e. DoS/DDoS attacks);
+- We consider the suspension or termination of the services to be necessary for the protection of ourselves, our infrastructure or other customers.
 
 We reserve the right to immediately terminate the Framework Agreement in such cases.
 
