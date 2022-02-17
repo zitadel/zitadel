@@ -29,7 +29,7 @@ export class ActionTableComponent implements OnInit {
   public actionsResult!: ListActionsResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumns: string[] = ['select', 'id', 'name', 'state', 'timeout', 'allowedToFail'];
+  @Input() public displayedColumns: string[] = ['select', 'name', 'state', 'timeout', 'allowedToFail'];
 
   @Output() public changedSelection: EventEmitter<Array<Action.AsObject>> = new EventEmitter();
 

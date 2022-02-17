@@ -1,24 +1,19 @@
 .btn-container {
   display: flex;
-  margin: -.5rem;
+  margin: -0.5rem;
   align-items: center;
 
   button {
-    margin: 1rem .5rem;
+    margin: 1rem 0.5rem;
   }
 }
 
 .desc {
-  color: var(--grey);
-  font-size: .9rem;
-
-  &.warn {
-    color: rgb(201, 51, 72);
-  }
+  font-size: 0.9rem;
 }
 
 .entry {
-  margin: .5rem 0;
+  margin: 0.5rem 0;
 }
 
 .line {
@@ -28,9 +23,9 @@
 
 .action {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 
   .ok-button {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }

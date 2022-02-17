@@ -36,17 +36,22 @@
           </mat-select>
         </cnsl-form-field>
 
-        <div class="topelements">
-          <div class="flow-type mat-elevation-z1">
-            <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
-            <button (click)="clearFlow()" color="warn" mat-raised-button>{{'ACTIONS.CLEAR' | translate}}</button>
-          </div>
-        </div>
 
-        <div class="trigger-wrapper">
-          <div *ngFor="let trigger of flow.triggerActionsList; index as i" class="trigger mat-elevation-z1">
-            <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
-            <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
+        <div *ngIf="flow" class="trigger-wrapper">
+          <div class="topbottomline"></div>
+
+          <div class="flow-type">
+            <i class="type-icon las la-dot-circle"></i>
+            <span>{{'FLOWS.TYPES.'+flow.type | translate}}</span>
+            <button matTooltip="{{'ACTIONS.CLEAR' | translate}}" mat-icon-button color="warn" (click)="clearFlow()"><i
+                class="type-button-icon las la-trash"></i></button>
+          </div>
+
+          <cnsl-card *ngFor="let trigger of flow.triggerActionsList; index as i" class="trigger">
+            <div class="trigger-top">
+              <mat-icon svgIcon="mdi_arrow_right_bottom" class="icon"></mat-icon>
+              <span>{{'FLOWS.TRIGGERTYPES.'+trigger.triggerType | translate}}</span>
+            </div>
             <span class="fill-space"></span>
             <div class="flow-action-wrapper" cdkDropList (cdkDropListDropped)="drop(i, trigger.actionsList, $event)">
               <div cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".action-wrapper" class="flow-action"
@@ -59,16 +64,16 @@
                   {{'FLOWS.STATES.'+action.state | translate}}</span>
               </div>
             </div>
-          </div>
+          </cnsl-card>
 
-          <div class="topbottomline"></div>
 
-          <button class="add-btn" mat-raised-button color="primary" (click)="openAddTrigger()">
-            <span>{{'ACTIONS.NEW' | translate}}</span>
-            <span *ngIf="selection && selection.length">&nbsp;({{selection.length}})</span>
+          <button class="add-btn cnsl-action-button" mat-raised-button color="primary" (click)="openAddTrigger()">
             <mat-icon>add</mat-icon>
+            <span>{{'FLOWS.ADDTRIGGER' | translate}}</span>
+            <span *ngIf="selection && selection.length">&nbsp;({{selection.length}})</span>
           </button>
         </div>
+
       </div>
     </ng-template>
   </div>

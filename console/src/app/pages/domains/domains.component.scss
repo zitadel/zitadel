@@ -39,18 +39,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding-top: 0.5rem;
+    margin-bottom: -0.5rem;
 
     .title {
       font-size: 16px;
       margin-right: 1rem;
-
-      &:not(.disabled) {
-        &:hover {
-          text-decoration: underline;
-          cursor: pointer;
-        }
-      }
     }
 
     .primaryset {
@@ -74,11 +67,6 @@
 
     .fill-space {
       flex: 1;
-    }
-
-    .domain-rem-button:not(:hover) {
-      transition: color 0.2s ease;
-      color: var(--grey);
     }
   }
 }

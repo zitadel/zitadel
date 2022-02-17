@@ -13,9 +13,7 @@
         <p class="desc">{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}</p>
       </div>
       <span class="fill-space"></span>
-      <!-- <button class="icon-button" (click)="loadDomains()" card-actions mat-icon-button>
-        <mat-icon class="icon">refresh</mat-icon>
-      </button> -->
+
       <button [disabled]="(canwrite$ | async) === false || (['custom_domain'] | hasFeature | async) === false"
         matTooltip="Add domain" mat-raised-button color="primary" class="cnsl-action-button" (click)="addNewDomain()">
         <mat-icon>add</mat-icon>
@@ -32,13 +30,7 @@
 
     <cnsl-card *ngFor="let domain of domains" class="domain-card">
       <div class="domain">
-        <span *ngIf="(canwrite$ | async) && (['custom_domain'] | hasFeature | async); else noCustom"
-          (click)="verifyDomain(domain)" class="title">{{domain.domainName}}</span>
-
-        <ng-template #noCustom>
-          <span class="title disabled">{{domain.domainName}}</span>
-        </ng-template>
-        <span *ngIf="(canwrite$ | async) === false" class="title disabled">{{domain?.domainName}}</span>
+        <span class="title">{{domain.domainName}}</span>
 
         <i matTooltip="verified" *ngIf="domain.isVerified" class="verified las la-check-circle"></i>
         <i matTooltip="primary" *ngIf="domain.isPrimary" class="primary las la-star"></i>
@@ -46,8 +38,13 @@
           (click)="setPrimary(domain)">{{'ORG.DOMAINS.SETPRIMARY' | translate}}</a>
 
         <span class="fill-space"></span>
-        <button class="domain-rem-button" [disabled]="(canwrite$ | async) === false" matTooltip="Remove domain"
-          color="warn" mat-icon-button (click)="removeDomain(domain.domainName)"><i class="las la-trash"></i></button>
+        <button mat-icon-button [disabled]="(canwrite$ | async) === false || domain.isVerified"
+          *ngIf="(canwrite$ | async) && (['custom_domain'] | hasFeature | async)" (click)="verifyDomain(domain)">
+          <i class="las la-pen"></i>
+        </button>
+        <button class="domain-rem-button" [disabled]="(canwrite$ | async) === false || domain.isPrimary"
+          matTooltip="Remove domain" color="warn" mat-icon-button (click)="removeDomain(domain.domainName)"><i
+            class="las la-trash"></i></button>
       </div>
     </cnsl-card>
   </ng-container>

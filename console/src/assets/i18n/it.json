@@ -612,6 +612,7 @@
       "2": "Pre creazione",
       "3": "Post creazione"
     },
+    "ADDTRIGGER": "Aggiungi trigger",
     "TIMEOUT": "Timeout",
     "TIMEOUTINSEC": "Timeout in secondi",
     "ALLOWEDTOFAIL": "Può fallire",

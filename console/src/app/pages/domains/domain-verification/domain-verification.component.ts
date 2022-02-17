@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { saveAs } from 'file-saver';
+import { InfoSectionType } from 'src/app/modules/info-section/info-section.component';
 import { GenerateOrgDomainValidationResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { Domain, DomainValidationType } from 'src/app/proto/generated/zitadel/org_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -24,6 +25,8 @@ export class DomainVerificationComponent {
   public showNew: boolean = false;
 
   public validating: boolean = false;
+  public InfoSectionType: any = InfoSectionType;
+
   constructor(
     private toast: ToastService,
     public dialogRef: MatDialogRef<DomainVerificationComponent>,
@@ -37,17 +40,17 @@ export class DomainVerificationComponent {
   }
 
   async loadHttpToken(): Promise<void> {
-    this.mgmtService.generateOrgDomainValidation(
-      this.domain.domainName,
-      DomainValidationType.DOMAIN_VALIDATION_TYPE_HTTP).then((http) => {
+    this.mgmtService
+      .generateOrgDomainValidation(this.domain.domainName, DomainValidationType.DOMAIN_VALIDATION_TYPE_HTTP)
+      .then((http) => {
         this.http = http;
       });
   }
 
   async loadDnsToken(): Promise<void> {
-    this.mgmtService.generateOrgDomainValidation(
-      this.domain.domainName,
-      DomainValidationType.DOMAIN_VALIDATION_TYPE_DNS).then((dns) => {
+    this.mgmtService
+      .generateOrgDomainValidation(this.domain.domainName, DomainValidationType.DOMAIN_VALIDATION_TYPE_DNS)
+      .then((dns) => {
         this.dns = dns;
       });
   }
@@ -58,14 +61,17 @@ export class DomainVerificationComponent {
 
   public validate(): void {
     this.validating = true;
-    this.mgmtService.validateOrgDomain(this.domain.domainName).then(() => {
-      this.dialogRef.close(true);
-      this.toast.showInfo('ORG.PAGES.ORGDOMAIN.VERIFICATION_SUCCESSFUL', true);
-      this.validating = false;
-    }).catch((error) => {
-      this.toast.showError(error);
-      this.validating = false;
-    });
+    this.mgmtService
+      .validateOrgDomain(this.domain.domainName)
+      .then(() => {
+        this.dialogRef.close(true);
+        this.toast.showInfo('ORG.PAGES.ORGDOMAIN.VERIFICATION_SUCCESSFUL', true);
+        this.validating = false;
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.validating = false;
+      });
   }
 
   public saveFile(): void {

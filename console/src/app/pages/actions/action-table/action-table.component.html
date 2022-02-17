@@ -1,7 +1,7 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource?.data?.length ?? 0"
   [timestamp]="actionsResult?.details?.viewTimestamp" [selection]="selection">
   <div actions *ngIf="selection.isEmpty()">
-    <a color="primary" mat-raised-button (click)="openAddAction()">
+    <a class="cnsl-action-button" color="primary" mat-raised-button (click)="openAddAction()">
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
   </div>
@@ -18,13 +18,13 @@
   <div class="table-wrapper">
     <table class="table" mat-table [dataSource]="dataSource">
       <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef class="action-select-cell">
           <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
             [checked]="selection.hasValue() && isAllSelected()"
             [indeterminate]="selection.hasValue() && !isAllSelected()">
           </mat-checkbox>
         </th>
-        <td mat-cell *matCellDef="let key">
+        <td mat-cell *matCellDef="let key" class="action-select-cell">
           <mat-checkbox color="primary" (click)="$event.stopPropagation()"
             (change)="$event ? selection.toggle(key) : null" [checked]="selection.isSelected(key)">
           </mat-checkbox>

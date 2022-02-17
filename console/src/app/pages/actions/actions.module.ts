@@ -13,6 +13,7 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
+import { CardModule } from 'src/app/modules/card/card.module';
 import { FormFieldModule } from 'src/app/modules/form-field/form-field.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
@@ -50,6 +51,7 @@ import { AddFlowDialogComponent } from './add-flow-dialog/add-flow-dialog.compon
     HasRoleModule,
     ActionKeysModule,
     MatTooltipModule,
+    CardModule,
     MatCheckboxModule,
     InputModule,
     FormFieldModule,

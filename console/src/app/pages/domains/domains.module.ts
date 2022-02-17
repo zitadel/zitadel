@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
@@ -30,7 +31,9 @@ import { DomainsComponent } from './domains.component';
     HasFeaturePipeModule,
     HasRolePipeModule,
     ActionKeysModule,
+    InfoSectionModule,
     MatButtonModule,
+    MatTooltipModule,
     CopyToClipboardModule,
     InputModule,
     TranslateModule,
