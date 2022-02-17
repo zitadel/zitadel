@@ -9,7 +9,7 @@ import (
 	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
 )
 
-func listSMSConfigsToModel(req *admin_pb.ListSMSProviderConfigsRequest) (*query.SMSConfigsSearchQueries, error) {
+func listSMSConfigsToModel(req *admin_pb.ListSMSProvidersRequest) (*query.SMSConfigsSearchQueries, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	return &query.SMSConfigsSearchQueries{
 		SearchRequest: query.SearchRequest{
@@ -27,8 +27,8 @@ func SMSConfigToPb(app *query.SMSConfig) settings_pb.SMSConfig {
 	return nil
 }
 
-func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProviderConfig_Twilio {
-	return &settings_pb.SMSProviderConfig_Twilio{
+func TwilioConfigToPb(twilio *query.Twilio) *settings_pb.SMSProvider_Twilio {
+	return &settings_pb.SMSProvider_Twilio{
 		Twilio: &settings_pb.TwilioConfig{
 			Sid:  twilio.SID,
 			From: twilio.From,
@@ -47,7 +47,7 @@ func smsStateToPb(state domain.SMSConfigState) settings_pb.SMSProviderConfigStat
 	}
 }
 
-func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderConfigTwilioRequest) *twilio.TwilioConfig {
+func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderTwilioRequest) *twilio.TwilioConfig {
 	return &twilio.TwilioConfig{
 		SID:        req.Sid,
 		SenderName: req.From,
@@ -55,7 +55,7 @@ func AddSMSConfigTwilioToConfig(req *admin_pb.AddSMSProviderConfigTwilioRequest)
 	}
 }
 
-func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderConfigTwilioRequest) *twilio.TwilioConfig {
+func UpdateSMSConfigTwilioToConfig(req *admin_pb.UpdateSMSProviderTwilioRequest) *twilio.TwilioConfig {
 	return &twilio.TwilioConfig{
 		SID:        req.Sid,
 		SenderName: req.From,

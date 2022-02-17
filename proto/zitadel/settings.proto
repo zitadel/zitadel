@@ -52,7 +52,7 @@ message SMTPConfig {
   string user = 6;
 }
 
-message SMSProviderConfig {
+message SMSProvider {
   zitadel.v1.ObjectDetails details = 1;
   string id = 2;
   SMSProviderConfigState state = 3;

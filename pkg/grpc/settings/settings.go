@@ -1,3 +1,3 @@
 package settings
 
-type SMSConfig = isSMSProviderConfig_Config
+type SMSConfig = isSMSProvider_Config

@@ -128,60 +128,60 @@ Update system smtp configuration password for host
     PUT: /smtp/password
 
 
-### ListSMSProviderConfigs
+### ListSMSProviders
 
-> **rpc** ListSMSProviderConfigs([ListSMSProviderConfigsRequest](#listsmsproviderconfigsrequest))
-[ListSMSProviderConfigsResponse](#listsmsproviderconfigsresponse)
+> **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
+[ListSMSProvidersResponse](#listsmsprovidersresponse)
 
-Set the default language
+list sms provider configurations
 
 
 
     POST: /sms/_search
 
 
-### GetSMSProviderConfig
+### GetSMSProvider
 
-> **rpc** GetSMSProviderConfig([GetSMSProviderConfigRequest](#getsmsproviderconfigrequest))
-[GetSMSProviderConfigResponse](#getsmsproviderconfigresponse)
+> **rpc** GetSMSProvider([GetSMSProviderRequest](#getsmsproviderrequest))
+[GetSMSProviderResponse](#getsmsproviderresponse)
 
-Set the default language
+Get sms provider
 
 
 
     GET: /sms/{id}
 
 
-### AddSMSProviderConfigTwilio
+### AddSMSProviderTwilio
 
-> **rpc** AddSMSProviderConfigTwilio([AddSMSProviderConfigTwilioRequest](#addsmsproviderconfigtwiliorequest))
-[AddSMSProviderConfigTwilioResponse](#addsmsproviderconfigtwilioresponse)
+> **rpc** AddSMSProviderTwilio([AddSMSProviderTwilioRequest](#addsmsprovidertwiliorequest))
+[AddSMSProviderTwilioResponse](#addsmsprovidertwilioresponse)
 
-Update secret generator configuration
+Add twilio sms provider
 
 
 
     POST: /sms/twilio
 
 
-### UpdateSMSProviderConfigTwilio
+### UpdateSMSProviderTwilio
 
-> **rpc** UpdateSMSProviderConfigTwilio([UpdateSMSProviderConfigTwilioRequest](#updatesmsproviderconfigtwiliorequest))
-[UpdateSMSProviderConfigTwilioResponse](#updatesmsproviderconfigtwilioresponse)
+> **rpc** UpdateSMSProviderTwilio([UpdateSMSProviderTwilioRequest](#updatesmsprovidertwiliorequest))
+[UpdateSMSProviderTwilioResponse](#updatesmsprovidertwilioresponse)
 
-Update secret generator configuration
+Update twilio sms provider
 
 
 
     PUT: /sms/twilio/{id}
 
 
-### UpdateSMSProviderConfigTwilioToken
+### UpdateSMSProviderTwilioToken
 
-> **rpc** UpdateSMSProviderConfigTwilioToken([UpdateSMSProviderConfigTwilioTokenRequest](#updatesmsproviderconfigtwiliotokenrequest))
-[UpdateSMSProviderConfigTwilioTokenResponse](#updatesmsproviderconfigtwiliotokenresponse)
+> **rpc** UpdateSMSProviderTwilioToken([UpdateSMSProviderTwilioTokenRequest](#updatesmsprovidertwiliotokenrequest))
+[UpdateSMSProviderTwilioTokenResponse](#updatesmsprovidertwiliotokenresponse)
 
-Update secret generator configuration
+Update twilio sms provider token
 
 
 
@@ -1506,7 +1506,7 @@ This is an empty request
 
 
 
-### AddSMSProviderConfigTwilioRequest
+### AddSMSProviderTwilioRequest
 
 
 
@@ -1519,7 +1519,7 @@ This is an empty request
 
 
 
-### AddSMSProviderConfigTwilioResponse
+### AddSMSProviderTwilioResponse
 
 
 
@@ -2175,7 +2175,7 @@ This is an empty request
 
 
 
-### GetSMSProviderConfigRequest
+### GetSMSProviderRequest
 
 
 
@@ -2186,13 +2186,13 @@ This is an empty request
 
 
 
-### GetSMSProviderConfigResponse
+### GetSMSProviderResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| config |  zitadel.settings.v1.SMSProviderConfig | - |  |
+| config |  zitadel.settings.v1.SMSProvider | - |  |
 
 
 
@@ -2470,7 +2470,7 @@ This is an empty request
 
 
 
-### ListSMSProviderConfigsRequest
+### ListSMSProvidersRequest
 
 
 
@@ -2481,14 +2481,14 @@ This is an empty request
 
 
 
-### ListSMSProviderConfigsResponse
+### ListSMSProvidersResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.settings.v1.SMSProviderConfig | - |  |
+| result | repeated zitadel.settings.v1.SMSProvider | - |  |
 
 
 
@@ -3702,7 +3702,7 @@ This is an empty request
 
 
 
-### UpdateSMSProviderConfigTwilioRequest
+### UpdateSMSProviderTwilioRequest
 
 
 
@@ -3715,7 +3715,7 @@ This is an empty request
 
 
 
-### UpdateSMSProviderConfigTwilioResponse
+### UpdateSMSProviderTwilioResponse
 
 
 
@@ -3726,7 +3726,7 @@ This is an empty request
 
 
 
-### UpdateSMSProviderConfigTwilioTokenRequest
+### UpdateSMSProviderTwilioTokenRequest
 
 
 
@@ -3738,7 +3738,7 @@ This is an empty request
 
 
 
-### UpdateSMSProviderConfigTwilioTokenResponse
+### UpdateSMSProviderTwilioTokenResponse
 
 
 

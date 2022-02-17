@@ -254,8 +254,8 @@ service AdminService {
         };
     }
 
-    // Set the default language
-    rpc ListSMSProviderConfigs(ListSMSProviderConfigsRequest) returns (ListSMSProviderConfigsResponse) {
+    // list sms provider configurations
+    rpc ListSMSProviders(ListSMSProvidersRequest) returns (ListSMSProvidersResponse) {
         option (google.api.http) = {
             post: "/sms/_search"
             body: "*"
@@ -266,8 +266,8 @@ service AdminService {
         };
     }
 
-    // Set the default language
-    rpc GetSMSProviderConfig(GetSMSProviderConfigRequest) returns (GetSMSProviderConfigResponse) {
+    // Get sms provider
+    rpc GetSMSProvider(GetSMSProviderRequest) returns (GetSMSProviderResponse) {
         option (google.api.http) = {
             get: "/sms/{id}";
         };
@@ -277,8 +277,8 @@ service AdminService {
         };
     }
 
-    // Update secret generator configuration
-    rpc AddSMSProviderConfigTwilio(AddSMSProviderConfigTwilioRequest) returns (AddSMSProviderConfigTwilioResponse) {
+    // Add twilio sms provider
+    rpc AddSMSProviderTwilio(AddSMSProviderTwilioRequest) returns (AddSMSProviderTwilioResponse) {
         option (google.api.http) = {
             post: "/sms/twilio";
             body: "*"
@@ -289,8 +289,8 @@ service AdminService {
         };
     }
 
-    // Update secret generator configuration
-    rpc UpdateSMSProviderConfigTwilio(UpdateSMSProviderConfigTwilioRequest) returns (UpdateSMSProviderConfigTwilioResponse) {
+    // Update twilio sms provider
+    rpc UpdateSMSProviderTwilio(UpdateSMSProviderTwilioRequest) returns (UpdateSMSProviderTwilioResponse) {
         option (google.api.http) = {
             put: "/sms/twilio/{id}";
             body: "*"
@@ -301,8 +301,8 @@ service AdminService {
         };
     }
 
-    // Update secret generator configuration
-    rpc UpdateSMSProviderConfigTwilioToken(UpdateSMSProviderConfigTwilioTokenRequest) returns (UpdateSMSProviderConfigTwilioTokenResponse) {
+    // Update twilio sms provider token
+    rpc UpdateSMSProviderTwilioToken(UpdateSMSProviderTwilioTokenRequest) returns (UpdateSMSProviderTwilioTokenResponse) {
         option (google.api.http) = {
             put: "/sms/twilio/{id}/token";
             body: "*"
@@ -2491,51 +2491,51 @@ message UpdateSMTPConfigPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message ListSMSProviderConfigsRequest {
+message ListSMSProvidersRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
 }
 
-message ListSMSProviderConfigsResponse {
+message ListSMSProvidersResponse {
     zitadel.v1.ListDetails details = 1;
-    repeated zitadel.settings.v1.SMSProviderConfig result = 3;
+    repeated zitadel.settings.v1.SMSProvider result = 3;
 }
 
-message GetSMSProviderConfigRequest {
+message GetSMSProviderRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
 }
 
-message GetSMSProviderConfigResponse {
-    zitadel.settings.v1.SMSProviderConfig config = 1;
+message GetSMSProviderResponse {
+    zitadel.settings.v1.SMSProvider config = 1;
 }
 
-message AddSMSProviderConfigTwilioRequest {
+message AddSMSProviderTwilioRequest {
     string sid = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string from = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message AddSMSProviderConfigTwilioResponse {
+message AddSMSProviderTwilioResponse {
     zitadel.v1.ObjectDetails details = 1;
     string id = 2;
 }
 
-message UpdateSMSProviderConfigTwilioRequest {
+message UpdateSMSProviderTwilioRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string sid = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string from = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message UpdateSMSProviderConfigTwilioResponse {
+message UpdateSMSProviderTwilioResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message UpdateSMSProviderConfigTwilioTokenRequest {
+message UpdateSMSProviderTwilioTokenRequest {
     string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message UpdateSMSProviderConfigTwilioTokenResponse {
+message UpdateSMSProviderTwilioTokenResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

@@ -8,7 +8,7 @@ import (
 	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
 )
 
-func (s *Server) ListSMSProviderConfigs(ctx context.Context, req *admin_pb.ListSMSProviderConfigsRequest) (*admin_pb.ListSMSProviderConfigsResponse, error) {
+func (s *Server) ListSMSProviders(ctx context.Context, req *admin_pb.ListSMSProvidersRequest) (*admin_pb.ListSMSProvidersResponse, error) {
 	queries, err := listSMSConfigsToModel(req)
 	if err != nil {
 		return nil, err
@@ -18,19 +18,19 @@ func (s *Server) ListSMSProviderConfigs(ctx context.Context, req *admin_pb.ListS
 		return nil, err
 
 	}
-	return &admin_pb.ListSMSProviderConfigsResponse{
+	return &admin_pb.ListSMSProvidersResponse{
 		Details: object.ToListDetails(result.Count, result.Sequence, result.Timestamp),
 	}, nil
 }
 
-func (s *Server) GetSMSProviderConfig(ctx context.Context, req *admin_pb.GetSMSProviderConfigRequest) (*admin_pb.GetSMSProviderConfigResponse, error) {
+func (s *Server) GetSMSProvider(ctx context.Context, req *admin_pb.GetSMSProviderRequest) (*admin_pb.GetSMSProviderResponse, error) {
 	result, err := s.query.SMSProviderConfigByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 
 	}
-	return &admin_pb.GetSMSProviderConfigResponse{
-		Config: &settings_pb.SMSProviderConfig{
+	return &admin_pb.GetSMSProviderResponse{
+		Config: &settings_pb.SMSProvider{
 			Details: object.ToViewDetailsPb(result.Sequence, result.CreationDate, result.ChangeDate, result.ResourceOwner),
 			Id:      result.ID,
 			State:   smsStateToPb(result.State),
@@ -39,36 +39,36 @@ func (s *Server) GetSMSProviderConfig(ctx context.Context, req *admin_pb.GetSMSP
 	}, nil
 }
 
-func (s *Server) AddSMSProviderConfigTwilio(ctx context.Context, req *admin_pb.AddSMSProviderConfigTwilioRequest) (*admin_pb.AddSMSProviderConfigTwilioResponse, error) {
+func (s *Server) AddSMSProviderTwilio(ctx context.Context, req *admin_pb.AddSMSProviderTwilioRequest) (*admin_pb.AddSMSProviderTwilioResponse, error) {
 	id, result, err := s.command.AddSMSConfigTwilio(ctx, AddSMSConfigTwilioToConfig(req))
 	if err != nil {
 		return nil, err
 
 	}
-	return &admin_pb.AddSMSProviderConfigTwilioResponse{
+	return &admin_pb.AddSMSProviderTwilioResponse{
 		Details: object.DomainToAddDetailsPb(result),
 		Id:      id,
 	}, nil
 }
 
-func (s *Server) UpdateSMSProviderConfigTwilio(ctx context.Context, req *admin_pb.UpdateSMSProviderConfigTwilioRequest) (*admin_pb.UpdateSMSProviderConfigTwilioResponse, error) {
+func (s *Server) UpdateSMSProviderTwilio(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioRequest) (*admin_pb.UpdateSMSProviderTwilioResponse, error) {
 	result, err := s.command.ChangeSMSConfigTwilio(ctx, req.Id, UpdateSMSConfigTwilioToConfig(req))
 	if err != nil {
 		return nil, err
 
 	}
-	return &admin_pb.UpdateSMSProviderConfigTwilioResponse{
+	return &admin_pb.UpdateSMSProviderTwilioResponse{
 		Details: object.DomainToChangeDetailsPb(result),
 	}, nil
 }
 
-func (s *Server) UpdateSMSProviderConfigTwilioToken(ctx context.Context, req *admin_pb.UpdateSMSProviderConfigTwilioTokenRequest) (*admin_pb.UpdateSMSProviderConfigTwilioTokenResponse, error) {
+func (s *Server) UpdateSMSProviderTwilioToken(ctx context.Context, req *admin_pb.UpdateSMSProviderTwilioTokenRequest) (*admin_pb.UpdateSMSProviderTwilioTokenResponse, error) {
 	result, err := s.command.ChangeSMSConfigTwilioToken(ctx, req.Id, req.Token)
 	if err != nil {
 		return nil, err
 
 	}
-	return &admin_pb.UpdateSMSProviderConfigTwilioTokenResponse{
+	return &admin_pb.UpdateSMSProviderTwilioTokenResponse{
 		Details: object.DomainToChangeDetailsPb(result),
 	}, nil
 }
