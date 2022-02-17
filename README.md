@@ -1,7 +1,9 @@
-<a href="https://zitadel.ch#gh-light-mode-only"><img src="./docs/static/logos/zitadel-logo-dark@2x.png" alt="Zitadel Logo" height="70px" width="auto" align="right" /></a>
-<a href="https://zitadel.ch#gh-dark-mode-only"><img src="./docs/static/logos/zitadel-logo-light@2x.png" alt="Zitadel Logo" height="70px" width="auto" align="right" /></a>
+<a href="https://zitadel.ch#gh-light-mode-only"><img src="./docs/static/logos/zitadel-logo-dark@2x.png" alt="Zitadel Logo" height="120px" width="auto" align="right" /></a>
+<a href="https://zitadel.ch#gh-dark-mode-only"><img src="./docs/static/logos/zitadel-logo-light@2x.png" alt="Zitadel Logo" height="120px" width="auto" align="right" /></a>
 
 # ZITADEL
+
+**[💬 chat](https://discord.gg/erh5Brh7jE) [📞 contact](https://zitadel.ch/contact/) [📋 guide](https://docs.zitadel.ch/docs/guides/overview) [🧑‍💻 api docs](https://docs.zitadel.ch/docs/apis/overview) [❓user manuals](https://docs.zitadel.ch/docs/manuals/introduction)**
 
 [![stable version](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/caos/zitadel)](https://goreportcard.com/report/github.com/caos/zitadel)
@@ -9,6 +11,8 @@
 [![license](https://badgen.net/github/license/caos/zitadel)](#license)
 [![discord](https://badgen.net/discord/online-members/erh5Brh7jE)](https://discord.gg/erh5Brh7jE)
 [![follow us](https://badgen.net/twitter/follow/zitadel_ch)](https://twitter.com/zitadel_ch)
+
+---
 
 The identity and access management (IAM) solution with the **strongest change track** built for modern **global scale** cloud capabilities. Thanks to it's unique approach to store user **activities as events**, every change of an object can be traced
 
