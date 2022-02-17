@@ -147,11 +147,12 @@
 
           &.hovering {
             border-radius: 16px;
-            box-shadow: if(
-              $is-dark-theme,
-              (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
-              (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
-            );
+            box-shadow:
+              if(
+                $is-dark-theme,
+                (inset 26px 26px 52px #252628, inset -26px -26px 52px #353638),
+                (inset 26px 26px 52px #d4d4d4, inset -26px -26px 52px #fff)
+              );
 
             .desc {
               color: if($is-dark-theme, white, black);
@@ -190,7 +191,7 @@
                 height: 80px;
                 width: 80px;
                 border-radius: 50vw;
-                background-color: #00000020;
+                background-color: if($is-dark-theme, #00000020, #00000020);
 
                 .dl-btn {
                   z-index: 2;
