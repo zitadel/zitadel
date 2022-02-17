@@ -27,8 +27,8 @@ The following policies complement the TOS. When accepting the TOS, you accept th
 
 This Agreement is extended with additional terms, in case your Subscription requires a Dedicated Instance. When you enter the Agreement with us, you accept these additional agreements.
 
-- [**Dedicated Instance Terms**](./terms-of-service-dedicated) - How we provide our services for a dedicated instance
-- [**Annex to the Dedicated Instance Terms**](./dedicated-instance-annex) - Describe differences of services and guarantees with different providers
+- [**Dedicated Instance Terms**](../terms-of-service-dedicated) - How we provide our services for a dedicated instance
+- [**Annex to the Dedicated Instance Terms**](../dedicated-instance-annex) - Describe differences of services and guarantees with different providers
 
 ### Alterations
 
