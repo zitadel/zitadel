@@ -6,7 +6,7 @@ ZITADEL is extremely grateful for security aware people who disclose vulnerabili
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
+| 1.x.x   | releases within the last 3 consecutive months |
 | 0.x.x   | :x:                |
 
 ## Reporting a vulnerability
