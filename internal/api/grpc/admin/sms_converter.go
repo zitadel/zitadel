@@ -2,7 +2,6 @@ package admin
 
 import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
-	obj_pb "github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/query"
@@ -19,16 +18,6 @@ func listSMSConfigsToModel(req *admin_pb.ListSMSProviderConfigsRequest) (*query.
 			Asc:    asc,
 		},
 	}, nil
-}
-
-func SMTPConfigToPb(sms *query.SMSConfig) *settings_pb.SMSProviderConfig {
-	mapped := &settings_pb.SMSProviderConfig{
-		Id:      sms.ID,
-		State:   smsStateToPb(sms.State),
-		Details: obj_pb.ToViewDetailsPb(sms.Sequence, sms.CreationDate, sms.ChangeDate, sms.AggregateID),
-		Config:  SMSConfigToPb(sms),
-	}
-	return mapped
 }
 
 func SMSConfigToPb(app *query.SMSConfig) settings_pb.SMSConfig {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
+	settings_pb "github.com/caos/zitadel/pkg/grpc/settings"
 )
 
 func (s *Server) ListSMSProviderConfigs(ctx context.Context, req *admin_pb.ListSMSProviderConfigsRequest) (*admin_pb.ListSMSProviderConfigsResponse, error) {
@@ -29,7 +30,12 @@ func (s *Server) GetSMSProviderConfig(ctx context.Context, req *admin_pb.GetSMSP
 
 	}
 	return &admin_pb.GetSMSProviderConfigResponse{
-		Config: SMTPConfigToPb(result),
+		Config: &settings_pb.SMSProviderConfig{
+			Details: object.ToViewDetailsPb(result.Sequence, result.CreationDate, result.ChangeDate, result.ResourceOwner),
+			Id:      result.ID,
+			State:   smsStateToPb(result.State),
+			Config:  SMSConfigToPb(result),
+		},
 	}, nil
 }
 

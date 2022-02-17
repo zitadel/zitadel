@@ -2175,6 +2175,28 @@ This is an empty request
 
 
 
+### GetSMSProviderConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProviderConfig | - |  |
+
+
+
+
 ### GetSMTPConfigRequest
 This is an empty request
 
@@ -2210,28 +2232,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
-
-
-
-
-### GetSMSProviderConfigRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
-
-
-
-
-### GetSMSProviderConfigResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| config |  zitadel.settings.v1.SMSProviderConfig | - |  |
 
 
 
@@ -2470,6 +2470,29 @@ This is an empty request
 
 
 
+### ListSMSProviderConfigsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProviderConfigsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProviderConfig | - |  |
+
+
+
+
 ### ListSecretGeneratorsRequest
 
 
@@ -2490,29 +2513,6 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | - |  |
 | result | repeated zitadel.settings.v1.SecretGenerator | - |  |
-
-
-
-
-### ListSMSProviderConfigsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
-
-
-
-
-### ListSMSProviderConfigsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ListDetails | - |  |
-| result | repeated zitadel.settings.v1.SMSProviderConfig | - |  |
 
 
 
@@ -3702,6 +3702,53 @@ This is an empty request
 
 
 
+### UpdateSMSProviderConfigTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderConfigTwilioTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateSMTPConfigPasswordRequest
 
 
@@ -3768,53 +3815,6 @@ This is an empty request
 
 
 ### UpdateSecretGeneratorResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdateSMSProviderConfigTwilioRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### UpdateSMSProviderConfigTwilioResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### UpdateSMSProviderConfigTwilioTokenRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### UpdateSMSProviderConfigTwilioTokenResponse
 
 
 

@@ -143,7 +143,14 @@ func startZitadel(config *startConfig) error {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
 	smtpPasswordCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMTPPasswordVerificationKey)
-	logging.Log("MAIN-en9ew").OnError(err).Fatal("cannot create smtp crypto")
+	if err != nil {
+		return fmt.Errorf("cannot create smtp crypto: %w", err)
+	}
+
+	smsCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMSVerificationKey)
+	if err != nil {
+		return fmt.Errorf("cannot create smtp crypto: %w", err)
+	}
 
 	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections.Config, config.SystemDefaults, config.Projections.KeyConfig, keyChan, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
@@ -159,7 +166,7 @@ func startZitadel(config *startConfig) error {
 		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
 		DisplayName: "ZITADEL",
 	}
-	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, smtpPasswordCrypto, webAuthNConfig)
+	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, webAuthNConfig, smtpPasswordCrypto, smsCrypto)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
