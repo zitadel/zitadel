@@ -92,7 +92,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQueries(
 					expectedSMSConfigsQuery,
-					appsCols,
+					smsConfigsCols,
 					[][]driver.Value{
 						{
 							"sms-id",
@@ -138,8 +138,8 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			prepare: prepareSMSConfigsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					expectedAppsQuery,
-					appsCols,
+					expectedSMSConfigsQuery,
+					smsConfigsCols,
 					[][]driver.Value{
 						{
 							"sms-id",
@@ -147,7 +147,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
-							domain.AppStateActive,
+							domain.SMSConfigStateInactive,
 							uint64(20211109),
 							// twilio config
 							"sms-id",
@@ -161,7 +161,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							testNow,
 							testNow,
 							"ro",
-							domain.AppStateActive,
+							domain.SMSConfigStateInactive,
 							uint64(20211109),
 							// twilio config
 							"sms-id2",
@@ -213,7 +213,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 			prepare: prepareSMSConfigsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					expectedAppsQuery,
+					expectedSMSConfigsQuery,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -249,7 +249,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 			prepare: prepareSMSConfigQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					expectedAppQuery,
+					expectedSMSConfigQuery,
 					nil,
 					nil,
 				),
@@ -260,7 +260,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 					return nil, true
 				},
 			},
-			object: (*App)(nil),
+			object: (*SMSConfig)(nil),
 		},
 		{
 			name:    "prepareSMSConfigQuery found",
@@ -268,7 +268,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 			want: want{
 				sqlExpectations: mockQuery(
 					expectedSMSConfigQuery,
-					appCols,
+					smsConfigCols,
 					[]driver.Value{
 						"sms-id",
 						"agg-id",
@@ -280,7 +280,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						// twilio config
 						"sms-id",
 						"sid",
-						"token",
+						&crypto.CryptoValue{},
 						"sender-name",
 					},
 				),
@@ -293,6 +293,11 @@ func Test_SMSConfigPrepare(t *testing.T) {
 				ResourceOwner: "ro",
 				State:         domain.SMSConfigStateInactive,
 				Sequence:      20211109,
+				TwilioConfig: &Twilio{
+					SID:        "sid",
+					SenderName: "sender-name",
+					Token:      &crypto.CryptoValue{},
+				},
 			},
 		},
 		{
