@@ -26,7 +26,7 @@ var (
 		` zitadel.projections.sms_configs_twilio.sms_id,` +
 		` zitadel.projections.sms_configs_twilio.sid,` +
 		` zitadel.projections.sms_configs_twilio.token,` +
-		` zitadel.projections.sms_configs_twilio.sender_name` +
+		` zitadel.projections.sms_configs_twilio.sender_number` +
 		` FROM zitadel.projections.sms_configs` +
 		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
 	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.sms_configs.id,` +
@@ -41,7 +41,7 @@ var (
 		` zitadel.projections.sms_configs_twilio.sms_id,` +
 		` zitadel.projections.sms_configs_twilio.sid,` +
 		` zitadel.projections.sms_configs_twilio.token,` +
-		` zitadel.projections.sms_configs_twilio.sender_name,` +
+		` zitadel.projections.sms_configs_twilio.sender_number,` +
 		` COUNT(*) OVER ()` +
 		` FROM zitadel.projections.sms_configs` +
 		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
@@ -58,7 +58,7 @@ var (
 		"sms_id",
 		"sid",
 		"token",
-		"sender-name",
+		"sender-number",
 	}
 	smsConfigsCols = append(smsConfigCols, "count")
 )
@@ -106,7 +106,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"sms-id",
 							"sid",
 							&crypto.CryptoValue{},
-							"sender-name",
+							"sender-number",
 						},
 					},
 				),
@@ -125,9 +125,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
 						TwilioConfig: &Twilio{
-							SID:        "sid",
-							Token:      &crypto.CryptoValue{},
-							SenderName: "sender-name",
+							SID:          "sid",
+							Token:        &crypto.CryptoValue{},
+							SenderNumber: "sender-number",
 						},
 					},
 				},
@@ -153,7 +153,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"sms-id",
 							"sid",
 							&crypto.CryptoValue{},
-							"sender-name",
+							"sender-number",
 						},
 						{
 							"sms-id2",
@@ -167,7 +167,7 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 							"sms-id2",
 							"sid2",
 							&crypto.CryptoValue{},
-							"sender-name2",
+							"sender-number2",
 						},
 					},
 				),
@@ -186,9 +186,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
 						TwilioConfig: &Twilio{
-							SID:        "sid",
-							Token:      &crypto.CryptoValue{},
-							SenderName: "sender-name",
+							SID:          "sid",
+							Token:        &crypto.CryptoValue{},
+							SenderNumber: "sender-number",
 						},
 					},
 					{
@@ -200,9 +200,9 @@ func Test_SMSConfigssPrepare(t *testing.T) {
 						State:         domain.SMSConfigStateInactive,
 						Sequence:      20211109,
 						TwilioConfig: &Twilio{
-							SID:        "sid2",
-							Token:      &crypto.CryptoValue{},
-							SenderName: "sender-name2",
+							SID:          "sid2",
+							Token:        &crypto.CryptoValue{},
+							SenderNumber: "sender-number2",
 						},
 					},
 				},
@@ -281,7 +281,7 @@ func Test_SMSConfigPrepare(t *testing.T) {
 						"sms-id",
 						"sid",
 						&crypto.CryptoValue{},
-						"sender-name",
+						"sender-number",
 					},
 				),
 			},
@@ -294,9 +294,9 @@ func Test_SMSConfigPrepare(t *testing.T) {
 				State:         domain.SMSConfigStateInactive,
 				Sequence:      20211109,
 				TwilioConfig: &Twilio{
-					SID:        "sid",
-					SenderName: "sender-name",
-					Token:      &crypto.CryptoValue{},
+					SID:          "sid",
+					SenderNumber: "sender-number",
+					Token:        &crypto.CryptoValue{},
 				},
 			},
 		},

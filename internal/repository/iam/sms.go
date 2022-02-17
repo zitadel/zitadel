@@ -24,10 +24,10 @@ const (
 type SMSConfigTwilioAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID         string              `json:"id,omitempty"`
-	SID        string              `json:"sid,omitempty"`
-	Token      *crypto.CryptoValue `json:"token,omitempty"`
-	SenderName string              `json:"senderName,omitempty"`
+	ID           string              `json:"id,omitempty"`
+	SID          string              `json:"sid,omitempty"`
+	Token        *crypto.CryptoValue `json:"token,omitempty"`
+	SenderNumber string              `json:"senderNumber,omitempty"`
 }
 
 func NewSMSConfigTwilioAddedEvent(
@@ -35,7 +35,7 @@ func NewSMSConfigTwilioAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	sid,
-	senderName string,
+	senderNumber string,
 	token *crypto.CryptoValue,
 ) *SMSConfigTwilioAddedEvent {
 	return &SMSConfigTwilioAddedEvent{
@@ -44,10 +44,10 @@ func NewSMSConfigTwilioAddedEvent(
 			aggregate,
 			SMSConfigTwilioAddedEventType,
 		),
-		ID:         id,
-		SID:        sid,
-		Token:      token,
-		SenderName: senderName,
+		ID:           id,
+		SID:          sid,
+		Token:        token,
+		SenderNumber: senderNumber,
 	}
 }
 
@@ -74,9 +74,9 @@ func SMSConfigTwilioAddedEventMapper(event *repository.Event) (eventstore.Event,
 type SMSConfigTwilioChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID         string  `json:"id,omitempty"`
-	SID        *string `json:"sid,omitempty"`
-	SenderName *string `json:"senderName,omitempty"`
+	ID           string  `json:"id,omitempty"`
+	SID          *string `json:"sid,omitempty"`
+	SenderNumber *string `json:"senderNumber,omitempty"`
 }
 
 func NewSMSConfigTwilioChangedEvent(
@@ -110,9 +110,9 @@ func ChangeSMSConfigTwilioSID(sid string) func(event *SMSConfigTwilioChangedEven
 	}
 }
 
-func ChangeSMSConfigTwilioSenderName(senderName string) func(event *SMSConfigTwilioChangedEvent) {
+func ChangeSMSConfigTwilioSenderNumber(senderNumber string) func(event *SMSConfigTwilioChangedEvent) {
 	return func(e *SMSConfigTwilioChangedEvent) {
-		e.SenderName = &senderName
+		e.SenderNumber = &senderNumber
 	}
 }
 

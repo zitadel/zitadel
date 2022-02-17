@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	sid        = "sid"
-	token      = "token"
-	senderName = "sender-name"
+	sid          = "sid"
+	token        = "token"
+	senderNumber = "sender-number"
 )
 
 func TestSMSProjection_reduces(t *testing.T) {
@@ -41,7 +41,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 							"algorithm": "RSA-265",
 							"keyId": "key-id"
 						},
-						"senderName": "sender-name"
+						"senderNumber": "sender-number"
 					}`),
 				), iam.SMSConfigTwilioAddedEventMapper),
 			},
@@ -66,12 +66,12 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.sms_configs_twilio (sms_id, sid, token, sender_name) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO zitadel.projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"id",
 								"sid",
 								anyArg{},
-								"sender-name",
+								"sender-number",
 							},
 						},
 					},
@@ -87,7 +87,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
-						"senderName": "sender-name"
+						"senderNumber": "sender-number"
 					}`),
 				), iam.SMSConfigTwilioChangedEventMapper),
 			},
@@ -100,10 +100,10 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs_twilio SET (sid, sender_name) = ($1, $2) WHERE (sms_id = $3)",
+							expectedStmt: "UPDATE zitadel.projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
 							expectedArgs: []interface{}{
 								&sid,
-								&senderName,
+								&senderNumber,
 								"id",
 							},
 						},

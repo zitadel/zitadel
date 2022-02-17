@@ -68,9 +68,9 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &twilio.TwilioConfig{
-					SID:        "sid",
-					Token:      "token",
-					SenderName: "senderName",
+					SID:          "sid",
+					Token:        "token",
+					SenderNumber: "senderName",
 				},
 			},
 			res: res{
@@ -179,9 +179,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &twilio.TwilioConfig{
-					SID:        "sid",
-					Token:      "token",
-					SenderName: "senderName",
+					SID:          "sid",
+					Token:        "token",
+					SenderNumber: "senderName",
 				},
 				id: "providerid",
 			},
@@ -228,9 +228,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &twilio.TwilioConfig{
-					SID:        "sid2",
-					Token:      "token2",
-					SenderName: "senderName2",
+					SID:          "sid2",
+					Token:        "token2",
+					SenderNumber: "senderName2",
 				},
 				id: "providerid",
 			},
@@ -594,7 +594,7 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName string) *iam.SMSConfigTwilioChangedEvent {
 	changes := []iam.SMSConfigTwilioChanges{
 		iam.ChangeSMSConfigTwilioSID(sid),
-		iam.ChangeSMSConfigTwilioSenderName(senderName),
+		iam.ChangeSMSConfigTwilioSenderNumber(senderName),
 	}
 	event, _ := iam.NewSMSConfigTwilioChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
