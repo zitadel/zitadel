@@ -95,7 +95,7 @@ zitadel start-with-init
 
 ### Quick starts
 
-To start developing your app as fast as possible check out our quick [star guides]((https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples in many languages.
+To start developing your app as fast as possible check out our quick [start guides](https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples in many languages.
 
 If your preferred language is missing please let us know [here](https://github.com/caos/zitadel/discussions/1717)
 
