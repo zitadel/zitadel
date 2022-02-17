@@ -25,7 +25,7 @@ var (
 		` zitadel.projections.sms_configs_twilio.sms_id,` +
 		` zitadel.projections.sms_configs_twilio.sid,` +
 		` zitadel.projections.sms_configs_twilio.token,` +
-		` zitadel.projections.sms_configs_twilio.from` +
+		` zitadel.projections.sms_configs_twilio.sender_name` +
 		` FROM zitadel.projections.sms_configs` +
 		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)
 	expectedSMSConfigsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.sms_configs.id,` +
@@ -40,7 +40,7 @@ var (
 		` zitadel.projections.sms_configs_twilio.sms_id,` +
 		` zitadel.projections.sms_configs_twilio.sid,` +
 		` zitadel.projections.sms_configs_twilio.token,` +
-		` zitadel.projections.sms_configs_twilio.from` +
+		` zitadel.projections.sms_configs_twilio.sender_name` +
 		` COUNT(*) OVER ()` +
 		` FROM zitadel.projections.sms_configs` +
 		` LEFT JOIN zitadel.projections.sms_configs_twilio ON zitadel.projections.sms_configs.id = zitadel.projections.sms_configs_twilio.sms_id`)

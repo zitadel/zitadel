@@ -1,11 +1,11 @@
 package twilio
 
 type TwilioConfig struct {
-	SID   string
-	Token string
-	From  string
+	SID        string
+	Token      string
+	SenderName string
 }
 
 func (t *TwilioConfig) IsValid() bool {
-	return t.SID != "" && t.Token != "" && t.From != ""
+	return t.SID != "" && t.Token != "" && t.SenderName != ""
 }

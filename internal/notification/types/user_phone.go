@@ -9,7 +9,7 @@ import (
 
 func generateSms(user *view_model.NotifyUser, content string, config systemdefaults.Notifications, lastPhone bool) error {
 	message := &messages.SMS{
-		SenderPhoneNumber:    config.Providers.Twilio.From,
+		SenderPhoneNumber:    config.Providers.Twilio.SenderName,
 		RecipientPhoneNumber: user.VerifiedPhone,
 		Content:              content,
 	}

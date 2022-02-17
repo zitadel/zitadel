@@ -68,11 +68,11 @@ const (
 	SMSColumnState         = "state"
 	SMSColumnSequence      = "sequence"
 
-	smsTwilioTableSuffix       = "twilio"
-	SMSTwilioConfigColumnSMSID = "sms_id"
-	SMSTwilioConfigColumnSID   = "sid"
-	SMSTwilioConfigColumnToken = "token"
-	SMSTwilioConfigColumnFrom  = "from"
+	smsTwilioTableSuffix            = "twilio"
+	SMSTwilioConfigColumnSMSID      = "sms_id"
+	SMSTwilioConfigColumnSID        = "sid"
+	SMSTwilioConfigColumnToken      = "token"
+	SMSTwilioConfigColumnSenderName = "sender_name"
 )
 
 func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -100,7 +100,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 				handler.NewCol(SMSTwilioConfigColumnSMSID, e.ID),
 				handler.NewCol(SMSTwilioConfigColumnSID, e.SID),
 				handler.NewCol(SMSTwilioConfigColumnToken, e.Token),
-				handler.NewCol(SMSTwilioConfigColumnFrom, e.From),
+				handler.NewCol(SMSTwilioConfigColumnSenderName, e.SenderName),
 			},
 			crdb.WithTableSuffix(smsTwilioTableSuffix),
 		),
@@ -117,8 +117,8 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 	if e.SID != nil {
 		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSID, e.SID))
 	}
-	if e.From != nil {
-		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnFrom, e.From))
+	if e.SenderName != nil {
+		columns = append(columns, handler.NewCol(SMSTwilioConfigColumnSenderName, e.SenderName))
 	}
 
 	return crdb.NewMultiStatement(

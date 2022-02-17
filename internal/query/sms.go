@@ -98,8 +98,8 @@ var (
 		name:  projection.SMSTwilioConfigColumnToken,
 		table: smsTwilioConfigsTable,
 	}
-	SMSTwilioConfigColumnFrom = Column{
-		name:  projection.SMSTwilioConfigColumnFrom,
+	SMSTwilioConfigColumnSenderName = Column{
+		name:  projection.SMSTwilioConfigColumnSenderName,
 		table: smsTwilioConfigsTable,
 	}
 )
@@ -151,7 +151,7 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 			SMSTwilioConfigColumnSMSID.identifier(),
 			SMSTwilioConfigColumnSID.identifier(),
 			SMSTwilioConfigColumnToken.identifier(),
-			SMSTwilioConfigColumnFrom.identifier(),
+			SMSTwilioConfigColumnSenderName.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
 			PlaceholderFormat(sq.Dollar), func(row *sql.Row) (*SMSConfig, error) {
@@ -173,7 +173,7 @@ func prepareSMSConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMSConfig, erro
 				&twilioConfig.smsID,
 				&twilioConfig.sid,
 				&twilioConfig.token,
-				&twilioConfig.from,
+				&twilioConfig.senderName,
 			)
 
 			if err != nil {
@@ -202,7 +202,7 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 			SMSTwilioConfigColumnSMSID.identifier(),
 			SMSTwilioConfigColumnSID.identifier(),
 			SMSTwilioConfigColumnToken.identifier(),
-			SMSTwilioConfigColumnFrom.identifier(),
+			SMSTwilioConfigColumnSenderName.identifier(),
 			countColumn.identifier(),
 		).From(smsConfigsTable.identifier()).
 			LeftJoin(join(SMSTwilioConfigColumnSMSID, SMSConfigColumnID)).
@@ -227,7 +227,7 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 					&twilioConfig.smsID,
 					&twilioConfig.sid,
 					&twilioConfig.token,
-					&twilioConfig.from,
+					&twilioConfig.senderName,
 					&configs.Count,
 				)
 
@@ -245,10 +245,10 @@ func prepareSMSConfigsQuery() (sq.SelectBuilder, func(*sql.Rows) (*SMSConfigs, e
 }
 
 type sqlTwilioConfig struct {
-	smsID sql.NullString
-	sid   sql.NullString
-	token sql.NullString
-	from  sql.NullString
+	smsID      sql.NullString
+	sid        sql.NullString
+	token      sql.NullString
+	senderName sql.NullString
 }
 
 func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
@@ -258,6 +258,6 @@ func (c sqlTwilioConfig) set(smsConfig *SMSConfig) {
 	smsConfig.TwilioConfig = &Twilio{
 		SID:   c.sid.String,
 		Token: c.token.String,
-		From:  c.from.String,
+		From:  c.senderName.String,
 	}
 }

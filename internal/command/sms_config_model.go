@@ -18,9 +18,9 @@ type IAMSMSConfigWriteModel struct {
 }
 
 type TwilioConfig struct {
-	SID   string
-	Token *crypto.CryptoValue
-	From  string
+	SID        string
+	Token      *crypto.CryptoValue
+	SenderName string
 }
 
 func NewIAMSMSConfigWriteModel(id string) *IAMSMSConfigWriteModel {
@@ -41,9 +41,9 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 				continue
 			}
 			wm.Twilio = &TwilioConfig{
-				SID:   e.SID,
-				Token: e.Token,
-				From:  e.From,
+				SID:        e.SID,
+				Token:      e.Token,
+				SenderName: e.SenderName,
 			}
 			wm.State = domain.SMSConfigStateInactive
 		case *iam.SMSConfigTwilioChangedEvent:
@@ -53,8 +53,8 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			if e.SID != nil {
 				wm.Twilio.SID = *e.SID
 			}
-			if e.From != nil {
-				wm.Twilio.From = *e.From
+			if e.SenderName != nil {
+				wm.Twilio.SenderName = *e.SenderName
 			}
 		case *iam.SMSConfigTwilioTokenChangedEvent:
 			if wm.ID != e.ID {
@@ -97,15 +97,15 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, from string) (*iam.SMSConfigTwilioChangedEvent, bool, error) {
+func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, senderName string) (*iam.SMSConfigTwilioChangedEvent, bool, error) {
 	changes := make([]iam.SMSConfigTwilioChanges, 0)
 	var err error
 
 	if wm.Twilio.SID != sid {
 		changes = append(changes, iam.ChangeSMSConfigTwilioSID(sid))
 	}
-	if wm.Twilio.From != from {
-		changes = append(changes, iam.ChangeSMSConfigTwilioFrom(from))
+	if wm.Twilio.SenderName != senderName {
+		changes = append(changes, iam.ChangeSMSConfigTwilioSenderName(senderName))
 	}
 
 	if len(changes) == 0 {

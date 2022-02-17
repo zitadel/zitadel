@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,6 +13,7 @@ import (
 	id_mock "github.com/caos/zitadel/internal/id/mock"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,6 +21,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 	type fields struct {
 		eventstore  *eventstore.Eventstore
 		idGenerator id.Generator
+		alg         crypto.EncryptionAlgorithm
 	}
 	type args struct {
 		ctx context.Context
@@ -47,21 +50,27 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
-								"token",
-								"from",
+								"senderName",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("token"),
+								},
 							),
 							),
 						},
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "providerid"),
+				alg:         crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx: context.Background(),
 				sms: &twilio.TwilioConfig{
-					SID:   "sid",
-					Token: "token",
-					From:  "from",
+					SID:        "sid",
+					Token:      "token",
+					SenderName: "senderName",
 				},
 			},
 			res: res{
@@ -76,6 +85,7 @@ func TestCommandSide_AddSMSConfigTwilio(t *testing.T) {
 			r := &Commands{
 				eventstore:  tt.fields.eventstore,
 				idGenerator: tt.fields.idGenerator,
+				smsCrypto:   tt.fields.alg,
 			}
 			_, got, err := r.AddSMSConfigTwilio(tt.args.ctx, tt.args.sms)
 			if tt.res.err == nil {
@@ -154,8 +164,13 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
-								"token",
-								"from",
+								"senderName",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("token"),
+								},
 							),
 						),
 					),
@@ -164,9 +179,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &twilio.TwilioConfig{
-					SID:   "sid",
-					Token: "token",
-					From:  "from",
+					SID:        "sid",
+					Token:      "token",
+					SenderName: "senderName",
 				},
 				id: "providerid",
 			},
@@ -187,7 +202,12 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 								"providerid",
 								"sid",
 								"token",
-								"from",
+								&crypto.CryptoValue{
+									CryptoType: crypto.TypeEncryption,
+									Algorithm:  "enc",
+									KeyID:      "id",
+									Crypted:    []byte("token"),
+								},
 							),
 						),
 					),
@@ -198,8 +218,7 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 									context.Background(),
 									"providerid",
 									"sid2",
-									"token2",
-									"from2",
+									"senderName2",
 								),
 							),
 						},
@@ -209,9 +228,9 @@ func TestCommandSide_ChangeSMSConfigTwilio(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				sms: &twilio.TwilioConfig{
-					SID:   "sid2",
-					Token: "token2",
-					From:  "from2",
+					SID:        "sid2",
+					Token:      "token2",
+					SenderName: "senderName2",
 				},
 				id: "providerid",
 			},
@@ -301,8 +320,8 @@ func TestCommandSide_ActivateSMSConfigTwilio(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
-								"token",
-								"from",
+								"sender-name",
+								&crypto.CryptoValue{},
 							),
 						),
 					),
@@ -409,8 +428,8 @@ func TestCommandSide_DeactivateSMSConfigTwilio(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
-								"token",
-								"from",
+								"sender-name",
+								&crypto.CryptoValue{},
 							),
 						),
 						eventFromEventPusher(
@@ -524,8 +543,8 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"providerid",
 								"sid",
-								"token",
-								"from",
+								"sender-name",
+								&crypto.CryptoValue{},
 							),
 						),
 					),
@@ -572,11 +591,10 @@ func TestCommandSide_RemoveSMSConfigTwilio(t *testing.T) {
 	}
 }
 
-func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, token, from string) *iam.SMSConfigTwilioChangedEvent {
+func newSMSConfigTwilioChangedEvent(ctx context.Context, id, sid, senderName string) *iam.SMSConfigTwilioChangedEvent {
 	changes := []iam.SMSConfigTwilioChanges{
 		iam.ChangeSMSConfigTwilioSID(sid),
-		iam.ChangeSMSConfigTwilioToken(token),
-		iam.ChangeSMSConfigTwilioFrom(from),
+		iam.ChangeSMSConfigTwilioSenderName(senderName),
 	}
 	event, _ := iam.NewSMSConfigTwilioChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,

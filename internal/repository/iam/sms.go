@@ -24,10 +24,10 @@ const (
 type SMSConfigTwilioAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID    string              `json:"id,omitempty"`
-	SID   string              `json:"sid,omitempty"`
-	Token *crypto.CryptoValue `json:"token,omitempty"`
-	From  string              `json:"from,omitempty"`
+	ID         string              `json:"id,omitempty"`
+	SID        string              `json:"sid,omitempty"`
+	Token      *crypto.CryptoValue `json:"token,omitempty"`
+	SenderName string              `json:"from,omitempty"`
 }
 
 func NewSMSConfigTwilioAddedEvent(
@@ -35,7 +35,7 @@ func NewSMSConfigTwilioAddedEvent(
 	aggregate *eventstore.Aggregate,
 	id,
 	sid,
-	from string,
+	senderName string,
 	token *crypto.CryptoValue,
 ) *SMSConfigTwilioAddedEvent {
 	return &SMSConfigTwilioAddedEvent{
@@ -44,10 +44,10 @@ func NewSMSConfigTwilioAddedEvent(
 			aggregate,
 			SMSConfigTwilioAddedEventType,
 		),
-		ID:    id,
-		SID:   sid,
-		Token: token,
-		From:  from,
+		ID:         id,
+		SID:        sid,
+		Token:      token,
+		SenderName: senderName,
 	}
 }
 
@@ -74,9 +74,9 @@ func SMSConfigTwilioAddedEventMapper(event *repository.Event) (eventstore.Event,
 type SMSConfigTwilioChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	ID   string  `json:"id,omitempty"`
-	SID  *string `json:"sid,omitempty"`
-	From *string `json:"from,omitempty"`
+	ID         string  `json:"id,omitempty"`
+	SID        *string `json:"sid,omitempty"`
+	SenderName *string `json:"senderName,omitempty"`
 }
 
 func NewSMSConfigTwilioChangedEvent(
@@ -110,9 +110,9 @@ func ChangeSMSConfigTwilioSID(sid string) func(event *SMSConfigTwilioChangedEven
 	}
 }
 
-func ChangeSMSConfigTwilioFrom(from string) func(event *SMSConfigTwilioChangedEvent) {
+func ChangeSMSConfigTwilioSenderName(senderName string) func(event *SMSConfigTwilioChangedEvent) {
 	return func(e *SMSConfigTwilioChangedEvent) {
-		e.From = &from
+		e.SenderName = &senderName
 	}
 }
 
