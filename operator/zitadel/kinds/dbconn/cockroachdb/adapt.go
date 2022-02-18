@@ -57,7 +57,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 
 		componentLabels := labels.MustForComponent(apiLabels, component)
 		certLabels := labels.MustForName(componentLabels, db.CertsSecret)
-		pwLabels := labels.MustForName(componentLabels, "dbpassword")
+		pwLabels := labels.AsSelectable(labels.MustForName(componentLabels, "db-connection-password"))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
@@ -81,7 +81,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 				var queriers []operator.QueryFunc
 				if certificate != "" {
 					certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
-						db.RootCert: certificate,
+						db.CACert: certificate,
 					})
 					if err != nil {
 						return nil, err
@@ -96,9 +96,9 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 				}
 
 				if password != "" {
-					currentDB.Current.PasswordSecretName = pwLabels.Name()
+					currentDB.Current.PasswordSecret = pwLabels
 					currentDB.Current.PasswordSecretKey = currentDB.Current.User
-					pwQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(pwLabels), map[string]string{
+					pwQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, pwLabels, map[string]string{
 						currentDB.Current.PasswordSecretKey: password,
 					})
 					if err != nil {

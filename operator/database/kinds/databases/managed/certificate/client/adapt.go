@@ -75,7 +75,7 @@ func AdaptFunc(
 				}
 
 				clientSecretData := map[string]string{
-					db.RootCert:     string(pemCaCert),
+					db.CACert:       string(pemCaCert),
 					userKeyFilename: string(pemClientPrivKey),
 					userCrtFilename: string(pemClientCert),
 				}

@@ -17,7 +17,12 @@ func getMigrationContainer(
 	certsVolumeMount corev1.VolumeMount,
 ) corev1.Container {
 
-	pwSecretName, pwSecretKey := dbConn.PasswordSecret()
+	pwSecret, pwSecretKey := dbConn.PasswordSecret()
+
+	var pwSecretName string
+	if pwSecret != nil {
+		pwSecretName = pwSecret.Name()
+	}
 
 	return corev1.Container{
 		Name:  "db-migration",
@@ -57,14 +62,14 @@ func sslParams(ssl *db.SSL, certsDir string) string {
 		return "sslmode=disable"
 	}
 
-	params := "sslmode=verify-full"
+	params := "sslmode=verify-full&ssl=true"
 
 	if ssl.RootCert {
-		params += fmt.Sprintf("&sslrootcert=%s/%s", certsDir, db.RootCert)
+		params += fmt.Sprintf("&sslrootcert=%s/%s", certsDir, db.CACert)
 	}
 
 	if ssl.UserCertAndKey {
-		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s", certsDir, db.UserCert, certsDir, db.UserKey)
+		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s&sslfactory=org.postgresql.ssl.NonValidatingFactory", certsDir, db.UserCert, certsDir, db.UserKey)
 	}
 
 	return params

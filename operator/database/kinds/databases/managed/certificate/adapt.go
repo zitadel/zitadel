@@ -7,6 +7,8 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/client"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/node"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user"
+	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 var (
@@ -19,11 +21,16 @@ func AdaptFunc(
 	componentLabels *labels.Component,
 	clusterDns string,
 	generateNodeIfNotExists bool,
+	userName string,
+	pwSecretLabels *labels.Selectable,
+	pwSecretKey string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
-	func(user, secretName, userCrtFilename, userKeyFilename string) (operator.QueryFunc, error),
-	func(secretName string) (operator.DestroyFunc, error),
+	operator.QueryFunc,
+	operator.DestroyFunc,
+	// func(user, secretName, userCrtFilename, userKeyFilename string) (operator.QueryFunc, error),
+	// func(secretName string) (operator.DestroyFunc, error),
 	//	func(k8sClient kubernetes.ClientInt) ([]string, error),
 	error,
 ) {
@@ -40,19 +47,65 @@ func AdaptFunc(
 		return nil, nil, nil, nil, err
 	}
 
-	queriers := []operator.QueryFunc{
-		queryNode,
+	/*TODO: dynamic variables*/
+	queryDBUser, destroyDBUser, err := user.AdaptFunc(
+		monitor,
+		namespace,
+		"cockroachdb-0",
+		"cockroachdb",
+		"/cockroach/cockroach-client-certs/",
+		userName,
+		"verysecret",
+		db.CertsSecret,
+		db.UserCert,
+		db.UserKey,
+		pwSecretLabels,
+		pwSecretKey,
+		componentLabels,
+	)
+	if err != nil {
+		return nil, nil, nil, nil, err
 	}
 
-	destroyers := []operator.DestroyFunc{
+	queryCert, destroyCert, err := client.AdaptFunc(
+		cMonitor,
+		namespace,
+		componentLabels,
+	)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	/*TODO: dynamic variables*/
+	beforeCRqueriers := []operator.QueryFunc{
+		queryNode,
+		queryCert("root", "rootcerts", db.RootUserCert, db.RootUserKey),
+		queryCert(userName, db.CertsSecret, db.UserCert, db.UserKey),
+	}
+
+	beforeCRdestroyers := []operator.DestroyFunc{
+		destroyCert(db.CertsSecret),
+		destroyCert("rootcerts"),
 		destroyNode,
 	}
 
+	afterCRqueriers := []operator.QueryFunc{
+		queryDBUser,
+	}
+
+	afterCRdestroyers := []operator.DestroyFunc{
+		destroyDBUser,
+	}
+
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			return operator.QueriersToEnsureFunc(cMonitor, false, queriers, k8sClient, queried)
+			return operator.QueriersToEnsureFunc(cMonitor, false, beforeCRqueriers, k8sClient, queried)
 		},
-		operator.DestroyersToDestroyFunc(cMonitor, destroyers),
-		func(user, secretName, userCrtFilename, userKeyFilename string) (operator.QueryFunc, error) {
+		operator.DestroyersToDestroyFunc(cMonitor, beforeCRdestroyers),
+		func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+			return operator.QueriersToEnsureFunc(cMonitor, false, afterCRqueriers, k8sClient, queried)
+		},
+		operator.DestroyersToDestroyFunc(cMonitor, afterCRdestroyers),
+		/*func(user, secretName, userCrtFilename, userKeyFilename string) (operator.QueryFunc, error) {
 			query, _, err := client.AdaptFunc(
 				cMonitor,
 				namespace,
@@ -84,7 +137,7 @@ func AdaptFunc(
 
 			return destroy(secretName), nil
 		},
-		/*		func(k8sClient kubernetes.ClientInt) ([]string, error) {
+				func(k8sClient kubernetes.ClientInt) ([]string, error) {
 				return client.QueryCertificates(namespace, labels.DeriveComponentSelector(componentLabels, false), k8sClient)
 			},*/
 		nil

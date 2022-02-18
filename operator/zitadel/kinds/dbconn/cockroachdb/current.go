@@ -2,6 +2,7 @@ package cockroachdb
 
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/labels"
 	"strings"
 
 	"github.com/caos/orbos/pkg/tree"
@@ -13,21 +14,21 @@ var _ db.Connection = (*Current)(nil)
 type Current struct {
 	Common  *tree.Common `yaml:",inline"`
 	Current struct {
-		Host               string
-		Port               string
-		Cluster            string
-		User               string
-		PasswordSecretName string
-		PasswordSecretKey  string
-		Secure             bool
+		Host              string
+		Port              string
+		Cluster           string
+		User              string
+		PasswordSecret    *labels.Selectable
+		PasswordSecretKey string
+		Secure            bool
 	}
 }
 
 func (c *Current) Host() string { return c.Current.Host }
 func (c *Current) Port() string { return c.Current.Port }
 func (c *Current) User() string { return c.Current.User }
-func (c *Current) PasswordSecret() (string, string) {
-	return c.Current.PasswordSecretName, c.Current.PasswordSecretKey
+func (c *Current) PasswordSecret() (*labels.Selectable, string) {
+	return c.Current.PasswordSecret, c.Current.PasswordSecretKey
 }
 
 func (c *Current) SSL() *db.SSL {

@@ -51,7 +51,7 @@ func literalsConfigMap(
 		"CR_PORT":                        dbConn.Port(),
 		"CR_USER":                        dbConn.User(),
 		"CR_OPTIONS":                     dbConn.Options(),
-		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.RootCert),
+		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.CACert),
 		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert),
 		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey),
 	}

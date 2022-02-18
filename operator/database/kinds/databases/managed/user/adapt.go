@@ -1,25 +1,28 @@
 package user
 
-/* Deprecated in V2
-
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
-	namespace string,
-	deployName string,
-	containerName string,
-	certsDir string,
-	userName string,
-	password string,
+	namespace,
+	podName,
+	containerName,
+	certsDir,
+	userName,
+	password,
+	certsSecretName,
+	userCrtFilename,
+	userKeyFilename string,
+	pwSecretSelectable *labels.Selectable,
+	pwSecretKey string,
 	componentLabels *labels.Component,
 ) (
 	operator.QueryFunc,
@@ -27,43 +30,38 @@ func AdaptFunc(
 	error,
 ) {
 	cmdSql := fmt.Sprintf("cockroach sql --certs-dir=%s", certsDir)
+	createSql := fmt.Sprintf(`%s --execute "CREATE USER IF NOT EXISTS %s;" --execute "GRANT admin TO %s;"`, cmdSql, userName, userName)
 
-	createSql := fmt.Sprintf("CREATE USER IF NOT EXISTS %s ", userName)
 	if password != "" {
-		createSql = fmt.Sprintf("%s WITH PASSWORD %s", createSql, password)
+		createSql += fmt.Sprintf(` --execute "ALTER USER %s WITH PASSWORD '%s';"`, userName, password)
 	}
 
-	deleteSql := fmt.Sprintf("DROP USER IF EXISTS %s", userName)
+	deleteSql := fmt.Sprintf(`%s --execute "DROP USER IF EXISTS %s;"`, cmdSql, userName)
 
-	_, _, addUserFunc, deleteUserFunc, _, err := certificate.AdaptFunc(monitor, namespace, componentLabels, "", false)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	addUser, err := addUserFunc(userName)
-	if err != nil {
-		return nil, nil, err
-	}
 	ensureUser := func(k8sClient kubernetes.ClientInt) error {
-		return k8sClient.ExecInPodOfDeployment(namespace, deployName, containerName, fmt.Sprintf("%s -e '%s;'", cmdSql, createSql))
-	}
-
-	deleteUser, err := deleteUserFunc(userName)
-	if err != nil {
-		return nil, nil, err
+		return k8sClient.ExecInPod(namespace, podName, containerName, createSql)
 	}
 	destoryUser := func(k8sClient kubernetes.ClientInt) error {
-		return k8sClient.ExecInPodOfDeployment(namespace, deployName, containerName, fmt.Sprintf("%s -e '%s;'", cmdSql, deleteSql))
+		return k8sClient.ExecInPod(namespace, podName, containerName, deleteSql)
+	}
+
+	queryPWSecret, err := secret.AdaptFuncToEnsure(namespace, pwSecretSelectable, map[string]string{pwSecretKey: password})
+	if err != nil {
+		return nil, nil, err
+	}
+	destroyPWSecret, err := secret.AdaptFuncToDestroy(namespace, pwSecretSelectable.Name())
+	if err != nil {
+		return nil, nil, err
 	}
 
 	queriers := []operator.QueryFunc{
-		addUser,
 		operator.EnsureFuncToQueryFunc(ensureUser),
+		operator.ResourceQueryToZitadelQuery(queryPWSecret),
 	}
 
 	destroyers := []operator.DestroyFunc{
 		destoryUser,
-		deleteUser,
+		operator.ResourceDestroyToZitadelDestroy(destroyPWSecret),
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -72,4 +70,3 @@ func AdaptFunc(
 		operator.DestroyersToDestroyFunc(monitor, destroyers),
 		nil
 }
-*/

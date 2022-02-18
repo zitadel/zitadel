@@ -3,7 +3,6 @@ package statefulset
 import (
 	"errors"
 	"fmt"
-	"github.com/caos/zitadel/pkg/databases/db"
 	"sort"
 	"strings"
 	"time"
@@ -34,7 +33,7 @@ const (
 	clientCertsInternal = "client-certs"
 	defaultMode         = int32(256)
 	nodeSecret          = "cockroachdb.node"
-	rootSecret          = db.CertsSecret
+	rootSecret          = "rootcerts"
 	cleanTimeout        = time.Minute * 5
 )
 

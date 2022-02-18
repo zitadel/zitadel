@@ -2,6 +2,7 @@ package current
 
 import (
 	"crypto/rsa"
+	"github.com/caos/orbos/pkg/labels"
 
 	"github.com/caos/zitadel/pkg/databases/db"
 
@@ -18,9 +19,13 @@ type Current struct {
 }
 
 type CurrentDB struct {
-	URL  string
-	Port string
-	CA   *cacurr.Current
+	URL               string
+	Port              string
+	User              string
+	PasswordSecret    *labels.Selectable
+	PasswordSecretKey string
+	CA                *cacurr.Current
+
 	/*
 		AddUserFunc    func(user string) (operator.QueryFunc, error)
 		DeleteUserFunc func(user string) (operator.DestroyFunc, error)
@@ -49,10 +54,12 @@ func (c *Current) SetCertificate(cert []byte) {
 	c.Current.CA.Certificate = cert
 }
 
-func (c *Current) Host() string                     { return "cockroachdb-public" }
-func (c *Current) Port() string                     { return "26257" }
-func (c *Current) User() string                     { return "root" }
-func (c *Current) PasswordSecret() (string, string) { return "", "" }
+func (c *Current) Host() string { return "cockroachdb-public" }
+func (c *Current) Port() string { return "26257" }
+func (c *Current) User() string { return c.Current.User }
+func (c *Current) PasswordSecret() (*labels.Selectable, string) {
+	return c.Current.PasswordSecret, c.Current.PasswordSecretKey
+}
 
 func (c *Current) SSL() *db.SSL {
 	return &db.SSL{

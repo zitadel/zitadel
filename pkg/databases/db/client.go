@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/caos/orbos/pkg/labels"
 
 	"github.com/caos/zitadel/operator/common"
 
@@ -20,17 +21,19 @@ type Client interface {
 */
 
 const (
-	CertsSecret = "db-certficates"
-	RootCert    = "ca.crt"
-	UserCert    = "client.root.crt"
-	UserKey     = "client.root.key"
+	CertsSecret  = "db-certficates" // TODO: make dynamic
+	CACert       = "ca.crt"
+	RootUserCert = "client.root.crt"
+	RootUserKey  = "client.root.key"
+	UserCert     = "client.zitadel.crt"
+	UserKey      = "client.zitadel.key"
 )
 
 type Connection interface {
 	Host() string
 	Port() string
 	User() string
-	PasswordSecret() (string, string)
+	PasswordSecret() (*labels.Selectable, string)
 	SSL() *SSL
 	Options() string
 }

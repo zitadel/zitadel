@@ -105,20 +105,37 @@ func Adapter(
 			}
 		}
 
-		queryCert, destroyCert, addUser, deleteUser, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
+		currentDB := &managedCurr.Current{
+			Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
+			Current: &managedCurr.CurrentDB{
+				CA: &certCurr.Current{},
+			},
 		}
-		addRoot, err := addUser("root", db.CertsSecret, db.UserCert, db.UserKey)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-		destroyRoot, err := deleteUser(db.CertsSecret)
+		current.Parsed = currentDB
+
+		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, "managed-db-password"))
+		currentDB.Current.PasswordSecretKey = "zitadel"
+		currentDB.Current.PasswordSecret = pwSecretLabels
+		currentDB.Current.User = "zitadel"
+
+		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := certificate.AdaptFunc(
+			internalMonitor,
+			namespace,
+			componentLabels,
+			desiredKind.Spec.ClusterDns,
+			isFeatureDatabase,
+			currentDB.Current.User,
+			pwSecretLabels,
+			currentDB.Current.PasswordSecretKey,
+		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryRBAC, destroyRBAC, err := rbac.AdaptFunc(internalMonitor, namespace, labels.MustForName(componentLabels, serviceAccountName))
+		if err != nil {
+			return nil, nil, nil, nil, nil, false, err
+		}
 
 		cockroachNameLabels := labels.MustForName(componentLabels, SfsName)
 		cockroachSelector := labels.DeriveNameSelector(cockroachNameLabels, false)
@@ -161,14 +178,6 @@ func Adapter(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		currentDB := &managedCurr.Current{
-			Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
-			Current: &managedCurr.CurrentDB{
-				CA: &certCurr.Current{},
-			},
-		}
-		current.Parsed = currentDB
-
 		var (
 			queriers    = make([]operator.QueryFunc, 0)
 			destroyers  = make([]operator.DestroyFunc, 0)
@@ -177,19 +186,19 @@ func Adapter(
 		if isFeatureDatabase {
 			queriers = append(queriers,
 				queryRBAC,
-				queryCert,
-				addRoot,
+				queryDBSetupBeforeCR,
 				operator.ResourceQueryToZitadelQuery(querySFS),
-				operator.ResourceQueryToZitadelQuery(queryPDB),
 				queryS,
 				operator.EnsureFuncToQueryFunc(ensureInit),
+				queryDBSetupAfterCR,
+				operator.ResourceQueryToZitadelQuery(queryPDB),
 			)
 			destroyers = append(destroyers,
 				destroyS,
+				destroyDBSetupAfterCR,
 				operator.ResourceDestroyToZitadelDestroy(destroySFS),
+				destroyDBSetupBeforeCR,
 				destroyRBAC,
-				destroyCert,
-				destroyRoot,
 			)
 		}
 

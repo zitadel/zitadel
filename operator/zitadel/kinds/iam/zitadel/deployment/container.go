@@ -29,8 +29,6 @@ func GetContainer(
 	dbConn db.Connection,
 ) corev1.Container {
 
-	crpwName, crpwKey := dbConn.PasswordSecret()
-
 	envVars := []corev1.EnvVar{{
 		Name: "POD_IP",
 		ValueFrom: &corev1.EnvVarSource{
@@ -100,13 +98,6 @@ func GetContainer(
 				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
 				Key:                  "SENTRY_DSN",
 			},
-		}}, {
-		Name: "CR_PASSWORD",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: crpwName},
-				Key:                  crpwKey,
-			},
 		}},
 	}
 	/*
@@ -124,6 +115,19 @@ func GetContainer(
 		}
 
 	*/
+
+	crpwSecret, crpwKey := dbConn.PasswordSecret()
+	if crpwSecret != nil {
+		envVars = append(envVars, corev1.EnvVar{
+			Name: "CR_PASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: crpwSecret.Name()},
+					Key:                  crpwKey,
+				},
+			},
+		})
+	}
 
 	volMounts := []corev1.VolumeMount{
 		{Name: secretName, MountPath: secretPath},
