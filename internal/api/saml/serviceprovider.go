@@ -9,14 +9,12 @@ import (
 	"crypto/x509"
 	"encoding/asn1"
 	"encoding/base64"
-	"encoding/xml"
 	"fmt"
+	mdxml "github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
-	"io"
 	"math/big"
-	"net/http"
 )
 
 type ServiceProviderConfig struct {
@@ -35,17 +33,10 @@ func (sp *ServiceProvider) GetEntityID() string {
 	return string(sp.metadata.EntityID)
 }
 
-func NewServiceProvider(config *ServiceProviderConfig) (*ServiceProvider, error) {
-	metadata := &md.EntityDescriptor{}
+func NewServiceProvider(id string, config *ServiceProviderConfig) (*ServiceProvider, error) {
 	metadataData := make([]byte, 0)
 	if config.URL != "" {
-		resp, err := http.Get(config.URL)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
+		body, err := mdxml.ReadMetadataFromURL(config.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -53,8 +44,7 @@ func NewServiceProvider(config *ServiceProviderConfig) (*ServiceProvider, error)
 	} else {
 		metadataData = []byte(config.Metadata)
 	}
-
-	err := xml.Unmarshal(metadataData, metadata)
+	metadata, err := mdxml.ParseMetadataXmlIntoStruct(metadataData)
 	if err != nil {
 		return nil, err
 	}
@@ -64,22 +54,25 @@ func NewServiceProvider(config *ServiceProviderConfig) (*ServiceProvider, error)
 	if metadata.SPSSODescriptor.KeyDescriptor != nil && len(metadata.SPSSODescriptor.KeyDescriptor) > 0 {
 		for _, keydesc := range metadata.SPSSODescriptor.KeyDescriptor {
 			if keydesc.Use == md.KeyTypesSigning {
-				certStr = keydesc.KeyInfo.X509Data[0].X509Certificate
+				certStr = keydesc.KeyInfo.X509Data[0].X509Certificate[0]
 			}
 		}
 
-		block, err := base64.StdEncoding.DecodeString(certStr)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse PEM block containing the public key")
+		if certStr != "" {
+			block, err := base64.StdEncoding.DecodeString(certStr)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse PEM block containing the public key")
+			}
+			certT, err := x509.ParseCertificate(block)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse certificate: " + err.Error())
+			}
+			cert = certT
 		}
-		certT, err := x509.ParseCertificate(block)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse certificate: " + err.Error())
-		}
-		cert = certT
 	}
 
 	return &ServiceProvider{
+		ID:              id,
 		metadata:        metadata,
 		url:             config.URL,
 		signerPublicKey: cert.PublicKey,

@@ -17,6 +17,7 @@ type SAMLConfigAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AppID       string `json:"appId"`
+	EntityID    string `json:"entityId"`
 	Metadata    string `json:"metadata,omitempty"`
 	MetadataURL string `json:"metadata_url,omitempty"`
 }
@@ -33,6 +34,7 @@ func NewSAMLConfigAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
+	entityID string,
 	metadata string,
 	metadataURL string,
 ) *SAMLConfigAddedEvent {
@@ -43,6 +45,7 @@ func NewSAMLConfigAddedEvent(
 			SAMLConfigAddedType,
 		),
 		AppID:       appID,
+		EntityID:    entityID,
 		Metadata:    metadata,
 		MetadataURL: metadataURL,
 	}
@@ -64,7 +67,8 @@ func SAMLConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader
 type SAMLConfigChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	AppID       string `json:"appId"`
+	AppID       string  `json:"appId"`
+	EntityID    string  `json:"entityId"`
 	Metadata    *string `json:"metadata,omitempty"`
 	MetadataURL *string `json:"metadata_url,omitempty"`
 }
@@ -81,6 +85,7 @@ func NewSAMLConfigChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
+	entityID string,
 	changes []SAMLConfigChanges,
 ) (*SAMLConfigChangedEvent, error) {
 	if len(changes) == 0 {

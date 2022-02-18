@@ -250,10 +250,6 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 		if err != nil {
 			logging.Log("API-pwaiks").OnError(err).Fatal("error starting saml")
 		}
-
-		if err := saml.AddTestSP(idp); err != nil {
-			logging.Log("API-pwaiks").OnError(err).Fatal("error adding saml sp")
-		}
 		apis.RegisterHandler("/saml", idp.HttpHandler())
 	}
 

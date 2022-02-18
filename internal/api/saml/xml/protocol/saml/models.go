@@ -68,7 +68,7 @@ type AssertionURIRef struct {
 
 // Element
 type Assertion struct {
-	XMLName xml.Name `xml:"Assertion"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Assertion"`
 
 	Version string `xml:"Version,attr"`
 
@@ -413,13 +413,13 @@ type AssertionType struct {
 }
 
 type SubjectType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Subject"`
 
 	SubjectConfirmation []SubjectConfirmationType `xml:"SubjectConfirmation"`
 
 	BaseID *BaseIDAbstractType `xml:"BaseID"`
 
-	NameID *NameIDType `xml:"NameID"`
+	NameID *NameIDType `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
 
 	EncryptedID *EncryptedElementType `xml:"EncryptedID"`
 
@@ -427,7 +427,7 @@ type SubjectType struct {
 }
 
 type SubjectConfirmationType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectConfirmation"`
 
 	Method string `xml:"Method,attr"`
 
@@ -443,7 +443,7 @@ type SubjectConfirmationType struct {
 }
 
 type SubjectConfirmationDataType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion SubjectConfirmationData"`
 
 	NotBefore string `xml:"NotBefore,attr,omitempty"`
 
@@ -475,7 +475,7 @@ type KeyInfoConfirmationDataType struct {
 }
 
 type ConditionsType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Conditions"`
 
 	NotBefore string `xml:"NotBefore,attr,omitempty"`
 
@@ -499,7 +499,7 @@ type ConditionAbstractType struct {
 }
 
 type AudienceRestrictionType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion AudienceRestriction"`
 
 	Audience []string `xml:",any"`
 
@@ -543,7 +543,7 @@ type StatementAbstractType struct {
 }
 
 type AuthnStatementType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnStatement"`
 
 	AuthnInstant string `xml:"AuthnInstant,attr"`
 
@@ -569,15 +569,15 @@ type SubjectLocalityType struct {
 }
 
 type AuthnContextType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContext"`
 
-	AuthenticatingAuthority []string `xml:"AuthenticatingAuthority"`
+	AuthenticatingAuthority []string `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthenticatingAuthority"`
 
-	AuthnContextClassRef string `xml:"AuthnContextClassRef"`
+	AuthnContextClassRef string `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextClassRef,omitempty"`
 
-	AuthnContextDecl string `xml:"AuthnContextDecl"`
+	AuthnContextDecl string `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextDecl,omitempty"`
 
-	AuthnContextDeclRef string `xml:"AuthnContextDeclRef"`
+	AuthnContextDeclRef string `xml:"urn:oasis:names:tc:SAML:2.0:assertion AuthnContextDeclRef,omitempty"`
 
 	InnerXml string `xml:",innerxml"`
 }
@@ -628,7 +628,7 @@ type AttributeStatementType struct {
 }
 
 type AttributeType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Attribute"`
 
 	Name string `xml:"Name,attr"`
 

@@ -253,7 +253,7 @@ type RSAKeyValue struct {
 // XSD ComplexType declarations
 
 type SignatureType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# Signature"`
 
 	Id string `xml:"Id,attr,omitempty"`
 

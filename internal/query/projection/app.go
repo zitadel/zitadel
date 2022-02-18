@@ -22,6 +22,7 @@ const (
 	AppProjectionTable = "zitadel.projections.apps"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
+	AppSAMLTable       = AppProjectionTable + "_" + appSAMLTableSuffix
 )
 
 func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *AppProjection {
@@ -85,6 +86,14 @@ func (p *AppProjection) reducers() []handler.AggregateReducer {
 					Event:  project.OIDCConfigSecretChangedType,
 					Reduce: p.reduceOIDCConfigSecretChanged,
 				},
+				{
+					Event:  project.SAMLConfigAddedType,
+					Reduce: p.reduceSAMLConfigAdded,
+				},
+				{
+					Event:  project.SAMLConfigChangedType,
+					Reduce: p.reduceSAMLConfigChanged,
+				},
 			},
 		},
 	}
@@ -124,6 +133,12 @@ const (
 	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
 	AppOIDCConfigColumnClockSkew                = "clock_skew"
 	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
+
+	appSAMLTableSuffix             = "saml_configs"
+	AppSAMLConfigColumnEntityID    = "entity_id"
+	AppSAMLConfigColumnAppID       = "app_id"
+	AppSAMLConfigColumnMetadata    = "metadata"
+	AppSAMLConfigColumnMetadataURL = "metadata_url"
 )
 
 func (p *AppProjection) reduceAppAdded(event eventstore.EventReader) (*handler.Statement, error) {
@@ -464,6 +479,75 @@ func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.EventRead
 				handler.NewCond(AppOIDCConfigColumnAppID, e.AppID),
 			},
 			crdb.WithTableSuffix(appOIDCTableSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+			},
+		),
+	), nil
+}
+
+func (p *AppProjection) reduceSAMLConfigAdded(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.SAMLConfigAddedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-nlDOv", "seq", event.Sequence(), "expectedType", project.SAMLConfigAddedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
+	}
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(AppSAMLConfigColumnAppID, e.AppID),
+				handler.NewCol(AppSAMLConfigColumnEntityID, e.EntityID),
+				handler.NewCol(AppSAMLConfigColumnMetadata, e.Metadata),
+				handler.NewCol(AppSAMLConfigColumnMetadataURL, e.MetadataURL),
+			},
+			crdb.WithTableSuffix(appSAMLTableSuffix),
+		),
+		crdb.AddUpdateStatement(
+			[]handler.Column{
+				handler.NewCol(AppColumnChangeDate, e.CreationDate()),
+				handler.NewCol(AppColumnSequence, e.Sequence()),
+			},
+			[]handler.Condition{
+				handler.NewCond(AppColumnID, e.AppID),
+			},
+		),
+	), nil
+}
+
+func (p *AppProjection) reduceSAMLConfigChanged(event eventstore.EventReader) (*handler.Statement, error) {
+	e, ok := event.(*project.SAMLConfigChangedEvent)
+	if !ok {
+		logging.LogWithFields("HANDL-nlDOv", "seq", event.Sequence(), "expectedType", project.SAMLConfigChangedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GMHU1", "reduce.wrong.event.type")
+	}
+
+	cols := make([]handler.Column, 0, 15)
+	if e.Metadata != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadata, *e.Metadata))
+	}
+	if e.MetadataURL != nil {
+		cols = append(cols, handler.NewCol(AppSAMLConfigColumnMetadataURL, *e.MetadataURL))
+	}
+
+	if len(cols) == 0 {
+		return crdb.NewNoOpStatement(e), nil
+	}
+
+	return crdb.NewMultiStatement(
+		e,
+		crdb.AddUpdateStatement(
+			cols,
+			[]handler.Condition{
+				handler.NewCond(AppSAMLConfigColumnAppID, e.AppID),
+			},
+			crdb.WithTableSuffix(appSAMLTableSuffix),
 		),
 		crdb.AddUpdateStatement(
 			[]handler.Column{

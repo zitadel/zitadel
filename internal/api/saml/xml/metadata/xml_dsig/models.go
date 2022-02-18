@@ -354,7 +354,7 @@ type DigestMethodType struct {
 }
 
 type KeyInfoType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# KeyInfo"`
 
 	Id string `xml:"Id,attr,omitempty"`
 
@@ -364,7 +364,7 @@ type KeyInfoType struct {
 
 	RetrievalMethod []RetrievalMethodType `xml:"RetrievalMethod"`
 
-	X509Data []X509DataType `xml:"X509Data"`
+	X509Data []X509DataType `xml:"http://www.w3.org/2000/09/xmldsig# X509Data"`
 
 	PGPData []PGPDataType `xml:"PGPData"`
 
@@ -398,17 +398,17 @@ type RetrievalMethodType struct {
 }
 
 type X509DataType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# X509Data"`
 
 	X509IssuerSerial *X509IssuerSerialType `xml:"X509IssuerSerial"`
 
-	X509SKI string `xml:"X509SKI"`
+	X509SKI string `xml:"http://www.w3.org/2000/09/xmldsig# X509SKI"`
 
-	X509SubjectName string `xml:"X509SubjectName"`
+	X509SubjectName string `xml:"http://www.w3.org/2000/09/xmldsig# X509SubjectName"`
 
-	X509Certificate string `xml:"X509Certificate"`
+	X509Certificate []string `xml:"http://www.w3.org/2000/09/xmldsig# X509Certificate"`
 
-	X509CRL string `xml:"X509CRL"`
+	X509CRL string `xml:"http://www.w3.org/2000/09/xmldsig# X509CRL"`
 
 	InnerXml string `xml:",innerxml"`
 }

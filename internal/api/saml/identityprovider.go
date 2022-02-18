@@ -12,7 +12,7 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"gopkg.in/square/go-jose.v2"
 	"net/http"
 	"text/template"
@@ -61,6 +61,7 @@ type IdentityProvider struct {
 	AAMetadata *md.AttributeAuthorityDescriptorType
 	signer     xmlsig.Signer
 
+	baseURL                      string
 	LoginService                 string
 	SingleSignOnService          string
 	SingleLogoutService          string
@@ -106,10 +107,11 @@ func NewIdentityProvider(baseURL string, conf *IdentityProviderConfig, storage I
 		return nil, err
 	}
 
-	metadata, aaMetadata := conf.getMetadata(baseURL, certPem)
+	metadata, aaMetadata := conf.getMetadata(baseURL, tlsCert.Certificate[0])
 	return &IdentityProvider{
 		storage:                      storage,
-		EntityID:                     baseURL + "/" + metadataEndpoint,
+		EntityID:                     baseURL + metadataEndpoint,
+		baseURL:                      baseURL,
 		Metadata:                     metadata,
 		AAMetadata:                   aaMetadata,
 		signer:                       signer,
@@ -143,12 +145,11 @@ func (p *IdentityProvider) GetRoutes() []*Route {
 
 func (p *IdentityProvider) GetRedirectURL(requestID string) string {
 	//TODO
-	return p.LoginService + "?requestId=" + requestID
+	return p.baseURL + p.LoginService + "?requestId=" + requestID
 }
 
-func (p *IdentityProvider) GetServiceProvider(applicationID, entityID string) *ServiceProvider {
-	p.
-		index := 0
+func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID string) (*ServiceProvider, error) {
+	index := 0
 	found := false
 	for i, sp := range p.ServiceProviders {
 		if sp.GetEntityID() == entityID {
@@ -158,13 +159,21 @@ func (p *IdentityProvider) GetServiceProvider(applicationID, entityID string) *S
 		}
 	}
 	if found == true {
-		return p.ServiceProviders[index]
+		return p.ServiceProviders[index], nil
 	}
-	return nil
+
+	sp, err := p.storage.GetEntityByID(ctx, entityID)
+	if err != nil {
+		return nil, err
+	}
+	if sp != nil {
+		p.ServiceProviders = append(p.ServiceProviders, sp)
+	}
+	return sp, nil
 }
 
-func (p *IdentityProvider) AddServiceProvider(config *ServiceProviderConfig) error {
-	sp, err := NewServiceProvider(config)
+func (p *IdentityProvider) AddServiceProvider(id string, config *ServiceProviderConfig) error {
+	sp, err := NewServiceProvider(id, config)
 	if err != nil {
 		return err
 	}
@@ -217,7 +226,7 @@ func notImplementedHandleFunc(w http.ResponseWriter, r *http.Request) {
 
 func getResponseCert(storage Storage) ([]byte, *rsa.PrivateKey) {
 	ctx := context.Background()
-	certAndKeyCh := make(chan eventstore.CertificateAndKey)
+	certAndKeyCh := make(chan key.CertificateAndKey)
 	go storage.GetResponseSigningKey(ctx, certAndKeyCh)
 
 	for {

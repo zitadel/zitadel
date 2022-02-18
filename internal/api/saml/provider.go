@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/auth/repository"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
@@ -184,7 +184,7 @@ func (p *Provider) Probes() []ProbesFn {
 }
 func getCACert(storage Storage) ([]byte, *rsa.PrivateKey) {
 	ctx := context.Background()
-	certAndKeyCh := make(chan eventstore.CertificateAndKey)
+	certAndKeyCh := make(chan key.CertificateAndKey)
 	go storage.GetCA(ctx, certAndKeyCh)
 	for {
 		select {
@@ -206,7 +206,7 @@ func getCACert(storage Storage) ([]byte, *rsa.PrivateKey) {
 
 func getMetadataCert(storage Storage) ([]byte, *rsa.PrivateKey) {
 	ctx := context.Background()
-	certAndKeyCh := make(chan eventstore.CertificateAndKey)
+	certAndKeyCh := make(chan key.CertificateAndKey)
 	go storage.GetMetadataSigningKey(ctx, certAndKeyCh)
 
 	for {

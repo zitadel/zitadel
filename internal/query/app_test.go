@@ -44,10 +44,16 @@ var (
 		` zitadel.projections.apps_oidc_configs.id_token_role_assertion,` +
 		` zitadel.projections.apps_oidc_configs.id_token_userinfo_assertion,` +
 		` zitadel.projections.apps_oidc_configs.clock_skew,` +
-		` zitadel.projections.apps_oidc_configs.additional_origins` +
+		` zitadel.projections.apps_oidc_configs.additional_origins,` +
+		// saml config
+		` zitadel.projections.apps_saml_configs.app_id,` +
+		` zitadel.projections.apps_saml_configs.entity_id,` +
+		` zitadel.projections.apps_saml_configs.metadata,` +
+		` zitadel.projections.apps_saml_configs.metadata_url` +
 		` FROM zitadel.projections.apps` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
-		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN zitadel.projections.apps_saml_configs ON zitadel.projections.apps.id = zitadel.projections.apps_saml_configs.app_id`)
 	expectedAppsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.apps.id,` +
 		` zitadel.projections.apps.name,` +
 		` zitadel.projections.apps.project_id,` +
@@ -77,10 +83,16 @@ var (
 		` zitadel.projections.apps_oidc_configs.id_token_userinfo_assertion,` +
 		` zitadel.projections.apps_oidc_configs.clock_skew,` +
 		` zitadel.projections.apps_oidc_configs.additional_origins,` +
+		// saml config
+		` zitadel.projections.apps_saml_configs.app_id,` +
+		` zitadel.projections.apps_saml_configs.entity_id,` +
+		` zitadel.projections.apps_saml_configs.metadata, ` +
+		` zitadel.projections.apps_saml_configs.metadata_url, ` +
 		` COUNT(*) OVER ()` +
 		` FROM zitadel.projections.apps` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
-		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN zitadel.projections.apps_saml_configs ON zitadel.projections.apps.id = zitadel.projections.apps_saml_configs.app_id`)
 	expectedAppIDsQuery = regexp.QuoteMeta(`SELECT zitadel.projections.apps_api_configs.client_id,` +
 		` zitadel.projections.apps_oidc_configs.client_id` +
 		` FROM zitadel.projections.apps` +
@@ -89,7 +101,8 @@ var (
 	expectedProjectIDByAppQuery = regexp.QuoteMeta(`SELECT zitadel.projections.apps.project_id` +
 		` FROM zitadel.projections.apps` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
-		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN zitadel.projections.apps_saml_configs ON zitadel.projections.apps.id = zitadel.projections.apps_saml_configs.app_id`)
 	expectedProjectByAppQuery = regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,` +
 		` zitadel.projections.projects.creation_date,` +
 		` zitadel.projections.projects.change_date,` +
@@ -104,7 +117,8 @@ var (
 		` FROM zitadel.projections.projects` +
 		` JOIN zitadel.projections.apps ON zitadel.projections.projects.id = zitadel.projections.apps.project_id` +
 		` LEFT JOIN zitadel.projections.apps_api_configs ON zitadel.projections.apps.id = zitadel.projections.apps_api_configs.app_id` +
-		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id`)
+		` LEFT JOIN zitadel.projections.apps_oidc_configs ON zitadel.projections.apps.id = zitadel.projections.apps_oidc_configs.app_id` +
+		` LEFT JOIN zitadel.projections.apps_saml_configs ON zitadel.projections.apps.id = zitadel.projections.apps_saml_configs.app_id`)
 
 	appCols = []string{
 		"id",
@@ -136,6 +150,11 @@ var (
 		"id_token_userinfo_assertion",
 		"clock_skew",
 		"additional_origins",
+		//saml config
+		"app_id",
+		"entity_id",
+		"metadata",
+		"metadata_url",
 	}
 	appsCols = append(appCols, "count")
 )
@@ -201,6 +220,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -257,6 +281,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							//saml config
 							nil,
 							nil,
 							nil,
@@ -325,6 +354,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							// saml config,
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -404,6 +438,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -483,6 +522,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -562,6 +606,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -641,6 +690,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -720,6 +774,11 @@ func Test_AppsPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 						{
 							"api-app-id",
@@ -747,6 +806,11 @@ func Test_AppsPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							//saml config
 							nil,
 							nil,
 							nil,
@@ -897,6 +961,11 @@ func Test_AppPrepare(t *testing.T) {
 						nil,
 						nil,
 						nil,
+						//saml config
+						nil,
+						nil,
+						nil,
+						nil,
 					},
 				),
 			},
@@ -945,6 +1014,11 @@ func Test_AppPrepare(t *testing.T) {
 							nil,
 							nil,
 							nil,
+							nil,
+							nil,
+							nil,
+							nil,
+							//saml config
 							nil,
 							nil,
 							nil,
@@ -1006,6 +1080,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1078,6 +1157,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1150,6 +1234,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1222,6 +1311,11 @@ func Test_AppPrepare(t *testing.T) {
 							true,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),
@@ -1294,6 +1388,11 @@ func Test_AppPrepare(t *testing.T) {
 							false,
 							1 * time.Second,
 							pq.StringArray{"additional.origin"},
+							//saml config
+							nil,
+							nil,
+							nil,
+							nil,
 						},
 					},
 				),

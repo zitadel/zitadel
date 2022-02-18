@@ -76,9 +76,8 @@ func (s *Server) AddSAMLApp(ctx context.Context, req *mgmt_pb.AddSAMLAppRequest)
 		return nil, err
 	}
 	return &mgmt_pb.AddSAMLAppResponse{
-		AppId:    app.AppID,
-		Details:  object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
-		EntityId: "test",
+		AppId:   app.AppID,
+		Details: object_grpc.AddToDetailsPb(app.Sequence, app.ChangeDate, app.ResourceOwner),
 	}, nil
 }
 

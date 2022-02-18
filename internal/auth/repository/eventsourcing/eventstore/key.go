@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"os"
 	"time"
 
@@ -38,11 +39,6 @@ type KeyRepository struct {
 	currentKeyExpiration     time.Time
 }
 
-type CertificateAndKey struct {
-	Certificate *jose.SigningKey
-	Key         *jose.SigningKey
-}
-
 const (
 	signingKey             = "signing_key"
 	samlMetadataSigningKey = "saml_metadata_singing_key"
@@ -72,7 +68,7 @@ func (k *KeyRepository) GetSigningKey(ctx context.Context, keyCh chan<- jose.Sig
 	}()
 }
 
-func (k *KeyRepository) GetCertificateAndKey(ctx context.Context, certAndKeyCh chan<- CertificateAndKey, algorithm string, usage model.KeyUsage) {
+func (k *KeyRepository) GetCertificateAndKey(ctx context.Context, certAndKeyCh chan<- key.CertificateAndKey, algorithm string, usage model.KeyUsage) {
 	renewTimer := time.After(0)
 	go func() {
 		for {
@@ -177,14 +173,14 @@ func (k *KeyRepository) ensureIsLatestKey(ctx context.Context) (bool, error) {
 func (k *KeyRepository) refreshCertificate(
 	ctx context.Context,
 	certAndKey *model.CertificateAndKeyView,
-	certAndKeyCh chan<- CertificateAndKey,
+	certAndKeyCh chan<- key.CertificateAndKey,
 	algorithm string,
 	usage model.KeyUsage,
 ) (refreshed bool, err error) {
 	if certAndKey == nil {
 		if k.currentKeyExpiration.Before(time.Now().UTC()) {
 			logging.Log("EVENT-ADg26").Info("unset current signing key")
-			certAndKeyCh <- CertificateAndKey{
+			certAndKeyCh <- key.CertificateAndKey{
 				Certificate: &jose.SigningKey{},
 				Key:         &jose.SigningKey{},
 			}
@@ -214,7 +210,7 @@ func (k *KeyRepository) refreshCertificate(
 			logging.Log("EVENT-HJd92").WithError(err).Error("cert cannot be decrypted -> immediate refresh")
 			return k.refreshCertificate(ctx, nil, certAndKeyCh, algorithm, usage)
 		}
-		certAndKeyCh <- CertificateAndKey{
+		certAndKeyCh <- key.CertificateAndKey{
 			Key: &jose.SigningKey{
 				Algorithm: jose.SignatureAlgorithm(certAndKeyView.Key.Algorithm),
 				Key: jose.JSONWebKey{

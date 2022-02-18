@@ -24,12 +24,12 @@ func GetTestConfig(basePath string) *ProviderConfig {
 			EmailAddress:    "stefan@caos.ch",
 			TelephoneNumber: "+41",
 		},
-		ValidUntil:    "2021-01-01T00:00:00",
-		CacheDuration: "PT30S",
-		ErrorURL:      "https://caos.ch",
+		ValidUntil: "2023-01-01T00:00:00Z",
+		//CacheDuration: "PT30S",
+		ErrorURL: "https://caos.ch",
 		IDP: &IdentityProviderConfig{
-			ValidUntil:                   "2021-01-01T00:00:00",
-			CacheDuration:                "PT30S",
+			ValidUntil: "2023-01-01T00:00:00Z",
+			//CacheDuration:                "PT30S",
 			ErrorURL:                     "https://caos.ch",
 			SignatureAlgorithm:           "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
 			DigestAlgorithm:              "http://www.w3.org/2000/09/xmldsig#sha1",
@@ -46,12 +46,4 @@ func GetTestConfig(basePath string) *ProviderConfig {
 		},
 	}
 	return conf
-}
-
-func AddTestSP(p *Provider) error {
-	conf := &ServiceProviderConfig{
-		URL: "http://service.example.org/simplesaml/module.php/saml/sp/metadata.php/default-sp",
-	}
-
-	return p.IdentityProvider.AddServiceProvider(conf)
 }

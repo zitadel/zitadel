@@ -3,9 +3,10 @@ package saml
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"github.com/caos/zitadel/internal/auth/repository"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore"
+	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/errors"
 	key_model "github.com/caos/zitadel/internal/key/model"
@@ -21,10 +22,11 @@ type Storage interface {
 }
 
 type EntityStorage interface {
-	GetEntityByID(ctx context.Context, entityID string)
-	GetCA(context.Context, chan<- eventstore.CertificateAndKey)
-	GetMetadataSigningKey(context.Context, chan<- eventstore.CertificateAndKey)
-	GetResponseSigningKey(context.Context, chan<- eventstore.CertificateAndKey)
+	GetEntityByID(ctx context.Context, entityID string) (*ServiceProvider, error)
+	GetEntityIDByAppID(ctx context.Context, entityID string) (string, error)
+	GetCA(context.Context, chan<- key.CertificateAndKey)
+	GetMetadataSigningKey(context.Context, chan<- key.CertificateAndKey)
+	GetResponseSigningKey(context.Context, chan<- key.CertificateAndKey)
 }
 
 type ProviderStorage struct {
@@ -35,22 +37,47 @@ type ProviderStorage struct {
 	SignAlgorithm string
 }
 
-func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) {
+func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*ServiceProvider, error) {
+	app, err := p.query.AppBySAMLEntityID(ctx, entityID)
+	if err != nil {
+		return nil, err
+	}
+	metadata := app.SAMLConfig.Metadata
 
+	return NewServiceProvider(
+		app.ID,
+		&ServiceProviderConfig{
+			Metadata: metadata,
+			URL:      app.SAMLConfig.MetadataURL,
+		},
+	)
 }
+
+func (p *ProviderStorage) GetEntityIDByAppID(ctx context.Context, appID string) (string, error) {
+	app, err := p.query.AppByID(ctx, appID)
+	if err != nil {
+		return "", err
+	}
+	metadata, err := xml.ParseMetadataXmlIntoStruct([]byte(app.SAMLConfig.Metadata))
+	if err != nil {
+		return "", err
+	}
+	return string(metadata.EntityID), nil
+}
+
 func (p *ProviderStorage) Health(context.Context) error {
 	return nil
 }
 
-func (p *ProviderStorage) GetCA(ctx context.Context, certAndKeyChan chan<- eventstore.CertificateAndKey) {
+func (p *ProviderStorage) GetCA(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
 	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLCA)
 }
 
-func (p *ProviderStorage) GetMetadataSigningKey(ctx context.Context, certAndKeyChan chan<- eventstore.CertificateAndKey) {
+func (p *ProviderStorage) GetMetadataSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
 	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLMetadataSigning)
 }
 
-func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyChan chan<- eventstore.CertificateAndKey) {
+func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
 	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLResponseSinging)
 }
 

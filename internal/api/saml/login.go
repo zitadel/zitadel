@@ -14,7 +14,7 @@ func (p *IdentityProvider) loginHandleFunc(w http.ResponseWriter, r *http.Reques
 		http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusInternalServerError)
 		return
 	}
-	requestID := r.Form.Get("requestID")
+	requestID := r.Form.Get("requestId")
 	if requestID == "" {
 		http.Error(w, fmt.Errorf("no requestID provided").Error(), http.StatusInternalServerError)
 		return
@@ -34,14 +34,41 @@ func (p *IdentityProvider) loginHandleFunc(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	entityID, err := p.storage.GetEntityIDByAppID(r.Context(), authRequest.GetApplicationID())
+	if err != nil {
+		http.Error(w, fmt.Errorf("failed to get entityID: %w", err).Error(), http.StatusInternalServerError)
+	}
+
+	nameID := authRequest.GetNameID()
+	nameID = "stefan"
+	ip := getIP(r).String()
+	ip = "192.168.0.1"
 	//TODO get userinfo
-	attributes := []*saml.AttributeType{}
+	attributes := []*saml.AttributeType{
+		{
+			Name:           "FirstName",
+			NameFormat:     "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+			AttributeValue: []string{"stefan"},
+		},
+		{
+			Name:           "SurName",
+			NameFormat:     "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+			AttributeValue: []string{"benz"},
+		},
+		{
+			Name:           "Email",
+			NameFormat:     "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
+			AttributeValue: []string{"stefan@caos.ch"},
+		},
+	}
 
 	resp := makeSuccessfulResponse(
 		authRequest,
-		getIP(r).String(),
-		authRequest.GetNameID(),
+		p.EntityID,
+		ip,
+		nameID,
 		attributes,
+		entityID,
 	)
 
 	signature, err := createSignatureP(p.signer, resp.Assertion)

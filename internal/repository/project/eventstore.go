@@ -37,6 +37,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(OIDCConfigSecretChangedType, OIDCConfigSecretChangedEventMapper).
 		RegisterFilterEventMapper(OIDCClientSecretCheckSucceededType, OIDCConfigSecretCheckSucceededEventMapper).
 		RegisterFilterEventMapper(OIDCClientSecretCheckFailedType, OIDCConfigSecretCheckFailedEventMapper).
+		RegisterFilterEventMapper(SAMLConfigAddedType, SAMLConfigAddedEventMapper).
+		RegisterFilterEventMapper(SAMLConfigChangedType, SAMLConfigChangedEventMapper).
 		RegisterFilterEventMapper(APIConfigAddedType, APIConfigAddedEventMapper).
 		RegisterFilterEventMapper(APIConfigChangedType, APIConfigChangedEventMapper).
 		RegisterFilterEventMapper(APIConfigSecretChangedType, APIConfigSecretChangedEventMapper).

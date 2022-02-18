@@ -3908,7 +3908,6 @@ message AddSAMLAppRequest {
 message AddSAMLAppResponse {
     string app_id = 1;
     zitadel.v1.ObjectDetails details = 2;
-    string entity_id = 3;
 }
 
 message AddAPIAppRequest {

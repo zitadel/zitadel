@@ -43,7 +43,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			KeyInfo: xml_dsig.KeyInfoType{
 				KeyName: []string{baseURL + " IDP " + string(md.KeyTypesSigning)},
 				X509Data: []xml_dsig.X509DataType{{
-					X509Certificate: base64.StdEncoding.EncodeToString(idpCertData),
+					X509Certificate: []string{base64.StdEncoding.EncodeToString(idpCertData)},
 				}},
 			},
 		},
@@ -52,7 +52,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			KeyInfo: xml_dsig.KeyInfoType{
 				KeyName: []string{baseURL + " IDP " + string(md.KeyTypesEncryption)},
 				X509Data: []xml_dsig.X509DataType{{
-					X509Certificate: base64.StdEncoding.EncodeToString(idpCertData),
+					X509Certificate: []string{base64.StdEncoding.EncodeToString(idpCertData)},
 				}},
 			},
 			EncryptionMethod: []xenc.EncryptionMethodType{{
@@ -145,7 +145,7 @@ func (p *ProviderConfig) getMetadata(
 
 	entity := &md.EntityDescriptor{
 		XMLName:       xml.Name{Local: "md"},
-		EntityID:      md.EntityIDType(p.BaseURL + "/" + metadataEndpoint),
+		EntityID:      md.EntityIDType(p.BaseURL + metadataEndpoint),
 		Id:            NewID(),
 		Signature:     nil,
 		Organization:  nil,

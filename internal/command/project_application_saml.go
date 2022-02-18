@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"fmt"
+	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -30,7 +32,6 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 	}
 	result := samlWriteModelToSAMLConfig(addedApplication)
 	return result, nil
-
 }
 
 func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstore.Aggregate, samlApp *domain.SAMLApp, resourceOwner string) (events []eventstore.EventPusher, err error) {
@@ -46,9 +47,30 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		project.NewApplicationAddedEvent(ctx, projectAgg, samlApp.AppID, samlApp.AppName),
 	}
 
+	if samlApp.Metadata == "" && samlApp.MetadataURL == "" {
+		return nil, fmt.Errorf("no metadata provided")
+	}
+
+	var metadata []byte
+	if samlApp.MetadataURL != "" {
+		data, err := xml.ReadMetadataFromURL(samlApp.MetadataURL)
+		if err != nil {
+			return nil, err
+		}
+		metadata = data
+	} else {
+		metadata = []byte(samlApp.Metadata)
+	}
+
+	entity, err := xml.ParseMetadataXmlIntoStruct(metadata)
+	if err != nil {
+		return nil, err
+	}
+
 	events = append(events, project.NewSAMLConfigAddedEvent(ctx,
 		projectAgg,
 		samlApp.AppID,
+		string(entity.EntityID),
 		samlApp.Metadata,
 		samlApp.MetadataURL,
 	))
@@ -72,10 +94,26 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, saml *domain.SAMLA
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GBr34", "Errors.Project.App.IsNotOIDC")
 	}
 	projectAgg := ProjectAggregateFromWriteModel(&existingSAML.WriteModel)
+
+	var metadata []byte
+	if saml.MetadataURL != "" {
+		data, err := xml.ReadMetadataFromURL(saml.MetadataURL)
+		if err != nil {
+			return nil, err
+		}
+		metadata = data
+	}
+
+	entity, err := xml.ParseMetadataXmlIntoStruct(metadata)
+	if err != nil {
+		return nil, err
+	}
+
 	changedEvent, hasChanged, err := existingSAML.NewChangedEvent(
 		ctx,
 		projectAgg,
 		saml.AppID,
+		string(entity.EntityID),
 		saml.Metadata,
 		saml.MetadataURL)
 	if err != nil {

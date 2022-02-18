@@ -51,7 +51,7 @@ func createSignatureM(signer xmlsig.Signer, data interface{}) (*xml_dsig.Signatu
 		KeyInfo: &xml_dsig.KeyInfoType{
 			XMLName: xml.Name{},
 			X509Data: []xml_dsig.X509DataType{{
-				X509Certificate: sig.KeyInfo.X509Data.X509Certificate,
+				X509Certificate: []string{sig.KeyInfo.X509Data.X509Certificate},
 			}},
 			InnerXml: "",
 		},

@@ -53,7 +53,10 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	sp := p.GetServiceProvider(authNRequest.Issuer.Text)
+	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
+	if err != nil {
+		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
+	}
 	if sp == nil {
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			authNRequest.Id,

@@ -155,6 +155,7 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	appID string,
+	entityID string,
 	metadata string,
 	metadataURL string,
 ) (*project.SAMLConfigChangedEvent, bool, error) {
@@ -170,7 +171,7 @@ func (wm *SAMLApplicationWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := project.NewSAMLConfigChangedEvent(ctx, aggregate, appID, changes)
+	changeEvent, err := project.NewSAMLConfigChangedEvent(ctx, aggregate, appID, entityID, changes)
 	if err != nil {
 		return nil, false, err
 	}

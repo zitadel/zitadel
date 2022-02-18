@@ -9,6 +9,7 @@ type SAMLApp struct {
 
 	AppID       string
 	AppName     string
+	EntityID    string
 	Metadata    string
 	MetadataURL string
 
@@ -31,9 +32,8 @@ func (a *SAMLApp) GetMetadataURL() string {
 	return a.MetadataURL
 }
 
-
 func (a *SAMLApp) IsValid() bool {
-	if a.MetadataURL == "" && a.Metadata == ""{
+	if a.MetadataURL == "" && a.Metadata == "" {
 		return false
 	}
 	return true

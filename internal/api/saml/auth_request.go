@@ -2,6 +2,7 @@ package saml
 
 type AuthRequestInt interface {
 	GetID() string
+	GetApplicationID() string
 	GetRelayState() string
 	GetNameID() string
 	GetAccessConsumerServiceURL() string

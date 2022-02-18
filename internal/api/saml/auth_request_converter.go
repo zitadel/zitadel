@@ -12,6 +12,10 @@ type AuthRequest struct {
 	*domain.AuthRequest
 }
 
+func (a *AuthRequest) GetApplicationID() string {
+	return a.ApplicationID
+}
+
 func (a *AuthRequest) GetID() string {
 	return a.ID
 }
@@ -56,8 +60,8 @@ func (a *AuthRequest) Done() bool {
 }
 
 func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ AuthRequestInt, err error) {
-	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); !ok {
-		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Haz7A", "auth request is not of type oidc")
+	if _, ok := authReq.Request.(*domain.AuthRequestSAML); !ok {
+		return nil, errors.ThrowInvalidArgument(nil, "OIDC-Hbz7A", "auth request is not of type saml")
 	}
 	return &AuthRequest{authReq}, nil
 }

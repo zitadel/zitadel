@@ -68,7 +68,7 @@ type AssertionURIRef struct {
 
 // Element
 type Assertion struct {
-	XMLName xml.Name `xml:"Assertion"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Assertion"`
 
 	Version string `xml:"Version,attr"`
 
@@ -383,7 +383,7 @@ type EncryptedElementType struct {
 }
 
 type AssertionType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Assertion"`
 
 	Version string `xml:"Version,attr"`
 

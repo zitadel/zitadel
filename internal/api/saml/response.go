@@ -149,16 +149,18 @@ func makeFailedResponse(
 
 func makeSuccessfulResponse(
 	request AuthRequestInt,
+	entityID string,
 	sendIP string,
 	nameID string,
 	attributes []*saml.AttributeType,
+	audience string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	fiveFromNowStr := now.Add(5 * time.Minute).Format(DefaultTimeFormat)
 	issuer := &saml.NameIDType{
 		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   request.GetDestination(),
+		Text:   entityID,
 	}
 
 	return makeAssertionResponse(
@@ -170,6 +172,7 @@ func makeSuccessfulResponse(
 		issuer,
 		nameID,
 		attributes,
+		audience,
 	)
 }
 
@@ -182,22 +185,24 @@ func makeAssertionResponse(
 	issuer *saml.NameIDType,
 	nameID string,
 	attributes []*saml.AttributeType,
+	audience string,
 ) *samlp.Response {
 	response := makeResponse(requestID, acsURL, issueInstant, StatusCodeSuccess, "", issuer)
-	assertion := makeAssertion(requestID, acsURL, sendIP, issueInstant, untilInstant, issuer, nameID, attributes)
+	assertion := makeAssertion(requestID, acsURL, sendIP, issueInstant, untilInstant, issuer, nameID, attributes, audience)
 	response.Assertion = *assertion
 	return response
 }
 
 func makeAssertion(
 	requestID string,
-	sendIP string,
 	acsURL string,
+	sendIP string,
 	issueInstant string,
 	untilInstant string,
 	issuer *saml.NameIDType,
 	nameID string,
 	attributes []*saml.AttributeType,
+	audience string,
 ) *saml.Assertion {
 	id := NewID()
 	return &saml.Assertion{
@@ -211,9 +216,9 @@ func makeAssertion(
 				Text:   nameID,
 			},
 			SubjectConfirmation: []saml.SubjectConfirmationType{
-				{
+				/*{
 					Method: "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches",
-				},
+				},*/
 				{
 					Method: "urn:oasis:names:tc:SAML:2.0:cm:bearer",
 					SubjectConfirmationData: &saml.SubjectConfirmationDataType{
@@ -229,7 +234,7 @@ func makeAssertion(
 			NotBefore:    issueInstant,
 			NotOnOrAfter: untilInstant,
 			AudienceRestriction: []saml.AudienceRestrictionType{
-				{Audience: []string{issuer.Text}},
+				{Audience: []string{audience}},
 			},
 		},
 		AttributeStatement: []saml.AttributeStatementType{

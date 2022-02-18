@@ -16,7 +16,7 @@ type Extensions struct {
 
 // Element
 type Status struct {
-	XMLName xml.Name `xml:"Status"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Status"`
 
 	StatusCode StatusCodeType `xml:"StatusCode"`
 
@@ -287,7 +287,7 @@ type GetComplete struct {
 
 // Element
 type Response struct {
-	XMLName xml.Name `xml:"Response"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Response"`
 
 	Id string `xml:"ID,attr"`
 
@@ -620,7 +620,7 @@ type StatusResponseType struct {
 }
 
 type StatusType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol Status"`
 
 	StatusCode StatusCodeType `xml:"StatusCode"`
 
@@ -632,7 +632,7 @@ type StatusType struct {
 }
 
 type StatusCodeType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol StatusCode"`
 
 	Value string `xml:"Value,attr"`
 
