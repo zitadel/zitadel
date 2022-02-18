@@ -205,32 +205,30 @@
             <div class="colors" *ngIf="data && previewData">
               <div class="color">
                 <cnsl-color [colorType]="ColorType.BACKGROUNDLIGHT"
-                  (previewChanged)="previewData.backgroundColor = $event" name="Background Color"
+                  (previewChanged)="previewData.backgroundColor = $event; savePolicy()" name="Background Color"
                   [color]="data.backgroundColor" [previewColor]="previewData.backgroundColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.PRIMARY" (previewChanged)="previewData.primaryColor = $event"
-                  name="Primary Color" [color]="data.primaryColor" [previewColor]="previewData.primaryColor">
+                <cnsl-color [colorType]="ColorType.PRIMARY"
+                  (previewChanged)="previewData.primaryColor = $event; savePolicy()" name="Primary Color"
+                  [color]="data.primaryColor" [previewColor]="previewData.primaryColor">
                 </cnsl-color>
               </div>
 
               <div class="color">
                 <cnsl-color [colorType]="ColorType.WARN" name="Warn Color"
-                  (previewChanged)="previewData.warnColor= $event" [color]="data.warnColor"
+                  (previewChanged)="previewData.warnColor= $event; savePolicy()" [color]="data.warnColor"
                   [previewColor]="previewData.warnColor"></cnsl-color>
               </div>
 
               <div class="color">
-                <cnsl-color [colorType]="ColorType.FONTLIGHT" (previewChanged)="previewData.fontColor = $event"
-                  name="Font Color" [color]="data.fontColor" [previewColor]="previewData.fontColor"></cnsl-color>
+                <cnsl-color [colorType]="ColorType.FONTLIGHT"
+                  (previewChanged)="previewData.fontColor = $event; savePolicy()" name="Font Color"
+                  [color]="data.fontColor" [previewColor]="previewData.fontColor"></cnsl-color>
               </div>
             </div>
           </ng-container>
-
-          <div class="clr-btn-wrapper">
-            <button color="primary" mat-raised-button (click)="savePolicy()">{{'ACTIONS.SAVE' | translate}}</button>
-          </div>
         </mat-expansion-panel>
 
         <mat-expansion-panel class="expansion">

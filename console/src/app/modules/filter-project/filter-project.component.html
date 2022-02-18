@@ -5,14 +5,14 @@
       <mat-checkbox id="resourceowner" class="cb" [checked]="getSubFilter(SubQuery.RESOURCEOWNER)"
         (change)="changeCheckbox(SubQuery.RESOURCEOWNER, $event )">{{'FILTER.RESOURCEOWNER' | translate}}
       </mat-checkbox>
-      <div class="subquery" *ngIf="getSubFilter(SubQuery.RESOURCEOWNER) as dnq">
+      <div class="subquery" *ngIf="getSubFilter(SubQuery.RESOURCEOWNER) as ronq">
         <span class="nomethod cnsl-secondary-text">
           {{ 'FILTER.METHODS.1' | translate }}
         </span>
 
         <cnsl-form-field class="filter-input-value">
-          <input cnslInput name="value" [value]="dnq.getResourceOwner()"
-            (change)="setValue(SubQuery.RESOURCEOWNER, dnq, $event)" />
+          <input cnslInput name="value" [value]="ronq.getResourceOwner()"
+            (change)="setValue(SubQuery.RESOURCEOWNER, ronq, $event)" />
         </cnsl-form-field>
       </div>
     </div>
