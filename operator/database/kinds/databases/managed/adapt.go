@@ -201,7 +201,6 @@ func Adapter(
 				destroyRBAC,
 			)
 		}
-
 		if isFeatureClean {
 			queriers = append(queriers,
 				operator.ResourceQueryToZitadelQuery(
@@ -214,6 +213,7 @@ func Adapter(
 				),
 				operator.EnsureFuncToQueryFunc(ensureInit),
 				operator.EnsureFuncToQueryFunc(checkDBReady),
+				queryDBSetupAfterCR,
 			)
 		}
 
@@ -241,8 +241,7 @@ func Adapter(
 						nodeselector,
 						tolerations,
 						version,
-						PublicServiceName,
-						cockroachPort,
+						currentDB,
 						features,
 						customImageRegistry,
 					)

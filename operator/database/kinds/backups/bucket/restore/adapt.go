@@ -1,6 +1,8 @@
 package restore
 
 import (
+	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/command"
+	"github.com/caos/zitadel/pkg/databases/db"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -20,7 +22,7 @@ const (
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
 	internalSecretName = "client-certs"
-	rootSecretName     = "cockroachdb.client.root"
+	rootSecretName     = db.CertsSecret
 	timeout            = 45 * time.Minute
 	saJsonBase64Env    = "SAJSON"
 )
@@ -37,8 +39,7 @@ func AdaptFunc(
 	checkDBReady operator.EnsureFunc,
 	secretName string,
 	secretKey string,
-	dbURL string,
-	dbPort int32,
+	dbConn db.Connection,
 	image string,
 ) (
 	queryFunc operator.QueryFunc,
@@ -47,14 +48,41 @@ func AdaptFunc(
 ) {
 
 	jobName := jobPrefix + backupName + jobSuffix
-	command := getCommand(
-		timestamp,
-		bucketName,
-		backupName,
+	/*
+		// TODO: make this dynamic and somewhere else
+		dbs := []string{
+			"adminapi",
+			"auth",
+			"authz",
+			"defaultdb",
+			"eventstore",
+			"management",
+			"notification",
+			"postgres",
+			"zitadel",
+		}
+		var deleteDBStatements []string
+
+		for _, db := range dbs {
+			deleteDBStatements = append(deleteDBStatements, fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE;", db))
+		}
+
+		cleanCmd, env := command.GetSQLCommand(
+			dbConn,
+			certPath,
+			deleteDBStatements...,
+		)
+	*/
+	restoreCmd, env := command.GetSQLCommand(
+		dbConn,
 		certPath,
-		secretPath,
-		dbURL,
-		dbPort,
+		command.GetBackupRestoreStatement(
+			bucketName,
+			backupName,
+			timestamp,
+			secretPath,
+			command.Restore,
+		),
 	)
 
 	jobdef := getJob(
@@ -64,8 +92,9 @@ func AdaptFunc(
 		tolerations,
 		secretName,
 		secretKey,
-		command,
+		restoreCmd,
 		image,
+		env,
 	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)

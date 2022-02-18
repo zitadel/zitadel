@@ -1,7 +1,8 @@
 package restore
 
+/*
 import (
-	"strconv"
+	"github.com/caos/zitadel/pkg/databases/db"
 	"strings"
 )
 
@@ -15,8 +16,7 @@ func getCommand(
 	sessionTokenPath string,
 	region string,
 	endpoint string,
-	dbURL string,
-	dbPort int32,
+	dbConn db.Connection,
 ) string {
 
 	backupCommands := make([]string, 0)
@@ -36,8 +36,8 @@ func getCommand(
 			"cockroach",
 			"sql",
 			"--certs-dir=" + certsFolder,
-			"--host=" + dbURL,
-			"--port=" + strconv.Itoa(int(dbPort)),
+			//			"--host=" + dbURL,
+			//			"--port=" + strconv.Itoa(int(dbPort)),
 			"-e",
 			"\"RESTORE FROM \\\"s3://" + bucketName + "/" + backupName + "/" + timestamp + "?" + strings.Join(parameters, "&") + "\\\";\"",
 		}, " ",
@@ -46,3 +46,4 @@ func getCommand(
 
 	return strings.Join(backupCommands, " && ")
 }
+*/

@@ -1,5 +1,6 @@
 package backup
 
+/*
 import (
 	"strconv"
 	"strings"
@@ -39,3 +40,4 @@ func getBackupCommand(
 
 	return strings.Join(backupCommands, " && ")
 }
+*/
