@@ -1,21 +1,21 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
-import { OwnedProjectListComponent } from './project-list.component';
+import { ProjectListComponent } from './project-list.component';
 
-describe('OwnedProjectListComponent', () => {
-  let component: OwnedProjectListComponent;
-  let fixture: ComponentFixture<OwnedProjectListComponent>;
+describe('ProjectListComponent', () => {
+  let component: ProjectListComponent;
+  let fixture: ComponentFixture<ProjectListComponent>;
 
   beforeEach(
     waitForAsync(() => {
       TestBed.configureTestingModule({
-        declarations: [OwnedProjectListComponent],
+        declarations: [ProjectListComponent],
       }).compileComponents();
     }),
   );
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OwnedProjectListComponent);
+    fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

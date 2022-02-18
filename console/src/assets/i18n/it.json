@@ -153,6 +153,7 @@
     "USERNAME": "User Name",
     "ORGNAME": "Nome organizzazione",
     "PROJECTNAME": "Nome del progetto",
+    "RESOURCEOWNER": "Resource Owner",
     "METHODS": {
       "5": "contiene",
       "7": "finisce con",

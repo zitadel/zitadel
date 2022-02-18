@@ -2,6 +2,9 @@
   <cnsl-refresh-table [hideRefresh]="true" (refreshed)="refreshPage(type)" [dataSize]="totalResult"
     [timestamp]="viewTimestamp" [selection]="selection" [loading]="loading$ | async">
 
+    <cnsl-filter-project actions *ngIf="!selection.hasValue()" (filterChanged)="applySearchQuery(type, $any($event))"
+      (filterOpen)="filterOpen = $event"></cnsl-filter-project>
+
     <ng-template actions cnslHasRole [hasRole]="['project.create']">
       <a *ngIf="type === ProjectType.PROJECTTYPE_OWNED" [routerLink]="[ '/projects', 'create']" color="primary"
         mat-raised-button class="cnsl-action-button">

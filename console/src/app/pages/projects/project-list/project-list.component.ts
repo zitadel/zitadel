@@ -11,7 +11,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { ProjectType } from 'src/app/modules/project-members/project-members-datasource';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
-import { GrantedProject, Project, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
+import { GrantedProject, Project, ProjectQuery, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
@@ -54,6 +54,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
   public grid: boolean = true;
+  public filterOpen: boolean = false;
 
   @Input() public zitadelProjectId: string = '';
   public ProjectState: any = ProjectState;
@@ -110,12 +111,17 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.emitAddProject.emit();
   }
 
-  private async getData(type: ProjectType, limit?: number, offset?: number): Promise<void> {
+  public applySearchQuery(type: ProjectType, searchQueries: ProjectQuery[]): void {
+    this.selection.clear();
+    this.getData(type, this.paginator.pageSize, this.paginator.pageSize * this.paginator.pageIndex, searchQueries);
+  }
+
+  private async getData(type: ProjectType, limit?: number, offset?: number, searchQueries?: ProjectQuery[]): Promise<void> {
     this.loadingSubject.next(true);
     switch (type) {
       case ProjectType.PROJECTTYPE_OWNED:
         this.mgmtService
-          .listProjects(limit, offset)
+          .listProjects(limit, offset, searchQueries)
           .then((resp) => {
             this.projectList = resp.resultList;
             if (resp.details?.totalResult) {
@@ -136,7 +142,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         break;
       case ProjectType.PROJECTTYPE_GRANTED:
         this.mgmtService
-          .listGrantedProjects(limit, offset)
+          .listGrantedProjects(limit, offset, searchQueries)
           .then((resp) => {
             this.projectList = resp.resultList;
             if (resp.details?.totalResult) {

@@ -13,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
 import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
 import { CardModule } from 'src/app/modules/card/card.module';
+import { FilterProjectModule } from 'src/app/modules/filter-project/filter-project.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -44,6 +45,7 @@ import { ProjectsComponent } from './projects.component';
     MatCheckboxModule,
     CardModule,
     MatTooltipModule,
+    FilterProjectModule,
     ActionKeysModule,
     MatSortModule,
     HasRolePipeModule,
