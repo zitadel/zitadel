@@ -15,17 +15,19 @@ import ProjectDescription from '../../concepts/structure/_project_description.md
 
 <ProjectDescription name="ProjectDescription" />
 
-The goal of this module is to give you an overview, but not dive too deep into details around managing access rights and delegating management of roles to third parties. So let’s create a straightforward example project first.
+The goal of this module is to give you an overview of managing access rights and delegating role management to third parties, without diving to deeply into the details.
+So let’s create a straightforward example project first.
 
 ## Exercise - Create a simple project
 
-Visit <https://console.zitadel.ch/projects> or select “Projects” within your organization, then click the button to create a new project.
+1. Visit <https://console.zitadel.ch/projects>, or select “Projects” within your organization.
+2. Select the button to create a new project.
 
 ![Empty Project](/img/console_projects_empty.png)
 
-Enter the name “ My first project” and continue.
+3. Enter the name `My first project` and continue.
 
-Let’s make this more interesting and add some basic roles and authorizations to your project and then confirm the scope of the roles and authorizations.
+Let’s make this more interesting and add some basic roles and authorizations to your project, then confirm the scope of the roles and authorizations.
 
 Jump to the section ROLES and create two new roles with the following values
 
@@ -41,7 +43,11 @@ and
 
 ![Add New Roles](/img/console_projects_add_new_roles.gif)
 
-Now, you can add roles to your own user, or you can create a new user. To create a new user, go to Users and click “New”. Enter the required contact details and save by clicking “Create”.
+Now, you can add roles to your own user, or you can create a new user.
+To create a new user:
+
+1. Go to Users and select **New**.
+2. Enter the required contact details and select **Create**.
 
 ![Create new user](/img/console_users_create_new_user.gif)
 
@@ -49,7 +55,11 @@ To grant users certain roles, you need to create authorizations. Go back to the 
 
 ![Verify your authorization](/img/console_projects_create_authorization.gif)
 
-You can verify the role grant on the user. Select Users from the navigation menu and click on the user Coyote. Scroll down to the section AUTHORIZATION, there you should be able to verify that the user has the role ‘reader’ for your project ‘My first project’.
+You can verify the role granted to the user.
+
+1. Select **Users** from the navigation menu.
+2. Select the user `Coyote`.
+3. Scroll down to the section AUTHORIZATION. There you should be able to verify that the user has the role `reader` for your project `My first project`.
 
 ![Organization grant](/img/console_projects_authorization_created.png)
 
@@ -63,8 +73,9 @@ import GrantedProjectDescription from '../../concepts/structure/_granted_project
 
 ## Exercise - Grant a project
 
-1. Visit the project that you have created before, then in the section GRANTED ORGANIZATIONS click New.
-2. Enter the domain ‘acme.caos.ch’, search the organization and continue to the next step.
+1. Visit the project that you created before. In the section GRANTED ORGANIZATIONS, select 
+**New**.
+2. Enter the domain ‘acme.caos.ch’. Search the organization and continue to the next step.
 3. Select some roles you would like to grant to the organization ACME and confirm.
 4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
 
@@ -75,10 +86,10 @@ import GrantedProjectDescription from '../../concepts/structure/_granted_project
 * You can setup multiple projects within an organization to manage scope
     - [ ] yes
     - [ ] no
-* Authorizations are define more detailed access rights within your application
+* Authorizations define more detailed access rights within your application
     - [ ] yes
     - [ ] no
-* Your projects as well as projects granted to your organization are visible within the Tab Projects of your organization
+* Your projects, as well as projects granted to your organization, are visible within the Tab Projects of your organization
     - [ ] yes
     - [ ] no
 
@@ -101,7 +112,7 @@ import GrantedProjectDescription from '../../concepts/structure/_granted_project
 
 ## Summary (2)
 
-* Manage scope of roles, authorizations and applications with projects
+* Use projects to manage the scope of roles, authorizations and applications
 * Create and assign roles to users of your organization within your project
 * Use project grants to enable other organizations to self-manage access rights (roles) to your applications
 
