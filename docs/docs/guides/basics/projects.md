@@ -15,7 +15,7 @@ import ProjectDescription from '../../concepts/structure/_project_description.md
 
 <ProjectDescription name="ProjectDescription" />
 
-The goal of this module is to give you an overview of managing access rights and delegating role management to third parties, without diving to deeply into the details.
+The goal of this module is to give you an overview of managing access rights and delegating role management to third parties, without diving too deeply into the details.
 So let’s create a straightforward example project first.
 
 ## Exercise - Create a simple project
