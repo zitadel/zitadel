@@ -1,8 +1,5 @@
-<a href="https://zitadel.ch#gh-dark-mode-only"><img src="./docs/static/headers/zitadel-header-dark.png" alt="Zitadel Header" height="120px" width="auto" /></a>
-<a href="https://zitadel.ch#gh-light-mode-only"><img src="./docs/static/headers/zitadel-header-light.png" alt="Zitadel Header" height="120px" width="auto" /></a>
-
-![ZITADEL header dark](./docs/static/headers/zitadel-header-dark.png#gh-dark-mode-only)
-![ZITADEL header light](./docs/static/headers/zitadel-header-light.png#gh-light-mode-only)
+<a href="https://zitadel.ch#gh-dark-mode-only"><img src="./docs/static/headers/zitadel-header-dark.png" alt="Zitadel Header" /></a>
+<a href="https://zitadel.ch#gh-light-mode-only"><img src="./docs/static/headers/zitadel-header-light.png" alt="Zitadel Header" /></a>
 
 # ZITADEL
 
