@@ -1,0 +1,25 @@
+<span class="title" mat-dialog-title>{{'USER.PERSONALACCESSTOKEN.ADD.TITLE' | translate}}</span>
+<div mat-dialog-content>
+  <cnsl-info-section class="desc"> {{'USER.PERSONALACCESSTOKEN.ADD.DESCRIPTION' | translate}}</cnsl-info-section>
+
+  <cnsl-form-field class="form-field" appearance="outline">
+    <cnsl-label>{{'USER.PERSONALACCESSTOKEN.ADD.CHOOSEEXPIRY' | translate}} (optional)</cnsl-label>
+    <input cnslInput [matDatepicker]="picker" [min]="startDate" [formControl]="dateControl">
+    <mat-datepicker-toggle style="top: 0;" cnslSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker startView="year" [startAt]="startDate"></mat-datepicker>
+    <span cnsl-error *ngIf="dateControl?.errors?.matDatepickerMin?.min">
+      {{'USER.PERSONALACCESSTOKEN.ADD.CHOOSEDATEAFTER' | translate}}:
+      {{dateControl?.errors?.matDatepickerMin.min.toDate() | localizedDate: 'EEE dd. MMM'}}
+    </span>
+  </cnsl-form-field>
+</div>
+<div mat-dialog-actions class=" action">
+  <button mat-button (click)="closeDialog()">
+    {{'ACTIONS.CANCEL' | translate}}
+  </button>
+
+  <button color="primary" mat-raised-button class="ok-button" [disabled]="dateControl.invalid"
+    (click)="closeDialogWithSuccess()">
+    {{'ACTIONS.ADD' | translate}}
+  </button>
+</div>

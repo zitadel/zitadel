@@ -32,6 +32,162 @@ Returns the default languages
     GET: /languages
 
 
+### SetDefaultLanguage
+
+> **rpc** SetDefaultLanguage([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
+[SetDefaultLanguageResponse](#setdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    PUT: /languages/default/{language}
+
+
+### GetDefaultLanguage
+
+> **rpc** GetDefaultLanguage([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
+[GetDefaultLanguageResponse](#getdefaultlanguageresponse)
+
+Set the default language
+
+
+
+    GET: /languages/default
+
+
+### ListSecretGenerators
+
+> **rpc** ListSecretGenerators([ListSecretGeneratorsRequest](#listsecretgeneratorsrequest))
+[ListSecretGeneratorsResponse](#listsecretgeneratorsresponse)
+
+Set the default language
+
+
+
+    POST: /secretgenerators/_search
+
+
+### GetSecretGenerator
+
+> **rpc** GetSecretGenerator([GetSecretGeneratorRequest](#getsecretgeneratorrequest))
+[GetSecretGeneratorResponse](#getsecretgeneratorresponse)
+
+Get Secret Generator by type (e.g PasswordResetCode)
+
+
+
+    GET: /secretgenerators/{generator_type}
+
+
+### UpdateSecretGenerator
+
+> **rpc** UpdateSecretGenerator([UpdateSecretGeneratorRequest](#updatesecretgeneratorrequest))
+[UpdateSecretGeneratorResponse](#updatesecretgeneratorresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /secretgenerators/{generator_type}
+
+
+### GetSMTPConfig
+
+> **rpc** GetSMTPConfig([GetSMTPConfigRequest](#getsmtpconfigrequest))
+[GetSMTPConfigResponse](#getsmtpconfigresponse)
+
+Get system smtp configuration
+
+
+
+    GET: /smtp
+
+
+### UpdateSMTPConfig
+
+> **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
+[UpdateSMTPConfigResponse](#updatesmtpconfigresponse)
+
+Update system smtp configuration
+
+
+
+    PUT: /smtp
+
+
+### UpdateSMTPConfigPassword
+
+> **rpc** UpdateSMTPConfigPassword([UpdateSMTPConfigPasswordRequest](#updatesmtpconfigpasswordrequest))
+[UpdateSMTPConfigPasswordResponse](#updatesmtpconfigpasswordresponse)
+
+Update system smtp configuration password for host
+
+
+
+    PUT: /smtp/password
+
+
+### ListSMSProviders
+
+> **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
+[ListSMSProvidersResponse](#listsmsprovidersresponse)
+
+list sms provider configurations
+
+
+
+    POST: /sms/_search
+
+
+### GetSMSProvider
+
+> **rpc** GetSMSProvider([GetSMSProviderRequest](#getsmsproviderrequest))
+[GetSMSProviderResponse](#getsmsproviderresponse)
+
+Get sms provider
+
+
+
+    GET: /sms/{id}
+
+
+### AddSMSProviderTwilio
+
+> **rpc** AddSMSProviderTwilio([AddSMSProviderTwilioRequest](#addsmsprovidertwiliorequest))
+[AddSMSProviderTwilioResponse](#addsmsprovidertwilioresponse)
+
+Add twilio sms provider
+
+
+
+    POST: /sms/twilio
+
+
+### UpdateSMSProviderTwilio
+
+> **rpc** UpdateSMSProviderTwilio([UpdateSMSProviderTwilioRequest](#updatesmsprovidertwiliorequest))
+[UpdateSMSProviderTwilioResponse](#updatesmsprovidertwilioresponse)
+
+Update twilio sms provider
+
+
+
+    PUT: /sms/twilio/{id}
+
+
+### UpdateSMSProviderTwilioToken
+
+> **rpc** UpdateSMSProviderTwilioToken([UpdateSMSProviderTwilioTokenRequest](#updatesmsprovidertwiliotokenrequest))
+[UpdateSMSProviderTwilioTokenResponse](#updatesmsprovidertwiliotokenresponse)
+
+Update twilio sms provider token
+
+
+
+    PUT: /sms/twilio/{id}/token
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1350,6 +1506,31 @@ This is an empty request
 
 
 
+### AddSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -1661,6 +1842,23 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.MessageCustomText | - |  |
+
+
+
+
+### GetDefaultLanguageRequest
+This is an empty request
+
+
+
+
+### GetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - |  |
 
 
 
@@ -1977,6 +2175,67 @@ This is an empty request
 
 
 
+### GetSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
+### GetSMTPConfigRequest
+This is an empty request
+
+
+
+
+### GetSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| smtp_config |  zitadel.settings.v1.SMTPConfig | - |  |
+
+
+
+
+### GetSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+
+
+
+
+### GetSecretGeneratorResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
+
+
+
+
 ### GetSupportedLanguagesRequest
 This is an empty request
 
@@ -2207,6 +2466,53 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSMSProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
+### ListSecretGeneratorsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.settings.v1.SecretGeneratorQuery | criterias the client is looking for |  |
+
+
+
+
+### ListSecretGeneratorsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SecretGenerator | - |  |
 
 
 
@@ -2820,6 +3126,28 @@ This is an empty request
 
 
 
+### SetDefaultLanguageRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+
+
+
+
+### SetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetDefaultPasswordResetMessageTextRequest
 
 
@@ -3369,6 +3697,129 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| length |  uint32 | - |  |
+| expiry |  google.protobuf.Duration | - |  |
+| include_lower_letters |  bool | - |  |
+| include_upper_letters |  bool | - |  |
+| include_digits |  bool | - |  |
+| include_symbols |  bool | - |  |
+
+
+
+
+### UpdateSecretGeneratorResponse
 
 
 

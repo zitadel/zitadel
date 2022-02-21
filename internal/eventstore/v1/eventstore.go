@@ -2,8 +2,10 @@ package v1
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/caos/zitadel/internal/eventstore/v1/internal/repository"
+	z_sql "github.com/caos/zitadel/internal/eventstore/v1/internal/repository/sql"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
@@ -18,6 +20,12 @@ var _ Eventstore = (*eventstore)(nil)
 
 type eventstore struct {
 	repo repository.Repository
+}
+
+func Start(db *sql.DB) (Eventstore, error) {
+	return &eventstore{
+		repo: z_sql.Start(db),
+	}, nil
 }
 
 func (es *eventstore) FilterEvents(ctx context.Context, searchQuery *models.SearchQuery) ([]*models.Event, error) {

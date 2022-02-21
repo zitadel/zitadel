@@ -30,3 +30,11 @@ func IsOrigin(rawOrigin string) bool {
 	}
 	return parsedUrl.Scheme != "" && parsedUrl.Host != "" && parsedUrl.Path == "" && len(parsedUrl.Query()) == 0 && parsedUrl.Fragment == ""
 }
+
+func BuildHTTP(hostname string, externalPort uint16, secure bool) string {
+	schema := "https"
+	if !secure {
+		schema = "http"
+	}
+	return fmt.Sprintf("%s://%s:%d", schema, hostname, externalPort)
+}

@@ -52,7 +52,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceGlobalOrgSet",
+			name: "reduceProjectIDSet",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(iam.ProjectSetEventType),
@@ -75,6 +75,36 @@ func TestIAMProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"project-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceDefaultLanguageSet",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(iam.DefaultLanguageSetEventType),
+					iam.AggregateType,
+					[]byte(`{"language": "en"}`),
+				), iam.DefaultLanguageSetMapper),
+			},
+			reduce: (&IAMProjection{}).reduceDefaultLanguageSet,
+			want: wantReduce{
+				projection:       IAMProjectionTable,
+				aggregateType:    eventstore.AggregateType("iam"),
+				sequence:         15,
+				previousSequence: 10,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPSERT INTO zitadel.projections.iam (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
+							expectedArgs: []interface{}{
+								"agg-id",
+								anyArg{},
+								uint64(15),
+								"en",
 							},
 						},
 					},

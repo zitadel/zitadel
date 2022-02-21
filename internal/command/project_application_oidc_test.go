@@ -20,14 +20,14 @@ import (
 
 func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		idGenerator     id.Generator
-		secretGenerator crypto.Generator
+		eventstore  *eventstore.Eventstore
+		idGenerator id.Generator
 	}
 	type args struct {
-		ctx           context.Context
-		oidcApp       *domain.OIDCApp
-		resourceOwner string
+		ctx             context.Context
+		oidcApp         *domain.OIDCApp
+		resourceOwner   string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.OIDCApp
@@ -160,8 +160,7 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(project.NewAddApplicationUniqueConstraint("app", "project1")),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "app1", "client1"),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -185,7 +184,8 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 					ClockSkew:                time.Second * 1,
 					AdditionalOrigins:        []string{"https://sub.test.ch"},
 				},
-				resourceOwner: "org1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -220,11 +220,10 @@ func TestCommandSide_AddOIDCApplication(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                 tt.fields.eventstore,
-				idGenerator:                tt.fields.idGenerator,
-				applicationSecretGenerator: tt.fields.secretGenerator,
+				eventstore:  tt.fields.eventstore,
+				idGenerator: tt.fields.idGenerator,
 			}
-			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner)
+			got, err := r.AddOIDCApplication(tt.args.ctx, tt.args.oidcApp, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -549,14 +548,14 @@ func TestCommandSide_ChangeOIDCApplication(t *testing.T) {
 
 func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 	type fields struct {
-		eventstore      *eventstore.Eventstore
-		secretGenerator crypto.Generator
+		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx           context.Context
-		appID         string
-		projectID     string
-		resourceOwner string
+		ctx             context.Context
+		appID           string
+		projectID       string
+		resourceOwner   string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.OIDCApp
@@ -675,13 +674,13 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 						},
 					),
 				),
-				secretGenerator: GetMockSecretGenerator(t),
 			},
 			args: args{
-				ctx:           context.Background(),
-				projectID:     "project1",
-				appID:         "app1",
-				resourceOwner: "org1",
+				ctx:             context.Background(),
+				projectID:       "project1",
+				appID:           "app1",
+				resourceOwner:   "org1",
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.OIDCApp{
@@ -715,10 +714,9 @@ func TestCommandSide_ChangeOIDCApplicationSecret(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:                 tt.fields.eventstore,
-				applicationSecretGenerator: tt.fields.secretGenerator,
+				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner)
+			got, err := r.ChangeOIDCApplicationSecret(tt.args.ctx, tt.args.projectID, tt.args.appID, tt.args.resourceOwner, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

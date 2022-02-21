@@ -53,7 +53,15 @@ func (s *Server) SetUpOrg(ctx context.Context, req *admin_pb.SetUpOrgRequest) (*
 	human := setUpOrgHumanToDomain(req.User.(*admin_pb.SetUpOrgRequest_Human_).Human) //TODO: handle machine
 	org := setUpOrgOrgToDomain(req.Org)
 
-	objectDetails, err := s.command.SetUpOrg(ctx, org, human, userIDs, false)
+	initCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, s.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	phoneCodeGenerator, err := s.query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, s.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	objectDetails, err := s.command.SetUpOrg(ctx, org, human, initCodeGenerator, phoneCodeGenerator, userIDs, false)
 	if err != nil {
 		return nil, err
 	}

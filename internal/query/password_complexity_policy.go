@@ -37,7 +37,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID strin
 				PasswordComplexityColID.identifier(): orgID,
 			},
 			sq.Eq{
-				PasswordComplexityColID.identifier(): q.iamID,
+				PasswordComplexityColID.identifier(): domain.IAMID,
 			},
 		}).
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
@@ -53,7 +53,7 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID strin
 func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context) (*PasswordComplexityPolicy, error) {
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		PasswordComplexityColID.identifier(): q.iamID,
+		PasswordComplexityColID.identifier(): domain.IAMID,
 	}).
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()

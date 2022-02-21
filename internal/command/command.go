@@ -8,7 +8,6 @@ import (
 	"github.com/caos/zitadel/internal/api/http"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -21,7 +20,6 @@ import (
 	usr_repo "github.com/caos/zitadel/internal/repository/user"
 	usr_grant_repo "github.com/caos/zitadel/internal/repository/usergrant"
 	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/internal/telemetry/tracing"
 	webauthn_helper "github.com/caos/zitadel/internal/webauthn"
 )
 
@@ -33,17 +31,12 @@ type Commands struct {
 	zitadelRoles []authz.RoleMapping
 
 	idpConfigSecretCrypto crypto.EncryptionAlgorithm
+	smtpPasswordCrypto    crypto.EncryptionAlgorithm
+	smsCrypto             crypto.EncryptionAlgorithm
 
 	userPasswordAlg             crypto.HashAlgorithm
-	initializeUserCode          crypto.Generator
-	emailVerificationCode       crypto.Generator
-	phoneVerificationCode       crypto.Generator
-	passwordVerificationCode    crypto.Generator
-	passwordlessInitCode        crypto.Generator
-	machineKeyAlg               crypto.EncryptionAlgorithm
 	machineKeySize              int
 	applicationKeySize          int
-	applicationSecretGenerator  crypto.Generator
 	domainVerificationAlg       crypto.EncryptionAlgorithm
 	domainVerificationGenerator crypto.Generator
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
@@ -61,16 +54,16 @@ type orgFeatureChecker interface {
 	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
-type Config struct {
-	Eventstore types.SQLUser
-}
-
 func StartCommands(
 	es *eventstore.Eventstore,
 	defaults sd.SystemDefaults,
 	authZConfig authz.Config,
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
+	keyConfig *crypto.KeyConfig,
+	webAuthN webauthn_helper.Config,
+	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
+	smsHashAlg crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
@@ -79,8 +72,10 @@ func StartCommands(
 		iamDomain:          defaults.Domain,
 		zitadelRoles:       authZConfig.RolePermissionMappings,
 		keySize:            defaults.KeyConfig.Size,
-		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
-		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
+		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime,
+		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime,
+		smtpPasswordCrypto: smtpPasswordEncAlg,
+		smsCrypto:          smsHashAlg,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
@@ -94,17 +89,8 @@ func StartCommands(
 	if err != nil {
 		return nil, err
 	}
-	userEncryptionAlgorithm, err := crypto.NewAESCrypto(defaults.UserVerificationKey)
-	if err != nil {
-		return nil, err
-	}
-	repo.initializeUserCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.InitializeUserCode, userEncryptionAlgorithm)
-	repo.emailVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.EmailVerificationCode, userEncryptionAlgorithm)
-	repo.phoneVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PhoneVerificationCode, userEncryptionAlgorithm)
-	repo.passwordVerificationCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordVerificationCode, userEncryptionAlgorithm)
-	repo.passwordlessInitCode = crypto.NewEncryptionGenerator(defaults.SecretGenerators.PasswordlessInitCode, userEncryptionAlgorithm)
+
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.machineKeyAlg = userEncryptionAlgorithm
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 
@@ -118,8 +104,6 @@ func StartCommands(
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
-	passwordAlg := crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
-	repo.applicationSecretGenerator = crypto.NewHashGenerator(defaults.SecretGenerators.ClientSecretGenerator, passwordAlg)
 
 	repo.domainVerificationAlg, err = crypto.NewAESCrypto(defaults.DomainVerification.VerificationKey)
 	if err != nil {
@@ -127,13 +111,13 @@ func StartCommands(
 	}
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
-	web, err := webauthn_helper.StartServer(defaults.WebAuthN)
+	web, err := webauthn_helper.StartServer(webAuthN)
 	if err != nil {
 		return nil, err
 	}
 	repo.webauthn = web
 
-	keyAlgorithm, err := crypto.NewAESCrypto(defaults.KeyConfig.EncryptionConfig)
+	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -141,19 +125,6 @@ func StartCommands(
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil
-}
-
-func (c *Commands) getIAMWriteModel(ctx context.Context) (_ *IAMWriteModel, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-
-	writeModel := NewIAMWriteModel()
-	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return writeModel, nil
 }
 
 func AppendAndReduce(object interface {

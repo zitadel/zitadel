@@ -26,19 +26,16 @@ const (
 
 type NotifyUser struct {
 	handler
-	iamID        string
 	subscription *v1.Subscription
 	queries      *query2.Queries
 }
 
 func newNotifyUser(
 	handler handler,
-	iamID string,
 	queries *query2.Queries,
 ) *NotifyUser {
 	h := &NotifyUser{
 		handler: handler,
-		iamID:   iamID,
 		queries: queries,
 	}
 

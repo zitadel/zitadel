@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/cache"
 	"github.com/caos/zitadel/internal/cache/bigcache"
 	"github.com/caos/zitadel/internal/cache/fastcache"

@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.OIDCApp, resourceOwner string) (_ *domain.OIDCApp, err error) {
+func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) (_ *domain.OIDCApp, err error) {
 	if application == nil || application.AggregateID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-34Fm0", "Errors.Application.Invalid")
 	}
@@ -23,7 +23,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.O
 	}
 	addedApplication := NewOIDCApplicationWriteModel(application.AggregateID, resourceOwner)
 	projectAgg := ProjectAggregateFromWriteModel(&addedApplication.WriteModel)
-	events, stringPw, err := c.addOIDCApplication(ctx, projectAgg, project, application, resourceOwner)
+	events, stringPw, err := c.addOIDCApplication(ctx, projectAgg, project, application, resourceOwner, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *Commands) AddOIDCApplication(ctx context.Context, application *domain.O
 	return result, nil
 }
 
-func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string) (events []eventstore.Command, stringPW string, err error) {
+func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstore.Aggregate, proj *domain.Project, oidcApp *domain.OIDCApp, resourceOwner string, appSecretGenerator crypto.Generator) (events []eventstore.Command, stringPW string, err error) {
 	if oidcApp.AppName == "" || !oidcApp.IsValid() {
 		return nil, "", caos_errs.ThrowInvalidArgument(nil, "PROJECT-1n8df", "Errors.Application.Invalid")
 	}
@@ -60,7 +60,7 @@ func (c *Commands) addOIDCApplication(ctx context.Context, projectAgg *eventstor
 	if err != nil {
 		return nil, "", err
 	}
-	stringPw, err = domain.SetNewClientSecretIfNeeded(oidcApp, c.applicationSecretGenerator)
+	stringPw, err = domain.SetNewClientSecretIfNeeded(oidcApp, appSecretGenerator)
 	if err != nil {
 		return nil, "", err
 	}
@@ -142,7 +142,7 @@ func (c *Commands) ChangeOIDCApplication(ctx context.Context, oidc *domain.OIDCA
 	return result, nil
 }
 
-func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string) (*domain.OIDCApp, error) {
+func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, appID, resourceOwner string, appSecretGenerator crypto.Generator) (*domain.OIDCApp, error) {
 	if projectID == "" || appID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-99i83", "Errors.IDMissing")
 	}
@@ -157,7 +157,7 @@ func (c *Commands) ChangeOIDCApplicationSecret(ctx context.Context, projectID, a
 	if !existingOIDC.IsOIDC() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-Ghrh3", "Errors.Project.App.IsNotOIDC")
 	}
-	cryptoSecret, stringPW, err := domain.NewClientSecret(c.applicationSecretGenerator)
+	cryptoSecret, stringPW, err := domain.NewClientSecret(appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}

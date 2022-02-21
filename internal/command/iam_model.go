@@ -4,6 +4,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/iam"
+	"golang.org/x/text/language"
 )
 
 type IAMWriteModel struct {
@@ -12,8 +13,9 @@ type IAMWriteModel struct {
 	SetUpStarted domain.Step
 	SetUpDone    domain.Step
 
-	GlobalOrgID string
-	ProjectID   string
+	GlobalOrgID     string
+	ProjectID       string
+	DefaultLanguage language.Tag
 }
 
 func NewIAMWriteModel() *IAMWriteModel {
@@ -32,6 +34,8 @@ func (wm *IAMWriteModel) Reduce() error {
 			wm.ProjectID = e.ProjectID
 		case *iam.GlobalOrgSetEvent:
 			wm.GlobalOrgID = e.OrgID
+		case *iam.DefaultLanguageSetEvent:
+			wm.DefaultLanguage = e.Language
 		case *iam.SetupStepEvent:
 			if e.Done {
 				wm.SetUpDone = e.Step
@@ -52,6 +56,7 @@ func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			iam.ProjectSetEventType,
 			iam.GlobalOrgSetEventType,
+			iam.DefaultLanguageSetEventType,
 			iam.SetupStartedEventType,
 			iam.SetupDoneEventType).
 		Builder()

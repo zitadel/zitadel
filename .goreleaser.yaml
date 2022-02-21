@@ -1,0 +1,56 @@
+project_name: zitadel
+release:
+  github:
+    owner: caos
+    name: zitadel
+  draft: true
+  prerelease: auto
+before:
+  hooks:
+    - docker build -f build/grpc/Dockerfile -t zitadel-base:local .
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-test --target go-codecov -o .artifacts/codecov
+    - docker build -f build/zitadel/Dockerfile . -t zitadel-go-base --target go-copy -o .artifacts/grpc/go-client
+    - sh -c "cp -r .artifacts/grpc/go-client/* ."
+    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target npm-copy -o .artifacts/grpc/js-client
+    - docker build -f build/console/Dockerfile . -t zitadel-npm-base --target angular-export -o .artifacts/console
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+dist: .artifacts/goreleaser
+dockers:
+- image_templates:
+  - "caos/zitadel:{{ .Version }}-amd64"
+  use: buildx
+  dockerfile: build/Dockerfile
+  build_flag_templates:
+  - "--platform=linux/amd64"
+- image_templates:
+  - "caos/zitadel:{{ .Version }}-arm64"
+  use: buildx
+  dockerfile: build/Dockerfile
+  build_flag_templates:
+  - "--platform=linux/arm64"
+archives:
+- format: binary
+gomod:
+  proxy: true
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

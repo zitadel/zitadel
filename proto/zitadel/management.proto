@@ -290,6 +290,7 @@ service ManagementService {
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
             put: "/users/{user_id}/username"
+            body: "*"
         };
 
         option (zitadel.v1.auth_option) = {
