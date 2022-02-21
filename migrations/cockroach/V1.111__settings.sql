@@ -27,7 +27,7 @@ CREATE TABLE zitadel.projections.smtp_configs (
 
     , tls BOOLEAN NOT NULL
     , sender_address STRING NOT NULL
-    , sender_name STRING NOT NULL
+    , sender_number STRING NOT NULL
     , host STRING NOT NULL
     , username STRING NOT NULL DEFAULT ''
     , password JSONB
