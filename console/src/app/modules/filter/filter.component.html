@@ -3,8 +3,7 @@
     <i class="las la-filter no-margin"></i>
     <span>{{ 'ACTIONS.FILTER' | translate }}</span>
     <span *ngIf="(filterCount$ | async)" class="filter-count">{{filterCount$ | async}}</span>
-    <cnsl-action-keys *ngIf="!showFilter" [doNotUseContrast]="true" [type]="ActionKeysType.FILTER"
-      (actionTriggered)="toggleFilter()">
+    <cnsl-action-keys [doNotUseContrast]="true" [type]="ActionKeysType.FILTER" (actionTriggered)="toggleFilter()">
     </cnsl-action-keys>
   </button>
   <div *ngIf="showFilter" class="filter-wrapper">

@@ -11,6 +11,7 @@ import { BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.s
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 
+import { ActionKeysType } from '../action-keys/action-keys.component';
 import { InfoOverlayArrowType } from '../info-overlay/info-overlay.component';
 
 @Component({
@@ -36,6 +37,7 @@ export class HeaderComponent implements OnDestroy {
   private destroy$: Subject<void> = new Subject();
   InfoOverlayArrowType: any = InfoOverlayArrowType;
   public BreadcrumbType: any = BreadcrumbType;
+  public ActionKeysType: any = ActionKeysType;
   constructor(
     public authenticationService: AuthenticationService,
     private authService: GrpcAuthService,

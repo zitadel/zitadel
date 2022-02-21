@@ -59,6 +59,8 @@
                     clip-rule="evenodd"></path>
                 </svg>
               </span>
+              <cnsl-action-keys (actionTriggered)="showOrgContext = !showOrgContext"
+                [type]="ActionKeysType.ORGSWITCHER"></cnsl-action-keys>
             </button>
             <cnsl-org-context class="context_card" *ngIf="org && showOrgContext" (closedCard)="showOrgContext = false"
               [org]="org" (setOrg)="setActiveOrg($event)">

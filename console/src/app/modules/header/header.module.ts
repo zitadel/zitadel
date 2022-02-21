@@ -13,6 +13,7 @@ import { OutsideClickModule } from 'src/app/directives/outside-click/outside-cli
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AccountsCardModule } from '../accounts-card/accounts-card.module';
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { AvatarModule } from '../avatar/avatar.module';
 import { OrgContextModule } from '../org-context/org-context.module';
 import { HeaderComponent } from './header.component';
@@ -25,6 +26,7 @@ import { HeaderComponent } from './header.component';
     ReactiveFormsModule,
     RouterModule,
     MatToolbarModule,
+    ActionKeysModule,
     MatRippleModule,
     MatIconModule,
     MatButtonModule,

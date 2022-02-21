@@ -162,15 +162,19 @@
   },
   "KEYBOARDSHORTCUTS": {
     "TITLE": "Tasti rapidi",
+    "UNDERORGCONTEXT": "All'interno delle pagine dell'organizzazione",
     "SIDEWIDE": "Tasti rapidi globali",
     "SHORTCUTS": {
-      "HOME": "Home",
-      "ORG": "Organizzazione",
-      "PROJECTS": "Progetti",
-      "USERS": "Utenti",
-      "USERGRANTS": "Autorizzazioni",
-      "ACTIONS": "Azioni e processi",
-      "DOMAINS": "Domini"
+      "HOME": "Vai alla panoramica",
+      "SYSTEM": "Vai al pagina di sistema",
+      "ORG": "Vai all'organizzazione",
+      "ORGSWITCHER": "Cambia organizzazione",
+      "ME": "Vai al profilo",
+      "PROJECTS": "Vai ai progetti",
+      "USERS": "Vai ai utenti",
+      "USERGRANTS": "Vai ai Autorizzazioni",
+      "ACTIONS": "Vai ai azioni e processi",
+      "DOMAINS": "Vai ai domini"
     }
   },
   "RESOURCEID": "Resource ID",

@@ -162,15 +162,19 @@
   },
   "KEYBOARDSHORTCUTS": {
     "TITLE": "Keyboard Shortcuts",
+    "UNDERORGCONTEXT": "Within organization pages",
     "SIDEWIDE": "Side-wide shortcuts",
     "SHORTCUTS": {
-      "HOME": "Home",
-      "ORG": "Organization",
-      "PROJECTS": "Projects",
-      "USERS": "Users",
-      "USERGRANTS": "Authorizations",
-      "ACTIONS": "Actions and Flows",
-      "DOMAINS": "Domains"
+      "HOME": "<strong>G</strong>o to <strong>H</strong>ome",
+      "SYSTEM": "<strong>G</strong>o to <strong>S</strong>ystem",
+      "ORG": "<strong>G</strong>o to <strong>O</strong>rganization",
+      "ORGSWITCHER": "Change Organization",
+      "ME": "To own profile",
+      "PROJECTS": "<strong>G</strong>o to <strong>P</strong>rojects",
+      "USERS": "<strong>G</strong>o to <strong>U</strong>sers",
+      "USERGRANTS": "<strong>G</strong>o to <strong>A</strong>uthorizations",
+      "ACTIONS": "<strong>G</strong>o to Actions and <strong>F</strong>lows",
+      "DOMAINS": "<strong>G</strong>o to <strong>D</strong>omains"
     }
   },
   "RESOURCEID": "Resource Id",

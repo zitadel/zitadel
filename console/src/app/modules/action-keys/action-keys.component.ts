@@ -6,6 +6,7 @@ export enum ActionKeysType {
   DEACTIVATE,
   REACTIVATE,
   FILTER,
+  ORGSWITCHER,
 }
 
 @Component({
@@ -25,6 +26,11 @@ export class ActionKeysComponent {
 
     if (exclude.indexOf(tagname.toLowerCase()) === -1) {
       switch (this.type) {
+        case ActionKeysType.ORGSWITCHER:
+          if (event.key === '/') {
+            this.actionTriggered.emit();
+          }
+          break;
         case ActionKeysType.ADD:
           if (event.code === 'KeyN') {
             this.actionTriggered.emit();

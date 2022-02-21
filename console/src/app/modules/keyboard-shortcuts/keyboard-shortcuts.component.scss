@@ -5,6 +5,7 @@
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
+  $text-color: map-get($foreground, text);
   $accent: map-get($theme, accent);
   $is-dark-theme: map-get($theme, is-dark);
   $accent-color: mat.get-color-from-palette($primary, 500);
@@ -17,6 +18,7 @@
     background-color: $card-background-color;
     padding: 1rem;
     border-radius: 0.5rem;
+    margin: 0.5rem 0 0 0;
 
     h2 {
       font-size: 1rem;
@@ -34,6 +36,10 @@
 
         .keyboard-shortcut-name {
           font-size: 14px;
+
+          strong {
+            color: $text-color;
+          }
         }
 
         &:not(:last-child) {
@@ -74,6 +80,7 @@
       left: 50%;
       transform: translateX(-50%) translateY(-50%);
       opacity: 1;
+      text-transform: uppercase;
     }
   }
 

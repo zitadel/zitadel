@@ -162,15 +162,19 @@
   },
   "KEYBOARDSHORTCUTS": {
     "TITLE": "Tastaturkürzel",
+    "UNDERORGCONTEXT": "Innerhalb der Organisation",
     "SIDEWIDE": "Seitenübergreifende Tastaturkürzel",
     "SHORTCUTS": {
-      "HOME": "Home",
-      "ORG": "Organisation",
-      "PROJECTS": "Projekte",
-      "USERS": "Benutzer",
-      "USERGRANTS": "Authentisierungen",
-      "ACTIONS": "Aktionen und Abläufe",
-      "DOMAINS": "Domains"
+      "HOME": "Zur Startseite",
+      "SYSTEM": "Zum <strong>S</strong>ystem",
+      "ORG": "Zur <strong>O</strong>rganisation",
+      "ORGSWITCHER": "Organisation wechseln",
+      "ME": "Zum eigenen Profil",
+      "PROJECTS": "Zu den <strong>P</strong>rojekten",
+      "USERS": "Zu den Benutzern",
+      "USERGRANTS": "Zu den <strong>A</strong>uthentisierungen",
+      "ACTIONS": "Zu den Aktionen und Abläufe",
+      "DOMAINS": "Zu den <strong>D</strong>omains"
     }
   },
   "RESOURCEID": "Ressourcen-ID",

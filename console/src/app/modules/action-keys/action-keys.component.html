@@ -1,4 +1,4 @@
-<div class="action-keys-wrapper" [ngSwitch]="type"
+<div *ngIf="type !== ActionKeysType.ORGSWITCHER" class="action-keys-wrapper" [ngSwitch]="type"
   [ngClass]="{'without-margin': withoutMargin, 'no-contrast-mode': doNotUseContrast}">
   <div *ngSwitchCase="ActionKeysType.ADD" class="action-keys-row">
     <div class="action-key">
