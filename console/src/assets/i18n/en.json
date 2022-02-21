@@ -160,6 +160,19 @@
       "1": "equals"
     }
   },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Keyboard Shortcuts",
+    "SIDEWIDE": "Side-wide shortcuts",
+    "SHORTCUTS": {
+      "HOME": "Home",
+      "ORG": "Organization",
+      "PROJECTS": "Projects",
+      "USERS": "Users",
+      "USERGRANTS": "Authorizations",
+      "ACTIONS": "Actions and Flows",
+      "DOMAINS": "Domains"
+    }
+  },
   "RESOURCEID": "Resource Id",
   "TABLE": {
     "NOROWS": "No data"

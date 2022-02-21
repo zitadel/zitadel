@@ -15,6 +15,7 @@ import { Org } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
+import { KeyboardShortcutsService } from './services/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
 import { OverlayWorkflowService } from './services/overlay-workflow.service';
 import { StorageLocation, StorageService } from './services/storage.service';
@@ -67,6 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
     public domSanitizer: DomSanitizer,
     private router: Router,
     update: UpdateService,
+    keyboardShortcuts: KeyboardShortcutsService,
     private activatedRoute: ActivatedRoute,
     private workflowService: OverlayWorkflowService,
     private storageService: StorageService,

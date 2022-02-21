@@ -24,6 +24,7 @@ import { AppComponent } from './app.component';
 import { HasRoleModule } from './directives/has-role/has-role.module';
 import { FooterModule } from './modules/footer/footer.module';
 import { HeaderModule } from './modules/header/header.module';
+import { KeyboardShortcutsModule } from './modules/keyboard-shortcuts/keyboard-shortcuts.module';
 import { NavModule } from './modules/nav/nav.module';
 import { WarnDialogModule } from './modules/warn-dialog/warn-dialog.module';
 import { SignedoutComponent } from './pages/signedout/signedout.component';
@@ -37,6 +38,7 @@ import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
+import { KeyboardShortcutsService } from './services/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
 import { OverlayService } from './services/overlay.service';
 import { RefreshService } from './services/refresh.service';
@@ -111,6 +113,7 @@ const authConfig: AuthConfig = {
     WarnDialogModule,
     MatSelectModule,
     MatDialogModule,
+    KeyboardShortcutsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
   ],
   providers: [
@@ -168,6 +171,7 @@ const authConfig: AuthConfig = {
     ManagementService,
     AdminService,
     SubscriptionService,
+    KeyboardShortcutsService,
     AssetService,
     { provide: 'windowObject', useValue: window },
   ],

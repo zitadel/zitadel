@@ -73,9 +73,9 @@
 
 
   <cnsl-card title="{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}" [expanded]="false">
-    <div class="content" *ngIf="loginData">
-      <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
+    <div class="login-policy-content" *ngIf="loginData">
+      <div class="login-policy-row">
+        <mat-slide-toggle class="login-policy-toggle" color="primary"
           [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.username_login'] | hasFeature | async) === false"
           ngDefaultControl [(ngModel)]="loginData.allowUsernamePassword">
           {{'POLICY.DATA.ALLOWUSERNAMEPASSWORD' | translate}}
@@ -93,10 +93,8 @@
           </cnsl-info-section>
         </ng-template>
       </div>
-      <div class="row">
-
-
-        <mat-slide-toggle class="toggle" color="primary"
+      <div class="login-policy-row">
+        <mat-slide-toggle class="login-policy-toggle" color="primary"
           [disabled]="disabled || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.registration'] | hasFeature | async) === false)"
           ngDefaultControl [(ngModel)]="loginData.allowRegister">
           {{'POLICY.DATA.ALLOWREGISTER' | translate}}
@@ -114,8 +112,8 @@
           </cnsl-info-section>
         </ng-template>
       </div>
-      <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
+      <div class="login-policy-row">
+        <mat-slide-toggle class="login-policy-toggle" color="primary"
           [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false"
           ngDefaultControl [(ngModel)]="loginData.allowExternalIdp">
           {{'POLICY.DATA.ALLOWEXTERNALIDP' | translate}}
@@ -133,8 +131,8 @@
           </cnsl-info-section>
         </ng-template>
       </div>
-      <div class="row">
-        <mat-slide-toggle class="toggle" color="primary"
+      <div class="login-policy-row">
+        <mat-slide-toggle class="login-policy-toggle" color="primary"
           [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false"
           ngDefaultControl [(ngModel)]="loginData.forceMfa">
           {{'POLICY.DATA.FORCEMFA' | translate}}
@@ -152,9 +150,8 @@
           </cnsl-info-section>
         </ng-template>
       </div>
-      <div class="row">
-
-        <mat-slide-toggle class="toggle" color="primary"
+      <div class="login-policy-row">
+        <mat-slide-toggle class="login-policy-toggle" color="primary"
           [disabled]="disabled || serviceType === PolicyComponentServiceType.MGMT && (['login_policy.password_reset'] | hasFeature | async) === false"
           ngDefaultControl [(ngModel)]="loginData.hidePasswordReset">
           {{'POLICY.DATA.HIDEPASSWORDRESET' | translate}}
@@ -173,8 +170,8 @@
         </ng-template>
       </div>
 
-      <div class="row">
-        <cnsl-form-field class="form-field" label="Access Code" required="true">
+      <div class="login-policy-row">
+        <cnsl-form-field label="Access Code" required="true">
           <cnsl-label>{{'LOGINPOLICY.PASSWORDLESS' | translate}}</cnsl-label>
           <mat-select [(ngModel)]="loginData.passwordlessType"
             [disabled]="disabled || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.passwordless'] | hasFeature | async) === false)">
@@ -193,9 +190,10 @@
     </div>
   </cnsl-card>
 
-  <button [disabled]="disabled" class="save-button" (click)="savePolicy()" color="primary" type="submit"
-    mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
-
+  <div class="login-policy-btn-container">
+    <button [disabled]="disabled" class="login-policy-save-button" (click)="savePolicy()" color="primary" type="submit"
+      mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
+  </div>
   <ng-template cnslHasRole [hasRole]="['org.idp.read']">
     <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
       [expanded]="false">

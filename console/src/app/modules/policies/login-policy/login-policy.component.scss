@@ -7,13 +7,13 @@
   font-size: 14px;
 }
 
-.content {
+.login-policy-content {
   padding-top: 1rem;
 
-  .row {
+  .login-policy-row {
     padding-bottom: 1.5rem;
 
-    .toggle {
+    .login-policy-toggle {
       margin: 0.3rem 0;
     }
 
@@ -23,10 +23,14 @@
   }
 }
 
-.save-button {
-  margin-bottom: 3rem;
-  float: right;
-  display: block;
+.login-policy-btn-container {
+  display: flex;
+  justify-content: flex-end;
+
+  .login-policy-save-button {
+    margin-bottom: 3rem;
+    display: block;
+  }
 }
 
 .idp-table-card {

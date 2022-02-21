@@ -160,6 +160,19 @@
       "1": "ist gleich"
     }
   },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tastaturkürzel",
+    "SIDEWIDE": "Seitenübergreifende Tastaturkürzel",
+    "SHORTCUTS": {
+      "HOME": "Home",
+      "ORG": "Organisation",
+      "PROJECTS": "Projekte",
+      "USERS": "Benutzer",
+      "USERGRANTS": "Authentisierungen",
+      "ACTIONS": "Aktionen und Abläufe",
+      "DOMAINS": "Domains"
+    }
+  },
   "RESOURCEID": "Ressourcen-ID",
   "TABLE": {
     "NOROWS": "Keine Daten"

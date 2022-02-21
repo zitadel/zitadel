@@ -14,6 +14,7 @@
 @import 'src/app/modules/nav/nav.component';
 @import 'src/app/modules/action-keys/action-keys.component.scss';
 @import 'src/app/modules/header/header.component';
+@import 'src/app/modules/keyboard-shortcuts/keyboard-shortcuts.component';
 @import 'src/app/modules/footer/footer.component';
 @import 'src/app/modules/theme-setting/theme-setting.component.scss';
 @import 'src/app/pages/orgs/org-detail/org-detail.component';
@@ -92,6 +93,7 @@
   @include org-detail-theme($theme);
   @include iam-detail-theme($theme);
   @include meta-theme($theme);
+  @include keyboard-shortcuts-theme($theme);
   @include project-grant-illustration-theme($theme);
   @include refresh-table-theme($theme);
   @include accounts-card-theme($theme);

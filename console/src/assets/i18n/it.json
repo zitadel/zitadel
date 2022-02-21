@@ -160,6 +160,19 @@
       "1": "equivale"
     }
   },
+  "KEYBOARDSHORTCUTS": {
+    "TITLE": "Tasti rapidi",
+    "SIDEWIDE": "Tasti rapidi globali",
+    "SHORTCUTS": {
+      "HOME": "Home",
+      "ORG": "Organizzazione",
+      "PROJECTS": "Progetti",
+      "USERS": "Utenti",
+      "USERGRANTS": "Autorizzazioni",
+      "ACTIONS": "Azioni e processi",
+      "DOMAINS": "Domini"
+    }
+  },
   "RESOURCEID": "Resource ID",
   "TABLE": {
     "NOROWS": "Nessun dato"
