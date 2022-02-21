@@ -623,11 +623,60 @@ Generates a new machine key, details should be stored after return
 > **rpc** RemoveMachineKey([RemoveMachineKeyRequest](#removemachinekeyrequest))
 [RemoveMachineKeyResponse](#removemachinekeyresponse)
 
-Removed a machine key
+Removes a machine key
 
 
 
     DELETE: /users/{user_id}/keys/{key_id}
+
+
+### GetPersonalAccessTokenByIDs
+
+> **rpc** GetPersonalAccessTokenByIDs([GetPersonalAccessTokenByIDsRequest](#getpersonalaccesstokenbyidsrequest))
+[GetPersonalAccessTokenByIDsResponse](#getpersonalaccesstokenbyidsresponse)
+
+Returns a personal access token of a (machine) user
+
+
+
+    GET: /users/{user_id}/pats/{token_id}
+
+
+### ListPersonalAccessTokens
+
+> **rpc** ListPersonalAccessTokens([ListPersonalAccessTokensRequest](#listpersonalaccesstokensrequest))
+[ListPersonalAccessTokensResponse](#listpersonalaccesstokensresponse)
+
+Returns all personal access tokens of a (machine) user which match the query
+Limit should always be set, there is a default limit set by the service
+
+
+
+    POST: /users/{user_id}/pats/_search
+
+
+### AddPersonalAccessToken
+
+> **rpc** AddPersonalAccessToken([AddPersonalAccessTokenRequest](#addpersonalaccesstokenrequest))
+[AddPersonalAccessTokenResponse](#addpersonalaccesstokenresponse)
+
+Generates a new personal access token for a machine user, details should be stored after return
+
+
+
+    POST: /users/{user_id}/pats
+
+
+### RemovePersonalAccessToken
+
+> **rpc** RemovePersonalAccessToken([RemovePersonalAccessTokenRequest](#removepersonalaccesstokenrequest))
+[RemovePersonalAccessTokenResponse](#removepersonalaccesstokenresponse)
+
+Removes a personal access token
+
+
+
+    DELETE: /users/{user_id}/pats/{token_id}
 
 
 ### ListHumanLinkedIDPs
@@ -3431,6 +3480,31 @@ This is an empty request
 
 
 
+### AddPersonalAccessTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br />  |
+| expiration_date |  google.protobuf.Timestamp | - |  |
+
+
+
+
+### AddPersonalAccessTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token_id |  string | - |  |
+| token |  string | - |  |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddProjectGrantMemberRequest
 
 
@@ -4816,6 +4890,29 @@ This is an empty request
 
 
 
+### GetPersonalAccessTokenByIDsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetPersonalAccessTokenByIDsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| token |  zitadel.user.v1.PersonalAccessToken | - |  |
+
+
+
+
 ### GetPreviewLabelPolicyRequest
 This is an empty request
 
@@ -5568,6 +5665,30 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ListDetails | list limitations and ordering |  |
 | result | repeated zitadel.member.v1.Member | criterias the client is looking for |  |
+
+
+
+
+### ListPersonalAccessTokensRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListPersonalAccessTokensResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.user.v1.PersonalAccessToken | - |  |
 
 
 
@@ -6515,6 +6636,29 @@ This is an empty response
 
 
 ### RemoveOrgMemberResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemovePersonalAccessTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### RemovePersonalAccessTokenResponse
 
 
 
