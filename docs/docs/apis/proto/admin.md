@@ -188,6 +188,102 @@ Update twilio sms provider token
     PUT: /sms/twilio/{id}/token
 
 
+### GetFileSystemNotificationProvider
+
+> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
+[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+
+Get file system notification provider
+
+
+
+    GET: /notification/provider/file
+
+
+### AddFileSystemNotificationProvider
+
+> **rpc** AddFileSystemNotificationProvider([AddFileSystemNotificationProviderRequest](#addfilesystemnotificationproviderrequest))
+[AddFileSystemNotificationProviderResponse](#addfilesystemnotificationproviderresponse)
+
+Add filesystem notification provider
+
+
+
+    POST: /notification/provider/file
+
+
+### UpdateFileSystemNotificationProvider
+
+> **rpc** UpdateFileSystemNotificationProvider([UpdateFileSystemNotificationProviderRequest](#updatefilesystemnotificationproviderrequest))
+[UpdateFileSystemNotificationProviderResponse](#updatefilesystemnotificationproviderresponse)
+
+Update filesystem notification provider
+
+
+
+    PUT: /notification/provider/file
+
+
+### RemoveFileSystemNotificationProvider
+
+> **rpc** RemoveFileSystemNotificationProvider([RemoveFileSystemNotificationProviderRequest](#removefilesystemnotificationproviderrequest))
+[RemoveFileSystemNotificationProviderResponse](#removefilesystemnotificationproviderresponse)
+
+Remove filesystem notification provider
+
+
+
+    DELETE: /notification/provider/file
+
+
+### GetLogNotificationProvider
+
+> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
+[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+
+Get log notification provider
+
+
+
+    GET: /notification/provider/log
+
+
+### AddLogNotificationProvider
+
+> **rpc** AddLogNotificationProvider([AddLogNotificationProviderRequest](#addlognotificationproviderrequest))
+[AddLogNotificationProviderResponse](#addlognotificationproviderresponse)
+
+Add log notification provider
+
+
+
+    POST: /notification/provider/log
+
+
+### UpdateLogNotificationProvider
+
+> **rpc** UpdateLogNotificationProvider([UpdateLogNotificationProviderRequest](#updatelognotificationproviderrequest))
+[UpdateLogNotificationProviderResponse](#updatelognotificationproviderresponse)
+
+Update filesystem notification provider
+
+
+
+    PUT: /notification/provider/log
+
+
+### RemoveLogNotificationProvider
+
+> **rpc** RemoveLogNotificationProvider([RemoveLogNotificationProviderRequest](#removelognotificationproviderrequest))
+[RemoveLogNotificationProviderResponse](#removelognotificationproviderresponse)
+
+Remove filesystem notification provider
+
+
+
+    DELETE: /notification/provider/log
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1379,6 +1475,29 @@ This is an empty request
 
 
 
+### AddFileSystemNotificationProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| compact |  bool | - |  |
+| enabled |  bool | - |  |
+
+
+
+
+### AddFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddIAMMemberRequest
 
 
@@ -1449,6 +1568,29 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | idp_id |  string | - |  |
+
+
+
+
+### AddLogNotificationProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| compact |  bool | - |  |
+| enabled |  bool | - |  |
+
+
+
+
+### AddLogNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -1973,6 +2115,23 @@ This is an empty request
 
 
 
+### GetFileSystemNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetIDPByIDRequest
 
 
@@ -2025,6 +2184,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
+### GetLogNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetLogNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
 
 
 
@@ -2575,6 +2751,23 @@ This is an empty response
 
 
 
+### RemoveFileSystemNotificationProviderRequest
+This is an empty request
+
+
+
+
+### RemoveFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### RemoveIAMMemberRequest
 
 
@@ -2716,6 +2909,23 @@ This is an empty request
 
 
 ### RemoveLabelPolicyLogoResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### RemoveLogNotificationProviderRequest
+This is an empty request
+
+
+
+
+### RemoveLogNotificationProviderResponse
 
 
 
@@ -3426,6 +3636,29 @@ This is an empty request
 
 
 
+### UpdateFileSystemNotificationProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| compact |  bool | - |  |
+| enabled |  bool | - |  |
+
+
+
+
+### UpdateFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateIAMMemberRequest
 
 
@@ -3571,6 +3804,29 @@ This is an empty request
 
 
 ### UpdateLockoutPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateLogNotificationProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| compact |  bool | - |  |
+| enabled |  bool | - |  |
+
+
+
+
+### UpdateLogNotificationProviderResponse
 
 
 
