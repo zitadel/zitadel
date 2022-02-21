@@ -31,7 +31,7 @@ func (msg *Email) GetContent() string {
 	if msg.SenderName != "" {
 		from = fmt.Sprintf("%s <%s>", msg.SenderName, msg.SenderEmail)
 	}
-	headers["from"] = from
+	headers["From"] = from
 	headers["To"] = strings.Join(msg.Recipients, ", ")
 	headers["Cc"] = strings.Join(msg.CC, ", ")
 
