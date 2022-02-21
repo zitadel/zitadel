@@ -48,7 +48,7 @@ func (email *Email) HandleMessage(message channels.Message) error {
 	}
 	emailMsg.SenderEmail = email.senderAddress
 	emailMsg.SenderName = email.senderName
-	// To && SenderNumber
+	// To && From
 	if err := email.smtpClient.Mail(emailMsg.SenderEmail); err != nil {
 		return caos_errs.ThrowInternalf(err, "EMAIL-s3is3", "could not set sender: %v", emailMsg.SenderEmail)
 	}
