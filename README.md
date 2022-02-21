@@ -3,7 +3,9 @@
 
 # ZITADEL
 
-**[💬 chat](https://discord.gg/erh5Brh7jE) [📞 contact](https://zitadel.ch/contact/) [📋 guide](https://docs.zitadel.ch/docs/guides/overview) [🧑‍💻 api docs](https://docs.zitadel.ch/docs/apis/overview) [❓user manuals](https://docs.zitadel.ch/docs/manuals/introduction)**
+
+
+**[🏡 website](https://zitadel.ch) [💬 chat](https://discord.gg/erh5Brh7jE) [📞 contact](https://zitadel.ch/contact/) [📋 guide](https://docs.zitadel.ch/docs/guides/overview) [🧑‍💻 api docs](https://docs.zitadel.ch/docs/apis/overview) [❓user manuals](https://docs.zitadel.ch/docs/manuals/introduction)**
 
 [![stable version](https://badgen.net/github/release/caos/zitadel/stable)](https://github.com/caos/zitadel/releases/latest)
 [![license](https://badgen.net/github/license/caos/zitadel)](#license)
