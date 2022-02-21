@@ -38,6 +38,7 @@ type Login struct {
 	zitadelURL          string
 	oidcAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
+	UserCodeAlg         crypto.EncryptionAlgorithm
 	iamDomain           string
 }
 
@@ -59,7 +60,7 @@ const (
 	DefaultLoggedOutPath = HandlerPrefix + EndpointLogoutDone
 )
 
-func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, zitadelURL, domain, oidcAuthCallbackURL string, externalSecure bool, userAgentCookie mux.MiddlewareFunc) (*Login, error) {
+func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, zitadelURL, domain, oidcAuthCallbackURL string, externalSecure bool, userAgentCookie mux.MiddlewareFunc, userCrypto *crypto.AESCrypto) (*Login, error) {
 	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
 	if err != nil {
 		return nil, fmt.Errorf("error create new aes crypto: %w", err)
@@ -74,6 +75,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		authRepo:            authRepo,
 		IDPConfigAesCrypto:  aesCrypto,
 		iamDomain:           domain,
+		UserCodeAlg:         userCrypto,
 	}
 	//TODO: enable when storage is implemented again
 	//login.staticCache, err = config.StaticCache.Config.NewCache()

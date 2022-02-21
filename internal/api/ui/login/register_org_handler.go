@@ -65,7 +65,17 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), userIDs, true)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordlessInitCode, l.UserCodeAlg)
+	if err != nil {
+		l.renderRegisterOrg(w, r, authRequest, data, err)
+		return
+	}
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.UserCodeAlg)
+	if err != nil {
+		l.renderRegisterOrg(w, r, authRequest, data, err)
+		return
+	}
+	_, err = l.command.SetUpOrg(ctx, data.toOrgDomain(), data.toUserDomain(), initCodeGenerator, phoneCodeGenerator, userIDs, true)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return

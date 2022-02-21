@@ -12,7 +12,7 @@ import (
 )
 
 //ResendInitialMail resend inital mail and changes email if provided
-func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string) (objectDetails *domain.ObjectDetails, err error) {
+func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourceOwner string, initCodeGenerator crypto.Generator) (objectDetails *domain.ObjectDetails, err error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-2n8vs", "Errors.User.UserIDMissing")
 	}
@@ -33,7 +33,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 		changedEvent, _ := existingCode.NewChangedEvent(ctx, userAgg, email)
 		events = append(events, changedEvent)
 	}
-	initCode, err := domain.NewInitUserCode(c.initializeUserCode)
+	initCode, err := domain.NewInitUserCode(initCodeGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *Commands) ResendInitialMail(ctx context.Context, userID, email, resourc
 	return writeModelToObjectDetails(&existingCode.WriteModel), nil
 }
 
-func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string) error {
+func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwner, code, passwordString string, initCodeGenerator crypto.Generator) error {
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-mkM9f", "Errors.User.UserIDMissing")
 	}
@@ -66,7 +66,7 @@ func (c *Commands) HumanVerifyInitCode(ctx context.Context, userID, resourceOwne
 	}
 
 	userAgg := UserAggregateFromWriteModel(&existingCode.WriteModel)
-	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, c.initializeUserCode)
+	err = crypto.VerifyCode(existingCode.CodeCreationDate, existingCode.CodeExpiry, existingCode.Code, code, initCodeGenerator)
 	if err != nil {
 		_, err = c.eventstore.Push(ctx, user.NewHumanInitializedCheckFailedEvent(ctx, userAgg))
 		logging.LogWithFields("COMMAND-Dg2z5", "userID", userAgg.ID).OnError(err).Error("NewHumanInitializedCheckFailedEvent push failed")

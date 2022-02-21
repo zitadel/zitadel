@@ -15,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/authz/repository"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
@@ -44,7 +43,6 @@ func New(
 		*query.Queries
 	},
 	authZ internal_authz.Config,
-	sd systemdefaults.SystemDefaults,
 	externalSecure bool,
 ) *API {
 	verifier := internal_authz.Start(repo)
@@ -55,7 +53,7 @@ func New(
 		router:         router,
 		externalSecure: externalSecure,
 	}
-	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
+	api.grpcServer = server.CreateServer(api.verifier, authZ, repo.Queries)
 	api.routeGRPC()
 
 	api.RegisterHandler("/debug", api.healthHandler())

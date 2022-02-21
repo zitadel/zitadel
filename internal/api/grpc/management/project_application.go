@@ -8,6 +8,7 @@ import (
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
+	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -57,7 +58,11 @@ func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChanges
 }
 
 func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest) (*mgmt_pb.AddOIDCAppResponse, error) {
-	app, err := s.command.AddOIDCApplication(ctx, AddOIDCAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.PasswordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddOIDCApplication(ctx, AddOIDCAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +77,11 @@ func (s *Server) AddOIDCApp(ctx context.Context, req *mgmt_pb.AddOIDCAppRequest)
 }
 
 func (s *Server) AddAPIApp(ctx context.Context, req *mgmt_pb.AddAPIAppRequest) (*mgmt_pb.AddAPIAppResponse, error) {
-	app, err := s.command.AddAPIApplication(ctx, AddAPIAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.PasswordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	app, err := s.command.AddAPIApplication(ctx, AddAPIAppRequestToDomain(req), authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +162,11 @@ func (s *Server) RemoveApp(ctx context.Context, req *mgmt_pb.RemoveAppRequest) (
 }
 
 func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.RegenerateOIDCClientSecretRequest) (*mgmt_pb.RegenerateOIDCClientSecretResponse, error) {
-	config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.PasswordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.ChangeOIDCApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +181,11 @@ func (s *Server) RegenerateOIDCClientSecret(ctx context.Context, req *mgmt_pb.Re
 }
 
 func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.RegenerateAPIClientSecretRequest) (*mgmt_pb.RegenerateAPIClientSecretResponse, error) {
-	config, err := s.command.ChangeAPIApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID)
+	appSecretGenerator, err := s.query.InitHashGenerator(ctx, domain.SecretGeneratorTypeAppSecret, s.PasswordHashAlg)
+	if err != nil {
+		return nil, err
+	}
+	config, err := s.command.ChangeAPIApplicationSecret(ctx, req.ProjectId, req.AppId, authz.GetCtxData(ctx).OrgID, appSecretGenerator)
 	if err != nil {
 		return nil, err
 	}

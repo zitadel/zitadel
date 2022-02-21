@@ -19,6 +19,7 @@ import (
 	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/types"
 	"github.com/caos/zitadel/internal/query"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
@@ -34,13 +35,14 @@ const (
 
 type Notification struct {
 	handler
-	command        *command.Commands
-	systemDefaults sd.SystemDefaults
-	AesCrypto      crypto.EncryptionAlgorithm
-	statikDir      http.FileSystem
-	subscription   *v1.Subscription
-	assetsPrefix   string
-	queries        *query.Queries
+	command            *command.Commands
+	systemDefaults     sd.SystemDefaults
+	AesCrypto          crypto.EncryptionAlgorithm
+	statikDir          http.FileSystem
+	subscription       *v1.Subscription
+	assetsPrefix       string
+	queries            *query.Queries
+	smtpPasswordCrypto crypto.EncryptionAlgorithm
 }
 
 func newNotification(
@@ -51,15 +53,17 @@ func newNotification(
 	aesCrypto crypto.EncryptionAlgorithm,
 	statikDir http.FileSystem,
 	assetsPrefix string,
+	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
 ) *Notification {
 	h := &Notification{
-		handler:        handler,
-		command:        command,
-		systemDefaults: defaults,
-		statikDir:      statikDir,
-		AesCrypto:      aesCrypto,
-		assetsPrefix:   assetsPrefix,
-		queries:        query,
+		handler:            handler,
+		command:            command,
+		systemDefaults:     defaults,
+		statikDir:          statikDir,
+		AesCrypto:          aesCrypto,
+		assetsPrefix:       assetsPrefix,
+		queries:            query,
+		smtpPasswordCrypto: smtpPasswordEncAlg,
 	}
 
 	h.subscribe()
@@ -161,7 +165,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(string(template.Template), translator, user, initCode, n.systemDefaults, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -199,7 +203,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(string(template.Template), translator, user, pwCode, n.systemDefaults, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -238,7 +242,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(string(template.Template), translator, user, emailCode, n.systemDefaults, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -303,7 +307,8 @@ func (n *Notification) handleDomainClaimed(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendDomainClaimed(string(template.Template), translator, user, data["userName"], n.systemDefaults, colors, n.assetsPrefix)
+
+	err = types.SendDomainClaimed(ctx, string(template.Template), translator, user, data["userName"], n.systemDefaults, n.getSMTPConfig, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -349,7 +354,8 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordlessRegistrationLink(string(template.Template), translator, user, addedEvent, n.systemDefaults, n.AesCrypto, colors, n.assetsPrefix)
+
+	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -410,12 +416,34 @@ func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate
 	return n.queries.MailTemplateByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
-func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
-	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.systemDefaults.DefaultLanguage})
+// Read iam smtp config
+func (n *Notification) getSMTPConfig(ctx context.Context) (*smtp.EmailConfig, error) {
+	config, err := n.queries.SMTPConfigByAggregateID(ctx, domain.IAMID)
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.TODO()
+	password, err := crypto.Decrypt(config.Password, n.smtpPasswordCrypto)
+	if err != nil {
+		return nil, err
+	}
+	return &smtp.EmailConfig{
+		From:     config.SenderAddress,
+		FromName: config.SenderName,
+		SMTP: smtp.SMTP{
+			Host:     config.Host,
+			User:     config.User,
+			Password: string(password),
+		},
+	}, nil
+}
+
+func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
+	ctx := context.Background()
+	translator, err := i18n.NewTranslator(n.statikDir, i18n.TranslatorConfig{DefaultLanguage: n.queries.GetDefaultLanguage(ctx)})
+	if err != nil {
+		return nil, err
+	}
+
 	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, domain.IAMID, textType)
 	if err != nil {
 		return translator, nil

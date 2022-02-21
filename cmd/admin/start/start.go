@@ -142,6 +142,9 @@ func startZitadel(config *startConfig) error {
 	if err != nil {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
+	smtpPasswordCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMTPPasswordVerificationKey)
+	logging.Log("MAIN-en9ew").OnError(err).Fatal("cannot create smtp crypto")
+
 	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections.Config, config.SystemDefaults, config.Projections.KeyConfig, keyChan, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
@@ -156,12 +159,12 @@ func startZitadel(config *startConfig) error {
 		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
 		DisplayName: "ZITADEL",
 	}
-	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, webAuthNConfig)
+	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, smtpPasswordCrypto, webAuthNConfig)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix)
+	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, smtpPasswordCrypto)
 
 	router := mux.NewRouter()
 	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo)
@@ -181,9 +184,12 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.SystemDefaults, config.ExternalSecure)
-
-	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix)
+	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure)
+	userEncryptionAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey)
+	if err != nil {
+		return nil
+	}
+	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix, userEncryptionAlgorithm)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
@@ -191,13 +197,13 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix)); err != nil {
+	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
 		return err
 	}
 
@@ -231,7 +237,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, userEncryptionAlgorithm)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

@@ -25,19 +25,16 @@ const (
 
 type User struct {
 	handler
-	iamID        string
 	subscription *v1.Subscription
 	queries      *query2.Queries
 }
 
 func newUser(
 	handler handler,
-	iamID string,
 	queries *query2.Queries,
 ) *User {
 	h := &User{
 		handler: handler,
-		iamID:   iamID,
 		queries: queries,
 	}
 

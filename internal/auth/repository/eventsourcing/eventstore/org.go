@@ -53,5 +53,5 @@ func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*d
 }
 
 func (p *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	return p.Eventstore.FilterEvents(ctx, models.NewSearchQuery().AggregateIDFilter(p.SystemDefaults.IamID).AggregateTypeFilter(iam.AggregateType))
+	return p.Eventstore.FilterEvents(ctx, models.NewSearchQuery().AggregateIDFilter(domain.IAMID).AggregateTypeFilter(iam.AggregateType))
 }

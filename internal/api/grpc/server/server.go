@@ -2,10 +2,10 @@ package server
 
 import (
 	grpc_api "github.com/caos/zitadel/internal/api/grpc"
+	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	"golang.org/x/text/language"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -20,7 +20,7 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang language.Tag) *grpc.Server {
+func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, queries *query.Queries) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	return grpc.NewServer(
 		grpc.UnaryInterceptor(
@@ -31,7 +31,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, lang l
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
-				middleware.TranslationHandler(lang),
+				middleware.TranslationHandler(queries),
 				middleware.ValidationHandler(),
 				middleware.ServiceHandler(),
 			),

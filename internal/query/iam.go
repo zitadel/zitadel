@@ -10,6 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -44,6 +45,10 @@ var (
 		name:  projection.IAMColumnSetUpDone,
 		table: iamTable,
 	}
+	IAMColumnDefaultLanguage = Column{
+		name:  projection.IAMColumnDefaultLanguage,
+		table: iamTable,
+	}
 )
 
 type IAM struct {
@@ -51,10 +56,11 @@ type IAM struct {
 	ChangeDate time.Time
 	Sequence   uint64
 
-	GlobalOrgID  string
-	IAMProjectID string
-	SetupStarted domain.Step
-	SetupDone    domain.Step
+	GlobalOrgID     string
+	IAMProjectID    string
+	DefaultLanguage language.Tag
+	SetupStarted    domain.Step
+	SetupDone       domain.Step
 }
 
 type IAMSearchQueries struct {
@@ -83,6 +89,14 @@ func (q *Queries) IAMByID(ctx context.Context, id string) (*IAM, error) {
 	return scan(row)
 }
 
+func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
+	iam, err := q.IAMByID(ctx, domain.IAMID)
+	if err != nil {
+		return language.Und
+	}
+	return iam.DefaultLanguage
+}
+
 func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 	return sq.Select(
 			IAMColumnID.identifier(),
@@ -92,18 +106,21 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 			IAMColumnProjectID.identifier(),
 			IAMColumnSetupStarted.identifier(),
 			IAMColumnSetupDone.identifier(),
+			IAMColumnDefaultLanguage.identifier(),
 		).
 			From(iamTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*IAM, error) {
-			o := new(IAM)
+			iam := new(IAM)
+			lang := ""
 			err := row.Scan(
-				&o.ID,
-				&o.ChangeDate,
-				&o.Sequence,
-				&o.GlobalOrgID,
-				&o.IAMProjectID,
-				&o.SetupStarted,
-				&o.SetupDone,
+				&iam.ID,
+				&iam.ChangeDate,
+				&iam.Sequence,
+				&iam.GlobalOrgID,
+				&iam.IAMProjectID,
+				&iam.SetupStarted,
+				&iam.SetupDone,
+				&lang,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -111,6 +128,7 @@ func prepareIAMQuery() (sq.SelectBuilder, func(*sql.Row) (*IAM, error)) {
 				}
 				return nil, errors.ThrowInternal(err, "QUERY-d9nw", "Errors.Internal")
 			}
-			return o, nil
+			iam.DefaultLanguage = language.Make(lang)
+			return iam, nil
 		}
 }

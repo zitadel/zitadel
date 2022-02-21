@@ -124,8 +124,6 @@ github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc/go.mod h1:paBW
 github.com/boombuler/barcode v1.0.1 h1:NDBbPmhS+EqABEs5Kg3n/5ZNjy73Pz7SIV+KCeqyXcs=
 github.com/boombuler/barcode v1.0.1/go.mod h1:paBWMcWSl3LHKBqUq+rly7CNSldXjb2rDl3JlRe0mD8=
 github.com/caos/logging v0.0.2/go.mod h1:9LKiDE2ChuGv6CHYif/kiugrfEXu9AwDiFWSreX7Wp0=
-github.com/caos/logging v0.3.0 h1:PMKd47Aqr98FjAPcAE8v3SCe8eqTEclytruND/zc7QU=
-github.com/caos/logging v0.3.0/go.mod h1:B8QNS0WDmR2Keac52Fw+XN4ZJkzLDGrcRIPB2Ux4uRo=
 github.com/caos/logging v0.3.1 h1:892AMeHs09D0e3ZcGB+QDRsZ5+2xtPAsAhOy8eKfztc=
 github.com/caos/logging v0.3.1/go.mod h1:B8QNS0WDmR2Keac52Fw+XN4ZJkzLDGrcRIPB2Ux4uRo=
 github.com/caos/oidc v1.0.1 h1:8UHAPynCObwaqortppDtJFktjqLDLYSLidkNy0Num4o=

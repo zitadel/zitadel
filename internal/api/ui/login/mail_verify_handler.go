@@ -51,7 +51,12 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg)
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.UserCodeAlg)
+	if err != nil {
+		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
+		return
+	}
+	_, err = l.command.CreateHumanEmailVerificationCode(setContext(r.Context(), userOrg), data.UserID, userOrg, emailCodeGenerator)
 	l.renderMailVerification(w, r, authReq, data.UserID, err)
 }
 
@@ -61,7 +66,12 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID
 	}
-	_, err := l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg)
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.UserCodeAlg)
+	if err != nil {
+		l.renderMailVerification(w, r, authReq, userID, err)
+		return
+	}
+	_, err = l.command.VerifyHumanEmail(setContext(r.Context(), userOrg), userID, code, userOrg, emailCodeGenerator)
 	if err != nil {
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return

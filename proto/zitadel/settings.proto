@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+import "google/protobuf/duration.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.settings.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/settings";
+
+message SecretGenerator {
+  SecretGeneratorType generator_type = 1;
+  zitadel.v1.ObjectDetails details = 2;
+  uint32 length = 3;
+  google.protobuf.Duration  expiry   = 4;
+  bool include_lower_letters = 5;
+  bool include_upper_letters = 6;
+  bool include_digits = 7;
+  bool include_symbols = 8;
+}
+
+
+message SecretGeneratorQuery {
+  oneof query {
+    option (validate.required) = true;
+
+    SecretGeneratorTypeQuery type_query = 1;
+  }
+}
+
+message SecretGeneratorTypeQuery {
+  SecretGeneratorType generator_type = 1;
+}
+
+enum SecretGeneratorType {
+  SECRET_GENERATOR_TYPE_UNSPECIFIED = 0;
+  SECRET_GENERATOR_TYPE_INIT_CODE = 1;
+  SECRET_GENERATOR_TYPE_VERIFY_EMAIL_CODE = 2;
+  SECRET_GENERATOR_TYPE_VERIFY_PHONE_CODE = 3;
+  SECRET_GENERATOR_TYPE_PASSWORD_RESET_CODE = 4;
+  SECRET_GENERATOR_TYPE_PASSWORDLESS_INIT_CODE = 5;
+  SECRET_GENERATOR_TYPE_APP_SECRET = 6;
+}
+
+message SMTPConfig {
+  zitadel.v1.ObjectDetails details = 1;
+  string sender_address = 2;
+  string sender_name = 3;
+  bool tls = 4;
+  string host = 5;
+  string user = 6;
+}

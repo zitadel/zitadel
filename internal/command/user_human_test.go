@@ -25,13 +25,13 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		idGenerator     id.Generator
-		secretGenerator crypto.Generator
 		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx   context.Context
-		orgID string
-		human *domain.Human
+		ctx             context.Context
+		orgID           string
+		human           *domain.Human
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.Human
@@ -228,8 +228,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -244,6 +243,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -312,7 +312,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -331,6 +330,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -391,7 +391,6 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -411,6 +410,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -489,8 +489,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -508,6 +507,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						PhoneNumber: "+41711234567",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -582,8 +582,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
+				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "user1"),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -602,6 +601,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 						IsPhoneVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -630,13 +630,11 @@ func TestCommandSide_AddHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				initializeUserCode:    tt.fields.secretGenerator,
-				phoneVerificationCode: tt.fields.secretGenerator,
-				userPasswordAlg:       tt.fields.userPasswordAlg,
+				eventstore:      tt.fields.eventstore,
+				idGenerator:     tt.fields.idGenerator,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human)
+			got, err := r.AddHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -652,17 +650,17 @@ func TestCommandSide_AddHuman(t *testing.T) {
 
 func TestCommandSide_ImportHuman(t *testing.T) {
 	type fields struct {
-		eventstore           *eventstore.Eventstore
-		idGenerator          id.Generator
-		secretGenerator      crypto.Generator
-		userPasswordAlg      crypto.HashAlgorithm
-		passwordlessInitCode crypto.Generator
+		eventstore      *eventstore.Eventstore
+		idGenerator     id.Generator
+		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx          context.Context
-		orgID        string
-		human        *domain.Human
-		passwordless bool
+		ctx                  context.Context
+		orgID                string
+		human                *domain.Human
+		passwordless         bool
+		secretGenerator      crypto.Generator
+		passwordlessInitCode crypto.Generator
 	}
 	type res struct {
 		wantHuman *domain.Human
@@ -850,7 +848,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -870,6 +867,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -930,7 +928,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -951,6 +948,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1025,10 +1023,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
-				secretGenerator:      GetMockSecretGenerator(t),
-				userPasswordAlg:      crypto.CreateMockHashAlg(gomock.NewController(t)),
-				passwordlessInitCode: GetMockSecretGenerator(t),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1044,7 +1040,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 				},
-				passwordless: true,
+				passwordless:         true,
+				secretGenerator:      GetMockSecretGenerator(t),
+				passwordlessInitCode: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1129,10 +1127,8 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						uniqueConstraintsFromEventConstraint(user.NewAddUsernameUniqueConstraint("username", "org1", true)),
 					),
 				),
-				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
-				secretGenerator:      GetMockSecretGenerator(t),
-				userPasswordAlg:      crypto.CreateMockHashAlg(gomock.NewController(t)),
-				passwordlessInitCode: GetMockSecretGenerator(t),
+				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1", "code1"),
+				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
 				ctx:   context.Background(),
@@ -1152,7 +1148,9 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 				},
-				passwordless: true,
+				passwordless:         true,
+				secretGenerator:      GetMockSecretGenerator(t),
+				passwordlessInitCode: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1242,7 +1240,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1265,6 +1262,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						PhoneNumber: "+41711234567",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1340,7 +1338,6 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1364,6 +1361,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 						IsPhoneVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				wantHuman: &domain.Human{
@@ -1392,14 +1390,11 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				initializeUserCode:    tt.fields.secretGenerator,
-				phoneVerificationCode: tt.fields.secretGenerator,
-				userPasswordAlg:       tt.fields.userPasswordAlg,
-				passwordlessInitCode:  tt.fields.passwordlessInitCode,
+				eventstore:      tt.fields.eventstore,
+				idGenerator:     tt.fields.idGenerator,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless)
+			gotHuman, gotCode, err := r.ImportHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.passwordless, tt.args.secretGenerator, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1418,15 +1413,15 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	type fields struct {
 		eventstore      *eventstore.Eventstore
 		idGenerator     id.Generator
-		secretGenerator crypto.Generator
 		userPasswordAlg crypto.HashAlgorithm
 	}
 	type args struct {
-		ctx            context.Context
-		orgID          string
-		human          *domain.Human
-		link           *domain.UserIDPLink
-		orgMemberRoles []string
+		ctx             context.Context
+		orgID           string
+		human           *domain.Human
+		link            *domain.UserIDPLink
+		orgMemberRoles  []string
+		secretGenerator crypto.Generator
 	}
 	type res struct {
 		want *domain.Human
@@ -1858,7 +1853,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1876,6 +1870,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -1957,7 +1952,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -1976,6 +1970,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						EmailAddress: "email@test.ch",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -2049,7 +2044,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -2069,6 +2063,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						IsEmailVerified: true,
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -2161,7 +2156,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -2183,6 +2177,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						SecretString: "password",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -2271,7 +2266,6 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					),
 				),
 				idGenerator:     id_mock.NewIDGeneratorExpectIDs(t, "user1"),
-				secretGenerator: GetMockSecretGenerator(t),
 				userPasswordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
 			},
 			args: args{
@@ -2294,6 +2288,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 						SecretString: "password",
 					},
 				},
+				secretGenerator: GetMockSecretGenerator(t),
 			},
 			res: res{
 				want: &domain.Human{
@@ -2322,13 +2317,11 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
-				eventstore:            tt.fields.eventstore,
-				idGenerator:           tt.fields.idGenerator,
-				initializeUserCode:    tt.fields.secretGenerator,
-				phoneVerificationCode: tt.fields.secretGenerator,
-				userPasswordAlg:       tt.fields.userPasswordAlg,
+				eventstore:      tt.fields.eventstore,
+				idGenerator:     tt.fields.idGenerator,
+				userPasswordAlg: tt.fields.userPasswordAlg,
 			}
-			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles)
+			got, err := r.RegisterHuman(tt.args.ctx, tt.args.orgID, tt.args.human, tt.args.link, tt.args.orgMemberRoles, tt.args.secretGenerator, tt.args.secretGenerator)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

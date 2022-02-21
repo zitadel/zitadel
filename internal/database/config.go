@@ -14,17 +14,21 @@ const (
 type Config struct {
 	Host            string
 	Port            string
-	User            string
-	Password        string
 	Database        string
-	SSL             SSL
 	MaxOpenConns    uint32
 	MaxConnLifetime time.Duration
 	MaxConnIdleTime time.Duration
+	User
 
 	//Additional options to be appended as options=<Options>
 	//The value will be taken as is. Multiple options are space separated.
 	Options string
+}
+
+type User struct {
+	Username string
+	Password string
+	SSL      SSL
 }
 
 type SSL struct {
@@ -57,7 +61,7 @@ func (c Config) String() string {
 	fields := []string{
 		"host=" + c.Host,
 		"port=" + c.Port,
-		"user=" + c.User,
+		"user=" + c.Username,
 		"dbname=" + c.Database,
 		"application_name=zitadel",
 		"sslmode=" + c.SSL.Mode,

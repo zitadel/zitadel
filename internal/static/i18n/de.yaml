@@ -27,6 +27,8 @@ Errors:
       RemoveFailed: Objekt konnte nicht gelöscht werden
   Limit:
     ExceedsDefault: Limit überschreitet default Limit
+  Language:
+    NotParsed: Sprache konnte nicht gemapped werde
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existierts bereits

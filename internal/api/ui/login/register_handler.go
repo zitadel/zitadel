@@ -74,7 +74,17 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		memberRoles = nil
 		resourceOwner = authRequest.RequestedOrgID
 	}
-	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, memberRoles)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.UserCodeAlg)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.UserCodeAlg)
+	if err != nil {
+		l.renderRegister(w, r, authRequest, data, err)
+		return
+	}
+	user, err := l.command.RegisterHuman(setContext(r.Context(), resourceOwner), resourceOwner, data.toHumanDomain(), nil, memberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
