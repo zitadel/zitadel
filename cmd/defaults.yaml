@@ -27,6 +27,12 @@ Database:
 
 AdminUser:
   Username: root
+  Password: ""
+  SSL:
+    Mode: diabled
+    RootCert: ""
+    Cert: ""
+    Key: ""
 
 Projections:
   Config:
