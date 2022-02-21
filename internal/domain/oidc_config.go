@@ -28,11 +28,6 @@ const (
 	oidcConfigStateCount
 )
 
-func (c OIDCConfig) IsValid() error {
-
-	return nil
-}
-
 func (c OIDCConfigState) Valid() bool {
 	return c >= 0 && c < oidcConfigStateCount
 }

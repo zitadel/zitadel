@@ -23,6 +23,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(SMSConfigActivatedEventType, SMSConfigActivatedEventMapper).
 		RegisterFilterEventMapper(SMSConfigDeactivatedEventType, SMSConfigDeactivatedEventMapper).
 		RegisterFilterEventMapper(SMSConfigRemovedEventType, SMSConfigRemovedEventMapper).
+		RegisterFilterEventMapper(OIDCConfigAddedEventType, OIDCConfigAddedEventMapper).
+		RegisterFilterEventMapper(OIDCConfigChangedEventType, OIDCConfigChangedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyAddedEventType, LabelPolicyAddedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyChangedEventType, LabelPolicyChangedEventMapper).
 		RegisterFilterEventMapper(LabelPolicyActivatedEventType, LabelPolicyActivatedEventMapper).
