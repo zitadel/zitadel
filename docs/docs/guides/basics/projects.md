@@ -76,7 +76,7 @@ import GrantedProjectDescription from '../../concepts/structure/_granted_project
 1. Visit the project that you created before. In the section GRANTED ORGANIZATIONS, select 
 **New**.
 2. Enter the domain ‘acme.caos.ch’. Search the organization and continue to the next step.
-3. Select some roles you would like to grant to the organization ACME and confirm.
+3. Select some roles that you would like to grant to the organization ACME. Confirm the change.
 4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
 
 ![Grant a project](/img/projects_create_org_grant_caos2acme.gif)

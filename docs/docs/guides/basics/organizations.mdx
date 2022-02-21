@@ -54,8 +54,9 @@ After you successfully register your organization, ZITADEL automatically generat
 Users that you create within your organization will be suffixed with this domain name.
 When you create users with your organization, their logonnames will have this suffix.
 
-To aid user experience, suffix users with a domain name that is in your control.
-You can prove the ownership of your domain by DNS or HTTP challenge.
+It's a good idea to use a domain name that you own for your loggonname suffix.
+This lets your users log in with their own company domain, improving user experience.
+You can prove the ownership of your domain by DNS or HTTP challenge ([Lets Encrypt has documentation about the different "challenge" types](https://letsencrypt.org/docs/challenge-types/)).
 
 An organization can have multiple domain names, but only one domain can be primary.
 The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in `access_tokens` (`preferred_username`).
