@@ -67,6 +67,7 @@
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
     "TOOLTIP": {
+      "HOME": "Vai alla panoramica",
       "PERSONAL": "Mostra il tuo account personale, i tuoi IDP, i metodi di accesso e le autorizzazioni.",
       "IAMPOLICIES": "Gestisci le impostazioni globali di accesso e modifica i manager di ZITADEL",
       "IAMEVENTSTORE": "Ripristina views ed eventi falliti di ZITADEL",

@@ -67,6 +67,7 @@
     "PRIVACY": "Datenschutz",
     "TOS": "AGB",
     "TOOLTIP": {
+      "HOME": "Zur Startseite",
       "PERSONAL": "Verwalte deinen persönlichen Account, deine IDPs, Login Methoden, Faktoren und Berechtigungen",
       "IAMPOLICIES": "Verwalte ZITADELs globale Zugangsrichtlinien und verwalte ZITADEL Manager",
       "IAMEVENTSTORE": "Bereinige views und fehlerhafte Events",

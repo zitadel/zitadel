@@ -67,6 +67,7 @@
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
     "TOOLTIP": {
+      "HOME": "Go to your shortcuts",
       "PERSONAL": "Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
       "IAMPOLICIES": "Manage ZITADELs global Access policies und elect ZITADEL Managers",
       "IAMEVENTSTORE": "Clear views and failed events",
