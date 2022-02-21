@@ -1514,7 +1514,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -3715,7 +3715,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
