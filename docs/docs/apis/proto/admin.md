@@ -128,6 +128,66 @@ Update system smtp configuration password for host
     PUT: /smtp/password
 
 
+### ListSMSProviders
+
+> **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
+[ListSMSProvidersResponse](#listsmsprovidersresponse)
+
+list sms provider configurations
+
+
+
+    POST: /sms/_search
+
+
+### GetSMSProvider
+
+> **rpc** GetSMSProvider([GetSMSProviderRequest](#getsmsproviderrequest))
+[GetSMSProviderResponse](#getsmsproviderresponse)
+
+Get sms provider
+
+
+
+    GET: /sms/{id}
+
+
+### AddSMSProviderTwilio
+
+> **rpc** AddSMSProviderTwilio([AddSMSProviderTwilioRequest](#addsmsprovidertwiliorequest))
+[AddSMSProviderTwilioResponse](#addsmsprovidertwilioresponse)
+
+Add twilio sms provider
+
+
+
+    POST: /sms/twilio
+
+
+### UpdateSMSProviderTwilio
+
+> **rpc** UpdateSMSProviderTwilio([UpdateSMSProviderTwilioRequest](#updatesmsprovidertwiliorequest))
+[UpdateSMSProviderTwilioResponse](#updatesmsprovidertwilioresponse)
+
+Update twilio sms provider
+
+
+
+    PUT: /sms/twilio/{id}
+
+
+### UpdateSMSProviderTwilioToken
+
+> **rpc** UpdateSMSProviderTwilioToken([UpdateSMSProviderTwilioTokenRequest](#updatesmsprovidertwiliotokenrequest))
+[UpdateSMSProviderTwilioTokenResponse](#updatesmsprovidertwiliotokenresponse)
+
+Update twilio sms provider token
+
+
+
+    PUT: /sms/twilio/{id}/token
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1446,6 +1506,31 @@ This is an empty request
 
 
 
+### AddSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -2090,6 +2175,28 @@ This is an empty request
 
 
 
+### GetSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
 ### GetSMTPConfigRequest
 This is an empty request
 
@@ -2359,6 +2466,29 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSMSProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProvider | - |  |
 
 
 
@@ -3562,6 +3692,53 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenResponse
 
 
 

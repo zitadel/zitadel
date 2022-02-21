@@ -32,6 +32,7 @@ type Commands struct {
 
 	idpConfigSecretCrypto crypto.EncryptionAlgorithm
 	smtpPasswordCrypto    crypto.EncryptionAlgorithm
+	smsCrypto             crypto.EncryptionAlgorithm
 
 	userPasswordAlg             crypto.HashAlgorithm
 	machineKeySize              int
@@ -60,8 +61,9 @@ func StartCommands(
 	staticStore static.Storage,
 	authZRepo authz_repo.Repository,
 	keyConfig *crypto.KeyConfig,
-	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
 	webAuthN webauthn_helper.Config,
+	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
+	smsHashAlg crypto.EncryptionAlgorithm,
 ) (repo *Commands, err error) {
 	repo = &Commands{
 		eventstore:         es,
@@ -73,6 +75,7 @@ func StartCommands(
 		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime,
 		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime,
 		smtpPasswordCrypto: smtpPasswordEncAlg,
+		smsCrypto:          smsHashAlg,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)

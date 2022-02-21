@@ -21,6 +21,7 @@ type SystemDefaults struct {
 	UserVerificationKey         *crypto.KeyConfig
 	IDPConfigVerificationKey    *crypto.KeyConfig
 	SMTPPasswordVerificationKey *crypto.KeyConfig
+	SMSVerificationKey          *crypto.KeyConfig
 	Multifactors                MultifactorConfig
 	VerificationLifetimes       VerificationLifetimes
 	DomainVerification          DomainVerification

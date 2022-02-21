@@ -51,3 +51,25 @@ message SMTPConfig {
   string host = 5;
   string user = 6;
 }
+
+message SMSProvider {
+  zitadel.v1.ObjectDetails details = 1;
+  string id = 2;
+  SMSProviderConfigState state = 3;
+
+  oneof config {
+    TwilioConfig twilio = 4;
+  }
+}
+
+message TwilioConfig {
+  string sid = 1;
+  string sender_number = 2;
+}
+
+
+enum SMSProviderConfigState {
+  SMS_PROVIDER_CONFIG_STATE_UNSPECIFIED = 0;
+  SMS_PROVIDER_CONFIG_ACTIVE = 1;
+  SMS_PROVIDER_CONFIG_INACTIVE = 2;
+}

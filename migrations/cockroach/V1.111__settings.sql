@@ -27,10 +27,31 @@ CREATE TABLE zitadel.projections.smtp_configs (
 
     , tls BOOLEAN NOT NULL
     , sender_address STRING NOT NULL
-    , sender_name STRING NOT NULL
+    , sender_number STRING NOT NULL
     , host STRING NOT NULL
     , username STRING NOT NULL DEFAULT ''
     , password JSONB
 
     , PRIMARY KEY (aggregate_id)
+);
+
+CREATE TABLE zitadel.projections.sms_configs (
+     id STRING NOT NULL
+    ,aggregate_id STRING NOT NULL
+    , creation_date TIMESTAMPTZ NOT NULL
+    , change_date TIMESTAMPTZ NOT NULL
+    , resource_owner STRING NOT NULL
+    , sequence INT8 NOT NULL
+    , state INT2
+
+    , PRIMARY KEY (id)
+);
+
+CREATE TABLE zitadel.projections.sms_configs_twilio (
+    sms_id STRING NOT NULL
+    ,sid STRING NOT NULL
+    ,sender_name STRING NOT NULL
+    ,token JSONB
+
+    , PRIMARY KEY (sms_id)
 );

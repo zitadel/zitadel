@@ -254,6 +254,66 @@ service AdminService {
         };
     }
 
+    // list sms provider configurations
+    rpc ListSMSProviders(ListSMSProvidersRequest) returns (ListSMSProvidersResponse) {
+        option (google.api.http) = {
+            post: "/sms/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get sms provider
+    rpc GetSMSProvider(GetSMSProviderRequest) returns (GetSMSProviderResponse) {
+        option (google.api.http) = {
+            get: "/sms/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add twilio sms provider
+    rpc AddSMSProviderTwilio(AddSMSProviderTwilioRequest) returns (AddSMSProviderTwilioResponse) {
+        option (google.api.http) = {
+            post: "/sms/twilio";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update twilio sms provider
+    rpc UpdateSMSProviderTwilio(UpdateSMSProviderTwilioRequest) returns (UpdateSMSProviderTwilioResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update twilio sms provider token
+    rpc UpdateSMSProviderTwilioToken(UpdateSMSProviderTwilioTokenRequest) returns (UpdateSMSProviderTwilioTokenResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}/token";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
         option (google.api.http) = {
@@ -2428,6 +2488,54 @@ message UpdateSMTPConfigPasswordRequest {
 }
 
 message UpdateSMTPConfigPasswordResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ListSMSProvidersRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListSMSProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.SMSProvider result = 3;
+}
+
+message GetSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetSMSProviderResponse {
+    zitadel.settings.v1.SMSProvider config = 1;
+}
+
+message AddSMSProviderTwilioRequest {
+    string sid = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddSMSProviderTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSMSProviderTwilioRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sid = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMSProviderTwilioTokenRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderTwilioTokenResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
