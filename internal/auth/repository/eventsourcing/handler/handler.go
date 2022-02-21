@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/config/types"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	query2 "github.com/caos/zitadel/internal/query"
@@ -14,7 +13,7 @@ import (
 type Configs map[string]*Config
 
 type Config struct {
-	MinimumCycleDuration types.Duration
+	MinimumCycleDuration time.Duration
 }
 
 type handler struct {
@@ -33,8 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, systemDefaults sd.SystemDefaults, queries *query2.Queries) []query.Handler {
 	return []query.Handler{
 		newUser(
-			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			systemDefaults.IamID, queries),
+			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es}, queries),
 		newUserSession(
 			handler{view, bulkLimit, configs.cycleDuration("UserSession"), errorCount, es}),
 		newToken(
@@ -57,7 +55,7 @@ func (configs Configs) cycleDuration(viewModel string) time.Duration {
 	if !ok {
 		return 3 * time.Minute
 	}
-	return c.MinimumCycleDuration.Duration
+	return c.MinimumCycleDuration
 }
 
 func (h *handler) MinimumCycleDuration() time.Duration {

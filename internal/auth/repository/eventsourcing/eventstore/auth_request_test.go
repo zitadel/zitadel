@@ -252,22 +252,17 @@ func (m *mockApp) AppByOIDCClientID(ctx context.Context, id string) (*query.App,
 
 func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	type fields struct {
-		AuthRequests               *cache.AuthRequestCache
-		View                       *view.View
-		userSessionViewProvider    userSessionViewProvider
-		userViewProvider           userViewProvider
-		userEventProvider          userEventProvider
-		orgViewProvider            orgViewProvider
-		userGrantProvider          userGrantProvider
-		projectProvider            projectProvider
-		applicationProvider        applicationProvider
-		loginPolicyProvider        loginPolicyViewProvider
-		lockoutPolicyProvider      lockoutPolicyViewProvider
-		PasswordCheckLifeTime      time.Duration
-		ExternalLoginCheckLifeTime time.Duration
-		MFAInitSkippedLifeTime     time.Duration
-		SecondFactorCheckLifeTime  time.Duration
-		MultiFactorCheckLifeTime   time.Duration
+		AuthRequests            *cache.AuthRequestCache
+		View                    *view.View
+		userSessionViewProvider userSessionViewProvider
+		userViewProvider        userViewProvider
+		userEventProvider       userEventProvider
+		orgViewProvider         orgViewProvider
+		userGrantProvider       userGrantProvider
+		projectProvider         projectProvider
+		applicationProvider     applicationProvider
+		loginPolicyProvider     loginPolicyViewProvider
+		lockoutPolicyProvider   lockoutPolicyViewProvider
 	}
 	type args struct {
 		request       *domain.AuthRequest
@@ -570,12 +565,16 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userViewProvider: &mockViewUser{
 					PasswordlessInitRequired: true,
 				},
-				userEventProvider:        &mockEventUser{},
-				orgViewProvider:          &mockViewOrg{State: domain.OrgStateActive},
-				MultiFactorCheckLifeTime: 10 * time.Hour,
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
+					},
+				},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						MultiFactorCheckLifetime: 10 * time.Hour,
 					},
 				},
 			},
@@ -597,7 +596,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				MultiFactorCheckLifeTime: 10 * time.Hour,
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						MultiFactorCheckLifetime: 10 * time.Hour,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
 			[]domain.NextStep{&domain.PasswordlessStep{}},
@@ -618,7 +621,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				MultiFactorCheckLifeTime: 10 * time.Hour,
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						MultiFactorCheckLifetime: 10 * time.Hour,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{PasswordlessType: domain.PasswordlessTypeAllowed}}, false},
 			[]domain.NextStep{&domain.PasswordlessStep{PasswordSet: true}},
@@ -644,14 +651,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				orgViewProvider:          &mockViewOrg{State: domain.OrgStateActive},
-				MultiFactorCheckLifeTime: 10 * time.Hour,
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
 			},
 			args{&domain.AuthRequest{
 				UserID: "UserID",
 				LoginPolicy: &domain.LoginPolicy{
-					PasswordlessType: domain.PasswordlessTypeAllowed,
-					MultiFactors:     []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+					PasswordlessType:         domain.PasswordlessTypeAllowed,
+					MultiFactors:             []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+					MultiFactorCheckLifetime: 10 * time.Hour,
 				},
 			}, false},
 			[]domain.NextStep{&domain.VerifyEMailStep{}},
@@ -692,10 +699,19 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				orgViewProvider:           &mockViewOrg{State: domain.OrgStateActive},
-				SecondFactorCheckLifeTime: 18 * time.Hour,
+				orgViewProvider: &mockViewOrg{State: domain.OrgStateActive},
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: 18 * time.Hour,
+					},
+				},
 			},
-			args{&domain.AuthRequest{UserID: "UserID", SelectedIDPConfigID: "IDPConfigID"}, false},
+			args{&domain.AuthRequest{
+				UserID:              "UserID",
+				SelectedIDPConfigID: "IDPConfigID",
+				LoginPolicy: &domain.LoginPolicy{
+					SecondFactorCheckLifetime: 18 * time.Hour,
+				}}, false},
 			[]domain.NextStep{&domain.ExternalLoginStep{SelectedIDPConfigID: "IDPConfigID"}},
 			nil,
 		},
@@ -715,23 +731,21 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 				userGrantProvider:   &mockUserGrants{},
 				projectProvider:     &mockProject{},
 				applicationProvider: &mockApp{app: &query.App{OIDCConfig: &query.OIDCApp{AppType: domain.OIDCApplicationTypeWeb}}},
-				loginPolicyProvider: &mockLoginPolicy{
-					policy: &query.LoginPolicy{},
-				},
 				lockoutPolicyProvider: &mockLockoutPolicy{
 					policy: &query.LockoutPolicy{
 						ShowFailures: true,
 					},
 				},
-				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime:  18 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
 					Request:             &domain.AuthRequestOIDC{},
-					LoginPolicy:         &domain.LoginPolicy{},
+					LoginPolicy: &domain.LoginPolicy{
+						ExternalLoginCheckLifetime: 10 * 24 * time.Hour,
+						SecondFactorCheckLifetime:  18 * time.Hour,
+					},
 				},
 				false},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
@@ -751,7 +765,11 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime: 10 * 24 * time.Hour,
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						PasswordCheckLifetime: 10 * 24 * time.Hour,
+					},
+				},
 			},
 			args{&domain.AuthRequest{UserID: "UserID", LoginPolicy: &domain.LoginPolicy{}}, false},
 			[]domain.NextStep{&domain.PasswordStep{}},
@@ -779,15 +797,16 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				SecondFactorCheckLifeTime:  18 * time.Hour,
-				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
 					Request:             &domain.AuthRequestOIDC{},
-					LoginPolicy:         &domain.LoginPolicy{},
+					LoginPolicy: &domain.LoginPolicy{
+						SecondFactorCheckLifetime:  18 * time.Hour,
+						ExternalLoginCheckLifetime: 10 * 24 * time.Hour,
+					},
 				}, false},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
 			nil,
@@ -811,14 +830,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
 					UserID: "UserID",
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						PasswordCheckLifetime:     10 * 24 * time.Hour,
+						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
@@ -844,14 +863,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
 					UserID: "UserID",
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						PasswordCheckLifetime:     10 * 24 * time.Hour,
+						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
@@ -878,16 +897,16 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:      10 * 24 * time.Hour,
-				ExternalLoginCheckLifeTime: 10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime:  18 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
 					UserID:              "UserID",
 					SelectedIDPConfigID: "IDPConfigID",
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						PasswordCheckLifetime:      10 * 24 * time.Hour,
+						ExternalLoginCheckLifetime: 10 * 24 * time.Hour,
+						SecondFactorCheckLifetime:  18 * time.Hour,
 					},
 				}, false},
 			[]domain.NextStep{&domain.MFAVerificationStep{
@@ -915,14 +934,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
 					UserID: "UserID",
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						PasswordCheckLifetime:     10 * 24 * time.Hour,
+						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				}, false},
 			[]domain.NextStep{&domain.ChangePasswordStep{}},
@@ -946,13 +965,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID: "UserID",
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, false},
 			[]domain.NextStep{&domain.VerifyEMailStep{}},
@@ -977,13 +996,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID: "UserID",
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, false},
 			[]domain.NextStep{&domain.ChangePasswordStep{}, &domain.VerifyEMailStep{}},
@@ -1011,14 +1030,14 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, false},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
@@ -1046,15 +1065,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, true},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
@@ -1082,15 +1101,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, true},
 			[]domain.NextStep{&domain.LoginSucceededStep{}, &domain.RedirectToCallbackStep{}},
@@ -1120,15 +1139,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, true},
 			[]domain.NextStep{&domain.GrantRequiredStep{}},
@@ -1159,15 +1178,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, true},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
@@ -1197,15 +1216,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, true},
 			[]domain.NextStep{&domain.ProjectRequiredStep{}},
@@ -1236,15 +1255,15 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
-				SecondFactorCheckLifeTime: 18 * time.Hour,
 			},
 			args{&domain.AuthRequest{
 				UserID:  "UserID",
 				Prompt:  []domain.Prompt{domain.PromptNone},
 				Request: &domain.AuthRequestOIDC{},
 				LoginPolicy: &domain.LoginPolicy{
-					SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+					PasswordCheckLifetime:     10 * 24 * time.Hour,
+					SecondFactorCheckLifetime: 18 * time.Hour,
 				},
 			}, true},
 			[]domain.NextStep{&domain.RedirectToCallbackStep{}},
@@ -1266,9 +1285,13 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				userEventProvider:         &mockEventUser{},
-				orgViewProvider:           &mockViewOrg{State: domain.OrgStateActive},
-				SecondFactorCheckLifeTime: 18 * time.Hour,
+				loginPolicyProvider: &mockLoginPolicy{
+					policy: &query.LoginPolicy{
+						SecondFactorCheckLifetime: 18 * time.Hour,
+					},
+				},
+				userEventProvider: &mockEventUser{},
+				orgViewProvider:   &mockViewOrg{State: domain.OrgStateActive},
 			},
 			args{
 				&domain.AuthRequest{
@@ -1299,8 +1322,6 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 						ShowFailures: true,
 					},
 				},
-				SecondFactorCheckLifeTime: 18 * time.Hour,
-				PasswordCheckLifeTime:     10 * 24 * time.Hour,
 			},
 			args{
 				&domain.AuthRequest{
@@ -1308,7 +1329,9 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 					SelectedIDPConfigID: "IDPConfigID",
 					LinkingUsers:        []*domain.ExternalUser{{IDPConfigID: "IDPConfigID", ExternalUserID: "UserID", DisplayName: "DisplayName"}},
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
+						PasswordCheckLifetime:     10 * 24 * time.Hour,
 					},
 				}, false},
 			[]domain.NextStep{&domain.LinkUsersStep{}},
@@ -1318,22 +1341,17 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := &AuthRequestRepo{
-				AuthRequests:               tt.fields.AuthRequests,
-				View:                       tt.fields.View,
-				UserSessionViewProvider:    tt.fields.userSessionViewProvider,
-				UserViewProvider:           tt.fields.userViewProvider,
-				UserEventProvider:          tt.fields.userEventProvider,
-				OrgViewProvider:            tt.fields.orgViewProvider,
-				UserGrantProvider:          tt.fields.userGrantProvider,
-				ProjectProvider:            tt.fields.projectProvider,
-				ApplicationProvider:        tt.fields.applicationProvider,
-				LoginPolicyViewProvider:    tt.fields.loginPolicyProvider,
-				LockoutPolicyViewProvider:  tt.fields.lockoutPolicyProvider,
-				PasswordCheckLifeTime:      tt.fields.PasswordCheckLifeTime,
-				ExternalLoginCheckLifeTime: tt.fields.ExternalLoginCheckLifeTime,
-				MFAInitSkippedLifeTime:     tt.fields.MFAInitSkippedLifeTime,
-				SecondFactorCheckLifeTime:  tt.fields.SecondFactorCheckLifeTime,
-				MultiFactorCheckLifeTime:   tt.fields.MultiFactorCheckLifeTime,
+				AuthRequests:              tt.fields.AuthRequests,
+				View:                      tt.fields.View,
+				UserSessionViewProvider:   tt.fields.userSessionViewProvider,
+				UserViewProvider:          tt.fields.userViewProvider,
+				UserEventProvider:         tt.fields.userEventProvider,
+				OrgViewProvider:           tt.fields.orgViewProvider,
+				UserGrantProvider:         tt.fields.userGrantProvider,
+				ProjectProvider:           tt.fields.projectProvider,
+				ApplicationProvider:       tt.fields.applicationProvider,
+				LoginPolicyViewProvider:   tt.fields.loginPolicyProvider,
+				LockoutPolicyViewProvider: tt.fields.lockoutPolicyProvider,
 			}
 			got, err := repo.nextSteps(context.Background(), tt.args.request, tt.args.checkLoggedIn)
 			if (err != nil && tt.wantErr == nil) || (tt.wantErr != nil && !tt.wantErr(err)) {
@@ -1346,11 +1364,6 @@ func TestAuthRequestRepo_nextSteps(t *testing.T) {
 }
 
 func TestAuthRequestRepo_mfaChecked(t *testing.T) {
-	type fields struct {
-		MFAInitSkippedLifeTime    time.Duration
-		SecondFactorCheckLifeTime time.Duration
-		MultiFactorCheckLifeTime  time.Duration
-	}
 	type args struct {
 		userSession *user_model.UserSessionView
 		request     *domain.AuthRequest
@@ -1358,7 +1371,6 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		fields      fields
 		args        args
 		want        domain.NextStep
 		wantChecked bool
@@ -1377,13 +1389,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		//},
 		{
 			"not set up, forced by policy, no mfas configured, error",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
 					LoginPolicy: &domain.LoginPolicy{
-						ForceMFA: true,
+						ForceMFA:            true,
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
 					},
 				},
 				user: &user_model.UserView{
@@ -1398,12 +1408,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		},
 		{
 			"not set up, no mfas configured, no prompt and true",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
-					LoginPolicy: &domain.LoginPolicy{},
+					LoginPolicy: &domain.LoginPolicy{
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
+					},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
@@ -1417,13 +1426,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		},
 		{
 			"not set up, prompt and false",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:       []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
 					},
 				},
 				user: &user_model.UserView{
@@ -1442,14 +1449,12 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		},
 		{
 			"not set up, forced by org, true",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
 					LoginPolicy: &domain.LoginPolicy{
-						ForceMFA:      true,
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						ForceMFA:            true,
+						SecondFactors:       []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
 					},
 				},
 				user: &user_model.UserView{
@@ -1469,12 +1474,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		},
 		{
 			"not set up and skipped, true",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
-					LoginPolicy: &domain.LoginPolicy{},
+					LoginPolicy: &domain.LoginPolicy{
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
+					},
 				},
 				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
@@ -1489,13 +1493,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		},
 		{
 			"checked second factor, true",
-			fields{
-				SecondFactorCheckLifeTime: 18 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				},
 				user: &user_model.UserView{
@@ -1512,13 +1514,11 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 		},
 		{
 			"not checked, check and false",
-			fields{
-				SecondFactorCheckLifeTime: 18 * time.Hour,
-			},
 			args{
 				request: &domain.AuthRequest{
 					LoginPolicy: &domain.LoginPolicy{
-						SecondFactors: []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactors:             []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+						SecondFactorCheckLifetime: 18 * time.Hour,
 					},
 				},
 				user: &user_model.UserView{
@@ -1539,11 +1539,7 @@ func TestAuthRequestRepo_mfaChecked(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repo := &AuthRequestRepo{
-				MFAInitSkippedLifeTime:    tt.fields.MFAInitSkippedLifeTime,
-				SecondFactorCheckLifeTime: tt.fields.SecondFactorCheckLifeTime,
-				MultiFactorCheckLifeTime:  tt.fields.MultiFactorCheckLifeTime,
-			}
+			repo := &AuthRequestRepo{}
 			got, ok, err := repo.mfaChecked(tt.args.userSession, tt.args.request, tt.args.user)
 			if (tt.errFunc != nil && !tt.errFunc(err)) || (err != nil && tt.errFunc == nil) {
 				t.Errorf("got wrong err: %v ", err)
@@ -1562,7 +1558,8 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		MFAInitSkippedLifeTime time.Duration
 	}
 	type args struct {
-		user *user_model.UserView
+		user    *user_model.UserView
+		request *domain.AuthRequest
 	}
 	tests := []struct {
 		name   string
@@ -1574,24 +1571,30 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 			"mfa set up, true",
 			fields{},
 			args{
-				&user_model.UserView{
+				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MFAMaxSetUp: model.MFALevelSecondFactor,
 					},
+				},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{},
 				},
 			},
 			true,
 		},
 		{
 			"mfa skipped active, true",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
+			fields{},
 			args{
-				&user_model.UserView{
+				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MFAMaxSetUp:    -1,
 						MFAInitSkipped: time.Now().UTC().Add(-10 * time.Hour),
+					},
+				},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
 					},
 				},
 			},
@@ -1599,14 +1602,17 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 		},
 		{
 			"mfa skipped inactive, false",
-			fields{
-				MFAInitSkippedLifeTime: 30 * 24 * time.Hour,
-			},
+			fields{},
 			args{
-				&user_model.UserView{
+				user: &user_model.UserView{
 					HumanView: &user_model.HumanView{
 						MFAMaxSetUp:    -1,
 						MFAInitSkipped: time.Now().UTC().Add(-40 * 24 * time.Hour),
+					},
+				},
+				request: &domain.AuthRequest{
+					LoginPolicy: &domain.LoginPolicy{
+						MFAInitSkipLifetime: 30 * 24 * time.Hour,
 					},
 				},
 			},
@@ -1615,10 +1621,8 @@ func TestAuthRequestRepo_mfaSkippedOrSetUp(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repo := &AuthRequestRepo{
-				MFAInitSkippedLifeTime: tt.fields.MFAInitSkippedLifeTime,
-			}
-			if got := repo.mfaSkippedOrSetUp(tt.args.user); got != tt.want {
+			repo := &AuthRequestRepo{}
+			if got := repo.mfaSkippedOrSetUp(tt.args.user, tt.args.request); got != tt.want {
 				t.Errorf("mfaSkippedOrSetUp() = %v, want %v", got, tt.want)
 			}
 		})

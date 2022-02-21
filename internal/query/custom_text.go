@@ -186,7 +186,7 @@ func (q *Queries) readLoginTranslationFile(lang string) ([]byte, error) {
 	if !ok {
 		contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", lang))
 		if errors.IsNotFound(err) {
-			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.DefaultLanguage.String()))
+			contents, err = q.readTranslationFile(q.LoginDir, fmt.Sprintf("/i18n/%s.yaml", q.GetDefaultLanguage(context.Background()).String()))
 		}
 		if err != nil {
 			return nil, err

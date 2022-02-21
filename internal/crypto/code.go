@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"time"
 
-	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -17,7 +16,7 @@ var (
 
 type GeneratorConfig struct {
 	Length              uint
-	Expiry              types.Duration
+	Expiry              time.Duration
 	IncludeLowerLetters bool
 	IncludeUpperLetters bool
 	IncludeDigits       bool
@@ -97,7 +96,7 @@ func newGenerator(config GeneratorConfig) generator {
 	}
 	return generator{
 		length: config.Length,
-		expiry: config.Expiry.Duration,
+		expiry: config.Expiry,
 		runes:  runes,
 	}
 }

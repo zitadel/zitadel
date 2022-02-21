@@ -33,16 +33,12 @@ type Styling struct {
 	resourceUrl  string
 }
 
-func newStyling(handler handler, static static.Storage, localDevMode bool) *Styling {
+func newStyling(handler handler, static static.Storage, loginPrefix string) *Styling {
 	h := &Styling{
 		handler: handler,
 		static:  static,
 	}
-	prefix := ""
-	if localDevMode {
-		prefix = "/login"
-	}
-	h.resourceUrl = prefix + "/resources/dynamic" //TODO: ?
+	h.resourceUrl = loginPrefix + "/resources/dynamic" //TODO: ?
 
 	h.subscribe()
 

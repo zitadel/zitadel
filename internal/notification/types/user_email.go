@@ -1,8 +1,10 @@
 package types
 
 import (
+	"context"
 	"html"
 
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/messages"
 	"github.com/caos/zitadel/internal/notification/senders"
 
@@ -10,19 +12,18 @@ import (
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
 
-func generateEmail(user *view_model.NotifyUser, subject, content string, config systemdefaults.Notifications, lastEmail bool) error {
+func generateEmail(ctx context.Context, user *view_model.NotifyUser, subject, content string, config systemdefaults.Notifications, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), lastEmail bool) error {
 	content = html.UnescapeString(content)
 	message := &messages.Email{
-		SenderEmail: config.Providers.Email.From,
-		Recipients:  []string{user.VerifiedEmail},
-		Subject:     subject,
-		Content:     content,
+		Recipients: []string{user.VerifiedEmail},
+		Subject:    subject,
+		Content:    content,
 	}
 	if lastEmail {
 		message.Recipients = []string{user.LastEmail}
 	}
 
-	channels, err := senders.EmailChannels(config)
+	channels, err := senders.EmailChannels(ctx, config, smtpConfig)
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
@@ -32,6 +33,7 @@ type AuthRequestRepo struct {
 	AuthRequests cache.AuthRequestCache
 	View         *view.View
 	Eventstore   v1.Eventstore
+	UserCodeAlg  crypto.EncryptionAlgorithm
 
 	LabelPolicyProvider       labelPolicyProvider
 	UserSessionViewProvider   userSessionViewProvider
@@ -48,14 +50,6 @@ type AuthRequestRepo struct {
 	ApplicationProvider       applicationProvider
 
 	IdGenerator id.Generator
-
-	PasswordCheckLifeTime      time.Duration
-	ExternalLoginCheckLifeTime time.Duration
-	MFAInitSkippedLifeTime     time.Duration
-	SecondFactorCheckLifeTime  time.Duration
-	MultiFactorCheckLifeTime   time.Duration
-
-	IAMID string
 }
 
 type labelPolicyProvider interface {
@@ -381,13 +375,21 @@ func (repo *AuthRequestRepo) VerifyPasswordlessSetup(ctx context.Context, userID
 func (repo *AuthRequestRepo) BeginPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, codeID, verificationCode string, preferredPlatformType domain.AuthenticatorAttachment) (login *domain.WebAuthNToken, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType)
+	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, repo.UserCodeAlg)
+	if err != nil {
+		return nil, err
+	}
+	return repo.Command.HumanAddPasswordlessSetupInitCode(ctx, userID, resourceOwner, codeID, verificationCode, preferredPlatformType, passwordlessInitCode)
 }
 
 func (repo *AuthRequestRepo) VerifyPasswordlessInitCodeSetup(ctx context.Context, userID, resourceOwner, userAgentID, tokenName, codeID, verificationCode string, credentialData []byte) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData)
+	passwordlessInitCode, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypePasswordlessInitCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	_, err = repo.Command.HumanPasswordlessSetupInitCode(ctx, userID, resourceOwner, tokenName, userAgentID, codeID, verificationCode, credentialData, passwordlessInitCode)
 	return err
 }
 
@@ -447,7 +449,15 @@ func (repo *AuthRequestRepo) AutoRegisterExternalUser(ctx context.Context, regis
 	if err != nil {
 		return err
 	}
-	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles)
+	initCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeInitCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	phoneCodeGenerator, err := repo.Query.InitEncryptionGenerator(ctx, domain.SecretGeneratorTypeVerifyPhoneCode, repo.UserCodeAlg)
+	if err != nil {
+		return err
+	}
+	human, err := repo.Command.RegisterHuman(ctx, resourceOwner, registerUser, externalIDP, orgMemberRoles, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
 		return err
 	}
@@ -519,7 +529,7 @@ func (repo *AuthRequestRepo) getLoginPolicyAndIDPProviders(ctx context.Context, 
 	if !policy.AllowExternalIDPs {
 		return policy, nil, nil
 	}
-	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, repo.IAMID, orgID, policy.IsDefault)
+	idpProviders, err := getLoginPolicyIDPProviders(repo.IDPProviderViewProvider, domain.IAMID, orgID, policy.IsDefault)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -534,7 +544,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		orgID = request.UserOrgID
 	}
 	if orgID == "" {
-		orgID = repo.IAMID
+		orgID = domain.IAMID
 	}
 
 	loginPolicy, idpProviders, err := repo.getLoginPolicyAndIDPProviders(ctx, orgID)
@@ -745,7 +755,7 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 	}
 
 	isInternalLogin := request.SelectedIDPConfigID == "" && userSession.SelectedIDPConfigID == ""
-	if !isInternalLogin && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, repo.ExternalLoginCheckLifeTime, request) {
+	if !isInternalLogin && len(request.LinkingUsers) == 0 && !checkVerificationTimeMaxAge(userSession.ExternalLoginVerification, request.LoginPolicy.ExternalLoginCheckLifetime, request) {
 		selectedIDPConfigID := request.SelectedIDPConfigID
 		if selectedIDPConfigID == "" {
 			selectedIDPConfigID = userSession.SelectedIDPConfigID
@@ -842,7 +852,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 
 	var step domain.NextStep
 	if request.LoginPolicy.PasswordlessType != domain.PasswordlessTypeNotAllowed && user.IsPasswordlessReady() {
-		if checkVerificationTimeMaxAge(userSession.PasswordlessVerification, repo.MultiFactorCheckLifeTime, request) {
+		if checkVerificationTimeMaxAge(userSession.PasswordlessVerification, request.LoginPolicy.MultiFactorCheckLifetime, request) {
 			request.AuthTime = userSession.PasswordlessVerification
 			return nil
 		}
@@ -859,7 +869,7 @@ func (repo *AuthRequestRepo) firstFactorChecked(request *domain.AuthRequest, use
 		return &domain.InitPasswordStep{}
 	}
 
-	if checkVerificationTimeMaxAge(userSession.PasswordVerification, repo.PasswordCheckLifeTime, request) {
+	if checkVerificationTimeMaxAge(userSession.PasswordVerification, request.LoginPolicy.PasswordCheckLifetime, request) {
 		request.PasswordVerified = true
 		request.AuthTime = userSession.PasswordVerification
 		return nil
@@ -874,7 +884,7 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	mfaLevel := request.MFALevel()
 	allowedProviders, required := user.MFATypesAllowed(mfaLevel, request.LoginPolicy)
 	promptRequired := (model.MFALevelToDomain(user.MFAMaxSetUp) < mfaLevel) || (len(allowedProviders) == 0 && required)
-	if promptRequired || !repo.mfaSkippedOrSetUp(user) {
+	if promptRequired || !repo.mfaSkippedOrSetUp(user, request) {
 		types := user.MFATypesSetupPossible(mfaLevel, request.LoginPolicy)
 		if promptRequired && len(types) == 0 {
 			return nil, false, errors.ThrowPreconditionFailed(nil, "LOGIN-5Hm8s", "Errors.Login.LoginPolicy.MFA.ForceAndNotConfigured")
@@ -896,14 +906,14 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 		}
 		fallthrough
 	case domain.MFALevelSecondFactor:
-		if checkVerificationTimeMaxAge(userSession.SecondFactorVerification, repo.SecondFactorCheckLifeTime, request) {
+		if checkVerificationTimeMaxAge(userSession.SecondFactorVerification, request.LoginPolicy.SecondFactorCheckLifetime, request) {
 			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.SecondFactorVerificationType))
 			request.AuthTime = userSession.SecondFactorVerification
 			return nil, true, nil
 		}
 		fallthrough
 	case domain.MFALevelMultiFactor:
-		if checkVerificationTimeMaxAge(userSession.MultiFactorVerification, repo.MultiFactorCheckLifeTime, request) {
+		if checkVerificationTimeMaxAge(userSession.MultiFactorVerification, request.LoginPolicy.MultiFactorCheckLifetime, request) {
 			request.MFAsVerified = append(request.MFAsVerified, model.MFATypeToDomain(userSession.MultiFactorVerificationType))
 			request.AuthTime = userSession.MultiFactorVerification
 			return nil, true, nil
@@ -914,11 +924,11 @@ func (repo *AuthRequestRepo) mfaChecked(userSession *user_model.UserSessionView,
 	}, false, nil
 }
 
-func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
+func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, request *domain.AuthRequest) bool {
 	if user.MFAMaxSetUp > model.MFALevelNotSetUp {
 		return true
 	}
-	return checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime)
+	return checkVerificationTime(user.MFAInitSkipped, request.LoginPolicy.MFAInitSkipLifetime)
 }
 
 func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {

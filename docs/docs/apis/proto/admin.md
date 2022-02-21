@@ -32,100 +32,160 @@ Returns the default languages
     GET: /languages
 
 
-### GetFileSystemNotificationProvider
+### SetDefaultLanguage
 
-> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
-[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+> **rpc** SetDefaultLanguage([SetDefaultLanguageRequest](#setdefaultlanguagerequest))
+[SetDefaultLanguageResponse](#setdefaultlanguageresponse)
 
-Get file system notification provider
-
-
-
-    GET: /notification/provider/file
-
-
-### AddFileSystemNotificationProvider
-
-> **rpc** AddFileSystemNotificationProvider([AddFileSystemNotificationProviderRequest](#addfilesystemnotificationproviderrequest))
-[AddFileSystemNotificationProviderResponse](#addfilesystemnotificationproviderresponse)
-
-Add filesystem notification provider
+Set the default language
 
 
 
-    POST: /notification/provider/file
+    PUT: /languages/default/{language}
 
 
-### UpdateFileSystemNotificationProvider
+### GetDefaultLanguage
 
-> **rpc** UpdateFileSystemNotificationProvider([UpdateFileSystemNotificationProviderRequest](#updatefilesystemnotificationproviderrequest))
-[UpdateFileSystemNotificationProviderResponse](#updatefilesystemnotificationproviderresponse)
+> **rpc** GetDefaultLanguage([GetDefaultLanguageRequest](#getdefaultlanguagerequest))
+[GetDefaultLanguageResponse](#getdefaultlanguageresponse)
 
-Update filesystem notification provider
-
-
-
-    PUT: /notification/provider/file
-
-
-### RemoveFileSystemNotificationProvider
-
-> **rpc** RemoveFileSystemNotificationProvider([RemoveFileSystemNotificationProviderRequest](#removefilesystemnotificationproviderrequest))
-[RemoveFileSystemNotificationProviderResponse](#removefilesystemnotificationproviderresponse)
-
-Remove filesystem notification provider
+Set the default language
 
 
 
-    DELETE: /notification/provider/file
+    GET: /languages/default
 
 
-### GetLogNotificationProvider
+### ListSecretGenerators
 
-> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
-[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+> **rpc** ListSecretGenerators([ListSecretGeneratorsRequest](#listsecretgeneratorsrequest))
+[ListSecretGeneratorsResponse](#listsecretgeneratorsresponse)
 
-Get log notification provider
-
-
-
-    GET: /notification/provider/log
-
-
-### AddLogNotificationProvider
-
-> **rpc** AddLogNotificationProvider([AddLogNotificationProviderRequest](#addlognotificationproviderrequest))
-[AddLogNotificationProviderResponse](#addlognotificationproviderresponse)
-
-Add log notification provider
+Set the default language
 
 
 
-    POST: /notification/provider/log
+    POST: /secretgenerators/_search
 
 
-### UpdateLogNotificationProvider
+### GetSecretGenerator
 
-> **rpc** UpdateLogNotificationProvider([UpdateLogNotificationProviderRequest](#updatelognotificationproviderrequest))
-[UpdateLogNotificationProviderResponse](#updatelognotificationproviderresponse)
+> **rpc** GetSecretGenerator([GetSecretGeneratorRequest](#getsecretgeneratorrequest))
+[GetSecretGeneratorResponse](#getsecretgeneratorresponse)
 
-Update filesystem notification provider
-
-
-
-    PUT: /notification/provider/log
-
-
-### RemoveLogNotificationProvider
-
-> **rpc** RemoveLogNotificationProvider([RemoveLogNotificationProviderRequest](#removelognotificationproviderrequest))
-[RemoveLogNotificationProviderResponse](#removelognotificationproviderresponse)
-
-Remove filesystem notification provider
+Get Secret Generator by type (e.g PasswordResetCode)
 
 
 
-    DELETE: /notification/provider/log
+    GET: /secretgenerators/{generator_type}
+
+
+### UpdateSecretGenerator
+
+> **rpc** UpdateSecretGenerator([UpdateSecretGeneratorRequest](#updatesecretgeneratorrequest))
+[UpdateSecretGeneratorResponse](#updatesecretgeneratorresponse)
+
+Update secret generator configuration
+
+
+
+    PUT: /secretgenerators/{generator_type}
+
+
+### GetSMTPConfig
+
+> **rpc** GetSMTPConfig([GetSMTPConfigRequest](#getsmtpconfigrequest))
+[GetSMTPConfigResponse](#getsmtpconfigresponse)
+
+Get system smtp configuration
+
+
+
+    GET: /smtp
+
+
+### UpdateSMTPConfig
+
+> **rpc** UpdateSMTPConfig([UpdateSMTPConfigRequest](#updatesmtpconfigrequest))
+[UpdateSMTPConfigResponse](#updatesmtpconfigresponse)
+
+Update system smtp configuration
+
+
+
+    PUT: /smtp
+
+
+### UpdateSMTPConfigPassword
+
+> **rpc** UpdateSMTPConfigPassword([UpdateSMTPConfigPasswordRequest](#updatesmtpconfigpasswordrequest))
+[UpdateSMTPConfigPasswordResponse](#updatesmtpconfigpasswordresponse)
+
+Update system smtp configuration password for host
+
+
+
+    PUT: /smtp/password
+
+
+### ListSMSProviders
+
+> **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
+[ListSMSProvidersResponse](#listsmsprovidersresponse)
+
+list sms provider configurations
+
+
+
+    POST: /sms/_search
+
+
+### GetSMSProvider
+
+> **rpc** GetSMSProvider([GetSMSProviderRequest](#getsmsproviderrequest))
+[GetSMSProviderResponse](#getsmsproviderresponse)
+
+Get sms provider
+
+
+
+    GET: /sms/{id}
+
+
+### AddSMSProviderTwilio
+
+> **rpc** AddSMSProviderTwilio([AddSMSProviderTwilioRequest](#addsmsprovidertwiliorequest))
+[AddSMSProviderTwilioResponse](#addsmsprovidertwilioresponse)
+
+Add twilio sms provider
+
+
+
+    POST: /sms/twilio
+
+
+### UpdateSMSProviderTwilio
+
+> **rpc** UpdateSMSProviderTwilio([UpdateSMSProviderTwilioRequest](#updatesmsprovidertwiliorequest))
+[UpdateSMSProviderTwilioResponse](#updatesmsprovidertwilioresponse)
+
+Update twilio sms provider
+
+
+
+    PUT: /sms/twilio/{id}
+
+
+### UpdateSMSProviderTwilioToken
+
+> **rpc** UpdateSMSProviderTwilioToken([UpdateSMSProviderTwilioTokenRequest](#updatesmsprovidertwiliotokenrequest))
+[UpdateSMSProviderTwilioTokenResponse](#updatesmsprovidertwiliotokenresponse)
+
+Update twilio sms provider token
+
+
+
+    PUT: /sms/twilio/{id}/token
 
 
 ### GetOrgByID
@@ -1319,29 +1379,6 @@ This is an empty request
 
 
 
-### AddFileSystemNotificationProviderRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| compact |  bool | - |  |
-| enabled |  bool | - |  |
-
-
-
-
-### AddFileSystemNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### AddIAMMemberRequest
 
 
@@ -1416,29 +1453,6 @@ This is an empty request
 
 
 
-### AddLogNotificationProviderRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| compact |  bool | - |  |
-| enabled |  bool | - |  |
-
-
-
-
-### AddLogNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### AddMultiFactorToLoginPolicyRequest
 
 
@@ -1488,6 +1502,31 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | details |  zitadel.v1.ObjectDetails | - |  |
 | idp_id |  string | - |  |
+
+
+
+
+### AddSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
 
 
 
@@ -1807,6 +1846,23 @@ This is an empty response
 
 
 
+### GetDefaultLanguageRequest
+This is an empty request
+
+
+
+
+### GetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - |  |
+
+
+
+
 ### GetDefaultLoginTextsRequest
 
 
@@ -1917,23 +1973,6 @@ This is an empty response
 
 
 
-### GetFileSystemNotificationProviderRequest
-This is an empty request
-
-
-
-
-### GetFileSystemNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
-
-
-
-
 ### GetIDPByIDRequest
 
 
@@ -1986,23 +2025,6 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LockoutPolicy | - |  |
-
-
-
-
-### GetLogNotificationProviderRequest
-This is an empty request
-
-
-
-
-### GetLogNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
 
 
 
@@ -2149,6 +2171,67 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
+
+
+
+
+### GetSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
+### GetSMTPConfigRequest
+This is an empty request
+
+
+
+
+### GetSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| smtp_config |  zitadel.settings.v1.SMTPConfig | - |  |
+
+
+
+
+### GetSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+
+
+
+
+### GetSecretGeneratorResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| secret_generator |  zitadel.settings.v1.SecretGenerator | - |  |
 
 
 
@@ -2387,6 +2470,53 @@ This is an empty request
 
 
 
+### ListSMSProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProvider | - |  |
+
+
+
+
+### ListSecretGeneratorsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+| queries | repeated zitadel.settings.v1.SecretGeneratorQuery | criterias the client is looking for |  |
+
+
+
+
+### ListSecretGeneratorsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SecretGenerator | - |  |
+
+
+
+
 ### ListViewsRequest
 This is an empty request
 
@@ -2441,23 +2571,6 @@ This is an empty request
 
 ### RemoveFailedEventResponse
 This is an empty response
-
-
-
-
-### RemoveFileSystemNotificationProviderRequest
-This is an empty request
-
-
-
-
-### RemoveFileSystemNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -2603,23 +2716,6 @@ This is an empty request
 
 
 ### RemoveLabelPolicyLogoResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
-### RemoveLogNotificationProviderRequest
-This is an empty request
-
-
-
-
-### RemoveLogNotificationProviderResponse
 
 
 
@@ -3030,6 +3126,28 @@ This is an empty request
 
 
 
+### SetDefaultLanguageRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| language |  string | - | string.min_len: 1<br /> string.max_len: 10<br />  |
+
+
+
+
+### SetDefaultLanguageResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### SetDefaultPasswordResetMessageTextRequest
 
 
@@ -3308,29 +3426,6 @@ This is an empty request
 
 
 
-### UpdateFileSystemNotificationProviderRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| compact |  bool | - |  |
-| enabled |  bool | - |  |
-
-
-
-
-### UpdateFileSystemNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### UpdateIAMMemberRequest
 
 
@@ -3486,29 +3581,6 @@ This is an empty request
 
 
 
-### UpdateLogNotificationProviderRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| compact |  bool | - |  |
-| enabled |  bool | - |  |
-
-
-
-
-### UpdateLogNotificationProviderResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-
-
-
-
 ### UpdateLoginPolicyRequest
 
 
@@ -3625,6 +3697,129 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| password |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigPasswordResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMTPConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sender_address |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| tls |  bool | - |  |
+| host |  string | - | string.min_len: 1<br /> string.max_len: 500<br />  |
+| user |  string | - |  |
+
+
+
+
+### UpdateSMTPConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSecretGeneratorRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| generator_type |  zitadel.settings.v1.SecretGeneratorType | - | enum.defined_only: true<br /> enum.not_in: [0]<br />  |
+| length |  uint32 | - |  |
+| expiry |  google.protobuf.Duration | - |  |
+| include_lower_letters |  bool | - |  |
+| include_upper_letters |  bool | - |  |
+| include_digits |  bool | - |  |
+| include_symbols |  bool | - |  |
+
+
+
+
+### UpdateSecretGeneratorResponse
 
 
 
