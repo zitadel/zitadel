@@ -1,20 +1,29 @@
 package domain
 
-import "github.com/caos/zitadel/internal/eventstore/v1/models"
+import (
+	"time"
+
+	"github.com/caos/zitadel/internal/eventstore/v1/models"
+)
 
 type LoginPolicy struct {
 	models.ObjectRoot
 
-	Default               bool
-	AllowUsernamePassword bool
-	AllowRegister         bool
-	AllowExternalIDP      bool
-	IDPProviders          []*IDPProvider
-	ForceMFA              bool
-	SecondFactors         []SecondFactorType
-	MultiFactors          []MultiFactorType
-	PasswordlessType      PasswordlessType
-	HidePasswordReset     bool
+	Default                    bool
+	AllowUsernamePassword      bool
+	AllowRegister              bool
+	AllowExternalIDP           bool
+	IDPProviders               []*IDPProvider
+	ForceMFA                   bool
+	SecondFactors              []SecondFactorType
+	MultiFactors               []MultiFactorType
+	PasswordlessType           PasswordlessType
+	HidePasswordReset          bool
+	PasswordCheckLifetime      time.Duration
+	ExternalLoginCheckLifetime time.Duration
+	MFAInitSkipLifetime        time.Duration
+	SecondFactorCheckLifetime  time.Duration
+	MultiFactorCheckLifetime   time.Duration
 }
 
 type IDPProvider struct {

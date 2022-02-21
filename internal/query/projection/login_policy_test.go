@@ -2,6 +2,7 @@ package projection
 
 import (
 	"testing"
+	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -29,13 +30,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(org.LoginPolicyAddedEventType),
 					org.AggregateType,
 					[]byte(`{
-	"allowUsernamePassword": true,
-	"allowRegister": true,
-	"allowExternalIdp": false,
-	"forceMFA": false,
-	"hidePasswordReset": true,
-	"passwordlessType": 1
-}`),
+						"allowUsernamePassword": true,
+						"allowRegister": true,
+						"allowExternalIdp": false,
+						"forceMFA": false,
+						"hidePasswordReset": true,
+						"passwordlessType": 1,
+						"passwordCheckLifetime": 10000000,
+						"externalLoginCheckLifetime": 10000000,
+						"mfaInitSkipLifetime": 10000000,
+						"secondFactorCheckLifetime": 10000000,
+						"multiFactorCheckLifetime": 10000000
+					}`),
 				), org.LoginPolicyAddedEventMapper),
 			},
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
@@ -47,7 +53,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -60,6 +66,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 								false,
 								true,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
 							},
 						},
 					},
@@ -74,13 +85,18 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(org.LoginPolicyChangedEventType),
 					org.AggregateType,
 					[]byte(`{
-	"allowUsernamePassword": true,
-	"allowRegister": true,
-	"allowExternalIdp": true,
-	"forceMFA": true,
-	"hidePasswordReset": true,
-	"passwordlessType": 1
-}`),
+						"allowUsernamePassword": true,
+						"allowRegister": true,
+						"allowExternalIdp": true,
+						"forceMFA": true,
+						"hidePasswordReset": true,
+						"passwordlessType": 1,
+						"passwordCheckLifetime": 10000000,
+						"externalLoginCheckLifetime": 10000000,
+						"mfaInitSkipLifetime": 10000000,
+						"secondFactorCheckLifetime": 10000000,
+						"multiFactorCheckLifetime": 10000000
+					}`),
 				), org.LoginPolicyChangedEventMapper),
 			},
 			want: wantReduce{
@@ -91,7 +107,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
+							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -101,6 +117,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								true,
 								domain.PasswordlessTypeAllowed,
 								true,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
 								"agg-id",
 							},
 						},
@@ -271,12 +292,17 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 					repository.EventType(iam.LoginPolicyAddedEventType),
 					iam.AggregateType,
 					[]byte(`{
-			"allowUsernamePassword": true,
-			"allowRegister": true,
-			"allowExternalIdp": false,
-			"forceMFA": false,
-			"hidePasswordReset": true,
-			"passwordlessType": 1
+						"allowUsernamePassword": true,
+						"allowRegister": true,
+						"allowExternalIdp": false,
+						"forceMFA": false,
+						"hidePasswordReset": true,
+						"passwordlessType": 1,
+						"passwordCheckLifetime": 10000000,
+						"externalLoginCheckLifetime": 10000000,
+						"mfaInitSkipLifetime": 10000000,
+						"secondFactorCheckLifetime": 10000000,
+						"multiFactorCheckLifetime": 10000000
 			}`),
 				), iam.LoginPolicyAddedEventMapper),
 			},
@@ -288,7 +314,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -301,6 +327,11 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 								domain.PasswordlessTypeAllowed,
 								true,
 								true,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
+								time.Millisecond * 10,
 							},
 						},
 					},

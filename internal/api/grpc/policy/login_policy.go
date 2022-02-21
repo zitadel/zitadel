@@ -5,18 +5,24 @@ import (
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/object"
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
+	"google.golang.org/protobuf/types/known/durationpb"
 	timestamp_pb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ModelLoginPolicyToPb(policy *query.LoginPolicy) *policy_pb.LoginPolicy {
 	return &policy_pb.LoginPolicy{
-		IsDefault:             policy.IsDefault,
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIdp:      policy.AllowExternalIDPs,
-		ForceMfa:              policy.ForceMFA,
-		PasswordlessType:      ModelPasswordlessTypeToPb(policy.PasswordlessType),
-		HidePasswordReset:     policy.HidePasswordReset,
+		IsDefault:                  policy.IsDefault,
+		AllowUsernamePassword:      policy.AllowUsernamePassword,
+		AllowRegister:              policy.AllowRegister,
+		AllowExternalIdp:           policy.AllowExternalIDPs,
+		ForceMfa:                   policy.ForceMFA,
+		PasswordlessType:           ModelPasswordlessTypeToPb(policy.PasswordlessType),
+		HidePasswordReset:          policy.HidePasswordReset,
+		PasswordCheckLifetime:      durationpb.New(policy.PasswordCheckLifetime),
+		ExternalLoginCheckLifetime: durationpb.New(policy.ExternalLoginCheckLifetime),
+		MfaInitSkipLifetime:        durationpb.New(policy.MFAInitSkipLifetime),
+		SecondFactorCheckLifetime:  durationpb.New(policy.SecondFactorCheckLifetime),
+		MultiFactorCheckLifetime:   durationpb.New(policy.MultiFactorCheckLifetime),
 		Details: &object.ObjectDetails{
 			Sequence:      policy.Sequence,
 			CreationDate:  timestamp_pb.New(policy.CreationDate),

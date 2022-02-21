@@ -23,7 +23,6 @@ type SystemDefaults struct {
 	SMTPPasswordVerificationKey *crypto.KeyConfig
 	SMSVerificationKey          *crypto.KeyConfig
 	Multifactors                MultifactorConfig
-	VerificationLifetimes       VerificationLifetimes
 	DomainVerification          DomainVerification
 	Notifications               Notifications
 	KeyConfig                   KeyConfig
@@ -47,14 +46,6 @@ type MultifactorConfig struct {
 type OTPConfig struct {
 	Issuer          string
 	VerificationKey *crypto.KeyConfig
-}
-
-type VerificationLifetimes struct {
-	PasswordCheck      time.Duration
-	ExternalLoginCheck time.Duration
-	MFAInitSkip        time.Duration
-	SecondFactorCheck  time.Duration
-	MultiFactorCheck   time.Duration
 }
 
 type DomainVerification struct {

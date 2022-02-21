@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "zitadel/object.proto";
+import "google/protobuf/duration.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
 package zitadel.policy.v1;
@@ -128,6 +129,12 @@ message LoginPolicy {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
+    google.protobuf.Duration password_check_lifetime = 9;
+    google.protobuf.Duration external_login_check_lifetime = 10;
+    google.protobuf.Duration mfa_init_skip_lifetime = 11;
+    google.protobuf.Duration second_factor_check_lifetime = 12;
+    google.protobuf.Duration multi_factor_check_lifetime = 13;
+
 }
 
 enum SecondFactorType {

@@ -1514,7 +1514,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -3593,6 +3593,11 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| password_check_lifetime |  google.protobuf.Duration | - |  |
+| external_login_check_lifetime |  google.protobuf.Duration | - |  |
+| mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
+| second_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 
 
 
@@ -3710,7 +3715,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 

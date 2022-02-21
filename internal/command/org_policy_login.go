@@ -42,7 +42,12 @@ func (c *Commands) AddLoginPolicy(ctx context.Context, resourceOwner string, pol
 			policy.AllowExternalIDP,
 			policy.ForceMFA,
 			policy.HidePasswordReset,
-			policy.PasswordlessType))
+			policy.PasswordlessType,
+			policy.PasswordCheckLifetime,
+			policy.ExternalLoginCheckLifetime,
+			policy.MFAInitSkipLifetime,
+			policy.SecondFactorCheckLifetime,
+			policy.MultiFactorCheckLifetime))
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +105,12 @@ func (c *Commands) ChangeLoginPolicy(ctx context.Context, resourceOwner string, 
 		policy.AllowExternalIDP,
 		policy.ForceMFA,
 		policy.HidePasswordReset,
-		policy.PasswordlessType)
+		policy.PasswordlessType,
+		policy.PasswordCheckLifetime,
+		policy.ExternalLoginCheckLifetime,
+		policy.MFAInitSkipLifetime,
+		policy.SecondFactorCheckLifetime,
+		policy.MultiFactorCheckLifetime)
 
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-5M9vdd", "Errors.Org.LoginPolicy.NotChanged")
