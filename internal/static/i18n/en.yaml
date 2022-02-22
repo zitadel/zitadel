@@ -824,6 +824,11 @@ EventTypes:
     deactivated: Action deactivated
     reactivated: Action reactivated
     removed: Action removed
+  oidc:
+    config:
+      added: OIDC configuration added
+      changed: OIDC configuration changed
+      removed: OIDC configuration removed
 Application:
   OIDC:
     UnsupportedVersion: Your OIDC version is not supported
