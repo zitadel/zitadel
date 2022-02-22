@@ -158,7 +158,7 @@ type SAML struct {
 	SigningAlgorithm string   `yaml:"signingAlgorithm,omitempty"`
 	DigestAlgorithm  string   `yaml:"digestAlgorithm,omitempty"`
 	EncryptAlgorithm string   `yaml:"encryptAlgorithm,omitempty"`
-	ErrorURL         string   `yaml:"errorURL,omitempty "`
+	ErrorURL         string   `yaml:"errorURL,omitempty"`
 }
 
 type Contact struct {
