@@ -303,16 +303,11 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding-bottom: 2rem;
         position: sticky;
         top: 0;
         min-height: 600px;
         width: fit-content;
         margin: auto;
-
-        .preview {
-          margin: 1rem;
-        }
       }
     }
   }
