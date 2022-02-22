@@ -4,31 +4,49 @@ title: B2C
 
 import Column from "../../../src/components/column";
 
+In _Business to Customer (B2C)_ scenarios, your organization works directly with individual users.
+
 ## Business to Consumer
 
-Users in general come with different needs. You may have end users, employees, or even customers from other parties (B2B).
-This groups of users usually don't share the same intentions and use applications differently.
-When planning your applications, investing time in researching your apps architecture is vital for later feature upgrades and enhancements as those changes come in with heftier price points if you have to make bigger changes.
+Generally, users come with different needs.
+You may have end users, employees, or even customers from other parties (B2B).
+These groups of users rarely want to use an app to do the same thing.
+So, they use applications differently.
 
-This guide introduces you to the grouping and structuring of ZITADEL projects which forms the base for all projects. This can be used as a quick start to the [B2B scenario](./b2b), which is merely focused on planning considerations if you are having projects with multiple organizations.
+When planning your applications, be sure to research your app's architecture.
+This is vital for later feature upgrades and enhancements.
+Bigger changes come with heftier price points.
 
-The journey of this guide starts with creating an Organization, the outermost layer of ZITADEL, as it is the vessel for projects, roles, applications and users.
-Creation can be done from [ZITADEL Console](https://console.zitadel.ch/org/create). You can choose your current account for the organization owner or create a new one.
+This topic introduces you to the grouping and structure that forms the basis of all ZITADEL projects.
+The concepts also carry over to B2B scenarios.
+The [B2B scenarios topic](./b2b) focuses on planning considerations when you have projects with multiple organizations.
 
-Depending on your Software Development Life Cycle (SDLC) you can create multiple organizations or projects to keep your applications environments seperated.
+Everything in the following sections assumes you've created an organization.
+An organization is the outermost layer of ZITADEL.
+It is the vessel for projects, roles, applications and users.
+You can create an organization from the [ZITADEL Console](https://console.zitadel.ch/org/create).
+You can choose your current account for the organization owner or create a new one.
 
-### Custom domain
+Depending on your Software Development Life Cycle (SDLC), you can create multiple organizations or projects, keeping your application environments separated.
 
-Right after org creation you'll be greeted with the domain section of your organization. ZITADEL automatically creates a custom domain of the form `[orgname].zitadel.ch`, but you can set your own by saving a verification file on the specified location.  
-We recommend that you create your domains early as they create a sense of confidence and trust for your application and changes later on might create additional migration effort.
-You can read more about how ZITADEL handles usernames [here](../basics/organizations#how-zitadel-handles-usernames).
+### Custom domains
+
+After you create an organization, you'll be greeted with the domain section of your organization.
+ZITADEL automatically creates a custom domain in the form `[orgname].zitadel.ch`, but you can set your own by saving a verification file in the specified location.
+    
+We recommend that you create your domains early.
+This creates a sense of confidence and trust for your application.
+Additionally, changing the domain later might create extra migration effort.
+[Read more about how ZITADEL handles usernames](../basics/organizations#how-zitadel-handles-usernames).
 
 ### Data Provisioning
 
-ZITADEL gives you a basic storage for users and manages phone and email addresses. It also allows you to store your own application data such as preferences or external identifiers to the metadata of a user.
+ZITADEL provides basic storage for users and manages phone and email addresses.
+It also allows you to store your own application data, like preferences or external identifiers, with the user's metadata.
 
-If you are migrating an existing project and you already have an external identity store you can consider bulk importing your user datasets.
-Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info. If the users email is not verified or no password is set, a initialization mail will be send.
+If you are migrating an existing project and already have an external identity store, consider bulk importing your user datasets.
+Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info.
+If the user's email is not verified, or if no password is set, a initialization mail will be sent.
 
 :::info
 Requests to the management API are rate limited. Read our [Rate limit Policy](../../legal/rate-limit-policy) for more info.
@@ -36,33 +54,39 @@ Requests to the management API are rate limited. Read our [Rate limit Policy](..
 
 ### User Authentication
 
-User Authentication can be performed in multiple ways. Default method in ZITADEL is username and password with MFA enabled.
-ZITADEL allows you to configure Multifactor- and Passwordless Authentication in order to enhance security for your users. All authentication methods are available from the FREE Tier.
-To setup your organizations login policy, go to your organizations detail in [Console](https://console.zitadel.ch/org).
+There are multiple ways to perform User Authentication.
+The default method in ZITADEL is with a username and password with MFA enabled.
+To enhance user security, ZITADEL lets you to configure Multifactor and Passwordless Authentication.
+All authentication methods are available from the FREE Tier.
+To set up your organization's login policy, go to your organization's detail in [Console](https://console.zitadel.ch/org).
 
-When planning your application consider the following questions about User Authentication:
+When planning your application, consider the following questions about User Authentication:
 
 - What are the methods to authenticate your users?
 - Where will your users enter their credentials?
 - Do you offer password authentication?
-- What do you do to keep your users credentials safe?
+- What do you do to keep user credentials safe?
 - Do you offer Multifactor Authentication?
-- Do you offer Login via Identity Provider?
+- Do you offer Login via an Identity Provider?
 - Which languages do you have to provide?
 
-When looking at this questions, you may have to admit that building an Identity Management System is much more complex and complicated than you thought initially and implementing if yourself may be too much work.
-Particularly because you should focus building your applications.
+Considering these questions, you might admit that building an Identity Management System is much more complex and complicated than you initially thought.
+Implementing it yourself might be too much work, especially if you want to focus on building your applications.
 
 ### Federation
 
-ZITADEL supports signup with OIDC Identity providers as well as JWT Identity Providers. On signup, ZITADEL imports user information to the own profile.
-//TODO extend this passage
+ZITADEL supports signup with OIDC Identity providers, as well as JWT Identity Providers.
+On signup, ZITADEL imports user information to their own profile.
+
+<!---TODO extend this passage---->
 
 ### Hosted Login
 
-ZITADEL offers a "secure by default approach" and comes with a Hosted Login which is a fixed endpoint for your users to authenticate.
+ZITADEL's approach is _secure by default_.
+It comes with a _Hosted Login_, a fixed endpoint for your users to authenticate.
 It's safe and secure and comes with Multifactor, Federated Login and Passwordless capabilities.
-OIDC (OpenID Connect) opens the doors to Single Sign On (SSO). Especially if you have more than one application, you may want a central and familiar authentication experience.
+OIDC (OpenID Connect) opens the doors for Single Sign On (SSO).
+Especially if you have more than one application, you may want a central and familiar authentication experience.
 With SSO, ZITADEL provides a seamless experience across all your apps.
 
 ### Branding
@@ -70,13 +94,18 @@ With SSO, ZITADEL provides a seamless experience across all your apps.
 <Column>
 <div>
 
-Branding and customization is a very important part of your application.
-With ZITADEL you can modify colors, logos, icons as well as configure your typography styles, such that you can provide a consistent design throughout your applications.
-In addition to visual modifications, you can edit notification texts for your users.
-ZITADEL gives you handlebar similar templating for variables. Of course you can define texts for any language.
-We'd appreciate if you could contribute to our repo with translations of your language. Read on how to contribute [here](../../guides/customization/texts).
+Branding and customization is an important part of your application.
+With ZITADEL, you can modify colors, logos, and icons.
+You can also configure your typography styles.
+These branding customizations let you provide a consistent design throughout your applications.
 
-> Note that your console design changes to your design too
+In addition to visual modifications, you can edit notification texts for your users.
+ZITADEL gives you handlebar-like templating for variables.
+Of course you can define texts for any language.
+We'd appreciate if you could contribute to our repo with translations of your language. 
+[Read about how to contribute](../../guides/customization/texts).
+
+> Note that your console design will also change for your branding.
 
 </div>
 <img src="/img/guides/branding.jpeg" alt="branding in console"/>
@@ -84,21 +113,26 @@ We'd appreciate if you could contribute to our repo with translations of your la
 
 ### Projects and applications
 
-As our Hosted Login is a separate authentication screen, you have to determine how you are directing your users from your applications.
-ZITADEL's Applications live under ZITADEL's Projects. You may add multiple applications for your different client-types (Native, Web, User Agent, or API). When setting up your applications consider reading our guide about [Authentication Flows](../authentication/login-users).
+As our Hosted Login is a separate authentication screen, you have to determine how you direct your users from your applications.
+ZITADEL's Applications live under ZITADEL's Projects.
+You may add multiple applications for your different client-types (Native, Web, User Agent, or API).
+When setting up your applications, consult our [guide about Authentication Flows](../authentication/login-users).
 
 ### Access Control
 
-By having authenticated a user you need to ensure users and services have access to your application and APIs. This process is called Access Control and comprises User Authentication, Authorization and Policy Enforcement.
-Take the following considerations:
+Having authenticated a user, you need to ensure users and services have access to your application and APIs.
+This process is called _Access Control_ and comprises User Authentication, Authorization, and Policy Enforcement.
+When implementing access control, consider these questions:
 
 - Does your application call your own APIs?
 - Does your application need to call third-party APIs?
-- Do **you** offer an API for third-party applications?
+- Do *you* offer an API for third-party applications?
 
-The data required to check if a user has access to a certain API is stored within a user grant. This information typically is stored within roles or custom claims and can be accessed with an `access` or OIDC `id` token.
+The data required to check whether a user has access to a certain API is stored within a user grant.
+This information typically is stored within roles or custom claims.
+You can access it with an `access` or OIDC `id` token.
 
-Read more about Authorization in our [Guide](../authorization/oauth-recommended-flows).
+[Read more about Authorization](../authorization/oauth-recommended-flows).
 
 ## Learn more
 
