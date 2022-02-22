@@ -32,6 +32,17 @@ Errors:
   OIDCConfig:
     NotFound: OIDC Configuration not found
     AlreadyExists: OIDC configuration already exists
+  SecretGenerator:
+    AlreadyExists: Secret generator already exists
+    TypeMissing: Secret generator type missing
+    NotFound: Secret generator not found
+  SMSConfig:
+    NotFound: SMS configuration not found
+    AlreadyActive: SMS configuration already active
+    AlreadyDeactivated: SMS configuration already deactived
+  SMTPConfig:
+    NotFound: SMTP configuration not found
+    AlreadyExists: SMTP configuration already exists
   User:
     NotFound: User could not be found
     AlreadyExists: User already exists
@@ -816,6 +827,35 @@ EventTypes:
           removed: Font removed from Label Policy
         assets:
           removed: Assets removed from Label Policy
+    default:
+      language:
+        set: Default language set
+    oidc:
+      config:
+        added: OIDC configuration added
+        changed: OIDC configuration changed
+        removed: OIDC configuration removed
+    secret:
+      generator:
+        added: Secret generator added
+        changed: Secret generator changed
+        removed: Secret generator removed
+    smtp:
+      config:
+        added: SMTP configuration added
+        changed: SMTP configuration changed
+        password:
+          changed: SMTP configuration secret changed
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS provider added
+          changed: Twilio SMS provider changed
+          token:
+            changed: Twilio SMS provider token changed
+          removed: Twilio SMS provider removed
+          activated: Twilio SMS provider activated
+          deactivated: Twilio SMS provider deactivated
   key_pair:
     added: Key pair added
   action:
@@ -824,11 +864,7 @@ EventTypes:
     deactivated: Action deactivated
     reactivated: Action reactivated
     removed: Action removed
-  oidc:
-    config:
-      added: OIDC configuration added
-      changed: OIDC configuration changed
-      removed: OIDC configuration removed
+
 Application:
   OIDC:
     UnsupportedVersion: Your OIDC version is not supported
