@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/caos/zitadel/internal/static/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
@@ -16,9 +18,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/features"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/caos/zitadel/internal/static"
-	"github.com/caos/zitadel/internal/static/mock"
 )
 
 func TestCommandSide_SetOrgFeatures(t *testing.T) {
@@ -165,6 +165,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -343,6 +348,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -547,6 +557,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -761,6 +776,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -990,6 +1010,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 						eventFromEventPusher(
@@ -1002,6 +1027,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeNotAllowed,
+								time.Hour*10,
+								time.Hour*20,
+								time.Hour*30,
+								time.Hour*40,
+								time.Hour*50,
 							),
 						),
 					),
@@ -1017,6 +1047,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								true,
 								true,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -1195,7 +1230,13 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								org.NewLoginPolicyMultiFactorAddedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate, domain.MultiFactorTypeU2FWithPIN),
 							),
 							eventFromEventPusher(
-								newLoginPolicyChangedEvent(context.Background(), "org1", true, true, true, true, true, domain.PasswordlessTypeAllowed),
+								newLoginPolicyChangedEvent(context.Background(), "org1",
+									true, true, true, true, true, domain.PasswordlessTypeAllowed,
+									nil,
+									nil,
+									nil,
+									nil,
+									nil),
 							),
 							eventFromEventPusher(
 								org.NewPasswordComplexityPolicyRemovedEvent(context.Background(), &org.NewAggregate("org1", "org1").Aggregate),
@@ -1278,6 +1319,11 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),
@@ -1537,6 +1583,11 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								false,
 								false,
 								domain.PasswordlessTypeAllowed,
+								time.Hour*1,
+								time.Hour*2,
+								time.Hour*3,
+								time.Hour*4,
+								time.Hour*5,
 							),
 						),
 					),

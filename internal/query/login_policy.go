@@ -14,19 +14,24 @@ import (
 )
 
 type LoginPolicy struct {
-	OrgID                 string
-	CreationDate          time.Time
-	ChangeDate            time.Time
-	Sequence              uint64
-	AllowRegister         bool
-	AllowUsernamePassword bool
-	AllowExternalIDPs     bool
-	ForceMFA              bool
-	SecondFactors         []domain.SecondFactorType
-	MultiFactors          []domain.MultiFactorType
-	PasswordlessType      domain.PasswordlessType
-	IsDefault             bool
-	HidePasswordReset     bool
+	OrgID                      string
+	CreationDate               time.Time
+	ChangeDate                 time.Time
+	Sequence                   uint64
+	AllowRegister              bool
+	AllowUsernamePassword      bool
+	AllowExternalIDPs          bool
+	ForceMFA                   bool
+	SecondFactors              []domain.SecondFactorType
+	MultiFactors               []domain.MultiFactorType
+	PasswordlessType           domain.PasswordlessType
+	IsDefault                  bool
+	HidePasswordReset          bool
+	PasswordCheckLifetime      time.Duration
+	ExternalLoginCheckLifetime time.Duration
+	MFAInitSkipLifetime        time.Duration
+	SecondFactorCheckLifetime  time.Duration
+	MultiFactorCheckLifetime   time.Duration
 }
 
 type SecondFactors struct {
@@ -93,6 +98,26 @@ var (
 	}
 	LoginPolicyColumnHidePasswordReset = Column{
 		name:  projection.LoginPolicyHidePWResetCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnPasswordCheckLifetime = Column{
+		name:  projection.PasswordCheckLifetimeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnExternalLoginCheckLifetime = Column{
+		name:  projection.ExternalLoginCheckLifetimeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnMFAInitSkipLifetime = Column{
+		name:  projection.MFAInitSkipLifetimeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnSecondFactorCheckLifetime = Column{
+		name:  projection.SecondFactorCheckLifetimeCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnMultiFacotrCheckLifetime = Column{
+		name:  projection.MultiFactorCheckLifetimeCol,
 		table: loginPolicyTable,
 	}
 )
@@ -234,6 +259,11 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 			LoginPolicyColumnPasswordlessType.identifier(),
 			LoginPolicyColumnIsDefault.identifier(),
 			LoginPolicyColumnHidePasswordReset.identifier(),
+			LoginPolicyColumnPasswordCheckLifetime.identifier(),
+			LoginPolicyColumnExternalLoginCheckLifetime.identifier(),
+			LoginPolicyColumnMFAInitSkipLifetime.identifier(),
+			LoginPolicyColumnSecondFactorCheckLifetime.identifier(),
+			LoginPolicyColumnMultiFacotrCheckLifetime.identifier(),
 		).From(loginPolicyTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*LoginPolicy, error) {
 			p := new(LoginPolicy)
@@ -253,6 +283,11 @@ func prepareLoginPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*LoginPolicy, 
 				&p.PasswordlessType,
 				&p.IsDefault,
 				&p.HidePasswordReset,
+				&p.PasswordCheckLifetime,
+				&p.ExternalLoginCheckLifetime,
+				&p.MFAInitSkipLifetime,
+				&p.SecondFactorCheckLifetime,
+				&p.MultiFactorCheckLifetime,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {

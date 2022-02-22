@@ -63,6 +63,11 @@ title: zitadel/policy.proto
 | passwordless_type |  PasswordlessType | - |  |
 | is_default |  bool | - |  |
 | hide_password_reset |  bool | - |  |
+| password_check_lifetime |  google.protobuf.Duration | - |  |
+| external_login_check_lifetime |  google.protobuf.Duration | - |  |
+| mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
+| second_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 
 
 

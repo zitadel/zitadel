@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
@@ -41,7 +42,12 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.multi_factors,`+
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset`+
+						` zitadel.projections.login_policies.hide_password_reset,`+
+						` zitadel.projections.login_policies.password_check_lifetime,`+
+						` zitadel.projections.login_policies.external_login_check_lifetime,`+
+						` zitadel.projections.login_policies.mfa_init_skip_lifetime,`+
+						` zitadel.projections.login_policies.second_factor_check_lifetime,`+
+						` zitadel.projections.login_policies.multi_factor_check_lifetime`+
 						` FROM zitadel.projections.login_policies`),
 					nil,
 					nil,
@@ -72,7 +78,12 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.multi_factors,`+
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset`+
+						` zitadel.projections.login_policies.hide_password_reset,`+
+						` zitadel.projections.login_policies.password_check_lifetime,`+
+						` zitadel.projections.login_policies.external_login_check_lifetime,`+
+						` zitadel.projections.login_policies.mfa_init_skip_lifetime,`+
+						` zitadel.projections.login_policies.second_factor_check_lifetime,`+
+						` zitadel.projections.login_policies.multi_factor_check_lifetime`+
 						` FROM zitadel.projections.login_policies`),
 					[]string{
 						"aggregate_id",
@@ -88,6 +99,11 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						"passwordless_type",
 						"is_default",
 						"hide_password_reset",
+						"password_check_lifetime",
+						"external_login_check_lifetime",
+						"mfa_init_skip_lifetime",
+						"second_factor_check_lifetime",
+						"multi_factor_check_lifetime",
 					},
 					[]driver.Value{
 						"ro",
@@ -103,23 +119,33 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						domain.PasswordlessTypeAllowed,
 						true,
 						true,
+						time.Hour * 2,
+						time.Hour * 2,
+						time.Hour * 2,
+						time.Hour * 2,
+						time.Hour * 2,
 					},
 				),
 			},
 			object: &LoginPolicy{
-				OrgID:                 "ro",
-				CreationDate:          testNow,
-				ChangeDate:            testNow,
-				Sequence:              20211109,
-				AllowRegister:         true,
-				AllowUsernamePassword: true,
-				AllowExternalIDPs:     true,
-				ForceMFA:              true,
-				SecondFactors:         []domain.SecondFactorType{domain.SecondFactorTypeOTP},
-				MultiFactors:          []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
-				PasswordlessType:      domain.PasswordlessTypeAllowed,
-				IsDefault:             true,
-				HidePasswordReset:     true,
+				OrgID:                      "ro",
+				CreationDate:               testNow,
+				ChangeDate:                 testNow,
+				Sequence:                   20211109,
+				AllowRegister:              true,
+				AllowUsernamePassword:      true,
+				AllowExternalIDPs:          true,
+				ForceMFA:                   true,
+				SecondFactors:              []domain.SecondFactorType{domain.SecondFactorTypeOTP},
+				MultiFactors:               []domain.MultiFactorType{domain.MultiFactorTypeU2FWithPIN},
+				PasswordlessType:           domain.PasswordlessTypeAllowed,
+				IsDefault:                  true,
+				HidePasswordReset:          true,
+				PasswordCheckLifetime:      time.Hour * 2,
+				ExternalLoginCheckLifetime: time.Hour * 2,
+				MFAInitSkipLifetime:        time.Hour * 2,
+				SecondFactorCheckLifetime:  time.Hour * 2,
+				MultiFactorCheckLifetime:   time.Hour * 2,
 			},
 		},
 		{
@@ -139,7 +165,12 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 						` zitadel.projections.login_policies.multi_factors,`+
 						` zitadel.projections.login_policies.passwordless_type,`+
 						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset`+
+						` zitadel.projections.login_policies.hide_password_reset,`+
+						` zitadel.projections.login_policies.password_check_lifetime,`+
+						` zitadel.projections.login_policies.external_login_check_lifetime,`+
+						` zitadel.projections.login_policies.mfa_init_skip_lifetime,`+
+						` zitadel.projections.login_policies.second_factor_check_lifetime,`+
+						` zitadel.projections.login_policies.multi_factor_check_lifetime`+
 						` FROM zitadel.projections.login_policies`),
 					sql.ErrConnDone,
 				),
