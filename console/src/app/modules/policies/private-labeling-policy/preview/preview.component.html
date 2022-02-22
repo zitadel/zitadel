@@ -1,5 +1,4 @@
 <div class="preview" *ngIf="policy">
-  <!-- <span class="label cnsl-secondary-text">{{label}}</span> -->
   <div class="dashed" [ngClass]="{'dark': theme === Theme.DARK, 'light': theme === Theme.LIGHT}"
     [style.background]="theme === Theme.DARK ? policy.backgroundColorDark : policy.backgroundColor">
     <div class="login-wrapper" [style.color]="theme === Theme.DARK ? policy.fontColorDark : policy.fontColor">
@@ -29,10 +28,10 @@
           [style.color]="theme === Theme.DARK ? policy.primaryColorDark : policy.primaryColor">{{'POLICY.PRIVATELABELING.PREVIEW.SECONDARYBUTTON'
           | translate}}</button>
         <button *ngIf="theme === Theme.DARK" mat-raised-button [style.background]="policy.primaryColorDark"
-          [style.color]="policy.primaryColorDark === '#ffffff' ? '#000000' : '#ffffff'">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON'
+          [style.color]="contrastTextColor">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON'
           | translate}}</button>
         <button *ngIf="theme === Theme.LIGHT" mat-raised-button [style.background]="policy.primaryColor"
-          [style.color]="policy.primaryColor === '#ffffff' ? '#000000' : '#ffffff'">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON'
+          [style.color]="contrastTextColor">{{'POLICY.PRIVATELABELING.PREVIEW.PRIMARYBUTTON'
           | translate}}</button>
       </div>
     </div>

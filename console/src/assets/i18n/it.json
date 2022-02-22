@@ -890,6 +890,10 @@
       "EMAILNOSVG": "Il formato di file SVG non \u00e8 supportato nelle email. Perci\u00f2 carica il tuo logo in PNG o in un altro formato supportato.",
       "MAXSIZEEXCEEDED": "Dimensione massima di 524kB superata.",
       "FONTINLOGINONLY": "Il carattere \u00e8 attualmente visualizzato solo nell'interfaccia di accesso.",
+      "VIEWS": {
+        "PREVIEW": "Anteprima",
+        "CURRENT": "Configurazione attuale"
+      },
       "PREVIEW": {
         "TITLE": "Accesso",
         "SECOND": "accedi con il tuo account ZITADEL.",

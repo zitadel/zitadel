@@ -23,19 +23,29 @@
     </div>
 
     <div class="privatelabeling-top-row">
-      <div>
-        <p>{{'POLICY.PRIVATELABELING.THEME' | translate}}</p>
-        <mat-button-toggle-group [(ngModel)]="theme" name="theme" aria-label="Theme">
-          <mat-button-toggle class="theme-toggle" [value]="Theme.LIGHT">
+      <mat-button-toggle-group class="buttongroup" [(ngModel)]="theme" name="theme" aria-label="Theme">
+        <mat-button-toggle class="theme-toggle" [value]="Theme.LIGHT">
+          <div class="toggle-row">
             <i class="icon las la-sun"></i>
             <span>{{'POLICY.PRIVATELABELING.LIGHT' | translate}}</span>
-          </mat-button-toggle>
-          <mat-button-toggle class="theme-toggle" [value]=" Theme.DARK">
+          </div>
+        </mat-button-toggle>
+        <mat-button-toggle class="theme-toggle" [value]=" Theme.DARK">
+          <div class="toggle-row">
             <i class="icon las la-moon"></i>
             <span> {{'POLICY.PRIVATELABELING.DARK' | translate}}</span>
-          </mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
+          </div>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-button-toggle-group class="buttongroup" [(ngModel)]="view" name="displayview" aria-label="Display View">
+        <mat-button-toggle class="theme-toggle" [value]="View.PREVIEW">
+          <span>{{'POLICY.PRIVATELABELING.VIEWS.PREVIEW' | translate}}</span>
+        </mat-button-toggle>
+        <mat-button-toggle class="theme-toggle" [value]="View.CURRENT">
+          <span> {{'POLICY.PRIVATELABELING.VIEWS.CURRENT' | translate}}</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
 
       <span class="fill-space"></span>
 
@@ -54,7 +64,6 @@
     </div>
 
     <div *ngIf="previewData && data" class="lab-policy-content">
-
       <mat-accordion class="settings">
         <mat-expansion-panel class="expansion">
           <mat-expansion-panel-header>
@@ -64,103 +73,57 @@
                 Logo
               </div>
             </mat-panel-title>
-            <mat-panel-description>
-
-            </mat-panel-description>
           </mat-expansion-panel-header>
 
-          <p class="description">{{'POLICY.PRIVATELABELING.USEOFLOGO' | translate}}</p>
+          <p class="cnsl-secondary-button">{{'POLICY.PRIVATELABELING.USEOFLOGO' | translate}}</p>
 
           <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.MAXSIZE' | translate}}</cnsl-info-section>
           <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
           </cnsl-info-section>
 
-          <div class="logo-setup-wrapper">
-            <div class="part">
-              <span class="label">Logo</span>
-              <container [ngSwitch]="theme">
-                <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <div class="img-wrapper mat-elevation-z3" *ngIf="previewData.logoUrlDark">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                      (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="previewData.logoUrlDark" alt="dark logo preview" />
-                  </div>
-                  <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="data.logoUrlDark">
-                    <img matTooltip="Current" class="curr" [src]="data.logoUrlDark" alt="dark logo" />
-                  </div>
-                </div>
-                <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                  <div class="img-wrapper" *ngIf="previewData.logoUrl">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                      (click)="deleteAsset(AssetType.LOGO, theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="previewData.logoUrl" alt="logo preview" />
-                  </div>
-                  <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="data.logoUrl">
-                    <img matTooltip="Current" class="curr" [src]="data.logoUrl" alt="logo" />
-                  </div>
-                </div>
-              </container>
-              <div class="dropzone" cnslDropzone (hovered)="toggleHoverLogo(theme, $event)"
-                (dropped)="onDropLogo(theme, $event)" [class.hovering]="isHoveringOverDarkLogo">
-                <label class="file-label">
-                  <i class="icon las la-image"></i>
-                  <span>{{isHoveringOverDarkLogo ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
-                    ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
-                  <input #selectedFile style="display: none;" class="file-input" type="file"
-                    (change)="onDropLogo(theme, $any($event.target).files)">
-                  <a class="btn"
-                    *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                    (click)="$event.preventDefault(); selectedFile.click();">
-                    {{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
-                </label>
-              </div>
-            </div>
-
-            <div class="part">
-              <span class="label cnsl-secondary-text">Icon</span>
-              <container [ngSwitch]="theme">
-                <div class="logo-view" *ngSwitchCase="Theme.DARK">
-                  <div class="img-wrapper" *ngIf="previewData.iconUrlDark">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                      (click)="deleteAsset(AssetType.ICON, theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="previewData.iconUrlDark" alt="dark icon preview" />
-                  </div>
-                  <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="data.iconUrlDark">
-                    <img matTooltip="Current" class="curr" [src]="data.iconUrlDark" alt="dark icon" />
-                  </div>
-                </div>
-                <div class="logo-view" *ngSwitchCase="Theme.LIGHT">
-                  <div class="img-wrapper" *ngIf="previewData.iconUrl">
-                    <mat-icon matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn" class="dl-btn"
-                      (click)="deleteAsset(AssetType.ICON,theme)">remove_circle</mat-icon>
-                    <img matTooltip="Preview" class="prev" [src]="previewData.iconUrl" alt="icon preview" />
-                  </div>
-                  <span class="fill-space"></span>
-                  <div class="img-wrapper" *ngIf="data.iconUrl">
-                    <img matTooltip="Current" class="curr" [src]="data.iconUrl" alt="icon" />
-                  </div>
-                </div>
-              </container>
-              <div class="dropzone" cnslDropzone (hovered)="toggleHoverIcon(theme, $event)"
-                (dropped)="onDropIcon(theme, $event)" [class.hovering]="isHoveringOverDarkIcon">
-                <label class="file-label">
-                  <i class="icon las la-image"></i>
-                  <span>{{isHoveringOverDarkIcon ? ('POLICY.PRIVATELABELING.RELEASE' | translate):
-                    ('POLICY.PRIVATELABELING.DROP' | translate)}}</span>
-                  <input #selectedFileIcon style="display: none;" class="file-input" type="file"
-                    (change)="onDropIcon(theme, $any($event.target).files)">
-                  <a class="btn"
-                    *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                    (click)="$event.preventDefault(); selectedFileIcon.click();">
-                    {{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
-                </label>
-              </div>
+          <div class="logo-view">
+            <span class="label cnsl-secondary-text">Logo</span>
+            <div class="img-wrapper">
+              <ng-container *ngIf="theme === Theme.DARK ? data.logoUrlDark : data.logoUrl;else addLogoButton">
+                <img [src]="theme === Theme.DARK ? data.logoUrlDark : data.logoUrl" alt="logo" />
+                <button class="dl-btn" mat-icon-button color="warn" (click)="deleteAsset(AssetType.LOGO, theme)"
+                  matTooltip="{{'ACTIONS.DELETE' | translate}}">
+                  <i class="las la-ban"></i>
+                </button>
+              </ng-container>
+              <ng-template #addLogoButton>
+                <input #selectedFile style="display: none;" class="file-input" type="file"
+                  (change)="onDropLogo(theme, $any($event.target).files)">
+                <button mat-icon-button matTooltip="{{'POLICY.PRIVATELABELING.BTN' | translate}}"
+                  *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
+                  (click)="$event.preventDefault(); selectedFile.click();">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </ng-template>
             </div>
           </div>
 
+          <div class="logo-view">
+            <span class="label cnsl-secondary-text">Icon</span>
+            <div class="img-wrapper icon">
+              <ng-container *ngIf="theme === Theme.DARK ? data.iconUrlDark : data.iconUrl; else addIconButton">
+                <img [src]="theme === Theme.DARK ? data.iconUrlDark : data.iconUrl" alt="icon" />
+                <button class="dl-btn" mat-icon-button color="warn" (click)="deleteAsset(AssetType.ICON, theme)"
+                  matTooltip="{{'ACTIONS.DELETE' | translate}}">
+                  <i class="las la-ban"></i>
+                </button>
+              </ng-container>
+              <ng-template #addIconButton>
+                <input #selectedIconFile style="display: none;" class="file-input" type="file"
+                  (change)="onDropIcon(theme, $any($event.target).files)">
+                <button mat-icon-button matTooltip="{{'POLICY.PRIVATELABELING.BTN' | translate}}"
+                  *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
+                  (click)="$event.preventDefault(); selectedIconFile.click();">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </ng-template>
+            </div>
+          </div>
         </mat-expansion-panel>
 
         <mat-expansion-panel class="expansion" [expanded]="true">
@@ -255,7 +218,7 @@
               </button>
             </div>
 
-            <div class="dropzone" cnslDropzone (hovered)="toggleHoverFont($event)" (dropped)="onDropFont($event)"
+            <!-- <div class="dropzone" cnslDropzone (hovered)="toggleHoverFont($event)" (dropped)="onDropFont($event)"
               [class.hovering]="isHoveringOverFont">
               <label class="file-label">
                 <i class="icon las la-file"></i>
@@ -267,7 +230,7 @@
                   *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
                   (click)="selectedFontFile.click()">{{'POLICY.PRIVATELABELING.BTN' | translate}}</a>
               </label>
-            </div>
+            </div> -->
           </div>
         </mat-expansion-panel>
 
@@ -314,8 +277,8 @@
 
       <div class="preview-wrapper">
         <div class="col">
-          <cnsl-preview [refresh]="refreshPreview" [theme]="theme" class="preview" label="PREVIEW"
-            [policy]="previewData">
+          <cnsl-preview [refresh]="refreshPreview" [theme]="theme" class="preview"
+            [policy]="view === View.PREVIEW ? previewData : data">
           </cnsl-preview>
         </div>
       </div>

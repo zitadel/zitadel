@@ -890,6 +890,10 @@
       "EMAILNOSVG": "Das SVG Dateiformat wird nicht in emails unterstützt. Laden Sie deshalb ihr Logo im PNG oder einem anderen unterstützten Format hoch.",
       "MAXSIZEEXCEEDED": "Maximale Grösse von 524kB überschritten",
       "FONTINLOGINONLY": "Die Schriftart wird momentan nur im Login interface angezeigt.",
+      "VIEWS": {
+        "PREVIEW": "Vorschau",
+        "CURRENT": "Aktuelle Konfiguration"
+      },
       "PREVIEW": {
         "TITLE": "Anmeldung",
         "SECOND": "mit ZITADEL-Konto anmelden.",

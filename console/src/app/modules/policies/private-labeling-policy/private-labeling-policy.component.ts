@@ -34,9 +34,9 @@ export enum Theme {
   LIGHT,
 }
 
-export enum Preview {
-  CURRENT,
+export enum View {
   PREVIEW,
+  CURRENT,
 }
 
 export enum ColorType {
@@ -78,7 +78,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public loading: boolean = false;
 
   public Theme: any = Theme;
-  public Preview: any = Preview;
+  public View: any = View;
   public ColorType: any = ColorType;
   public AssetType: any = AssetType;
 
@@ -88,6 +88,7 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   public InfoSectionType: any = InfoSectionType;
 
   private destroy$: Subject<void> = new Subject();
+  public view: View = View.PREVIEW;
   constructor(
     private authService: GrpcAuthService,
     private route: ActivatedRoute,
