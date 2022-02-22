@@ -75,53 +75,56 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
 
-          <p class="cnsl-secondary-button">{{'POLICY.PRIVATELABELING.USEOFLOGO' | translate}}</p>
+          <div>
+            <p class="cnsl-secondary-button">{{'POLICY.PRIVATELABELING.USEOFLOGO' | translate}}</p>
 
-          <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.MAXSIZE' | translate}}</cnsl-info-section>
-          <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
-          </cnsl-info-section>
+            <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.MAXSIZE' | translate}}
+            </cnsl-info-section>
+            <cnsl-info-section class="max-size-desc"> {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
+            </cnsl-info-section>
 
-          <div class="logo-view">
-            <span class="label cnsl-secondary-text">Logo</span>
-            <div class="img-wrapper">
-              <ng-container *ngIf="theme === Theme.DARK ? data.logoUrlDark : data.logoUrl;else addLogoButton">
-                <img [src]="theme === Theme.DARK ? data.logoUrlDark : data.logoUrl" alt="logo" />
-                <button class="dl-btn" mat-icon-button color="warn" (click)="deleteAsset(AssetType.LOGO, theme)"
-                  matTooltip="{{'ACTIONS.DELETE' | translate}}">
-                  <i class="las la-ban"></i>
-                </button>
-              </ng-container>
-              <ng-template #addLogoButton>
-                <input #selectedFile style="display: none;" class="file-input" type="file"
-                  (change)="onDropLogo(theme, $any($event.target).files)">
-                <button mat-icon-button matTooltip="{{'POLICY.PRIVATELABELING.BTN' | translate}}"
-                  *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                  (click)="$event.preventDefault(); selectedFile.click();">
-                  <mat-icon>add</mat-icon>
-                </button>
-              </ng-template>
+            <div class="logo-view">
+              <span class="label cnsl-secondary-text">Logo</span>
+              <div class="img-wrapper">
+                <ng-container *ngIf="theme === Theme.DARK ? data.logoUrlDark : data.logoUrl;else addLogoButton">
+                  <img [src]="theme === Theme.DARK ? data.logoUrlDark : data.logoUrl" alt="logo" />
+                  <button class="dl-btn" mat-icon-button color="warn" (click)="deleteAsset(AssetType.LOGO, theme)"
+                    matTooltip="{{'ACTIONS.DELETE' | translate}}">
+                    <i class="las la-ban"></i>
+                  </button>
+                </ng-container>
+                <ng-template #addLogoButton>
+                  <input #selectedFile style="display: none;" class="file-input" type="file"
+                    (change)="onDropLogo(theme, $any($event.target).files)">
+                  <button mat-icon-button matTooltip="{{'POLICY.PRIVATELABELING.BTN' | translate}}"
+                    *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
+                    (click)="$event.preventDefault(); selectedFile.click();">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </ng-template>
+              </div>
             </div>
-          </div>
 
-          <div class="logo-view">
-            <span class="label cnsl-secondary-text">Icon</span>
-            <div class="img-wrapper icon">
-              <ng-container *ngIf="theme === Theme.DARK ? data.iconUrlDark : data.iconUrl; else addIconButton">
-                <img [src]="theme === Theme.DARK ? data.iconUrlDark : data.iconUrl" alt="icon" />
-                <button class="dl-btn" mat-icon-button color="warn" (click)="deleteAsset(AssetType.ICON, theme)"
-                  matTooltip="{{'ACTIONS.DELETE' | translate}}">
-                  <i class="las la-ban"></i>
-                </button>
-              </ng-container>
-              <ng-template #addIconButton>
-                <input #selectedIconFile style="display: none;" class="file-input" type="file"
-                  (change)="onDropIcon(theme, $any($event.target).files)">
-                <button mat-icon-button matTooltip="{{'POLICY.PRIVATELABELING.BTN' | translate}}"
-                  *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
-                  (click)="$event.preventDefault(); selectedIconFile.click();">
-                  <mat-icon>add</mat-icon>
-                </button>
-              </ng-template>
+            <div class="logo-view">
+              <span class="label cnsl-secondary-text">Icon</span>
+              <div class="img-wrapper icon">
+                <ng-container *ngIf="theme === Theme.DARK ? data.iconUrlDark : data.iconUrl; else addIconButton">
+                  <img [src]="theme === Theme.DARK ? data.iconUrlDark : data.iconUrl" alt="icon" />
+                  <button class="dl-btn" mat-icon-button color="warn" (click)="deleteAsset(AssetType.ICON, theme)"
+                    matTooltip="{{'ACTIONS.DELETE' | translate}}">
+                    <i class="las la-ban"></i>
+                  </button>
+                </ng-container>
+                <ng-template #addIconButton>
+                  <input #selectedIconFile style="display: none;" class="file-input" type="file"
+                    (change)="onDropIcon(theme, $any($event.target).files)">
+                  <button mat-icon-button matTooltip="{{'POLICY.PRIVATELABELING.BTN' | translate}}"
+                    *ngIf="serviceType === PolicyComponentServiceType.ADMIN || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async))"
+                    (click)="$event.preventDefault(); selectedIconFile.click();">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </ng-template>
+              </div>
             </div>
           </div>
         </mat-expansion-panel>
