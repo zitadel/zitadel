@@ -20,6 +20,7 @@ type Configuration struct {
 	ClusterDNS          string         `yaml:"clusterdns"`
 	AssetStorage        *AssetStorage  `yaml:"assetStorage,omitempty"`
 	Proxy               *Proxy         `yaml:"proxy,omitempty"`
+	SAML                *SAML          `yaml:"saml,omitempty"`
 }
 
 func (c *Configuration) Validate() (err error) {
@@ -150,4 +151,21 @@ type Proxy struct {
 	HTTPS         *secret.Secret   `yaml:"https,omitempty"`
 	ExistingHTTP  *secret.Existing `yaml:"existingHTTP,omitempty"`
 	ExistingHTTPS *secret.Existing `yaml:"existingHTTPS,omitempty"`
+}
+
+type SAML struct {
+	Contact          *Contact `yaml:"contact,omitempty"`
+	SigningAlgorithm string   `yaml:"signingAlgorithm,omitempty"`
+	DigestAlgorithm  string   `yaml:"digestAlgorithm,omitempty"`
+	EncryptAlgorithm string   `yaml:"encryptAlgorithm,omitempty"`
+	ErrorURL         string   `yaml:"errorURL,omitempty "`
+}
+
+type Contact struct {
+	GivenName       string
+	Surname         string
+	TelephoneNumber string
+	Company         string
+	URL             string
+	Email           string
 }

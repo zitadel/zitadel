@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xenc"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/xml_dsig"
@@ -34,23 +35,26 @@ func writeXML(w http.ResponseWriter, body interface{}) error {
 }
 
 func (p *IdentityProviderConfig) getMetadata(
-	baseURL string,
+	metadataEndpoint *op.Endpoint,
 	idpCertData []byte,
 ) (*md.IDPSSODescriptorType, *md.AttributeAuthorityDescriptorType) {
 	idpKeyDescriptors := []md.KeyDescriptorType{
 		{
 			Use: md.KeyTypesSigning,
 			KeyInfo: xml_dsig.KeyInfoType{
-				KeyName: []string{baseURL + " IDP " + string(md.KeyTypesSigning)},
+				KeyName: []string{metadataEndpoint.Absolute("") + " IDP " + string(md.KeyTypesSigning)},
 				X509Data: []xml_dsig.X509DataType{{
 					X509Certificate: []string{base64.StdEncoding.EncodeToString(idpCertData)},
 				}},
 			},
 		},
-		{
+	}
+
+	if p.EncryptionAlgorithm != "" {
+		idpKeyDescriptors = append(idpKeyDescriptors, md.KeyDescriptorType{
 			Use: md.KeyTypesEncryption,
 			KeyInfo: xml_dsig.KeyInfoType{
-				KeyName: []string{baseURL + " IDP " + string(md.KeyTypesEncryption)},
+				KeyName: []string{metadataEndpoint.Absolute("") + " IDP " + string(md.KeyTypesEncryption)},
 				X509Data: []xml_dsig.X509DataType{{
 					X509Certificate: []string{base64.StdEncoding.EncodeToString(idpCertData)},
 				}},
@@ -58,7 +62,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			EncryptionMethod: []xenc.EncryptionMethodType{{
 				Algorithm: p.EncryptionAlgorithm,
 			}},
-		},
+		})
 	}
 
 	return &md.IDPSSODescriptorType{
@@ -71,7 +75,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			ErrorURL:                   p.ErrorURL,
 			SingleSignOnService: []md.EndpointType{{
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-				Location: baseURL + p.SingleSignOnService,
+				Location: p.Endpoints.SingleSignOn.URL,
 			}},
 			//TODO definition for more profiles
 			AttributeProfile: []string{
@@ -83,16 +87,16 @@ func (p *IdentityProviderConfig) getMetadata(
 				Index:     "0",
 				IsDefault: "true",
 				Binding:   "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-				Location:  baseURL + p.ArtifactResulationService,
+				Location:  p.Endpoints.ArtifactResulation.URL,
 			}},
 			SingleLogoutService: []md.EndpointType{
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-					Location: baseURL + p.SLOArtifactResulationService,
+					Location: p.Endpoints.SLOArtifactResulation.URL,
 				},
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-					Location: baseURL + p.SingleLogoutService,
+					Location: p.Endpoints.SingleLogout.URL,
 				},
 			},
 			NameIDFormat:  []string{p.NameIDFormat},
@@ -117,7 +121,7 @@ func (p *IdentityProviderConfig) getMetadata(
 			ErrorURL:                   p.ErrorURL,
 			AttributeService: []md.EndpointType{{
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-				Location: baseURL + p.AttributeService,
+				Location: p.Endpoints.Attribute.URL,
 			}},
 			NameIDFormat: []string{p.NameIDFormat},
 			//TODO definition for more profiles
@@ -145,7 +149,7 @@ func (p *ProviderConfig) getMetadata(
 
 	entity := &md.EntityDescriptor{
 		XMLName:       xml.Name{Local: "md"},
-		EntityID:      md.EntityIDType(p.BaseURL + metadataEndpoint),
+		EntityID:      md.EntityIDType(idp.EntityID),
 		Id:            NewID(),
 		Signature:     nil,
 		Organization:  nil,

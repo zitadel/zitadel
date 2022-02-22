@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
+	"github.com/caos/oidc/pkg/op"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
@@ -43,13 +44,7 @@ type IdentityProviderConfig struct {
 	NameIDFormat           string
 	WantAuthRequestsSigned string
 
-	LoginService                 string
-	SingleSignOnService          string
-	SingleLogoutService          string
-	ArtifactResulationService    string
-	SLOArtifactResulationService string
-	NameIDMappingService         string
-	AttributeService             string
+	Endpoints *EndpointConfig
 }
 
 type IdentityProvider struct {
@@ -61,19 +56,33 @@ type IdentityProvider struct {
 	AAMetadata *md.AttributeAuthorityDescriptorType
 	signer     xmlsig.Signer
 
-	baseURL                      string
-	LoginService                 string
-	SingleSignOnService          string
-	SingleLogoutService          string
-	ArtifactResulationService    string
-	SLOArtifactResulationService string
-	NameIDMappingService         string
-	AttributeService             string
+	LoginEndpoint                 op.Endpoint
+	SingleSignOnEndpoint          op.Endpoint
+	SingleLogoutEndpoint          op.Endpoint
+	ArtifactResulationEndpoint    op.Endpoint
+	SLOArtifactResulationEndpoint op.Endpoint
+	NameIDMappingEndpoint         op.Endpoint
+	AttributeEndpoint             op.Endpoint
 
 	ServiceProviders []*ServiceProvider
 }
 
-func NewIdentityProvider(baseURL string, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
+type EndpointConfig struct {
+	Login                 Endpoint
+	SingleSignOn          Endpoint
+	SingleLogout          Endpoint
+	ArtifactResulation    Endpoint
+	SLOArtifactResulation Endpoint
+	NameIDMapping         Endpoint
+	Attribute             Endpoint
+}
+
+type Endpoint struct {
+	Path string
+	URL  string
+}
+
+func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
 	cert, key := getResponseCert(storage)
 
 	certPem := pem.EncodeToMemory(
@@ -107,22 +116,21 @@ func NewIdentityProvider(baseURL string, conf *IdentityProviderConfig, storage I
 		return nil, err
 	}
 
-	metadata, aaMetadata := conf.getMetadata(baseURL, tlsCert.Certificate[0])
+	metadata, aaMetadata := conf.getMetadata(metadataEndpoint, tlsCert.Certificate[0])
 	return &IdentityProvider{
-		storage:                      storage,
-		EntityID:                     baseURL + metadataEndpoint,
-		baseURL:                      baseURL,
-		Metadata:                     metadata,
-		AAMetadata:                   aaMetadata,
-		signer:                       signer,
-		LoginService:                 conf.LoginService,
-		SingleSignOnService:          conf.SingleSignOnService,
-		SingleLogoutService:          conf.SingleLogoutService,
-		ArtifactResulationService:    conf.ArtifactResulationService,
-		SLOArtifactResulationService: conf.SLOArtifactResulationService,
-		NameIDMappingService:         conf.NameIDMappingService,
-		AttributeService:             conf.AttributeService,
-		postTemplate:                 temp,
+		storage:                       storage,
+		EntityID:                      metadataEndpoint.Absolute(""),
+		Metadata:                      metadata,
+		AAMetadata:                    aaMetadata,
+		signer:                        signer,
+		LoginEndpoint:                 op.NewEndpointWithURL(conf.Endpoints.Login.Path, conf.Endpoints.Login.URL),
+		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),
+		SingleLogoutEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleLogout.Path, conf.Endpoints.SingleLogout.URL),
+		ArtifactResulationEndpoint:    op.NewEndpointWithURL(conf.Endpoints.ArtifactResulation.Path, conf.Endpoints.ArtifactResulation.URL),
+		SLOArtifactResulationEndpoint: op.NewEndpointWithURL(conf.Endpoints.SLOArtifactResulation.Path, conf.Endpoints.SLOArtifactResulation.URL),
+		NameIDMappingEndpoint:         op.NewEndpointWithURL(conf.Endpoints.NameIDMapping.Path, conf.Endpoints.NameIDMapping.URL),
+		AttributeEndpoint:             op.NewEndpointWithURL(conf.Endpoints.Attribute.Path, conf.Endpoints.Attribute.URL),
+		postTemplate:                  temp,
 	}, nil
 }
 
@@ -133,19 +141,19 @@ type Route struct {
 
 func (p *IdentityProvider) GetRoutes() []*Route {
 	return []*Route{
-		{p.LoginService, p.loginHandleFunc},
-		{p.SingleSignOnService, p.ssoHandleFunc},
-		{p.SingleLogoutService, p.logoutHandleFunc},
-		{p.ArtifactResulationService, notImplementedHandleFunc},
-		{p.SLOArtifactResulationService, notImplementedHandleFunc},
-		{p.NameIDMappingService, notImplementedHandleFunc},
-		{p.AttributeService, notImplementedHandleFunc},
+		{p.LoginEndpoint.Relative(), p.loginHandleFunc},
+		{p.SingleSignOnEndpoint.Relative(), p.ssoHandleFunc},
+		{p.SingleLogoutEndpoint.Relative(), p.logoutHandleFunc},
+		{p.ArtifactResulationEndpoint.Relative(), notImplementedHandleFunc},
+		{p.SLOArtifactResulationEndpoint.Relative(), notImplementedHandleFunc},
+		{p.NameIDMappingEndpoint.Relative(), notImplementedHandleFunc},
+		{p.AttributeEndpoint.Relative(), notImplementedHandleFunc},
 	}
 }
 
 func (p *IdentityProvider) GetRedirectURL(requestID string) string {
 	//TODO
-	return p.baseURL + p.LoginService + "?requestId=" + requestID
+	return p.LoginEndpoint.Absolute("") + "?requestId=" + requestID
 }
 
 func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID string) (*ServiceProvider, error) {

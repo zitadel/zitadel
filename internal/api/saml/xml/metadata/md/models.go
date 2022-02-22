@@ -704,11 +704,11 @@ type OrganizationType struct {
 
 	Extensions *ExtensionsType `xml:"Extensions"`
 
-	OrganizationName []LocalizedNameType `xml:"OrganizationName"`
+	OrganizationName []LocalizedNameType `xml:"OrganizationName,omitempty"`
 
-	OrganizationDisplayName []LocalizedNameType `xml:"OrganizationDisplayName"`
+	OrganizationDisplayName []LocalizedNameType `xml:"OrganizationDisplayName,omitempty"`
 
-	OrganizationURL []LocalizedURIType `xml:"OrganizationURL"`
+	OrganizationURL []LocalizedURIType `xml:"OrganizationURL,omitempty"`
 
 	InnerXml string `xml:",innerxml"`
 }
@@ -720,15 +720,15 @@ type ContactType struct {
 
 	Extensions *ExtensionsType `xml:"Extensions"`
 
-	Company string `xml:"Company"`
+	Company string `xml:"Company,omitempty"`
 
-	GivenName string `xml:"GivenName"`
+	GivenName string `xml:"GivenName,omitempty"`
 
-	SurName string `xml:"SurName"`
+	SurName string `xml:"SurName,omitempty"`
 
-	EmailAddress []string `xml:"EmailAddress"`
+	EmailAddress []string `xml:"EmailAddress,omitempty"`
 
-	TelephoneNumber []string `xml:"TelephoneNumber"`
+	TelephoneNumber []string `xml:"TelephoneNumber,omitempty"`
 
 	InnerXml string `xml:",innerxml"`
 }

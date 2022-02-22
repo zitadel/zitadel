@@ -107,7 +107,7 @@ type userGrantProvider interface {
 }
 
 type projectProvider interface {
-	ProjectByClientID(ctx context.Context, appID string) (*query.Project, error)
+	ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
 }
 
@@ -123,7 +123,7 @@ func (repo *AuthRequestRepo) CreateAuthRequest(ctx context.Context, request *dom
 		return nil, err
 	}
 	request.ID = reqID
-	project, err := repo.ProjectProvider.ProjectByClientID(ctx, request.ApplicationID)
+	project, err := repo.ProjectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
 	if err != nil {
 		return nil, err
 	}
@@ -1204,7 +1204,7 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
+		project, err = projectProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}

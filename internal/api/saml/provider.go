@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/amdonov/xmlsig"
 	"github.com/caos/logging"
+	"github.com/caos/oidc/pkg/op"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
@@ -26,23 +27,22 @@ import (
 )
 
 type ProviderConfig struct {
-	BaseURL string
-
-	SignatureAlgorithm  string
-	DigestAlgorithm     string
-	EncryptionAlgorithm string
-
+	Metadata      *Metadata
 	Organisation  *Organisation
 	ContactPerson *ContactPerson
-
-	ValidUntil    string
-	CacheDuration string
-	ErrorURL      string
 
 	IDP           *IdentityProviderConfig
 	StorageConfig *StorageConfig
 
 	UserAgentCookieConfig *middleware.UserAgentCookieConfig
+}
+
+type Metadata struct {
+	Path                string
+	URL                 string
+	SignatureAlgorithm  string
+	DigestAlgorithm     string
+	EncryptionAlgorithm string
 }
 
 type Certificate struct {
@@ -73,7 +73,6 @@ func NewID() string {
 const (
 	healthEndpoint    = "/healthz"
 	readinessEndpoint = "/ready"
-	metadataEndpoint  = "/metadata"
 )
 
 type Provider struct {
@@ -83,14 +82,15 @@ type Provider struct {
 	caCert       string
 	caKey        string
 
-	Metadata *md.EntityDescriptor
-	Signer   xmlsig.Signer
+	MetadataEndpoint *op.Endpoint
+	Metadata         *md.EntityDescriptor
+	Signer           xmlsig.Signer
 
 	IdentityProvider *IdentityProvider
 }
 
 func NewProvider(
-	conf *ProviderConfig,
+	conf ProviderConfig,
 	command *command.Commands,
 	query *query.Queries,
 	repo repository.Repository,
@@ -130,15 +130,16 @@ func NewProvider(
 	}
 
 	signer, err := xmlsig.NewSignerWithOptions(tlsCert, xmlsig.SignerOptions{
-		SignatureAlgorithm: conf.SignatureAlgorithm,
-		DigestAlgorithm:    conf.DigestAlgorithm,
+		SignatureAlgorithm: conf.Metadata.SignatureAlgorithm,
+		DigestAlgorithm:    conf.Metadata.DigestAlgorithm,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	metadata := op.NewEndpointWithURL(conf.Metadata.Path, conf.Metadata.URL)
 	idp, err := NewIdentityProvider(
-		conf.BaseURL,
+		&metadata,
 		conf.IDP,
 		storage,
 	)
@@ -147,6 +148,7 @@ func NewProvider(
 	}
 
 	prov := &Provider{
+		MetadataEndpoint: &metadata,
 		Metadata:         conf.getMetadata(idp),
 		Signer:           signer,
 		storage:          storage,
@@ -238,7 +240,7 @@ func CreateRouter(p *Provider, interceptors ...HttpInterceptor) *mux.Router {
 	))
 	router.HandleFunc(healthEndpoint, healthHandler)
 	router.HandleFunc(readinessEndpoint, readyHandler(p.Probes()))
-	router.HandleFunc(metadataEndpoint, p.metadataHandle)
+	router.HandleFunc(p.MetadataEndpoint.Relative(), p.metadataHandle)
 
 	if p.IdentityProvider != nil {
 		for _, route := range p.IdentityProvider.GetRoutes() {

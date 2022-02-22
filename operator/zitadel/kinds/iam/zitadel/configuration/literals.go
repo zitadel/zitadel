@@ -89,6 +89,7 @@ func literalsConfigMap(
 			accounts := "https://" + accountsDomain
 			issuer := "https://" + desired.DNS.Subdomains.Issuer + "." + defaultDomain
 			oauth := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/oauth/v2"
+			saml := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/saml"
 			authorize := "https://" + desired.DNS.Subdomains.Accounts + "." + defaultDomain + "/oauth/v2"
 			console := "https://" + desired.DNS.Subdomains.Console + "." + defaultDomain
 			apiDomain := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain
@@ -96,6 +97,7 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ISSUER"] = issuer
 			literalsConfigMap["ZITADEL_ACCOUNTS"] = accounts
 			literalsConfigMap["ZITADEL_OAUTH"] = oauth
+			literalsConfigMap["ZITADEL_SAML"] = saml
 			literalsConfigMap["ZITADEL_AUTHORIZE"] = authorize
 			literalsConfigMap["ZITADEL_CONSOLE"] = console
 			literalsConfigMap["ZITADEL_ACCOUNTS_DOMAIN"] = accountsDomain
@@ -110,6 +112,22 @@ func literalsConfigMap(
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_LOCATION"] = desired.AssetStorage.Location
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_BUCKET_PREFIX"] = desired.AssetStorage.BucketPrefix
 			literalsConfigMap["ZITADEL_ASSET_STORAGE_MULTI_DELETE"] = strconv.FormatBool(desired.AssetStorage.MultiDelete)
+		}
+		if desired.SAML != nil {
+			if desired.SAML.Contact != nil {
+				literalsConfigMap["ZITADEL_SAML_CONTACT_COMPANY"] = desired.SAML.Contact.Company
+				literalsConfigMap["ZITADEL_SAML_CONTACT_URL"] = desired.SAML.Contact.URL
+				literalsConfigMap["ZITADEL_SAML_CONTACT_EMAIL"] = desired.SAML.Contact.Email
+				literalsConfigMap["ZITADEL_SAML_CONTACT_GIVENNAME"] = desired.SAML.Contact.GivenName
+				literalsConfigMap["ZITADEL_SAML_CONTACT_SURNAME"] = desired.SAML.Contact.Surname
+				literalsConfigMap["ZITADEL_SAML_CONTACT_TEL"] = desired.SAML.Contact.TelephoneNumber
+			}
+			literalsConfigMap["ZITADEL_SAML_METADATA_SIGNALG"] = desired.SAML.SigningAlgorithm
+			literalsConfigMap["ZITADEL_SAML_METADATA_DIGALG"] = desired.SAML.DigestAlgorithm
+			literalsConfigMap["ZITADEL_SAML_IDP_SIGNALG"] = desired.SAML.SigningAlgorithm
+			literalsConfigMap["ZITADEL_SAML_IDP_DIGALG"] = desired.SAML.DigestAlgorithm
+			literalsConfigMap["ZITADEL_SAML_IDP_ENCALG"] = desired.SAML.EncryptAlgorithm
+			literalsConfigMap["ZITADEL_SAML_ERRORURL"] = desired.SAML.ErrorURL
 		}
 		if desired.Proxy != nil {
 			literalsConfigMap["NO_PROXY"] = strings.Join(desired.Proxy.NoProxy, ",")
