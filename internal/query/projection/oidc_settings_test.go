@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-func TestOIDCConfigProjection_reduces(t *testing.T) {
+func TestOIDCSettingsProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -22,24 +22,24 @@ func TestOIDCConfigProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "reduceOIDCConfigChanged",
+			name: "reduceOIDCSettingsChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OIDCConfigChangedEventType),
+					repository.EventType(iam.OIDCSettingsChangedEventType),
 					iam.AggregateType,
 					[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
-				), iam.OIDCConfigChangedEventMapper),
+				), iam.OIDCSettingsChangedEventMapper),
 			},
-			reduce: (&OIDCConfigProjection{}).reduceOIDCConfigChanged,
+			reduce: (&OIDCSettingsProjection{}).reduceOIDCSettingsChanged,
 			want: wantReduce{
-				projection:       OIDCConfigProjectionTable,
+				projection:       OIDCSettingsProjectionTable,
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.oidc_configs SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7)",
+							expectedStmt: "UPDATE zitadel.projections.oidc_settings SET (change_date, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) = ($1, $2, $3, $4, $5, $6) WHERE (aggregate_id = $7)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -55,24 +55,24 @@ func TestOIDCConfigProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "reduceOIDCConfigAdded",
+			name: "reduceOIDCSettingsAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OIDCConfigAddedEventType),
+					repository.EventType(iam.OIDCSettingsAddedEventType),
 					iam.AggregateType,
 					[]byte(`{"accessTokenLifetime": 10000000, "idTokenLifetime": 10000000, "refreshTokenIdleExpiration": 10000000, "refreshTokenExpiration": 10000000}`),
-				), iam.OIDCConfigAddedEventMapper),
+				), iam.OIDCSettingsAddedEventMapper),
 			},
-			reduce: (&OIDCConfigProjection{}).reduceOIDCConfigAdded,
+			reduce: (&OIDCSettingsProjection{}).reduceOIDCSettingsAdded,
 			want: wantReduce{
-				projection:       OIDCConfigProjectionTable,
+				projection:       OIDCSettingsProjectionTable,
 				aggregateType:    eventstore.AggregateType("iam"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.oidc_configs (aggregate_id, creation_date, change_date, resource_owner, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO zitadel.projections.oidc_settings (aggregate_id, creation_date, change_date, resource_owner, sequence, access_token_lifetime, id_token_lifetime, refresh_token_idle_expiration, refresh_token_expiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},

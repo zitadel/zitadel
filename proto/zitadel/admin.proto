@@ -313,10 +313,10 @@ service AdminService {
         };
     }
 
-    // Get OIDC Config (e.g token lifetimes, etc.)
-    rpc GetOIDCConfig(GetOIDCConfigRequest) returns (GetOIDCConfigResponse) {
+    // Get OIDC settings (e.g token lifetimes, etc.)
+    rpc GetOIDCSettings(GetOIDCSettingsRequest) returns (GetOIDCSettingsResponse) {
         option (google.api.http) = {
-            get: "/oidcconfig";
+            get: "/settings/oidc";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -324,10 +324,10 @@ service AdminService {
         };
     }
 
-    // Update oidc configuration (e.g token lifetimes, etc)
-    rpc UpdateOIDCConfig(UpdateOIDCConfigRequest) returns (UpdateOIDCConfigResponse) {
+    // Update oidc settings (e.g token lifetimes, etc)
+    rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
         option (google.api.http) = {
-            put: "/oidcconfig";
+            put: "/settings/oidc";
             body: "*"
         };
 
@@ -2562,20 +2562,20 @@ message UpdateSMSProviderTwilioTokenResponse {
 }
 
 // This is an empty request
-message GetOIDCConfigRequest {}
+message GetOIDCSettingsRequest {}
 
-message GetOIDCConfigResponse {
-    zitadel.settings.v1.OIDCConfig config = 1;
+message GetOIDCSettingsResponse {
+    zitadel.settings.v1.OIDCSettings settings = 1;
 }
 
-message UpdateOIDCConfigRequest {
+message UpdateOIDCSettingsRequest {
     google.protobuf.Duration  access_token_lifetime   = 1;
     google.protobuf.Duration  id_token_lifetime   = 2;
     google.protobuf.Duration  refresh_token_idle_expiration   = 3;
     google.protobuf.Duration  refresh_token_expiration   = 4;
 }
 
-message UpdateOIDCConfigResponse {
+message UpdateOIDCSettingsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

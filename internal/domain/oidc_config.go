@@ -6,10 +6,10 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
-type OIDCConfig struct {
+type OIDCSettings struct {
 	models.ObjectRoot
 
-	State   OIDCConfigState
+	State   OIDCSettingsState
 	Default bool
 
 	AccessTokenLifetime        time.Duration
@@ -18,20 +18,20 @@ type OIDCConfig struct {
 	RefreshTokenExpiration     time.Duration
 }
 
-type OIDCConfigState int32
+type OIDCSettingsState int32
 
 const (
-	OIDCConfigStateUnspecified OIDCConfigState = iota
-	OIDCConfigStateActive
-	OIDCConfigStateRemoved
+	OIDCSettingsStateUnspecified OIDCSettingsState = iota
+	OIDCSettingsStateActive
+	OIDCSettingsStateRemoved
 
-	oidcConfigStateCount
+	oidcSettingsStateCount
 )
 
-func (c OIDCConfigState) Valid() bool {
-	return c >= 0 && c < oidcConfigStateCount
+func (c OIDCSettingsState) Valid() bool {
+	return c >= 0 && c < oidcSettingsStateCount
 }
 
-func (s OIDCConfigState) Exists() bool {
-	return s != OIDCConfigStateUnspecified && s != OIDCConfigStateRemoved
+func (s OIDCSettingsState) Exists() bool {
+	return s != OIDCSettingsStateUnspecified && s != OIDCSettingsStateRemoved
 }

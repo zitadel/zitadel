@@ -29,7 +29,7 @@ Errors:
     ExceedsDefault: Limit exceeds default limit
   Language:
     NotParsed: Could not parse languge
-  OIDCConfig:
+  OIDCSettings:
     NotFound: OIDC Configuration not found
     AlreadyExists: OIDC configuration already exists
   SecretGenerator:
@@ -831,7 +831,7 @@ EventTypes:
       language:
         set: Default language set
     oidc:
-      config:
+      settings:
         added: OIDC configuration added
         changed: OIDC configuration changed
         removed: OIDC configuration removed

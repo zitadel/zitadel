@@ -188,28 +188,28 @@ Update twilio sms provider token
     PUT: /sms/twilio/{id}/token
 
 
-### GetOIDCConfig
+### GetOIDCSettings
 
-> **rpc** GetOIDCConfig([GetOIDCConfigRequest](#getoidcconfigrequest))
-[GetOIDCConfigResponse](#getoidcconfigresponse)
+> **rpc** GetOIDCSettings([GetOIDCSettingsRequest](#getoidcsettingsrequest))
+[GetOIDCSettingsResponse](#getoidcsettingsresponse)
 
-Get OIDC Config (e.g token lifetimes, etc.)
-
-
-
-    GET: /oidcconfig
-
-
-### UpdateOIDCConfig
-
-> **rpc** UpdateOIDCConfig([UpdateOIDCConfigRequest](#updateoidcconfigrequest))
-[UpdateOIDCConfigResponse](#updateoidcconfigresponse)
-
-Update oidc configuration (e.g token lifetimes, etc)
+Get OIDC settings (e.g token lifetimes, etc.)
 
 
 
-    PUT: /oidcconfig
+    GET: /settings/oidc
+
+
+### UpdateOIDCSettings
+
+> **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
+[UpdateOIDCSettingsResponse](#updateoidcsettingsresponse)
+
+Update oidc settings (e.g token lifetimes, etc)
+
+
+
+    PUT: /settings/oidc
 
 
 ### GetOrgByID
@@ -2070,19 +2070,19 @@ This is an empty request
 
 
 
-### GetOIDCConfigRequest
+### GetOIDCSettingsRequest
 This is an empty request
 
 
 
 
-### GetOIDCConfigResponse
+### GetOIDCSettingsResponse
 
 
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| config |  zitadel.settings.v1.OIDCConfig | - |  |
+| settings |  zitadel.settings.v1.OIDCSettings | - |  |
 
 
 
@@ -3654,7 +3654,7 @@ This is an empty request
 
 
 
-### UpdateOIDCConfigRequest
+### UpdateOIDCSettingsRequest
 
 
 
@@ -3668,7 +3668,7 @@ This is an empty request
 
 
 
-### UpdateOIDCConfigResponse
+### UpdateOIDCSettingsResponse
 
 
 

@@ -20,7 +20,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		oidcConfig *domain.OIDCConfig
+		oidcConfig *domain.OIDCSettings
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -39,7 +39,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOIDCConfigAddedEvent(context.Background(),
+							iam.NewOIDCSettingsAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								time.Hour*1,
 								time.Hour*1,
@@ -52,7 +52,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				oidcConfig: &domain.OIDCConfig{
+				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
 					RefreshTokenIdleExpiration: 1 * time.Hour,
@@ -71,7 +71,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					expectFilter(),
 					expectPush(
 						[]*repository.Event{
-							eventFromEventPusher(iam.NewOIDCConfigAddedEvent(
+							eventFromEventPusher(iam.NewOIDCSettingsAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								time.Hour*1,
@@ -86,7 +86,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				oidcConfig: &domain.OIDCConfig{
+				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
 					RefreshTokenIdleExpiration: 1 * time.Hour,
@@ -105,7 +105,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOIDCConfig(tt.args.ctx, tt.args.oidcConfig)
+			got, err := r.AddOIDCSettings(tt.args.ctx, tt.args.oidcConfig)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -125,7 +125,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 	}
 	type args struct {
 		ctx        context.Context
-		oidcConfig *domain.OIDCConfig
+		oidcConfig *domain.OIDCSettings
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -159,7 +159,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOIDCConfigAddedEvent(
+							iam.NewOIDCSettingsAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								time.Hour*1,
@@ -173,7 +173,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				oidcConfig: &domain.OIDCConfig{
+				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        1 * time.Hour,
 					IdTokenLifetime:            1 * time.Hour,
 					RefreshTokenIdleExpiration: 1 * time.Hour,
@@ -191,7 +191,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOIDCConfigAddedEvent(
+							iam.NewOIDCSettingsAddedEvent(
 								context.Background(),
 								&iam.NewAggregate().Aggregate,
 								time.Hour*1,
@@ -216,7 +216,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				oidcConfig: &domain.OIDCConfig{
+				oidcConfig: &domain.OIDCSettings{
 					AccessTokenLifetime:        2 * time.Hour,
 					IdTokenLifetime:            2 * time.Hour,
 					RefreshTokenIdleExpiration: 2 * time.Hour,
@@ -235,7 +235,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeOIDCConfig(tt.args.ctx, tt.args.oidcConfig)
+			got, err := r.ChangeOIDCSettings(tt.args.ctx, tt.args.oidcConfig)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -249,14 +249,14 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 	}
 }
 
-func newOIDCConfigChangedEvent(ctx context.Context, accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration) *iam.OIDCConfigChangedEvent {
-	changes := []iam.OIDCConfigChanges{
-		iam.ChangeOIDCConfigAccessTokenLifetime(accessTokenLifetime),
-		iam.ChangeOIDCConfigIdTokenLifetime(idTokenLifetime),
-		iam.ChangeOIDCConfigRefreshTokenIdleExpiration(refreshTokenIdleExpiration),
-		iam.ChangeOIDCConfigRefreshTokenExpiration(refreshTokenExpiration),
+func newOIDCConfigChangedEvent(ctx context.Context, accessTokenLifetime, idTokenLifetime, refreshTokenIdleExpiration, refreshTokenExpiration time.Duration) *iam.OIDCSettingsChangedEvent {
+	changes := []iam.OIDCSettingsChanges{
+		iam.ChangeOIDCSettingsAccessTokenLifetime(accessTokenLifetime),
+		iam.ChangeOIDCSettingsIdTokenLifetime(idTokenLifetime),
+		iam.ChangeOIDCSettingsRefreshTokenIdleExpiration(refreshTokenIdleExpiration),
+		iam.ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration),
 	}
-	event, _ := iam.NewOIDCConfigChangeEvent(ctx,
+	event, _ := iam.NewOIDCSettingsChangeEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		changes,
 	)

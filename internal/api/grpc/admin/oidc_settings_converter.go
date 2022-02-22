@@ -9,8 +9,8 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
-func OIDCConfigToPb(config *query.OIDCConfig) *settings_pb.OIDCConfig {
-	return &settings_pb.OIDCConfig{
+func OIDCSettingsToPb(config *query.OIDCSettings) *settings_pb.OIDCSettings {
+	return &settings_pb.OIDCSettings{
 		Details:                    obj_grpc.ToViewDetailsPb(config.Sequence, config.CreationDate, config.ChangeDate, config.AggregateID),
 		AccessTokenLifetime:        durationpb.New(config.AccessTokenLifetime),
 		IdTokenLifetime:            durationpb.New(config.IdTokenLifetime),
@@ -19,8 +19,8 @@ func OIDCConfigToPb(config *query.OIDCConfig) *settings_pb.OIDCConfig {
 	}
 }
 
-func UpdateOIDCConfigToConfig(req *admin_pb.UpdateOIDCConfigRequest) *domain.OIDCConfig {
-	return &domain.OIDCConfig{
+func UpdateOIDCConfigToConfig(req *admin_pb.UpdateOIDCSettingsRequest) *domain.OIDCSettings {
+	return &domain.OIDCSettings{
 		AccessTokenLifetime:        req.AccessTokenLifetime.AsDuration(),
 		IdTokenLifetime:            req.IdTokenLifetime.AsDuration(),
 		RefreshTokenIdleExpiration: req.RefreshTokenIdleExpiration.AsDuration(),

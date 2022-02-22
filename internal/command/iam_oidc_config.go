@@ -8,49 +8,49 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-func (c *Commands) AddOIDCConfig(ctx context.Context, config *domain.OIDCConfig) (*domain.ObjectDetails, error) {
-	secretConfigWriteModel, err := c.getOIDCConfig(ctx)
+func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
+	oidcSettingWriteModel, err := c.getOIDCConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if secretConfigWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-d9nlw", "Errors.OIDCConfig.AlreadyExists")
+	if oidcSettingWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMAND-d9nlw", "Errors.OIDCSettings.AlreadyExists")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&secretConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewOIDCConfigAddedEvent(
+	iamAgg := IAMAggregateFromWriteModel(&oidcSettingWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, iam.NewOIDCSettingsAddedEvent(
 		ctx,
 		iamAgg,
-		config.AccessTokenLifetime,
-		config.IdTokenLifetime,
-		config.RefreshTokenIdleExpiration,
-		config.RefreshTokenExpiration))
+		settings.AccessTokenLifetime,
+		settings.IdTokenLifetime,
+		settings.RefreshTokenIdleExpiration,
+		settings.RefreshTokenExpiration))
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(secretConfigWriteModel, pushedEvents...)
+	err = AppendAndReduce(oidcSettingWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&secretConfigWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&oidcSettingWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeOIDCConfig(ctx context.Context, config *domain.OIDCConfig) (*domain.ObjectDetails, error) {
-	secretConfigWriteModel, err := c.getOIDCConfig(ctx)
+func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
+	oidcSettingWriteModel, err := c.getOIDCConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if !secretConfigWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-8snEr", "Errors.OIDCConfig.NotFound")
+	if !oidcSettingWriteModel.State.Exists() {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-8snEr", "Errors.OIDCSettings.NotFound")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&secretConfigWriteModel.WriteModel)
+	iamAgg := IAMAggregateFromWriteModel(&oidcSettingWriteModel.WriteModel)
 
-	changedEvent, hasChanged, err := secretConfigWriteModel.NewChangedEvent(
+	changedEvent, hasChanged, err := oidcSettingWriteModel.NewChangedEvent(
 		ctx,
 		iamAgg,
-		config.AccessTokenLifetime,
-		config.IdTokenLifetime,
-		config.RefreshTokenIdleExpiration,
-		config.RefreshTokenExpiration)
+		settings.AccessTokenLifetime,
+		settings.IdTokenLifetime,
+		settings.RefreshTokenIdleExpiration,
+		settings.RefreshTokenExpiration)
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (c *Commands) ChangeOIDCConfig(ctx context.Context, config *domain.OIDCConf
 	if err != nil {
 		return nil, err
 	}
-	err = AppendAndReduce(secretConfigWriteModel, pushedEvents...)
+	err = AppendAndReduce(oidcSettingWriteModel, pushedEvents...)
 	if err != nil {
 		return nil, err
 	}
-	return writeModelToObjectDetails(&secretConfigWriteModel.WriteModel), nil
+	return writeModelToObjectDetails(&oidcSettingWriteModel.WriteModel), nil
 }
 
 func (c *Commands) getOIDCConfig(ctx context.Context) (_ *IAMOIDCConfigWriteModel, err error) {

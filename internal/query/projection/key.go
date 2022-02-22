@@ -27,7 +27,7 @@ const (
 )
 
 func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
-	p := &KeyProjection{}
+	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -21,7 +21,7 @@ const (
 )
 
 func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SecretGeneratorProjection {
-	p := &SecretGeneratorProjection{}
+	p := new(SecretGeneratorProjection)
 	config.ProjectionName = SecretGeneratorProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

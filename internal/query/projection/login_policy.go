@@ -23,7 +23,7 @@ const (
 )
 
 func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginPolicyProjection {
-	p := &LoginPolicyProjection{}
+	p := new(LoginPolicyProjection)
 	config.ProjectionName = LoginPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -29,7 +29,7 @@ Errors:
     ExceedsDefault: Il limite supera quello predefinito
   Language:
     NotParsed: Impossibile analizzare la lingua
-  OIDCConfig:
+  OIDCSettings:
     NotFound: Impossibile trovare la configurazione OIDC
     AlreadyExists: La configurazione OIDC esiste già
   SecretGenerator:
@@ -829,7 +829,7 @@ EventTypes:
       language:
         set: lingua predefinita impostata
     oidc:
-      config:
+      settings:
         added: Configurazione OIDC aggiunta
         changed: Configurazione OIDC cambiata
         removed: Configurazione OIDC rimossa

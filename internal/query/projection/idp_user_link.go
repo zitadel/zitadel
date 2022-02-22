@@ -18,7 +18,7 @@ type IDPUserLinkProjection struct {
 }
 
 func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPUserLinkProjection {
-	p := &IDPUserLinkProjection{}
+	p := new(IDPUserLinkProjection)
 	config.ProjectionName = IDPUserLinkTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

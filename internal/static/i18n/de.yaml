@@ -29,7 +29,7 @@ Errors:
     ExceedsDefault: Limit überschreitet default Limit
   Language:
     NotParsed: Sprache konnte nicht gemapped werde
-  OIDCConfig:
+  OIDCSettings:
     NotFound: OIDC Konfiguration konnte nicht gefunden werden
     AlreadyExists: OIDC Konfiguration existiert bereits
   SecretGenerator:
@@ -832,9 +832,9 @@ EventTypes:
           removed: Bilder und Schrift von Label Richtlinie entfernt
     default:
       language:
-        set: Default Sprache gesetzt
+        set: Standard Sprache gesetzt
     oidc:
-      config:
+      settings:
         added: OIDC Konfiguration hinzugefügt
         changed: OIDC Konfiguration geändert
         removed: OIDC Konfiguration gelöscht

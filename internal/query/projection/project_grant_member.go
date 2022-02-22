@@ -24,7 +24,7 @@ const (
 )
 
 func NewProjectGrantMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantMemberProjection {
-	p := &ProjectGrantMemberProjection{}
+	p := new(ProjectGrantMemberProjection)
 	config.ProjectionName = ProjectGrantMemberProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

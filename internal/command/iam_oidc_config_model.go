@@ -16,7 +16,7 @@ type IAMOIDCConfigWriteModel struct {
 	IdTokenLifetime            time.Duration
 	RefreshTokenIdleExpiration time.Duration
 	RefreshTokenExpiration     time.Duration
-	State                      domain.OIDCConfigState
+	State                      domain.OIDCSettingsState
 }
 
 func NewIAMOIDCConfigWriteModel() *IAMOIDCConfigWriteModel {
@@ -31,13 +31,13 @@ func NewIAMOIDCConfigWriteModel() *IAMOIDCConfigWriteModel {
 func (wm *IAMOIDCConfigWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *iam.OIDCConfigAddedEvent:
+		case *iam.OIDCSettingsAddedEvent:
 			wm.AccessTokenLifetime = e.AccessTokenLifetime
 			wm.IdTokenLifetime = e.IdTokenLifetime
 			wm.RefreshTokenIdleExpiration = e.RefreshTokenIdleExpiration
 			wm.RefreshTokenExpiration = e.RefreshTokenExpiration
-			wm.State = domain.OIDCConfigStateActive
-		case *iam.OIDCConfigChangedEvent:
+			wm.State = domain.OIDCSettingsStateActive
+		case *iam.OIDCSettingsChangedEvent:
 			if e.AccessTokenLifetime != nil {
 				wm.AccessTokenLifetime = *e.AccessTokenLifetime
 			}
@@ -62,8 +62,8 @@ func (wm *IAMOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			iam.OIDCConfigAddedEventType,
-			iam.OIDCConfigChangedEventType).
+			iam.OIDCSettingsAddedEventType,
+			iam.OIDCSettingsChangedEventType).
 		Builder()
 }
 
@@ -74,26 +74,26 @@ func (wm *IAMOIDCConfigWriteModel) NewChangedEvent(
 	idTokenLifetime,
 	refreshTokenIdleExpiration,
 	refreshTokenExpiration time.Duration,
-) (*iam.OIDCConfigChangedEvent, bool, error) {
-	changes := make([]iam.OIDCConfigChanges, 0)
+) (*iam.OIDCSettingsChangedEvent, bool, error) {
+	changes := make([]iam.OIDCSettingsChanges, 0, 4)
 	var err error
 
 	if wm.AccessTokenLifetime != accessTokenLifetime {
-		changes = append(changes, iam.ChangeOIDCConfigAccessTokenLifetime(accessTokenLifetime))
+		changes = append(changes, iam.ChangeOIDCSettingsAccessTokenLifetime(accessTokenLifetime))
 	}
 	if wm.IdTokenLifetime != idTokenLifetime {
-		changes = append(changes, iam.ChangeOIDCConfigIdTokenLifetime(idTokenLifetime))
+		changes = append(changes, iam.ChangeOIDCSettingsIdTokenLifetime(idTokenLifetime))
 	}
 	if wm.RefreshTokenIdleExpiration != refreshTokenIdleExpiration {
-		changes = append(changes, iam.ChangeOIDCConfigRefreshTokenIdleExpiration(refreshTokenIdleExpiration))
+		changes = append(changes, iam.ChangeOIDCSettingsRefreshTokenIdleExpiration(refreshTokenIdleExpiration))
 	}
 	if wm.RefreshTokenExpiration != refreshTokenExpiration {
-		changes = append(changes, iam.ChangeOIDCConfigRefreshTokenExpiration(refreshTokenExpiration))
+		changes = append(changes, iam.ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration))
 	}
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := iam.NewOIDCConfigChangeEvent(ctx, aggregate, changes)
+	changeEvent, err := iam.NewOIDCSettingsChangeEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false, err
 	}

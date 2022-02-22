@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	oidcConfigPrefix           = "oidc.config."
-	OIDCConfigAddedEventType   = iamEventTypePrefix + oidcConfigPrefix + "added"
-	OIDCConfigChangedEventType = iamEventTypePrefix + oidcConfigPrefix + "changed"
-	OIDCConfigRemovedEventType = iamEventTypePrefix + oidcConfigPrefix + "removed"
+	oidcSettingsPrefix           = "oidc.settings."
+	OIDCSettingsAddedEventType   = iamEventTypePrefix + oidcSettingsPrefix + "added"
+	OIDCSettingsChangedEventType = iamEventTypePrefix + oidcSettingsPrefix + "changed"
+	OIDCSettingsRemovedEventType = iamEventTypePrefix + oidcSettingsPrefix + "removed"
 )
 
-type OIDCConfigAddedEvent struct {
+type OIDCSettingsAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AccessTokenLifetime        time.Duration `json:"accessTokenLifetime,omitempty"`
@@ -26,19 +26,19 @@ type OIDCConfigAddedEvent struct {
 	RefreshTokenExpiration     time.Duration `json:"refreshTokenExpiration,omitempty"`
 }
 
-func NewOIDCConfigAddedEvent(
+func NewOIDCSettingsAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	accessTokenLifetime,
 	idTokenLifetime,
 	refreshTokenIdleExpiration,
 	refreshTokenExpiration time.Duration,
-) *OIDCConfigAddedEvent {
-	return &OIDCConfigAddedEvent{
+) *OIDCSettingsAddedEvent {
+	return &OIDCSettingsAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			OIDCConfigAddedEventType,
+			OIDCSettingsAddedEventType,
 		),
 		AccessTokenLifetime:        accessTokenLifetime,
 		IdTokenLifetime:            idTokenLifetime,
@@ -47,27 +47,27 @@ func NewOIDCConfigAddedEvent(
 	}
 }
 
-func (e *OIDCConfigAddedEvent) Data() interface{} {
+func (e *OIDCSettingsAddedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OIDCConfigAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCSettingsAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func OIDCConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	secretGeneratorAdded := &OIDCConfigAddedEvent{
+func OIDCSettingsAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	oidcSettingsAdded := &OIDCSettingsAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
-	err := json.Unmarshal(event.Data, secretGeneratorAdded)
+	err := json.Unmarshal(event.Data, oidcSettingsAdded)
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "IAM-soiwj", "unable to unmarshal oidc config added")
 	}
 
-	return secretGeneratorAdded, nil
+	return oidcSettingsAdded, nil
 }
 
-type OIDCConfigChangedEvent struct {
+type OIDCSettingsChangedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
 	AccessTokenLifetime        *time.Duration `json:"accessTokenLifetime,omitempty"`
@@ -76,27 +76,27 @@ type OIDCConfigChangedEvent struct {
 	RefreshTokenExpiration     *time.Duration `json:"refreshTokenExpiration,omitempty"`
 }
 
-func (e *OIDCConfigChangedEvent) Data() interface{} {
+func (e *OIDCSettingsChangedEvent) Data() interface{} {
 	return e
 }
 
-func (e *OIDCConfigChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
+func (e *OIDCSettingsChangedEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	return nil
 }
 
-func NewOIDCConfigChangeEvent(
+func NewOIDCSettingsChangeEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	changes []OIDCConfigChanges,
-) (*OIDCConfigChangedEvent, error) {
+	changes []OIDCSettingsChanges,
+) (*OIDCSettingsChangedEvent, error) {
 	if len(changes) == 0 {
 		return nil, errors.ThrowPreconditionFailed(nil, "IAM-dnlwe", "Errors.NoChangesFound")
 	}
-	changeEvent := &OIDCConfigChangedEvent{
+	changeEvent := &OIDCSettingsChangedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			OIDCConfigChangedEventType,
+			OIDCSettingsChangedEventType,
 		),
 	}
 	for _, change := range changes {
@@ -105,40 +105,40 @@ func NewOIDCConfigChangeEvent(
 	return changeEvent, nil
 }
 
-type OIDCConfigChanges func(event *OIDCConfigChangedEvent)
+type OIDCSettingsChanges func(event *OIDCSettingsChangedEvent)
 
-func ChangeOIDCConfigAccessTokenLifetime(accessTokenLifetime time.Duration) func(event *OIDCConfigChangedEvent) {
-	return func(e *OIDCConfigChangedEvent) {
+func ChangeOIDCSettingsAccessTokenLifetime(accessTokenLifetime time.Duration) func(event *OIDCSettingsChangedEvent) {
+	return func(e *OIDCSettingsChangedEvent) {
 		e.AccessTokenLifetime = &accessTokenLifetime
 	}
 }
 
-func ChangeOIDCConfigIdTokenLifetime(idTokenLifetime time.Duration) func(event *OIDCConfigChangedEvent) {
-	return func(e *OIDCConfigChangedEvent) {
+func ChangeOIDCSettingsIdTokenLifetime(idTokenLifetime time.Duration) func(event *OIDCSettingsChangedEvent) {
+	return func(e *OIDCSettingsChangedEvent) {
 		e.IdTokenLifetime = &idTokenLifetime
 	}
 }
 
-func ChangeOIDCConfigRefreshTokenIdleExpiration(refreshTokenIdleExpiration time.Duration) func(event *OIDCConfigChangedEvent) {
-	return func(e *OIDCConfigChangedEvent) {
+func ChangeOIDCSettingsRefreshTokenIdleExpiration(refreshTokenIdleExpiration time.Duration) func(event *OIDCSettingsChangedEvent) {
+	return func(e *OIDCSettingsChangedEvent) {
 		e.RefreshTokenIdleExpiration = &refreshTokenIdleExpiration
 	}
 }
 
-func ChangeOIDCConfigRefreshTokenExpiration(refreshTokenExpiration time.Duration) func(event *OIDCConfigChangedEvent) {
-	return func(e *OIDCConfigChangedEvent) {
+func ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration time.Duration) func(event *OIDCSettingsChangedEvent) {
+	return func(e *OIDCSettingsChangedEvent) {
 		e.RefreshTokenExpiration = &refreshTokenExpiration
 	}
 }
 
-func OIDCConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e := &OIDCConfigChangedEvent{
+func OIDCSettingsChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+	e := &OIDCSettingsChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
 
 	err := json.Unmarshal(event.Data, e)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-f98uf", "unable to unmarshal oidc config changed")
+		return nil, errors.ThrowInternal(err, "IAM-f98uf", "unable to unmarshal oidc settings changed")
 	}
 
 	return e, nil
