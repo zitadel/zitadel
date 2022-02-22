@@ -29,6 +29,9 @@ Errors:
     ExceedsDefault: Il limite supera quello predefinito
   Language:
     NotParsed: Impossibile analizzare la lingua
+  OIDCConfig:
+    NotFound: Impossibile trovare la configurazione OIDC
+    AlreadyExists: La configurazione OIDC esiste già
   User:
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente

@@ -29,6 +29,9 @@ Errors:
     ExceedsDefault: Limit überschreitet default Limit
   Language:
     NotParsed: Sprache konnte nicht gemapped werde
+  OIDCConfig:
+    NotFound: OIDC Konfiguration konnte nicht gefunden werden
+    AlreadyExists: OIDC Konfiguration existiert bereits
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existierts bereits

@@ -40,7 +40,7 @@ func (c *Commands) ChangeOIDCConfig(ctx context.Context, config *domain.OIDCConf
 		return nil, err
 	}
 	if !secretConfigWriteModel.State.Exists() {
-		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-8snEr", "Errors.OIDCConfig.NotExisting")
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-8snEr", "Errors.OIDCConfig.NotFound")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&secretConfigWriteModel.WriteModel)
 

@@ -188,6 +188,30 @@ Update twilio sms provider token
     PUT: /sms/twilio/{id}/token
 
 
+### GetOIDCConfig
+
+> **rpc** GetOIDCConfig([GetOIDCConfigRequest](#getoidcconfigrequest))
+[GetOIDCConfigResponse](#getoidcconfigresponse)
+
+Get OIDC Config (e.g token lifetimes, etc.)
+
+
+
+    GET: /oidcconfig
+
+
+### UpdateOIDCConfig
+
+> **rpc** UpdateOIDCConfig([UpdateOIDCConfigRequest](#updateoidcconfigrequest))
+[UpdateOIDCConfigResponse](#updateoidcconfigresponse)
+
+Update oidc configuration (e.g token lifetimes, etc)
+
+
+
+    PUT: /oidcconfig
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1514,7 +1538,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 
@@ -2042,6 +2066,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
+
+
+
+
+### GetOIDCConfigRequest
+This is an empty request
+
+
+
+
+### GetOIDCConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.OIDCConfig | - |  |
 
 
 
@@ -3608,6 +3649,31 @@ This is an empty request
 
 
 
+### UpdateOIDCConfigRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### UpdateOIDCConfigResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateOrgIAMPolicyRequest
 
 
@@ -3710,7 +3776,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| from |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 
 
 

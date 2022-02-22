@@ -20,7 +20,6 @@ message SecretGenerator {
   bool include_symbols = 8;
 }
 
-
 message SecretGeneratorQuery {
   oneof query {
     option (validate.required) = true;
@@ -67,9 +66,16 @@ message TwilioConfig {
   string sender_number = 2;
 }
 
-
 enum SMSProviderConfigState {
   SMS_PROVIDER_CONFIG_STATE_UNSPECIFIED = 0;
   SMS_PROVIDER_CONFIG_ACTIVE = 1;
   SMS_PROVIDER_CONFIG_INACTIVE = 2;
+}
+
+message OIDCConfig {
+  zitadel.v1.ObjectDetails details = 1;
+  google.protobuf.Duration  access_token_lifetime = 2;
+  google.protobuf.Duration  id_token_lifetime = 3;
+  google.protobuf.Duration  refresh_token_idle_expiration = 4;
+  google.protobuf.Duration  refresh_token_expiration = 5;
 }
