@@ -2,20 +2,21 @@
 title: Authenticated MongoDB Charts
 ---
 
-This integration guide shows how you can embed authenticated MongoDB Charts in your web application using ZITADEL as authentication provider.
+If you want to embed authenticated MongoDB Charts in your web application, you can use ZITADEL as an authentication provider.
+This integration guide shows you how.
 
 ## Setup ZITADEL Application
 
-Before you can embed an authenticated chart in your application, you have to do a few configuration steps in ZITADEL Console.
-You will need to provide some information about your app. We recommend creating a new app to start from scratch.
+Before you embed an authenticated chart in your application, you need to provide some information about your app in the ZITADEL Console.
+We recommend creating a new app to start from scratch.
 
 1. Navigate to your [Project](https://console.zitadel.ch/projects)
 1. Add a new application at the top of the page.
 1. Select Web application type and continue.
 1. Use [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
-1. Skip the redirect settings and confirm the app creation
-1. Copy the client ID, you will need to tell MongoDB Charts about it.
-1. When you created the app, expand its _OIDC Configuration_ section, change the _Auth Token Type_ to _JWT_ and save the change.
+1. Skip the redirect settings. Confirm the app creation
+1. Copy the client ID. You will need to tell MongoDB Charts about it.
+1. Once you create the app, expand its **OIDC Configuration** section, change the **Auth Token Type** to _JWT_. Save the change.
 
 Your application configuration should now look similar to this:
 
@@ -37,7 +38,7 @@ Your configuration should look similar to this:
 
 ## Embedding your Chart
 
-Embed a chart into your application now, following the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
+Now, embed a chart into your application. To do so, follow the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
 
 If you've done the [Angular Quickstart](../../quickstarts/login/angular.md), your code could look something like this:
 
