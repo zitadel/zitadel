@@ -136,13 +136,11 @@ RUN apk add rsync
 
 COPY --from=go-copy / /src
 
-ARG UID=1000
-ARG GID=1000
+ENV UID=1000
+ENV GID=1000
 
-# Create a group and user
-RUN addgroup -S tmpgroup -g $GID && adduser -S tmpuser -G tmpgroup -u $UID
-
-CMD [ "rsync", "-a", "--chown", "tmpuser:tmpgroup", "/src/", "/dest" ]
+ENTRYPOINT [ "sh", "-c" ]
+CMD [ "rsync -a --chown $UID:$GID /src/ /dest" ]
 
 #######################
 ## Go test

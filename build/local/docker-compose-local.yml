@@ -186,9 +186,9 @@ services:
       context: ../..
       dockerfile: build/zitadel/Dockerfile
       target: merge-go-copy
-      args:
-        UID: $UID
-        GID: $GID
+    environment:
+      UID: $UID
+      GID: $GID
     volumes:
       - ../../:/dest
 
@@ -238,9 +238,9 @@ services:
       context: ../..
       dockerfile: build/console/Dockerfile
       target: init-dev
-      args:
-        UID: $UID
-        GID: $GID
+    environment:
+      UID: $UID
+      GID: $GID
     volumes:
       - ../../console:/console
       - ~/.cache:/cache

@@ -77,14 +77,11 @@ COPY --from=npm-base /console/node_modules /builtconsole/node_modules
 COPY --from=npm-base /console/src/app/proto/generated /builtconsole/src/app/proto/generated
 COPY --from=npm-base /root/.cache /builtcache
 
-ARG UID=1000
-ARG GID=1000
-
-# Create a group and user
-RUN addgroup -S tmpgroup -g $GID && adduser -S tmpuser -G tmpgroup -u $UID
+ENV UID=1000
+ENV GID=1000
 
 ENTRYPOINT [ "sh", "-c" ]
-CMD [ "rsync -a --chown tmpuser:tmpgroup /builtconsole/ /console && rsync -a --chown tmpuser:tmpgroup /builtcache/ /cache" ]
+CMD [ "rsync -a --chown $UID:$GID /builtconsole/ /console && rsync -a --chown $UID:$GID /builtcache/ /cache" ]
 
 #######################
 ## angular dev build
