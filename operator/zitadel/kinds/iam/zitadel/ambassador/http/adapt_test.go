@@ -185,6 +185,30 @@ func TestHttp_Adapt(t *testing.T) {
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OauthName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).MinTimes(1).MaxTimes(1)
 
+	samlName := labels.MustForName(componentLabels, SamlName)
+	saml := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": group + "/" + version,
+			"kind":       kind,
+			"metadata": map[string]interface{}{
+				"labels":    labels.MustK8sMap(samlName),
+				"name":      samlName.Name(),
+				"namespace": namespace,
+			},
+			"spec": map[string]interface{}{
+				"connect_timeout_ms": 30000,
+				"host":               ".",
+				"prefix":             "/saml/",
+				"rewrite":            "",
+				"service":            url,
+				"timeout_ms":         30000,
+				"cors":               cors,
+			},
+		},
+	}
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, SamlName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, SamlName, saml).MinTimes(1).MaxTimes(1)
+
 	mgmtName := labels.MustForName(componentLabels, MgmtName)
 	mgmt := &unstructured.Unstructured{
 		Object: map[string]interface{}{
@@ -440,6 +464,31 @@ func TestHttp_Adapt2(t *testing.T) {
 	}
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, OauthName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, OauthName, oauth).MinTimes(1).MaxTimes(1)
+
+
+	samlName := labels.MustForName(componentLabels, SamlName)
+	saml := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": group + "/" + version,
+			"kind":       kind,
+			"metadata": map[string]interface{}{
+				"labels":    labels.MustK8sMap(samlName),
+				"name":      samlName.Name(),
+				"namespace": namespace,
+			},
+			"spec": map[string]interface{}{
+				"connect_timeout_ms": 30000,
+				"host":               "api.domain",
+				"prefix":             "/saml/",
+				"rewrite":            "",
+				"service":            url,
+				"timeout_ms":         30000,
+				"cors":               cors,
+			},
+		},
+	}
+	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, SamlName, "")
+	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, SamlName, saml).MinTimes(1).MaxTimes(1)
 
 	mgmtName := labels.MustForName(componentLabels, MgmtName)
 	mgmt := &unstructured.Unstructured{

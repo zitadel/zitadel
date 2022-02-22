@@ -15,6 +15,7 @@ const (
 	Upload         = "assets-v1"
 	MgmtName       = "mgmt-v1"
 	OauthName      = "oauth-v1"
+	SamlName       = "saml-v1"
 	AuthRName      = "auth-rest-v1"
 	AuthorizeName  = "authorize-v1"
 	EndsessionName = "endsession-v1"
@@ -55,6 +56,11 @@ func AdaptFunc(
 		return nil, nil, err
 	}
 
+	destroySAML, err := mapping.AdaptFuncToDestroy(namespace, SamlName)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	destroyAuthR, err := mapping.AdaptFuncToDestroy(namespace, AuthRName)
 	if err != nil {
 		return nil, nil, err
@@ -85,6 +91,7 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroyUpload),
 		operator.ResourceDestroyToZitadelDestroy(destroyMgmtRest),
 		operator.ResourceDestroyToZitadelDestroy(destroyOAuthv2),
+		operator.ResourceDestroyToZitadelDestroy(destroySAML),
 		operator.ResourceDestroyToZitadelDestroy(destroyAuthR),
 		operator.ResourceDestroyToZitadelDestroy(destroyAuthorize),
 		operator.ResourceDestroyToZitadelDestroy(destroyEndsession),
@@ -165,6 +172,22 @@ func AdaptFunc(
 				false,
 				apiDomain,
 				"/oauth/v2/",
+				"",
+				httpUrl,
+				30000,
+				30000,
+				cors,
+			)
+			if err != nil {
+				return nil, err
+			}
+
+			querySaml, err := mapping.AdaptFuncToEnsure(
+				namespace,
+				labels.MustForName(componentLabels, SamlName),
+				false,
+				apiDomain,
+				"/saml/",
 				"",
 				httpUrl,
 				30000,
@@ -260,6 +283,7 @@ func AdaptFunc(
 				operator.ResourceQueryToZitadelQuery(queryUpload),
 				operator.ResourceQueryToZitadelQuery(queryMgmtRest),
 				operator.ResourceQueryToZitadelQuery(queryOAuthv2),
+				operator.ResourceQueryToZitadelQuery(querySaml),
 				operator.ResourceQueryToZitadelQuery(queryAuthR),
 				operator.ResourceQueryToZitadelQuery(queryAuthorize),
 				operator.ResourceQueryToZitadelQuery(queryEndsession),
