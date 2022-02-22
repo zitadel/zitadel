@@ -50,45 +50,65 @@
 
     .privatelabeling-top-row {
       display: flex;
+      margin-bottom: 1rem;
 
       .buttongroup {
         margin-right: 0.5rem;
+        margin-top: 0.5rem;
+
+        .mat-button-toggle-button {
+          display: flex;
+          height: 36px;
+          line-height: 36px;
+          align-items: center;
+          font-size: 14px;
+        }
+
+        .toggle-row {
+          display: flex;
+          align-items: center;
+
+          i {
+            margin-right: 0.5rem;
+          }
+
+          .current-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            background-color: rgb(84, 142, 230);
+            margin-left: 0.5rem;
+          }
+        }
       }
 
       .fill-space {
         flex: 1;
       }
 
-      .reset-button {
-        align-self: flex-end;
-        margin-right: 1rem;
-      }
-
-      .activate-button {
-        border-radius: 50%;
-        align-self: flex-end;
-      }
-    }
-
-    .theme-toggle {
-      display: flex;
-      align-items: center;
-
-      .toggle-row {
-        display: flex;
-        align-items: center;
-
-        i {
-          margin-right: 0.5rem;
-        }
+      .pl-action-button {
+        align-self: flex-start;
+        margin-top: 0.5rem;
       }
     }
 
     .lab-policy-content {
-      padding-top: 1rem;
+      padding-top: 2rem;
       display: flex;
       flex-direction: column;
       margin: 0 -1rem;
+
+      @media only screen and (min-width: 1000px) {
+        flex-direction: row;
+        justify-content: space-between;
+        flex-wrap: wrap;
+
+        .preview-wrapper {
+          .col {
+            min-width: 400px;
+          }
+        }
+      }
 
       .settings {
         flex: 1;
@@ -205,48 +225,50 @@
           }
 
           .font-preview {
+            height: 70px;
+            width: 70px;
             display: flex;
             align-items: center;
-            padding: 0.5rem;
-            text-align: center;
+            justify-content: center;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
+            border: 1px solid map-get($foreground, divider);
+            position: relative;
 
             .icon {
-              margin-right: 1rem;
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translateX(-50%) translateY(-50%);
             }
 
-            .fill-space {
-              flex: 1;
+            .dl-btn {
+              z-index: 2;
+              position: absolute;
+              right: 0;
+              top: 0;
+              cursor: pointer;
+              visibility: hidden;
+              transform: translateX(50%) translateY(-50%);
+            }
+
+            &:hover {
+              .dl-btn {
+                visibility: visible;
+              }
             }
           }
 
-          .font-selector {
+          .font-add {
+            height: 70px;
+            width: 70px;
+            box-sizing: border-box;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            border: 1px solid map-get($foreground, divider);
             display: flex;
+            justify-content: center;
             align-items: center;
-            flex-wrap: wrap;
-            margin: 0 -0.25rem;
-            padding-bottom: 1rem;
-
-            .font {
-              height: 50px;
-              width: 50px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              border-radius: 0.5rem;
-              margin: 0.25rem;
-              box-sizing: border-box;
-              border: 2px solid if($is-dark-theme, #ffffff30, #00000030);
-              font-size: 1.5rem;
-              background-color: inherit;
-              color: inherit;
-              cursor: pointer;
-
-              &.active {
-                border: 2px solid if($is-dark-theme, #fff, #000);
-              }
-            }
           }
         }
 
@@ -294,18 +316,6 @@
 
         .preview {
           margin: 1rem;
-        }
-      }
-    }
-
-    @media only screen and (min-width: 1000px) {
-      flex-direction: row;
-      justify-content: space-between;
-      flex-wrap: wrap;
-
-      .preview-wrapper {
-        .col {
-          min-width: 400px;
         }
       }
     }

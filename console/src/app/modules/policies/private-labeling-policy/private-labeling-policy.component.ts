@@ -603,4 +603,34 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
         this.toast.showError(error);
       });
   }
+
+  /**
+   *  defaults to false because urls are distinct anyway
+   */
+  public get previewEqualsCurrentPolicy(): boolean {
+    const getComparable = (policy: LabelPolicy.AsObject): Partial<LabelPolicy.AsObject> => {
+      return Object.assign({
+        primaryColor: policy.primaryColor,
+        hideLoginNameSuffix: policy.primaryColor,
+        warnColor: policy.warnColor,
+        backgroundColor: policy.backgroundColor,
+        fontColor: policy.fontColor,
+        primaryColorDark: policy.primaryColorDark,
+        backgroundColorDark: policy.backgroundColorDark,
+        warnColorDark: policy.warnColorDark,
+        fontColorDark: policy.fontColorDark,
+        disableWatermark: policy.disableWatermark,
+        logoUrl: policy.logoUrl,
+        iconUrl: policy.iconUrl,
+        logoUrlDark: policy.logoUrlDark,
+        iconUrlDark: policy.iconUrlDark,
+        fontUrl: policy.fontUrl,
+      });
+    };
+
+    const c = getComparable(this.data);
+    const p = getComparable(this.previewData);
+
+    return JSON.stringify(p) === JSON.stringify(c);
+  }
 }

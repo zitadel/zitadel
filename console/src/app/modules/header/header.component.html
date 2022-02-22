@@ -12,11 +12,11 @@
 
     <ng-template #customHome>
       <a class="title" [routerLink]="['/']">
-        <img class="logo" alt="home logo" *ngIf="isDarkTheme; else customlighttheme"
+        <img class="logo light" alt="home logo" *ngIf="isDarkTheme; else customlighttheme"
           [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : '/assets/images/zitadel-logo-solo-light.svg'"
           onerror="this.src='/assets/images/zitadel-logo-solo-light.svg';this.onerror='';" />
         <ng-template #customlighttheme>
-          <img alt="home logo" class="logo"
+          <img alt="home logo" class="logo dark"
             [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : '/assets/images/zitadel-logo-solo-dark.svg'"
             onerror="this.src='/assets/images/zitadel-logo-solo-dark.svg';this.onerror='';" />
         </ng-template>

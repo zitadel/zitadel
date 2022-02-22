@@ -186,6 +186,15 @@
       .logo {
         max-height: 40px;
         width: 40px;
+        border-radius: 50%;
+
+        &.dark {
+          background: #00000010;
+        }
+
+        &.light {
+          background: #00000020;
+        }
       }
 
       .title {
