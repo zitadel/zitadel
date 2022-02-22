@@ -76,9 +76,6 @@ $ npm run e2e:open
 You can switch to `ng serve` for better development experience.
 
 ```
-$ # Reuse the environment.json file from the still running frontend container
-$ curl http://localhost:4200/assets/environment.json > ./console/src/assets/environment.json
-
 $ # Stop the frontend container
 $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
 
