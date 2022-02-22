@@ -9,7 +9,7 @@ on:
 
 jobs:
   test_message:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     # Skip in case it's a prerelease
     if: "!github.event.release.prerelease"
@@ -20,8 +20,6 @@ jobs:
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.2.3
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
     
       # Send Webhook to Discord
       - name: Discord Webhook
