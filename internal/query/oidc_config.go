@@ -14,7 +14,7 @@ import (
 
 var (
 	oidcConfigsTable = table{
-		name: projection.SecretGeneratorProjectionTable,
+		name: projection.OIDCConfigProjectionTable,
 	}
 	OIDCConfigColumnAggregateID = Column{
 		name:  projection.OIDCConfigColumnAggregateID,
