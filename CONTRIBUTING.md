@@ -24,8 +24,10 @@ Help shaping the future of ZITADEL by
 
 [Contribute](#how-to-contribute)
 
-- [Code](#code)
-- If you found a mistake on our [docs page](https://docs.zitadel.ch) or something is missing please read [the docs section](#docs)
+- [Code](#contribute-code)
+- If you found a mistake on our [docs page](https://docs.zitadel.ch) or something is missing please read [the docs section](#contribute-docs)
+
+Follow [@zitadel](https://twitter.com/zitadel) on twitter
 
 ## How to contribute
 
@@ -39,17 +41,35 @@ We accept contributions through pull requests. You need a github account for tha
 4. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
 5. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 
-### Code
+## Contribute Code
 
 The code consists of the following parts:
 
-| name | description | language | where to find |
-|---|---|---|---|
-| backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) |
-| console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
-| login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) |
-| API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) |
+| name | description | language | where to find | Architecture |
+|---|---|---|---|---|
+| backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) | TODO |
+| console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) | TODO |
+| login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) | TODO |
+| API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) | TODO |
 
+Please validate and test the code before you contribute.
 
+### Backend / Login
 
-### Docs
+To keep the code clean and understandable we use [golangci-lint](https://golangci-lint.run). We recommend to format the code with this linter while working on ZITADEL to simplify the review process. The configuration is locaed [here](./.golangci.yaml).
+
+To start the backend with a debugger run the [`main.go`-file](./main.go) located in the root of ZITADEL and provide the following arguments: <!-- TODO: args and flags-->. Ensure that the database is running by running `docker compose -f ./build/local/docker-compose.yml up database` <!-- TODO: validate command -->. For additional information please use the documentation of your IDE.
+
+### Console
+
+<!-- TODO: ask maxpe for infos -->
+
+### API Definitions
+
+Ensure the provided code meets the [offical style guide](https://developers.google.com/protocol-buffers/docs/style).
+
+<!-- TODO: docker command to generate stub-->
+
+## Contribute Docs
+
+<!-- TODO: ask maxpe for infos -->
