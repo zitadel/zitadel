@@ -1,46 +1,55 @@
-# How to contribute to ZITADEL
+# Contributing to ZITADEL
 
-## Did you find a bug?
+## Introduction
 
-Please file an issue [here](https://github.com/caos/zitadel/issues/new?assignees=&labels=bug&template=bug_report.md&title=).
+Thank you for your interest about how to contribute! As you might know there is more than code to contribute. You can find all information needed to start contributing here.
 
-Bugs are evaluated every day as soon as possible.
+Please give us and our community the chance to get rid of security vularbilities by responsibly disclose this kind of issues by contacting [security@zitadel.ch](mailto:security@zitadel.ch).
 
-## Enhancement
+The strongest part of a community is the possibility to share thoughts. That's why we give try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the TODO:issues and TODO:discussions section here or in our TODO:discord chat, but we understand your doubts and provide further contact options [here](https://zitadel.ch/contact).
 
-Do you miss a feature? Please file an issue [here](https://github.com/caos/zitadel/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
+If you want to give an answer or be part of discussion please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 
-Enhancements are discussed and evaluated every Wednesday by the ZITADEL core team.
+## What can I contribute?
 
-## Grab an Issues
+For people who are new to ZITADEL: We flag issues which are a good starting point to start contributing. You find them [here](https://github.com/caos/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
-We add the label "good first issue" for problems we think are a good starting point to contribute to ZITADEL.
+Make ZITADEL more popular and give it a ⭐
 
-* [Issues for first time contributors](https://github.com/caos/zitadel/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
-* [All issues](https://github.com/caos/zitadel/issues)
+Help shaping the future of ZITADEL by 
 
-### Make a PR
+- Join our TODO:[chat]() and discuss with us or others.
+- Ask or answer questions in the [issues section](https://github.com/caos/zitadel/issues)
+- Share your thoughts and ideas in the [discussions section](https://github.com/caos/zitadel/discussions)
 
-If you like to contribute fork the ZITADEL repository. After you implemented the new feature create a PullRequest in the ZITADEL reposiotry.
+[Contribute](#how-to-contribute)
 
-Make sure you use semantic release:
+- [Code](#code)
+- If you found a mistake on our [docs page](https://docs.zitadel.ch) or something is missing please read [the docs section](#docs)
 
-* feat: New Feature
-* fix: Bug Fix
-* docs: Documentation
+## How to contribute
 
-## Want to start ZITADEL?
+We strongly recomend to talk to us before you start contributing to streamline our and your work.
 
-Checkout the following chapters to start ZITADEL locally.
+We accept contributions through pull requests. You need a github account for that. If you are unfamiliar with git have a look at Github's documentation on [creating forks](https://help.github.com/articles/fork-a-repo) and [creating pull requests](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork). Please draft the pull request as soon as possible. Go through the following checklist before you submit the final pull request:
 
-### Build for local development
+1. Create a feature branch from the `main`-branch
+2. [Merge](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging) the lastet commit of the `main`-branch
+3. <!-- TODO: additional steps or does the pipeline the rest? -->
+4. Use [Semantic Release commit messages](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#type) to simplify creation of release notes. In the title of the pull request correct tagging is required and will be requested by the reviewers.
+5. Request a [review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/requesting-a-pull-request-review) from one of the authors. The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 
-* Check out our [development guide](guides/development.md).
+### Code
 
-### Quick start
+The code consists of the following parts:
 
-* Check out our [quick start guide](guides/quickstart.md).
+| name | description | language | where to find |
+|---|---|---|---|
+| backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) |
+| console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
+| login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) |
+| API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) |
 
-## **Did you find a security flaw?**
 
-* Please read [Security Policy](SECURITY.md).
+
+### Docs
