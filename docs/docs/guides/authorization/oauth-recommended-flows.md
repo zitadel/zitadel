@@ -29,7 +29,7 @@ title: Recommended authorization flows
 
 ## Introduction
 
-Before we set up our first application within ZITADEL, we need outline the basics of how to authorize with OpenID Connect 1.x and OAuth 2.x.
+Before we set up our first application within ZITADEL, we need to outline the basics of how to authorize with OpenID Connect 1.x and OAuth 2.x.
 
 ZITADEL makes no assumptions about the application type that you are going to integrate.
 Therefore you must choose an appropriate method to authorize your users (i.e. define an *authentication flow*).

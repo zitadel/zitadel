@@ -5,7 +5,7 @@ title: Authenticated MongoDB Charts
 If you want to embed authenticated MongoDB Charts in your web application, you can use ZITADEL as an authentication provider.
 This integration guide shows you how.
 
-## Setup ZITADEL Application
+## Setup your ZITADEL application
 
 Before you embed an authenticated chart in your application, you need to provide some information about your app in the ZITADEL Console.
 We recommend creating a new app to start from scratch.
@@ -24,7 +24,7 @@ Your application configuration should now look similar to this:
 
 ## Setup Custom JWT Provider for MongoDB Charts
 
-Configure ZITADEL as your _Custom JWT Provider_ following the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
+To configure ZITADEL as your _Custom JWT Provider_, follow the [MongoDB docs](https://docs.mongodb.com/charts/configure-auth-providers/) .
 
 Configure the following values:
 - Signing Algorithm: RS256
@@ -38,9 +38,10 @@ Your configuration should look similar to this:
 
 ## Embedding your Chart
 
-Now, embed a chart into your application. To do so, follow the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
+Now, embed a chart into your application.
+To do so, follow the corresponding [MongoDB docs](https://docs.mongodb.com/charts/saas/embed-chart-jwt-auth/).
 
-If you've done the [Angular Quickstart](../../quickstarts/login/angular.md), your code could look something like this:
+If you've done the [Angular Quickstart](../../quickstarts/login/angular.md), your code might look something like this:
 
 ```html
 <!-- chart.component.html -->
@@ -50,7 +51,7 @@ If you've done the [Angular Quickstart](../../quickstarts/login/angular.md), you
 ```css
 /* chart.component.css */
 div#chart {
-    height: 500px;    
+    height: 500px;
 }
 ```
 

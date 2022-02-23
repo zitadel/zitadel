@@ -8,12 +8,11 @@ In _Business to Customer (B2C)_ scenarios, your organization works directly with
 
 ## Business to Consumer
 
-Generally, users come with different needs.
+Users come with different needs.
 You may have end users, employees, or even customers from other parties (B2B).
-These groups of users rarely want to use an app to do the same thing.
-So, they use applications differently.
+These groups of users rarely want to use an app to do the exactly same thing.
 
-When planning your applications, be sure to research your app's architecture.
+When planning your applications, be sure to research your user use cases and your app's architecture.
 This is vital for later feature upgrades and enhancements.
 Bigger changes come with heftier price points.
 
@@ -25,7 +24,7 @@ Everything in the following sections assumes you've created an organization.
 An organization is the outermost layer of ZITADEL.
 It is the vessel for projects, roles, applications and users.
 You can create an organization from the [ZITADEL Console](https://console.zitadel.ch/org/create).
-You can choose your current account for the organization owner or create a new one.
+You can either choose your current account for the organization owner, or create a new one.
 
 Depending on your Software Development Life Cycle (SDLC), you can create multiple organizations or projects, keeping your application environments separated.
 
@@ -41,12 +40,13 @@ Additionally, changing the domain later might create extra migration effort.
 
 ### Data Provisioning
 
-ZITADEL provides basic storage for users and manages phone and email addresses.
-It also allows you to store your own application data, like preferences or external identifiers, with the user's metadata.
+ZITADEL provides basic storage for users.
+It manages phone and email addresses,
+and also allows you to store your own application data, like preferences or external identifiers, with the user's metadata.
 
 If you are migrating an existing project and already have an external identity store, consider bulk importing your user datasets.
 Read our [Management API definitions](../../apis/proto/management#importhumanuser) for more info.
-If the user's email is not verified, or if no password is set, a initialization mail will be sent.
+If the user's email is not verified, or if no password is set, ZITADEL sends an initialization email.
 
 :::info
 Requests to the management API are rate limited. Read our [Rate limit Policy](../../legal/rate-limit-policy) for more info.
@@ -70,7 +70,7 @@ When planning your application, consider the following questions about User Auth
 - Do you offer Login via an Identity Provider?
 - Which languages do you have to provide?
 
-Considering these questions, you might admit that building an Identity Management System is much more complex and complicated than you initially thought.
+Considering these questions, you might admit that building an Identity Management System is more complex than you initially thought.
 Implementing it yourself might be too much work, especially if you want to focus on building your applications.
 
 ### Federation
@@ -102,7 +102,7 @@ These branding customizations let you provide a consistent design throughout you
 In addition to visual modifications, you can edit notification texts for your users.
 ZITADEL gives you handlebar-like templating for variables.
 Of course you can define texts for any language.
-We'd appreciate if you could contribute to our repo with translations of your language. 
+We'd appreciate anyone who contributes to our repo with translations of their language.
 [Read about how to contribute](../../guides/customization/texts).
 
 > Note that your console design will also change for your branding.

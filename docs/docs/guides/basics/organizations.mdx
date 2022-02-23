@@ -36,33 +36,34 @@ To register your organization and create a user for ZITADEL, visit zitadel.ch or
 
 ## How ZITADEL handles usernames
 
-As we mentioned before, each organization has its own pool of usernames.
+As mentioned, each organization has its own pool of usernames.
 These usernames include both humans and services.
 
-For example the username `road.runner` can only exist once and only for one user in an organization called ACME.
-ZITADEL will automatically generate a *logonname* for each  consisting of `{username}@{domainname}.{zitadeldomain}`.
-In this example, the *loggonname*` would be `road.runner@acme.zitadel.ch`.
+For example, the username `road.runner` can exist only once and only for one user in an organization called ACME.
+ZITADEL will automatically generate a *loginname* for each user, in the structure `{username}@{domainname}.{zitadeldomain}`.
+In this example, the *loginname*` would be `road.runner@acme.zitadel.ch`.
 
-When you verify your domain name, ZITADEL generates additional logonnames for each user with the verified domain.
-If ACME owned the domain acme.ch and verified this domain for the organization ACME, then the resulting logonname in our example would be `road.runner@acme.ch`.
+When you verify your domain name, ZITADEL generates additional loginnames for each user with the verified domain.
+If ACME owned the domain acme.ch and verified this domain for the organization ACME, then the resulting loginname in our example would be `road.runner@acme.ch`.
 This name would be in addition to the already generated `road.runner@acme.zitadel.ch`.
-The user can now use either logonname to authenticate with your application.
+The user can now use either loginname to authenticate with your application.
 
 ## Domain verification and primary domain
 
 After you successfully register your organization, ZITADEL automatically generates a domain name for your organization (eg, acme.zitadel.ch).
-Users that you create within your organization will be suffixed with this domain name.
-When you create users with your organization, their logonnames will have this suffix.
+When you create users with your organization, their loginnames will have this suffix.
 
-It's a good idea to use a domain name that you own for your loggonname suffix.
+It's a good idea to use a domain name that you own for your loginname suffix.
 This lets your users log in with their own company domain, improving user experience.
 You can prove the ownership of your domain by DNS or HTTP challenge ([Lets Encrypt has documentation about the different "challenge" types](https://letsencrypt.org/docs/challenge-types/)).
 
 An organization can have multiple domain names, but only one domain can be primary.
-The primary domain defines which login name ZITADEL displays to the user, and what information gets asserted in `access_tokens` (`preferred_username`).
+The primary domain defines which loginname ZITADEL displays to the user, and what information gets asserted in `access_tokens` (`preferred_username`).
 
-Please note that domain verification also removes the logonname from all users, who might have used this combination in the global organization (ie. users not belonging to a specific organization).
-In the example with `acme.ch`: If a user ‘coyote’ exists in the global organization with the logonname `coyote@acme.ch`, after `acme.ch` is verified this logonname will be replaced with `coyote@{randomvalue.tld}`.
+Note that domain verification also removes the loginname from all users, some of whom might have used this combination in the global organization
+(i.e. users who do not belong to a specific organization).
+In the example with `acme.ch`, if a user ‘coyote’ exists in the global organization with the loginname `coyote@acme.ch`,
+after ZITADEL verifies `acme.ch`, it will replace this loginname with `coyote@{randomvalue.tld}`.
 ZITADEL will notify users affected by this change.
 
 ## Exercise - Verify your domain name
@@ -71,12 +72,13 @@ ZITADEL will notify users affected by this change.
 2. Click **Add Domain**.
 3. To start the domain verification, click the domain name. A dialog appears, where you can choose between DNS or HTTP challenge methods.
 4. As an example, create a TXT record with your DNS provider for the used domain. Select **verify**.
-   ZITADEL will then check your DNS.
-5. When the verification is successful you have the option to activate the domain by clicking **Set as primary**
+   ZITADEL then checks your DNS.
+5. After successful verification, you can activate the domain by clicking **Set as primary**
+
+> **_Note:_** Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
 
 ![Verify Domain](/img/console_verify_domain.gif)
 
-> **_Please note:_** Do not delete the verification code, as ZITADEL will re-check the ownership of your domain from time to time
 
 ## Knowledge Check
 

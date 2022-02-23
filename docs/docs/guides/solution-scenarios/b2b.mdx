@@ -4,8 +4,8 @@ title: B2B
 
 import { B2B } from '../../../src/components/b2b';
 
-As opposed to [B2C](./b2c), where the organization often interacts with end users and other individuals,
-in _Business to business (B2B)_ scenarios, an organization interacts with other organizations.
+In _Business to business (B2B)_ scenarios, an organization interacts with other organizations.
+This is different from typical [B2C](./b2c) cases, where the organization often interacts with end users and other individuals.
 
 ## Business to Business
 
@@ -29,9 +29,10 @@ When describing multiple-organization scenarios, this topic sometimes also refer
 ### Portal Application
 
 Octagon has a *Portal application*, where its employees can access their account and list all applications they are allowed to use.
+
 Employees work for a department within Octagon, or for Octagon itself. 
 Some users supervise teams.
-These users have enhanced features, letting them onboard new employees and manage their roles and access.
+These users have enhanced permissions, letting them onboard new employees and manage their roles and access.
 Target groups of the application can be split into:
 - Employees: users who use the application as a starting point for their work.
 - Supervisors: users who use the application to manage users and their access of their department.
@@ -43,18 +44,19 @@ To define the Portal Application's needs, the application's builders need to con
 
 - Login and Access: Does a user have a preset organization to log in?
   Does the application show the default login page, or does each organization use its own branding?
-- Organizations: Does a user have access in multiple organizations?
+- Organizations: Does a user have access to multiple organizations?
   Is a user required to use a different federated login for those organizations?
 - Roles: Does the application need users to have specific roles assigned within their organizations?
   Which roles are needed to enable certain features of the application?
 
 ### Login
 
-You can decide whether a organization is preselected for the login, an
+You can decide whether a organization is preselected for the login, or redirected to a login screen.
 
-To send the user to a specific organization, define the organization in a custom scope (primary domain).
-To change the branding or the login options of the organization, head to the organization section in [Console](https://console.zitadel.ch/org). 
 To set the behavior of the login, go to your projects detail page.
+To send the user to a specific organization, define the organization in a custom scope (primary domain).
+
+To change the branding or the login options of the organization, head to the organization section in [Console](https://console.zitadel.ch/org). 
 You can choose the branding of the selected organization, the user resource owner, or the project's resource owner.
 
 ### Organizations
@@ -74,7 +76,7 @@ Our sample organization has these users:
   Octagon therefore has set up Microsoft as Identity Provider.
   Octagon also requires its users to secure their accounts with additional factors.
 - Michael: a trainee of Pentagon using the portal only to access his workspace apps.
-  Michael uses his Google Account in combination with his laptops fingerprint.
+  Michael uses his Google Account in combination with his laptop's fingerprint.
 - Bill: an employee of Octagon, working as Administrator of the Portal Application.
   Bill also uses a Microsoft Account in combination with a Security Key to secure his account.
 
