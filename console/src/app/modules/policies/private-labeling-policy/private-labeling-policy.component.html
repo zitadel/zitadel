@@ -81,7 +81,12 @@
             <mat-panel-title>
               <div class="panel-title">
                 <i class="icon las la-image"></i>
-                Logo
+                <span>Logos</span>
+                <span class="space"></span>
+                <small class="cnsl-secondary-text" *ngIf="theme === Theme.DARK">({{'POLICY.PRIVATELABELING.DARK' |
+                  translate}})</small>
+                <small class="cnsl-secondary-text" *ngIf="theme === Theme.LIGHT">({{'POLICY.PRIVATELABELING.LIGHT' |
+                  translate}})</small>
               </div>
             </mat-panel-title>
           </mat-expansion-panel-header>
@@ -151,7 +156,12 @@
             <mat-panel-title>
               <div class="panel-title">
                 <i class="icon las la-palette"></i>
-                {{'POLICY.PRIVATELABELING.COLORS' | translate}}
+                <span>{{'POLICY.PRIVATELABELING.COLORS' | translate}}</span>
+                <span class="space"></span>
+                <small class="cnsl-secondary-text" *ngIf="theme === Theme.DARK">({{'POLICY.PRIVATELABELING.DARK' |
+                  translate}})</small>
+                <small class="cnsl-secondary-text" *ngIf="theme === Theme.LIGHT">({{'POLICY.PRIVATELABELING.LIGHT' |
+                  translate}})</small>
               </div>
             </mat-panel-title>
           </mat-expansion-panel-header>

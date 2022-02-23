@@ -1,10 +1,10 @@
-<p class="name cnsl-secondary-text">{{name}} <span *ngIf="color">(current {{color}})</span></p>
+<p class="name cnsl-secondary-text">{{name}}</p>
 
 <div class="wrapper">
   <button [disabled]="disabled" class="color-shadow" [style.background-color]="previewColor" (click)="isOpen = !isOpen"
     cdkOverlayOrigin #trigger="cdkOverlayOrigin" matTooltip="{{'ACTIONS.SET' | translate}}"> </button>
 
-  <div class="hex-wrapper" (click)="disabled ? null : (isOpen = !isOpen)">
+  <div class="hex-wrapper" [ngClass]="{'pointer': !disabled}" (click)="disabled ? null : (isOpen = !isOpen)">
     <i class="las la-hashtag"></i>
     <span class="hex">{{previewColorCropped}}</span>
   </div>

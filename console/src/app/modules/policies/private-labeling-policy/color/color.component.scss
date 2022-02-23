@@ -19,7 +19,10 @@
     flex-direction: row;
     font-size: 14px;
     padding: 0 1rem;
-    cursor: pointer;
+
+    &.pointer {
+      cursor: pointer;
+    }
 
     .hex {
       font-size: 16px;
@@ -27,7 +30,6 @@
   }
 
   button {
-    cursor: pointer;
     margin: 0.5rem 0;
     border-radius: 0.5rem;
     height: 35px;

@@ -98,7 +98,7 @@
       flex-direction: column;
       margin: 0 -1rem;
 
-      @media only screen and (min-width: 1000px) {
+      @media only screen and (min-width: 950px) {
         flex-direction: row;
         justify-content: space-between;
         flex-wrap: wrap;
@@ -112,6 +112,7 @@
 
       .settings {
         flex: 1;
+        min-width: 350px;
         margin: 0 1rem;
 
         .expansion {
@@ -128,6 +129,10 @@
 
             .icon {
               margin-right: 0.5rem;
+            }
+
+            .space {
+              width: 1rem;
             }
           }
         }
@@ -292,7 +297,7 @@
 
     .preview-wrapper {
       margin: 0 1rem;
-      flex: 1;
+      flex: 2;
       position: relative;
       background-color: #00000010;
       border: 1px solid $border-color;
