@@ -1,5 +1,7 @@
 package certificates
 
+/* Deprecated in V2
+
 import (
 	"crypto/x509"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
@@ -52,3 +54,4 @@ func TestCertificates_Chain(t *testing.T) {
 	_, err = cert.Verify(opts)
 	assert.NoError(t, err)
 }
+*/
