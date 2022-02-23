@@ -25,15 +25,14 @@ func (p *IdentityProvider) loginHandleFunc(w http.ResponseWriter, r *http.Reques
 	}
 
 	authRequest, err := p.storage.AuthRequestByID(r.Context(), requestID)
-
 	if err != nil {
+		logging.Log("SAML-91jp3k").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequest.GetRelayState(), "", makeDeniedResponse(
 			"",
 			"",
 			p.EntityID,
 			fmt.Errorf("failed to get request: %w", err).Error(),
 		)); err != nil {
-			logging.Log("SAML-91jp3k").Error(err)
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
 		return
@@ -80,13 +79,13 @@ func (p *IdentityProvider) loginHandleFunc(w http.ResponseWriter, r *http.Reques
 
 	signature, err := createSignatureP(p.signer, resp.Assertion)
 	if err != nil {
+		logging.Log("SAML-91jw3k").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequest.GetRelayState(), "", makeResponderFailResponse(
 			"",
 			"",
 			p.EntityID,
 			fmt.Errorf("failed to sign response: %w", err).Error(),
 		)); err != nil {
-			logging.Log("SAML-11jpdk").Error(err)
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
 		return
@@ -94,6 +93,7 @@ func (p *IdentityProvider) loginHandleFunc(w http.ResponseWriter, r *http.Reques
 	resp.Assertion.Signature = signature
 
 	if err := sendBackResponse(p.postTemplate, w, authRequest.GetRelayState(), authRequest.GetAccessConsumerServiceURL(), resp); err != nil {
+		logging.Log("SAML-81jp3k").Error(err)
 		http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 	}
 	return

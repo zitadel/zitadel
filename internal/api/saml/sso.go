@@ -32,6 +32,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	}
 
 	if err := verifyForm(authRequestForm); err != nil {
+		logging.Log("SAML-827n2s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			"",
 			"",
@@ -40,12 +41,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-827n2s").Error(err)
 		return
 	}
 
 	authNRequest, err := decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
 	if err != nil {
+		logging.Log("SAML-837s2s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -54,17 +55,17 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-837s2s").Error(err)
 		return
 	}
 
 	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
 	if err != nil {
-		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
 		logging.Log("SAML-317s2s").Error(err)
+		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
 		return
 	}
 	if sp == nil {
+		logging.Log("SAML-837nas").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -73,7 +74,6 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-837nas").Error(err)
 		return
 	}
 
@@ -93,6 +93,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			authRequestForm.SigAlg,
 			authRequestForm.Sig,
 		); err != nil {
+			logging.Log("SAML-817n2s").Error(err)
 			if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 				authNRequest.Id,
 				authNRequest.AssertionConsumerServiceURL,
@@ -101,12 +102,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			)); err != nil {
 				http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 			}
-			logging.Log("SAML-817n2s").Error(err)
 			return
 		}
 	}
 
 	if err := p.verifyRequestDestination(authNRequest); err != nil {
+		logging.Log("SAML-83722s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -115,7 +116,6 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-83722s").Error(err)
 		return
 	}
 
@@ -127,6 +127,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		}
 	}
 	if acsURL == "" {
+		logging.Log("SAML-83711s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeUnsupportedBindingResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -135,7 +136,6 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-83711s").Error(err)
 		return
 	}
 
@@ -144,6 +144,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		string(sp.metadata.EntityID),
 		acsURL,
 	); err != nil {
+		logging.Log("SAML-8kj22s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -152,12 +153,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-8kj22s").Error(err)
 		return
 	}
 
 	authRequest, err := p.storage.CreateAuthRequest(r.Context(), authNRequest, authRequestForm.RelayState, sp.ID)
 	if err != nil {
+		logging.Log("SAML-8opi22s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeResponderFailResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -166,7 +167,6 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-8opi22s").Error(err)
 		return
 	}
 
@@ -176,6 +176,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
 		http.Redirect(w, r, p.GetRedirectURL(authRequest.GetID()), http.StatusTemporaryRedirect)
 	default:
+		logging.Log("SAML-67722s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeUnsupportedBindingResponse(
 			authNRequest.Id,
 			authNRequest.AssertionConsumerServiceURL,
@@ -184,7 +185,6 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
-		logging.Log("SAML-67722s").Error(err)
 	}
 	return
 }
