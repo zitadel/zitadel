@@ -229,7 +229,7 @@ type mockProject struct {
 	projectCheck bool
 }
 
-func (m *mockProject) ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockProject) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{HasProjectCheck: m.projectCheck}, nil
 }
 
