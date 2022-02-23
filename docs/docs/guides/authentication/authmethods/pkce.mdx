@@ -26,7 +26,8 @@ We recommend always using two additional parameters: `state` and `nonce`.
 PKCE stands for __Proof Key for Code Exchange_.
 So other than "normal" code exchange, it does not authenticate using
 `client_id` and `client_secret`, but through an additional code.
-You will have to generate a random string, hash it and send this hash
+
+Generate a random string, hash it and send this hash
 to the `authorization_endpoint`.
 Then send the plain string to the `token_endpoint` for the authorization to compute the hash to verify it matches.
 In order to do so, you're required to send the following two parameters as well:
