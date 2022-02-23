@@ -41,7 +41,7 @@ _Federated identity management_ is an arrangement that is made between two or mo
 For example,
 if Google is configured as an identity provider on your organization, users can use their Google Account on the Login Screen of ZITADEL (1).
 ZITADEL redirects users to the login screen of Google, where they authenticate themselves, (2) and are sent back (3).
-Because Google is registered as a trusted identity provider, users can login in with the Google account after they link an existing ZITADEL Account, or after they register a new one with the claims provided by Google (4)(5).
+Because Google is registered as a trusted identity provider, users can log in with the Google account after they link an existing ZITADEL Account, or after they register a new one with the claims provided by Google (4)(5).
 
 ![Identity Brokering](/img/guides/identity_brokering.png)
 
@@ -52,7 +52,7 @@ In this exercise, we will add a new Google identity provider to federate identit
 ### 1. Create new OIDC Client
 
 1. Register an OIDC Client in your preferred provider.
-2. Make sure you add the ZITADEL callback redirect uris.
+2. Make sure you add the ZITADEL callback redirect URIs.
    https://accounts.zitadel.ch/register/externalidp/callback
    https://accounts.zitadel.ch/login/externalidp/callback
 
@@ -63,7 +63,7 @@ Google Example:
 1. Go to the Google Gloud Platform and choose youre project: <https://console.cloud.google.com/apis/credentials>
 2. Select **+ CREATE CREDENTIALS**. Choose **OAuth client ID**.
 3. Choose **Web application** as the Application type and give it a name.
-4. Add the redirect uris from above.
+4. Add the redirect URIs from above.
 5. Save the `clientid` and client secret.
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
@@ -81,7 +81,7 @@ Google Example:
 1. Go to the identity providers section. Select **new**.
 2. Fill out the form:
    - Use the issuer, `clientid` and client secret provided by your provider
-   - The scopes will be prefilled with `openid`, profile and email, because this information is relevant for ZITADEL.
+   - The scopes will be prefilled with `openid`, `profile` and `email`, because this information is relevant for ZITADEL.
    - Choose what fields you like to map as the display name and username. The fields you can choose are `preferred_username` and `email`
      (Example: For Google, you should choose `email` for both fields)
 3. Save your configuration
