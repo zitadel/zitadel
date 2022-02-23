@@ -292,6 +292,7 @@ $caos-dark-theme-foreground: (
   elevation: black,
   hint-text: $light-disabled-text,
   secondary-text: $light-secondary-text,
+  placeholder-text: rgba(white, 0.4),
   icon: rgba(white, 0.54),
   icons: rgba(white, 0.54),
   text: $caos-dark-theme-text,
@@ -314,6 +315,7 @@ $caos-light-theme-foreground: (
   elevation: black,
   hint-text: $dark-disabled-text,
   secondary-text: $dark-secondary-text,
+  placeholder-text: rgba(black, 0.3),
   icon: rgba(black, 0.54),
   icons: rgba(black, 0.54),
   text: $caos-light-theme-text,
@@ -344,10 +346,9 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography:
-  mat.define-typography-config(
-    $font-family: 'Lato',
-  );
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
 
 @include mat.core($custom-typography);
 @include component-themes($caos-dark-app-theme);
@@ -493,19 +494,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 h1 {

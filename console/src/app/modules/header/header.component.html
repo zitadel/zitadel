@@ -95,7 +95,7 @@
       {{'MENU.DOCUMENTATION' | translate}}
     </a>
 
-    <div class="system-rel">
+    <div class="system-rel" *ngIf="!isOnMe">
       <a id="systembutton" *ngIf="!isOnSystem && (['iam.read$','iam.write$'] | hasRole | async)"
         [routerLink]="[ '/system']" class="iam-settings cnsl-action-button" mat-stroked-button>
         <span class="iam-label">{{'MENU.SYSTEM' | translate}}</span>

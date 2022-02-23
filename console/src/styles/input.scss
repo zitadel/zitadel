@@ -62,7 +62,7 @@
 
   [cnslInput]::placeholder {
     font-size: 14px;
-    color: map-get($foreground, secondary-text);
+    color: map-get($foreground, placeholder-text);
     font-style: italic;
   }
 

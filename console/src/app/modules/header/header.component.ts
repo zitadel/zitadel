@@ -104,4 +104,8 @@ export class HeaderComponent implements OnDestroy {
       new RegExp('/system/policy/*').test(this.router.url)
     );
   }
+
+  public get isOnMe(): boolean {
+    return this.router.url === '/users/me';
+  }
 }
