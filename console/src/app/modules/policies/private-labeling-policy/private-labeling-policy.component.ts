@@ -571,13 +571,13 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
   }
 
   private applyToConsole(labelpolicy: LabelPolicy.AsObject): void {
-    const darkPrimary = labelpolicy?.primaryColorDark || '#5282c1';
-    const lightPrimary = labelpolicy?.primaryColor || '#5282c1';
+    const darkPrimary = labelpolicy?.primaryColorDark || '#bbbafa';
+    const lightPrimary = labelpolicy?.primaryColor || '#5469d4';
 
     const darkWarn = labelpolicy?.warnColorDark || '#ff3b5b';
     const lightWarn = labelpolicy?.warnColor || '#cd3d56';
 
-    const darkBackground = labelpolicy?.backgroundColorDark || '#212224';
+    const darkBackground = labelpolicy?.backgroundColorDark || '#111827';
     const lightBackground = labelpolicy?.backgroundColor || '#fafafa';
 
     this.themeService.savePrimaryColor(darkPrimary, true);
@@ -604,33 +604,33 @@ export class PrivateLabelingPolicyComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   *  defaults to false because urls are distinct anyway
-   */
-  public get previewEqualsCurrentPolicy(): boolean {
-    const getComparable = (policy: LabelPolicy.AsObject): Partial<LabelPolicy.AsObject> => {
-      return Object.assign({
-        primaryColor: policy.primaryColor,
-        hideLoginNameSuffix: policy.primaryColor,
-        warnColor: policy.warnColor,
-        backgroundColor: policy.backgroundColor,
-        fontColor: policy.fontColor,
-        primaryColorDark: policy.primaryColorDark,
-        backgroundColorDark: policy.backgroundColorDark,
-        warnColorDark: policy.warnColorDark,
-        fontColorDark: policy.fontColorDark,
-        disableWatermark: policy.disableWatermark,
-        logoUrl: policy.logoUrl,
-        iconUrl: policy.iconUrl,
-        logoUrlDark: policy.logoUrlDark,
-        iconUrlDark: policy.iconUrlDark,
-        fontUrl: policy.fontUrl,
-      });
-    };
+  // /**
+  //  *  defaults to false because urls are distinct anyway
+  //  */
+  // public get previewEqualsCurrentPolicy(): boolean {
+  //   const getComparable = (policy: LabelPolicy.AsObject): Partial<LabelPolicy.AsObject> => {
+  //     return Object.assign({
+  //       primaryColor: policy.primaryColor,
+  //       hideLoginNameSuffix: policy.primaryColor,
+  //       warnColor: policy.warnColor,
+  //       backgroundColor: policy.backgroundColor,
+  //       fontColor: policy.fontColor,
+  //       primaryColorDark: policy.primaryColorDark,
+  //       backgroundColorDark: policy.backgroundColorDark,
+  //       warnColorDark: policy.warnColorDark,
+  //       fontColorDark: policy.fontColorDark,
+  //       disableWatermark: policy.disableWatermark,
+  //       logoUrl: policy.logoUrl,
+  //       iconUrl: policy.iconUrl,
+  //       logoUrlDark: policy.logoUrlDark,
+  //       iconUrlDark: policy.iconUrlDark,
+  //       fontUrl: policy.fontUrl,
+  //     });
+  //   };
 
-    const c = getComparable(this.data);
-    const p = getComparable(this.previewData);
+  //   const c = getComparable(this.data);
+  //   const p = getComparable(this.previewData);
 
-    return JSON.stringify(p) === JSON.stringify(c);
-  }
+  //   return JSON.stringify(p) === JSON.stringify(c);
+  // }
 }

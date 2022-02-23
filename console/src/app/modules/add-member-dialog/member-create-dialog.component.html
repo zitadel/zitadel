@@ -26,20 +26,15 @@
   <cnsl-search-user-autocomplete [users]="preselectedUsers" (selectionChanged)="users = $any($event)">
   </cnsl-search-user-autocomplete>
 
-  <cnsl-form-field class="full-width" appearance="outline"
-    *ngIf="creationType === CreationType.PROJECT_OWNED || creationType === CreationType.PROJECT_GRANTED || creationType === CreationType.IAM">
-    <cnsl-label>{{ 'ROLESLABEL' | translate }}</cnsl-label>
-    <mat-select [(ngModel)]="roles" multiple>
-      <mat-option *ngFor="let role of memberRoleOptions" [value]="role">
-        {{ role }}
-      </mat-option>
-    </mat-select>
-  </cnsl-form-field>
-
-  <ng-container *ngIf="creationType === CreationType.ORG">
-    <cnsl-org-member-roles-autocomplete (selectionChanged)="setOrgMemberRoles($event)">
-    </cnsl-org-member-roles-autocomplete>
-  </ng-container>
+  <div class="roles-selection">
+    <mat-checkbox class="role-cb" *ngFor="let role of memberRoleOptions" color="primary" (change)="toggleRole(role)"
+      [checked]="roles.includes(role)">
+      <div class="role-cb-content">
+        <div class="cnsl-chip-dot" [style.background]="getColor(role)"></div>
+        <span>{{role | roletransform}}</span>
+      </div>
+    </mat-checkbox>
+  </div>
 
 </div>
 <div mat-dialog-actions class="action">

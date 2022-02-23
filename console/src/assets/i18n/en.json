@@ -452,7 +452,7 @@
       "CONFIRMINITIAL": "Confirm Password",
       "RESET": "Reset Current Password",
       "SET": "Set New Password",
-      "RESENDNOTIFICATION": "Resend Password Reset Link",
+      "RESENDNOTIFICATION": "Send Password Reset Link",
       "REQUIRED": "Some required fields are missing.",
       "MINLENGTHERROR": "The password has to be at least {{value}} characters long.",
       "NOTEQUAL": "The passwords provided do not match."
@@ -1085,7 +1085,7 @@
       "EMAIL": "E-mail",
       "ROLES": "Roles",
       "ADD": "Add Member",
-      "ADDDESCRIPTION": "Enter the e-mail addresses of the users to be added."
+      "ADDDESCRIPTION": "Enter the names of the users to be added."
     },
     "TABLE": {
       "TOTAL": "Entries total",

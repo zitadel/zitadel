@@ -92,7 +92,8 @@
                 (resendEmailVerification)="resendEmailVerification()"
                 (resendPhoneVerification)="resendPhoneVerification()">
                 <button pwdAction [disabled]="(canWrite$ | async) === false" (click)="sendSetPasswordNotification()"
-                  mat-stroked-button color="primary" *ngIf="user.state === UserState.USER_STATE_INITIAL">{{
+                  mat-stroked-button color="primary"
+                  *ngIf="user.state !== UserState.USER_STATE_LOCKED && user.state !== UserState.USER_STATE_INACTIVE && user.state !== UserState.USER_STATE_INITIAL">{{
                   'USER.PASSWORD.RESENDNOTIFICATION' | translate }}</button>
                 <button emailAction [disabled]="(canWrite$ | async) === false" class="resendemail"
                   *ngIf="user.state === UserState.USER_STATE_INITIAL" mat-stroked-button color="primary"

@@ -452,7 +452,7 @@
       "CONFIRMINITIAL": "Passwort wiederholen",
       "RESET": "Passwort zurücksetzen",
       "SET": "Passwort neu setzen",
-      "RESENDNOTIFICATION": "Link für das Zurücksetzen des Passworts senden",
+      "RESENDNOTIFICATION": "Email zum Zurücksetzen senden",
       "REQUIRED": "Bitte prüfe, dass alle notwendigen Felder ausgefüllt sind.",
       "MINLENGTHERROR": "Das Passwort muss mindestens {{value}} Zeichen lang sein.",
       "NOTEQUAL": "Die Passwörter stimmen nicht überein."

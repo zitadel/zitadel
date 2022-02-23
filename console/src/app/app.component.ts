@@ -237,13 +237,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public loadPrivateLabelling(): void {
     const setDefaultColors = () => {
-      const darkPrimary = '#5282c1';
-      const lightPrimary = '#5282c1';
+      const darkPrimary = '#bbbafa';
+      const lightPrimary = '#5469d4';
 
-      const darkWarn = '#cd3d56';
+      const darkWarn = '#ff3b5b';
       const lightWarn = '#cd3d56';
 
-      const darkBackground = '#212224';
+      const darkBackground = '#111827';
       const lightBackground = '#fafafa';
 
       const darkText = '#ffffff';
@@ -271,10 +271,10 @@ export class AppComponent implements OnInit, OnDestroy {
         const isDark = (color: string) => this.themeService.isDark(color);
         const isLight = (color: string) => this.themeService.isLight(color);
 
-        const darkPrimary = this.labelpolicy?.primaryColorDark || '#5282c1';
-        const lightPrimary = this.labelpolicy?.primaryColor || '#5282c1';
+        const darkPrimary = this.labelpolicy?.primaryColorDark || '#bbbafa';
+        const lightPrimary = this.labelpolicy?.primaryColor || '#5469d4';
 
-        const darkWarn = this.labelpolicy?.warnColorDark || '#cd3d56';
+        const darkWarn = this.labelpolicy?.warnColorDark || '#ff3b5b';
         const lightWarn = this.labelpolicy?.warnColor || '#cd3d56';
 
         let darkBackground = this.labelpolicy?.backgroundColorDark;
@@ -293,9 +293,9 @@ export class AppComponent implements OnInit, OnDestroy {
           console.info(
             `Background (${darkBackground}) is not dark enough for a dark theme. Falling back to zitadel background`,
           );
-          darkBackground = '#212224';
+          darkBackground = '#111827';
         }
-        this.themeService.saveBackgroundColor(darkBackground || '#212224', true);
+        this.themeService.saveBackgroundColor(darkBackground || '#111827', true);
 
         if (lightBackground && !isLight(lightBackground)) {
           console.info(

@@ -64,7 +64,7 @@
       </ng-template>
 
       <button *ngIf="view === View.PREVIEW" class="pl-action-button"
-        [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false) || previewEqualsCurrentPolicy"
+        [disabled]="(serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false)"
         mat-raised-button color="primary" (click)="activatePolicy()">
         {{'POLICY.PRIVATELABELING.ACTIVATEPREVIEW' | translate}}
       </button>
@@ -286,7 +286,8 @@
 
             <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
               [disabled]="view === View.CURRENT || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.private_label'] | hasFeature | async) === false)"
-              [(ngModel)]="previewData.hideLoginNameSuffix" (change)="savePolicy()">
+              [(ngModel)]="view === View.CURRENT ? data.hideLoginNameSuffix : previewData.hideLoginNameSuffix"
+              (change)="savePolicy()">
               {{'POLICY.DATA.HIDELOGINNAMESUFFIX' | translate}}
             </mat-slide-toggle>
 
@@ -298,7 +299,8 @@
             </ng-container>
             <mat-slide-toggle class="toggle" color="primary" ngDefaultControl
               [disabled]="view === View.CURRENT || (serviceType === PolicyComponentServiceType.MGMT && (['label_policy.watermark'] | hasFeature | async) === false)"
-              [(ngModel)]="previewData.disableWatermark" (change)="savePolicy()">
+              [(ngModel)]="view === View.CURRENT ? data.disableWatermark : previewData.disableWatermark"
+              (change)="savePolicy()">
               {{'POLICY.DATA.DISABLEWATERMARK' | translate}}
             </mat-slide-toggle>
           </div>

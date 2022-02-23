@@ -452,7 +452,7 @@
       "CONFIRMINITIAL": "Conferma password",
       "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
-      "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
+      "RESENDNOTIFICATION": "Invia email per la reimpostazione",
       "REQUIRED": "Mancano alcuni campi obbligatori.",
       "MINLENGTHERROR": "La password deve essere lunga almeno {{valore}} caratteri.",
       "NOTEQUAL": "Le password fornite non corrispondono."
