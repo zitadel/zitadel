@@ -47,9 +47,6 @@ func (wm *HumanInitCodeWriteModel) Reduce() error {
 			wm.IsEmailVerified = false
 		case *user.HumanEmailVerifiedEvent:
 			wm.IsEmailVerified = true
-			if wm.UserState == domain.UserStateInitial {
-				wm.UserState = domain.UserStateActive
-			}
 		case *user.HumanInitialCodeAddedEvent:
 			wm.Code = e.Code
 			wm.CodeCreationDate = e.CreationDate()

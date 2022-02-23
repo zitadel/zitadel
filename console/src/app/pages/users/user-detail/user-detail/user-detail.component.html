@@ -23,7 +23,7 @@
           <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED"
             (click)="unlockUser()">{{'USER.PAGES.UNLOCK' |
             translate}}</button>
-          <button mat-menu-item *ngIf="user?.state !== UserState.USER_STATE_INACTIVE"
+          <button mat-menu-item *ngIf="user?.state === UserState.USER_STATE_ACTIVE"
             (click)="changeState(UserState.USER_STATE_INACTIVE)">{{'USER.PAGES.DEACTIVATE' |
             translate}}</button>
           <button mat-menu-item *ngIf="user?.state === UserState.USER_STATE_INACTIVE"
@@ -84,6 +84,11 @@
       <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.KEYSTITLE' | translate }}"
         description="{{ 'USER.MACHINE.KEYSDESC' | translate }}">
         <cnsl-machine-keys [userId]="user.id"></cnsl-machine-keys>
+      </cnsl-card>
+
+      <cnsl-card *ngIf="user.machine && user.id" title="{{ 'USER.MACHINE.TOKENSTITLE' | translate }}"
+        description="{{ 'USER.MACHINE.TOKENSDESC' | translate }}">
+        <cnsl-personal-access-tokens [userId]="user.id"></cnsl-personal-access-tokens>
       </cnsl-card>
     </ng-template>
 

@@ -53,7 +53,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						` zitadel.projections.features.custom_text_message,`+
 						` zitadel.projections.features.custom_text_login,`+
 						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions`+
+						` zitadel.projections.features.actions_allowed,`+
+						` zitadel.projections.features.max_actions`+
 						` FROM zitadel.projections.features`),
 					nil,
 					nil,
@@ -96,7 +97,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						` zitadel.projections.features.custom_text_message,`+
 						` zitadel.projections.features.custom_text_login,`+
 						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions`+
+						` zitadel.projections.features.actions_allowed,`+
+						` zitadel.projections.features.max_actions`+
 						` FROM zitadel.projections.features`),
 					[]string{
 						"aggregate_id",
@@ -123,7 +125,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						"custom_text_message",
 						"custom_text_login",
 						"lockout_policy",
-						"actions",
+						"actions_allowed",
+						"max_actions",
 					},
 					[]driver.Value{
 						"aggregate-id",
@@ -150,7 +153,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						true,
+						domain.ActionsMaxAllowed,
+						10,
 					},
 				),
 			},
@@ -179,7 +183,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 				CustomTextMessage:        true,
 				CustomTextLogin:          true,
 				LockoutPolicy:            true,
-				Actions:                  true,
+				ActionsAllowed:           domain.ActionsMaxAllowed,
+				MaxActions:               10,
 			},
 		},
 		{
@@ -211,7 +216,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						` zitadel.projections.features.custom_text_message,`+
 						` zitadel.projections.features.custom_text_login,`+
 						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions`+
+						` zitadel.projections.features.actions_allowed,`+
+						` zitadel.projections.features.max_actions`+
 						` FROM zitadel.projections.features`),
 					[]string{
 						"aggregate_id",
@@ -238,7 +244,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						"custom_text_message",
 						"custom_text_login",
 						"lockout_policy",
-						"actions",
+						"actions_allowed",
+						"max_actions",
 					},
 					[]driver.Value{
 						"aggregate-id",
@@ -265,7 +272,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						true,
 						true,
 						true,
-						true,
+						domain.ActionsMaxAllowed,
+						10,
 					},
 				),
 			},
@@ -294,7 +302,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 				CustomTextMessage:        true,
 				CustomTextLogin:          true,
 				LockoutPolicy:            true,
-				Actions:                  true,
+				ActionsAllowed:           domain.ActionsMaxAllowed,
+				MaxActions:               10,
 			},
 		},
 		{
@@ -326,7 +335,8 @@ func Test_FeaturesPrepares(t *testing.T) {
 						` zitadel.projections.features.custom_text_message,`+
 						` zitadel.projections.features.custom_text_login,`+
 						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions`+
+						` zitadel.projections.features.actions_allowed,`+
+						` zitadel.projections.features.max_actions`+
 						` FROM zitadel.projections.features`),
 					sql.ErrConnDone,
 				),

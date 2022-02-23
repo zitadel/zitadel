@@ -1,10 +1,9 @@
 package repository
 
-import (
-	"context"
-)
+import "context"
 
 type Repository interface {
 	Health(context.Context) error
-	UserGrantRepository
+	UserMembershipRepository
+	TokenVerifierRepository
 }

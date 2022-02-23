@@ -76,7 +76,9 @@ func (q *Queries) RemoveFailedEvent(ctx context.Context, projectionName string, 
 		Where(sq.Eq{
 			failedEventsColumnProjectionName: projectionName,
 			failedEventsColumnFailedSequence: sequence,
-		}).ToSql()
+		}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 	if err != nil {
 		return errors.ThrowInternal(err, "QUERY-DGgh3", "Errors.RemoveFailed")
 	}

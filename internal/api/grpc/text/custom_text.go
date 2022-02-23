@@ -22,7 +22,7 @@ func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomTe
 			msg.ChangeDate,
 			msg.AggregateID,
 		),
-		IsDefault: msg.AggregateID == domain.IAMID,
+		IsDefault: msg.IsDefault,
 	}
 }
 

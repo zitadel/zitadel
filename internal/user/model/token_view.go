@@ -21,6 +21,7 @@ type TokenView struct {
 	Sequence          uint64
 	PreferredLanguage string
 	RefreshTokenID    string
+	IsPAT             bool
 }
 
 type TokenSearchRequest struct {

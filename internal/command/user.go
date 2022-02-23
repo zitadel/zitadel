@@ -70,6 +70,9 @@ func (c *Commands) DeactivateUser(ctx context.Context, userID, resourceOwner str
 	if !isUserStateExists(existingUser.UserState) {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-3M9ds", "Errors.User.NotFound")
 	}
+	if isUserStateInitial(existingUser.UserState) {
+		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-ke0fw", "Errors.User.CantDeactivateInitial")
+	}
 	if isUserStateInactive(existingUser.UserState) {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-5M0sf", "Errors.User.AlreadyInactive")
 	}
