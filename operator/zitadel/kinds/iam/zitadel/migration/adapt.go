@@ -31,16 +31,9 @@ import (
 const (
 	migrationConfigmap = "migrate-db"
 	migrationsPath     = "/migrate"
-	rootUserInternal   = "root"
 	envMigrationUser   = "FLYWAY_USER"
 	envMigrationPW     = "FLYWAY_PASSWORD"
 	jobNamePrefix      = "cockroachdb-cluster-migration-"
-	/*
-		createFile             = "create.sql"
-		grantFile              = "grant.sql"
-		deleteFile             = "delete.sql"
-
-	*/
 )
 
 func AdaptFunc(
@@ -50,8 +43,6 @@ func AdaptFunc(
 	namespace string,
 	reason string,
 	secretPasswordName string,
-	migrationUser string,
-	users []string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	customImageRegistry string,
@@ -206,11 +197,6 @@ const migrationFileRegex = `(V|U)(\.|\d)+(__)(\w|\_|\ )+(\.sql)`
 func getMigrationFiles(monitor mntr.Monitor, root string) []migration {
 	migrations := make([]migration, 0)
 	files := []string{}
-	/*
-		absPath, err := filepath.Abs(root)
-		if err != nil {
-			return migrations
-		}*/
 
 	statikFS, err := fs.New()
 	if err != nil {

@@ -9,7 +9,6 @@ func GetVolumes(
 	secretName string,
 	secretPasswordsName string,
 	consoleCMName string,
-	users []string,
 ) []corev1.Volume {
 
 	return []corev1.Volume{{
@@ -43,27 +42,3 @@ func GetVolumes(
 		},
 	}}
 }
-
-/*
-func userVolumes(
-	users []string,
-) []corev1.Volume {
-	volumes := make([]corev1.Volume, 0)
-
-	sort.Strings(users)
-	for _, user := range users {
-		userReplaced := strings.ReplaceAll(user, "_", "-")
-		internalName := "client-" + userReplaced
-		volumes = append(volumes, corev1.Volume{
-			Name: internalName,
-			VolumeSource: corev1.VolumeSource{
-				Secret: &corev1.SecretVolumeSource{
-					SecretName:  "cockroachdb.client." + userReplaced,
-					DefaultMode: helpers.PointerInt32(384),
-				},
-			},
-		})
-	}
-	return volumes
-}
-*/

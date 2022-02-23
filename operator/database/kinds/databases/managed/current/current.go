@@ -6,7 +6,7 @@ import (
 
 	"github.com/caos/zitadel/pkg/databases/db"
 
-	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/current"
+	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
 
 	"github.com/caos/orbos/pkg/tree"
 )
@@ -25,13 +25,6 @@ type CurrentDB struct {
 	PasswordSecret    *labels.Selectable
 	PasswordSecretKey string
 	CA                *cacurr.Current
-
-	/*
-		AddUserFunc    func(user string) (operator.QueryFunc, error)
-		DeleteUserFunc func(user string) (operator.DestroyFunc, error)
-		ListUsersFunc  func(k8sClient kubernetes.ClientInt) ([]string, error)
-
-	*/
 }
 
 func (c *Current) GetCA() *cacurr.Current {
@@ -68,28 +61,3 @@ func (c *Current) SSL() *db.SSL {
 	}
 }
 func (c *Current) Options() string { return "" }
-
-/*
-func (c *Current) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	destroy, err := c.Current.DeleteUserFunc(user)
-	if err != nil {
-		return err
-	}
-	return destroy(k8sClient)
-}
-func (c *Current) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	query, err := c.Current.AddUserFunc(user)
-	if err != nil {
-		return err
-	}
-
-	ensure, err := query(k8sClient, nil)
-	if err != nil {
-		return err
-	}
-	return ensure(k8sClient)
-}
-func (c *Current) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
-	return c.Current.ListUsersFunc(k8sClient)
-}
-*/

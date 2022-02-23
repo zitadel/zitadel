@@ -24,7 +24,6 @@ const (
 	internalSecretName = "client-certs"
 	rootSecretName     = db.CertsSecret
 	timeout            = 45 * time.Minute
-	saJsonBase64Env    = "SAJSON"
 )
 
 func AdaptFunc(
@@ -48,31 +47,7 @@ func AdaptFunc(
 ) {
 
 	jobName := jobPrefix + backupName + jobSuffix
-	/*
-		// TODO: make this dynamic and somewhere else
-		dbs := []string{
-			"adminapi",
-			"auth",
-			"authz",
-			"defaultdb",
-			"eventstore",
-			"management",
-			"notification",
-			"postgres",
-			"zitadel",
-		}
-		var deleteDBStatements []string
 
-		for _, db := range dbs {
-			deleteDBStatements = append(deleteDBStatements, fmt.Sprintf("DROP DATABASE IF EXISTS %s CASCADE;", db))
-		}
-
-		cleanCmd, env := command.GetSQLCommand(
-			dbConn,
-			certPath,
-			deleteDBStatements...,
-		)
-	*/
 	restoreCmd, env := command.GetSQLCommand(
 		dbConn,
 		certPath,

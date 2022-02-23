@@ -18,10 +18,6 @@ const (
 	component = "database"
 )
 
-func ComponentSelector() *labels.Selector {
-	return labels.OpenComponentSelector("ZITADEL", component)
-}
-
 func Adapt(
 	monitor mntr.Monitor,
 	desiredTree *tree.Tree,

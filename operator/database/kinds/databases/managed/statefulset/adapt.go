@@ -26,14 +26,11 @@ import (
 
 const (
 	certPath            = "/cockroach/cockroach-certs"
-	clientCertPath      = "/cockroach/cockroach-client-certs"
 	datadirPath         = "/cockroach/cockroach-data"
 	datadirInternal     = "datadir"
 	certsInternal       = "certs"
 	clientCertsInternal = "client-certs"
 	defaultMode         = int32(256)
-	nodeSecret          = "cockroachdb.node"
-	rootSecret          = "rootcerts"
 	cleanTimeout        = time.Minute * 5
 )
 
@@ -66,12 +63,14 @@ func AdaptFunc(
 	resourcesSFS *k8s.Resources,
 	cache string,
 	maxSqlMemory string,
+	clientCertsPath string,
+	rootCertsSecret string,
+	nodeSecret string,
 ) (
 	resources.QueryFunc,
 	resources.DestroyFunc,
 	operator.EnsureFunc,
 	operator.EnsureFunc,
-	//	func(k8sClient kubernetes.ClientInt) ([]string, error),
 	error,
 ) {
 	internalMonitor := monitor.WithField("component", "statefulset")
@@ -138,7 +137,7 @@ func AdaptFunc(
 							MountPath: certPath,
 						}, {
 							Name:      clientCertsInternal,
-							MountPath: clientCertPath,
+							MountPath: clientCertsPath,
 						}},
 						Env: []corev1.EnvVar{{
 							Name:  "COCKROACH_CHANNEL",
@@ -177,7 +176,7 @@ func AdaptFunc(
 						Name: clientCertsInternal,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName:  rootSecret,
+								SecretName:  rootCertsSecret,
 								DefaultMode: helpers.PointerInt32(defaultMode),
 							},
 						},
@@ -244,7 +243,7 @@ func AdaptFunc(
 			return nil
 		}
 
-		command := "/cockroach/cockroach init --certs-dir=" + clientCertPath + " --host=" + name + "-0." + name
+		command := "/cockroach/cockroach init --certs-dir=" + clientCertsPath + " --host=" + name + "-0." + name
 
 		if err := k8sClient.ExecInPod(namespace, name+"-0", name, command); err != nil {
 			return err
@@ -260,35 +259,6 @@ func AdaptFunc(
 		internalMonitor.Info("statefulset is ready")
 		return nil
 	}
-
-	/*
-		getAllDBs := func(k8sClient kubernetes.ClientInt) ([]string, error) {
-			if err := checkDBRunning(k8sClient); err != nil {
-				return nil, err
-			}
-
-			if err := checkDBReady(k8sClient); err != nil {
-				return nil, err
-			}
-
-			command := "/cockroach/cockroach sql --certs-dir=" + clientCertPath + " --host=" + name + "-0." + name + " -e 'SHOW DATABASES;'"
-
-			databasesStr, err := k8sClient.ExecInPodWithOutput(namespace, name+"-0", name, command)
-			if err != nil {
-				return nil, err
-			}
-			databases := strings.Split(databasesStr, "\n")
-			dbAndOwners := databases[1 : len(databases)-1]
-			dbs := []string{}
-			for _, dbAndOwner := range dbAndOwners {
-				parts := strings.Split(dbAndOwner, "\t")
-				if parts[1] != "node" {
-					dbs = append(dbs, parts[0])
-				}
-			}
-			return dbs, nil
-		}
-	*/
 
 	return wrapedQuery, wrapedDestroy, ensureInit, checkDBReady, err
 }

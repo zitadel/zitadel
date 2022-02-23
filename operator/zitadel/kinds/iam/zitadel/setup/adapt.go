@@ -20,8 +20,6 @@ import (
 const (
 	jobNamePrefix = "zitadel-setup-"
 	containerName = "zitadel"
-	rootSecret    = "client-root"
-	dbSecrets     = "db-secrets"
 )
 
 func AdaptFunc(
@@ -44,8 +42,7 @@ func AdaptFunc(
 	dbConn db.Connection,
 ) (
 	func(
-		necessaryUsers map[string]string,
-		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
@@ -65,18 +62,11 @@ func AdaptFunc(
 	}
 
 	return func(
-			necessaryUsers map[string]string,
-			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{} /*, necessaryUsers map[string]string*/) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				users := make([]string, 0)
-				for user := range necessaryUsers {
-					users = append(users, user)
-				}
-
 				jobDef := jobDef(
 					nameLabels,
-					users,
 					version,
 					resources,
 					cmName,
@@ -93,7 +83,7 @@ func AdaptFunc(
 					dbConn,
 				)
 
-				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
+				hashes, err := getConfigurationHashes(k8sClient, queried /*, necessaryUsers*/)
 				if err != nil {
 					return nil, err
 				}
@@ -123,7 +113,6 @@ func AdaptFunc(
 
 func jobDef(
 	name *labels.Name,
-	users []string,
 	version *string,
 	resources *k8s.Resources,
 	cmName string,
@@ -158,13 +147,10 @@ func jobDef(
 			true,
 			deployment.GetResourcesFromDefault(resources),
 			cmName,
-			certPath,
 			secretName,
 			secretPath,
 			consoleCMName,
 			secretVarsName,
-			secretPasswordsName,
-			users,
 			chownedVolumeMount,
 			"setup",
 			customImageRegistry,
@@ -194,7 +180,7 @@ func jobDef(
 					SchedulerName:                 "default-scheduler",
 					TerminationGracePeriodSeconds: helpers.PointerInt64(30),
 					Volumes: append(
-						deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users),
+						deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName),
 						srcVolume,
 						destVolume,
 					),

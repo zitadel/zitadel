@@ -112,24 +112,6 @@ func AdaptFunc(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		/*_, destroyC, err := clean.AdaptFunc(
-			monitor,
-			name,
-			namespace,
-			componentLabels,
-			[]string{},
-			[]string{},
-			nodeselector,
-			tolerations,
-			checkDBReady,
-			secretName,
-			secretKey,
-			image,
-		)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}*/
-
 		destroyers := make([]operator.DestroyFunc, 0)
 		for _, feature := range features {
 			switch feature {
@@ -138,10 +120,7 @@ func AdaptFunc(
 					operator.ResourceDestroyToZitadelDestroy(destroyS),
 					destroyB,
 				)
-			/*case clean.Instant:
-			destroyers = append(destroyers,
-				destroyC,
-			)*/
+
 			case restore.Instant:
 				destroyers = append(destroyers,
 					destroyR,
@@ -205,24 +184,6 @@ func AdaptFunc(
 					return nil, err
 				}
 
-				/*queryC, _, err := clean.AdaptFunc(
-					monitor,
-					name,
-					namespace,
-					componentLabels,
-					databases,
-					users,
-					nodeselector,
-					tolerations,
-					checkDBReady,
-					secretName,
-					secretKey,
-					image,
-				)
-				if err != nil {
-					return nil, err
-				}*/
-
 				queriers := make([]operator.QueryFunc, 0)
 				cleanupQueries := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
@@ -240,14 +201,7 @@ func AdaptFunc(
 						cleanupQueries = append(cleanupQueries,
 							operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
 						)
-					/*case clean.Instant:
-					queriers = append(queriers,
-						operator.ResourceQueryToZitadelQuery(queryS),
-						queryC,
-					)
-					cleanupQueries = append(cleanupQueries,
-						operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
-					)*/
+
 					case restore.Instant:
 						queriers = append(queriers,
 							operator.ResourceQueryToZitadelQuery(queryS),

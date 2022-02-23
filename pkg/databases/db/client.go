@@ -21,7 +21,7 @@ type Client interface {
 */
 
 const (
-	CertsSecret  = "db-certficates" // TODO: make dynamic
+	CertsSecret  = "user-certs" // TODO: make dynamic
 	CACert       = "ca.crt"
 	RootUserCert = "client.root.crt"
 	RootUserKey  = "client.root.key"

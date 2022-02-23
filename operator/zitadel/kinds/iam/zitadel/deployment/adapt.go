@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	rootSecret    = "client-root"
 	dbSecrets     = "db-secrets"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
@@ -53,8 +52,7 @@ func AdaptFunc(
 	dbConn db.Connection,
 ) (
 	func(
-		necessaryUsers map[string]string,
-		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
@@ -70,15 +68,9 @@ func AdaptFunc(
 	}
 
 	return func(
-			necessaryUsers map[string]string,
-			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{} /*, necessaryUsers map[string]string*/) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				users := make([]string, 0)
-				for user := range necessaryUsers {
-					users = append(users, user)
-				}
-
 				deploymentDef := deploymentDef(
 					nameLabels,
 					namespace,
@@ -87,7 +79,6 @@ func AdaptFunc(
 					nodeSelector,
 					tolerations,
 					affinity,
-					users,
 					version,
 					resources,
 					cmName,
@@ -101,7 +92,7 @@ func AdaptFunc(
 					dbConn,
 				)
 
-				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
+				hashes, err := getConfigurationHashes(k8sClient, queried)
 				if err != nil {
 					return nil, err
 				}
@@ -140,7 +131,6 @@ func deploymentDef(
 	nodeSelector map[string]string,
 	tolerations []corev1.Toleration,
 	affinity *k8s.Affinity,
-	users []string,
 	version *string,
 	resources *k8s.Resources,
 	cmName string,
@@ -201,13 +191,10 @@ func deploymentDef(
 							true,
 							GetResourcesFromDefault(resources),
 							cmName,
-							certPath,
 							secretName,
 							secretPath,
 							consoleCMName,
 							secretVarsName,
-							secretPasswordsName,
-							users,
 							chownedVolumeMount,
 							"start",
 							customImageRegistry,
@@ -218,7 +205,6 @@ func deploymentDef(
 						secretName,
 						secretPasswordsName,
 						consoleCMName,
-						users,
 					), srcVolume, destVolume),
 				},
 			},

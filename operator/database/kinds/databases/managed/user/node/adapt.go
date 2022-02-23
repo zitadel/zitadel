@@ -13,13 +13,13 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/certificates"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/pem"
-	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/certificates"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/pem"
 )
 
 const (
-	caCertKey      = "ca.crt"
+	caCertKey      = db.CACert
 	caPrivKeyKey   = "ca.key"
 	nodeCertKey    = "node.crt"
 	nodePrivKeyKey = "node.key"
@@ -49,7 +49,7 @@ func AdaptFunc(
 				return nil, err
 			}
 
-			managedDB := currentDB.(*managedCurr.Current)
+			managedDB := currentDB.(*current.Current)
 
 			allNodeSecrets, err := k8sClient.ListSecrets(namespace, nodeSecretSelector)
 			if err != nil {

@@ -1,4 +1,4 @@
-package certificate
+package user
 
 /* Deprecated in V2
 import (

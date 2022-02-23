@@ -19,9 +19,7 @@ const (
 	defaultMode        int32 = 256
 	certPath                 = "/cockroach/cockroach-certs"
 	secretPath               = "/secrets/sa.json"
-	backupPath               = "/cockroach"
 	backupNameEnv            = "BACKUP_NAME"
-	saJsonBase64Env          = "SAJSON"
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
 	rootSecretName           = db.CertsSecret

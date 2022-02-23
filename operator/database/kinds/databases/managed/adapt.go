@@ -2,6 +2,7 @@ package managed
 
 import (
 	"fmt"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user"
 	"strconv"
 	"strings"
 
@@ -20,12 +21,11 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
-	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/current"
 	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
+	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
 )
 
 const (
@@ -38,6 +38,10 @@ const (
 	cockroachHTTPPort  = int32(8080)
 	Clean              = "clean"
 	DBReady            = "dbready"
+	rootCertsSecret    = "root-certs"
+	nodeCertsSecret    = "node-certs"
+	zitadelCertsSecret = "zitadel-certs"
+	clientCertsPath    = "/cockroach/cockroach-client-certs"
 )
 
 func Adapter(
@@ -71,11 +75,7 @@ func Adapter(
 			}
 		}()
 
-		var (
-			internalMonitor = monitor.WithField("kind", "cockroachdb")
-			allSecrets      = make(map[string]*secret.Secret)
-			allExisting     = make(map[string]*secret.Existing)
-		)
+		internalMonitor := monitor.WithField("kind", "cockroachdb")
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
@@ -91,6 +91,8 @@ func Adapter(
 		if !monitor.IsVerbose() && desiredKind.Spec.Verbose {
 			internalMonitor.Verbose()
 		}
+
+		allSecrets, allExisting := getSecretsMap(desiredKind)
 
 		var (
 			isFeatureDatabase bool
@@ -118,15 +120,20 @@ func Adapter(
 		currentDB.Current.PasswordSecret = pwSecretLabels
 		currentDB.Current.User = "zitadel"
 
-		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := certificate.AdaptFunc(
+		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := user.AdaptFunc(
 			internalMonitor,
 			namespace,
 			componentLabels,
 			desiredKind.Spec.ClusterDns,
 			isFeatureDatabase,
 			currentDB.Current.User,
+			desiredKind.Spec.ZitadelUserPassword,
+			desiredKind.Spec.ZitadelUserPasswordExisting,
 			pwSecretLabels,
 			currentDB.Current.PasswordSecretKey,
+			rootCertsSecret,
+			clientCertsPath,
+			nodeCertsSecret,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -158,6 +165,9 @@ func Adapter(
 			desiredKind.Spec.Resources,
 			desiredKind.Spec.Cache,
 			desiredKind.Spec.MaxSQLMemory,
+			clientCertsPath,
+			rootCertsSecret,
+			nodeCertsSecret,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -265,11 +275,6 @@ func Adapter(
 					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
 					currentDB.Current.URL = PublicServiceName
-					/*
-						currentDB.Current.AddUserFunc = addUser
-						currentDB.Current.DeleteUserFunc = deleteUser
-						currentDB.Current.ListUsersFunc = listUsers
-					*/
 					db.SetQueriedForDatabase(queried, current)
 					internalMonitor.Info("set current state of managed database")
 				}
