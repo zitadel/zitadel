@@ -40,7 +40,8 @@ Please check the [authorization_endpoint reference](/docs/apis/openidoauth/endpo
 
 ## Callback
 
-Regardless of a successful or error response from the authorization_endpoint, the authorization server will call your callback endpoint you provided by the `redirect_uri`.
+No matter wheter the `authorization_endpoint` response returns a success message or an error,
+the authorization server will call your callback endpoint you provided by the `redirect_uri`.
 
 :::note
 If no `redirect_uri` is registered, or if anything else prevents the auth server from returning the response to the client,
