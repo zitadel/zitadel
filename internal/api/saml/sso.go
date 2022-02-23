@@ -56,6 +56,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
 	if err != nil {
 		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
+		return
 	}
 	if sp == nil {
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
@@ -93,6 +94,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			)); err != nil {
 				http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 			}
+			return
 		}
 	}
 
@@ -105,6 +107,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		return
 	}
 
 	acsURL := ""
@@ -113,6 +116,17 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			acsURL = acs.Location
 			break
 		}
+	}
+	if acsURL == "" {
+		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeUnsupportedBindingResponse(
+			authNRequest.Id,
+			authNRequest.AssertionConsumerServiceURL,
+			p.EntityID,
+			fmt.Errorf("unsupported binding").Error(),
+		)); err != nil {
+			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
+		}
+		return
 	}
 
 	if err := verifyRequestContent(
@@ -128,6 +142,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		return
 	}
 
 	authRequest, err := p.storage.CreateAuthRequest(r.Context(), authNRequest, authRequestForm.RelayState, sp.ID)
@@ -140,6 +155,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		return
 	}
 
 	switch authNRequest.ProtocolBinding {

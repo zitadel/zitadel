@@ -341,6 +341,13 @@ API:
         Path: 'keys'
         URL: '$ZITADEL_OAUTH/keys'
   SAML:
+    StorageConfig:
+      DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
+      DefaultAccessTokenLifetime: 12h
+      DefaultIdTokenLifetime: 12h
+      DefaultRefreshTokenIdleExpiration: 720h #30d
+      DefaultRefreshTokenExpiration: 2160h #90d
+      SigningKeyAlgorithm: RS256
     UserAgentCookieConfig:
       Name: caos.zitadel.useragent
       Domain: $ZITADEL_COOKIE_DOMAIN
@@ -386,7 +393,7 @@ API:
         SLOArtifact:
           Path: 'SLOartifact'
           URL: '$ZITADEL_SAML/SLOartifact'
-        NameID:
+        NameIDMapping:
           Path: 'nameid'
           URL: '$ZITADEL_SAML/nameid'
         Attribute:

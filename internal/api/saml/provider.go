@@ -31,8 +31,8 @@ type ProviderConfig struct {
 	Organisation  *Organisation
 	ContactPerson *ContactPerson
 
-	IDP           *IdentityProviderConfig
-	StorageConfig *StorageConfig
+	IDP           *IdentityProviderConfig `yaml:"IDP"`
+	StorageConfig *StorageConfig          `yaml:"StorageConfig"`
 
 	UserAgentCookieConfig *middleware.UserAgentCookieConfig
 }

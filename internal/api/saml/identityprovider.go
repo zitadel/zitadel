@@ -32,10 +32,14 @@ type AuthStorage interface {
 	GetAttributesFromNameID(ctx context.Context, nameID string) (map[string]interface{}, error)
 }
 
-type IdentityProviderConfig struct {
+type MetadataIDP struct {
 	ValidUntil    string
 	CacheDuration string
 	ErrorURL      string
+}
+
+type IdentityProviderConfig struct {
+	Metadata *MetadataIDP
 
 	SignatureAlgorithm  string
 	DigestAlgorithm     string
@@ -44,7 +48,22 @@ type IdentityProviderConfig struct {
 	NameIDFormat           string
 	WantAuthRequestsSigned string
 
-	Endpoints *EndpointConfig
+	Endpoints *EndpointConfig `yaml:"Endpoints"`
+}
+
+type EndpointConfig struct {
+	Login         Endpoint `yaml:"Login"`
+	SingleSignOn  Endpoint `yaml:"SingleSignOn"`
+	SingleLogOut  Endpoint `yaml:"SingleLogOut"`
+	Artifact      Endpoint `yaml:"Artifact"`
+	SLOArtifact   Endpoint `yaml:"SLOArtifact"`
+	NameIDMapping Endpoint `yaml:"NameIDMapping"`
+	Attribute     Endpoint `yaml:"Attribute"`
+}
+
+type Endpoint struct {
+	Path string `yaml:"Path"`
+	URL  string `yaml:"URL"`
 }
 
 type IdentityProvider struct {
@@ -64,22 +83,7 @@ type IdentityProvider struct {
 	NameIDMappingEndpoint         op.Endpoint
 	AttributeEndpoint             op.Endpoint
 
-	ServiceProviders []*ServiceProvider
-}
-
-type EndpointConfig struct {
-	Login                 Endpoint
-	SingleSignOn          Endpoint
-	SingleLogout          Endpoint
-	ArtifactResulation    Endpoint
-	SLOArtifactResulation Endpoint
-	NameIDMapping         Endpoint
-	Attribute             Endpoint
-}
-
-type Endpoint struct {
-	Path string
-	URL  string
+	serviceProviders []*ServiceProvider
 }
 
 func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderConfig, storage IDPStorage) (*IdentityProvider, error) {
@@ -125,9 +129,9 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		signer:                        signer,
 		LoginEndpoint:                 op.NewEndpointWithURL(conf.Endpoints.Login.Path, conf.Endpoints.Login.URL),
 		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),
-		SingleLogoutEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleLogout.Path, conf.Endpoints.SingleLogout.URL),
-		ArtifactResulationEndpoint:    op.NewEndpointWithURL(conf.Endpoints.ArtifactResulation.Path, conf.Endpoints.ArtifactResulation.URL),
-		SLOArtifactResulationEndpoint: op.NewEndpointWithURL(conf.Endpoints.SLOArtifactResulation.Path, conf.Endpoints.SLOArtifactResulation.URL),
+		SingleLogoutEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleLogOut.Path, conf.Endpoints.SingleLogOut.URL),
+		ArtifactResulationEndpoint:    op.NewEndpointWithURL(conf.Endpoints.Artifact.Path, conf.Endpoints.Artifact.URL),
+		SLOArtifactResulationEndpoint: op.NewEndpointWithURL(conf.Endpoints.SLOArtifact.Path, conf.Endpoints.SLOArtifact.URL),
 		NameIDMappingEndpoint:         op.NewEndpointWithURL(conf.Endpoints.NameIDMapping.Path, conf.Endpoints.NameIDMapping.URL),
 		AttributeEndpoint:             op.NewEndpointWithURL(conf.Endpoints.Attribute.Path, conf.Endpoints.Attribute.URL),
 		postTemplate:                  temp,
@@ -159,7 +163,7 @@ func (p *IdentityProvider) GetRedirectURL(requestID string) string {
 func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID string) (*ServiceProvider, error) {
 	index := 0
 	found := false
-	for i, sp := range p.ServiceProviders {
+	for i, sp := range p.serviceProviders {
 		if sp.GetEntityID() == entityID {
 			found = true
 			index = i
@@ -167,7 +171,7 @@ func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID stri
 		}
 	}
 	if found == true {
-		return p.ServiceProviders[index], nil
+		return p.serviceProviders[index], nil
 	}
 
 	sp, err := p.storage.GetEntityByID(ctx, entityID)
@@ -175,7 +179,7 @@ func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID stri
 		return nil, err
 	}
 	if sp != nil {
-		p.ServiceProviders = append(p.ServiceProviders, sp)
+		p.serviceProviders = append(p.serviceProviders, sp)
 	}
 	return sp, nil
 }
@@ -186,14 +190,14 @@ func (p *IdentityProvider) AddServiceProvider(id string, config *ServiceProvider
 		return err
 	}
 
-	p.ServiceProviders = append(p.ServiceProviders, sp)
+	p.serviceProviders = append(p.serviceProviders, sp)
 	return nil
 }
 
 func (p *IdentityProvider) DeleteServiceProvider(entityID string) error {
 	index := 0
 	found := false
-	for i, sp := range p.ServiceProviders {
+	for i, sp := range p.serviceProviders {
 		if sp.GetEntityID() == entityID {
 			found = true
 			index = i
@@ -201,7 +205,7 @@ func (p *IdentityProvider) DeleteServiceProvider(entityID string) error {
 		}
 	}
 	if found == true {
-		p.ServiceProviders = append(p.ServiceProviders[:index], p.ServiceProviders[index+1:]...)
+		p.serviceProviders = append(p.serviceProviders[:index], p.serviceProviders[index+1:]...)
 	}
 	return nil
 }

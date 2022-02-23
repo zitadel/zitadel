@@ -69,10 +69,10 @@ func (p *IdentityProviderConfig) getMetadata(
 			XMLName:                    xml.Name{},
 			WantAuthnRequestsSigned:    p.WantAuthRequestsSigned,
 			Id:                         NewID(),
-			ValidUntil:                 p.ValidUntil,
-			CacheDuration:              p.CacheDuration,
+			ValidUntil:                 p.Metadata.ValidUntil,
+			CacheDuration:              p.Metadata.CacheDuration,
 			ProtocolSupportEnumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
-			ErrorURL:                   p.ErrorURL,
+			ErrorURL:                   p.Metadata.ErrorURL,
 			SingleSignOnService: []md.EndpointType{{
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
 				Location: p.Endpoints.SingleSignOn.URL,
@@ -87,16 +87,16 @@ func (p *IdentityProviderConfig) getMetadata(
 				Index:     "0",
 				IsDefault: "true",
 				Binding:   "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-				Location:  p.Endpoints.ArtifactResulation.URL,
+				Location:  p.Endpoints.Artifact.URL,
 			}},
 			SingleLogoutService: []md.EndpointType{
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
-					Location: p.Endpoints.SLOArtifactResulation.URL,
+					Location: p.Endpoints.SLOArtifact.URL,
 				},
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-					Location: p.Endpoints.SingleLogout.URL,
+					Location: p.Endpoints.SingleLogOut.URL,
 				},
 			},
 			NameIDFormat:  []string{p.NameIDFormat},
@@ -115,10 +115,10 @@ func (p *IdentityProviderConfig) getMetadata(
 		&md.AttributeAuthorityDescriptorType{
 			XMLName:                    xml.Name{},
 			Id:                         NewID(),
-			ValidUntil:                 p.ValidUntil,
-			CacheDuration:              p.CacheDuration,
+			ValidUntil:                 p.Metadata.ValidUntil,
+			CacheDuration:              p.Metadata.CacheDuration,
 			ProtocolSupportEnumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
-			ErrorURL:                   p.ErrorURL,
+			ErrorURL:                   p.Metadata.ErrorURL,
 			AttributeService: []md.EndpointType{{
 				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:SOAP",
 				Location: p.Endpoints.Attribute.URL,
