@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-type IAMOIDCConfigWriteModel struct {
+type IAMOIDCSettingsWriteModel struct {
 	eventstore.WriteModel
 
 	AccessTokenLifetime        time.Duration
@@ -19,8 +19,8 @@ type IAMOIDCConfigWriteModel struct {
 	State                      domain.OIDCSettingsState
 }
 
-func NewIAMOIDCConfigWriteModel() *IAMOIDCConfigWriteModel {
-	return &IAMOIDCConfigWriteModel{
+func NewIAMOIDCSettingsWriteModel() *IAMOIDCSettingsWriteModel {
+	return &IAMOIDCSettingsWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   domain.IAMID,
 			ResourceOwner: domain.IAMID,
@@ -28,7 +28,7 @@ func NewIAMOIDCConfigWriteModel() *IAMOIDCConfigWriteModel {
 	}
 }
 
-func (wm *IAMOIDCConfigWriteModel) Reduce() error {
+func (wm *IAMOIDCSettingsWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
 		case *iam.OIDCSettingsAddedEvent:
@@ -55,7 +55,7 @@ func (wm *IAMOIDCConfigWriteModel) Reduce() error {
 	return wm.WriteModel.Reduce()
 }
 
-func (wm *IAMOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *IAMOIDCSettingsWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
@@ -67,7 +67,7 @@ func (wm *IAMOIDCConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 		Builder()
 }
 
-func (wm *IAMOIDCConfigWriteModel) NewChangedEvent(
+func (wm *IAMOIDCSettingsWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	accessTokenLifetime,

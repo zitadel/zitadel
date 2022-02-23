@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
-	oidcSettingWriteModel, err := c.getOIDCConfig(ctx)
+	oidcSettingWriteModel, err := c.getOIDCSettings(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSet
 }
 
 func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
-	oidcSettingWriteModel, err := c.getOIDCConfig(ctx)
+	oidcSettingWriteModel, err := c.getOIDCSettings(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +68,8 @@ func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDC
 	return writeModelToObjectDetails(&oidcSettingWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getOIDCConfig(ctx context.Context) (_ *IAMOIDCConfigWriteModel, err error) {
-	writeModel := NewIAMOIDCConfigWriteModel()
+func (c *Commands) getOIDCSettings(ctx context.Context) (_ *IAMOIDCSettingsWriteModel, err error) {
+	writeModel := NewIAMOIDCSettingsWriteModel()
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
