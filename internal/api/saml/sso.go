@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"net/http"
 )
@@ -25,7 +26,9 @@ type AuthRequestForm struct {
 func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request) {
 	authRequestForm, err := getAuthRequestFromRequest(r)
 	if err != nil {
+		logging.Log("SAML-837n2s").Error(err)
 		http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if err := verifyForm(authRequestForm); err != nil {
@@ -37,6 +40,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-827n2s").Error(err)
 		return
 	}
 
@@ -50,12 +54,14 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-837s2s").Error(err)
 		return
 	}
 
 	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
 	if err != nil {
 		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
+		logging.Log("SAML-317s2s").Error(err)
 		return
 	}
 	if sp == nil {
@@ -67,6 +73,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-837nas").Error(err)
 		return
 	}
 
@@ -94,6 +101,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			)); err != nil {
 				http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 			}
+			logging.Log("SAML-817n2s").Error(err)
 			return
 		}
 	}
@@ -107,6 +115,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-83722s").Error(err)
 		return
 	}
 
@@ -126,6 +135,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-83711s").Error(err)
 		return
 	}
 
@@ -142,6 +152,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-8kj22s").Error(err)
 		return
 	}
 
@@ -155,6 +166,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-8opi22s").Error(err)
 		return
 	}
 
@@ -172,6 +184,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		)); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
+		logging.Log("SAML-67722s").Error(err)
 	}
 	return
 }
