@@ -384,7 +384,7 @@ API:
         SingleSignOn:
           Path: 'SSO'
           URL: '$ZITADEL_SAML/SSO'
-        SingeLogOut:
+        SingleLogOut:
           Path: 'SLO'
           URL: '$ZITADEL_SAML/SLO'
         Artifact:
