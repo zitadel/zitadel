@@ -196,6 +196,7 @@
       "IDP": "Identity Provider",
       "MFA": "Multifactor Authentication",
       "KEYS": "Schlüssel",
+      "PAT": "Personal Access Tokens",
       "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
@@ -421,7 +422,7 @@
       "DESCRIPTION": "Beschreibung",
       "KEYSTITLE": "Schlüssel",
       "KEYSDESC": "Definiere Deine Schlüssel mit einem optionalen Ablaufdatum.",
-      "TOKENSTITLE": "Access Tokens",
+      "TOKENSTITLE": "Personal Access Tokens",
       "TOKENSDESC": "Diese Access Tokens funktionieren wie gewöhnliche OAuth Access Tokens.",
       "ID": "Schlüssel-ID",
       "TYPE": "Typ",
@@ -440,6 +441,12 @@
       },
       "KEYTYPES": {
         "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Schlüssel löschen",
+          "DESCRIPTION": "Möchten Sie den ausgewählten Schlüssel löschen? Das kann nicht rückgängig gemacht werden."
+        }
       }
     },
     "PASSWORD": {

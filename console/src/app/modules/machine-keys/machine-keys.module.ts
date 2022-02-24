@@ -21,38 +21,35 @@ import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ShowKeyDialogModule } from '../show-key-dialog/show-key-dialog.module';
+import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { MachineKeysComponent } from './machine-keys.component';
 
-
 @NgModule({
-    declarations: [
-        MachineKeysComponent,
-    ],
-    imports: [
-        CommonModule,
-        RouterModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogModule,
-        HasRoleModule,
-        CardModule,
-        MatTableModule,
-        PaginatorModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatCheckboxModule,
-        MatTooltipModule,
-        HasRolePipeModule,
-        TimestampToDatePipeModule,
-        LocalizedDatePipeModule,
-        TranslateModule,
-        RefreshTableModule,
-        InputModule,
-        ShowKeyDialogModule,
-        AddKeyDialogModule,
-    ],
-    exports: [
-        MachineKeysComponent,
-    ],
+  declarations: [MachineKeysComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogModule,
+    HasRoleModule,
+    CardModule,
+    MatTableModule,
+    PaginatorModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    WarnDialogModule,
+    MatTooltipModule,
+    HasRolePipeModule,
+    TimestampToDatePipeModule,
+    LocalizedDatePipeModule,
+    TranslateModule,
+    RefreshTableModule,
+    InputModule,
+    ShowKeyDialogModule,
+    AddKeyDialogModule,
+  ],
+  exports: [MachineKeysComponent],
 })
-export class MachineKeysModule { }
+export class MachineKeysModule {}

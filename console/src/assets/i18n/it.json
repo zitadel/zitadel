@@ -196,6 +196,7 @@
       "IDP": "Identity Providers",
       "MFA": "Autenticazione a più fattori",
       "KEYS": "Chiavi",
+      "PAT": "Personal Access Tokens",
       "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Autorizzazioni",
       "MEMBERSHIPS": "Memberships",
@@ -421,7 +422,7 @@
       "DESCRIPTION": "Descrizione",
       "KEYSTITLE": "Chiavi",
       "KEYSDESC": "Definisci le tue chiavi e aggiungi una data di scadenza opzionale.",
-      "TOKENSTITLE": "Access Tokens",
+      "TOKENSTITLE": "Personal Access Tokens",
       "TOKENSDESC": "Questi Token d'accesso personali funzionano come i Access Token per OAuth.",
       "ID": "ID chiave",
       "TYPE": "Tipo",
@@ -440,6 +441,12 @@
       },
       "KEYTYPES": {
         "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Elimina Chiave",
+          "DESCRIPTION": "Vuoi eliminare la chiave selezionata? Questa azione non può essere annullata."
+        }
       }
     },
     "PASSWORD": {

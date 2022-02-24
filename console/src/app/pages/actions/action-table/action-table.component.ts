@@ -5,6 +5,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { Action, ActionState } from 'src/app/proto/generated/zitadel/action_pb';
 import {
@@ -34,6 +35,8 @@ export class ActionTableComponent implements OnInit {
   @Output() public changedSelection: EventEmitter<Array<Action.AsObject>> = new EventEmitter();
 
   public ActionState: any = ActionState;
+  public ActionKeysType: any = ActionKeysType;
+
   constructor(
     public translate: TranslateService,
     private mgmtService: ManagementService,

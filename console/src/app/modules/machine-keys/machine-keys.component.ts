@@ -13,7 +13,8 @@ import { ListMachineKeysResponse } from 'src/app/proto/generated/zitadel/managem
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
 
-import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
+import { PaginatorComponent } from '../paginator/paginator.component';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 @Component({
   selector: 'cnsl-machine-keys',
@@ -33,8 +34,12 @@ export class MachineKeysComponent implements OnInit {
 
   @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
 
-  constructor(public translate: TranslateService, private mgmtService: ManagementService, private dialog: MatDialog,
-    private toast: ToastService) {
+  constructor(
+    public translate: TranslateService,
+    private mgmtService: ManagementService,
+    private dialog: MatDialog,
+    private toast: ToastService,
+  ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
     });
@@ -44,7 +49,6 @@ export class MachineKeysComponent implements OnInit {
     this.getData(10, 0);
   }
 
-
   public isAllSelected(): boolean {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
@@ -52,23 +56,36 @@ export class MachineKeysComponent implements OnInit {
   }
 
   public masterToggle(): void {
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
+    this.isAllSelected() ? this.selection.clear() : this.dataSource.data.forEach((row) => this.selection.select(row));
   }
 
-
-  public changePage(event: PageEvent): void {
-    this.getData(event.pageSize, event.pageIndex * event.pageSize);
+  public changePage(): void {
+    this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
   public deleteKey(key: Key.AsObject): void {
-    this.mgmtService.removeMachineKey(key.id, this.userId).then(() => {
-      this.selection.clear();
-      this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
-      this.getData(10, 0);
-    }).catch(error => {
-      this.toast.showError(error);
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'USER.MACHINE.DIALOG.DELETE_KEY.TITLE',
+        descriptionKey: 'USER.MACHINE.DIALOG.DELETE_KEY.DESCRIPTION',
+      },
+      width: '400px',
+    });
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.mgmtService
+          .removeMachineKey(key.id, this.userId)
+          .then(() => {
+            this.selection.clear();
+            this.toast.showInfo('USER.TOAST.SELECTEDKEYSDELETED', true);
+            this.changePage();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
     });
   }
 
@@ -78,7 +95,7 @@ export class MachineKeysComponent implements OnInit {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         const type: KeyType = resp.type;
 
@@ -95,23 +112,26 @@ export class MachineKeysComponent implements OnInit {
         }
 
         if (type) {
-          this.mgmtService.addMachineKey(this.userId, type, date).then((response) => {
-            if (response) {
-              setTimeout(() => {
-                this.refreshPage();
-              }, 1000);
+          this.mgmtService
+            .addMachineKey(this.userId, type, date)
+            .then((response) => {
+              if (response) {
+                setTimeout(() => {
+                  this.refreshPage();
+                }, 1000);
 
-              this.dialog.open(ShowKeyDialogComponent, {
-                data: {
-                  key: response,
-                  type: AddKeyDialogType.MACHINE,
-                },
-                width: '400px',
-              });
-            }
-          }).catch((error: any) => {
-            this.toast.showError(error);
-          });
+                this.dialog.open(ShowKeyDialogComponent, {
+                  data: {
+                    key: response,
+                    type: AddKeyDialogType.MACHINE,
+                  },
+                  width: '400px',
+                });
+              }
+            })
+            .catch((error: any) => {
+              this.toast.showError(error);
+            });
         }
       }
     });
@@ -121,16 +141,19 @@ export class MachineKeysComponent implements OnInit {
     this.loadingSubject.next(true);
 
     if (this.userId) {
-      this.mgmtService.listMachineKeys(this.userId, limit, offset).then(resp => {
-        this.keyResult = resp;
-        if (resp.resultList) {
-          this.dataSource.data = resp.resultList;
-        }
-        this.loadingSubject.next(false);
-      }).catch((error: any) => {
-        this.toast.showError(error);
-        this.loadingSubject.next(false);
-      });
+      this.mgmtService
+        .listMachineKeys(this.userId, limit, offset)
+        .then((resp) => {
+          this.keyResult = resp;
+          if (resp.resultList) {
+            this.dataSource.data = resp.resultList;
+          }
+          this.loadingSubject.next(false);
+        })
+        .catch((error: any) => {
+          this.toast.showError(error);
+          this.loadingSubject.next(false);
+        });
     }
   }
 

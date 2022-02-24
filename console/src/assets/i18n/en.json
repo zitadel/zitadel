@@ -196,6 +196,7 @@
       "IDP": "Identity Providers",
       "MFA": "Multifactor Authentication",
       "KEYS": "Keys",
+      "PAT": "Personal Access Tokens",
       "PASSWORDLESS": "Passwordless",
       "USERGRANTS": "Authorizations",
       "MEMBERSHIPS": "Memberships",
@@ -421,7 +422,7 @@
       "DESCRIPTION": "Description",
       "KEYSTITLE": "Keys",
       "KEYSDESC": "Define your keys and add an optional expiration date.",
-      "TOKENSTITLE": "Access Tokens",
+      "TOKENSTITLE": "Personal Access Tokens",
       "TOKENSDESC": "Personal access tokens function like ordinary OAuth access tokens.",
       "ID": "Key ID",
       "TYPE": "Type",
@@ -440,6 +441,12 @@
       },
       "KEYTYPES": {
         "1": "JSON"
+      },
+      "DIALOG": {
+        "DELETE_KEY": {
+          "TITLE": "Delete Key",
+          "DESCRIPTION": "Do you want to delete the selected key? This cannot be undone."
+        }
       }
     },
     "PASSWORD": {

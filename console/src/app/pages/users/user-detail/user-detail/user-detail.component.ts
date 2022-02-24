@@ -27,7 +27,7 @@ const IDP: SidenavSetting = { id: 'idp', i18nKey: 'USER.SETTINGS.IDP', featureRe
 const PASSWORDLESS: SidenavSetting = { id: 'passwordless', i18nKey: 'USER.SETTINGS.PASSWORDLESS', featureRequired: false };
 const MFA: SidenavSetting = { id: 'mfa', i18nKey: 'USER.SETTINGS.MFA', featureRequired: false };
 const PERSONALACCESSTOKEN: SidenavSetting = { id: 'pat', i18nKey: 'USER.SETTINGS.PAT', featureRequired: false };
-const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.PAT', featureRequired: false };
+const KEYS: SidenavSetting = { id: 'keys', i18nKey: 'USER.SETTINGS.KEYS', featureRequired: false };
 const MEMBERSHIPS: SidenavSetting = { id: 'memberships', i18nKey: 'USER.SETTINGS.MEMBERSHIPS', featureRequired: false };
 
 @Component({
