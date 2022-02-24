@@ -73,7 +73,7 @@ type Reference struct {
 
 	DigestMethod DigestMethodType `xml:"DigestMethod"`
 
-	DigestValue DigestValueType `xml:"DigestValue"`
+	DigestValue DigestValueType `xml:"http://www.w3.org/2000/09/xmldsig# DigestValue"`
 }
 
 // Element
@@ -269,7 +269,7 @@ type SignatureType struct {
 }
 
 type SignatureValueType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# SignatureValue"`
 
 	Id string `xml:"Id,attr,omitempty"`
 
@@ -278,7 +278,7 @@ type SignatureValueType struct {
 }
 
 type SignedInfoType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# SignedInfo"`
 
 	Id string `xml:"Id,attr,omitempty"`
 
@@ -292,7 +292,7 @@ type SignedInfoType struct {
 }
 
 type CanonicalizationMethodType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# CanonicalizationMethod"`
 
 	Algorithm string `xml:"Algorithm,attr"`
 
@@ -300,7 +300,7 @@ type CanonicalizationMethodType struct {
 }
 
 type SignatureMethodType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# SignatureMethod"`
 
 	Algorithm string `xml:"Algorithm,attr"`
 
@@ -310,7 +310,7 @@ type SignatureMethodType struct {
 }
 
 type ReferenceType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# Reference"`
 
 	Id string `xml:"Id,attr,omitempty"`
 
@@ -322,13 +322,13 @@ type ReferenceType struct {
 
 	DigestMethod DigestMethodType `xml:"DigestMethod"`
 
-	DigestValue DigestValueType `xml:"DigestValue"`
+	DigestValue DigestValueType `xml:"http://www.w3.org/2000/09/xmldsig# DigestValue"`
 
 	InnerXml string `xml:",innerxml"`
 }
 
 type TransformsType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# Transforms"`
 
 	Transform []TransformType `xml:",any"`
 
@@ -336,7 +336,7 @@ type TransformsType struct {
 }
 
 type TransformType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# Transform"`
 
 	Algorithm string `xml:"Algorithm,attr"`
 
@@ -346,7 +346,7 @@ type TransformType struct {
 }
 
 type DigestMethodType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# DigestMethod"`
 
 	Algorithm string `xml:"Algorithm,attr"`
 
@@ -354,7 +354,7 @@ type DigestMethodType struct {
 }
 
 type KeyInfoType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# KeyInfo"`
 
 	Id string `xml:"Id,attr,omitempty"`
 
@@ -398,17 +398,17 @@ type RetrievalMethodType struct {
 }
 
 type X509DataType struct {
-	XMLName xml.Name
+	XMLName xml.Name `xml:"http://www.w3.org/2000/09/xmldsig# X509Data"`
 
 	X509IssuerSerial *X509IssuerSerialType `xml:"X509IssuerSerial"`
 
-	X509SKI string `xml:"X509SKI"`
+	X509SKI string `xml:"X509SKI,omitempty"`
 
-	X509SubjectName string `xml:"X509SubjectName"`
+	X509SubjectName string `xml:"X509SubjectName,omitempty"`
 
-	X509Certificate string `xml:"X509Certificate"`
+	X509Certificate string `xml:"http://www.w3.org/2000/09/xmldsig# X509Certificate"`
 
-	X509CRL string `xml:"X509CRL"`
+	X509CRL string `xml:"X509CRL,omitempty"`
 
 	InnerXml string `xml:",innerxml"`
 }
