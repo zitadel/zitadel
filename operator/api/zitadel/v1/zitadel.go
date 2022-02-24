@@ -6,6 +6,7 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	orbz "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
@@ -38,14 +39,12 @@ type Status struct {
 }
 
 type Spec struct {
-	Common *tree.Common `json:",inline" yaml:",inline"`
-	Spec   *orbz.Spec   `json:"spec" yaml:"spec"`
-	IAM    *Empty       `json:"iam" yaml:"iam"`
+	Common *tree.Common               `json:",inline" yaml:",inline"`
+	Spec   *orbz.Spec                 `json:"spec" yaml:"spec"`
+	IAM    *unstructured.Unstructured `json:"iam" yaml:"iam"`
 	// +kubebuilder:validation:Optional
-	DBConn *Empty `json:"databaseConnection" yaml:"databaseConnection"`
+	DBConn *unstructured.Unstructured `json:"databaseConnection" yaml:"databaseConnection"`
 }
-
-type Empty struct{}
 
 // +kubebuilder:object:root=true
 type ZitadelList struct {

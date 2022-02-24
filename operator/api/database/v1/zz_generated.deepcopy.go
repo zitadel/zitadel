@@ -100,8 +100,7 @@ func (in *Spec) DeepCopyInto(out *Spec) {
 	}
 	if in.Database != nil {
 		in, out := &in.Database, &out.Database
-		*out = new(Empty)
-		**out = **in
+		*out = (*in).DeepCopy()
 	}
 }
 
