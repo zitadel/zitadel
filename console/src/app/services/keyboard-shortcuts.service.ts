@@ -1,10 +1,22 @@
 import { Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { BehaviorSubject, pairwise, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, of, pairwise, Subject, takeUntil } from 'rxjs';
 
 import { KeyboardShortcutsComponent } from '../modules/keyboard-shortcuts/keyboard-shortcuts.component';
-import { ACTIONS, DOMAINS, HOME, ME, ORG, PROJECTS, SYSTEM, USERGRANTS, USERS } from './keyboard-shortcuts';
+import { GrpcAuthService } from './grpc-auth.service';
+import {
+  ACTIONS,
+  DOMAINS,
+  HOME,
+  KeyboardShortcut,
+  ME,
+  ORG,
+  PROJECTS,
+  SYSTEM,
+  USERGRANTS,
+  USERS,
+} from './keyboard-shortcuts';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +26,12 @@ export class KeyboardShortcutsService implements OnDestroy {
   private keyPressed: BehaviorSubject<any> = new BehaviorSubject<any>(null);
   private destroy$: Subject<void> = new Subject();
 
-  constructor(private rendererFactory2: RendererFactory2, private dialog: MatDialog, private router: Router) {
+  constructor(
+    private rendererFactory2: RendererFactory2,
+    private dialog: MatDialog,
+    private router: Router,
+    private authService: GrpcAuthService,
+  ) {
     this.renderer = this.rendererFactory2.createRenderer(null, null);
     this.renderer.listen('document', 'keydown', (event) => {
       this.keyPressed.next(event);
@@ -37,31 +54,49 @@ export class KeyboardShortcutsService implements OnDestroy {
         }
 
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyH') {
-          this.router.navigate(HOME.link);
+          if (this.hasPermission(HOME) && this.hasFeature(HOME)) {
+            this.router.navigate(HOME.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyS') {
-          this.router.navigate(SYSTEM.link);
+          if (this.hasPermission(SYSTEM) && this.hasFeature(SYSTEM)) {
+            this.router.navigate(SYSTEM.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyO') {
-          this.router.navigate(ORG.link);
+          if (this.hasPermission(ORG) && this.hasFeature(ORG)) {
+            this.router.navigate(ORG.link);
+          }
         }
         if (firstKey.code === 'KeyM' && secondKey.code === 'KeyE') {
-          this.router.navigate(ME.link);
+          if (this.hasPermission(ME) && this.hasFeature(ME)) {
+            this.router.navigate(ME.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyP') {
-          this.router.navigate(PROJECTS.link);
+          if (this.hasPermission(PROJECTS) && this.hasFeature(PROJECTS)) {
+            this.router.navigate(PROJECTS.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyU') {
-          this.router.navigate(USERS.link);
+          if (this.hasPermission(USERS) && this.hasFeature(USERS)) {
+            this.router.navigate(USERS.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyA') {
-          this.router.navigate(USERGRANTS.link);
+          if (this.hasPermission(USERGRANTS) && this.hasFeature(USERGRANTS)) {
+            this.router.navigate(USERGRANTS.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyF') {
-          this.router.navigate(ACTIONS.link);
+          if (this.hasPermission(ACTIONS) && this.hasFeature(ACTIONS)) {
+            this.router.navigate(ACTIONS.link);
+          }
         }
         if (firstKey.code === 'KeyG' && secondKey.code === 'KeyD') {
-          this.router.navigate(DOMAINS.link);
+          if (this.hasPermission(DOMAINS) && this.hasFeature(DOMAINS)) {
+            this.router.navigate(DOMAINS.link);
+          }
         }
 
         // if (secondKey.shiftKey && (secondKey.code === 'Digit7' || secondKey.key==='/')) {
@@ -92,5 +127,21 @@ export class KeyboardShortcutsService implements OnDestroy {
       if (resp) {
       }
     });
+  }
+
+  private hasPermission(shortcut: KeyboardShortcut): Observable<boolean> {
+    if (shortcut.permissions) {
+      return this.authService.isAllowed(shortcut.permissions);
+    } else {
+      return of(true);
+    }
+  }
+
+  private hasFeature(shortcut: KeyboardShortcut): Observable<boolean> {
+    if (shortcut.features) {
+      return this.authService.canUseFeature(shortcut.features);
+    } else {
+      return of(true);
+    }
   }
 }

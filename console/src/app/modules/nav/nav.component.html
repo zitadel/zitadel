@@ -84,11 +84,13 @@
                 </ng-template>
 
                 <ng-template cnslHasFeature [hasFeature]="['actions']">
-                  <a matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item"
-                    [routerLinkActive]="['active']" [routerLink]="[ '/actions']"
-                    [routerLinkActiveOptions]="{ exact: true }">
-                    <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
-                  </a>
+                  <ng-template cnslHasRole [hasRole]="['org.action.read']">
+                    <a matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item"
+                      [routerLinkActive]="['active']" [routerLink]="[ '/actions']"
+                      [routerLinkActiveOptions]="{ exact: true }">
+                      <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
+                    </a>
+                  </ng-template>
                 </ng-template>
 
                 <ng-template cnslHasRole [hasRole]="['org.read']">

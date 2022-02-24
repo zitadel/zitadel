@@ -15,12 +15,19 @@
   <div class="keyboard-shortcuts-group">
     <h2>{{'KEYBOARDSHORTCUTS.SIDEWIDE' | translate}}</h2>
     <div class="keyboard-shortcuts-wrapper">
-      <div class="keyboard-shortcut" *ngFor="let shortcut of shortcuts">
-        <span class="keyboard-shortcut-name cnsl-secondary-text" [innerHTML]="shortcut.i18nKey | translate"></span>
-        <span class="fill-space"></span>
-        <template *ngFor="let key of shortcut.keyboardKeys; index as i" [ngTemplateOutlet]="actionkey"
-          [ngTemplateOutletContext]="{key: key, last: i === shortcut.keyboardKeys.length-1}"></template>
-      </div>
+      <ng-container *ngFor="let shortcut of shortcuts">
+        <ng-template cnslHasRole [hasRole]="shortcut.permissions">
+          <ng-template cnslHasFeature [hasFeature]="shortcut.features">
+            <div class="keyboard-shortcut">
+              <span class="keyboard-shortcut-name cnsl-secondary-text"
+                [innerHTML]="shortcut.i18nKey | translate"></span>
+              <span class="fill-space"></span>
+              <template *ngFor="let key of shortcut.keyboardKeys; index as i" [ngTemplateOutlet]="actionkey"
+                [ngTemplateOutletContext]="{key: key, last: i === shortcut.keyboardKeys.length-1}"></template>
+            </div>
+          </ng-template>
+        </ng-template>
+      </ng-container>
     </div>
   </div>
 </div>
