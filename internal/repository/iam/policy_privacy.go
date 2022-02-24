@@ -22,7 +22,8 @@ func NewPrivacyPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		PrivacyPolicyAddedEvent: *policy.NewPrivacyPolicyAddedEvent(
@@ -31,7 +32,8 @@ func NewPrivacyPolicyAddedEvent(
 				aggregate,
 				PrivacyPolicyAddedEventType),
 			tosLink,
-			privacyLink),
+			privacyLink,
+			helpLink),
 	}
 }
 

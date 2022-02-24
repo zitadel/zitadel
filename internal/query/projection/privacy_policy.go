@@ -28,6 +28,7 @@ const (
 	PrivacyPolicyStateCol         = "state"
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
+	PrivacyPolicyHelpLinkCol      = "help_link"
 	PrivacyPolicyIsDefaultCol     = "is_default"
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
 )
@@ -99,6 +100,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(PrivacyPolicyPrivacyLinkCol, policyEvent.PrivacyLink),
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
+			handler.NewCol(PrivacyPolicyHelpLinkCol, policyEvent.HelpLink),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 		}), nil
@@ -124,6 +126,9 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	if policyEvent.TOSLink != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicyTOSLinkCol, *policyEvent.TOSLink))
+	}
+	if policyEvent.HelpLink != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyHelpLinkCol, *policyEvent.HelpLink))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,

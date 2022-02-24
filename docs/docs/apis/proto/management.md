@@ -3108,6 +3108,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
+| help_link |  string | - |  |
 
 
 
@@ -7823,6 +7824,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
+| help_link |  string | - |  |
 
 
 

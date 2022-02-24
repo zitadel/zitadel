@@ -4635,6 +4635,7 @@ message GetDefaultPrivacyPolicyResponse {
 message AddCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -4644,6 +4645,7 @@ message AddCustomPrivacyPolicyResponse {
 message UpdateCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdateCustomPrivacyPolicyResponse {

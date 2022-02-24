@@ -46,6 +46,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -63,6 +64,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
@@ -74,6 +76,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -93,6 +96,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 									&org.NewAggregate("org1", "org1").Aggregate,
 									"TOSLink",
 									"PrivacyLink",
+									"HelpLink",
 								),
 							),
 						},
@@ -105,6 +109,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -115,6 +120,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 		},
@@ -131,6 +137,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 									&org.NewAggregate("org1", "org1").Aggregate,
 									"",
 									"",
+									"",
 								),
 							),
 						},
@@ -143,6 +150,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "",
 					PrivacyLink: "",
+					HelpLink:    "",
 				},
 			},
 			res: res{
@@ -153,6 +161,7 @@ func TestCommandSide_AddPrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "",
 					PrivacyLink: "",
+					HelpLink:    "",
 				},
 			},
 		},
@@ -207,6 +216,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -227,6 +237,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -244,6 +255,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
@@ -255,6 +267,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -272,13 +285,14 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newPrivacyPolicyChangedEvent(context.Background(), "org1", "TOSLinkChange", "PrivacyLinkChange"),
+								newPrivacyPolicyChangedEvent(context.Background(), "org1", "TOSLinkChange", "PrivacyLinkChange", "HelpLinkChange"),
 							),
 						},
 					),
@@ -290,6 +304,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLinkChange",
 					PrivacyLink: "PrivacyLinkChange",
+					HelpLink:    "HelpLinkChange",
 				},
 			},
 			res: res{
@@ -300,6 +315,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "TOSLinkChange",
 					PrivacyLink: "PrivacyLinkChange",
+					HelpLink:    "HelpLinkChange",
 				},
 			},
 		},
@@ -314,13 +330,14 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newPrivacyPolicyChangedEvent(context.Background(), "org1", "", ""),
+								newPrivacyPolicyChangedEvent(context.Background(), "org1", "", "", ""),
 							),
 						},
 					),
@@ -332,6 +349,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "",
 					PrivacyLink: "",
+					HelpLink:    "",
 				},
 			},
 			res: res{
@@ -342,6 +360,7 @@ func TestCommandSide_ChangePrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "",
 					PrivacyLink: "",
+					HelpLink:    "",
 				},
 			},
 		},
@@ -424,6 +443,7 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 								&org.NewAggregate("org1", "org1").Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
@@ -467,12 +487,13 @@ func TestCommandSide_RemovePrivacyPolicy(t *testing.T) {
 	}
 }
 
-func newPrivacyPolicyChangedEvent(ctx context.Context, orgID string, tosLink, privacyLink string) *org.PrivacyPolicyChangedEvent {
+func newPrivacyPolicyChangedEvent(ctx context.Context, orgID string, tosLink, privacyLink, helpLink string) *org.PrivacyPolicyChangedEvent {
 	event, _ := org.NewPrivacyPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		[]policy.PrivacyPolicyChanges{
 			policy.ChangeTOSLink(tosLink),
 			policy.ChangePrivacyLink(privacyLink),
+			policy.ChangeHelpLink(helpLink),
 		},
 	)
 	return event

@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"testing"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -10,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/policy"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
@@ -42,6 +43,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
@@ -52,6 +54,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -71,6 +74,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 									&iam.NewAggregate().Aggregate,
 									"TOSLink",
 									"PrivacyLink",
+									"HelpLink",
 								),
 							),
 						},
@@ -82,6 +86,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -92,6 +97,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 		},
@@ -108,6 +114,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 									&iam.NewAggregate().Aggregate,
 									"",
 									"",
+									"",
 								),
 							),
 						},
@@ -119,6 +126,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "",
 					PrivacyLink: "",
+					HelpLink:    "",
 				},
 			},
 			res: res{
@@ -129,6 +137,7 @@ func TestCommandSide_AddDefaultPrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "",
 					PrivacyLink: "",
+					HelpLink:    "",
 				},
 			},
 		},
@@ -183,6 +192,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -200,6 +210,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
@@ -210,6 +221,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLink",
 					PrivacyLink: "PrivacyLink",
+					HelpLink:    "HelpLink",
 				},
 			},
 			res: res{
@@ -227,6 +239,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 								&iam.NewAggregate().Aggregate,
 								"TOSLink",
 								"PrivacyLink",
+								"HelpLink",
 							),
 						),
 					),
@@ -236,6 +249,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 								newDefaultPrivacyPolicyChangedEvent(context.Background(),
 									"TOSLinkChanged",
 									"PrivacyLinkChanged",
+									"HelpLinkChanged",
 								),
 							),
 						},
@@ -247,6 +261,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 				policy: &domain.PrivacyPolicy{
 					TOSLink:     "TOSLinkChanged",
 					PrivacyLink: "PrivacyLinkChanged",
+					HelpLink:    "HelpLinkChanged",
 				},
 			},
 			res: res{
@@ -257,6 +272,7 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 					},
 					TOSLink:     "TOSLinkChanged",
 					PrivacyLink: "PrivacyLinkChanged",
+					HelpLink:    "HelpLinkChanged",
 				},
 			},
 		},
@@ -280,12 +296,13 @@ func TestCommandSide_ChangeDefaultPrivacyPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultPrivacyPolicyChangedEvent(ctx context.Context, tosLink, privacyLink string) *iam.PrivacyPolicyChangedEvent {
+func newDefaultPrivacyPolicyChangedEvent(ctx context.Context, tosLink, privacyLink, helpLink string) *iam.PrivacyPolicyChangedEvent {
 	event, _ := iam.NewPrivacyPolicyChangedEvent(ctx,
 		&iam.NewAggregate().Aggregate,
 		[]policy.PrivacyPolicyChanges{
 			policy.ChangeTOSLink(tosLink),
 			policy.ChangePrivacyLink(privacyLink),
+			policy.ChangeHelpLink(helpLink),
 		},
 	)
 	return event
