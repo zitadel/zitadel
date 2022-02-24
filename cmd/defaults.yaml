@@ -20,7 +20,7 @@ Database:
     Username: zitadel
     Password: ""
     SSL:
-      Mode: diabled
+      Mode: disable
       RootCert: ""
       Cert: ""
       Key: ""
@@ -29,7 +29,7 @@ AdminUser:
   Username: root
   Password: ""
   SSL:
-    Mode: diabled
+    Mode: disable
     RootCert: ""
     Cert: ""
     Key: ""
@@ -44,10 +44,6 @@ Projections:
     Customizations:
       projects:
         BulkLimit: 2000
-  KeyConfig:
-    # We don't need an EncryptionKey but DecryptionKeys (and load them via env)
-    DecryptionKeyIDs:
-    Path: ""
 
 AuthZ:
   Repository:
@@ -72,8 +68,6 @@ Admin:
 
 UserAgentCookie:
   Name: zitadel.useragent
-  Key:
-    EncryptionKeyID:
   MaxAge: 8760h #365*24h (1 year)
 
 OIDC:
@@ -90,19 +84,11 @@ OIDC:
   Cache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
-  KeyConfig:
-    EncryptionKeyID: ""
-    DecryptionKeyIDs:
-    Path: ""
   CustomEndpoints:
 
 Login:
   LanguageCookieName: zitadel.login.lang
-  CSRF:
-    CookieName: zitadel.login.csrf
-    Development: true
-    Key:
-      EncryptionKeyID:
+  CSRFCookieName: zitadel.login.csrf
   Cache:
     MaxAge: 12h
     SharedMaxAge: 168h #7d
@@ -124,6 +110,31 @@ Notification:
       FailureCountUntilSkip: 5
       Handlers:
 
+EncryptionKeys:
+  DomainVerification:
+    EncryptionKeyID: "domainVerificationKey"
+    DecryptionKeyIDs:
+  IDPConfig:
+    EncryptionKeyID: "idpConfigKey"
+    DecryptionKeyIDs:
+  OIDC:
+    EncryptionKeyID: "oidcKey"
+    DecryptionKeyIDs:
+  OTP:
+    EncryptionKeyID: "otpKey"
+    DecryptionKeyIDs:
+  SMS:
+    EncryptionKeyID: "smsKey"
+    DecryptionKeyIDs:
+  SMTP:
+    EncryptionKeyID: "smtpKey"
+    DecryptionKeyIDs:
+  User:
+    EncryptionKeyID: "userKey"
+    DecryptionKeyIDs:
+  CSRFCookieKeyID: "csrfCookieKey"
+  UserAgentCookieKeyID: "userAgentCookieKey"
+
 #TODO: configure as soon as possible
 #AssetStorage:
 #  Type: $ZITADEL_ASSET_STORAGE_TYPE
@@ -143,14 +154,6 @@ SystemDefaults:
   ZitadelDocs:
     Issuer: $ZITADEL_ISSUER
     DiscoveryEndpoint: '$ZITADEL_ISSUER/.well-known/openid-configuration'
-  UserVerificationKey:
-    EncryptionKeyID: $ZITADEL_USER_VERIFICATION_KEY
-  IDPConfigVerificationKey:
-    EncryptionKeyID: $ZITADEL_IDP_CONFIG_VERIFICATION_KEY
-  SMTPPasswordVerificationKey:
-    EncryptionKeyID: $ZITADEL_SMTP_PASSWORD_VERIFICATION_KEY
-  SMSVerificationKey:
-    EncryptionKeyID: $ZITADEL_SMS_VERIFICATION_KEY
   SecretGenerators:
     PasswordSaltCost: 14
     ClientSecretGenerator:
@@ -199,8 +202,6 @@ SystemDefaults:
   Multifactors:
     OTP:
       Issuer: 'ZITADEL'
-      VerificationKey:
-        EncryptionKeyID: $ZITADEL_OTP_VERIFICATION_KEY
   VerificationLifetimes:
     PasswordCheck: 240h #10d
     ExternalLoginCheck: 240h #10d
@@ -208,8 +209,6 @@ SystemDefaults:
     SecondFactorCheck: 18h
     MultiFactorCheck: 12h
   DomainVerification:
-    VerificationKey:
-      EncryptionKeyID: $ZITADEL_DOMAIN_VERIFICATION_KEY
     VerificationGenerator:
       Length: 32
       IncludeLowerLetters: true

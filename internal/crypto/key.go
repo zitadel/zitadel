@@ -1,51 +1,48 @@
 package crypto
 
 import (
-	"os"
-
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/config"
 	"github.com/caos/zitadel/internal/errors"
-)
-
-const (
-	ZitadelKeyPath = "ZITADEL_KEY_PATH"
 )
 
 type KeyConfig struct {
 	EncryptionKeyID  string
 	DecryptionKeyIDs []string
-	Path             string
 }
 
 type Keys map[string]string
 
-func ReadKeys(path string) (Keys, error) {
-	if path == "" {
-		path = os.Getenv(ZitadelKeyPath)
-		if path == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "CRYPT-56lka", "no path set")
-		}
-	}
-	keys := new(Keys)
-	err := config.Read(keys, path)
-	return *keys, err
+type Key struct {
+	ID    string
+	Value string
 }
 
-func LoadKey(config *KeyConfig, id string) (string, error) {
-	keys, _, err := LoadKeys(config)
+type EncryptionKeys struct {
+	DomainVerification   *KeyConfig
+	IDPConfig            *KeyConfig
+	OIDC                 *KeyConfig
+	OTP                  *KeyConfig
+	SMS                  *KeyConfig
+	SMTP                 *KeyConfig
+	User                 *KeyConfig
+	CSRFCookieKeyID      string
+	UserAgentCookieKeyID string
+}
+
+func LoadKey(keyStorage KeyStorage, id string) (string, error) {
+	key, err := keyStorage.ReadKey(id)
 	if err != nil {
 		return "", err
 	}
-	return keys[id], nil
+	return key.Value, nil
 }
 
-func LoadKeys(config *KeyConfig) (map[string]string, []string, error) {
+func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (map[string]string, []string, error) {
 	if config == nil {
 		return nil, nil, errors.ThrowInvalidArgument(nil, "CRYPT-dJK8s", "config must not be nil")
 	}
-	readKeys, err := ReadKeys(config.Path)
+	readKeys, err := keyStorage.ReadKeys()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -62,7 +59,7 @@ func LoadKeys(config *KeyConfig) (map[string]string, []string, error) {
 	for _, id := range config.DecryptionKeyIDs {
 		key, ok := readKeys[id]
 		if !ok {
-			logging.Log("CRYPT-s23rf").Warnf("description key %s not found", id)
+			logging.Errorf("description key %s not found", id)
 			continue
 		}
 		keys[id] = key

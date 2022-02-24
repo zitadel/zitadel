@@ -35,23 +35,18 @@ type Login struct {
 	//staticCache         cache.Cache //TODO: enable when storage is implemented again
 	authRepo            auth_repository.Repository
 	baseURL             string
-	zitadelURL          string
+	consolePath         string
 	oidcAuthCallbackURL string
-	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
-	UserCodeAlg         crypto.EncryptionAlgorithm
+	idpConfigAlg        crypto.EncryptionAlgorithm
+	userCodeAlg         crypto.EncryptionAlgorithm
 	iamDomain           string
 }
 
 type Config struct {
 	LanguageCookieName string
-	CSRF               CSRF
+	CSRFCookieName     string
 	Cache              middleware.CacheConfig
 	//StaticCache         cache_config.CacheConfig //TODO: enable when storage is implemented again
-}
-
-type CSRF struct {
-	CookieName string
-	Key        *crypto.KeyConfig
 }
 
 const (
@@ -60,22 +55,40 @@ const (
 	DefaultLoggedOutPath = HandlerPrefix + EndpointLogoutDone
 )
 
-func CreateLogin(config Config, command *command.Commands, query *query.Queries, authRepo *eventsourcing.EsRepository, staticStorage static.Storage, systemDefaults systemdefaults.SystemDefaults, zitadelURL, domain, oidcAuthCallbackURL string, externalSecure bool, userAgentCookie mux.MiddlewareFunc, userCrypto *crypto.AESCrypto) (*Login, error) {
-	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.IDPConfigVerificationKey)
+func CreateLogin(config Config,
+	command *command.Commands,
+	query *query.Queries,
+	authRepo *eventsourcing.EsRepository,
+	staticStorage static.Storage,
+	systemDefaults systemdefaults.SystemDefaults,
+	consolePath,
+	domain,
+	baseURL,
+	oidcAuthCallbackURL string,
+	externalSecure bool,
+	userAgentCookie mux.MiddlewareFunc,
+	keyStorage crypto.KeyStorage,
+	encryptionKeyConfig *crypto.EncryptionKeys,
+) (*Login, error) {
+	userCodeAlg, err := crypto.NewAESCrypto(encryptionKeyConfig.User, keyStorage)
+	if err != nil {
+		return nil, fmt.Errorf("error create new aes crypto: %w", err)
+	}
+	idpConfigAlg, err := crypto.NewAESCrypto(encryptionKeyConfig.IDPConfig, keyStorage)
 	if err != nil {
 		return nil, fmt.Errorf("error create new aes crypto: %w", err)
 	}
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
-		baseURL:             HandlerPrefix,
-		zitadelURL:          zitadelURL,
+		baseURL:             baseURL + HandlerPrefix,
+		consolePath:         consolePath,
 		command:             command,
 		query:               query,
 		staticStorage:       staticStorage,
 		authRepo:            authRepo,
-		IDPConfigAesCrypto:  aesCrypto,
 		iamDomain:           domain,
-		UserCodeAlg:         userCrypto,
+		idpConfigAlg:        idpConfigAlg,
+		userCodeAlg:         userCodeAlg,
 	}
 	//TODO: enable when storage is implemented again
 	//login.staticCache, err = config.StaticCache.Config.NewCache()
@@ -88,7 +101,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
 	}
 
-	csrfInterceptor, err := createCSRFInterceptor(config.CSRF, externalSecure, login.csrfErrorHandler())
+	csrfInterceptor, err := createCSRFInterceptor(config.CSRFCookieName, keyStorage, encryptionKeyConfig.CSRFCookieKeyID, externalSecure, login.csrfErrorHandler())
 	if err != nil {
 		return nil, fmt.Errorf("unable to create csrfInterceptor: %w", err)
 	}
@@ -111,15 +124,15 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createCSRFInterceptor(config CSRF, externalSecure bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
-	csrfKey, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
+func createCSRFInterceptor(cookieName string, keyStorage crypto.KeyStorage, encryptionKeyID string, externalSecure bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
+	csrfKey, err := crypto.LoadKey(keyStorage, encryptionKeyID)
 	if err != nil {
 		return nil, err
 	}
 	path := "/"
 	return csrf.Protect([]byte(csrfKey),
 		csrf.Secure(externalSecure),
-		csrf.CookieName(http_utils.SetCookiePrefix(config.CookieName, "", path, externalSecure)),
+		csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
 		csrf.Path(path),
 		csrf.ErrorHandler(errorHandler),
 	), nil

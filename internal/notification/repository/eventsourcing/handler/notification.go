@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -37,11 +38,11 @@ type Notification struct {
 	handler
 	command            *command.Commands
 	systemDefaults     sd.SystemDefaults
-	AesCrypto          crypto.EncryptionAlgorithm
 	statikDir          http.FileSystem
 	subscription       *v1.Subscription
 	assetsPrefix       string
 	queries            *query.Queries
+	userDataCrypto     crypto.EncryptionAlgorithm
 	smtpPasswordCrypto crypto.EncryptionAlgorithm
 }
 
@@ -50,25 +51,33 @@ func newNotification(
 	command *command.Commands,
 	query *query.Queries,
 	defaults sd.SystemDefaults,
-	aesCrypto crypto.EncryptionAlgorithm,
 	statikDir http.FileSystem,
 	assetsPrefix string,
-	smtpPasswordEncAlg crypto.EncryptionAlgorithm,
-) *Notification {
+	keyStorage crypto.KeyStorage,
+	userEncryptionConfig *crypto.KeyConfig,
+	smtpEncryptionConfig *crypto.KeyConfig,
+) (*Notification, error) {
 	h := &Notification{
-		handler:            handler,
-		command:            command,
-		systemDefaults:     defaults,
-		statikDir:          statikDir,
-		AesCrypto:          aesCrypto,
-		assetsPrefix:       assetsPrefix,
-		queries:            query,
-		smtpPasswordCrypto: smtpPasswordEncAlg,
+		handler:        handler,
+		command:        command,
+		systemDefaults: defaults,
+		statikDir:      statikDir,
+		assetsPrefix:   assetsPrefix,
+		queries:        query,
+	}
+	var err error
+	h.userDataCrypto, err = crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
+	if err != nil {
+		return nil, fmt.Errorf("cannot initialize user data decryption: %w", err)
+	}
+	h.smtpPasswordCrypto, err = crypto.NewAESCrypto(smtpEncryptionConfig, keyStorage)
+	if err != nil {
+		return nil, fmt.Errorf("cannot initialize smtp password decryption: %w", err)
 	}
 
 	h.subscribe()
 
-	return h
+	return h, nil
 }
 
 func (k *Notification) subscribe() {
@@ -165,7 +174,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -203,7 +212,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -242,7 +251,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -268,7 +277,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(translator, user, phoneCode, n.systemDefaults, n.AesCrypto)
+	err = types.SendPhoneVerificationCode(translator, user, phoneCode, n.systemDefaults, n.userDataCrypto)
 	if err != nil {
 		return err
 	}
@@ -355,7 +364,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 
-	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}

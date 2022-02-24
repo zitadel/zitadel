@@ -14,18 +14,14 @@ import (
 )
 
 type SystemDefaults struct {
-	DefaultLanguage             language.Tag
-	Domain                      string
-	ZitadelDocs                 ZitadelDocs
-	SecretGenerators            SecretGenerators
-	UserVerificationKey         *crypto.KeyConfig
-	IDPConfigVerificationKey    *crypto.KeyConfig
-	SMTPPasswordVerificationKey *crypto.KeyConfig
-	SMSVerificationKey          *crypto.KeyConfig
-	Multifactors                MultifactorConfig
-	DomainVerification          DomainVerification
-	Notifications               Notifications
-	KeyConfig                   KeyConfig
+	DefaultLanguage       language.Tag
+	Domain                string
+	ZitadelDocs           ZitadelDocs
+	SecretGenerators      SecretGenerators
+	Multifactors          MultifactorConfig
+	DomainVerification    DomainVerification
+	Notifications         Notifications
+	KeyConfig             KeyConfig
 }
 
 type ZitadelDocs struct {
@@ -44,12 +40,10 @@ type MultifactorConfig struct {
 }
 
 type OTPConfig struct {
-	Issuer          string
-	VerificationKey *crypto.KeyConfig
+	Issuer string
 }
 
 type DomainVerification struct {
-	VerificationKey       *crypto.KeyConfig
 	VerificationGenerator crypto.GeneratorConfig
 }
 

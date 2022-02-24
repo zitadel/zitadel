@@ -14,6 +14,6 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func Start(config Config, systemDefaults sd.SystemDefaults, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig) (repository.Repository, error) {
-	return eventsourcing.Start(config.Repository, systemDefaults, queries, dbClient, keyConfig)
+func Start(config Config, systemDefaults sd.SystemDefaults, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig, keyStorage crypto.KeyStorage) (repository.Repository, error) {
+	return eventsourcing.Start(config.Repository, systemDefaults, queries, dbClient, keyConfig, keyStorage)
 }

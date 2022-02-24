@@ -79,14 +79,14 @@ new -f keys.yaml key2=anotherkey`,
 	return cmd
 }
 
-func keysFromArgs(args []string) ([]crypto.Key, error) {
-	keys := make([]crypto.Key, len(args))
+func keysFromArgs(args []string) ([]*crypto.Key, error) {
+	keys := make([]*crypto.Key, len(args))
 	for i, arg := range args {
 		key := strings.Split(arg, "=")
 		if len(key) != 2 {
 			return nil, helper.NewUserError("argument is not in the valid format [keyID=key]")
 		}
-		keys[i] = crypto.Key{
+		keys[i] = &crypto.Key{
 			ID:    key[0],
 			Value: key[1],
 		}
@@ -94,7 +94,7 @@ func keysFromArgs(args []string) ([]crypto.Key, error) {
 	return keys, nil
 }
 
-func keysFromYAML(file io.Reader) ([]crypto.Key, error) {
+func keysFromYAML(file io.Reader) ([]*crypto.Key, error) {
 	data, err := io.ReadAll(file)
 	if err != nil {
 		return nil, helper.NewUserErrorf("unable to extract keys from file").WithParent(err)
@@ -103,9 +103,9 @@ func keysFromYAML(file io.Reader) ([]crypto.Key, error) {
 	if err = yaml.Unmarshal(data, &keysYAML); err != nil {
 		return nil, helper.NewUserError("unable to extract keys from file").WithParent(err)
 	}
-	keys := make([]crypto.Key, 0, len(keysYAML))
+	keys := make([]*crypto.Key, 0, len(keysYAML))
 	for id, key := range keysYAML {
-		keys = append(keys, crypto.Key{
+		keys = append(keys, &crypto.Key{
 			ID:    id,
 			Value: key,
 		})

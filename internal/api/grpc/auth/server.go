@@ -1,8 +1,10 @@
 package auth
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/logging"
 	"google.golang.org/grpc"
+
+	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
@@ -27,21 +29,30 @@ type Server struct {
 	repo            repository.Repository
 	defaults        systemdefaults.SystemDefaults
 	assetsAPIDomain string
-	UserCodeAlg     crypto.EncryptionAlgorithm
+	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository, defaults systemdefaults.SystemDefaults, assetsAPIDomain string, userCrypto *crypto.AESCrypto) *Server {
+func CreateServer(command *command.Commands,
+	query *query.Queries,
+	authRepo repository.Repository,
+	defaults systemdefaults.SystemDefaults,
+	assetsAPIDomain string,
+	keyStorage crypto.KeyStorage,
+	userEncryptionConfig *crypto.KeyConfig,
+) *Server {
+	userCodeAlg, err := crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
+	logging.OnError(err).Fatal("unable to initialise user code algorithm")
 	return &Server{
 		command:         command,
 		query:           query,
 		repo:            authRepo,
 		defaults:        defaults,
 		assetsAPIDomain: assetsAPIDomain,
-		UserCodeAlg:     userCrypto,
+		userCodeAlg:     userCodeAlg,
 	}
 }
 

@@ -39,6 +39,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	cryptoDB "github.com/caos/zitadel/internal/crypto/database"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -50,6 +51,10 @@ import (
 	static_config "github.com/caos/zitadel/internal/static/config"
 	"github.com/caos/zitadel/internal/webauthn"
 	"github.com/caos/zitadel/openapi"
+)
+
+const (
+	flagMasterKey = "masterkey"
 )
 
 func New() *cobra.Command {
@@ -72,13 +77,16 @@ Requirements:
 			if err != nil {
 				return err
 			}
-			return startZitadel(config)
+			masterKey, _ := cmd.Flags().GetString("masterkey")
+			return startZitadel(config, masterKey)
 		},
 	}
 	bindUint16Flag(start, "port", "port to run ZITADEL on")
 	bindStringFlag(start, "externalDomain", "domain ZITADEL will be exposed on")
 	bindStringFlag(start, "externalPort", "port ZITADEL will be exposed on")
 	bindBoolFlag(start, "externalSecure", "if ZITADEL will be served on HTTPS")
+
+	start.PersistentFlags().String(flagMasterKey, "", "masterkey for en/decryption keys")
 
 	return start
 }
@@ -105,7 +113,7 @@ type startConfig struct {
 	ExternalDomain  string
 	ExternalSecure  bool
 	Database        database.Config
-	Projections     projectionConfig
+	Projections     projection.Config
 	AuthZ           authz.Config
 	Auth            auth_es.Config
 	Admin           admin_es.Config
@@ -117,20 +125,20 @@ type startConfig struct {
 	AssetStorage    static_config.AssetStorageConfig
 	InternalAuthZ   internal_authz.Config
 	SystemDefaults  systemdefaults.SystemDefaults
+	EncryptionKeys  *crypto.EncryptionKeys
 }
 
-type projectionConfig struct {
-	projection.Config
-	KeyConfig *crypto.KeyConfig
-}
-
-func startZitadel(config *startConfig) error {
+func startZitadel(config *startConfig, masterKey string) error {
 	ctx := context.Background()
 	keyChan := make(chan interface{})
 
 	dbClient, err := database.Connect(config.Database)
 	if err != nil {
 		return fmt.Errorf("cannot start client for projection: %w", err)
+	}
+	keyStorage, err := cryptoDB.NewKeyStorage(dbClient, masterKey)
+	if err != nil {
+		return fmt.Errorf("cannot start key storage: %w", err)
 	}
 	var storage static.Storage
 	//TODO: enable when storage is implemented again
@@ -142,22 +150,22 @@ func startZitadel(config *startConfig) error {
 	if err != nil {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)
 	}
-	smtpPasswordCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMTPPasswordVerificationKey)
-	if err != nil {
-		return fmt.Errorf("cannot create smtp crypto: %w", err)
-	}
+	//smtpPasswordCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMTPPasswordVerificationKey)
+	//if err != nil {
+	//	return fmt.Errorf("cannot create smtp crypto: %w", err)
+	//}
+	//
+	//smsCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMSVerificationKey)
+	//if err != nil {
+	//	return fmt.Errorf("cannot create smtp crypto: %w", err)
+	//}
 
-	smsCrypto, err := crypto.NewAESCrypto(config.SystemDefaults.SMSVerificationKey)
-	if err != nil {
-		return fmt.Errorf("cannot create smtp crypto: %w", err)
-	}
-
-	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections.Config, config.SystemDefaults, config.Projections.KeyConfig, keyChan, config.InternalAuthZ.RolePermissionMappings)
+	queries, err := query.StartQueries(ctx, eventstoreClient, dbClient, config.Projections, config.EncryptionKeys.OIDC, keyStorage, keyChan, config.InternalAuthZ.RolePermissionMappings)
 	if err != nil {
 		return fmt.Errorf("cannot start queries: %w", err)
 	}
 
-	authZRepo, err := authz.Start(config.AuthZ, config.SystemDefaults, queries, dbClient, config.OIDC.KeyConfig)
+	authZRepo, err := authz.Start(config.AuthZ, config.SystemDefaults, queries, dbClient, config.EncryptionKeys.OIDC, keyStorage)
 	if err != nil {
 		return fmt.Errorf("error starting authz repo: %w", err)
 	}
@@ -166,22 +174,22 @@ func startZitadel(config *startConfig) error {
 		Origin:      http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure),
 		DisplayName: "ZITADEL",
 	}
-	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.OIDC.KeyConfig, webAuthNConfig, smtpPasswordCrypto, smsCrypto)
+	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, storage, authZRepo, config.EncryptionKeys, keyStorage, webAuthNConfig)
 	if err != nil {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, smtpPasswordCrypto)
+	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keyStorage, config.EncryptionKeys.User, config.EncryptionKeys.SMTP)
 
 	router := mux.NewRouter()
-	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo)
+	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo, keyStorage)
 	if err != nil {
 		return err
 	}
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *startConfig, store static.Storage, authZRepo authz_repo.Repository) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *startConfig, store static.Storage, authZRepo authz_repo.Repository, keyStorage crypto.KeyStorage) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries
@@ -192,11 +200,11 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	verifier := internal_authz.Start(repo)
 
 	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure)
-	userEncryptionAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey)
-	if err != nil {
-		return nil
-	}
-	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, config.OIDC.KeyConfig, assets.HandlerPrefix, userEncryptionAlgorithm)
+	//userEncryptionAlgorithm, err := crypto.NewAESCrypto(config.SystemDefaults.UserVerificationKey, keyStorage)
+	//if err != nil {
+	//	return nil
+	//}
+	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keyStorage, config.EncryptionKeys.OIDC, config.EncryptionKeys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
 	}
@@ -204,25 +212,25 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("error starting admin repo: %w", err)
 	}
-	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
+	if err := apis.RegisterServer(ctx, admin.CreateServer(commands, queries, adminRepo, config.SystemDefaults.Domain, assets.HandlerPrefix, keyStorage, config.EncryptionKeys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
+	if err := apis.RegisterServer(ctx, management.CreateServer(commands, queries, config.SystemDefaults, assets.HandlerPrefix, keyStorage, config.EncryptionKeys.User)); err != nil {
 		return err
 	}
-	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, userEncryptionAlgorithm)); err != nil {
+	if err := apis.RegisterServer(ctx, auth.CreateServer(commands, queries, authRepo, config.SystemDefaults, assets.HandlerPrefix, keyStorage, config.EncryptionKeys.User)); err != nil {
 		return err
 	}
 
 	apis.RegisterHandler(assets.HandlerPrefix, assets.NewHandler(commands, verifier, config.InternalAuthZ, id.SonyFlakeGenerator, store, queries))
 
-	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
+	userAgentInterceptor, err := middleware.NewUserAgentHandler(config.UserAgentCookie, keyStorage, config.EncryptionKeys.UserAgentCookieKeyID, config.ExternalDomain, id.SonyFlakeGenerator, config.ExternalSecure)
 	if err != nil {
 		return err
 	}
 
 	issuer := oidc.Issuer(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, userAgentInterceptor)
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, eventstore, dbClient, keyChan, keyStorage, config.EncryptionKeys.OIDC, userAgentInterceptor)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -238,13 +246,14 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return fmt.Errorf("unable to get client_id for console: %w", err)
 	}
-	c, err := console.Start(config.Console, config.ExternalDomain, http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure), issuer, consoleID)
+	baseURL := http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
+	c, err := console.Start(config.Console, config.ExternalDomain, baseURL, issuer, consoleID)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, userEncryptionAlgorithm)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, baseURL, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, keyStorage, config.EncryptionKeys)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}

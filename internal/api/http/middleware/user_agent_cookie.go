@@ -35,12 +35,11 @@ type userAgentHandler struct {
 
 type UserAgentCookieConfig struct {
 	Name   string
-	Key    *crypto.KeyConfig
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
-	key, err := crypto.LoadKey(config.Key, config.Key.EncryptionKeyID)
+func NewUserAgentHandler(config *UserAgentCookieConfig, keyStorage crypto.KeyStorage, encryptionKeyID, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
+	key, err := crypto.LoadKey(keyStorage, encryptionKeyID)
 	if err != nil {
 		return nil, err
 	}

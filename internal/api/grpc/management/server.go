@@ -1,13 +1,14 @@
 package management
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/logging"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -24,18 +25,26 @@ type Server struct {
 	query           *query.Queries
 	systemDefaults  systemdefaults.SystemDefaults
 	assetAPIPrefix  string
-	PasswordHashAlg crypto.HashAlgorithm
-	UserCodeAlg     crypto.EncryptionAlgorithm
+	passwordHashAlg crypto.HashAlgorithm
+	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, sd systemdefaults.SystemDefaults, assetAPIPrefix string, userCrypto *crypto.AESCrypto) *Server {
+func CreateServer(command *command.Commands,
+	query *query.Queries,
+	sd systemdefaults.SystemDefaults,
+	assetAPIPrefix string,
+	keyStorage crypto.KeyStorage,
+	userEncryptionConfig *crypto.KeyConfig,
+) *Server {
+	userCodeAlg, err := crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
+	logging.OnError(err).Fatal("unable to initialise user code algorithm")
 	return &Server{
 		command:         command,
 		query:           query,
 		systemDefaults:  sd,
 		assetAPIPrefix:  assetAPIPrefix,
-		PasswordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
-		UserCodeAlg:     userCrypto,
+		passwordHashAlg: crypto.NewBCrypt(sd.SecretGenerators.PasswordSaltCost),
+		userCodeAlg:     userCodeAlg,
 	}
 }
 

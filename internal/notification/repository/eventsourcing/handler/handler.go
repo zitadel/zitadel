@@ -34,25 +34,40 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm) []queryv1.Handler {
-	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
-	logging.OnError(err).Fatal("error create new aes crypto")
+func Register(configs Configs,
+	bulkLimit,
+	errorCount uint64,
+	view *view.View,
+	es v1.Eventstore,
+	command *command.Commands,
+	queries *query.Queries,
+	systemDefaults sd.SystemDefaults,
+	dir http.FileSystem,
+	assetsPrefix string,
+	keyStorage crypto.KeyStorage,
+	userEncryptionConfig *crypto.KeyConfig,
+	smtpEncryptionConfig *crypto.KeyConfig,
+) []queryv1.Handler {
+
+	notification, err := newNotification(
+		handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
+		command,
+		queries,
+		systemDefaults,
+		dir,
+		assetsPrefix,
+		keyStorage,
+		userEncryptionConfig,
+		smtpEncryptionConfig,
+	)
+	logging.OnError(err).Fatal("cannot start notification handler")
 
 	return []queryv1.Handler{
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			queries,
 		),
-		newNotification(
-			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
-			command,
-			queries,
-			systemDefaults,
-			aesCrypto,
-			dir,
-			assetsPrefix,
-			smtpPasswordEncAlg,
-		),
+		notification,
 	}
 }
 

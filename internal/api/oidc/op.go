@@ -44,7 +44,6 @@ type Config struct {
 	DefaultRefreshTokenExpiration     time.Duration
 	UserAgentCookieConfig             *middleware.UserAgentCookieConfig
 	Cache                             *middleware.CacheConfig
-	KeyConfig                         *crypto.KeyConfig
 	CustomEndpoints                   *EndpointConfig
 }
 
@@ -83,12 +82,12 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
-	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI)
+func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, keyStorage crypto.KeyStorage, oidcKeyConfig *crypto.KeyConfig, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI, keyStorage, oidcKeyConfig)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create op config: %w", err)
 	}
-	storage, err := newStorage(config, command, query, repo, keyConfig, config.KeyConfig, es, projections, keyChan)
+	storage, err := newStorage(config, command, query, repo, keyConfig, oidcKeyConfig, es, projections, keyStorage, keyChan)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create storage: %w", err)
 	}
@@ -112,7 +111,7 @@ func Issuer(domain string, port uint16, externalSecure bool) string {
 	return http_utils.BuildHTTP(domain, port, externalSecure) + HandlerPrefix
 }
 
-func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string) (*op.Config, error) {
+func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, keyStorage crypto.KeyStorage, oidcKeyConfig *crypto.KeyConfig) (*op.Config, error) {
 	supportedLanguages, err := getSupportedLanguages()
 	if err != nil {
 		return nil, err
@@ -127,14 +126,14 @@ func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string) (*op
 		RequestObjectSupported:   config.RequestObjectSupported,
 		SupportedUILocales:       supportedLanguages,
 	}
-	if err := cryptoKey(opConfig, config.KeyConfig); err != nil {
+	if err := cryptoKey(opConfig, oidcKeyConfig, keyStorage); err != nil {
 		return nil, err
 	}
 	return opConfig, nil
 }
 
-func cryptoKey(config *op.Config, keyConfig *crypto.KeyConfig) error {
-	tokenKey, err := crypto.LoadKey(keyConfig, keyConfig.EncryptionKeyID)
+func cryptoKey(config *op.Config, keyConfig *crypto.KeyConfig, keyStorage crypto.KeyStorage) error {
+	tokenKey, err := crypto.LoadKey(keyStorage, keyConfig.EncryptionKeyID)
 	if err != nil {
 		return fmt.Errorf("cannot load OP crypto key: %w", err)
 	}
@@ -191,8 +190,8 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	return options
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}) (*OPStorage, error) {
-	encAlg, err := crypto.NewAESCrypto(c)
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyStorage crypto.KeyStorage, keyChan <-chan interface{}) (*OPStorage, error) {
+	encAlg, err := crypto.NewAESCrypto(c, keyStorage)
 	if err != nil {
 		return nil, err
 	}

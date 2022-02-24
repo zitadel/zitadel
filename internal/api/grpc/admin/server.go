@@ -1,8 +1,10 @@
 package admin
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
+	"github.com/caos/logging"
 	"google.golang.org/grpc"
+
+	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/admin/repository"
 	"github.com/caos/zitadel/internal/admin/repository/eventsourcing"
@@ -34,14 +36,23 @@ type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, iamDomain, assetsAPIDomain string, userCrypto *crypto.AESCrypto) *Server {
+func CreateServer(command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	iamDomain,
+	assetsAPIDomain string,
+	keyStorage crypto.KeyStorage,
+	userEncryptionConfig *crypto.KeyConfig,
+) *Server {
+	userCodeAlg, err := crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
+	logging.OnError(err).Fatal("unable to initialise user code algorithm")
 	return &Server{
 		command:         command,
 		query:           query,
 		administrator:   repo,
 		iamDomain:       iamDomain,
 		assetsAPIDomain: assetsAPIDomain,
-		UserCodeAlg:     userCrypto,
+		UserCodeAlg:     userCodeAlg,
 	}
 }
 
