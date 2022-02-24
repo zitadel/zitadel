@@ -129,6 +129,8 @@ spec:
                 description: Don't access X_ApiVersion, it is only exported for (de-)serialization.
                   Use Version and OverwriteVersion methods instead.
                 type: string
+              databaseConnection:
+                type: object
               iam:
                 type: object
               kind:

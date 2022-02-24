@@ -41,6 +41,8 @@ type Spec struct {
 	Common *tree.Common `json:",inline" yaml:",inline"`
 	Spec   *orbz.Spec   `json:"spec" yaml:"spec"`
 	IAM    *Empty       `json:"iam" yaml:"iam"`
+	// +kubebuilder:validation:Optional
+	DBConn *Empty `json:"databaseConnection" yaml:"databaseConnection"`
 }
 
 type Empty struct{}
