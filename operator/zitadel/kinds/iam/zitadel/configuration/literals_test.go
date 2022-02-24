@@ -473,7 +473,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 		"ZITADEL_SAML_IDP_SIGNALG":            "sign",
 		"ZITADEL_SAML_IDP_DIGALG":             "digest",
 		"ZITADEL_SAML_IDP_ENCALG":             "encrypt",
-		"ZITADEL_SAML":                        "https://api.domain/saml",
+		"ZITADEL_SAML":                        "https://accounts.domain/saml",
 		"ZITADEL_SAML_ERRORURL":               "errorurl",
 	}
 	literals := literalsConfigMap(desiredFull, users, certPath, secretPath, googleSA, zitadelKeyPath, queried)

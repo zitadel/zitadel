@@ -89,7 +89,7 @@ func literalsConfigMap(
 			accounts := "https://" + accountsDomain
 			issuer := "https://" + desired.DNS.Subdomains.Issuer + "." + defaultDomain
 			oauth := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/oauth/v2"
-			saml := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain + "/saml"
+			saml := "https://" + desired.DNS.Subdomains.Accounts + "." + defaultDomain + "/saml"
 			authorize := "https://" + desired.DNS.Subdomains.Accounts + "." + defaultDomain + "/oauth/v2"
 			console := "https://" + desired.DNS.Subdomains.Console + "." + defaultDomain
 			apiDomain := "https://" + desired.DNS.Subdomains.API + "." + defaultDomain

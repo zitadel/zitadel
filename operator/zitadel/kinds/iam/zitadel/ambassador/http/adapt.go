@@ -186,7 +186,7 @@ func AdaptFunc(
 				namespace,
 				labels.MustForName(componentLabels, SamlName),
 				false,
-				apiDomain,
+				accountsDomain,
 				"/saml/",
 				"",
 				httpUrl,
