@@ -1,24 +1,23 @@
 <mat-toolbar class="header-wrapper">
   <div class="header-content">
-    <ng-container *ngIf="labelpolicy">
-      <a class="title" [routerLink]="['/']" *ngIf="!labelpolicy.disableWatermark; else customHome">
+    <a class="title custom" [routerLink]="['/']"
+      *ngIf="org && labelpolicy && labelpolicy.disableWatermark; else defaultHome">
+      <img class="logo" alt="home logo" *ngIf="isDarkTheme; else customlighttheme"
+        [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : '/assets/images/zitadel-logo-solo-light.svg'"
+        onerror="this.src='/assets/images/zitadel-logo-solo-light.svg';this.onerror='';" />
+      <ng-template #customlighttheme>
+        <img alt="home logo" class="logo"
+          [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : '/assets/images/zitadel-logo-solo-dark.svg'"
+          onerror="this.src='/assets/images/zitadel-logo-solo-dark.svg';this.onerror='';" />
+      </ng-template>
+    </a>
+
+    <ng-template #defaultHome>
+      <a *ngIf="org" class="title" [routerLink]="['/']">
         <img class="logo" alt="zitadel logo" *ngIf="isDarkTheme; else lighttheme"
           src="/assets/images/zitadel-logo-solo-light.svg" />
         <ng-template #lighttheme>
           <img alt="zitadel logo" class="logo" src="../assets/images/zitadel-logo-solo-dark.svg" />
-        </ng-template>
-      </a>
-    </ng-container>
-
-    <ng-template #customHome>
-      <a class="title custom" [routerLink]="['/']">
-        <img class="logo" alt="home logo" *ngIf="isDarkTheme; else customlighttheme"
-          [src]="labelpolicy?.iconUrlDark ? labelpolicy.iconUrlDark : '/assets/images/zitadel-logo-solo-light.svg'"
-          onerror="this.src='/assets/images/zitadel-logo-solo-light.svg';this.onerror='';" />
-        <ng-template #customlighttheme>
-          <img alt="home logo" class="logo"
-            [src]="labelpolicy?.iconUrl ? labelpolicy.iconUrl : '/assets/images/zitadel-logo-solo-dark.svg'"
-            onerror="this.src='/assets/images/zitadel-logo-solo-dark.svg';this.onerror='';" />
         </ng-template>
       </a>
     </ng-template>

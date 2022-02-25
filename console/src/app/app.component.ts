@@ -181,9 +181,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((route) => {
       const { org } = route;
       if (org) {
-        this.authService.getActiveOrg(org).then((queriedOrg) => {
-          this.org = queriedOrg;
-        });
+        this.authService
+          .getActiveOrg(org)
+          .then((queriedOrg) => {
+            this.org = queriedOrg;
+          })
+          .catch((error) => {
+            this.router.navigate(['/users/me']);
+          });
       }
     });
 
@@ -196,11 +201,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.authenticationService.authenticationChanged.pipe(takeUntil(this.destroy$)).subscribe((authenticated) => {
       if (authenticated) {
-        this.authService.getActiveOrg().then((org) => {
-          this.org = org;
+        this.authService
+          .getActiveOrg()
+          .then((org) => {
+            this.org = org;
 
-          this.startIntroWorkflow();
-        });
+            this.startIntroWorkflow();
+          })
+          .catch((error) => {
+            this.router.navigate(['/users/me']);
+          });
       }
     });
 
