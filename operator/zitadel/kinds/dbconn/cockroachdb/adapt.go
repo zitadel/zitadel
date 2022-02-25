@@ -38,11 +38,18 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		bool,
 		error,
 	) {
+
+		internalMonitor := monitor.WithField("kind", "cockroachdb")
+
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, fmt.Errorf("parsing desired state failed: %w", err)
 		}
 		desired.Parsed = desiredKind
+
+		if desiredKind.Spec.Verbose {
+			internalMonitor = internalMonitor.Verbose()
+		}
 
 		if err := desiredKind.validate(); err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -123,7 +130,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 				*/
 
 				db.SetQueriedForDatabase(queried, current)
-				return operator.QueriersToEnsureFunc(monitor, true, queriers, k8sClient, queried)
+				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			}, func(k8sClient kubernetes.ClientInt) error { return nil },
 			func(kubernetes.ClientInt, map[string]interface{}, bool) error { return nil },
 			allSecrets,
