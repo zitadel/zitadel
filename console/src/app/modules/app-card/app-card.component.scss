@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin app-card-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
@@ -9,8 +8,6 @@
   $is-dark-theme: map-get($theme, is-dark);
   $accent-color: mat.get-color-from-palette($primary, 500);
   $back: map-get($background, background);
-
-  /* stylelint-enable */
 
   .cnsl-app-card {
     padding: 1rem;

@@ -1,5 +1,4 @@
 @mixin filter-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
@@ -36,7 +35,6 @@
       transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
       border: 1px solid $border-color;
       box-sizing: border-box;
-      border-radius: 0.5rem;
       outline: none;
       width: 320px;
       display: flex;

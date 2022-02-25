@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin project-role-chips-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
@@ -17,7 +16,7 @@
   $list-background-color: mat.get-color-from-palette($background, 300);
   $card-background-color: mat.get-color-from-palette($background, card);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
-  $border-selected-color: if($is-dark-theme, #ffffff, #000000);
+  $border-selected-color: if($is-dark-theme, #fff, #000);
 
   .project-role-chip {
     display: flex;

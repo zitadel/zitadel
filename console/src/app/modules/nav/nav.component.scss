@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin nav-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
@@ -13,7 +12,6 @@
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($background, background);
-  /* stylelint-enable */
 
   .nav-col {
     display: flex;

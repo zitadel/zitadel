@@ -1,5 +1,4 @@
 @mixin header-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
   $background: map-get($theme, background);
@@ -82,7 +81,6 @@
 
           .org-switch-button {
             font-weight: bold;
-            padding-right: 0.5rem;
             border: none;
             color: map-get($foreground, base);
             border-radius: 6px;
@@ -94,7 +92,6 @@
             background-color: transparent;
             cursor: pointer;
             transition: all ease 0.2s;
-            // z-index: 502;
 
             &:hover {
               background-color: if($is-dark-theme, #ffffff10, #00000010);
@@ -261,7 +258,7 @@
         }
 
         &:hover {
-          border-color: if($is-dark-theme, #ffffff, #00000050);
+          border-color: if($is-dark-theme, #fff, #00000050);
         }
 
         .docs {

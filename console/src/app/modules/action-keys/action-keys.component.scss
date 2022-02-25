@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin action-keys-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $background: map-get($theme, background);
   $foreground: map-get($theme, foreground);
@@ -61,7 +60,7 @@
       .action-keys-row {
         .key-overlay {
           z-index: 0;
-          background: if($is-dark-theme, #ffffff, #000000);
+          background: if($is-dark-theme, #fff, #000);
           opacity: 0.15;
         }
       }
