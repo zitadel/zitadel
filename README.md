@@ -85,13 +85,18 @@ zitadel start-with-init
 
 ### Client libraries
 
-| Language | Client | ManagmentAPI | AdminAPI | AuthAPI | Thanks to the maintainers |
+<!-- TODO: check other libraries -->
+
+| Language | Client | API | Machine authentication (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
 | .NET       | [zitadel-net](https://github.com/caos/zitadel-net) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
 | Dart       | [zitadel-dart](https://github.com/caos/zitadel-dart) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
 | Elixir     | [zitadel_api](https://github.com/jshmrtn/zitadel_api) | ✔️ | ✔️ | ✔️ | [jshmrtn 🙏🏻](https://github.com/jshmrtn) |
 | Go         | [zitadel-go](https://github.com/caos/zitadel-go) | ✔️ | ✔️ | ✔️ | ZITADEL |
 | Rust       | [zitadel-rust](https://crates.io/crates/zitadel) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
+
+(\*) Automatically authenticate service accounts with [JWT Profile](https://docs.zitadel.ch/docs/apis/openidoauth/grant-types#json-web-token-jwt-profile).  
+(\*\*) Automatically check if the access token is valid and claims match
 
 ### Quick starts
 
