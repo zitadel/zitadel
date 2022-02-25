@@ -35,7 +35,7 @@ type AuthNKeyProjection struct {
 }
 
 func NewAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *AuthNKeyProjection {
-	p := &AuthNKeyProjection{}
+	p := new(AuthNKeyProjection)
 	config.ProjectionName = AuthNKeyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

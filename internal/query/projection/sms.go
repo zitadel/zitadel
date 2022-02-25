@@ -22,7 +22,7 @@ const (
 )
 
 func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SMSConfigProjection {
-	p := &SMSConfigProjection{}
+	p := new(SMSConfigProjection)
 	config.ProjectionName = SMSConfigProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

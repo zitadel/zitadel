@@ -26,7 +26,7 @@ const (
 )
 
 func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginNameProjection {
-	p := &LoginNameProjection{}
+	p := new(LoginNameProjection)
 	config.ProjectionName = LoginNameProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

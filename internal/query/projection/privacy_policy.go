@@ -33,7 +33,7 @@ const (
 )
 
 func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PrivacyPolicyProjection {
-	p := &PrivacyPolicyProjection{}
+	p := new(PrivacyPolicyProjection)
 	config.ProjectionName = PrivacyPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

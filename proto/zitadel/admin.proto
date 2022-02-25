@@ -313,6 +313,28 @@ service AdminService {
         };
     }
 
+    // Get OIDC settings (e.g token lifetimes, etc.)
+    rpc GetOIDCSettings(GetOIDCSettingsRequest) returns (GetOIDCSettingsResponse) {
+        option (google.api.http) = {
+            get: "/settings/oidc";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Update oidc settings (e.g token lifetimes, etc)
+    rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
+        option (google.api.http) = {
+            put: "/settings/oidc";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
 
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
@@ -2536,6 +2558,24 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+// This is an empty request
+message GetOIDCSettingsRequest {}
+
+message GetOIDCSettingsResponse {
+    zitadel.settings.v1.OIDCSettings settings = 1;
+}
+
+message UpdateOIDCSettingsRequest {
+    google.protobuf.Duration  access_token_lifetime   = 1;
+    google.protobuf.Duration  id_token_lifetime   = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
+    google.protobuf.Duration  refresh_token_expiration   = 4;
+}
+
+message UpdateOIDCSettingsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

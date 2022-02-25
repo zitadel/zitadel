@@ -23,7 +23,7 @@ const (
 )
 
 func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordComplexityProjection {
-	p := &PasswordComplexityProjection{}
+	p := new(PasswordComplexityProjection)
 	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

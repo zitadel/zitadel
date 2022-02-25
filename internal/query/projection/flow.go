@@ -26,7 +26,7 @@ type FlowProjection struct {
 }
 
 func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FlowProjection {
-	p := &FlowProjection{}
+	p := new(FlowProjection)
 	config.ProjectionName = FlowTriggerTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

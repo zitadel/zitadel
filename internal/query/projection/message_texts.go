@@ -39,7 +39,7 @@ const (
 )
 
 func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MessageTextProjection {
-	p := &MessageTextProjection{}
+	p := new(MessageTextProjection)
 	config.ProjectionName = MessageTextTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

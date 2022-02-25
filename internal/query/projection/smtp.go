@@ -21,7 +21,7 @@ const (
 )
 
 func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SMTPConfigProjection {
-	p := &SMTPConfigProjection{}
+	p := new(SMTPConfigProjection)
 	config.ProjectionName = SMTPConfigProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
