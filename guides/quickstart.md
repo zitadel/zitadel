@@ -64,6 +64,9 @@ $ docker compose -f ../build/local/docker-compose-local.yml up -d --no-deps --bu
 $ # Change to the console directory
 $ cd ./console
 
+$ # Install test suite dependencies
+$ npm install --only dev
+
 $ # Run all end-to-end tests
 $ npm run e2e
 
