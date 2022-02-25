@@ -80,9 +80,6 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 			sq.Eq{
 				PrivacyColID.identifier(): orgID,
 			},
-			sq.Eq{
-				PrivacyColID.identifier(): q.iamID,
-			},
 		}).
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -145,4 +142,13 @@ func preparePrivacyPolicyQuery() (sq.SelectBuilder, func(*sql.Row) (*PrivacyPoli
 			}
 			return policy, nil
 		}
+}
+
+func (p *PrivacyPolicy) ToDomain() *domain.PrivacyPolicy {
+	return &domain.PrivacyPolicy{
+		TOSLink:     p.TOSLink,
+		PrivacyLink: p.PrivacyLink,
+		HelpLink:    p.HelpLink,
+		Default:     p.IsDefault,
+	}
 }
