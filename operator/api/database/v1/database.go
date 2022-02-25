@@ -4,7 +4,6 @@ package v1
 
 import (
 	"github.com/caos/orbos/pkg/tree"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -39,9 +38,8 @@ type Status struct {
 }
 
 type Spec struct {
-	Common   *tree.Common               `json:",inline" yaml:",inline"`
-	Spec     *orbdb.Spec                `json:"spec" yaml:"spec"`
-	Database *unstructured.Unstructured `json:"database" yaml:"database"`
+	Common *tree.Common              `json:",inline" yaml:",inline"`
+	Spec   unstructured.Unstructured `json:"spec" yaml:"spec"`
 }
 
 type Empty struct{}
