@@ -11,8 +11,11 @@ The commands in this guide are known to work with the following prerequisites:
 * CPU's: 2
 * Memory: 4Gb
 
-### Dependencies
+### Supported Operating Systems
 * Ubuntu, Version 18.04
+* macOS Monterey, Version 12.2.1
+
+### Dependencies
 * Docker Community Editition, Version 20.10.12
 * [Compose V2]((https://docs.docker.com/compose/cli-command/), Version 2.2.2
 
@@ -120,9 +123,11 @@ $ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --bui
 
 **password**: `Password1!`  
 
-### Mac M1 (Apple Silicon)
+### Troubleshooting
 
-Bellow are some errors we faced with apple silicon.
+#### Failing End-to-End Tests
+
+The command `npm run e2e` prints `no such service: db` and the end-to-end test fail with many 401 responses. Make sure you have the docker compose plugin version installed as described [above](#Dependencies)
 
 #### database-migrations don't start or stop without exit code
 
@@ -140,18 +145,9 @@ The problem is that the database has a connection issues. You can simply restart
 $ docker compose -f ./build/local/docker-compose-local.yml restart db
 ```
 
-### Remove the quickstart
+### Destroy your local development environment
 
 ```bash
-$ docker compose -f ./build/local/docker-compose-local.yml --profile database --profile init-backend --profile init-frontend --profile backend --profile frontend rm
+$ docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend rm
 ```
 
-If you are **confident** that you don't need to run the same ZITADEL instance again, go ahead and delete the `.keys` folder and reset the `environment.json` as well.
-
-```bash
-$ rm -rf .keys
-```
-
-```bash
-$ git reset build/local/environment.json
-```
