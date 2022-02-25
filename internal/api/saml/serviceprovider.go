@@ -27,13 +27,18 @@ type ServiceProvider struct {
 	metadata        *md.EntityDescriptor
 	url             string
 	signerPublicKey interface{}
+	defaultLoginURL string
 }
 
 func (sp *ServiceProvider) GetEntityID() string {
 	return string(sp.metadata.EntityID)
 }
 
-func NewServiceProvider(id string, config *ServiceProviderConfig) (*ServiceProvider, error) {
+func (sp *ServiceProvider) LoginURL(id string) string {
+	return sp.defaultLoginURL + id
+}
+
+func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginURL string) (*ServiceProvider, error) {
 	metadataData := make([]byte, 0)
 	if config.URL != "" {
 		body, err := mdxml.ReadMetadataFromURL(config.URL)
@@ -76,6 +81,7 @@ func NewServiceProvider(id string, config *ServiceProviderConfig) (*ServiceProvi
 		metadata:        metadata,
 		url:             config.URL,
 		signerPublicKey: cert.PublicKey,
+		defaultLoginURL: defaultLoginURL,
 	}, nil
 }
 

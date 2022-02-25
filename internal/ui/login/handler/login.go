@@ -42,6 +42,7 @@ type Login struct {
 	baseURL             string
 	zitadelURL          string
 	oidcAuthCallbackURL string
+	samlAuthCallbackURL string
 	IDPConfigAesCrypto  crypto.EncryptionAlgorithm
 	iamDomain           string
 }
@@ -49,6 +50,7 @@ type Login struct {
 type Config struct {
 	BaseURL               string
 	OidcAuthCallbackURL   string
+	SamlAuthCallbackURL   string
 	ZitadelURL            string
 	LanguageCookieName    string
 	DefaultLanguage       language.Tag
@@ -76,6 +78,7 @@ func CreateLogin(config Config, command *command.Commands, query *query.Queries,
 	}
 	login := &Login{
 		oidcAuthCallbackURL: config.OidcAuthCallbackURL,
+		samlAuthCallbackURL: config.SamlAuthCallbackURL,
 		baseURL:             config.BaseURL,
 		zitadelURL:          config.ZitadelURL,
 		command:             command,

@@ -24,6 +24,7 @@ const (
 	StatusCodeRequestUnsupported     = "urn:oasis:names:tc:SAML:2.0:status:RequestUnsupported"
 	StatusCodeUnsupportedBinding     = "urn:oasis:names:tc:SAML:2.0:status:UnsupportedBinding"
 	StatusCodeResponder              = "urn:oasis:names:tc:SAML:2.0:status:Responder"
+	StatusCodePartialLogout = "urn:oasis:names:tc:SAML:2.0:status:PartialLogout"
 )
 
 type AuthResponseForm struct {
@@ -151,13 +152,13 @@ func makeSuccessfulResponse(
 	request AuthRequestInt,
 	entityID string,
 	sendIP string,
-	nameID string,
-	attributes []*saml.AttributeType,
+	attributes *Attributes,
 	audience string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	fiveFromNowStr := now.Add(5 * time.Minute).Format(DefaultTimeFormat)
+
 	issuer := &saml.NameIDType{
 		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
 		Text:   entityID,
@@ -170,7 +171,6 @@ func makeSuccessfulResponse(
 		nowStr,
 		fiveFromNowStr,
 		issuer,
-		nameID,
 		attributes,
 		audience,
 	)
@@ -183,12 +183,11 @@ func makeAssertionResponse(
 	issueInstant string,
 	untilInstant string,
 	issuer *saml.NameIDType,
-	nameID string,
-	attributes []*saml.AttributeType,
+	attributes *Attributes,
 	audience string,
 ) *samlp.Response {
 	response := makeResponse(requestID, acsURL, issueInstant, StatusCodeSuccess, "", issuer)
-	assertion := makeAssertion(requestID, acsURL, sendIP, issueInstant, untilInstant, issuer, nameID, attributes, audience)
+	assertion := makeAssertion(requestID, acsURL, sendIP, issueInstant, untilInstant, issuer, attributes.GetNameID(), attributes.GetSAML(), audience)
 	response.Assertion = *assertion
 	return response
 }
@@ -200,7 +199,7 @@ func makeAssertion(
 	issueInstant string,
 	untilInstant string,
 	issuer *saml.NameIDType,
-	nameID string,
+	nameID *saml.NameIDType,
 	attributes []*saml.AttributeType,
 	audience string,
 ) *saml.Assertion {
@@ -211,10 +210,7 @@ func makeAssertion(
 		IssueInstant: issueInstant,
 		Issuer:       *issuer,
 		Subject: &saml.SubjectType{
-			NameID: &saml.NameIDType{
-				Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
-				Text:   nameID,
-			},
+			NameID: nameID,
 			SubjectConfirmation: []saml.SubjectConfirmationType{
 				/*{
 					Method: "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches",

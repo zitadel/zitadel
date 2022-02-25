@@ -39,7 +39,11 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 		userData: l.getUserData(r, authReq, "Login Successful", errID, errMessage),
 	}
 	if authReq != nil {
-		data.RedirectURI = l.oidcAuthCallbackURL
+		if _, ok := authReq.Request.(*domain.AuthRequestOIDC); ok {
+			data.RedirectURI = l.oidcAuthCallbackURL
+		} else if _, ok := authReq.Request.(*domain.AuthRequestSAML); ok {
+			data.RedirectURI = l.samlAuthCallbackURL
+		}
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
 }

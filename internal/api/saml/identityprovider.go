@@ -22,6 +22,7 @@ import (
 type IDPStorage interface {
 	AuthStorage
 	EntityStorage
+	UserStorage
 	Health(context.Context) error
 }
 
@@ -52,7 +53,7 @@ type IdentityProviderConfig struct {
 }
 
 type EndpointConfig struct {
-	Login         Endpoint `yaml:"Login"`
+	Callback      Endpoint `yaml:"Callback"`
 	SingleSignOn  Endpoint `yaml:"SingleSignOn"`
 	SingleLogOut  Endpoint `yaml:"SingleLogOut"`
 	Artifact      Endpoint `yaml:"Artifact"`
@@ -67,15 +68,16 @@ type Endpoint struct {
 }
 
 type IdentityProvider struct {
-	storage      IDPStorage
-	postTemplate *template.Template
+	storage        IDPStorage
+	postTemplate   *template.Template
+	logoutTemplate *template.Template
 
 	EntityID   string
 	Metadata   *md.IDPSSODescriptorType
 	AAMetadata *md.AttributeAuthorityDescriptorType
 	signer     xmlsig.Signer
 
-	LoginEndpoint                 op.Endpoint
+	CallbackEndpoint              op.Endpoint
 	SingleSignOnEndpoint          op.Endpoint
 	SingleLogoutEndpoint          op.Endpoint
 	ArtifactResulationEndpoint    op.Endpoint
@@ -115,7 +117,12 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		return nil, err
 	}
 
-	temp, err := template.New("post").Parse(postTemplate)
+	postTemplate, err := template.New("post").Parse(postTemplate)
+	if err != nil {
+		return nil, err
+	}
+
+	logoutTemplate, err := template.New("post").Parse(logoutTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -127,14 +134,15 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		Metadata:                      metadata,
 		AAMetadata:                    aaMetadata,
 		signer:                        signer,
-		LoginEndpoint:                 op.NewEndpointWithURL(conf.Endpoints.Login.Path, conf.Endpoints.Login.URL),
+		CallbackEndpoint:              op.NewEndpointWithURL(conf.Endpoints.Callback.Path, conf.Endpoints.Callback.URL),
 		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),
 		SingleLogoutEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleLogOut.Path, conf.Endpoints.SingleLogOut.URL),
 		ArtifactResulationEndpoint:    op.NewEndpointWithURL(conf.Endpoints.Artifact.Path, conf.Endpoints.Artifact.URL),
 		SLOArtifactResulationEndpoint: op.NewEndpointWithURL(conf.Endpoints.SLOArtifact.Path, conf.Endpoints.SLOArtifact.URL),
 		NameIDMappingEndpoint:         op.NewEndpointWithURL(conf.Endpoints.NameIDMapping.Path, conf.Endpoints.NameIDMapping.URL),
 		AttributeEndpoint:             op.NewEndpointWithURL(conf.Endpoints.Attribute.Path, conf.Endpoints.Attribute.URL),
-		postTemplate:                  temp,
+		postTemplate:                  postTemplate,
+		logoutTemplate:                logoutTemplate,
 	}, nil
 }
 
@@ -145,7 +153,7 @@ type Route struct {
 
 func (p *IdentityProvider) GetRoutes() []*Route {
 	return []*Route{
-		{p.LoginEndpoint.Relative(), p.loginHandleFunc},
+		{p.CallbackEndpoint.Relative(), p.callbackHandleFunc},
 		{p.SingleSignOnEndpoint.Relative(), p.ssoHandleFunc},
 		{p.SingleLogoutEndpoint.Relative(), p.logoutHandleFunc},
 		{p.ArtifactResulationEndpoint.Relative(), notImplementedHandleFunc},
@@ -153,11 +161,6 @@ func (p *IdentityProvider) GetRoutes() []*Route {
 		{p.NameIDMappingEndpoint.Relative(), notImplementedHandleFunc},
 		{p.AttributeEndpoint.Relative(), notImplementedHandleFunc},
 	}
-}
-
-func (p *IdentityProvider) GetRedirectURL(requestID string) string {
-	//TODO
-	return p.LoginEndpoint.Absolute("") + "?requestId=" + requestID
 }
 
 func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID string) (*ServiceProvider, error) {
@@ -182,16 +185,6 @@ func (p *IdentityProvider) GetServiceProvider(ctx context.Context, entityID stri
 		p.serviceProviders = append(p.serviceProviders, sp)
 	}
 	return sp, nil
-}
-
-func (p *IdentityProvider) AddServiceProvider(id string, config *ServiceProviderConfig) error {
-	sp, err := NewServiceProvider(id, config)
-	if err != nil {
-		return err
-	}
-
-	p.serviceProviders = append(p.serviceProviders, sp)
-	return nil
 }
 
 func (p *IdentityProvider) DeleteServiceProvider(entityID string) error {

@@ -102,7 +102,7 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByOIDCClientID(context.Context, string) (*query.Project, error)
+	ProjectByClientID(ctx context.Context, appID string) (*query.Project, error)
 	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
 }
 
@@ -1183,7 +1183,12 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 	var project *query.Project
 	switch request.Request.Type() {
 	case domain.AuthRequestTypeOIDC:
-		project, err = userGrantProvider.ProjectByOIDCClientID(ctx, request.ApplicationID)
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+	case domain.AuthRequestTypeSAML:
+		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
 		}
@@ -1208,8 +1213,13 @@ func projectRequired(ctx context.Context, request *domain.AuthRequest, projectPr
 		if err != nil {
 			return false, err
 		}
+	case domain.AuthRequestTypeSAML:
+		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
 	default:
-		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw2", "Errors.AuthRequest.RequestTypeNotSupported")
+		return false, errors.ThrowPreconditionFailed(nil, "EVENT-dfrw3", "Errors.AuthRequest.RequestTypeNotSupported")
 	}
 	if !project.HasProjectCheck {
 		return false, nil

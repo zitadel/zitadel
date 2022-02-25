@@ -172,9 +172,9 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 
 	switch authNRequest.ProtocolBinding {
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
-		http.Redirect(w, r, p.GetRedirectURL(authRequest.GetID()), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusTemporaryRedirect)
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
-		http.Redirect(w, r, p.GetRedirectURL(authRequest.GetID()), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusTemporaryRedirect)
 	default:
 		logging.Log("SAML-67722s").Error(err)
 		if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeUnsupportedBindingResponse(

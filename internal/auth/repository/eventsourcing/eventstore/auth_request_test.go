@@ -212,7 +212,7 @@ type mockUserGrants struct {
 	userGrants int
 }
 
-func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*query.Project, error) {
+func (m *mockUserGrants) ProjectByClientID(ctx context.Context, s string) (*query.Project, error) {
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 

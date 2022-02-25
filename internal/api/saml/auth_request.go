@@ -12,5 +12,7 @@ type AuthRequestInt interface {
 	GetIssuer() string
 	GetIssuerName() string
 	GetDestination() string
+	GetUserID() string
+	GetUserName() string
 	Done() bool
 }

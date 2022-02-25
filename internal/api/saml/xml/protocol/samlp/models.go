@@ -486,7 +486,7 @@ type SessionIndex struct {
 
 // Element
 type LogoutResponse struct {
-	XMLName xml.Name `xml:"LogoutResponse"`
+	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:protocol LogoutResponse"`
 
 	Id string `xml:"ID,attr"`
 
@@ -500,7 +500,7 @@ type LogoutResponse struct {
 
 	Consent string `xml:"Consent,attr,omitempty"`
 
-	Issuer *saml.NameIDType `xml:"Issuer"`
+	Issuer *saml.NameIDType `xml:"urn:oasis:names:tc:SAML:2.0:assertion Issuer"`
 
 	Signature *xml_dsig.SignatureType `xml:"Signature"`
 

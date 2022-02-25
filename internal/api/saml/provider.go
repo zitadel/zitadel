@@ -35,6 +35,7 @@ type ProviderConfig struct {
 	StorageConfig *StorageConfig          `yaml:"StorageConfig"`
 
 	UserAgentCookieConfig *middleware.UserAgentCookieConfig
+	defaultLoginURL       string
 }
 
 type Metadata struct {
@@ -103,10 +104,12 @@ func NewProvider(
 	}
 
 	storage := &ProviderStorage{
-		repo:    repo,
-		command: command,
-		query:   query,
+		repo:            repo,
+		command:         command,
+		query:           query,
+		defaultLoginURL: conf.StorageConfig.DefaultLoginURL,
 	}
+	
 	getCACert(storage)
 	cert, key := getMetadataCert(storage)
 

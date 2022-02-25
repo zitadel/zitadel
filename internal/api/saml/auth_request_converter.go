@@ -25,8 +25,9 @@ func (a *AuthRequest) GetRelayState() string {
 func (a *AuthRequest) GetAccessConsumerServiceURL() string {
 	return a.CallbackURI
 }
+
 func (a *AuthRequest) GetNameID() string {
-	return a.UserID
+	return a.UserName
 }
 
 func (a *AuthRequest) saml() *domain.AuthRequestSAML {
@@ -49,6 +50,12 @@ func (a *AuthRequest) GetDestination() string {
 }
 func (a *AuthRequest) GetCode() string {
 	return a.saml().Code
+}
+func (a *AuthRequest) GetUserID() string {
+	return a.UserID
+}
+func (a *AuthRequest) GetUserName() string {
+	return a.UserName
 }
 func (a *AuthRequest) Done() bool {
 	for _, step := range a.PossibleSteps {

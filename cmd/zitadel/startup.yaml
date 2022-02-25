@@ -343,11 +343,6 @@ API:
   SAML:
     StorageConfig:
       DefaultLoginURL: $ZITADEL_ACCOUNTS/login?authRequestID=
-      DefaultAccessTokenLifetime: 12h
-      DefaultIdTokenLifetime: 12h
-      DefaultRefreshTokenIdleExpiration: 720h #30d
-      DefaultRefreshTokenExpiration: 2160h #90d
-      SigningKeyAlgorithm: RS256
     UserAgentCookieConfig:
       Name: caos.zitadel.useragent
       Domain: $ZITADEL_COOKIE_DOMAIN
@@ -378,9 +373,9 @@ API:
       NameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       WantAuthRequestsSigned: 'false'
       Endpoints:
-        Login:
-          Path: 'login'
-          URL: '$ZITADEL_SAML/login'
+        Callback:
+          Path: 'callback'
+          URL: '$ZITADEL_SAML/callback'
         SingleSignOn:
           Path: 'SSO'
           URL: '$ZITADEL_SAML/SSO'
@@ -406,6 +401,7 @@ UI:
     Handler:
       BaseURL: '$ZITADEL_ACCOUNTS'
       OidcAuthCallbackURL: '$ZITADEL_AUTHORIZE/authorize/callback?id='
+      SamlAuthCallbackURL: '$ZITADEL_SAML/callback?id='
       ZitadelURL: '$ZITADEL_CONSOLE'
       LanguageCookieName: 'caos.zitadel.login.lang'
       DefaultLanguage: 'de'

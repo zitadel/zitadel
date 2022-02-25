@@ -14,7 +14,9 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-type StorageConfig struct{}
+type StorageConfig struct {
+	DefaultLoginURL string
+}
 
 type Storage interface {
 	EntityStorage
@@ -29,12 +31,17 @@ type EntityStorage interface {
 	GetResponseSigningKey(context.Context, chan<- key.CertificateAndKey)
 }
 
+type UserStorage interface {
+	SetUserinfo(ctx context.Context, userinfo AttributeSetter, userID, applicationID string, attributes []int) (err error)
+}
+
 type ProviderStorage struct {
 	repo    repository.Repository
 	command *command.Commands
 	query   *query.Queries
 
-	SignAlgorithm string
+	SignAlgorithm   string
+	defaultLoginURL string
 }
 
 func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*ServiceProvider, error) {
@@ -50,6 +57,7 @@ func (p *ProviderStorage) GetEntityByID(ctx context.Context, entityID string) (*
 			Metadata: metadata,
 			URL:      app.SAMLConfig.MetadataURL,
 		},
+		p.defaultLoginURL,
 	)
 }
 
@@ -139,4 +147,41 @@ func (p *ProviderStorage) GetAttributesFromNameID(ctx context.Context, nameID st
 		"LastName":          user.LastName,
 		"PreferredUsername": user.PreferredLoginName,
 	}, nil
+}
+
+func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSetter, userID, applicationID string, attributes []int) (err error) {
+	ctx, span := tracing.NewSpan(ctx)
+	defer func() { span.EndWithError(err) }()
+	user, err := p.repo.UserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	for _, attribute := range attributes {
+		switch attribute {
+		case AttributeEmail:
+			userinfo.SetEmail(user.Email)
+		case AttributeSurname:
+			userinfo.SetSurname(user.LastName)
+		case AttributeFullName:
+			userinfo.SetFullName(user.DisplayName)
+		case AttributeGivenName:
+			userinfo.SetGivenName(user.FirstName)
+		case AttributeUsername:
+			userinfo.SetUsername(user.PreferredLoginName)
+		case AttributeUserID:
+			userinfo.SetUserID(userID)
+		case AttributeApplicationID:
+			userinfo.SetApplicationID(applicationID)
+		}
+	}
+	if attributes == nil || len(attributes) == 0 {
+		userinfo.SetEmail(user.Email)
+		userinfo.SetSurname(user.LastName)
+		userinfo.SetGivenName(user.FirstName)
+		userinfo.SetFullName(user.DisplayName)
+		userinfo.SetUsername(user.PreferredLoginName)
+		userinfo.SetUserID(userID)
+	}
+	return nil
 }
