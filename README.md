@@ -87,7 +87,7 @@ zitadel start-with-init
 
 <!-- TODO: check other libraries -->
 
-| Language | Client | API | Machine authentication (\*) | Auth check (\*\*) | Thanks to the maintainers |
+| Language | Client | API | Machine auth (\*) | Auth check (\*\*) | Thanks to the maintainers |
 |----------|--------|--------------|----------|---------|---------------------------|
 | .NET       | [zitadel-net](https://github.com/caos/zitadel-net) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
 | Dart       | [zitadel-dart](https://github.com/caos/zitadel-dart) | ✔️ | ✔️ | ✔️ | [buehler 👑](https://github.com/buehler) |
