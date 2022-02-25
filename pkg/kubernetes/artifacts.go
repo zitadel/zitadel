@@ -125,7 +125,7 @@ spec:
             type: object
           spec:
             type: object
-			x-kubernetes-preserve-unknown-fields: true
+            x-kubernetes-preserve-unknown-fields: true
           status:
             type: object
         type: object
@@ -409,7 +409,7 @@ spec:
                 type: string
               spec:
                 type: object
-			    x-kubernetes-preserve-unknown-fields: true
+                x-kubernetes-preserve-unknown-fields: true
               version:
                 description: Don't access X_Version, it is only exported for (de-)serialization.
                   Use Version and OverwriteVersion methods instead.
