@@ -2132,6 +2132,7 @@ service ManagementService {
 
     // Add a custom privacy policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/privacy"
@@ -2146,6 +2147,7 @@ service ManagementService {
 
     // Update the privacy complexity policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy"

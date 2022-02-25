@@ -2095,6 +2095,7 @@ With this policy the privacy relevant things can be configured (e.g tos link)
 
 Add a custom privacy policy for the organisation
 With this policy privacy relevant things can be configured (e.g. tos link)
+Variable {{.Lang}} can be set to have different links based on the language
 
 
 
@@ -2108,6 +2109,7 @@ With this policy privacy relevant things can be configured (e.g. tos link)
 
 Update the privacy complexity policy for the organisation
 With this policy privacy relevant things can be configured (e.g. tos link)
+Variable {{.Lang}} can be set to have different links based on the language
 
 
 
