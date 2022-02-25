@@ -60,15 +60,9 @@ jobs:
     - run: docker compose -f ./build/local/docker-compose-local.yml logs
       if: failure()
 
-    - name: Generate Backend gRPC
-      run: docker build -f build/zitadel/Dockerfile . -t zitadel:gen-be --target go-copy -o .
-
-    - uses: actions/setup-go@v2
-      with:
-        go-version: '1.17.6'
-
-    - name: Setup E2E Org
-      run: ./scripts/e2e-setup.sh
+    - name: Install Dev Dependencies
+      working-directory: ./console
+      run: npm install --only dev
 
     - name: Run Tests
       working-directory: ./console
