@@ -62,7 +62,7 @@ jobs:
 
     - name: Install Dev Dependencies
       working-directory: ./console
-      run: npm install --only dev
+      run: npm ci --only dev
 
     - name: Run Tests
       working-directory: ./console
