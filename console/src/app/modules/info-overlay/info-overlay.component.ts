@@ -1,10 +1,5 @@
 import { Component, Inject, InjectionToken } from '@angular/core';
-import { OverlayWorkflowService } from 'src/app/services/overlay-workflow.service';
-
-export enum InfoOverlayArrowType {
-  TOP_LEFT,
-  TOP_RIGHT,
-}
+import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
 
 export const OVERLAY_DATA = new InjectionToken<any>('OVERLAY_DATA');
 
@@ -14,7 +9,5 @@ export const OVERLAY_DATA = new InjectionToken<any>('OVERLAY_DATA');
   styleUrls: ['./info-overlay.component.scss'],
 })
 export class InfoOverlayComponent {
-  InfoOverlayArrowType: any = InfoOverlayArrowType;
-
   constructor(public workflowService: OverlayWorkflowService, @Inject(OVERLAY_DATA) public data: any) {}
 }

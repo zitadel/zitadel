@@ -2,7 +2,7 @@ import { MediaMatcher } from '@angular/cdk/layout';
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject, switchMap, take, takeUntil, zip } from 'rxjs';
 
-import { GrpcAuthService } from './grpc-auth.service';
+import { GrpcAuthService } from '../grpc-auth.service';
 import { CnslOverlayRef } from './overlay-ref';
 import { OverlayService } from './overlay.service';
 
@@ -17,6 +17,8 @@ export interface CnslOverlay {
   origin: string;
   toHighlight: string[];
   content: {
+    count?: number;
+    number?: number;
     i18nText: string;
   };
   requirements?: {
@@ -39,11 +41,6 @@ export class OverlayWorkflowService implements OnDestroy {
   public highlightedIds: { [id: string]: number } = {};
   public callback: Function | null = null;
   constructor(private mediaMatcher: MediaMatcher, overlayService: OverlayService, private authService: GrpcAuthService) {
-    // const media: string = '(max-width: 500px)';
-    // const small = this.mediaMatcher.matchMedia(media).matches;
-    // if (small) {
-    // }
-
     this.currentWorkflow$.pipe(takeUntil(this.destroy$)).subscribe((workflow) => {
       if (this.openRef) {
         this.openRef.close();

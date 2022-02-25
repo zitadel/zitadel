@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { KeyboardShortcut, ORGSHORTCUTS, SIDEWIDESHORTCUTS } from 'src/app/services/keyboard-shortcuts';
+import { KeyboardShortcut, ORGSHORTCUTS, SIDEWIDESHORTCUTS } from 'src/app/services/keyboard-shortcuts/keyboard-shortcuts';
 
 @Component({
   selector: 'cnsl-keyboard-shortcuts',

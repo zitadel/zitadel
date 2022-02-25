@@ -1,16 +1,12 @@
-<div class="context_intro_overlay"
-  [ngClass]="{'top-left': data.arrowType === InfoOverlayArrowType.TOP_LEFT, 'top-right': data.arrowType === InfoOverlayArrowType.TOP_RIGHT}">
+<div class="context_intro_overlay">
   <div class="overlay-info-row">
-    <span class="info">INFO</span>
+    <span class="info">INFO <span *ngIf="data.number && data.count">{{data.number}}/{{data.count}}</span></span>
     <button mat-icon-button (click)="workflowService.reset()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
   <p>{{data.i18nText | translate}}</p>
   <div class="overlay-actions">
-    <!-- <button (click)="workflowService.previousStep()" *ngIf="workflowService.previousPossible"
-      mat-stroked-button>{{'ACTIONS.PREVIOUS' | translate}}</button> -->
-
     <button (click)="workflowService.nextStep()" *ngIf="workflowService.nextPossible && !workflowService.isLast"
       mat-stroked-button>{{'ACTIONS.NEXT' | translate}}</button>
 

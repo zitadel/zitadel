@@ -15,13 +15,13 @@ import { Org } from './proto/generated/zitadel/org_pb';
 import { LabelPolicy, PrivacyPolicy } from './proto/generated/zitadel/policy_pb';
 import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
-import { KeyboardShortcutsService } from './services/keyboard-shortcuts.service';
+import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
-import { OverlayWorkflowService } from './services/overlay-workflow.service';
+import { OverlayWorkflowService } from './services/overlay/overlay-workflow.service';
+import { IntroWorkflowOverlays } from './services/overlay/workflows';
 import { StorageLocation, StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 import { UpdateService } from './services/update.service';
-import { IntroWorkflowOverlays } from './services/workflows';
 
 @Component({
   selector: 'cnsl-root',

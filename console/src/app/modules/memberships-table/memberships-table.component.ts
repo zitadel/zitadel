@@ -9,10 +9,10 @@ import { Membership } from 'src/app/proto/generated/zitadel/user_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
-import { OverlayWorkflowService } from 'src/app/services/overlay-workflow.service';
+import { OverlayWorkflowService } from 'src/app/services/overlay/overlay-workflow.service';
+import { OrgContextChangedWorkflowOverlays } from 'src/app/services/overlay/workflows';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 import { ToastService } from 'src/app/services/toast.service';
-import { OrgContextChangedWorkflowOverlays } from 'src/app/services/workflows';
 import { getMembershipColor } from 'src/app/utils/color';
 
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';

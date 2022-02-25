@@ -1,7 +1,6 @@
 @use '@angular/material' as mat;
 
 @mixin input-theme($theme) {
-  /* stylelint-disable */
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $primary-light-color: mat.get-color-from-palette($primary, 200);

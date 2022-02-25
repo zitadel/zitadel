@@ -6,6 +6,8 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
     origin: 'orgswitchbutton',
     toHighlight: ['orgswitchbutton', 'orglink'],
     content: {
+      number: 1,
+      count: 4,
       i18nText: 'OVERLAYS.ORGSWITCHER.TEXT',
     },
     requirements: {
@@ -17,6 +19,8 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
     origin: 'systembutton',
     toHighlight: ['systembutton'],
     content: {
+      number: 2,
+      count: 4,
       i18nText: 'OVERLAYS.SYSTEM.TEXT',
     },
     requirements: {
@@ -29,6 +33,8 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
     origin: 'avatartoggle',
     toHighlight: ['avatartoggle'],
     content: {
+      number: 3,
+      count: 4,
       i18nText: 'OVERLAYS.PROFILE.TEXT',
     },
   },
@@ -37,6 +43,8 @@ export const IntroWorkflowOverlays: CnslOverlay[] = [
     origin: 'mainnav',
     toHighlight: ['mainnav'],
     content: {
+      number: 4,
+      count: 4,
       i18nText: 'OVERLAYS.NAV.TEXT',
     },
     requirements: {

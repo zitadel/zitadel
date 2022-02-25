@@ -3,8 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, pairwise, Subject, takeUntil } from 'rxjs';
 
-import { KeyboardShortcutsComponent } from '../modules/keyboard-shortcuts/keyboard-shortcuts.component';
-import { GrpcAuthService } from './grpc-auth.service';
+import { KeyboardShortcutsComponent } from '../../modules/keyboard-shortcuts/keyboard-shortcuts.component';
+import { GrpcAuthService } from '../grpc-auth.service';
 import {
   ACTIONS,
   DOMAINS,

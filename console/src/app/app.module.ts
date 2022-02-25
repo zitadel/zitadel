@@ -38,13 +38,16 @@ import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { GRPC_INTERCEPTORS } from './services/interceptors/grpc-interceptor';
 import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
-import { KeyboardShortcutsService } from './services/keyboard-shortcuts.service';
+import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
-import { OverlayService } from './services/overlay.service';
+import { OverlayService } from './services/overlay/overlay.service';
 import { RefreshService } from './services/refresh.service';
 import { SeoService } from './services/seo.service';
-import { StatehandlerProcessorService, StatehandlerProcessorServiceImpl } from './services/statehandler-processor.service';
-import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler.service';
+import {
+  StatehandlerProcessorService,
+  StatehandlerProcessorServiceImpl,
+} from './services/statehandler/statehandler-processor.service';
+import { StatehandlerService, StatehandlerServiceImpl } from './services/statehandler/statehandler.service';
 import { StorageService } from './services/storage.service';
 import { ThemeService } from './services/theme.service';
 

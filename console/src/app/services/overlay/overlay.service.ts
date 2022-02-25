@@ -2,7 +2,7 @@ import { ConnectedPosition, ConnectionPositionPair, Overlay, OverlayConfig, Over
 import { ComponentPortal, PortalInjector } from '@angular/cdk/portal';
 import { ComponentRef, Injectable, Injector } from '@angular/core';
 
-import { InfoOverlayComponent, OVERLAY_DATA } from '../modules/info-overlay/info-overlay.component';
+import { InfoOverlayComponent, OVERLAY_DATA } from '../../modules/info-overlay/info-overlay.component';
 import { CnslOverlayRef } from './overlay-ref';
 import { CnslOverlay } from './overlay-workflow.service';
 
