@@ -82,6 +82,9 @@ $ docker compose -f ./build/local/docker-compose-local.yml --profile frontend st
 $ # Change to the console directory
 $ cd ./console
 
+$ # Install dependencies
+$ npm install
+
 $ # Run the local server
 $ ng serve
 

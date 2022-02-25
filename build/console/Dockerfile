@@ -73,15 +73,13 @@ FROM base as init-dev
 
 RUN apk add rsync
 
-COPY --from=npm-base /console/node_modules /builtconsole/node_modules
 COPY --from=npm-base /console/src/app/proto/generated /builtconsole/src/app/proto/generated
-COPY --from=npm-base /root/.cache /builtcache
 
 ENV UID=1000
 ENV GID=1000
 
 ENTRYPOINT [ "sh", "-c" ]
-CMD [ "rsync -a --chown $UID:$GID /builtconsole/ /console && rsync -a --chown $UID:$GID /builtcache/ /cache" ]
+CMD [ "rsync -a --chown $UID:$GID /builtconsole/ /console" ]
 
 #######################
 ## angular dev build

@@ -243,7 +243,6 @@ services:
       GID: $GID
     volumes:
       - ../../console:/console
-      - ~/.cache:/cache
 
 # starts console in development mode
   frontend-run:
