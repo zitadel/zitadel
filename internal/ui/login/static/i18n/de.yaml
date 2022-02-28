@@ -207,6 +207,7 @@ RegistrationUser:
   LanguageLabel: Sprache
   German: Deutsch
   English: English
+  Italian: Italiano
   GenderLabel: Geschlecht
   Female: weiblich
   Male: männlich
@@ -234,6 +235,7 @@ ExternalRegistrationUserOverview:
   LanguageLabel: Sprache
   German: Deutsch
   English: English
+  Italian: Italiano
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
@@ -257,7 +259,7 @@ RegistrationOrg:
   TosLinkText: AGBs
   TosConfirmAnd: und die
   PrivacyLinkText: Datenschutzerklärung
-  SaveButtonText: speichern
+  SaveButtonText: Organisation speichern
 
 LoginSuccess:
   Title: Erfolgreich eingeloggt
@@ -280,12 +282,15 @@ ExternalNotFoundOption:
   Title: Externer Benutzer
   Description: Externer Benutzer konnte nicht gefunden werden. Willst du deinen Benutzer mit einem bestehenden verlinken oder diesen als neuen Benutzer registrieren.
   LinkButtonText: Verlinken
-  AutoRegisterButtonText: Automatisches registrieren
+  AutoRegisterButtonText: registrieren
   TosAndPrivacyLabel: Allgemeine Geschäftsbedingungen und Datenschutz
   TosConfirm: Ich akzeptiere die
   TosLinkText: AGBs
   TosConfirmAnd: und die
   PrivacyLinkText: Datenschutzerklärung
+  German: Deutsch
+  English: English
+  Italian: Italiano
 
 Footer:
   PoweredBy: Powered By

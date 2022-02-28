@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+	"sort"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -13,6 +14,10 @@ import (
 func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, resourceOwner string) (_ string, _ *domain.ObjectDetails, err error) {
 	if !addAction.IsValid() {
 		return "", nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-eg2gf", "Errors.Action.Invalid")
+	}
+	err = c.checkAdditionalActionAllowed(ctx, resourceOwner)
+	if err != nil {
+		return "", nil, err
 	}
 	addAction.AggregateID, err = c.idGenerator.Next()
 	if err != nil {
@@ -37,6 +42,27 @@ func (c *Commands) AddAction(ctx context.Context, addAction *domain.Action, reso
 		return "", nil, err
 	}
 	return actionModel.AggregateID, writeModelToObjectDetails(&actionModel.WriteModel), nil
+}
+
+func (c *Commands) checkAdditionalActionAllowed(ctx context.Context, resourceOwner string) error {
+	features, err := c.getOrgFeaturesOrDefault(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+	existingActions, err := c.getActionsByOrgWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return err
+	}
+	activeActions := make([]*ActionWriteModel, 0, len(existingActions.Actions))
+	for _, existingAction := range existingActions.Actions {
+		if existingAction.State == domain.ActionStateActive {
+			activeActions = append(activeActions, existingAction)
+		}
+	}
+	if features.ActionsAllowed == domain.ActionsAllowedUnlimited || len(activeActions) < features.MaxActions {
+		return nil
+	}
+	return caos_errs.ThrowPreconditionFailed(nil, "COMMAND-dfwg2", "Errors.Action.MaxAllowed")
 }
 
 func (c *Commands) ChangeAction(ctx context.Context, actionChange *domain.Action, resourceOwner string) (*domain.ObjectDetails, error) {
@@ -119,6 +145,11 @@ func (c *Commands) ReactivateAction(ctx context.Context, actionID string, resour
 	if existingAction.State != domain.ActionStateInactive {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-J53zh", "Errors.Action.NotInactive")
 	}
+	err = c.checkAdditionalActionAllowed(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+
 	actionAgg := ActionAggregateFromWriteModel(&existingAction.WriteModel)
 	events := []eventstore.Command{
 		action.NewReactivatedEvent(ctx, actionAgg),
@@ -174,9 +205,34 @@ func (c *Commands) removeActionsFromOrg(ctx context.Context, resourceOwner strin
 		return nil, nil
 	}
 	events := make([]eventstore.Command, 0, len(existingActions.Actions))
-	for id, name := range existingActions.Actions {
+	for id, existingAction := range existingActions.Actions {
 		actionAgg := NewActionAggregate(id, resourceOwner)
-		events = append(events, action.NewRemovedEvent(ctx, actionAgg, name))
+		events = append(events, action.NewRemovedEvent(ctx, actionAgg, existingAction.Name))
+	}
+	return events, nil
+}
+
+func (c *Commands) deactivateNotAllowedActionsFromOrg(ctx context.Context, resourceOwner string, maxAllowed int) ([]eventstore.Command, error) {
+	existingActions, err := c.getActionsByOrgWriteModelByID(ctx, resourceOwner)
+	if err != nil {
+		return nil, err
+	}
+	activeActions := make([]*ActionWriteModel, 0, len(existingActions.Actions))
+	for _, existingAction := range existingActions.Actions {
+		if existingAction.State == domain.ActionStateActive {
+			activeActions = append(activeActions, existingAction)
+		}
+	}
+	if len(activeActions) <= maxAllowed {
+		return nil, nil
+	}
+	sort.Slice(activeActions, func(i, j int) bool {
+		return activeActions[i].WriteModel.ChangeDate.Before(activeActions[j].WriteModel.ChangeDate)
+	})
+	events := make([]eventstore.Command, 0, len(existingActions.Actions))
+	for i := maxAllowed; i < len(activeActions); i++ {
+		actionAgg := NewActionAggregate(activeActions[i].AggregateID, resourceOwner)
+		events = append(events, action.NewDeactivatedEvent(ctx, actionAgg))
 	}
 	return events, nil
 }

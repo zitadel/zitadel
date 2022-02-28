@@ -48,6 +48,14 @@ module.exports = {
     },
     {
       type: "category",
+      label: "Integrations",
+      collapsed: false,
+      items: [
+        "guides/integrations/authenticated-mongodb-charts",
+      ],
+    },
+    {
+      type: "category",
       label: "Solution Scenarios",
       collapsed: false,
       items: [
@@ -147,6 +155,7 @@ module.exports = {
       label: "API Definition",
       collapsed: false,
       items: [
+        "apis/statuscodes",
         {
           type: "category",
           label: "Proto",

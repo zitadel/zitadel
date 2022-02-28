@@ -32,20 +32,6 @@ func (p *OrgIAMPolicy) Changes(changed *OrgIAMPolicy) map[string]interface{} {
 	return changes
 }
 
-func (i *IAM) appendAddOrgIAMPolicyEvent(event *es_models.Event) error {
-	i.DefaultOrgIAMPolicy = new(OrgIAMPolicy)
-	err := i.DefaultOrgIAMPolicy.SetData(event)
-	if err != nil {
-		return err
-	}
-	i.DefaultOrgIAMPolicy.ObjectRoot.CreationDate = event.CreationDate
-	return nil
-}
-
-func (i *IAM) appendChangeOrgIAMPolicyEvent(event *es_models.Event) error {
-	return i.DefaultOrgIAMPolicy.SetData(event)
-}
-
 func (p *OrgIAMPolicy) SetData(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {

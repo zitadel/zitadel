@@ -18,7 +18,7 @@ h1 {
   }
 
   i {
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 }
 
@@ -29,8 +29,8 @@ h1 {
 
   .flow-type {
     padding: 1rem 1rem;
-    margin: .5rem 0;
-    border-radius: .5rem;
+    margin: 0.5rem 0;
+    border-radius: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -39,7 +39,7 @@ h1 {
   .topelements {
     border: 3px solid var(--color-main);
     border-radius: 1rem;
-    padding: 0 .5rem;
+    padding: 0 0.5rem;
   }
 
   .trigger-wrapper {
@@ -57,13 +57,13 @@ h1 {
     }
 
     .trigger {
-      padding: .5rem 1rem;
-      border-radius: .5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
       display: flex;
       align-items: center;
       background: var(--color-main);
       color: white;
-      margin: .5rem 0;
+      margin: 0.5rem 0;
       min-height: 40px;
 
       .icon {
@@ -74,18 +74,27 @@ h1 {
         flex: 1;
       }
 
-      .action-wrapper {
-        padding: 0 .5rem;
+      .flow-action-wrapper {
+        padding: 0 0.5rem;
+        margin: 0;
 
-        .action {
+        .flow-action {
           display: flex;
           align-items: center;
           font-size: 14px;
-          padding: .5rem 0;
+          padding: 0.5rem 0;
           cursor: move;
 
+          .flow-action-name {
+            margin-right: 1rem;
+          }
+
+          .fill-space {
+            flex: 1;
+          }
+
           i {
-            margin-right: .5rem;
+            margin-right: 0.5rem;
           }
         }
       }
@@ -105,13 +114,13 @@ h1 {
   display: flex;
   align-items: center;
   font-size: 14px;
-  border-radius: .5rem;
-  padding: 0 .5rem;
+  border-radius: 0.5rem;
+  padding: 0 0.5rem;
   background-color: var(--color-main);
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
 
   i {
-    margin-right: .5rem;
+    margin-right: 0.5rem;
   }
 }
 
@@ -120,5 +129,5 @@ h1 {
 }
 
 .cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, .2, 1);
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }

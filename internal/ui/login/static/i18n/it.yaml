@@ -205,8 +205,9 @@ RegistrationUser:
   FirstnameLabel: Nome
   LastnameLabel: Cognome
   LanguageLabel: Lingua
-  German: Tedesco
-  English: Inglese
+  German: Deutsch
+  English: English
+  Italian: Italiano
   GenderLabel: Genere
   Female: Femminile
   Male: Maschile
@@ -232,8 +233,9 @@ ExternalRegistrationUserOverview:
   NicknameLabel: Soprannome
   PhoneLabel: Numero di telefono
   LanguageLabel: Lingua
-  German: Tedesco
-  English: Inglese
+  German: Deutsch
+  English: English
+  Italian: Italiano
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
@@ -258,7 +260,7 @@ RegistrationOrg:
   TosLinkText: Termini di servizio
   TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
-  SaveButtonText: Salva
+  SaveButtonText: Creare organizzazione
 
 LoginSuccess:
   Title: Accesso riuscito
@@ -281,12 +283,15 @@ ExternalNotFoundOption:
   Title: Utente esterno
   Description: Utente esterno non trovato. Vuoi collegare il tuo utente o registrarne uno nuovo automaticamente.
   LinkButtonText: Link
-  AutoRegisterButtonText: Registra automaticamente
+  AutoRegisterButtonText: Registra
   TosAndPrivacyLabel: Termini di servizio
   TosConfirm: Accetto i
   TosLinkText: Termini di servizio
   TosConfirmAnd: e
   PrivacyLinkText: l'informativa sulla privacy
+  German: Deutsch
+  English: English
+  Italian: Italiano
 
 Footer:
   PoweredBy: Alimentato da

@@ -38,20 +38,6 @@ func LabelPolicyToModel(policy *LabelPolicy) *iam_model.LabelPolicy {
 	}
 }
 
-func (i *IAM) appendAddLabelPolicyEvent(event *es_models.Event) error {
-	i.DefaultLabelPolicy = new(LabelPolicy)
-	err := i.DefaultLabelPolicy.SetDataLabel(event)
-	if err != nil {
-		return err
-	}
-	i.DefaultLabelPolicy.ObjectRoot.CreationDate = event.CreationDate
-	return nil
-}
-
-func (i *IAM) appendChangeLabelPolicyEvent(event *es_models.Event) error {
-	return i.DefaultLabelPolicy.SetDataLabel(event)
-}
-
 func (p *LabelPolicy) SetDataLabel(event *es_models.Event) error {
 	err := json.Unmarshal(event.Data, p)
 	if err != nil {

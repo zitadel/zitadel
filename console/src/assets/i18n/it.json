@@ -378,6 +378,8 @@
       "DESCRIPTION": "Descrizione",
       "KEYSTITLE": "Chiavi",
       "KEYSDESC": "Definisci le tue chiavi e aggiungi una data di scadenza opzionale.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Questi Token d'accesso personali funzionano come i Access Token per OAuth.",
       "ID": "ID chiave",
       "TYPE": "Tipo",
       "EXPIRATIONDATE": "Data di scadenza",
@@ -533,6 +535,25 @@
         "PROJECT": "Progetto",
         "GRANTEDPROJECT": "Progetto concesso"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Genera un nuovo token",
+        "DESCRIPTION": "Definisci la data di scadenza del token",
+        "CHOOSEEXPIRY": "Seleziona una data di scadenza",
+        "CHOOSEDATEAFTER": "Inserisci una scadenza valida"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Copia il tuo token di accesso. Non sarà possibile recuperarlo in seguito."
+      },
+      "DELETE": {
+        "TITLE": "Elimina Token",
+        "DESCRIPTION": "Stai per eliminare il token di accesso. Sei sicuro di voler continuare?"
+      },
+      "DELETED": "Token eliminato con successo."
     }
   },
   "FLOWS": {
@@ -564,6 +585,7 @@
     "FLOWTYPE": "Tipo processo",
     "TRIGGERTYPE": "Tipo trigger",
     "ACTIONS": "Azioni",
+    "ACTIONSMAX": "In base al tuo tier, hai a disposizione un numero limitato di azioni ({{value}}). Assicurati di disattivare quelli di cui non hai bisogno o considera di fare un upgrade.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Crea azione"
@@ -581,7 +603,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Azioni salvate!"
+      "ACTIONSSET": "Azioni salvate!",
+      "ACTIONREACTIVATED": "Azioni riattivati con successo",
+      "ACTIONDEACTIVATED": "Azioni disattivati con successo"
     }
   },
   "IAM": {
@@ -756,7 +780,16 @@
       "CUSTOMTEXTMESSAGE": "Testi email personalizzati",
       "PRIVACYPOLICY": "Link personalizzati all'informativa sulla privacy e ai TOS",
       "METADATAUSER": "Metadati utente",
-      "FLOWS": "Azioni e processi"
+      "FLOWS": "Azioni e processi",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Non abilitato",
+          "1": "Numero limitato",
+          "2": "Illimitato"
+        },
+        "COUNT": "Anzahl",
+        "TYPE": "Tipo di utilizzo"
+      }
     },
     "TIERSTATES": {
       "0": "Attivo",

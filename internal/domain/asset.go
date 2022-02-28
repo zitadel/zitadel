@@ -37,3 +37,10 @@ type AssetInfo struct {
 func GetHumanAvatarAssetPath(userID string) string {
 	return UsersAssetPath + "/" + userID + AvatarAssetPath
 }
+
+func AssetURL(prefix, resourceOwner, key string) string {
+	if prefix == "" || resourceOwner == "" || key == "" {
+		return ""
+	}
+	return prefix + resourceOwner + "/" + key
+}

@@ -39,6 +39,7 @@ Errors:
     DomainNotAllowedAsUsername: Il dominio è già riservato e non può essere utilizzato
     AlreadyInactive: Utente già inattivo
     NotInactive: L'utente non è inattivo
+    CantDeactivateInitial: Gli utenti con lo stato iniziale possono solo essere cancellati e non disattivati
     ShouldBeActiveOrInitial: L'utente non è attivo o inizializzato
     AlreadyInitialised: L'utente è già inizializzato
     NotInitialised: L'utente non è ancora inizializzato
@@ -65,8 +66,11 @@ Errors:
     Machine:
       Key:
         NotFound: Machine Key non trovato
+    PAT:
+      NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
     NotMachine: L'utente deve essere tecnico
+    WrongType: Non consentito per questo tipo di utente
     NotAllowedToLink: L'utente non è autorizzato a collegarsi con un provider di accesso esterno
     Username:
       AlreadyExists: Nome utente già preso
@@ -338,6 +342,7 @@ Errors:
     NotExisting: La configurazione del IDP non esiste
   Changes:
     NotFound: Nessuna storia trovata
+    AuditRetention: La storia è al di fuori della Ritenzione Audit Log
   Token:
     NotFound: Token non trovato
   UserSession:
@@ -373,6 +378,7 @@ Errors:
     NotFound: L'azione non trovata
     NotActive: L'azione non è attiva
     NotInactive: L'azione non è inattiva
+    MaxAllowed: Non sono permesse altre azioni attive
   Flow:
     FlowTypeMissing: FlowType mancante
     Empty: Flow è già vuoto

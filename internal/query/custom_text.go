@@ -131,6 +131,8 @@ func (q *Queries) GetDefaultLoginTexts(ctx context.Context, lang string) (*domai
 	if err := yaml.Unmarshal(contents, loginText); err != nil {
 		return nil, errors.ThrowInternal(err, "TEXT-M0p4s", "Errors.TranslationFile.ReadError")
 	}
+	loginText.IsDefault = true
+	loginText.AggregateID = domain.IAMID
 	return loginText, nil
 }
 
@@ -139,7 +141,7 @@ func (q *Queries) GetCustomLoginTexts(ctx context.Context, aggregateID, lang str
 	if err != nil {
 		return nil, err
 	}
-	return CustomTextsToLoginDomain(domain.IAMID, lang, texts), err
+	return CustomTextsToLoginDomain(aggregateID, lang, texts), err
 }
 
 func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.CustomLoginText, error) {
@@ -171,6 +173,8 @@ func (q *Queries) IAMLoginTexts(ctx context.Context, lang string) (*domain.Custo
 	if err := json.Unmarshal(jsonbody, &loginText); err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-m93Jf", "Errors.TranslationFile.MergeError")
 	}
+	loginText.AggregateID = domain.IAMID
+	loginText.IsDefault = true
 	return loginText, nil
 }
 
@@ -271,6 +275,10 @@ func CustomTextsToLoginDomain(aggregateID, lang string, texts *CustomTexts) *dom
 			AggregateID: aggregateID,
 		},
 		Language: langTag,
+	}
+	if len(texts.CustomTexts) == 0 {
+		result.AggregateID = domain.IAMID
+		result.IsDefault = true
 	}
 	for _, text := range texts.CustomTexts {
 		if text.CreationDate.Before(result.CreationDate) {

@@ -13,7 +13,7 @@ func (s *Server) GetLabelPolicy(ctx context.Context, req *admin_pb.GetLabelPolic
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
+	return &admin_pb.GetLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetsAPIDomain)}, nil
 }
 
 func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *admin_pb.GetPreviewLabelPolicyRequest) (*admin_pb.GetPreviewLabelPolicyResponse, error) {
@@ -21,7 +21,7 @@ func (s *Server) GetPreviewLabelPolicy(ctx context.Context, req *admin_pb.GetPre
 	if err != nil {
 		return nil, err
 	}
-	return &admin_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy)}, nil
+	return &admin_pb.GetPreviewLabelPolicyResponse{Policy: policy_grpc.ModelLabelPolicyToPb(policy, s.assetsAPIDomain)}, nil
 }
 
 func (s *Server) UpdateLabelPolicy(ctx context.Context, req *admin_pb.UpdateLabelPolicyRequest) (*admin_pb.UpdateLabelPolicyResponse, error) {

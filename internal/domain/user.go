@@ -39,3 +39,31 @@ const (
 func (f UserType) Valid() bool {
 	return f >= 0 && f < userTypeCount
 }
+
+type UserAuthMethodType int32
+
+const (
+	UserAuthMethodTypeUnspecified UserAuthMethodType = iota
+	UserAuthMethodTypeOTP
+	UserAuthMethodTypeU2F
+	UserAuthMethodTypePasswordless
+	userAuthMethodTypeCount
+)
+
+func (f UserAuthMethodType) Valid() bool {
+	return f >= 0 && f < userAuthMethodTypeCount
+}
+
+type PersonalAccessTokenState int32
+
+const (
+	PersonalAccessTokenStateUnspecified PersonalAccessTokenState = iota
+	PersonalAccessTokenStateActive
+	PersonalAccessTokenStateRemoved
+
+	personalAccessTokenStateCount
+)
+
+func (f PersonalAccessTokenState) Valid() bool {
+	return f >= 0 && f < personalAccessTokenStateCount
+}

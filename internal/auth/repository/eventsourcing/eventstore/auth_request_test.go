@@ -20,7 +20,6 @@ import (
 	user_model "github.com/caos/zitadel/internal/user/model"
 	user_es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type mockViewNoUserSession struct{}
@@ -216,10 +215,10 @@ func (m *mockUserGrants) ProjectByOIDCClientID(ctx context.Context, s string) (*
 	return &query.Project{ProjectRoleCheck: m.roleCheck}, nil
 }
 
-func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*grant_view_model.UserGrantView, error) {
-	var grants []*grant_view_model.UserGrantView
+func (m *mockUserGrants) UserGrantsByProjectAndUserID(s string, s2 string) ([]*query.UserGrant, error) {
+	var grants []*query.UserGrant
 	if m.userGrants > 0 {
-		grants = make([]*grant_view_model.UserGrantView, m.userGrants)
+		grants = make([]*query.UserGrant, m.userGrants)
 	}
 	return grants, nil
 }

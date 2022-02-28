@@ -61,7 +61,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	iam, err := l.authRepo.GetIAM(r.Context())
+	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -115,7 +115,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	if resourceOwner == "" {
-		iam, err := l.authRepo.GetIAM(r.Context())
+		iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 		if err != nil {
 			l.renderRegister(w, r, authRequest, formData, err)
 			return

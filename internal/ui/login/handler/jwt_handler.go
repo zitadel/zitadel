@@ -112,7 +112,7 @@ func (l *Login) jwtExtractionUserNotFound(w http.ResponseWriter, r *http.Request
 		err = nil
 	}
 	if !idpConfig.AutoRegister {
-		l.renderExternalNotFoundOption(w, r, authReq, err)
+		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return
 	}
 	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)

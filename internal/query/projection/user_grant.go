@@ -87,6 +87,18 @@ func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 					Event:  project.GrantRemovedType,
 					Reduce: p.reduceProjectGrantRemoved,
 				},
+				{
+					Event:  project.RoleRemovedType,
+					Reduce: p.reduceRoleRemoved,
+				},
+				{
+					Event:  project.GrantChangedType,
+					Reduce: p.reduceProjectGrantChanged,
+				},
+				{
+					Event:  project.GrantCascadeChangedType,
+					Reduce: p.reduceProjectGrantChanged,
+				},
 			},
 		},
 	}
@@ -250,6 +262,50 @@ func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) 
 		event,
 		[]handler.Condition{
 			handler.NewCond(UserGrantGrantID, e.GrantID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*project.RoleRemovedEvent)
+	if !ok {
+		logging.LogWithFields("PROJE-Edg22", "seq", event.Sequence(), "expectedType", project.RoleRemovedType).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-dswg2", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			crdb.NewArrayRemoveCol(UserGrantRoles, e.Key),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserGrantProjectID, e.Aggregate().ID),
+		},
+	), nil
+}
+
+func (p *UserGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
+	var grantID string
+	var keys []string
+	switch e := event.(type) {
+	case *project.GrantChangedEvent:
+		grantID = e.GrantID
+		keys = e.RoleKeys
+	case *project.GrantCascadeChangedEvent:
+		grantID = e.GrantID
+		keys = e.RoleKeys
+	default:
+		logging.LogWithFields("PROJE-FGgw2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.GrantChangedType, project.GrantCascadeChangedType}).Error("wrong event type")
+		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Fh3gw", "reduce.wrong.event.type")
+	}
+
+	return crdb.NewUpdateStatement(
+		event,
+		[]handler.Column{
+			crdb.NewArrayIntersectCol(UserGrantRoles, pq.StringArray(keys)),
+		},
+		[]handler.Condition{
+			handler.NewCond(UserGrantGrantID, grantID),
 		},
 	), nil
 }

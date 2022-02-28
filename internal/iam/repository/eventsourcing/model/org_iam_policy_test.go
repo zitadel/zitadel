@@ -1,10 +1,7 @@
 package model
 
 import (
-	"encoding/json"
 	"testing"
-
-	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 )
 
 func TestOrgIAMPolicyChanges(t *testing.T) {
@@ -46,80 +43,6 @@ func TestOrgIAMPolicyChanges(t *testing.T) {
 			changes := tt.args.existing.Changes(tt.args.new)
 			if len(changes) != tt.res.changesLen {
 				t.Errorf("got wrong changes len: expected: %v, actual: %v ", tt.res.changesLen, len(changes))
-			}
-		})
-	}
-}
-
-func TestAppendAddOrgIAMPolicyEvent(t *testing.T) {
-	type args struct {
-		iam    *IAM
-		policy *OrgIAMPolicy
-		event  *es_models.Event
-	}
-	tests := []struct {
-		name   string
-		args   args
-		result *IAM
-	}{
-		{
-			name: "append add org iam policy event",
-			args: args{
-				iam:    new(IAM),
-				policy: &OrgIAMPolicy{UserLoginMustBeDomain: true},
-				event:  new(es_models.Event),
-			},
-			result: &IAM{DefaultOrgIAMPolicy: &OrgIAMPolicy{UserLoginMustBeDomain: true}},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.args.policy != nil {
-				data, _ := json.Marshal(tt.args.policy)
-				tt.args.event.Data = data
-			}
-			tt.args.iam.appendAddOrgIAMPolicyEvent(tt.args.event)
-			if tt.result.DefaultOrgIAMPolicy.UserLoginMustBeDomain != tt.args.iam.DefaultOrgIAMPolicy.UserLoginMustBeDomain {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultOrgIAMPolicy.UserLoginMustBeDomain, tt.args.iam.DefaultOrgIAMPolicy.UserLoginMustBeDomain)
-			}
-		})
-	}
-}
-
-func TestAppendChangeOrgIAMPolicyEvent(t *testing.T) {
-	type args struct {
-		iam    *IAM
-		policy *OrgIAMPolicy
-		event  *es_models.Event
-	}
-	tests := []struct {
-		name   string
-		args   args
-		result *IAM
-	}{
-		{
-			name: "append change org iam policy event",
-			args: args{
-				iam: &IAM{DefaultOrgIAMPolicy: &OrgIAMPolicy{
-					UserLoginMustBeDomain: true,
-				}},
-				policy: &OrgIAMPolicy{UserLoginMustBeDomain: false},
-				event:  &es_models.Event{},
-			},
-			result: &IAM{DefaultOrgIAMPolicy: &OrgIAMPolicy{
-				UserLoginMustBeDomain: false,
-			}},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.args.policy != nil {
-				data, _ := json.Marshal(tt.args.policy)
-				tt.args.event.Data = data
-			}
-			tt.args.iam.appendChangeOrgIAMPolicyEvent(tt.args.event)
-			if tt.result.DefaultOrgIAMPolicy.UserLoginMustBeDomain != tt.args.iam.DefaultOrgIAMPolicy.UserLoginMustBeDomain {
-				t.Errorf("got wrong result: expected: %v, actual: %v ", tt.result.DefaultOrgIAMPolicy.UserLoginMustBeDomain, tt.args.iam.DefaultOrgIAMPolicy.UserLoginMustBeDomain)
 			}
 		})
 	}

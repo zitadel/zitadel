@@ -22,7 +22,7 @@ func ModelCustomMessageTextToPb(msg *query.MessageText) *text_pb.MessageCustomTe
 			msg.ChangeDate,
 			msg.AggregateID,
 		),
-		IsDefault: msg.AggregateID == domain.IAMID,
+		IsDefault: msg.IsDefault,
 	}
 }
 
@@ -34,6 +34,7 @@ func CustomLoginTextToPb(text *domain.CustomLoginText) *text_pb.LoginCustomText 
 			text.ChangeDate,
 			text.AggregateID,
 		),
+		IsDefault:                            text.IsDefault,
 		SelectAccountText:                    SelectAccountScreenToPb(text.SelectAccount),
 		LoginText:                            LoginScreenTextToPb(text.Login),
 		PasswordText:                         PasswordScreenTextToPb(text.Password),

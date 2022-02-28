@@ -23,14 +23,13 @@ import (
 	"github.com/caos/zitadel/internal/api/oidc"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/authz"
-	authz_repo "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
-	mgmt_es "github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -64,7 +63,6 @@ type Config struct {
 	AuthZ authz.Config
 	Auth  auth_es.Config
 	Admin admin_es.Config
-	Mgmt  mgmt_es.Config
 
 	API api.Config
 	UI  ui.Config
@@ -158,10 +156,10 @@ func startZitadel(configPaths []string) {
 	}
 
 	keyChan := make(chan interface{})
-	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan)
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
-	authZRepo, err := authz.Start(ctx, conf.AuthZ, conf.InternalAuthZ, conf.SystemDefaults, queries)
+	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
 	logging.Log("MAIN-s9KOw").OnError(err).Fatal("error starting authz repo")
 
 	esCommands, err := eventstore.StartWithUser(conf.EventstoreBase, conf.Commands.Eventstore)
@@ -177,15 +175,15 @@ func startZitadel(configPaths []string) {
 
 	var authRepo *auth_es.EsRepository
 	if *authEnabled || *oidcEnabled || *loginEnabled {
-		authRepo, err = auth_es.Start(conf.Auth, conf.InternalAuthZ, conf.SystemDefaults, commands, queries, authZRepo, esQueries)
+		authRepo, err = auth_es.Start(conf.Auth, conf.SystemDefaults, commands, queries)
 		logging.Log("MAIN-9oRw6").OnError(err).Fatal("error starting auth repo")
 	}
 
 	repo := struct {
-		authz_repo.EsRepository
+		authz_repo.Repository
 		query.Queries
 	}{
-		*authZRepo,
+		authZRepo,
 		*queries,
 	}
 
@@ -215,33 +213,27 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo *authz_repo.EsRepository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) {
-	roles := make([]string, len(conf.InternalAuthZ.RolePermissionMappings))
-	for i, role := range conf.InternalAuthZ.RolePermissionMappings {
-		roles[i] = role.Role
-	}
-	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, roles, *localDevMode)
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) {
+	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
 	apis := api.Create(conf.API, conf.InternalAuthZ, query, authZRepo, authRepo, repo, conf.SystemDefaults)
 
 	if *adminEnabled {
-		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain, conf.Admin.APIDomain+"/assets/v1/"))
+		apis.RegisterServer(ctx, admin.CreateServer(command, query, repo, conf.SystemDefaults.Domain, conf.API.Domain+"/assets/v1/"))
 	}
-	managementRepo, err := mgmt_es.Start(conf.Mgmt, conf.SystemDefaults, roles, query, static)
-	logging.Log("API-Gd2qq").OnError(err).Fatal("error starting management repo")
 	if *managementEnabled {
-		apis.RegisterServer(ctx, management.CreateServer(command, query, managementRepo, conf.SystemDefaults, conf.Mgmt.APIDomain+"/assets/v1/"))
+		apis.RegisterServer(ctx, management.CreateServer(command, query, conf.SystemDefaults, conf.API.Domain+"/assets/v1/"))
 	}
 	if *authEnabled {
-		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults))
+		apis.RegisterServer(ctx, auth.CreateServer(command, query, authRepo, conf.SystemDefaults, conf.API.Domain+"/assets/v1/"))
 	}
 	if *oidcEnabled {
-		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, es, projections, keyChan)
+		op := oidc.NewProvider(ctx, conf.API.OIDC, command, query, authRepo, conf.SystemDefaults.KeyConfig, *localDevMode, es, projections, keyChan, conf.API.Domain+"/assets/v1/")
 		apis.RegisterHandler("/oauth/v2", op.HttpHandler())
 	}
 	if *assetsEnabled {
-		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, managementRepo, query)
+		assetsHandler := assets.NewHandler(command, verifier, conf.InternalAuthZ, id.SonyFlakeGenerator, static, query)
 		apis.RegisterHandler("/assets/v1", assetsHandler)
 	}
 

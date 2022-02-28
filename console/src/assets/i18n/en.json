@@ -378,6 +378,8 @@
       "DESCRIPTION": "Description",
       "KEYSTITLE": "Keys",
       "KEYSDESC": "Define your keys and add an optional expiration date.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Personal access tokens function like ordinary OAuth access tokens.",
       "ID": "Key ID",
       "TYPE": "Type",
       "EXPIRATIONDATE": "Expiration date",
@@ -533,6 +535,25 @@
         "PROJECT": "Project",
         "GRANTEDPROJECT": "Granted Project"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generate new Personal Access Token",
+        "DESCRIPTION": "Define a custom expiration for the token.",
+        "CHOOSEEXPIRY": "Select an expiration date",
+        "CHOOSEDATEAFTER": "Enter a valid expiration after"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Make sure to copy your personal access token. You won't be able to see it again!"
+      },
+      "DELETE": {
+        "TITLE": "Delete Token",
+        "DESCRIPTION": "You are about to delete the personal access token. Are you sure?"
+      },
+      "DELETED": "Token deleted with success."
     }
   },
   "FLOWS": {
@@ -564,6 +585,7 @@
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
     "ACTIONS": "Actions",
+    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deaktivate those you are not in need or consider upgrading your tier.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Create an Action"
@@ -581,7 +603,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Actions set"
+      "ACTIONSSET": "Actions set",
+      "ACTIONREACTIVATED": "Actions reactivated with success",
+      "ACTIONDEACTIVATED": "Actions deactivated with success"
     }
   },
   "IAM": {
@@ -756,7 +780,16 @@
       "CUSTOMTEXTMESSAGE": "Custom notification mail texts",
       "PRIVACYPOLICY": "Custom Privacy Policy and TOS Links",
       "METADATAUSER": "User Metadata",
-      "FLOWS": "Actions and Flows"
+      "FLOWS": "Actions and Flows",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Not allowed",
+          "1": "Limited Actions",
+          "2": "Unlimited Actions"
+        },
+        "TYPE": "Type of use",
+        "COUNT": "Number"
+      }
     },
     "TIERSTATES": {
       "0": "Active",

@@ -207,6 +207,7 @@ RegistrationUser:
   LanguageLabel: Language
   German: Deutsch
   English: English
+  Italian: Italiano
   GenderLabel: Gender
   Female: Female
   Male: Male
@@ -234,6 +235,7 @@ ExternalRegistrationUserOverview:
   LanguageLabel: Language
   German: Deutsch
   English: English
+  Italian: Italiano
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
@@ -258,7 +260,7 @@ RegistrationOrg:
   TosLinkText: TOS
   TosConfirmAnd: and the
   PrivacyLinkText: privacy policy
-  SaveButtonText: save
+  SaveButtonText: Create organization
 
 LoginSuccess:
   Title: Login successful
@@ -281,12 +283,15 @@ ExternalNotFoundOption:
   Title: External User
   Description: External user not found. Do you want to link your user or auto register a new one.
   LinkButtonText: Link
-  AutoRegisterButtonText: Auto register
+  AutoRegisterButtonText: register
   TosAndPrivacyLabel: Terms and conditions
   TosConfirm: I accept the
   TosLinkText: TOS
   TosConfirmAnd: and the
   PrivacyLinkText: privacy policy
+  German: Deutsch
+  English: English
+  Italian: Italiano
 
 Footer:
   PoweredBy: Powered By
