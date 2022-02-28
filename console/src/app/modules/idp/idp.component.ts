@@ -19,6 +19,7 @@ import {
   UpdateOrgIDPRequest,
 } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -67,6 +68,7 @@ export class IdpComponent implements OnDestroy {
     private _location: Location,
     private authService: GrpcAuthService,
     private dialog: MatDialog,
+    breadcrumbService: BreadcrumbService,
   ) {
     this.idpForm = new FormGroup({
       id: new FormControl({ disabled: true, value: '' }, [Validators.required]),
@@ -99,10 +101,26 @@ export class IdpComponent implements OnDestroy {
         case PolicyComponentServiceType.MGMT:
           this.service = this.injector.get(ManagementService as Type<ManagementService>);
 
+          const iambread = new Breadcrumb({
+            type: BreadcrumbType.IAM,
+            name: 'System',
+            routerLink: ['/system'],
+          });
+          const bread: Breadcrumb = {
+            type: BreadcrumbType.ORG,
+            routerLink: ['/org'],
+          };
+          breadcrumbService.setBreadcrumb([iambread, bread]);
           break;
         case PolicyComponentServiceType.ADMIN:
           this.service = this.injector.get(AdminService as Type<AdminService>);
 
+          const iamBread = new Breadcrumb({
+            type: BreadcrumbType.IAM,
+            name: 'System',
+            routerLink: ['/system'],
+          });
+          breadcrumbService.setBreadcrumb([iamBread]);
           break;
       }
 

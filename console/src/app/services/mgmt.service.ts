@@ -638,14 +638,15 @@ export class ManagementService {
 
   public listOrgIDPs(limit?: number, offset?: number, queryList?: IDPQuery[]): Promise<ListOrgIDPsResponse.AsObject> {
     const req = new ListOrgIDPsRequest();
-    const metadata = new ListQuery();
+    const query = new ListQuery();
 
     if (limit) {
-      metadata.setLimit(limit);
+      query.setLimit(limit);
     }
     if (offset) {
-      metadata.setOffset(offset);
+      query.setOffset(offset);
     }
+    req.setQuery(query);
     if (queryList) {
       req.setQueriesList(queryList);
     }

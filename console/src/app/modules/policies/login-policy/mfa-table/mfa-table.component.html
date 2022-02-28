@@ -1,6 +1,15 @@
 <div class="sp_wrapper">
   <mat-spinner diameter="30" *ngIf="loading$ | async"></mat-spinner>
 </div>
+<!-- <cnsl-form-field class="form-field" appearance="outline">
+  <cnsl-label>{{'USER.MACHINE.TYPE' | translate}}</cnsl-label>
+  <mat-select [(ngModel)]="mfas">
+    <mat-option *ngFor="let t of types" [value]="t">
+      {{'USER.MACHINE.KEYTYPES.'+t | translate}}
+    </mat-option>
+  </mat-select>
+</cnsl-form-field> -->
+
 <div class="login-policy-mfa-list">
   <div class="mfa" *ngFor="let mfa of mfas">
     <span>

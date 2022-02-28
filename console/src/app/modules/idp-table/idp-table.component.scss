@@ -1,18 +1,9 @@
-.ar-button {
+.margin-right {
   margin-right: 0.5rem;
 }
 
 td {
   outline: none;
-
-  img {
-    height: 30px;
-    width: 30px;
-    margin-left: 1rem;
-    border-radius: 0.5rem;
-    object-fit: contain;
-    margin-top: 0.5rem;
-  }
 }
 
 tr {
@@ -37,59 +28,6 @@ tr {
   color: var(--warn);
 }
 
-.avatar {
-  height: 30px;
-  width: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: black;
-  color: white;
-
-  span {
-    font-size: 14px;
-    text-transform: uppercase;
-  }
-}
-
-.flex-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 2px 0;
-  width: 250px;
-
-  .key {
-    margin-right: 0.5rem;
-    font-size: 12px;
-    flex: 1 0 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .value {
-    font-size: 12px;
-    flex: 1 0 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &:first-child {
-    padding-top: 0.5rem;
-  }
-
-  &:last-child {
-    padding-bottom: 0.5rem;
-  }
-}
-
-.date-block {
-  margin: 0.5rem 0;
-  display: block;
-  min-width: 120px;
-
-  .date-sub {
-    font-size: 13px;
-    display: block;
-  }
+.idp-table-actions {
+  width: 100px;
 }

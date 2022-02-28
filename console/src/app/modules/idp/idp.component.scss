@@ -1,14 +1,99 @@
-.container {
-  width: 100%;
+@use '@angular/material' as mat;
 
-  @media only screen and (max-width: 450px) {
-    padding: 4rem 1rem 2rem 1rem;
-  }
+@mixin idp-detail-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
+  $button-text-color: map-get($foreground, text);
+  $button-disabled-text-color: map-get($foreground, disabled-button);
+  $divider-color: map-get($foreground, dividers);
 
-  .idp-form {
-    border-top: 1px solid #ffffff20;
-    padding-top: 1rem;
+  .idp-top {
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 2rem 2rem 1rem 2rem;
+    background: if($is-dark-theme, #00000020, #605f5f0f);
+
+    @media only screen and (max-width: 500px) {
+      margin: 0 -1.5rem;
+    }
+
+    .idp-top-row {
+      display: flex;
+      align-items: center;
+      padding-bottom: 1rem;
+      flex-wrap: wrap;
+
+      .idp-title-wrapper {
+        display: flex;
+        align-items: center;
+
+        a {
+          margin-right: 1rem;
+        }
+
+        .idp-title-row {
+          display: flex;
+          align-items: center;
+
+          .idp-title {
+            margin: 0;
+            margin-right: 0.5rem;
+            font-size: 2rem;
+          }
+
+          .idp-state-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+
+            &.active {
+              background-color: var(--success);
+            }
+
+            &.inactive {
+              background-color: var(--warn);
+            }
+          }
+        }
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .actions-trigger-desk {
+        display: none;
+        align-items: center;
+
+        @media only screen and (min-width: 700px) {
+          display: flex;
+        }
+
+        .icon {
+          margin-left: 0.25rem;
+          margin-right: -0.5rem;
+        }
+      }
+
+      .actions-trigger-mob {
+        display: inline;
+
+        @media only screen and (min-width: 700px) {
+          display: none;
+        }
+      }
+    }
   }
+}
+
+.idp-form {
+  padding-top: 1rem;
+}
+
+.idp-desc {
+  font-size: 14px;
 }
 
 .idp-content {

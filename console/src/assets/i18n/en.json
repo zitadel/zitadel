@@ -1391,7 +1391,7 @@
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "OIDC": {
       "TITLE": "OIDC IDP",
-      "DESCRIPTION": "Enter the data for OIDC Identity Provider."
+      "DESCRIPTION": "Enter the data for the OIDC Identity Provider."
     },
     "JWT": {
       "TITLE": "JWT IDP",
