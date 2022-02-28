@@ -5,14 +5,19 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/caos/zitadel/internal/domain"
+	errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
+	"golang.org/x/text/language"
 )
 
 type OrgSetup struct {
 	Name   string
 	Domain string
+	Human  AddHuman
 }
 
 var (
@@ -20,186 +25,160 @@ var (
 	ErrOrgDomainEmpty = errors.New("Errors.Invalid.Argument")
 )
 
-func SetUpOrg(ctx context.Context, o *OrgSetup) error {
+type Command struct {
+	es *eventstore.Eventstore
+}
+
+func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	//TODO: add default domain
+	userID, err := id.SonyFlakeGenerator.Next()
+	if err != nil {
+		return nil, err
+	}
 
-	// cmd :=
+	orgAgg := org.NewAggregate(orgID, orgID)
+	userAgg := user.NewAggregate(userID, orgID)
 
-	cmd := addOrgDomainCommand(
-		addOrgCommand(
-			NewCommander(&org.NewAggregate(orgID, orgID).Aggregate),
-			o.Name,
-		),
-		o.Domain,
-	)
+	cmds, err := NewCommander(&orgAgg.Aggregate, addOrgCommand(o.Name)).
+		Next(addOrgDomainCommand(o.Domain)).
+		Next(verifyOrgDomainCommand(o.Domain)).
+		Next(setOrgDomainPrimaryCommand(o.Domain)).
+		// TODO: default domain
+		Next(WithAggregate(&userAgg.Aggregate), addHumanCommand(command.es, &o.Human)).
+		Next(WithAggregate(&orgAgg.Aggregate), addOrgMemberCommand(userID, orgID, domain.RoleOrgOwner)).
+		Commands(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	_ = cmd
-
-	return nil
+	events, err := command.es.Push(ctx, cmds...)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.ObjectDetails{
+		Sequence:      events[len(events)-1].Sequence(),
+		EventDate:     events[len(events)-1].CreationDate(),
+		ResourceOwner: orgID,
+	}, nil
 }
 
-func addOrgCommand(c *commander, name string) *commander {
-	//TODO: should we always remove the spaces?
-	if strings.TrimSpace(name) == "" {
-		return c.Next(nil, WithErr(ErrOrgNameEmpty))
-	}
-	return c.Next(
-		func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
+func addOrgCommand(name string) commanderOption {
+	// TODO: should we always remove the spaces?
+	return func(c *commander) {
+		if name = strings.TrimSpace(name); name == "" {
+			c.err = ErrOrgNameEmpty
+			return
+		}
+		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
 			return []eventstore.Command{org.NewOrgAddedEvent(ctx, a, name)}, nil
-		},
-	)
-}
-
-func addOrgDomainCommand(c *commander, domain string) *commander {
-	//TODO: should we always remove the spaces?
-	if strings.TrimSpace(domain) == "" {
-		return c.Next(nil, WithErr(ErrOrgDomainEmpty))
+		}
 	}
-
-	return c.Next(
-		func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
-			return []eventstore.Command{org.NewDomainAddedEvent(ctx, a, domain)}, nil
-		},
-	)
 }
 
-/*
-AddOrg(name string)
-AddDomain(domain string)
-SetDomainPrimary(domain string)
-VerifyDomain(domain string)
-AddMember(userID, roles ...string)
+func addOrgDomainCommand(domain string) commanderOption {
+	// TODO: should we always remove the spaces?
+	return func(c *commander) {
+		if domain = strings.TrimSpace(domain); domain == "" {
+			c.err = ErrOrgDomainEmpty
+			return
+		}
+		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewDomainAddedEvent(ctx, a, domain)}, nil
+		}
+	}
+}
 
-AddUser(firstName, lastName, username string) => validate password, validate username on orgiam policy
-*/
+func verifyOrgDomainCommand(domain string) commanderOption {
+	//TODO: check exists, but when: if domain will be added in this transaction?
+	return func(c *commander) {
+		if domain = strings.TrimSpace(domain); domain == "" {
+			c.err = ErrOrgDomainEmpty
+			return
+		}
+		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewDomainVerifiedEvent(ctx, a, domain)}, nil
+		}
+	}
+}
 
-// import (
-// 	"context"
-// 	"errors"
-// 	"fmt"
+func setOrgDomainPrimaryCommand(domain string) commanderOption {
+	//TODO: check exists, but when if domain will be added in this transaction?
+	return func(c *commander) {
+		if domain = strings.TrimSpace(domain); domain == "" {
+			c.err = ErrOrgDomainEmpty
+			return
+		}
+		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, a, domain)}, nil
+		}
+	}
+}
 
-// 	"github.com/caos/zitadel/internal/api/authz"
-// 	"github.com/caos/zitadel/internal/domain"
-// 	caos_errs "github.com/caos/zitadel/internal/errors"
-// 	errs "github.com/caos/zitadel/internal/errors"
-// 	"github.com/caos/zitadel/internal/eventstore"
-// 	"github.com/caos/zitadel/internal/id"
-// 	"github.com/caos/zitadel/internal/repository/org"
-// 	"github.com/caos/zitadel/internal/repository/user"
-// )
+type AddHuman struct {
+	// Username is required
+	Username string
+	// FirstName is required
+	FirstName string
+	// LastName is required
+	LastName string
+	// NickName is required
+	NickName string
+	// DisplayName is required
+	DisplayName string
+	// Email is required
+	Email string
+	// PreferredLang is required
+	PreferredLang language.Tag
+	// Gender is required
+	Gender domain.Gender
+	//TODO: can it also be verified?
+	Phone string
+	//Password is optional
+	//TODO: should we use the domain object?
+	Password *domain.Password
+}
 
-// type SetUpOrg struct {
-// 	Name string
-// }
+func addHumanCommand(es *eventstore.Eventstore, human *AddHuman) commanderOption {
+	return func(c *commander) {
+		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
+			existing := NewHumanWriteModel(a.ID, a.ResourceOwner)
+			err := es.FilterToQueryReducer(ctx, existing)
+			if err != nil {
+				return nil, err
+			}
+			if isUserStateExists(existing.UserState) {
+				return nil, errs.ThrowAlreadyExists(nil, "COMMA-CxDKf", "Errors.User.AlreadyExists")
+			}
 
-// var (
-// 	ErrInvalidArg      = errors.New("Errors.Invalid.Argument")
-// 	ErrInvalidUsername = fmt.Errorf("%w.User.Username", ErrInvalidArg)
-// )
+			cmd := user.NewHumanAddedEvent(
+				ctx,
+				a,
+				human.Username,
+				human.FirstName,
+				human.LastName,
+				human.NickName,
+				human.DisplayName,
+				human.PreferredLang,
+				human.Gender,
+				human.Email,
+				true, //TODO: depends on policy
+			)
+			if phone := strings.TrimSpace(human.Phone); phone != "" {
+				cmd.AddPhoneData(phone)
+			}
+			if human.Password != nil {
+				cmd.AddPasswordData(human.Password.SecretCrypto, false) //TOOD: when is it false when true?
+			}
 
-// func SetupOrg(ctx context.Context, o *SetUpOrg) error {
-// 	orgID, err := id.SonyFlakeGenerator.Next()
-// 	if err != nil {
-// 		return errs.ThrowInternal(err, "COMMA-41QOL", "Errors.Internal")
-// 	}
-// 	userID, err := id.SonyFlakeGenerator.Next()
-// 	if err != nil {
-// 		return errs.ThrowInternal(err, "COMMA-mSzIb", "Errors.Internal")
-// 	}
+			return []eventstore.Command{cmd}, nil
+		}
+	}
+}
 
-// 	orgAgg := eventstore.NewAggregate(ctx, orgID, org.AggregateType, org.AggregateVersion)
-// 	userAgg := eventstore.NewAggregate(ctx, userID, user.AggregateType, user.AggregateVersion, eventstore.WithResourceOwner(orgID))
-
-// 	defaultDomain := domain.NewIAMDomainName(o.Name, "TODO:")
-
-// 	cmds := []commands{
-// 		addOrg(o.Name),
-// 		addDomain(&AddDomain{Domain: defaultDomain, Verified: true}),
-// 		verifyDomain(defaultDomain),
-// 	}
-// 	addMember, err := AddMember(userID, domain.RoleOrgOwner)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	cmds = append(cmds, addMember)
-
-// 	// cmds = append(cmds, addOrgCommands(ctx, o.Name)
-
-// 	return nil
-// }
-
-// type cmds struct {
-// 	err  error
-// 	cmds []commands
-// }
-
-// type commands func(ctx context.Context, agg *eventstore.Aggregate) (cmds []eventstore.Command)
-
-// func (c *commands) chain(...commands) {
-// 	if c.err != nil {
-// 		return
-// 	}
-
-// 	for _, cmmand := range commands {
-
-// 	}
-// }
-
-// func (c *commands) Err() error {
-// 	return c.err
-// }
-
-// func addOrg(name string, domains ...*AddDomain) (commands, error) {
-// 	return func(ctx context.Context, agg *eventstore.Aggregate) []eventstore.Command {
-// 		cmds := make([]eventstore.Command, 0, len(domains)+3)
-// 		cmds = append(cmds, org.NewOrgAddedEvent(ctx, agg, name))
-// 		for _, domain := range domains {
-// 			cmds = append(cmds, addDomain(domain)(ctx, agg)...)
-// 		}
-// 		cmds = append(cmds)
-// 		return cmds
-// 	}, nil
-// }
-
-// type AddDomain struct {
-// 	Domain   string
-// 	Verified bool
-// }
-
-// func addDomain(domain *AddDomain) commands {
-// 	//TODO: should the event has a unique constraint check for verified domains?
-// 	return func(ctx context.Context, agg *eventstore.Aggregate) []eventstore.Command {
-// 		cmds := make([]eventstore.Command, 0, 3)
-
-// 		cmds = append(cmds, org.NewDomainAddedEvent(ctx, agg, domain.Domain))
-// 		if domain.Verified {
-// 			cmds = append(cmds, org.NewDomainVerifiedEvent(ctx, agg, domain.Domain))
-// 		}
-// 		//TODO: claimed users
-
-// 		return cmds
-// 	}
-// }
-
-// func verifyDomain(domain string) commands {
-// 	return func(ctx context.Context, agg *eventstore.Aggregate) []eventstore.Command {
-// 		return []eventstore.Command{org.NewDomainVerifiedEvent(ctx, agg, domain)}
-// 	}
-// }
-
-// func AddMember(userID string, roles ...string) (commands, error) {
-// 	//TODO: rolemapping
-// 	if len(domain.CheckForInvalidRoles(roles, domain.OrgRolePrefix, []authz.RoleMapping{})) > 0 &&
-// 		len(domain.CheckForInvalidRoles(roles, domain.RoleSelfManagementGlobal, []authz.RoleMapping{})) > 0 {
-// 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMA-4N8es", "Errors.Org.MemberInvalid")
-// 	}
-// 	//TODO: unique constraint for member and roles?
-// 	return func(ctx context.Context, agg *eventstore.Aggregate) []eventstore.Command {
-// 		return []eventstore.Command{org.NewMemberAddedEvent(ctx, agg, userID, roles...)}
-// 	}, nil
-// }
+func addOrgMemberCommand(userID, orgID string, roles ...string) commanderOption {
+	return func(c *commander) {}
+}
