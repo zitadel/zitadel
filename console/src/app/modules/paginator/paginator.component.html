@@ -6,8 +6,9 @@
     </p>
   </div>
   <span class="fill-space"></span>
-  <span class="pos cnsl-secondary-text">{{pageIndex * pageSize}} - {{pageIndex * pageSize + pageSize}} </span>
-  <div class="row">
+  <span class="pos cnsl-secondary-text" *ngIf="!hidePagination">{{pageIndex * pageSize}} - {{pageIndex * pageSize +
+    pageSize}} </span>
+  <div class="row" *ngIf="!hidePagination">
     <cnsl-form-field class="size" appearance="outline">
       <mat-select [(ngModel)]="pageSize" (selectionChange)="emitChange()">
         <mat-option *ngFor="let sizeOption of pageSizeOptions" [value]="sizeOption">

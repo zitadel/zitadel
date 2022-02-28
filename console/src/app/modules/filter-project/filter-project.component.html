@@ -1,7 +1,7 @@
 <cnsl-filter (resetted)="resetFilter()" (trigger)="emitFilter()">
   <div class="filter-row" id="filtercomp">
 
-    <div class="name-query">
+    <!-- <div class="name-query">
       <mat-checkbox id="resourceowner" class="cb" [checked]="getSubFilter(SubQuery.RESOURCEOWNER)"
         (change)="changeCheckbox(SubQuery.RESOURCEOWNER, $event )">{{'FILTER.RESOURCEOWNER' | translate}}
       </mat-checkbox>
@@ -15,7 +15,7 @@
             (change)="setValue(SubQuery.RESOURCEOWNER, ronq, $event)" />
         </cnsl-form-field>
       </div>
-    </div>
+    </div> -->
 
     <div class="email-query">
       <mat-checkbox id="name" class="cb" [checked]="getSubFilter(SubQuery.NAME)"

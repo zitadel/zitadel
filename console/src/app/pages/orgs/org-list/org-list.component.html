@@ -31,18 +31,14 @@
         </ng-container>
 
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header
-            [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
             {{ 'ORG.PAGES.NAME' | translate }}
-            <template [ngTemplateOutlet]="templateRef"
-              [ngTemplateOutletContext]="{key: OrgListSearchKey.NAME}"></template>
           </th>
           <td mat-cell *matCellDef="let org"> {{org.name}} </td>
         </ng-container>
 
         <ng-container matColumnDef="creationDate">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header
-            [ngClass]="{'search-active': this.orgSearchKey === OrgListSearchKey.NAME}">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
             {{ 'ORG.PAGES.CREATIONDATE' | translate }}
           </th>
           <td mat-cell *matCellDef="let org">
@@ -50,18 +46,20 @@
           </td>
         </ng-container>
 
+        <ng-container matColumnDef="changeDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ 'ORG.PAGES.CHANGEDATE' | translate }}
+          </th>
+          <td mat-cell *matCellDef="let org">
+            {{org.details?.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+          </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr (click)="setAndNavigateToOrg(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
-      <mat-paginator class="paginator" [pageSize]="20" #paginator [pageSizeOptions]="[10, 20, 100, 250]">
-      </mat-paginator>
+      <cnsl-paginator #paginator class="paginator" [timestamp]="timestamp" [length]="totalResult || 0"
+        [pageSize]="initialLimit" [pageSizeOptions]="[10, 20, 50, 100]" (page)="changePage($event)"></cnsl-paginator>
     </cnsl-refresh-table>
   </div>
 </div>
-
-<ng-template #templateRef let-key="key">
-  <button class="search-button" mat-icon-button (click)="setFilter(key)">
-    <mat-icon *ngIf="this.orgSearchKey !== key">search</mat-icon>
-    <mat-icon *ngIf="this.orgSearchKey === key">search_off</mat-icon>
-  </button>
-</ng-template>

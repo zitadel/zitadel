@@ -1,19 +1,14 @@
 import { Component } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import {
-  ProjectNameQuery,
-  ProjectQuery,
-  ProjectResourceOwnerQuery,
-  ProjectState,
-} from 'src/app/proto/generated/zitadel/project_pb';
+import { ProjectNameQuery, ProjectQuery, ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { UserNameQuery } from 'src/app/proto/generated/zitadel/user_pb';
 
 import { FilterComponent } from '../filter/filter.component';
 
 enum SubQuery {
   NAME,
-  RESOURCEOWNER,
+  // RESOURCEOWNER,
 }
 
 @Component({
@@ -33,15 +28,15 @@ export class FilterProjectComponent extends FilterComponent {
   public changeCheckbox(subquery: SubQuery, event: MatCheckboxChange) {
     if (event.checked) {
       switch (subquery) {
-        case SubQuery.RESOURCEOWNER:
-          const ronq = new ProjectResourceOwnerQuery();
-          ronq.setResourceOwner('');
+        // case SubQuery.RESOURCEOWNER:
+        //   const ronq = new ProjectResourceOwnerQuery();
+        //   ronq.setResourceOwner('');
 
-          const ro_sq = new ProjectQuery();
-          ro_sq.setProjectResourceOwnerQuery(ronq);
+        //   const ro_sq = new ProjectQuery();
+        //   ro_sq.setProjectResourceOwnerQuery(ronq);
 
-          this.searchQueries.push(ro_sq);
-          break;
+        //   this.searchQueries.push(ro_sq);
+        //   break;
         case SubQuery.NAME:
           const nq = new ProjectNameQuery();
           nq.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
@@ -55,14 +50,14 @@ export class FilterProjectComponent extends FilterComponent {
       }
     } else {
       switch (subquery) {
-        case SubQuery.RESOURCEOWNER:
-          const index_s = this.searchQueries.findIndex(
-            (q) => (q as ProjectQuery).toObject().projectResourceOwnerQuery !== undefined,
-          );
-          if (index_s > -1) {
-            this.searchQueries.splice(index_s, 1);
-          }
-          break;
+        // case SubQuery.RESOURCEOWNER:
+        //   const index_s = this.searchQueries.findIndex(
+        //     (q) => (q as ProjectQuery).toObject().projectResourceOwnerQuery !== undefined,
+        //   );
+        //   if (index_s > -1) {
+        //     this.searchQueries.splice(index_s, 1);
+        //   }
+        //   break;
         case SubQuery.NAME:
           const index_dn = this.searchQueries.findIndex((q) => (q as ProjectQuery).toObject().nameQuery !== undefined);
           if (index_dn > -1) {
@@ -76,10 +71,10 @@ export class FilterProjectComponent extends FilterComponent {
   public setValue(subquery: SubQuery, query: any, event: any) {
     const value = event?.target?.value ?? event.value;
     switch (subquery) {
-      case SubQuery.RESOURCEOWNER:
-        (query as ProjectResourceOwnerQuery).setResourceOwner(value);
-        this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
-        break;
+      // case SubQuery.RESOURCEOWNER:
+      //   (query as ProjectResourceOwnerQuery).setResourceOwner(value);
+      //   this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
+      //   break;
       case SubQuery.NAME:
         (query as ProjectNameQuery).setName(value);
         this.filterChanged.emit(this.filterCount ? this.searchQueries : undefined);
@@ -91,13 +86,13 @@ export class FilterProjectComponent extends FilterComponent {
 
   public getSubFilter(subquery: SubQuery): any {
     switch (subquery) {
-      case SubQuery.RESOURCEOWNER:
-        const s = this.searchQueries.find((q) => (q as ProjectQuery).toObject().projectResourceOwnerQuery !== undefined);
-        if (s) {
-          return (s as ProjectQuery).getProjectResourceOwnerQuery();
-        } else {
-          return undefined;
-        }
+      // case SubQuery.RESOURCEOWNER:
+      //   const s = this.searchQueries.find((q) => (q as ProjectQuery).toObject().projectResourceOwnerQuery !== undefined);
+      //   if (s) {
+      //     return (s as ProjectQuery).getProjectResourceOwnerQuery();
+      //   } else {
+      //     return undefined;
+      //   }
       case SubQuery.NAME:
         const dn = this.searchQueries.find((q) => (q as ProjectQuery).toObject().nameQuery !== undefined);
         if (dn) {

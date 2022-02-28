@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -12,6 +11,7 @@ import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy
 import { CardModule } from 'src/app/modules/card/card.module';
 import { InfoSectionModule } from 'src/app/modules/info-section/info-section.module';
 import { InputModule } from 'src/app/modules/input/input.module';
+import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
@@ -39,8 +39,8 @@ import { IamViewsComponent } from './iam-views.component';
     InfoSectionModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatPaginatorModule,
     RefreshTableModule,
+    PaginatorModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
     MatTableModule,
