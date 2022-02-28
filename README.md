@@ -69,10 +69,10 @@ COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -f ./build/local/doc
 
 ### Run on your machine
 
-<!--  TODO: download/install zitadel  -->
+<!-- TODO: download/install zitadel  -->
 
-<!--  TODO: add basic start-with-init command -->
-<!--  TODO: insecure, should we write logs to a file? -->
+<!-- TODO: add basic start-with-init command -->
+<!-- TODO: insecure, should we write logs to a file? -->
 <!-- TODO: what will be printed? is it possible to open the browser and show the login screen? -->
 
 First of all you need to start the cockroach database [using their guide to start a cluster](https://www.cockroachlabs.com/docs/v21.2/start-a-local-cluster)
@@ -103,8 +103,6 @@ zitadel start-with-init
 To start developing your app as fast as possible check out our [quick start guides](https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples in many languages.
 
 If your preferred language is missing please let us know [here](https://github.com/caos/zitadel/discussions/1717)
-
-<!-- TODO: add more quick starts, at least for the languages with client libraries -->
 
 ## Help and Documentation
 
