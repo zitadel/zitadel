@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -44,30 +42,24 @@ func Register(configs Configs,
 	systemDefaults sd.SystemDefaults,
 	dir http.FileSystem,
 	assetsPrefix string,
-	keyStorage crypto.KeyStorage,
-	userEncryptionConfig *crypto.KeyConfig,
-	smtpEncryptionConfig *crypto.KeyConfig,
+	userEncryption crypto.EncryptionAlgorithm,
+	smtpEncryption crypto.EncryptionAlgorithm,
 ) []queryv1.Handler {
-
-	notification, err := newNotification(
-		handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
-		command,
-		queries,
-		systemDefaults,
-		dir,
-		assetsPrefix,
-		keyStorage,
-		userEncryptionConfig,
-		smtpEncryptionConfig,
-	)
-	logging.OnError(err).Fatal("cannot start notification handler")
-
 	return []queryv1.Handler{
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
 			queries,
 		),
-		notification,
+		newNotification(
+			handler{view, bulkLimit, configs.cycleDuration("Notification"), errorCount, es},
+			command,
+			queries,
+			systemDefaults,
+			dir,
+			assetsPrefix,
+			userEncryption,
+			smtpEncryption,
+		),
 	}
 }
 

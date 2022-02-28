@@ -6,7 +6,6 @@ import (
 	"time"
 
 	http_utils "github.com/caos/zitadel/internal/api/http"
-	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/id"
 )
@@ -38,12 +37,7 @@ type UserAgentCookieConfig struct {
 	MaxAge time.Duration
 }
 
-func NewUserAgentHandler(config *UserAgentCookieConfig, keyStorage crypto.KeyStorage, encryptionKeyID, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
-	key, err := crypto.LoadKey(keyStorage, encryptionKeyID)
-	if err != nil {
-		return nil, err
-	}
-	cookieKey := []byte(key)
+func NewUserAgentHandler(config *UserAgentCookieConfig, cookieKey []byte, domain string, idGenerator id.Generator, externalSecure bool) (func(http.Handler) http.Handler, error) {
 	opts := []http_utils.CookieHandlerOpt{
 		http_utils.WithEncryption(cookieKey, cookieKey),
 		http_utils.WithDomain(domain),

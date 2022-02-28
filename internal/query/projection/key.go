@@ -26,17 +26,15 @@ const (
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 )
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig *crypto.KeyConfig, keyStorage crypto.KeyStorage, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyEncryptionAlgorithm crypto.EncryptionAlgorithm, keyChan chan<- interface{}) *KeyProjection {
 	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.keyChan = keyChan
-	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig, keyStorage)
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
+	p.encryptionAlgorithm = keyEncryptionAlgorithm
+
+	return p
 }
 
 func (p *KeyProjection) reducers() []handler.AggregateReducer {

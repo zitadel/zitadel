@@ -1,7 +1,6 @@
 package management
 
 import (
-	"github.com/caos/logging"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -33,11 +32,8 @@ func CreateServer(command *command.Commands,
 	query *query.Queries,
 	sd systemdefaults.SystemDefaults,
 	assetAPIPrefix string,
-	keyStorage crypto.KeyStorage,
-	userEncryptionConfig *crypto.KeyConfig,
+	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
-	userCodeAlg, err := crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
-	logging.OnError(err).Fatal("unable to initialise user code algorithm")
 	return &Server{
 		command:         command,
 		query:           query,

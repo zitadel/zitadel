@@ -54,16 +54,33 @@ type orgFeatureChecker interface {
 	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
-func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZConfig authz.Config, staticStore static.Storage, authZRepo authz_repo.Repository, encryptionKeyConfig *crypto.EncryptionKeys, keyStorage crypto.KeyStorage, webAuthN webauthn_helper.Config) (repo *Commands, err error) {
+func StartCommands(es *eventstore.Eventstore,
+	defaults sd.SystemDefaults,
+	authZConfig authz.Config,
+	staticStore static.Storage,
+	authZRepo authz_repo.Repository,
+	webAuthN webauthn_helper.Config,
+	idpConfigEncryption,
+	otpEncryption,
+	smtpEncryption,
+	smsEncryption,
+	domainVerificationEncryption,
+	oidcEncryption crypto.EncryptionAlgorithm,
+) (repo *Commands, err error) {
 	repo = &Commands{
-		eventstore:         es,
-		static:             staticStore,
-		idGenerator:        id.SonyFlakeGenerator,
-		iamDomain:          defaults.Domain,
-		zitadelRoles:       authZConfig.RolePermissionMappings,
-		keySize:            defaults.KeyConfig.Size,
-		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime,
-		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime,
+		eventstore:            es,
+		static:                staticStore,
+		idGenerator:           id.SonyFlakeGenerator,
+		iamDomain:             defaults.Domain,
+		zitadelRoles:          authZConfig.RolePermissionMappings,
+		keySize:               defaults.KeyConfig.Size,
+		privateKeyLifetime:    defaults.KeyConfig.PrivateKeyLifetime,
+		publicKeyLifetime:     defaults.KeyConfig.PublicKeyLifetime,
+		idpConfigSecretCrypto: idpConfigEncryption,
+		smtpPasswordCrypto:    smtpEncryption,
+		smsCrypto:             smsEncryption,
+		domainVerificationAlg: domainVerificationEncryption,
+		keyAlgorithm:          oidcEncryption,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)
@@ -73,39 +90,17 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZC
 	keypair.RegisterEventMappers(repo.eventstore)
 	action.RegisterEventMappers(repo.eventstore)
 
-	repo.idpConfigSecretCrypto, err = crypto.NewAESCrypto(encryptionKeyConfig.IDPConfig, keyStorage)
-	if err != nil {
-		return nil, err
-	}
-
 	repo.userPasswordAlg = crypto.NewBCrypt(defaults.SecretGenerators.PasswordSaltCost)
 	repo.machineKeySize = int(defaults.SecretGenerators.MachineKeySize)
 	repo.applicationKeySize = int(defaults.SecretGenerators.ApplicationKeySize)
 
-	aesOTPCrypto, err := crypto.NewAESCrypto(encryptionKeyConfig.OTP, keyStorage)
-	if err != nil {
-		return nil, err
-	}
 	repo.multifactors = domain.MultifactorConfigs{
 		OTP: domain.OTPConfig{
-			CryptoMFA: aesOTPCrypto,
+			CryptoMFA: otpEncryption,
 			Issuer:    defaults.Multifactors.OTP.Issuer,
 		},
 	}
 
-	repo.smtpPasswordCrypto, err = crypto.NewAESCrypto(encryptionKeyConfig.SMTP, keyStorage)
-	if err != nil {
-		return nil, err
-	}
-	repo.smsCrypto, err = crypto.NewAESCrypto(encryptionKeyConfig.SMS, keyStorage)
-	if err != nil {
-		return nil, err
-	}
-
-	repo.domainVerificationAlg, err = crypto.NewAESCrypto(encryptionKeyConfig.DomainVerification, keyStorage)
-	if err != nil {
-		return nil, err
-	}
 	repo.domainVerificationGenerator = crypto.NewEncryptionGenerator(defaults.DomainVerification.VerificationGenerator, repo.domainVerificationAlg)
 	repo.domainVerificationValidator = http.ValidateDomain
 	web, err := webauthn_helper.StartServer(webAuthN)
@@ -113,12 +108,6 @@ func StartCommands(es *eventstore.Eventstore, defaults sd.SystemDefaults, authZC
 		return nil, err
 	}
 	repo.webauthn = web
-
-	keyAlgorithm, err := crypto.NewAESCrypto(encryptionKeyConfig.OIDC, keyStorage)
-	if err != nil {
-		return nil, err
-	}
-	repo.keyAlgorithm = keyAlgorithm
 
 	repo.tokenVerifier = authZRepo
 	return repo, nil

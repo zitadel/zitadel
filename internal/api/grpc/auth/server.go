@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"github.com/caos/logging"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -41,11 +40,8 @@ func CreateServer(command *command.Commands,
 	authRepo repository.Repository,
 	defaults systemdefaults.SystemDefaults,
 	assetsAPIDomain string,
-	keyStorage crypto.KeyStorage,
-	userEncryptionConfig *crypto.KeyConfig,
+	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
-	userCodeAlg, err := crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
-	logging.OnError(err).Fatal("unable to initialise user code algorithm")
 	return &Server{
 		command:         command,
 		query:           query,

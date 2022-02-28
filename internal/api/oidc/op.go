@@ -11,6 +11,8 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
+	caos_errs "github.com/caos/zitadel/internal/errors"
+
 	"github.com/caos/zitadel/internal/api/assets"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -82,18 +84,15 @@ type OPStorage struct {
 	assetAPIPrefix                    string
 }
 
-func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, keyStorage crypto.KeyStorage, oidcKeyConfig *crypto.KeyConfig, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
-	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI, keyStorage, oidcKeyConfig)
+func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedirectURI string, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, encryptionAlg crypto.EncryptionAlgorithm, cryptoKey []byte, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}, userAgentCookie func(http.Handler) http.Handler) (op.OpenIDProvider, error) {
+	opConfig, err := createOPConfig(config, issuer, defaultLogoutRedirectURI, cryptoKey)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create op config: %w", err)
+		return nil, caos_errs.ThrowInternal(err, "OIDC-EGrqd", "cannot create op config: %w")
 	}
-	storage, err := newStorage(config, command, query, repo, keyConfig, oidcKeyConfig, es, projections, keyStorage, keyChan)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create storage: %w", err)
-	}
+	storage := newStorage(config, command, query, repo, keyConfig, encryptionAlg, es, projections, keyChan)
 	options, err := createOptions(config, userAgentCookie)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create options: %w", err)
+		return nil, caos_errs.ThrowInternal(err, "OIDC-D3gq1", "cannot create options: %w")
 	}
 	provider, err := op.NewOpenIDProvider(
 		ctx,
@@ -102,7 +101,7 @@ func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedire
 		options...,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create provider: %w", err)
+		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider: %w")
 	}
 	return provider, nil
 }
@@ -111,7 +110,7 @@ func Issuer(domain string, port uint16, externalSecure bool) string {
 	return http_utils.BuildHTTP(domain, port, externalSecure) + HandlerPrefix
 }
 
-func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, keyStorage crypto.KeyStorage, oidcKeyConfig *crypto.KeyConfig) (*op.Config, error) {
+func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, cryptoKey []byte) (*op.Config, error) {
 	supportedLanguages, err := getSupportedLanguages()
 	if err != nil {
 		return nil, err
@@ -126,23 +125,11 @@ func createOPConfig(config Config, issuer, defaultLogoutRedirectURI string, keyS
 		RequestObjectSupported:   config.RequestObjectSupported,
 		SupportedUILocales:       supportedLanguages,
 	}
-	if err := cryptoKey(opConfig, oidcKeyConfig, keyStorage); err != nil {
-		return nil, err
+	if cryptoLength := len(cryptoKey); cryptoLength != 32 {
+		return nil, caos_errs.ThrowInternalf(nil, "OIDC-D43gf", "crypto key must be 32 bytes, but is %d", cryptoLength)
 	}
+	copy(opConfig.CryptoKey[:], cryptoKey)
 	return opConfig, nil
-}
-
-func cryptoKey(config *op.Config, keyConfig *crypto.KeyConfig, keyStorage crypto.KeyStorage) error {
-	tokenKey, err := crypto.LoadKey(keyStorage, keyConfig.EncryptionKeyID)
-	if err != nil {
-		return fmt.Errorf("cannot load OP crypto key: %w", err)
-	}
-	cryptoKey := []byte(tokenKey)
-	if len(cryptoKey) != 32 {
-		return fmt.Errorf("OP crypto key must be exactly 32 bytes")
-	}
-	copy(config.CryptoKey[:], cryptoKey)
-	return nil
 }
 
 func createOptions(config Config, userAgentCookie func(http.Handler) http.Handler) ([]op.Option, error) {
@@ -190,11 +177,7 @@ func customEndpoints(endpointConfig *EndpointConfig) []op.Option {
 	return options
 }
 
-func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, c *crypto.KeyConfig, es *eventstore.Eventstore, projections *sql.DB, keyStorage crypto.KeyStorage, keyChan <-chan interface{}) (*OPStorage, error) {
-	encAlg, err := crypto.NewAESCrypto(c, keyStorage)
-	if err != nil {
-		return nil, err
-	}
+func newStorage(config Config, command *command.Commands, query *query.Queries, repo repository.Repository, keyConfig systemdefaults.KeyConfig, encAlg crypto.EncryptionAlgorithm, es *eventstore.Eventstore, projections *sql.DB, keyChan <-chan interface{}) *OPStorage {
 	return &OPStorage{
 		repo:                              repo,
 		command:                           command,
@@ -212,7 +195,7 @@ func newStorage(config Config, command *command.Commands, query *query.Queries, 
 		locker:                            crdb.NewLocker(projections, locksTable, signingKey),
 		keyChan:                           keyChan,
 		assetAPIPrefix:                    assets.HandlerPrefix,
-	}, nil
+	}
 }
 
 func (o *OPStorage) Health(ctx context.Context) error {

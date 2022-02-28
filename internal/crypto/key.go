@@ -1,6 +1,8 @@
 package crypto
 
 import (
+	"crypto/rand"
+
 	"github.com/caos/logging"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -18,19 +20,18 @@ type Key struct {
 	Value string
 }
 
-type EncryptionKeys struct {
-	DomainVerification   *KeyConfig
-	IDPConfig            *KeyConfig
-	OIDC                 *KeyConfig
-	OTP                  *KeyConfig
-	SMS                  *KeyConfig
-	SMTP                 *KeyConfig
-	User                 *KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
+func NewKey(id string) (*Key, error) {
+	randBytes := make([]byte, 32)
+	if _, err := rand.Read(randBytes); err != nil {
+		return nil, err
+	}
+	return &Key{
+		ID:    id,
+		Value: string(randBytes),
+	}, nil
 }
 
-func LoadKey(keyStorage KeyStorage, id string) (string, error) {
+func LoadKey(id string, keyStorage KeyStorage) (string, error) {
 	key, err := keyStorage.ReadKey(id)
 	if err != nil {
 		return "", err
@@ -51,7 +52,7 @@ func LoadKeys(config *KeyConfig, keyStorage KeyStorage) (map[string]string, []st
 	if config.EncryptionKeyID != "" {
 		key, ok := readKeys[config.EncryptionKeyID]
 		if !ok {
-			return nil, nil, errors.ThrowInternalf(nil, "CRYPT-v2Kas", "encryption key not found")
+			return nil, nil, errors.ThrowInternalf(nil, "CRYPT-v2Kas", "encryption key %s not found", config.EncryptionKeyID)
 		}
 		keys[config.EncryptionKeyID] = key
 		ids = append(ids, config.EncryptionKeyID)

@@ -67,17 +67,11 @@ func CreateLogin(config Config,
 	oidcAuthCallbackURL string,
 	externalSecure bool,
 	userAgentCookie mux.MiddlewareFunc,
-	keyStorage crypto.KeyStorage,
-	encryptionKeyConfig *crypto.EncryptionKeys,
+	userCodeAlg crypto.EncryptionAlgorithm,
+	idpConfigAlg crypto.EncryptionAlgorithm,
+	csrfCookieKey []byte,
 ) (*Login, error) {
-	userCodeAlg, err := crypto.NewAESCrypto(encryptionKeyConfig.User, keyStorage)
-	if err != nil {
-		return nil, fmt.Errorf("error create new aes crypto: %w", err)
-	}
-	idpConfigAlg, err := crypto.NewAESCrypto(encryptionKeyConfig.IDPConfig, keyStorage)
-	if err != nil {
-		return nil, fmt.Errorf("error create new aes crypto: %w", err)
-	}
+
 	login := &Login{
 		oidcAuthCallbackURL: oidcAuthCallbackURL,
 		baseURL:             baseURL + HandlerPrefix,
@@ -101,7 +95,7 @@ func CreateLogin(config Config,
 		return nil, fmt.Errorf("unable to create filesystem: %w", err)
 	}
 
-	csrfInterceptor, err := createCSRFInterceptor(config.CSRFCookieName, keyStorage, encryptionKeyConfig.CSRFCookieKeyID, externalSecure, login.csrfErrorHandler())
+	csrfInterceptor, err := createCSRFInterceptor(config.CSRFCookieName, csrfCookieKey, externalSecure, login.csrfErrorHandler())
 	if err != nil {
 		return nil, fmt.Errorf("unable to create csrfInterceptor: %w", err)
 	}
@@ -124,13 +118,9 @@ func csp() *middleware.CSP {
 	return &csp
 }
 
-func createCSRFInterceptor(cookieName string, keyStorage crypto.KeyStorage, encryptionKeyID string, externalSecure bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
-	csrfKey, err := crypto.LoadKey(keyStorage, encryptionKeyID)
-	if err != nil {
-		return nil, err
-	}
+func createCSRFInterceptor(cookieName string, csrfCookieKey []byte, externalSecure bool, errorHandler http.Handler) (func(http.Handler) http.Handler, error) {
 	path := "/"
-	return csrf.Protect([]byte(csrfKey),
+	return csrf.Protect(csrfCookieKey,
 		csrf.Secure(externalSecure),
 		csrf.CookieName(http_utils.SetCookiePrefix(cookieName, "", path, externalSecure)),
 		csrf.Path(path),

@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -53,31 +52,23 @@ func newNotification(
 	defaults sd.SystemDefaults,
 	statikDir http.FileSystem,
 	assetsPrefix string,
-	keyStorage crypto.KeyStorage,
-	userEncryptionConfig *crypto.KeyConfig,
-	smtpEncryptionConfig *crypto.KeyConfig,
-) (*Notification, error) {
+	userEncryption crypto.EncryptionAlgorithm,
+	smtpEncryption crypto.EncryptionAlgorithm,
+) *Notification {
 	h := &Notification{
-		handler:        handler,
-		command:        command,
-		systemDefaults: defaults,
-		statikDir:      statikDir,
-		assetsPrefix:   assetsPrefix,
-		queries:        query,
-	}
-	var err error
-	h.userDataCrypto, err = crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
-	if err != nil {
-		return nil, fmt.Errorf("cannot initialize user data decryption: %w", err)
-	}
-	h.smtpPasswordCrypto, err = crypto.NewAESCrypto(smtpEncryptionConfig, keyStorage)
-	if err != nil {
-		return nil, fmt.Errorf("cannot initialize smtp password decryption: %w", err)
+		handler:            handler,
+		command:            command,
+		systemDefaults:     defaults,
+		statikDir:          statikDir,
+		assetsPrefix:       assetsPrefix,
+		queries:            query,
+		userDataCrypto:     userEncryption,
+		smtpPasswordCrypto: smtpEncryption,
 	}
 
 	h.subscribe()
 
-	return h, nil
+	return h
 }
 
 func (k *Notification) subscribe() {

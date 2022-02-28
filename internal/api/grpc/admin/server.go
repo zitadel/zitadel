@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"github.com/caos/logging"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -28,8 +27,7 @@ type Server struct {
 	administrator   repository.AdministratorRepository
 	iamDomain       string
 	assetsAPIDomain string
-
-	UserCodeAlg crypto.EncryptionAlgorithm
+	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
 type Config struct {
@@ -41,18 +39,15 @@ func CreateServer(command *command.Commands,
 	repo repository.Repository,
 	iamDomain,
 	assetsAPIDomain string,
-	keyStorage crypto.KeyStorage,
-	userEncryptionConfig *crypto.KeyConfig,
+	userCodeAlg crypto.EncryptionAlgorithm,
 ) *Server {
-	userCodeAlg, err := crypto.NewAESCrypto(userEncryptionConfig, keyStorage)
-	logging.OnError(err).Fatal("unable to initialise user code algorithm")
 	return &Server{
 		command:         command,
 		query:           query,
 		administrator:   repo,
 		iamDomain:       iamDomain,
 		assetsAPIDomain: assetsAPIDomain,
-		UserCodeAlg:     userCodeAlg,
+		userCodeAlg:     userCodeAlg,
 	}
 }
 
