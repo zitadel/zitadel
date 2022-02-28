@@ -13,40 +13,28 @@ td {
     object-fit: contain;
     margin-top: 0.5rem;
   }
-
-  .name-col {
-    display: flex;
-    flex-direction: column;
-
-    span {
-      margin-bottom: 0.5rem;
-    }
-  }
 }
 
 tr {
   outline: none;
-
-  button {
-    visibility: hidden;
-    transition: color 0.2s ease;
-
-    &:not(:hover) {
-      color: var(--grey);
-    }
-  }
-
-  &:hover {
-    button {
-      visibility: visible;
-    }
-  }
 
   &.disabled,
   &.disabled * {
     opacity: 0.8;
     cursor: default;
   }
+}
+
+.availability {
+  width: 40px;
+}
+
+.idp-available {
+  color: var(--success);
+}
+
+.idp-not-available {
+  color: var(--warn);
 }
 
 .avatar {

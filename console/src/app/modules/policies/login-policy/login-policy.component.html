@@ -29,18 +29,20 @@
     </ng-template>
   </ng-container>
 
-  <cnsl-card title="{{ 'IDP.LIST.ACTIVETITLE' | translate }}" [expanded]="true">
-    <cnsl-info-section
-      *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false"
-      [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
-      <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
-    </cnsl-info-section>
+  <ng-template cnslHasRole [hasRole]="['org.idp.read']">
+    <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}">
 
-    <cnsl-login-policy-idps [serviceType]="serviceType" [service]="service"
-      [disabled]="disabled || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false)">
-    </cnsl-login-policy-idps>
-  </cnsl-card>
+      <cnsl-info-section
+        *ngIf="serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false"
+        [featureLink]="['/org/features']" class="info" [type]="InfoSectionType.WARN">
+        <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'login_policy.idp'})"></span>
+      </cnsl-info-section>
 
+      <cnsl-idp-table [service]="service" [serviceType]="serviceType"
+        [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))">
+      </cnsl-idp-table>
+    </cnsl-card>
+  </ng-template>
 
   <cnsl-card title="{{ 'MFA.LIST.MULTIFACTORTITLE' | translate }}"
     description="{{'MFA.LIST.MULTIFACTORDESCRIPTION' | translate}}" [expanded]="false">
@@ -69,8 +71,6 @@
       [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.policy.write' : serviceType === PolicyComponentServiceType.MGMT ? 'policy.write' : ''] | hasRole | async) === false || (serviceType === PolicyComponentServiceType.MGMT && (['login_policy.factors'] | hasFeature | async) === false)">
     </cnsl-mfa-table>
   </cnsl-card>
-
-
 
   <cnsl-card title="{{ 'POLICY.LOGIN_POLICY.ADVANCED' | translate }}" [expanded]="false">
     <div class="login-policy-content" *ngIf="loginData">
@@ -194,15 +194,6 @@
     <button [disabled]="disabled" class="login-policy-save-button" (click)="savePolicy()" color="primary" type="submit"
       mat-raised-button>{{ 'ACTIONS.SAVE' | translate }}</button>
   </div>
-  <ng-template cnslHasRole [hasRole]="['org.idp.read']">
-    <cnsl-card title="{{ 'IDP.LIST.TITLE' | translate }}" description="{{ 'IDP.LIST.DESCRIPTION' | translate }}"
-      [expanded]="false">
-
-      <cnsl-idp-table [service]="service" [serviceType]="serviceType"
-        [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))">
-      </cnsl-idp-table>
-    </cnsl-card>
-  </ng-template>
 
   <cnsl-policy-grid class="grid" [currentPolicy]="currentPolicy" [type]="serviceType" tagForFilter="security">
   </cnsl-policy-grid>

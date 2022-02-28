@@ -6,8 +6,8 @@ import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ListIDPsResponse } from 'src/app/proto/generated/zitadel/admin_pb';
-import { IDP, IDPOwnerType, IDPOwnerTypeQuery, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
-import { IDPQuery, ListOrgIDPsResponse } from 'src/app/proto/generated/zitadel/management_pb';
+import { IDP, IDPLoginPolicyLink, IDPOwnerType, IDPState, IDPStylingType } from 'src/app/proto/generated/zitadel/idp_pb';
+import { ListOrgIDPsResponse } from 'src/app/proto/generated/zitadel/management_pb';
 import { AdminService } from 'src/app/services/admin.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -34,10 +34,11 @@ export class IdpTableComponent implements OnInit {
   public PolicyComponentServiceType: any = PolicyComponentServiceType;
   public IDPOwnerType: any = IDPOwnerType;
   public IDPState: any = IDPState;
-  public IDPSTYLINGTYPE: any = IDPStylingType;
-  @Input() public displayedColumns: string[] = ['select', 'name', 'dates', 'state'];
-
+  public displayedColumns: string[] = ['availability', 'name', 'type', 'creationDate', 'changeDate', 'state'];
   @Output() public changedSelection: EventEmitter<Array<IDP.AsObject>> = new EventEmitter();
+
+  public idps: IDPLoginPolicyLink.AsObject[] = [];
+  public IDPStylingType: any = IDPStylingType;
 
   constructor(public translate: TranslateService, private toast: ToastService, private dialog: MatDialog) {
     this.selection.changed.subscribe(() => {
@@ -47,8 +48,12 @@ export class IdpTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.getData(10, 0);
+    this.getIdps().then((resp) => {
+      this.idps = resp;
+    });
+
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      this.displayedColumns = ['select', 'name', 'dates', 'state', 'owner'];
+      this.displayedColumns = ['availability', 'name', 'type', 'owner', 'creationDate', 'changeDate', 'state'];
     }
 
     if (!this.disabled) {
@@ -108,7 +113,7 @@ export class IdpTableComponent implements OnInit {
       });
   }
 
-  public removeIdp(idp: IDP.AsObject): void {
+  public deleteIdp(idp: IDP.AsObject): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
@@ -154,12 +159,12 @@ export class IdpTableComponent implements OnInit {
     this.loadingSubject.next(true);
 
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      const query: IDPQuery = new IDPQuery();
-      const otQuery: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
-      otQuery.setOwnerType(IDPOwnerType.IDP_OWNER_TYPE_ORG);
-      query.setOwnerTypeQuery(otQuery);
+      // const query: IDPQuery = new IDPQuery();
+      // const otQuery: IDPOwnerTypeQuery = new IDPOwnerTypeQuery();
+      // otQuery.setOwnerType(IDPOwnerType.IDP_OWNER_TYPE_ORG);
+      // query.setOwnerTypeQuery(otQuery);
       (this.service as ManagementService)
-        .listOrgIDPs(limit, offset, [query])
+        .listOrgIDPs(limit, offset)
         .then((resp) => {
           this.idpResult = resp;
           this.dataSource.data = resp.resultList;
@@ -211,5 +216,77 @@ export class IdpTableComponent implements OnInit {
           return ['/system', 'idp', row.id];
       }
     }
+  }
+
+  private async getIdps(): Promise<IDPLoginPolicyLink.AsObject[]> {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return (this.service as ManagementService).listLoginPolicyIDPs().then((resp) => {
+          return resp.resultList;
+        });
+      case PolicyComponentServiceType.ADMIN:
+        return (this.service as AdminService).listLoginPolicyIDPs().then((providers) => {
+          return providers.resultList;
+        });
+    }
+  }
+
+  public addIdp(idp: IDP.AsObject | IDP.AsObject): Promise<any> {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        return (this.service as ManagementService).addIDPToLoginPolicy(idp.id, idp.owner).then(() => {
+          this.getIdps()
+            .then((resp) => {
+              this.idps = resp;
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        });
+      case PolicyComponentServiceType.ADMIN:
+        return (this.service as AdminService)
+          .addIDPToLoginPolicy(idp.id)
+          .then(() => {
+            this.getIdps().then((resp) => {
+              this.idps = resp;
+            });
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+    }
+  }
+
+  public removeIdp(idp: IDP.AsObject): void {
+    switch (this.serviceType) {
+      case PolicyComponentServiceType.MGMT:
+        (this.service as ManagementService).removeIDPFromLoginPolicy(idp.id).then(
+          () => {
+            this.getIdps().then((resp) => {
+              this.idps = resp;
+            });
+          },
+          (error) => {
+            this.toast.showError(error);
+          },
+        );
+        break;
+      case PolicyComponentServiceType.ADMIN:
+        (this.service as AdminService).removeIDPFromLoginPolicy(idp.id).then(
+          () => {
+            this.getIdps().then((resp) => {
+              this.idps = resp;
+            });
+          },
+          (error) => {
+            this.toast.showError(error);
+          },
+        );
+        break;
+    }
+  }
+
+  public isEnabled(idp: IDP.AsObject): boolean {
+    return this.idps.findIndex((i) => i.idpId === idp.id) > -1;
   }
 }

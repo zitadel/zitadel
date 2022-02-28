@@ -1365,6 +1365,11 @@
     "TYPE": "Typ",
     "OWNER": "Besitzer",
     "ID": "ID",
+    "AVAILABILITY": "Verfügbarkeit",
+    "AVAILABLE": "verfügbar",
+    "AVAILABLEBUTINACTIVE": "verfügbar aber inaktiv",
+    "SETAVAILABLE": "verfügbar setzen",
+    "SETUNAVAILABLE": "auf nicht verfügbar setzen",
     "NAME": "Name",
     "CONFIG": "Konfiguration",
     "STATE": "Status",
@@ -1385,7 +1390,7 @@
     "DELETE_SELECTION_TITLE": "Identity Providers löschen",
     "DELETE_SELECTION_DESCRIPTION": "Sie sind im Begriff mehrere Identity Provider zu löschen. Die daruch hervorgerufenen Änderungen sind unwiederruflich. Wollen Sie dies wirklich tun?",
     "OIDC": {
-      "TITLE": "OpenId Connect IDP",
+      "TITLE": "OIDC IDP",
       "DESCRIPTION": "Geben Sie die Daten OIDC Identity Providers ein."
     },
     "JWT": {

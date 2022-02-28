@@ -1366,6 +1366,11 @@
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Nome",
+    "AVAILABILITY": "Disponibilità",
+    "AVAILABLE": "disponibile",
+    "AVAILABLEBUTINACTIVE": "disponible ma inattivo",
+    "SETAVAILABLE": "Imposta come disponibile",
+    "SETUNAVAILABLE": "Imposta come non disponibile",
     "CONFIG": "Configurazione",
     "STATE": "Stato",
     "ISSUER": "Issuer",
@@ -1385,7 +1390,7 @@
     "DELETE_SELECTION_TITLE": "Rimuovere IDP",
     "DELETE_SELECTION_DESCRIPTION": "Stai per rimuovere un fornitore di identit\u00e0. I cambiamenti risultanti sono irrevocabili. Vuoi davvero farlo?",
     "OIDC": {
-      "TITLE": "OpenId Connect IDP",
+      "TITLE": "OIDC IDP",
       "DESCRIPTION": "Inserisci i dati per il OIDC Identity Provider."
     },
     "JWT": {

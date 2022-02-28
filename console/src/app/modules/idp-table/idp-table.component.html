@@ -1,6 +1,6 @@
 <cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource.data.length"
   [emitRefreshOnPreviousRoutes]="['/system/idp/create']" [timestamp]="idpResult?.details?.viewTimestamp"
-  [selection]="selection">
+  [selection]="selection" [hideRefresh]="true">
   <div actions>
     <button (click)="deactivateSelectedIdps()" matTooltip="{{'IDP.DEACTIVATE' | translate}}" class="ar-button"
       mat-stroked-button *ngIf="selection.hasValue()" [disabled]="disabled">
@@ -11,7 +11,8 @@
       {{'IDP.ACTIVATE' | translate}}
     </button>
 
-    <a [routerLink]="createRouterLink" color="primary" mat-raised-button [disabled]="disabled">
+    <a [routerLink]="createRouterLink" class="cnsl-action-button" color="primary" mat-raised-button
+      [disabled]="disabled">
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
   </div>
@@ -31,21 +32,37 @@
             [disabled]="serviceType === PolicyComponentServiceType.MGMT && idp?.owner === IDPOwnerType.IDP_OWNER_TYPE_SYSTEM"
             (change)="$event ? selection.toggle(idp) : null" [checked]="selection.isSelected(idp)">
             <img src="../../../assets/images/google.png"
-              *ngIf="idp.stylingType === IDPSTYLINGTYPE.IDPSTYLINGTYPE_GOOGLE" alt="google" />
+              *ngIf="idp.stylingType === IDPStylingType.IDPSTYLINGTYPE_GOOGLE" alt="google" />
           </mat-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="availability">
+        <th class="availability" mat-header-cell *matHeaderCellDef>
+          <!-- <span>{{ 'IDP.AVAILABILITY' | translate }}</span> -->
+        </th>
+        <td class="availability" [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+          <i matTooltip="{{'IDP.AVAILABLE' | translate}}"
+            *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_ACTIVE"
+            class="idp-available las la-check-circle"></i>
+          <i matTooltip="{{'IDP.AVAILABLEBUTINACTIVE' | translate}}"
+            *ngIf="isEnabled(idp) && idp.state === IDPState.IDP_STATE_INACTIVE"
+            class="idp-not-available las la-check-circle"></i>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> {{ 'IDP.NAME' | translate }} </th>
         <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
-          <div class="name-col">
-            <span>{{idp?.name}}</span>
-            <mat-icon matTooltip="{{'IDP.OIDC.TITLE' | translate}}" *ngIf="idp?.oidcConfig" svgIcon="mdi_openid">
-            </mat-icon>
-            <mat-icon matTooltip="{{'IDP.JWT.TITLE' | translate}}" *ngIf="idp?.jwtConfig" svgIcon="mdi_jwt"></mat-icon>
+          <span>{{idp?.name}}</span>
+        </td>
+      </ng-container>
 
-          </div>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> {{ 'IDP.TYPE' | translate }} </th>
+        <td [routerLink]="routerLinkForRow(idp)" mat-cell *matCellDef="let idp">
+          <span class="state" *ngIf="idp?.oidcConfig">{{'IDP.OIDC.TITLE' | translate}}</span>
+          <span class="state" *ngIf="idp?.jwtConfig">{{'IDP.JWT.TITLE' | translate}}</span>
         </td>
       </ng-container>
 
@@ -68,17 +85,17 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="dates">
-        <th mat-header-cell *matHeaderCellDef> {{ 'IDP.DATES' | translate }} </th>
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CREATIONDATE' | translate }} </th>
         <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
-          <div class="date-block">
-            <span class="date-sub">{{ 'IDP.CREATIONDATE' | translate }}:</span>
-            <span>{{idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
-          </div>
-          <div class="date-block">
-            <span class="date-sub">{{ 'IDP.CHANGEDATE' | translate }}</span>
-            <span>{{idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
-          </div>
+          <span>{{idp.details.creationDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="changeDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'IDP.CHANGEDATE' | translate }} </th>
+        <td [routerLink]="routerLinkForRow(idp)" class="pointer" mat-cell *matCellDef="let idp">
+          <span>{{idp.details.changeDate | timestampToDate | localizedDate: 'dd. MMM, HH:mm' }}</span>
         </td>
       </ng-container>
 
@@ -93,9 +110,19 @@
         <td mat-cell *matCellDef="let idp">
           <div class="cnsl-table-action-wrapper">
             <div class="cnsl-table-action">
+              <button *ngIf="!isEnabled(idp)"
+                [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))"
+                mat-icon-button matTooltip="{{'IDP.SETAVAILABLE' | translate}}" (click)="addIdp(idp)">
+                <i class="las la-check-circle"></i>
+              </button>
+              <button *ngIf="isEnabled(idp)"
+                [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))"
+                mat-icon-button matTooltip="{{'IDP.SETUNAVAILABLE' | translate}}" (click)="removeIdp(idp)">
+                <i class="las la-times-circle"></i>
+              </button>
               <button
                 [disabled]="serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG"
-                mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" (click)="removeIdp(idp)">
+                mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" (click)="deleteIdp(idp)">
                 <i class="las la-trash"></i>
               </button>
             </div>

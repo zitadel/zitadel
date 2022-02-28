@@ -20,21 +20,13 @@ import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.mod
 
 import { InfoSectionModule } from '../../info-section/info-section.module';
 import { PolicyGridModule } from '../../policy-grid/policy-grid.module';
-import { AddIdpDialogComponent } from './login-policy-idps/add-idp-dialog/add-idp-dialog.component';
-import { LoginPolicyIdpsComponent } from './login-policy-idps/login-policy-idps.component';
 import { LoginPolicyRoutingModule } from './login-policy-routing.module';
 import { LoginPolicyComponent } from './login-policy.component';
 import { DialogAddTypeComponent } from './mfa-table/dialog-add-type/dialog-add-type.component';
 import { MfaTableComponent } from './mfa-table/mfa-table.component';
 
 @NgModule({
-  declarations: [
-    LoginPolicyComponent,
-    LoginPolicyIdpsComponent,
-    MfaTableComponent,
-    DialogAddTypeComponent,
-    AddIdpDialogComponent,
-  ],
+  declarations: [LoginPolicyComponent, MfaTableComponent, DialogAddTypeComponent],
   imports: [
     LoginPolicyRoutingModule,
     CommonModule,
@@ -59,4 +51,4 @@ import { MfaTableComponent } from './mfa-table/mfa-table.component';
     PolicyGridModule,
   ],
 })
-export class LoginPolicyModule { }
+export class LoginPolicyModule {}

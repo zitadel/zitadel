@@ -1366,6 +1366,11 @@
     "OWNER": "Owner",
     "ID": "ID",
     "NAME": "Name",
+    "AVAILABILITY": "Availability",
+    "AVAILABLE": "available",
+    "AVAILABLEBUTINACTIVE": "available but inactive",
+    "SETAVAILABLE": "set as available",
+    "SETUNAVAILABLE": "set as not available",
     "CONFIG": "Configuration",
     "STATE": "Status",
     "ISSUER": "Issuer",
@@ -1385,7 +1390,7 @@
     "DELETE_SELECTION_TITLE": "Delete Idp",
     "DELETE_SELECTION_DESCRIPTION": "You are about to delete an identity provider. The resulting changes are irrevocable. Do you really want to do this?",
     "OIDC": {
-      "TITLE": "OpenId Connect IDP",
+      "TITLE": "OIDC IDP",
       "DESCRIPTION": "Enter the data for OIDC Identity Provider."
     },
     "JWT": {
