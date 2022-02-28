@@ -31,7 +31,7 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 - [Private labeling](https://docs.zitadel.ch/docs/guides/customization/branding) for a uniform user experience
 - [cockroach database](https://www.cockroachlabs.com/) is the only dependency
 
-### Authentication
+### Authentication possibities
 
 - Single Sign On (SSO)
 - Passwordless with FIDO2
@@ -40,12 +40,12 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 - [Identity Brokering](https://docs.zitadel.ch/docs/guides/authentication/identity-brokering)
 - [Machine-to-machine (JWT profile)](https://docs.zitadel.ch/docs/guides/authentication/serviceusers)
 
-### Access Management
+### Access Management possibilities
 
 - Role Based Access Control (RBAC)
 - Delegate role management to third-parties
 
-### Identity Management
+### Identity Management possibilities
 
 - Self-registration including verification
 - User self service
