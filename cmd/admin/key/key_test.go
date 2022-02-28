@@ -2,14 +2,14 @@ package key
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caos/zitadel/cmd/helper"
+	caos_errors "github.com/caos/zitadel/internal/errors"
+
 	"github.com/caos/zitadel/internal/crypto"
 )
 
@@ -18,8 +18,8 @@ func Test_keysFromArgs(t *testing.T) {
 		args []string
 	}
 	type res struct {
-		keys []crypto.Key
-		err  error
+		keys []*crypto.Key
+		err  func(error) bool
 	}
 	tests := []struct {
 		name string
@@ -30,7 +30,7 @@ func Test_keysFromArgs(t *testing.T) {
 			"no args",
 			args{},
 			res{
-				keys: []crypto.Key{},
+				keys: []*crypto.Key{},
 			},
 		},
 		{
@@ -39,7 +39,7 @@ func Test_keysFromArgs(t *testing.T) {
 				args: []string{"keyID", "value"},
 			},
 			res{
-				err: helper.NewUserError("argument is not in the valid format [keyID=key]"),
+				err: caos_errors.IsInternal,
 			},
 		},
 		{
@@ -48,7 +48,7 @@ func Test_keysFromArgs(t *testing.T) {
 				args: []string{"keyID=value"},
 			},
 			res{
-				keys: []crypto.Key{
+				keys: []*crypto.Key{
 					{
 						ID:    "keyID",
 						Value: "value",
@@ -62,7 +62,7 @@ func Test_keysFromArgs(t *testing.T) {
 				args: []string{"keyID=value", "keyID2=value2"},
 			},
 			res{
-				keys: []crypto.Key{
+				keys: []*crypto.Key{
 					{
 						ID:    "keyID",
 						Value: "value",
@@ -78,9 +78,11 @@ func Test_keysFromArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := keysFromArgs(tt.args.args)
-			if !errors.Is(err, tt.res.err) {
-				t.Errorf("keysFromArgs() error = %v, err %v", err, tt.res.err)
-				return
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 			if !reflect.DeepEqual(got, tt.res.keys) {
 				t.Errorf("keysFromArgs() got = %v, want %v", got, tt.res.keys)
@@ -94,8 +96,8 @@ func Test_keysFromYAML(t *testing.T) {
 		file io.Reader
 	}
 	type res struct {
-		keys []crypto.Key
-		err  error
+		keys []*crypto.Key
+		err  func(error) bool
 	}
 	tests := []struct {
 		name string
@@ -108,7 +110,7 @@ func Test_keysFromYAML(t *testing.T) {
 				file: bytes.NewReader([]byte("keyID=ds")),
 			},
 			res{
-				err: helper.NewUserError("unable to extract keys from file"),
+				err: caos_errors.IsInternal,
 			},
 		},
 		{
@@ -117,7 +119,7 @@ func Test_keysFromYAML(t *testing.T) {
 				file: bytes.NewReader([]byte("keyID: value")),
 			},
 			res{
-				keys: []crypto.Key{
+				keys: []*crypto.Key{
 					{
 						ID:    "keyID",
 						Value: "value",
@@ -131,7 +133,7 @@ func Test_keysFromYAML(t *testing.T) {
 				file: bytes.NewReader([]byte("keyID: value\nkeyID2: value2")),
 			},
 			res{
-				keys: []crypto.Key{
+				keys: []*crypto.Key{
 					{
 						ID:    "keyID",
 						Value: "value",
@@ -147,9 +149,11 @@ func Test_keysFromYAML(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := keysFromYAML(tt.args.file)
-			if !errors.Is(err, tt.res.err) {
-				t.Errorf("keysFromArgs() error = %v, err %v", err, tt.res.err)
-				return
+			if tt.res.err == nil {
+				assert.NoError(t, err)
+			}
+			if tt.res.err != nil && !tt.res.err(err) {
+				t.Errorf("got wrong err: %v ", err)
 			}
 			assert.EqualValues(t, got, tt.res.keys)
 		})
