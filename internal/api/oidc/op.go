@@ -11,8 +11,6 @@ import (
 	"github.com/rakyll/statik/fs"
 	"golang.org/x/text/language"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-
 	"github.com/caos/zitadel/internal/api/assets"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
@@ -21,6 +19,7 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/i18n"

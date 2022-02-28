@@ -11,9 +11,8 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 func Test_database_ReadKeys(t *testing.T) {

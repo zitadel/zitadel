@@ -60,5 +60,5 @@ ALTER TABLE zitadel.projections.login_policies
     ADD COLUMN password_check_lifetime BIGINT NOT NULL DEFAULT 0
     , ADD COLUMN external_login_check_lifetime BIGINT NOT NULL DEFAULT 0
     , ADD COLUMN mfa_init_skip_lifetime BIGINT NOT NULL DEFAULT 0
-    , ADD COLUMN second_factor_check_lifetime BIGINT NOT NULL DEFAULT 0;
+    , ADD COLUMN second_factor_check_lifetime BIGINT NOT NULL DEFAULT 0
     , ADD COLUMN multi_factor_check_lifetime BIGINT NOT NULL DEFAULT 0;

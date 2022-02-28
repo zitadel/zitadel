@@ -5,9 +5,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	caos_errs "github.com/caos/zitadel/internal/errors"
-
 	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
 type database struct {
