@@ -23,7 +23,7 @@
     "@angular/router": "~13.2.0",
     "@angular/service-worker": "~13.2.0",
     "@ctrl/ngx-codemirror": "^5.1.1",
-    "@grpc/grpc-js": "^1.5.3",
+    "@grpc/grpc-js": "^1.5.7",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
     "@types/file-saver": "^2.0.2",
