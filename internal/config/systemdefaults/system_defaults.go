@@ -14,14 +14,14 @@ import (
 )
 
 type SystemDefaults struct {
-	DefaultLanguage       language.Tag
-	Domain                string
-	ZitadelDocs           ZitadelDocs
-	SecretGenerators      SecretGenerators
-	Multifactors          MultifactorConfig
-	DomainVerification    DomainVerification
-	Notifications         Notifications
-	KeyConfig             KeyConfig
+	DefaultLanguage    language.Tag
+	Domain             string
+	ZitadelDocs        ZitadelDocs
+	SecretGenerators   SecretGenerators
+	Multifactors       MultifactorConfig
+	DomainVerification DomainVerification
+	Notifications      Notifications
+	KeyConfig          KeyConfig
 }
 
 type ZitadelDocs struct {
