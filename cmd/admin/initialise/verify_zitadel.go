@@ -26,13 +26,13 @@ var (
 	createEventstoreStmt string
 	//go:embed sql/05_projections.sql
 	createProjectionsStmt string
-	//go:embed sql/05_system.sql
+	//go:embed sql/06_system.sql
 	createSystemStmt string
 	//go:embed sql/07_encryption_keys_table.sql
 	createEncryptionKeysStmt string
-	//go:embed sql/06_enable_hash_sharded_indexes.sql
+	//go:embed sql/08_enable_hash_sharded_indexes.sql
 	enableHashShardedIdx string
-	//go:embed sql/07_events_table.sql
+	//go:embed sql/09_events_table.sql
 	createEventsStmt string
 )
 
