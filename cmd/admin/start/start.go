@@ -60,7 +60,7 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(startConfig)
+			config := new(Config)
 			err := viper.Unmarshal(config, viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
 				mapstructure.StringToTimeDurationHookFunc(),
 				mapstructure.StringToSliceHookFunc(":"),
@@ -98,7 +98,7 @@ func bindBoolFlag(cmd *cobra.Command, name, description string) {
 	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
 }
 
-type startConfig struct {
+type Config struct {
 	Log             *logging.Config
 	Port            uint16
 	ExternalPort    uint16
@@ -124,7 +124,7 @@ type projectionConfig struct {
 	KeyConfig *crypto.KeyConfig
 }
 
-func startZitadel(config *startConfig) error {
+func startZitadel(config *Config) error {
 	ctx := context.Background()
 	keyChan := make(chan interface{})
 
@@ -181,7 +181,7 @@ func startZitadel(config *startConfig) error {
 	return listen(ctx, router, config.Port)
 }
 
-func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *startConfig, store static.Storage, authZRepo authz_repo.Repository) error {
+func startAPIs(ctx context.Context, router *mux.Router, commands *command.Commands, queries *query.Queries, eventstore *eventstore.Eventstore, dbClient *sql.DB, keyChan chan interface{}, config *Config, store static.Storage, authZRepo authz_repo.Repository) error {
 	repo := struct {
 		authz_repo.Repository
 		*query.Queries

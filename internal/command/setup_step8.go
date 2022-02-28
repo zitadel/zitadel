@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
+//TODO: make in login policy available
 type Step8 struct {
 	U2F bool
 }

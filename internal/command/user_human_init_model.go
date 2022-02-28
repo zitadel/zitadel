@@ -68,6 +68,7 @@ func (wm *HumanInitCodeWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(user.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(user.UserV1AddedType,
+			user.UserV1AddedType,
 			user.HumanAddedType,
 			user.UserV1RegisteredType,
 			user.HumanRegisteredType,

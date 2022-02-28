@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 )
 
+//TODO: make in login policy available
 type Step7 struct {
 	OTP bool
 }

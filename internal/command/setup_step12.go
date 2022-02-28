@@ -8,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
+//TODO: ignore for the moment
 type Step12 struct {
 	TierName                 string
 	TierDescription          string
