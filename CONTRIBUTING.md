@@ -18,7 +18,7 @@ Make ZITADEL more popular and give it a ⭐
 
 Help shaping the future of ZITADEL by 
 
-- Join our TODO:[chat]() and discuss with us or others.
+- Join our [chat](https://zitadel.ch/chat) and discuss with us or others.
 - Ask or answer questions in the [issues section](https://github.com/caos/zitadel/issues)
 - Share your thoughts and ideas in the [discussions section](https://github.com/caos/zitadel/discussions)
 
@@ -45,12 +45,12 @@ We accept contributions through pull requests. You need a github account for tha
 
 The code consists of the following parts:
 
-| name | description | language | where to find | Architecture |
-|---|---|---|---|---|
-| backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) | TODO |
-| console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) | TODO |
-| login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) | TODO |
-| API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) | TODO |
+| name | description | language | where to find |
+|---|---|---|---|
+| backend | Service that serves the grpc(-web) and RESTful API  | [go](https://go.dev) | [API implementation](./internal/api/grpc) |
+| console | Frontend the user inertacts with after he is logged in | [Angular](https://angular.io), [Typescript](https://www.typescriptlang.org) | [./console](./console) |
+| login | Server side rendered frontend the user interacts with during login | [go](https://go.dev), [go templates](https://pkg.go.dev/html/template) | [./internal/api/ui/login](./internal/api/ui/login) |
+| API definitions | Specifications of the API | [Protobuf](https://developers.google.com/protocol-buffers) | [./proto/zitadel](./proto/zitadel) |
 
 Please validate and test the code before you contribute.
 
