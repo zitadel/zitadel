@@ -6,7 +6,7 @@ Thank you for your interest about how to contribute! As you might know there is 
 
 Please give us and our community the chance to get rid of security vularbilities by responsibly disclose this kind of issues by contacting [security@zitadel.ch](mailto:security@zitadel.ch).
 
-The strongest part of a community is the possibility to share thoughts. That's why we give try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the TODO:issues and TODO:discussions section here or in our TODO:discord chat, but we understand your doubts and provide further contact options [here](https://zitadel.ch/contact).
+The strongest part of a community is the possibility to share thoughts. That's why we give try to react as soon as possible to your ideas, thoughts and feedback. We love to discuss as much as possible in an open space like in the [issues](https://github.com/caos/zitadel/issues) and [discussions](https://github.com/caos/zitadel/discussions) section here or in our [chat](https://zitadel.ch/chat), but we understand your doubts and provide further contact options [here](https://zitadel.ch/contact).
 
 If you want to give an answer or be part of discussion please be kind. Treat others like you want to be treated. Read more about our code of conduct [here](CODE_OF_CONDUCT.md).
 
