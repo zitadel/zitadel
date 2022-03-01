@@ -237,7 +237,7 @@ func verifyForm(r *AuthRequestForm) error {
 func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, error) {
 	reqBytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to base64 decode: %w", err)
 	}
 
 	req := &samlp.AuthnRequest{}
@@ -246,11 +246,11 @@ func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, e
 		reader := flate.NewReader(bytes.NewReader(reqBytes))
 		decoder := xml.NewDecoder(reader)
 		if err = decoder.Decode(req); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to defalte decode: %w", err)
 		}
 	default:
 		if err := xml.Unmarshal(reqBytes, req); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to unmarshal: %w", err)
 		}
 	}
 
