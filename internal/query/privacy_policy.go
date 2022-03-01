@@ -80,6 +80,9 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 			sq.Eq{
 				PrivacyColID.identifier(): orgID,
 			},
+			sq.Eq{
+				PrivacyColID.identifier(): q.iamID,
+			},
 		}).
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()
