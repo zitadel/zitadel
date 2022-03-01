@@ -35,7 +35,7 @@
                 </cnsl-type-radio>
                 <div class="actions">
                     <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
-                        matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                        matStepperNext [attr.data-e2e]="'continue-button'">{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -55,7 +55,7 @@
                     <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |
                         translate}}</button>
                     <button mat-raised-button color="primary" [disabled]="secondFormGroup.invalid"
-                        matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                        matStepperNext [attr.data-e2e]="'continue-button'">{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -92,7 +92,7 @@
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" matStepperNext>{{'ACTIONS.CONTINUE' | translate}}</button>
+                <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button'">{{'ACTIONS.CONTINUE' | translate}}</button>
             </div>
         </mat-step>
 
@@ -188,7 +188,7 @@
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" (click)="createApp()">{{'ACTIONS.CREATE' |
+                <button mat-raised-button color="primary" (click)="createApp()" [attr.data-e2e]="'create-button'">{{'ACTIONS.CREATE' |
                     translate}}</button>
             </div>
         </mat-step>

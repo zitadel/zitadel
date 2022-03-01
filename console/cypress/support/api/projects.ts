@@ -40,11 +40,9 @@ export function ensureProjectResourceDoesntExist(api: apiCallProperties, project
         api,
         `projects/${projectId}/${resourceType.resourcePath}/_search`,
         (resource: any) => {
-            debugger
             return resource[resourceType.compareProperty] === resourceName
         },
         (resource) => {
-            debugger
             return `projects/${projectId}/${resourceType.resourcePath}/${resource[resourceType.identifierProperty]}`
         }
     )
