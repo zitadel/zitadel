@@ -10,9 +10,6 @@ assignees: ''
 
 Description
 
-- [ ] Todo
-- [ ] Todo
-
 **Acceptance criteria**
 - [ ] ...
 - [ ] ...
