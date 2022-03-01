@@ -1,27 +1,28 @@
 package senders
 
 import (
+	"context"
+
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/notification/channels"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
 	"github.com/caos/zitadel/internal/notification/channels/log"
 )
 
-func debugChannels(config systemdefaults.Notifications) (channels.NotificationChannel, error) {
+func debugChannels(ctx context.Context, config systemdefaults.Notifications, getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) (*Chain, error) {
 	var (
 		providers []channels.NotificationChannel
 	)
 
-	if config.Providers.FileSystem.Enabled {
-		p, err := fs.InitFSChannel(config.Providers.FileSystem)
-		if err != nil {
-			return nil, err
+	if fsProvider, err := getFileSystemProvider(ctx); err == nil {
+		p, err := fs.InitFSChannel(config.FileSystemPath, *fsProvider)
+		if err == nil {
+			providers = append(providers, p)
 		}
-		providers = append(providers, p)
 	}
 
-	if config.Providers.Log.Enabled {
-		providers = append(providers, log.InitStdoutChannel(config.Providers.Log))
+	if logProvider, err := getLogProvider(ctx); err == nil {
+		providers = append(providers, log.InitStdoutChannel(*logProvider))
 	}
 
 	return chainChannels(providers...), nil

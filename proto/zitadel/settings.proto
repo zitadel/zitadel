@@ -77,5 +77,4 @@ enum SMSProviderConfigState {
 message DebugNotificationProvider {
     zitadel.v1.ObjectDetails details = 1;
     bool compact = 2;
-    bool enabled = 3;
 }

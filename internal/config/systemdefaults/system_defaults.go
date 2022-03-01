@@ -53,9 +53,10 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	DebugMode bool
-	Endpoints Endpoints
-	Providers Channels
+	DebugMode      bool
+	Endpoints      Endpoints
+	FileSystemPath string
+	//Providers Channels
 }
 
 type Endpoints struct {

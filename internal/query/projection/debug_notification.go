@@ -44,14 +44,6 @@ func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateRedu
 					Reduce: p.reduceDebugNotificationProviderChanged,
 				},
 				{
-					Event:  iam.DebugNotificationProviderFileEnabledEventType,
-					Reduce: p.reduceDebugNotificationProviderEnabled,
-				},
-				{
-					Event:  iam.DebugNotificationProviderFileDisabledEventType,
-					Reduce: p.reduceDebugNotificationProviderDisabled,
-				},
-				{
 					Event:  iam.DebugNotificationProviderFileRemovedEventType,
 					Reduce: p.reduceDebugNotificationProviderRemoved,
 				},
@@ -62,14 +54,6 @@ func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateRedu
 				{
 					Event:  iam.DebugNotificationProviderLogChangedEventType,
 					Reduce: p.reduceDebugNotificationProviderChanged,
-				},
-				{
-					Event:  iam.DebugNotificationProviderLogEnabledEventType,
-					Reduce: p.reduceDebugNotificationProviderEnabled,
-				},
-				{
-					Event:  iam.DebugNotificationProviderLogDisabledEventType,
-					Reduce: p.reduceDebugNotificationProviderDisabled,
 				},
 				{
 					Event:  iam.DebugNotificationProviderLogRemovedEventType,
@@ -102,7 +86,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		providerEvent = e.DebugNotificationProviderAddedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.LogWithFields("HANDL-dwjfs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileAddedEventType, iam.DebugNotificationProviderLogAddedEventType}).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileAddedEventType, iam.DebugNotificationProviderLogAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
 
@@ -112,7 +96,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
 		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
 		handler.NewCol(DebugNotificationProviderResourceOwnerCol, providerEvent.Aggregate().ResourceOwner),
-		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateDisabled),
+		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateActive),
 		handler.NewCol(DebugNotificationProviderTypeCol, providerType),
 		handler.NewCol(DebugNotificationProviderCompactCol, providerEvent.Compact),
 	}), nil
@@ -129,7 +113,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		providerEvent = e.DebugNotificationProviderChangedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.LogWithFields("HANDL-d9wjrs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileChangedEventType, iam.DebugNotificationProviderLogChangedEventType}).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileChangedEventType, iam.DebugNotificationProviderLogChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
 
@@ -139,68 +123,6 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 	}
 	if providerEvent.Compact != nil {
 		cols = append(cols, handler.NewCol(DebugNotificationProviderCompactCol, *providerEvent.Compact))
-	}
-
-	return crdb.NewUpdateStatement(
-		&providerEvent,
-		cols,
-		[]handler.Condition{
-			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
-			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
-		},
-	), nil
-}
-
-func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderEnabled(event eventstore.Event) (*handler.Statement, error) {
-	var providerEvent settings.DebugNotificationProviderEnabledEvent
-	var providerType domain.NotificationProviderType
-	switch e := event.(type) {
-	case *iam.DebugNotificationProviderFileEnabledEvent:
-		providerEvent = e.DebugNotificationProviderEnabledEvent
-		providerType = domain.NotificationProviderTypeFile
-	case *iam.DebugNotificationProviderLogEnabledEvent:
-		providerEvent = e.DebugNotificationProviderEnabledEvent
-		providerType = domain.NotificationProviderTypeLog
-	default:
-		logging.LogWithFields("HANDL-wijds", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileEnabledEventType, iam.DebugNotificationProviderLogEnabledEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-5mKKK", "reduce.wrong.event.type")
-	}
-
-	cols := []handler.Column{
-		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
-		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
-		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateEnabled),
-	}
-
-	return crdb.NewUpdateStatement(
-		&providerEvent,
-		cols,
-		[]handler.Condition{
-			handler.NewCond(DebugNotificationProviderAggIDCol, providerEvent.Aggregate().ID),
-			handler.NewCond(DebugNotificationProviderTypeCol, providerType),
-		},
-	), nil
-}
-
-func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderDisabled(event eventstore.Event) (*handler.Statement, error) {
-	var providerEvent settings.DebugNotificationProviderDisabledEvent
-	var providerType domain.NotificationProviderType
-	switch e := event.(type) {
-	case *iam.DebugNotificationProviderFileDisabledEvent:
-		providerEvent = e.DebugNotificationProviderDisabledEvent
-		providerType = domain.NotificationProviderTypeFile
-	case *iam.DebugNotificationProviderLogDisabledEvent:
-		providerEvent = e.DebugNotificationProviderDisabledEvent
-		providerType = domain.NotificationProviderTypeLog
-	default:
-		logging.LogWithFields("HANDL-d9now", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileDisabledEventType, iam.DebugNotificationProviderLogDisabledEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-dow9f", "reduce.wrong.event.type")
-	}
-
-	cols := []handler.Column{
-		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
-		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
-		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateDisabled),
 	}
 
 	return crdb.NewUpdateStatement(
@@ -224,7 +146,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		providerEvent = e.DebugNotificationProviderRemovedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.LogWithFields("HANDL-d9now", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileRemovedEventType, iam.DebugNotificationProviderLogRemovedEventType}).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileRemovedEventType, iam.DebugNotificationProviderLogRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-dow9f", "reduce.wrong.event.type")
 	}
 

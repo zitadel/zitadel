@@ -80,60 +80,6 @@ func DebugNotificationProviderLogChangedEventMapper(event *repository.Event) (ev
 	return &DebugNotificationProviderLogChangedEvent{DebugNotificationProviderChangedEvent: *e.(*settings.DebugNotificationProviderChangedEvent)}, nil
 }
 
-type DebugNotificationProviderLogEnabledEvent struct {
-	settings.DebugNotificationProviderEnabledEvent
-}
-
-func NewDebugNotificationProviderLogEnabledEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *DebugNotificationProviderLogEnabledEvent {
-	return &DebugNotificationProviderLogEnabledEvent{
-		DebugNotificationProviderEnabledEvent: *settings.NewDebugNotificationProviderEnabledEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				DebugNotificationProviderLogEnabledEventType),
-		),
-	}
-}
-
-func DebugNotificationProviderLogEnabledEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := settings.DebugNotificationProviderEnabledEventMapper(event)
-	if err != nil {
-		return nil, err
-	}
-
-	return &DebugNotificationProviderLogEnabledEvent{DebugNotificationProviderEnabledEvent: *e.(*settings.DebugNotificationProviderEnabledEvent)}, nil
-}
-
-type DebugNotificationProviderLogDisabledEvent struct {
-	settings.DebugNotificationProviderDisabledEvent
-}
-
-func NewDebugNotificationProviderLogDisabledEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *DebugNotificationProviderLogDisabledEvent {
-	return &DebugNotificationProviderLogDisabledEvent{
-		DebugNotificationProviderDisabledEvent: *settings.NewDebugNotificationProviderDisabledEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				DebugNotificationProviderLogDisabledEventType),
-		),
-	}
-}
-
-func DebugNotificationProviderLogDisabledEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := settings.DebugNotificationProviderDisabledEventMapper(event)
-	if err != nil {
-		return nil, err
-	}
-
-	return &DebugNotificationProviderLogDisabledEvent{DebugNotificationProviderDisabledEvent: *e.(*settings.DebugNotificationProviderDisabledEvent)}, nil
-}
-
 type DebugNotificationProviderLogRemovedEvent struct {
 	settings.DebugNotificationProviderRemovedEvent
 }

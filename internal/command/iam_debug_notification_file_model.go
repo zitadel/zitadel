@@ -32,10 +32,6 @@ func (wm *IAMDebugNotificationFileWriteModel) AppendEvents(events ...eventstore.
 			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderAddedEvent)
 		case *iam.DebugNotificationProviderFileChangedEvent:
 			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderChangedEvent)
-		case *iam.DebugNotificationProviderFileEnabledEvent:
-			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderEnabledEvent)
-		case *iam.DebugNotificationProviderFileDisabledEvent:
-			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderDisabledEvent)
 		case *iam.DebugNotificationProviderFileRemovedEvent:
 			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderRemovedEvent)
 		}
@@ -59,8 +55,6 @@ func (wm *IAMDebugNotificationFileWriteModel) Query() *eventstore.SearchQueryBui
 		EventTypes(
 			iam.DebugNotificationProviderFileAddedEventType,
 			iam.DebugNotificationProviderFileChangedEventType,
-			iam.DebugNotificationProviderFileEnabledEventType,
-			iam.DebugNotificationProviderFileDisabledEventType,
 			iam.DebugNotificationProviderFileRemovedEventType).
 		Builder()
 }

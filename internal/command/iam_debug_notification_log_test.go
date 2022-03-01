@@ -90,7 +90,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "add enabled provider,ok",
+			name: "add provider,ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -101,11 +101,6 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 								iam.NewDebugNotificationProviderLogAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
 									true,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderLogEnabledEvent(context.Background(),
-									&iam.NewAggregate().Aggregate,
 								),
 							),
 						},
@@ -209,37 +204,6 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "no changes enabled, precondition error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								true,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderLogEnabledEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-							),
-						),
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &fs.FSConfig{
-					Compact: true,
-					Enabled: true,
-				},
-			},
-			res: res{
-				err: caos_errs.IsPreconditionFailed,
-			},
-		},
-		{
 			name: "change, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -276,7 +240,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 			},
 		},
 		{
-			name: "change enable, ok",
+			name: "change, ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -293,10 +257,6 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 							eventFromEventPusher(
 								newDefaultDebugNotificationLogChangedEvent(context.Background(),
 									false),
-							),
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderLogEnabledEvent(context.Background(),
-									&iam.NewAggregate().Aggregate),
 							),
 						},
 					),
@@ -307,50 +267,6 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 				provider: &fs.FSConfig{
 					Compact: false,
 					Enabled: true,
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
-				},
-			},
-		},
-		{
-			name: "change disable, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								true,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderLogEnabledEvent(context.Background(),
-								&iam.NewAggregate().Aggregate),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultDebugNotificationLogChangedEvent(context.Background(),
-									false),
-							),
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderLogDisabledEvent(context.Background(),
-									&iam.NewAggregate().Aggregate),
-							),
-						},
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &fs.FSConfig{
-					Compact: false,
-					Enabled: false,
 				},
 			},
 			res: res{

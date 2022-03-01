@@ -48,7 +48,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"ro-id",
-								domain.NotificationProviderStateDisabled,
+								domain.NotificationProviderStateActive,
 								domain.NotificationProviderTypeFile,
 								true,
 							},
@@ -82,68 +82,6 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								true,
-								"agg-id",
-								domain.NotificationProviderTypeFile,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "iam.reduceNotificationProviderFileEnabled",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderEnabled,
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderFileEnabledEventType),
-					iam.AggregateType,
-					nil,
-				), iam.DebugNotificationProviderFileEnabledEventMapper),
-			},
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
-				sequence:         15,
-				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.notification_providers SET (change_date, sequence, state) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.NotificationProviderStateEnabled,
-								"agg-id",
-								domain.NotificationProviderTypeFile,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "iam.reduceNotificationProviderFileDisabled",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderDisabled,
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderFileDisabledEventType),
-					iam.AggregateType,
-					nil,
-				), iam.DebugNotificationProviderFileDisabledEventMapper),
-			},
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
-				sequence:         15,
-				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.notification_providers SET (change_date, sequence, state) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.NotificationProviderStateDisabled,
 								"agg-id",
 								domain.NotificationProviderTypeFile,
 							},
@@ -207,7 +145,7 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"ro-id",
-								domain.NotificationProviderStateDisabled,
+								domain.NotificationProviderStateActive,
 								domain.NotificationProviderTypeLog,
 								true,
 							},
@@ -241,68 +179,6 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								true,
-								"agg-id",
-								domain.NotificationProviderTypeLog,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "iam.reduceNotificationProviderLogEnabled",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderEnabled,
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderLogEnabledEventType),
-					iam.AggregateType,
-					nil,
-				), iam.DebugNotificationProviderLogEnabledEventMapper),
-			},
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
-				sequence:         15,
-				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.notification_providers SET (change_date, sequence, state) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.NotificationProviderStateEnabled,
-								"agg-id",
-								domain.NotificationProviderTypeLog,
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:   "iam.reduceNotificationProviderLogDisabled",
-			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderDisabled,
-			args: args{
-				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderLogDisabledEventType),
-					iam.AggregateType,
-					nil,
-				), iam.DebugNotificationProviderLogDisabledEventMapper),
-			},
-			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
-				sequence:         15,
-				previousSequence: 10,
-				projection:       DebugNotificationProviderTable,
-				executer: &testExecuter{
-					executions: []execution{
-						{
-							expectedStmt: "UPDATE zitadel.projections.notification_providers SET (change_date, sequence, state) = ($1, $2, $3) WHERE (aggregate_id = $4) AND (provider_type = $5)",
-							expectedArgs: []interface{}{
-								anyArg{},
-								uint64(15),
-								domain.NotificationProviderStateDisabled,
 								"agg-id",
 								domain.NotificationProviderTypeLog,
 							},

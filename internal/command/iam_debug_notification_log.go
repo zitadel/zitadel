@@ -43,20 +43,17 @@ func (c *Commands) addDefaultDebugNotificationLog(ctx context.Context, iamAgg *e
 			iamAgg,
 			fileSystemProvider.Compact),
 	}
-	if fileSystemProvider.Enabled {
-		events = append(events, iam_repo.NewDebugNotificationProviderLogEnabledEvent(ctx, iamAgg))
-	}
 	return events, nil
 }
 
 func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemProvider *fs.FSConfig) (*domain.ObjectDetails, error) {
 	writeModel := NewIAMDebugNotificationLogWriteModel()
 	iamAgg := IAMAggregateFromWriteModel(&writeModel.WriteModel)
-	events, err := c.changeDefaultDebugNotificationProviderLog(ctx, iamAgg, writeModel, fileSystemProvider)
+	event, err := c.changeDefaultDebugNotificationProviderLog(ctx, iamAgg, writeModel, fileSystemProvider)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +64,7 @@ func (c *Commands) ChangeDefaultNotificationLog(ctx context.Context, fileSystemP
 	return writeModelToObjectDetails(&writeModel.DebugNotificationWriteModel.WriteModel), nil
 }
 
-func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context, iamAgg *eventstore.Aggregate, existingProvider *IAMDebugNotificationLogWriteModel, fileSystemProvider *fs.FSConfig) ([]eventstore.Command, error) {
+func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context, iamAgg *eventstore.Aggregate, existingProvider *IAMDebugNotificationLogWriteModel, fileSystemProvider *fs.FSConfig) (eventstore.Command, error) {
 	err := c.defaultDebugNotificationProviderLogWriteModelByID(ctx, existingProvider)
 	if err != nil {
 		return nil, err
@@ -81,14 +78,7 @@ func (c *Commands) changeDefaultDebugNotificationProviderLog(ctx context.Context
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-fn9p3", "Errors.IAM.LoginPolicy.NotChanged")
 	}
-	events := make([]eventstore.Command, 0)
-	events = append(events, changedEvent)
-	if existingProvider.State == domain.NotificationProviderStateEnabled && fileSystemProvider.Enabled == false {
-		events = append(events, iam_repo.NewDebugNotificationProviderLogDisabledEvent(ctx, iamAgg))
-	} else if existingProvider.State == domain.NotificationProviderStateDisabled && fileSystemProvider.Enabled {
-		events = append(events, iam_repo.NewDebugNotificationProviderLogEnabledEvent(ctx, iamAgg))
-	}
-	return events, nil
+	return changedEvent, nil
 }
 
 func (c *Commands) RemoveDefaultNotificationLog(ctx context.Context) (*domain.ObjectDetails, error) {

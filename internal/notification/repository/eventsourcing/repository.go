@@ -22,7 +22,7 @@ type EsRepository struct {
 	spooler *es_spol.Spooler
 }
 
-func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm) (*EsRepository, error) {
+func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm, smsCrypto *crypto.AESCrypto) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func Start(conf Config, dir http.FileSystem, systemDefaults sd.SystemDefaults, c
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, command, queries, systemDefaults, dir, assetsPrefix, smtpPasswordEncAlg)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, command, queries, systemDefaults, dir, assetsPrefix, smtpPasswordEncAlg, smsCrypto)
 
 	return &EsRepository{
 		spool,

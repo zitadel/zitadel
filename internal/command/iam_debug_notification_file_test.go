@@ -60,7 +60,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 			},
 		},
 		{
-			name: "add disabled provider,ok",
+			name: "add provider,ok",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -81,42 +81,6 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 				ctx: context.Background(),
 				provider: &fs.FSConfig{
 					Compact: true,
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: domain.IAMID,
-				},
-			},
-		},
-		{
-			name: "add enabled provider,ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate,
-									true,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderFileEnabledEvent(context.Background(),
-									&iam.NewAggregate().Aggregate,
-								),
-							),
-						},
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &fs.FSConfig{
-					Compact: true,
-					Enabled: true,
 				},
 			},
 			res: res{
@@ -220,11 +184,6 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 								true,
 							),
 						),
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderFileEnabledEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-							),
-						),
 					),
 				),
 			},
@@ -257,90 +216,6 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 							eventFromEventPusher(
 								newDefaultDebugNotificationFileChangedEvent(context.Background(),
 									false),
-							),
-						},
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &fs.FSConfig{
-					Compact: false,
-					Enabled: false,
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
-				},
-			},
-		},
-		{
-			name: "change enable, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								true,
-							),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultDebugNotificationFileChangedEvent(context.Background(),
-									false),
-							),
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderFileEnabledEvent(context.Background(),
-									&iam.NewAggregate().Aggregate),
-							),
-						},
-					),
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-				provider: &fs.FSConfig{
-					Compact: false,
-					Enabled: true,
-				},
-			},
-			res: res{
-				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
-				},
-			},
-		},
-		{
-			name: "change disable, ok",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-					expectFilter(
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
-								true,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewDebugNotificationProviderFileEnabledEvent(context.Background(),
-								&iam.NewAggregate().Aggregate),
-						),
-					),
-					expectPush(
-						[]*repository.Event{
-							eventFromEventPusher(
-								newDefaultDebugNotificationFileChangedEvent(context.Background(),
-									false),
-							),
-							eventFromEventPusher(
-								iam.NewDebugNotificationProviderFileDisabledEvent(context.Background(),
-									&iam.NewAggregate().Aggregate),
 							),
 						},
 					),

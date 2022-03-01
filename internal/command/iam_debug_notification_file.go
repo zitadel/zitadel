@@ -43,9 +43,6 @@ func (c *Commands) addDefaultDebugNotificationFile(ctx context.Context, iamAgg *
 			iamAgg,
 			fileSystemProvider.Compact),
 	}
-	if fileSystemProvider.Enabled {
-		events = append(events, iam_repo.NewDebugNotificationProviderFileEnabledEvent(ctx, iamAgg))
-	}
 	return events, nil
 }
 
@@ -81,11 +78,6 @@ func (c *Commands) changeDefaultDebugNotificationProviderFile(ctx context.Contex
 		fileSystemProvider.Compact)
 	if hasChanged {
 		events = append(events, changedEvent)
-	}
-	if existingProvider.State == domain.NotificationProviderStateEnabled && fileSystemProvider.Enabled == false {
-		events = append(events, iam_repo.NewDebugNotificationProviderFileDisabledEvent(ctx, iamAgg))
-	} else if existingProvider.State == domain.NotificationProviderStateDisabled && fileSystemProvider.Enabled {
-		events = append(events, iam_repo.NewDebugNotificationProviderFileEnabledEvent(ctx, iamAgg))
 	}
 	if len(events) == 0 {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-5M9vdd", "Errors.IAM.LoginPolicy.NotChanged")

@@ -14,11 +14,9 @@ const (
 )
 
 var (
-	DebugNotificationProviderFileAddedEventType    = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderAdded
-	DebugNotificationProviderFileChangedEventType  = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderChanged
-	DebugNotificationProviderFileEnabledEventType  = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderEnabled
-	DebugNotificationProviderFileDisabledEventType = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderDisabled
-	DebugNotificationProviderFileRemovedEventType  = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderRemoved
+	DebugNotificationProviderFileAddedEventType   = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderAdded
+	DebugNotificationProviderFileChangedEventType = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderChanged
+	DebugNotificationProviderFileRemovedEventType = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderRemoved
 )
 
 type DebugNotificationProviderFileAddedEvent struct {
@@ -78,60 +76,6 @@ func DebugNotificationProviderFileChangedEventMapper(event *repository.Event) (e
 	}
 
 	return &DebugNotificationProviderFileChangedEvent{DebugNotificationProviderChangedEvent: *e.(*settings.DebugNotificationProviderChangedEvent)}, nil
-}
-
-type DebugNotificationProviderFileEnabledEvent struct {
-	settings.DebugNotificationProviderEnabledEvent
-}
-
-func NewDebugNotificationProviderFileEnabledEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *DebugNotificationProviderFileEnabledEvent {
-	return &DebugNotificationProviderFileEnabledEvent{
-		DebugNotificationProviderEnabledEvent: *settings.NewDebugNotificationProviderEnabledEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				DebugNotificationProviderFileEnabledEventType),
-		),
-	}
-}
-
-func DebugNotificationProviderFileEnabledEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := settings.DebugNotificationProviderEnabledEventMapper(event)
-	if err != nil {
-		return nil, err
-	}
-
-	return &DebugNotificationProviderFileEnabledEvent{DebugNotificationProviderEnabledEvent: *e.(*settings.DebugNotificationProviderEnabledEvent)}, nil
-}
-
-type DebugNotificationProviderFileDisabledEvent struct {
-	settings.DebugNotificationProviderDisabledEvent
-}
-
-func NewDebugNotificationProviderFileDisabledEvent(
-	ctx context.Context,
-	aggregate *eventstore.Aggregate,
-) *DebugNotificationProviderFileDisabledEvent {
-	return &DebugNotificationProviderFileDisabledEvent{
-		DebugNotificationProviderDisabledEvent: *settings.NewDebugNotificationProviderDisabledEvent(
-			eventstore.NewBaseEventForPush(
-				ctx,
-				aggregate,
-				DebugNotificationProviderFileDisabledEventType),
-		),
-	}
-}
-
-func DebugNotificationProviderFileDisabledEventMapper(event *repository.Event) (eventstore.Event, error) {
-	e, err := settings.DebugNotificationProviderDisabledEventMapper(event)
-	if err != nil {
-		return nil, err
-	}
-
-	return &DebugNotificationProviderFileDisabledEvent{DebugNotificationProviderDisabledEvent: *e.(*settings.DebugNotificationProviderDisabledEvent)}, nil
 }
 
 type DebugNotificationProviderFileRemovedEvent struct {

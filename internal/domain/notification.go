@@ -17,15 +17,14 @@ type NotificationProviderState int32
 
 const (
 	NotificationProviderStateUnspecified NotificationProviderState = iota
-	NotificationProviderStateEnabled
-	NotificationProviderStateDisabled
+	NotificationProviderStateActive
 	NotificationProviderStateRemoved
 
 	notificationProviderCount
 )
 
 func (s NotificationProviderState) Exists() bool {
-	return s == NotificationProviderStateEnabled || s == NotificationProviderStateDisabled
+	return s == NotificationProviderStateActive
 }
 
 type NotificationProviderType int32

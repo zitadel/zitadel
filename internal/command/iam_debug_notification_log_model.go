@@ -32,10 +32,6 @@ func (wm *IAMDebugNotificationLogWriteModel) AppendEvents(events ...eventstore.E
 			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderAddedEvent)
 		case *iam.DebugNotificationProviderLogChangedEvent:
 			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderChangedEvent)
-		case *iam.DebugNotificationProviderLogEnabledEvent:
-			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderEnabledEvent)
-		case *iam.DebugNotificationProviderLogDisabledEvent:
-			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderDisabledEvent)
 		case *iam.DebugNotificationProviderLogRemovedEvent:
 			wm.DebugNotificationWriteModel.AppendEvents(&e.DebugNotificationProviderRemovedEvent)
 		}

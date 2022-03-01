@@ -105,54 +105,6 @@ func DebugNotificationProviderChangedEventMapper(event *repository.Event) (event
 	return e, nil
 }
 
-type DebugNotificationProviderEnabledEvent struct {
-	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *DebugNotificationProviderEnabledEvent) Data() interface{} {
-	return nil
-}
-
-func (e *DebugNotificationProviderEnabledEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func NewDebugNotificationProviderEnabledEvent(base *eventstore.BaseEvent) *DebugNotificationProviderEnabledEvent {
-	return &DebugNotificationProviderEnabledEvent{
-		BaseEvent: *base,
-	}
-}
-
-func DebugNotificationProviderEnabledEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &DebugNotificationProviderEnabledEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
-}
-
-type DebugNotificationProviderDisabledEvent struct {
-	eventstore.BaseEvent `json:"-"`
-}
-
-func (e *DebugNotificationProviderDisabledEvent) Data() interface{} {
-	return nil
-}
-
-func (e *DebugNotificationProviderDisabledEvent) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	return nil
-}
-
-func NewDebugNotificationProviderDisabledEvent(base *eventstore.BaseEvent) *DebugNotificationProviderDisabledEvent {
-	return &DebugNotificationProviderDisabledEvent{
-		BaseEvent: *base,
-	}
-}
-
-func DebugNotificationProviderDisabledEventMapper(event *repository.Event) (eventstore.Event, error) {
-	return &DebugNotificationProviderDisabledEvent{
-		BaseEvent: *eventstore.BaseEventFromRepo(event),
-	}, nil
-}
-
 type DebugNotificationProviderRemovedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 }
