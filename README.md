@@ -107,7 +107,7 @@ If your preferred language is missing please let us know [here](https://github.c
 ## Help and Documentation
 
 - Visit our [docs page](https://docs.zitadel.ch) for more detailed documentation
-- Join our the community on [Discord](https://zitadel.ch/chat)
+- Join the community on [Discord](https://zitadel.ch/chat)
 - Get [in touch with us](https://zitadel.ch/contact/) through different channels
 
 ## Contribute
