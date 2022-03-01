@@ -34,7 +34,7 @@
   </div>
 
   <div class="actions">
-    <button *ngIf="privacyPolicy && !privacyPolicy?.isDefault" class="reset-button"
+    <button *ngIf="privacyPolicy && privacyPolicy.isDefault === false" class="reset-button"
       [disabled]="serviceType === PolicyComponentServiceType.MGMT && (['privacy_policy'] | hasFeature | async) === false"
       (click)="resetDefault()" color="warn" type="submit" mat-stroked-button><i class="las la-history"></i> {{
       'ACTIONS.RESETDEFAULT' | translate }}</button>

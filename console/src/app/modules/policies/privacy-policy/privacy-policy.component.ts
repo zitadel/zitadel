@@ -37,7 +37,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public nextLinks: CnslLinks[] = [];
   private sub: Subscription = new Subscription();
 
-  public privacyPolicy!: PrivacyPolicy.AsObject;
+  public privacyPolicy: PrivacyPolicy.AsObject | undefined = undefined;
   public form!: FormGroup;
   public currentPolicy: GridPolicy = PRIVACY_POLICY;
   public InfoSectionType: any = InfoSectionType;
@@ -95,6 +95,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
           this.privacyPolicy = resp.policy;
           this.form.patchValue(this.privacyPolicy);
         } else {
+          this.privacyPolicy = undefined;
           this.form.patchValue({
             tosLink: '',
             privacyLink: '',
@@ -103,7 +104,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
         }
       })
       .catch((error) => {
-        console.error(error);
+        this.privacyPolicy = undefined;
         this.form.patchValue({
           tosLink: '',
           privacyLink: '',
@@ -123,6 +124,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
           .addCustomPrivacyPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+            this.loadData();
           })
           .catch((error) => this.toast.showError(error));
       } else {
@@ -135,6 +137,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
           .updateCustomPrivacyPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+            this.loadData();
           })
           .catch((error) => this.toast.showError(error));
       }
@@ -148,6 +151,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
         .updatePrivacyPolicy(req)
         .then(() => {
           this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+          this.loadData();
         })
         .catch((error) => this.toast.showError(error));
     }
