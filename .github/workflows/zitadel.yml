@@ -402,6 +402,7 @@ jobs:
 
   test_message:
     name: Trigger the discord channel on release
+    needs: [ release ]
     runs-on: ubuntu-20.04
     # Skip in case it's a prerelease
     if: ${{ github.event.release.released }}
