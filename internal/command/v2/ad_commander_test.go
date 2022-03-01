@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	testSetCommand = func(c *commander) error {
+	testSetCommand = func(c *commandBuilder) error {
 		c.command = testCommand
 		return nil
 	}
-	testErrSetter = func(c *commander) error {
+	testErrSetter = func(c *commandBuilder) error {
 		c.err = testErr
 		return testErr
 	}
@@ -27,20 +27,20 @@ var (
 func TestNewCommander(t *testing.T) {
 	type args struct {
 		agg  *eventstore.Aggregate
-		opts []commanderOption
+		opts []validation
 	}
 	tests := []struct {
 		name string
 		args args
-		want *commander
+		want *commandBuilder
 	}{
 		{
 			name: "no aggregate",
 			args: args{
 				agg:  nil,
-				opts: []commanderOption{testSetCommand},
+				opts: []validation{testSetCommand},
 			},
-			want: &commander{
+			want: &commandBuilder{
 				err:     ErrNoAggregate,
 				command: testCommand,
 				agg:     nil,
@@ -51,7 +51,7 @@ func TestNewCommander(t *testing.T) {
 			args: args{
 				agg: testAgg,
 			},
-			want: &commander{
+			want: &commandBuilder{
 				agg: testAgg,
 				err: ErrNotExecutable,
 			},
@@ -60,9 +60,9 @@ func TestNewCommander(t *testing.T) {
 			name: "with command",
 			args: args{
 				agg:  testAgg,
-				opts: []commanderOption{testSetCommand},
+				opts: []validation{testSetCommand},
 			},
-			want: &commander{
+			want: &commandBuilder{
 				agg:     testAgg,
 				command: testCommand,
 			},
@@ -70,7 +70,7 @@ func TestNewCommander(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertCommander(t, tt.want, NewCommander(tt.args.agg, tt.args.opts...))
+			assertCommander(t, tt.want, prepareCommands(tt.args.agg, tt.args.opts...))
 		})
 	}
 }
@@ -79,21 +79,21 @@ func Test_commander_Next(t *testing.T) {
 	type fields struct {
 		err      error
 		agg      *eventstore.Aggregate
-		previous *commander
+		previous *commandBuilder
 		command  createCommands
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		args   []commanderOption
-		want   *commander
+		args   []validation
+		want   *commandBuilder
 	}{
 		{
 			name: "existing error",
 			fields: fields{
 				err: testErr,
 			},
-			want: &commander{
+			want: &commandBuilder{
 				err: testErr,
 			},
 		},
@@ -102,13 +102,13 @@ func Test_commander_Next(t *testing.T) {
 			fields: fields{
 				agg: testAgg,
 			},
-			args: []commanderOption{
+			args: []validation{
 				testSetCommand,
 			},
-			want: &commander{
+			want: &commandBuilder{
 				agg:     testAgg,
 				command: testCommand,
-				previous: &commander{
+				previous: &commandBuilder{
 					agg: testAgg,
 				},
 			},
@@ -116,7 +116,7 @@ func Test_commander_Next(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &commander{
+			c := &commandBuilder{
 				err:      tt.fields.err,
 				agg:      tt.fields.agg,
 				previous: tt.fields.previous,
@@ -130,16 +130,16 @@ func Test_commander_Next(t *testing.T) {
 func Test_commander_use(t *testing.T) {
 	tests := []struct {
 		name string
-		args []commanderOption
-		want *commander
+		args []validation
+		want *commandBuilder
 	}{
 		{
 			name: "no aggregate",
-			args: []commanderOption{
+			args: []validation{
 				WithAggregate(nil),
 				testSetCommand,
 			},
-			want: &commander{
+			want: &commandBuilder{
 				err:     ErrNoAggregate,
 				command: testCommand,
 				agg:     nil,
@@ -147,32 +147,32 @@ func Test_commander_use(t *testing.T) {
 		},
 		{
 			name: "not executable",
-			args: []commanderOption{
+			args: []validation{
 				WithAggregate(testAgg),
 			},
-			want: &commander{
+			want: &commandBuilder{
 				agg: testAgg,
 				err: ErrNotExecutable,
 			},
 		},
 		{
 			name: "with error",
-			args: []commanderOption{
+			args: []validation{
 				WithAggregate(testAgg),
 				testErrSetter,
 			},
-			want: &commander{
+			want: &commandBuilder{
 				agg: testAgg,
 				err: testErr,
 			},
 		},
 		{
 			name: "with command",
-			args: []commanderOption{
+			args: []validation{
 				WithAggregate(testAgg),
 				testSetCommand,
 			},
-			want: &commander{
+			want: &commandBuilder{
 				agg:     testAgg,
 				command: testCommand,
 			},
@@ -180,7 +180,7 @@ func Test_commander_use(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertCommander(t, tt.want, (&commander{}).use(tt.args))
+			assertCommander(t, tt.want, (&commandBuilder{}).use(tt.args))
 		})
 	}
 }
@@ -188,22 +188,22 @@ func Test_commander_use(t *testing.T) {
 func Test_commander_Error(t *testing.T) {
 	tests := []struct {
 		name      string
-		commander *commander
+		commander *commandBuilder
 		err       error
 	}{
 		{
 			name: "no error",
-			commander: &commander{
-				previous: &commander{
-					previous: &commander{},
+			commander: &commandBuilder{
+				previous: &commandBuilder{
+					previous: &commandBuilder{},
 				},
 			},
 		},
 		{
 			name: "error in first",
-			commander: &commander{
-				previous: &commander{
-					previous: &commander{
+			commander: &commandBuilder{
+				previous: &commandBuilder{
+					previous: &commandBuilder{
 						err: testErr,
 					},
 				},
@@ -212,20 +212,20 @@ func Test_commander_Error(t *testing.T) {
 		},
 		{
 			name: "error in last",
-			commander: &commander{
+			commander: &commandBuilder{
 				err: testErr,
-				previous: &commander{
-					previous: &commander{},
+				previous: &commandBuilder{
+					previous: &commandBuilder{},
 				},
 			},
 			err: testErr,
 		},
 		{
 			name: "error between",
-			commander: &commander{
-				previous: &commander{
+			commander: &commandBuilder{
+				previous: &commandBuilder{
 					err:      testErr,
-					previous: &commander{},
+					previous: &commandBuilder{},
 				},
 			},
 			err: testErr,
@@ -240,7 +240,7 @@ func Test_commander_Error(t *testing.T) {
 	}
 }
 
-func assertCommander(t *testing.T, want, got *commander) {
+func assertCommander(t *testing.T, want, got *commandBuilder) {
 	t.Helper()
 	for want != nil {
 		if want.err != got.err {
