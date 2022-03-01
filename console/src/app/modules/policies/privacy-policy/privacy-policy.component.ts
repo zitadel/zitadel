@@ -89,12 +89,27 @@ export class PrivacyPolicyComponent implements OnDestroy {
       return this.service.getPrivacyPolicy();
     };
 
-    getData().then((resp) => {
-      if (resp.policy) {
-        this.privacyPolicy = resp.policy;
-        this.form.patchValue(this.privacyPolicy);
-      }
-    });
+    getData()
+      .then((resp) => {
+        if (resp.policy) {
+          this.privacyPolicy = resp.policy;
+          this.form.patchValue(this.privacyPolicy);
+        } else {
+          this.form.patchValue({
+            tosLink: '',
+            privacyLink: '',
+            helpLink: '',
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        this.form.patchValue({
+          tosLink: '',
+          privacyLink: '',
+          helpLink: '',
+        });
+      });
   }
 
   public saveCurrentMessage(): void {
