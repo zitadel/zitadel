@@ -5,13 +5,17 @@ import (
 	"errors"
 	"strings"
 
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/crypto"
+	caos_errs "github.com/caos/zitadel/internal/errors"
+
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
-	"golang.org/x/text/language"
 )
 
 type OrgSetup struct {
@@ -43,14 +47,19 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 	orgAgg := org.NewAggregate(orgID, orgID)
 	userAgg := user.NewAggregate(userID, orgID)
 
-	cmds, err := NewCommander(&orgAgg.Aggregate, addOrgCommand(o.Name)).
-		Next(addOrgDomainCommand(o.Domain)).
-		Next(verifyOrgDomainCommand(o.Domain)).
-		Next(setOrgDomainPrimaryCommand(o.Domain)).
+	cmd, err := NewCommander(&orgAgg.Aggregate, command.es.Filter,
+		addOrgCommand(orgAgg, o.Name),
+		addOrgDomainCommand(orgAgg, o.Domain),
+		verifyOrgDomainCommand(orgAgg, o.Domain),
+		setOrgDomainPrimaryCommand(orgAgg, o.Domain),
 		// TODO: default domain
-		Next(WithAggregate(&userAgg.Aggregate), addHumanCommand(command.es, &o.Human)).
-		Next(WithAggregate(&orgAgg.Aggregate), addOrgMemberCommand(userID, orgID, domain.RoleOrgOwner)).
-		Commands(ctx)
+		addHumanCommand(userAgg, &o.Human),
+		addOrgMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+	)
+	if err != nil {
+		return nil, err
+	}
+	cmds, err := cmd.Commands(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -66,55 +75,48 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 	}, nil
 }
 
-func addOrgCommand(name string) commanderOption {
-	// TODO: should we always remove the spaces?
-	return func(c *commander) {
+func addOrgCommand(a *org.Aggregate, name string) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {
-			c.err = ErrOrgNameEmpty
-			return
+			return nil, ErrOrgNameEmpty
 		}
-		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
-			return []eventstore.Command{org.NewOrgAddedEvent(ctx, a, name)}, nil
-		}
+		return func(ctx context.Context) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewOrgAddedEvent(ctx, &a.Aggregate, name)}, nil
+		}, nil
 	}
 }
 
-func addOrgDomainCommand(domain string) commanderOption {
-	// TODO: should we always remove the spaces?
-	return func(c *commander) {
+func addOrgDomainCommand(a *org.Aggregate, domain string) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
-			c.err = ErrOrgDomainEmpty
-			return
+			//c.err = ErrOrgDomainEmpty
+			return nil, ErrOrgDomainEmpty
 		}
-		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
-			return []eventstore.Command{org.NewDomainAddedEvent(ctx, a, domain)}, nil
-		}
+		return func(ctx context.Context) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewDomainAddedEvent(ctx, &a.Aggregate, domain)}, nil
+		}, nil
 	}
 }
 
-func verifyOrgDomainCommand(domain string) commanderOption {
-	//TODO: check exists, but when: if domain will be added in this transaction?
-	return func(c *commander) {
+func verifyOrgDomainCommand(a *org.Aggregate, domain string) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
-			c.err = ErrOrgDomainEmpty
-			return
+			return nil, ErrOrgDomainEmpty
 		}
-		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
-			return []eventstore.Command{org.NewDomainVerifiedEvent(ctx, a, domain)}, nil
-		}
+		return func(ctx context.Context) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewDomainVerifiedEvent(ctx, &a.Aggregate, domain)}, nil
+		}, nil
 	}
 }
 
-func setOrgDomainPrimaryCommand(domain string) commanderOption {
-	//TODO: check exists, but when if domain will be added in this transaction?
-	return func(c *commander) {
+func setOrgDomainPrimaryCommand(a *org.Aggregate, domain string) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
-			c.err = ErrOrgDomainEmpty
-			return
+			return nil, ErrOrgDomainEmpty
 		}
-		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
-			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, a, domain)}, nil
-		}
+		return func(ctx context.Context) ([]eventstore.Command, error) {
+			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, &a.Aggregate, domain)}, nil
+		}, nil
 	}
 }
 
@@ -142,21 +144,29 @@ type AddHuman struct {
 	Password *domain.Password
 }
 
-func addHumanCommand(es *eventstore.Eventstore, human *AddHuman) commanderOption {
-	return func(c *commander) {
-		c.command = func(ctx context.Context, a *eventstore.Aggregate) ([]eventstore.Command, error) {
+type FilterToQueryReducer func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
+
+type Generator interface {
+	Gen() (*crypto.CryptoValue, error)
+}
+
+func addHumanCommand(a *user.Aggregate, human *AddHuman) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) {
+		return func(ctx context.Context) ([]eventstore.Command, error) {
 			existing := NewHumanWriteModel(a.ID, a.ResourceOwner)
-			err := es.FilterToQueryReducer(ctx, existing)
+			events, err := filter(ctx, existing.Query())
 			if err != nil {
 				return nil, err
 			}
+			existing.AppendEvents(events...)
+			existing.Reduce()
 			if isUserStateExists(existing.UserState) {
 				return nil, errs.ThrowAlreadyExists(nil, "COMMA-CxDKf", "Errors.User.AlreadyExists")
 			}
 
 			cmd := user.NewHumanAddedEvent(
 				ctx,
-				a,
+				&a.Aggregate,
 				human.Username,
 				human.FirstName,
 				human.LastName,
@@ -175,10 +185,37 @@ func addHumanCommand(es *eventstore.Eventstore, human *AddHuman) commanderOption
 			}
 
 			return []eventstore.Command{cmd}, nil
-		}
+		}, nil
 	}
 }
 
-func addOrgMemberCommand(userID, orgID string, roles ...string) commanderOption {
-	return func(c *commander) {}
+func changeHumanProfileCommand(a *org.Aggregate, human *AddHuman) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) {
+		return func(ctx context.Context) ([]eventstore.Command, error) {
+			existing := NewHumanProfileWriteModel(a.ID, a.ResourceOwner)
+			events, err := filter(ctx, existing.Query())
+			if err != nil {
+				return nil, err
+			}
+			existing.AppendEvents(events...)
+			existing.Reduce()
+			if !isUserStateExists(existing.UserState) {
+				return nil, errs.ThrowAlreadyExists(nil, "COMMA-CxDKf", "Errors.User.AlreadyExists")
+			}
+
+			changedEvent, hasChanged, err := existing.NewChangedEvent(ctx, &a.Aggregate, human.FirstName, human.LastName, human.NickName, human.DisplayName, human.PreferredLang, human.Gender)
+			if err != nil {
+				return nil, err
+			}
+			if !hasChanged {
+				return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-2M0fs", "Errors.User.Profile.NotChanged")
+			}
+
+			return []eventstore.Command{changedEvent}, nil
+		}, nil
+	}
+}
+
+func addOrgMemberCommand(a *org.Aggregate, userID string, roles ...string) commanderOption {
+	return func(filter FilterToQueryReducer) (createCommands, error) { return nil, nil }
 }

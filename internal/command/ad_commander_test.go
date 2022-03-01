@@ -9,13 +9,15 @@ import (
 )
 
 var (
-	testSetCommand = func(c *commander) {
+	testSetCommand = func(c *commander) error {
 		c.command = testCommand
+		return nil
 	}
-	testErrSetter = func(c *commander) {
+	testErrSetter = func(c *commander) error {
 		c.err = testErr
+		return testErr
 	}
-	testCommand = func(context.Context, *eventstore.Aggregate) ([]eventstore.Command, error) {
+	testCommand = func(context.Context) ([]eventstore.Command, error) {
 		return nil, nil
 	}
 	testAgg = &eventstore.Aggregate{Type: "test"}

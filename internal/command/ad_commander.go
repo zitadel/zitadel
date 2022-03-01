@@ -7,59 +7,64 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
-func NewCommander(agg *eventstore.Aggregate, opts ...commanderOption) *commander {
+func NewCommander(agg *eventstore.Aggregate, filter FilterToQueryReducer, opts ...commanderOption) (*commander, error) {
 	c := new(commander)
-	return c.use(append([]commanderOption{WithAggregate(agg)}, opts...))
+	c.defaultFilter = filter
+	c.agg = agg
+	return c.use(opts)
 }
 
 type commander struct {
-	err      error
-	agg      *eventstore.Aggregate
-	previous *commander
-	command  createCommands
+	err           error
+	agg           *eventstore.Aggregate
+	previous      *commander
+	commands      []createCommands
+	events        []eventstore.Command
+	defaultFilter FilterToQueryReducer
 }
 
-type createCommands func(context.Context, *eventstore.Aggregate) ([]eventstore.Command, error)
-type commanderOption func(*commander)
+func (c *commander) filter(ctx context.Context, i *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+	events, err := c.defaultFilter(ctx, i)
+	if err != nil {
+		return nil, err
+	}
+	seq := uint64(0)
+	if len(events) > 0 {
+		seq = events[len(events)-1].Sequence()
+	}
+	for _, command := range c.events {
+		seq++
+		events = append(events, commandToEvent(command, seq))
+	}
+	return events, nil
+}
+
+func commandToEvent(command eventstore.Command, seq uint64) eventstore.Event {
+	return command.(eventstore.Event)
+}
+
+type createCommands func(context.Context) ([]eventstore.Command, error)
+type commanderOption func(FilterToQueryReducer) (createCommands, error)
 
 var (
 	ErrNotExecutable = errors.New("commander ist not executable")
 	ErrNoAggregate   = errors.New("no aggregate provided")
 )
 
-func (c *commander) Next(opts ...commanderOption) (next *commander) {
-	if c.err != nil {
-		return c
-	}
-
-	next = &commander{
-		agg:      c.agg,
-		previous: c,
-	}
-	return next.use(opts)
-}
-
-func WithAggregate(agg *eventstore.Aggregate) commanderOption {
-	return func(c *commander) {
-		c.agg = agg
-	}
-}
-
-func (c *commander) Commands(ctx context.Context) ([]eventstore.Command, error) {
+func (c *commander) Commands(ctx context.Context) (cmds []eventstore.Command, err error) {
 	if c.err != nil {
 		return nil, c.err
 	}
-	cmds, err := c.command(ctx, c.agg)
-	if err != nil || c.previous == nil {
-		return cmds, err
+	for _, command := range c.commands {
+		cmd, err := command(ctx)
+		if err != nil {
+			return nil, err
+		}
+		cmds = append(cmds, cmd...)
+		c.events = append(c.events, cmd...)
 	}
 
-	previousCmds, err := c.previous.Commands(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return append(previousCmds, cmds...), nil
+	return cmds, nil
 }
 
 func (c *commander) Error() error {
@@ -69,17 +74,21 @@ func (c *commander) Error() error {
 	return c.previous.Error()
 }
 
-func (c *commander) use(opts []commanderOption) *commander {
-	for _, opt := range opts {
-		opt(c)
+func (c *commander) use(opts []commanderOption) (*commander, error) {
+	for _, option := range opts {
+		cmds, err := option(c.filter)
+		if err != nil {
+			return nil, err
+		}
+		c.commands = append(c.commands, cmds)
 	}
 
-	if c.command == nil && c.err == nil {
+	if c.commands == nil && c.err == nil {
 		c.err = ErrNotExecutable
 	}
 	if c.agg == nil {
 		c.err = ErrNoAggregate
 	}
 
-	return c
+	return c, nil
 }
