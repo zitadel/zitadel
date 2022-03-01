@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 export enum ActionKeysType {
   ADD,
@@ -14,7 +14,7 @@ export enum ActionKeysType {
   templateUrl: './action-keys.component.html',
   styleUrls: ['./action-keys.component.scss'],
 })
-export class ActionKeysComponent {
+export class ActionKeysComponent implements AfterViewInit {
   @Input() type: ActionKeysType = ActionKeysType.ADD;
   @Input() withoutMargin: boolean = false;
   @Input() doNotUseContrast: boolean = false;
@@ -38,7 +38,7 @@ export class ActionKeysComponent {
           break;
 
         case ActionKeysType.DELETE:
-          if ((event.ctrlKey || event.metaKey) && event.code === 'Enter') {
+          if ((event.ctrlKey || event.metaKey) && event.code === 'Backspace') {
             this.actionTriggered.emit();
           }
           break;
@@ -58,16 +58,24 @@ export class ActionKeysComponent {
           break;
 
         case ActionKeysType.FILTER:
-          if (event.code === 'KeyF') {
-            event.preventDefault();
+          if (event.ctrlKey === false && event.code === 'KeyF') {
             this.actionTriggered.emit();
           }
           break;
       }
     }
   }
+
   public ActionKeysType: any = ActionKeysType;
+
   constructor() {}
+
+  ngAfterViewInit(): void {
+    window.focus();
+    if (document.activeElement) {
+      (document.activeElement as any).blur();
+    }
+  }
 
   public get isMacLike(): boolean {
     return /(Mac|iPhone|iPod|iPad)/i.test(navigator.userAgent);

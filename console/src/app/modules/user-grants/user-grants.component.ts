@@ -239,8 +239,8 @@ export class UserGrantsComponent implements OnInit, AfterViewInit {
         cancelKey: 'ACTIONS.CANCEL',
         titleKey: 'GRANTS.DIALOG.BULK_DELETE_TITLE',
         descriptionKey: 'GRANTS.DIALOG.BULK_DELETE_DESCRIPTION',
-        width: '400px',
       },
+      width: '400px',
     });
 
     dialogRef.afterClosed().subscribe((resp) => {
