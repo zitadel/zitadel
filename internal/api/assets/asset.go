@@ -1,8 +1,10 @@
 package assets
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -10,6 +12,7 @@ import (
 
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
+	"github.com/go-oss/image/imageutil"
 	"github.com/gorilla/mux"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -139,7 +142,7 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
-		cleanedFile, cleanedSize, err := s.Commands().RemoveExif(file, size, contentType)
+		cleanedFile, cleanedSize, err := removeExif(file, size, contentType)
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("remove exif error: %v", err), http.StatusInternalServerError)
 			return
@@ -199,4 +202,27 @@ func DownloadHandleFunc(s AssetsService, downloader Downloader) func(http.Respon
 		w.Header().Set("ETag", info.ETag)
 		w.Write(data)
 	}
+}
+
+func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int64, error) {
+	if !isAllowedContentType(contentType) {
+		return file, size, nil
+	}
+	file, err := imageutil.RemoveExif(file)
+	if err != nil {
+		return file, 0, err
+	}
+	data := new(bytes.Buffer)
+	_, err = data.ReadFrom(file)
+	if err != nil {
+		return file, 0, err
+	}
+	return bytes.NewReader(data.Bytes()), int64(data.Len()), nil
+}
+
+func isAllowedContentType(contentType string) bool {
+	return strings.HasSuffix(contentType, "png") ||
+		strings.HasSuffix(contentType, "jpg") ||
+		strings.HasSuffix(contentType, "jpeg") ||
+		strings.HasSuffix(contentType, "tiff")
 }
