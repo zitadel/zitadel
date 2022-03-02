@@ -10,14 +10,15 @@ The commands in this guide are known to work with the following prerequisites:
 
 * CPU's: 2
 * Memory: 4Gb
+* Free disk space: 16G
 
-### Supported Operating Systems
+### Operating Systems
 * Ubuntu, Version 18.04
 * macOS Monterey, Version 12.2.1
 
 ### Dependencies
 * Docker Community Editition, Version 20.10.12
-* [Compose V2]((https://docs.docker.com/compose/cli-command/), Version 2.2.2
+* [Compose V2]((https://docs.docker.com/compose/cli-command/), Version 2.2.3
 
 ### Environment Variables
 
