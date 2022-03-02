@@ -9,6 +9,7 @@ func AddPrivacyPolicyToDomain(req *mgmt_pb.AddCustomPrivacyPolicyRequest) *domai
 	return &domain.PrivacyPolicy{
 		TOSLink:     req.TosLink,
 		PrivacyLink: req.PrivacyLink,
+		HelpLink:    req.HelpLink,
 	}
 }
 
@@ -16,5 +17,6 @@ func UpdatePrivacyPolicyToDomain(req *mgmt_pb.UpdateCustomPrivacyPolicyRequest) 
 	return &domain.PrivacyPolicy{
 		TOSLink:     req.TosLink,
 		PrivacyLink: req.PrivacyLink,
+		HelpLink:    req.HelpLink,
 	}
 }

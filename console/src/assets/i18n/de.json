@@ -944,6 +944,7 @@
       "DESCRIPTION": "Legen Sie Ihre Datenschutzrichtlinien und Nutzungsbedingungen fest",
       "TOSLINK": "Link zu den Allgemeinen Geschäftsbedingungen",
       "POLICYLINK": "Link zur den Datenschutzrichtlinien",
+      "HELPLINK": "Link zur Hilfestellung",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Standardwerte wiederherstellen",
       "RESET_DESCRIPTION": "Sie sind im Begriff die Standardlinks für die AGBs und Datenschutzrichtlinie wiederherzustellen. Wollen Sie fortfahren?"

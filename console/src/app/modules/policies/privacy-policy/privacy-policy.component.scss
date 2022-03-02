@@ -28,28 +28,61 @@
   padding-top: 1rem;
 }
 
-.chips {
-  display: flex;
-  margin: 0 -0.25rem;
-
-  .chip {
-    border-radius: 50vw;
-    padding: 2px 0.5rem;
-    font-size: 12px;
-    background: #cbf4c9;
-    color: #0e6245;
-    margin: 0.25rem;
+.privacy-policy-formfield {
+  .chips {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
+    flex-wrap: wrap;
+    opacity: 0;
+    margin: 0 -0.25rem;
+    transition: all 0.2s ease;
+
+    .chip {
+      border-radius: 50vw;
+      padding: 4px 0.5rem;
+      font-size: 12px;
+      background: #5282c1;
+      color: white;
+      margin: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+
+      * {
+        transition: all 0.2s ease;
+      }
+
+      i {
+        opacity: 0.5;
+        font-size: 1.1rem;
+        margin-left: 0.5rem;
+      }
+
+      .key {
+        display: inline-block;
+      }
+    }
   }
+
+  &.cnsl-focused {
+    .chips {
+      opacity: 1;
+      cursor: copy;
+    }
+  }
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(#81868a, 0.5);
+  margin: 1.5rem 0 0 0;
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  margin: 3rem -0.25rem 0 -0.25rem;
+  margin: 0 -0.25rem;
 
   .save-button,
   .reset-button {

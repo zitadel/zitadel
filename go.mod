@@ -26,6 +26,7 @@ require (
 	github.com/duo-labs/webauthn v0.0.0-20211216225436-9a12cd078b8a
 	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/getsentry/sentry-go v0.11.0
+	github.com/go-oss/image v0.1.0
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -49,7 +50,6 @@ require (
 	github.com/pquerna/otp v1.3.0
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/cors v1.8.0
-	github.com/sirupsen/logrus v1.8.1
 	github.com/sony/sonyflake v1.0.0
 	github.com/spf13/cobra v1.2.1
 	github.com/stretchr/testify v1.7.0
@@ -113,7 +113,9 @@ require (
 	github.com/cloudscale-ch/cloudscale-go-sdk v1.7.1 // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1 // indirect
+	github.com/corona10/goimagehash v1.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
@@ -182,8 +184,10 @@ require (
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rs/xid v1.2.1 // indirect
+	github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/wcharczuk/go-chart/v2 v2.1.0 // indirect

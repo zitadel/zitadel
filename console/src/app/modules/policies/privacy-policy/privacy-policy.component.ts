@@ -41,7 +41,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
   public nextLinks: CnslLinks[] = [];
   private sub: Subscription = new Subscription();
 
-  public privacyPolicy!: PrivacyPolicy.AsObject;
+  public privacyPolicy: PrivacyPolicy.AsObject | undefined = undefined;
   public form!: FormGroup;
   public currentPolicy: GridPolicy = PRIVACY_POLICY;
   public InfoSectionType: any = InfoSectionType;
@@ -54,6 +54,9 @@ export class PrivacyPolicyComponent implements OnDestroy {
       ? 'policy.write'
       : '',
   ]);
+
+  public LANGPLACEHOLDER: string = '{{.Lang}}';
+  public copied: string = '';
 
   constructor(
     private authService: GrpcAuthService,
@@ -68,6 +71,7 @@ export class PrivacyPolicyComponent implements OnDestroy {
     this.form = this.fb.group({
       tosLink: ['', []],
       privacyLink: ['', []],
+      helpLink: ['', []],
     });
 
     this.canWrite$.pipe(take(1)).subscribe((canWrite) => {
@@ -121,39 +125,65 @@ export class PrivacyPolicyComponent implements OnDestroy {
       .subscribe();
   }
 
+  public addChip(formControlName: string, value: string): void {
+    const c = this.form.get(formControlName)?.value;
+    this.form.get(formControlName)?.setValue(`${c}${value}`);
+  }
+
   public async loadData(): Promise<any> {
     const getData = (): Promise<AdminGetPrivacyPolicyResponse.AsObject | GetPrivacyPolicyResponse.AsObject> => {
-      return (this.service as AdminService).getPrivacyPolicy();
+      return this.service.getPrivacyPolicy();
     };
 
-    getData().then((resp) => {
-      if (resp.policy) {
-        this.privacyPolicy = resp.policy;
-        this.form.patchValue(this.privacyPolicy);
-      }
-    });
+    getData()
+      .then((resp) => {
+        if (resp.policy) {
+          this.privacyPolicy = resp.policy;
+          this.form.patchValue(this.privacyPolicy);
+        } else {
+          this.privacyPolicy = undefined;
+          this.form.patchValue({
+            tosLink: '',
+            privacyLink: '',
+            helpLink: '',
+          });
+        }
+      })
+      .catch((error) => {
+        this.privacyPolicy = undefined;
+        this.form.patchValue({
+          tosLink: '',
+          privacyLink: '',
+          helpLink: '',
+        });
+      });
   }
 
   public saveCurrentMessage(): void {
     if (this.serviceType === PolicyComponentServiceType.MGMT) {
-      if ((this.privacyPolicy as PrivacyPolicy.AsObject).isDefault) {
+      if (!this.privacyPolicy || (this.privacyPolicy as PrivacyPolicy.AsObject).isDefault) {
         const req = new AddCustomPrivacyPolicyRequest();
         req.setPrivacyLink(this.form.get('privacyLink')?.value);
         req.setTosLink(this.form.get('tosLink')?.value);
+        req.setHelpLink(this.form.get('helpLink')?.value);
         (this.service as ManagementService)
           .addCustomPrivacyPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+            this.loadData();
           })
           .catch((error) => this.toast.showError(error));
       } else {
         const req = new UpdateCustomPrivacyPolicyRequest();
         req.setPrivacyLink(this.form.get('privacyLink')?.value);
         req.setTosLink(this.form.get('tosLink')?.value);
+        req.setHelpLink(this.form.get('helpLink')?.value);
+
         (this.service as ManagementService)
           .updateCustomPrivacyPolicy(req)
           .then(() => {
             this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+            this.loadData();
           })
           .catch((error) => this.toast.showError(error));
       }
@@ -161,11 +191,13 @@ export class PrivacyPolicyComponent implements OnDestroy {
       const req = new UpdatePrivacyPolicyRequest();
       req.setPrivacyLink(this.form.get('privacyLink')?.value);
       req.setTosLink(this.form.get('tosLink')?.value);
+      req.setHelpLink(this.form.get('helpLink')?.value);
 
       (this.service as AdminService)
         .updatePrivacyPolicy(req)
         .then(() => {
           this.toast.showInfo('POLICY.PRIVACY_POLICY.SAVED', true);
+          this.loadData();
         })
         .catch((error) => this.toast.showError(error));
     }

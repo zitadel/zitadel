@@ -894,7 +894,4 @@ func footerKeyToDomain(text *CustomTextView, result *domain.CustomLoginText) {
 	if text.Key == domain.LoginKeyFooterHelp {
 		result.Footer.Help = text.Text
 	}
-	if text.Key == domain.LoginKeyFooterHelpLink {
-		result.Footer.HelpLink = text.Text
-	}
 }

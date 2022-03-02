@@ -52,7 +52,7 @@ func (c *Commands) addDefaultPrivacyPolicy(ctx context.Context, iamAgg *eventsto
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-M00rJ", "Errors.IAM.PrivacyPolicy.AlreadyExists")
 	}
 
-	return iam_repo.NewPrivacyPolicyAddedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink), nil
+	return iam_repo.NewPrivacyPolicyAddedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink), nil
 }
 
 func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
@@ -65,7 +65,7 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
