@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/xml"
+	"fmt"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"net/http"
@@ -24,8 +25,40 @@ const (
 	StatusCodeRequestUnsupported     = "urn:oasis:names:tc:SAML:2.0:status:RequestUnsupported"
 	StatusCodeUnsupportedBinding     = "urn:oasis:names:tc:SAML:2.0:status:UnsupportedBinding"
 	StatusCodeResponder              = "urn:oasis:names:tc:SAML:2.0:status:Responder"
-	StatusCodePartialLogout = "urn:oasis:names:tc:SAML:2.0:status:PartialLogout"
+	StatusCodePartialLogout          = "urn:oasis:names:tc:SAML:2.0:status:PartialLogout"
 )
+
+type Response struct {
+	Template        *template.Template
+	ProtocolBinding string
+	RelayState      string
+	SAMLResponse    string
+	AcsUrl          string
+	Signature       string
+	SigAlg          string
+}
+
+func (r *Response) DoResponse(request *http.Request, w http.ResponseWriter) error {
+	switch r.ProtocolBinding {
+	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
+		data := AuthResponseForm{
+			url.QueryEscape(r.RelayState),
+			r.SAMLResponse,
+			r.AcsUrl,
+		}
+
+		return r.Template.Execute(w, data)
+	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
+		redirectURL := fmt.Sprintf("%s?SAMLResponse=%s&RelayState= %s", r.AcsUrl, url.QueryEscape(r.SAMLResponse), url.QueryEscape(r.RelayState))
+		if r.Signature != "" && r.SigAlg != "" {
+			redirectURL = fmt.Sprintf("%s&Signature=%s&SigAlg=%s", redirectURL, url.QueryEscape(r.Signature), url.QueryEscape(r.SigAlg))
+		}
+		http.Redirect(w, request, redirectURL, http.StatusTemporaryRedirect)
+	default:
+		//TODO: no binding
+	}
+	return nil
+}
 
 type AuthResponseForm struct {
 	RelayState                  string
@@ -33,7 +66,17 @@ type AuthResponseForm struct {
 	AssertionConsumerServiceURL string
 }
 
-func sendBackResponse(template *template.Template, w http.ResponseWriter, relayState string, acsURL string, resp *samlp.Response) error {
+func sendBackResponse(
+	protocolBinding string,
+	r *http.Request,
+	template *template.Template,
+	w http.ResponseWriter,
+	relayState string,
+	acsURL string,
+	resp *samlp.Response,
+	signature string,
+	sigAlg string,
+) error {
 	var xmlbuff bytes.Buffer
 
 	memWriter := bufio.NewWriter(&xmlbuff)
@@ -55,13 +98,16 @@ func sendBackResponse(template *template.Template, w http.ResponseWriter, relayS
 
 	samlMessage := base64.StdEncoding.EncodeToString(xmlbuff.Bytes())
 
-	data := AuthResponseForm{
-		url.QueryEscape(relayState),
-		samlMessage,
-		acsURL,
+	response := &Response{
+		Template:        template,
+		ProtocolBinding: protocolBinding,
+		RelayState:      relayState,
+		SAMLResponse:    samlMessage,
+		AcsUrl:          acsURL,
+		Signature:       signature,
+		SigAlg:          sigAlg,
 	}
-
-	return template.Execute(w, data)
+	return response.DoResponse(r, w)
 }
 
 func makeUnsupportedBindingResponse(

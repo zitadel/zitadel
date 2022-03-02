@@ -25,14 +25,25 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 	}
 
 	authRequest, err := p.storage.AuthRequestByID(r.Context(), requestID)
+	protocolBinding := authRequest.GetBindingType()
 	if err != nil {
 		logging.Log("SAML-91jp3k").Error(err)
-		if err := sendBackResponse(p.postTemplate, w, authRequest.GetRelayState(), "", makeDeniedResponse(
+		if err := sendBackResponse(
+			protocolBinding,
+			r,
+			p.postTemplate,
+			w,
+			authRequest.GetRelayState(),
+			"",
+			makeDeniedResponse(
+				"",
+				"",
+				p.EntityID,
+				fmt.Errorf("failed to get request: %w", err).Error(),
+			),
 			"",
 			"",
-			p.EntityID,
-			fmt.Errorf("failed to get request: %w", err).Error(),
-		)); err != nil {
+		); err != nil {
 			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 		}
 		return
@@ -70,26 +81,77 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 		entityID,
 	)
 
-	signature, err := createSignatureP(p.signer, resp.Assertion)
-	if err != nil {
-		logging.Log("SAML-91jw3k").Error(err)
-		if err := sendBackResponse(p.postTemplate, w, authRequest.GetRelayState(), "", makeResponderFailResponse(
-			"",
-			"",
-			p.EntityID,
-			fmt.Errorf("failed to sign response: %w", err).Error(),
-		)); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
+	signature := ""
+	sigAlg := ""
+	switch protocolBinding {
+	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
+		signature, err := createSignatureP(p.signer, resp.Assertion)
+		if err != nil {
+			logging.Log("SAML-91jw3k").Error(err)
+			if err := sendBackResponse(
+				protocolBinding,
+				r,
+				p.postTemplate,
+				w,
+				authRequest.GetRelayState(),
+				"",
+				makeResponderFailResponse(
+					"",
+					"",
+					p.EntityID,
+					fmt.Errorf("failed to sign response: %w", err).Error(),
+				),
+				"",
+				"",
+			); err != nil {
+				http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
+			}
+			return
 		}
-		return
+		resp.Assertion.Signature = signature
+	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
+		signatureT, err := createSignatureP(p.signer, resp)
+		if err != nil {
+			logging.Log("SAML-91jw2k").Error(err)
+			if err := sendBackResponse(
+				protocolBinding,
+				r,
+				p.postTemplate,
+				w,
+				authRequest.GetRelayState(),
+				"",
+				makeResponderFailResponse(
+					"",
+					"",
+					p.EntityID,
+					fmt.Errorf("failed to sign response: %w", err).Error(),
+				),
+				"",
+				"",
+			); err != nil {
+				http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
+			}
+			signature = signatureT.SignatureValue.Text
+			sigAlg = signatureT.SignedInfo.SignatureMethod.Algorithm
+		}
 	}
-	resp.Assertion.Signature = signature
 
-	if err := sendBackResponse(p.postTemplate, w, authRequest.GetRelayState(), authRequest.GetAccessConsumerServiceURL(), resp); err != nil {
+	if err := sendBackResponse(
+		protocolBinding,
+		r,
+		p.postTemplate,
+		w,
+		authRequest.GetRelayState(),
+		authRequest.GetAccessConsumerServiceURL(),
+		resp,
+		signature,
+		sigAlg,
+	); err != nil {
 		logging.Log("SAML-81jp3k").Error(err)
 		http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
 	}
 	return
+
 }
 
 func getIP(request *http.Request) net.IP {
