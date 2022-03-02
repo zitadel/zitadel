@@ -46,7 +46,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		}
 		return
 	}
-	authRequestForm.AuthRequest = "PHNhbWxwOkF1dGhuUmVxdWVzdCB4bWxuczpzYW1scD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIiAgICAJRGVzdGluYXRpb249Imh0dHBzOi8vYWNjb3VudHMub3Jib3MuaW8vc2FtbC9TU08iICAgIElEPSJfZmFiYmZmMzNkNDc3ZjAxZGY5Mzk2NTU1NmM2NTU0MDIiICAgIElzc3VlSW5zdGFudD0iMjAyMi0wMy0wMVQxNzo1MzozMFoiICAgIFByb3RvY29sQmluZGluZz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmJpbmRpbmdzOkhUVFAtUE9TVCIgVmVyc2lvbj0iMi4wIj48c2FtbDpJc3N1ZXIgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+dXJuOmF1dGgwOm9yYm9zLWlvOm9yYm9zPC9zYW1sOklzc3Vlcj48L3NhbWxwOkF1dGhuUmVxdWVzdD4="
+
 	authNRequest, err := decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
 	if err != nil {
 		logging.Log("SAML-837s2s").Error(err)
@@ -90,7 +90,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			authRequestForm.SigAlg = authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm
 			authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
 
-			authRequestForm.AuthRequest, err = decodeAuthNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
+			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
 			if err != nil {
 				logging.Log("SAML-i1o2mh").Error(err)
 				logging.Log("SAML-817n2s").Error(err)
@@ -277,14 +277,16 @@ func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, e
 	return req, nil
 }
 
-func decodeAuthNRequestIntoStringWithoutSignature(encoding string, message string) (string, error) {
+func authNRequestIntoStringWithoutSignature(encoding string, message string) (string, error) {
 	reqBytes, err := base64.StdEncoding.DecodeString(message)
 	if err != nil {
 		return "", fmt.Errorf("failed to base64 decode: %w", err)
 	}
 
 	regex := regexp.MustCompile(`(<)(.?)(.?)(:?)(Signature)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(Signature>)`)
-	return regex.ReplaceAllString(string(reqBytes), ""), nil
+	authRequest := regex.ReplaceAll(reqBytes, []byte(""))
+
+	return base64.StdEncoding.EncodeToString(authRequest), nil
 
 }
 
