@@ -2,8 +2,8 @@ package preparation
 
 import (
 	"context"
-	"errors"
 
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -20,7 +20,8 @@ type CreateCommands func(context.Context, FilterToQueryReducer) ([]eventstore.Co
 type FilterToQueryReducer func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error)
 
 var (
-	ErrNotExecutable = errors.New("commander ist not executable")
+	//ErrNotExecutable is thrown if no command creator was created
+	ErrNotExecutable = errors.ThrowInvalidArgument(nil, "PREPA-pH70n", "Errors.Internal")
 )
 
 // PrepareCommands checks the passed validations and if ok creates the commands
@@ -29,15 +30,7 @@ func PrepareCommands(ctx context.Context, filter FilterToQueryReducer, validatio
 	if err != nil {
 		return nil, err
 	}
-	for _, command := range commanders {
-		cmd, err := command(ctx, transactionFilter(filter, cmds))
-		if err != nil {
-			return nil, err
-		}
-		cmds = append(cmds, cmd...)
-	}
-
-	return cmds, nil
+	return create(ctx, filter, commanders)
 }
 
 func validate(validations []Validation) ([]CreateCommands, error) {
@@ -55,6 +48,18 @@ func validate(validations []Validation) ([]CreateCommands, error) {
 		return nil, ErrNotExecutable
 	}
 	return creators, nil
+}
+
+func create(ctx context.Context, filter FilterToQueryReducer, commanders []CreateCommands) (cmds []eventstore.Command, err error) {
+	for _, command := range commanders {
+		cmd, err := command(ctx, transactionFilter(filter, cmds))
+		if err != nil {
+			return nil, err
+		}
+		cmds = append(cmds, cmd...)
+	}
+
+	return cmds, nil
 }
 
 func transactionFilter(filter FilterToQueryReducer, commands []eventstore.Command) FilterToQueryReducer {
