@@ -3,12 +3,13 @@ package webauthn
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/domain"
 
+	"github.com/caos/logging"
 	"github.com/duo-labs/webauthn/protocol"
 	"github.com/duo-labs/webauthn/webauthn"
 
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
@@ -112,6 +113,7 @@ func (w *WebAuthN) FinishRegistration(user *domain.Human, webAuthN *domain.WebAu
 	}
 	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
 	if err != nil {
+		logging.Log("WEBAU-aqet2").WithError(err).Error("webauthn credential could not be parsed")
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
