@@ -12,10 +12,10 @@ import { AuthFactorDialogComponent } from '../auth-factor-dialog/auth-factor-dia
 
 export interface WebAuthNOptions {
   challenge: string;
-  rp: { name: string, id: string; };
-  user: { name: string, id: string, displayName: string; };
+  rp: { name: string; id: string };
+  user: { name: string; id: string; displayName: string };
   pubKeyCredParams: any;
-  authenticatorSelection: { userVerification: string; };
+  authenticatorSelection: { userVerification: string };
   timeout: number;
   attestation: string;
 }
@@ -26,7 +26,7 @@ export interface WebAuthNOptions {
   styleUrls: ['./auth-user-mfa.component.scss'],
 })
 export class AuthUserMfaComponent implements OnInit, OnDestroy {
-  public displayedColumns: string[] = ['type', 'name', 'state', 'actions'];
+  public displayedColumns: string[] = ['name', 'type', 'state', 'actions'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
@@ -39,11 +39,7 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   public error: string = '';
   public otpAvailable: boolean = false;
 
-  constructor(
-    private service: GrpcAuthService,
-    private toast: ToastService,
-    private dialog: MatDialog,
-  ) { }
+  constructor(private service: GrpcAuthService, private toast: ToastService, private dialog: MatDialog) {}
 
   public ngOnInit(): void {
     this.getMFAs();
@@ -70,18 +66,21 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
   }
 
   public getMFAs(): void {
-    this.service.listMyMultiFactors().then(mfas => {
-      const list = mfas.resultList;
-      this.dataSource = new MatTableDataSource(list);
-      this.dataSource.sort = this.sort;
+    this.service
+      .listMyMultiFactors()
+      .then((mfas) => {
+        const list = mfas.resultList;
+        this.dataSource = new MatTableDataSource(list);
+        this.dataSource.sort = this.sort;
 
-      const index = list.findIndex(mfa => mfa.otp);
-      if (index === -1) {
-        this.otpAvailable = true;
-      }
-    }).catch(error => {
-      this.error = error.message;
-    });
+        const index = list.findIndex((mfa) => mfa.otp);
+        if (index === -1) {
+          this.otpAvailable = true;
+        }
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
   }
 
   public deleteMFA(factor: AuthFactor.AsObject): void {
@@ -95,37 +94,40 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
       width: '400px',
     });
 
-    dialogRef.afterClosed().subscribe(resp => {
+    dialogRef.afterClosed().subscribe((resp) => {
       if (resp) {
         if (factor.otp) {
-          this.service.removeMyMultiFactorOTP().then(() => {
-            this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
+          this.service
+            .removeMyMultiFactorOTP()
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.OTPREMOVED', true);
 
-            const index = this.dataSource.data.findIndex(mfa => !!mfa.otp);
-            if (index > -1) {
-              this.dataSource.data.splice(index, 1);
-            }
-            this.getMFAs();
-          }).catch(error => {
-            this.toast.showError(error);
-          });
-        } else
-          if (factor.u2f) {
-            this.service.removeMyMultiFactorU2F(factor.u2f.id).then(() => {
-              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
-
-              const index = this.dataSource.data.findIndex(mfa => !!mfa.u2f);
+              const index = this.dataSource.data.findIndex((mfa) => !!mfa.otp);
               if (index > -1) {
                 this.dataSource.data.splice(index, 1);
               }
               this.getMFAs();
-            }).catch(error => {
+            })
+            .catch((error) => {
               this.toast.showError(error);
             });
-          }
+        } else if (factor.u2f) {
+          this.service
+            .removeMyMultiFactorU2F(factor.u2f.id)
+            .then(() => {
+              this.toast.showInfo('USER.TOAST.U2FREMOVED', true);
+
+              const index = this.dataSource.data.findIndex((mfa) => !!mfa.u2f);
+              if (index > -1) {
+                this.dataSource.data.splice(index, 1);
+              }
+              this.getMFAs();
+            })
+            .catch((error) => {
+              this.toast.showError(error);
+            });
+        }
       }
     });
   }
-
-
 }

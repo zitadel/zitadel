@@ -270,7 +270,7 @@
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
-      "TABLEACTIONS": "Aktionen",
+      "EMPTY": "Kein Gerät definiert",
       "TITLE": "Passwortlose Authentifizierungsmethoden",
       "DESCRIPTION": "Füge WebAuthn kompatible Authentifikatoren hinzu um dich passwortlos anzumelden.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
@@ -321,7 +321,7 @@
       "TABLETYPE": "Typ",
       "TABLESTATE": "Status",
       "NAME": "Name",
-      "TABLEACTIONS": "Aktionen",
+      "EMPTY": "Keine weiteren Faktoren",
       "TITLE": "Multifaktor-Authentisierung",
       "DESCRIPTION": "Füge einen zusätzlichen Faktor hinzu, um Dein Konto optimal zu schützen.",
       "MANAGE_DESCRIPTION": "Verwalte die Multifaktor-Merkmale Deiner Benutzer.",
@@ -360,6 +360,7 @@
       "IDPNAME": "Idp Name",
       "USERDISPLAYNAME": "Externer Name",
       "EXTERNALUSERID": "Externe Benutzer ID",
+      "EMPTY": "Kein IDP gefunden",
       "DIALOG": {
         "DELETE_TITLE": "Idp entfernen",
         "DELETE_DESCRIPTION": "Sie sind im Begriff einen Identity Provider zu entfernen. Wollen Sie dies wirklich tun?"
@@ -589,6 +590,7 @@
       "TYPE": "Typ",
       "ORGID": "Organisation ID",
       "UPDATED": "Membership wurde geändert.",
+      "NOPERMISSIONTOEDIT": "Ihnen fehlt die benötigte Berechtigung um Rollen zu ändern!",
       "TYPES": {
         "UNKNOWN": "Unbekannt",
         "ORG": "Organisation",

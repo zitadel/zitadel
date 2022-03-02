@@ -270,7 +270,7 @@
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
       "NAME": "Nome",
-      "TABLEACTIONS": "Azioni",
+      "EMPTY": "Nessun dispositivo impostato",
       "TITLE": "Autenticazione passwordless",
       "DESCRIPTION": "Aggiungi i metodi di autenticazione basati su WebAuthn per accedere a ZITADEL senza password.",
       "MANAGE_DESCRIPTION": "Gestisci i metodi del secondo fattore dei vostri utenti.",
@@ -321,7 +321,7 @@
       "TABLETYPE": "Tipo",
       "TABLESTATE": "Stato",
       "NAME": "Nome",
-      "TABLEACTIONS": "Azioni",
+      "EMPTY": "nessun fattore aggiuntivo",
       "TITLE": "Autenticazione a pi\u00f9 fattori",
       "DESCRIPTION": "Aggiungi un secondo fattore per garantire la sicurezza ottimale del tuo account.",
       "MANAGE_DESCRIPTION": "Gestite i metodi del secondo fattore dei vostri utenti.",
@@ -360,6 +360,7 @@
       "IDPNAME": "Nome Idp",
       "USERDISPLAYNAME": "Nome esterno",
       "EXTERNALUSERID": "ID utente esterno",
+      "EMPTY": "Nessun IDP esterno trovato",
       "DIALOG": {
         "DELETE_TITLE": "Rimuovere l'IDP",
         "DELETE_DESCRIPTION": "Stai per eliminare un Identity Provider da un utente. Vuoi continuare?"
@@ -589,6 +590,7 @@
       "TYPE": "Tipo",
       "ORGID": "ID dell' organizzazione",
       "UPDATED": "membership cambiato con successo.",
+      "NOPERMISSIONTOEDIT": "Non hai l'autorizzazione richiesta per cambiare i ruoli!",
       "TYPES": {
         "UNKNOWN": "Sconosciuto",
         "ORG": "Organizzazione",

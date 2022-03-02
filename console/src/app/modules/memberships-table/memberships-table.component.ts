@@ -123,27 +123,67 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
     const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
 
     if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
-      this.authService.getActiveOrg(membership.orgId).then((membershipOrg) => {
-        this.router.navigate(['/org/members']).then(() => {
-          this.startOrgContextWorkflow(membershipOrg, org);
+      // only shown on auth user, or if currentOrg === resourceOwner
+      this.authService
+        .getActiveOrg(membership.orgId)
+        .then((membershipOrg) => {
+          this.router.navigate(['/org/members']).then(() => {
+            this.startOrgContextWorkflow(membershipOrg, org);
+          });
+        })
+        .catch(() => {
+          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
         });
-      });
     } else if (membership.projectGrantId && membership.details?.resourceOwner) {
-      this.authService.getActiveOrg(membership.details?.resourceOwner).then((membershipOrg) => {
-        this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]).then(() => {
-          this.startOrgContextWorkflow(membershipOrg, org);
+      // only shown on auth user
+      this.authService
+        .getActiveOrg(membership.details?.resourceOwner)
+        .then((membershipOrg) => {
+          this.router.navigate(['/granted-projects', membership.projectId, 'grants', membership.projectGrantId]).then(() => {
+            this.startOrgContextWorkflow(membershipOrg, org);
+          });
+        })
+        .catch(() => {
+          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
         });
-      });
     } else if (membership.projectId && membership.details?.resourceOwner) {
-      this.authService.getActiveOrg(membership.details?.resourceOwner).then((membershipOrg) => {
-        this.router.navigate(['/projects', membership.projectId, 'members']).then(() => {
-          this.startOrgContextWorkflow(membershipOrg, org);
+      // only shown on auth user, or if currentOrg === resourceOwner
+      this.authService
+        .getActiveOrg(membership.details?.resourceOwner)
+        .then((membershipOrg) => {
+          this.router.navigate(['/projects', membership.projectId, 'members']).then(() => {
+            this.startOrgContextWorkflow(membershipOrg, org);
+          });
+        })
+        .catch(() => {
+          this.toast.showInfo('USER.MEMBERSHIPS.NOPERMISSIONTOEDIT', true);
         });
-      });
     } else if (membership.iam) {
+      // only shown on auth user
       this.router.navigate(['/system/members']);
     }
   }
+
+  // public canNavigateToEdit(membership: Membership.AsObject): Observable<boolean> {
+  //   if (membership.orgId && !membership.projectId && !membership.projectGrantId) {
+  //     return this.authService.isAllowed(['org.member.read:' + membership.orgId]);
+  //   } else if (membership.projectGrantId && membership.details?.resourceOwner) {
+  //     return from(this.authService.getActiveOrg(membership.details?.resourceOwner)).pipe(
+  //       switchMap(() => this.authService.isAllowed(['project.grant.member.read:' + membership.projectId])),
+  //       catchError(() => of(false)),
+  //     );
+  //   } else if (membership.projectId && membership.details?.resourceOwner) {
+  //     return from(this.authService.getActiveOrg(membership.details?.resourceOwner)).pipe(
+  //       take(1),
+  //       switchMap(() => this.authService.isAllowed(['project.member.read:' + membership.projectId])),
+  //       catchError(() => of(false)),
+  //     );
+  //   } else if (membership.iam) {
+  //     return this.authService.isAllowed(['iam.member.read']);
+  //   } else {
+  //     return of(false);
+  //   }
+  // }
 
   private startOrgContextWorkflow(membershipOrg: Org.AsObject, currentOrg?: Org.AsObject | null): void {
     if (!currentOrg || (membershipOrg.id && currentOrg.id && currentOrg.id !== membershipOrg.id)) {

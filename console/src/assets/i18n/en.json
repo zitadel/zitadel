@@ -270,7 +270,7 @@
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
       "NAME": "Name",
-      "TABLEACTIONS": "Actions",
+      "EMPTY": "No device set",
       "TITLE": "Passwordless Authentication",
       "DESCRIPTION": "Add WebAuthn based Authentication Methods to log onto ZITADEL passwordless.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
@@ -321,11 +321,11 @@
       "TABLETYPE": "Type",
       "TABLESTATE": "Status",
       "NAME": "Name",
-      "TABLEACTIONS": "Actions",
+      "EMPTY": "No additional factors",
       "TITLE": "Multifactor Authentication",
       "DESCRIPTION": "Add a second factor to ensure optimal security for your account.",
       "MANAGE_DESCRIPTION": "Manage the second factor methods of your users.",
-      "ADD": "Add AuthFactor",
+      "ADD": "Add Factor",
       "OTP": "OTP (One-Time Password)",
       "OTP_DIALOG_TITLE": "Add OTP",
       "OTP_DIALOG_DESCRIPTION": "Scan the QR code with an authenticator app and enter the code below to verify and activate the OTP method.",
@@ -360,6 +360,7 @@
       "IDPNAME": "IDP Name",
       "USERDISPLAYNAME": "External Name",
       "EXTERNALUSERID": "External User ID",
+      "EMPTY": "No external IDP found",
       "DIALOG": {
         "DELETE_TITLE": "Remove IDP",
         "DELETE_DESCRIPTION": "You are about to delete an Identity Provider from a user. Do you really want to continue?"
@@ -589,6 +590,7 @@
       "TYPE": "Type",
       "ORGID": "Organization ID",
       "UPDATED": "The membership was updated.",
+      "NOPERMISSIONTOEDIT": "You are missing the required permissions to edit roles!",
       "TYPES": {
         "UNKNOWN": "Unknown",
         "ORG": "Organization",

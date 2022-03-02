@@ -4,22 +4,6 @@
   }
 }
 
-.add-row {
-  display: flex;
-  margin: -0.5rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-
-  .button {
-    margin: 0.5rem;
-    margin-top: 1rem;
-
-    .icon {
-      margin-right: 0.5rem;
-    }
-  }
-}
-
 .centered {
   display: flex;
   align-items: center;

@@ -3,6 +3,9 @@
     <div class="header-row">
       <div class="text">
         <div class="user-title-wrapper">
+          <a *ngIf="['org.read'] | hasRole | async" [routerLink]="['/']" mat-icon-button>
+            <mat-icon class="icon">arrow_back</mat-icon>
+          </a>
           <div>
             <div *ngIf="user" class="user-title-row">
               <h1 class="user-title">
