@@ -297,7 +297,6 @@ Footer:
   Tos: AGB
   PrivacyPolicy: Datenschutzerklärung
   Help: Hilfe
-  HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
 Errors:
   Internal: Es ist ein interner Fehler aufgetreten

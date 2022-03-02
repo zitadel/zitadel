@@ -294,7 +294,6 @@ const (
 	LoginKeyFooterTOS           = LoginKeyFooter + "Tos"
 	LoginKeyFooterPrivacyPolicy = LoginKeyFooter + "PrivacyPolicy"
 	LoginKeyFooterHelp          = LoginKeyFooter + "Help"
-	LoginKeyFooterHelpLink      = LoginKeyFooter + "HelpLink"
 )
 
 type CustomLoginText struct {
@@ -637,7 +636,6 @@ type FooterText struct {
 	TOS           string
 	PrivacyPolicy string
 	Help          string
-	HelpLink      string
 }
 
 type PasswordlessPromptScreenText struct {

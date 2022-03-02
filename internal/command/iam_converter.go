@@ -125,6 +125,7 @@ func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolic
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		TOSLink:     wm.TOSLink,
 		PrivacyLink: wm.PrivacyLink,
+		HelpLink:    wm.HelpLink,
 	}
 }
 
