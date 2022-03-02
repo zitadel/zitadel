@@ -11,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/xml_dsig"
 	"net/http"
 	"regexp"
-	"strings"
 )
 
 const (
@@ -211,7 +210,6 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	if err := verifyRequestContent(
 		authNRequest,
 		string(sp.metadata.EntityID),
-		acsURL,
 	); err != nil {
 		logging.Log("SAML-8kj22s").Error(err)
 		if err := sendBackResponse(
@@ -359,7 +357,7 @@ func authNRequestIntoStringWithoutSignature(encoding string, message string) (st
 
 }
 
-func verifyRequestContent(request *samlp.AuthnRequest, entityID, acsURL string) error {
+func verifyRequestContent(request *samlp.AuthnRequest, entityID string) error {
 	if request.Id == "" {
 		return fmt.Errorf("request with empty id")
 	}
@@ -375,16 +373,5 @@ func verifyRequestContent(request *samlp.AuthnRequest, entityID, acsURL string) 
 	if request.Issuer.Text != entityID {
 		return fmt.Errorf("request with unknown issuer")
 	}
-
-	if !strings.Contains(entityID, "auth0.com") {
-		if request.AssertionConsumerServiceURL == "" {
-			return fmt.Errorf("request with empty assertionConsumerServiceURL")
-		}
-
-		if request.AssertionConsumerServiceURL != acsURL {
-			return fmt.Errorf("request with unknown assertionConsumerServiceURL")
-		}
-	}
-
 	return nil
 }
