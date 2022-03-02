@@ -13,7 +13,7 @@ describe("password complexity", ()=> {
                 login(user)
                 cy.visit(orgPath)
                 // TODO: Why force?
-                cy.contains('[data-e2e=policy-card]', 'Password Complexity').contains('button', 'Modify').click({force: true})
+                cy.contains('[data-e2e=policy-card]', 'Password Complexity').contains('button', 'Modify').click({force: true}) // TODO: select data-e2e
             })
 
             // TODO: fix saving password complexity policy bug

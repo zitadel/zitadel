@@ -17,7 +17,7 @@ describe("private labeling", ()=> {
                 login(user)
                 cy.visit(orgPath)
                 // TODO: Why force?
-                cy.contains('[data-e2e=policy-card]', 'Private Labeling').contains('button', 'Modify').click({force: true})
+                cy.contains('[data-e2e=policy-card]', 'Private Labeling').contains('button', 'Modify').click({force: true}) // TODO: select data-e2e
             })
                         
             customize('white', user)
@@ -40,7 +40,7 @@ function customize(theme: string, user: User) {
         describe.skip('logo', () => {
 
             beforeEach('expand logo category', () => {
-                cy.contains('[data-e2e=policy-category]', 'Logo').click()
+                cy.contains('[data-e2e=policy-category]', 'Logo').click() // TODO: select data-e2e
                 cy.fixture('logo.png').as('logo')
             })
 
@@ -62,11 +62,11 @@ function customize(theme: string, user: User) {
         it('should update an icon')
         it('should delete an icon')
         it.skip('should update the background color', () => {
-            cy.contains('[data-e2e=color]', 'Background Color').find('button').click()
+            cy.contains('[data-e2e=color]', 'Background Color').find('button').click() // TODO: select data-e2e
             cy.get('color-editable-input').find('input').clear().type('#ae44dc')
             cy.get('[data-e2e=save-colors-button]').click()
             cy.get('[data-e2e=header-user-avatar]').click()
-            cy.contains('Logout All Users').click()
+            cy.contains('Logout All Users').click() // TODO: select data-e2e
             login(User.LoginPolicyUser, true, null, () => {
                 cy.pause()
             })

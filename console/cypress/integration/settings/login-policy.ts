@@ -14,7 +14,7 @@ describe("login policy", ()=> {
                 login(user)
                 cy.visit(orgPath)
                 // TODO: Why force?
-                cy.contains('[data-e2e=policy-card]', 'Login Policy').contains('button', 'Modify').click({force: true})
+                cy.contains('[data-e2e=policy-card]', 'Login Policy').contains('button', 'Modify').click({force: true}) // TODO: select data-e2e
                 apiAuth().then(api => {
                     ensureHumanUserExists(api, User.LoginPolicyUser)
                 })

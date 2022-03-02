@@ -41,8 +41,8 @@ describe('applications', () => {
                     cy.get('[id*=overlay]').should('exist')
                 }) 
                 //TODO: check client ID/Secret
-                cy.contains('Project not found', {timeout: 4_000}).should('not.exist')
-                cy.get('button').filter(':contains("Close")').should('exist').click()
+                cy.contains('Project not found', {timeout: 4_000}).should('not.exist') // TODO: select data-e2e
+                cy.get('button').filter(':contains("Close")').should('exist').click() // TODO: select data-e2e
                 cy.contains('arrow_back').click()
                 cy.contains('[data-e2e=app-card]', testAppName)
             })

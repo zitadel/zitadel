@@ -36,13 +36,13 @@ describe.only('permissions', () => {
                 })
 
                 it.only('should add a role', () => {
-                    cy.contains('[data-e2e=app-card]', 'Roles').within(() => {
-                        cy.contains('a', 'New').click({ force: true })
+                    cy.contains('[data-e2e=app-card]', 'Roles').within(() => { // TODO: select data-e2e
+                        cy.contains('a', 'New').click({ force: true }) // TODO: select data-e2e
                     })
                     cy.get('[formcontrolname^=key]').type(testRoleName)
                     cy.get('[formcontrolname^=displayName]').type(testRoleDisplay)
                     cy.get('[formcontrolname^=group]').type(testRoleGroup)
-                    cy.contains('button', 'Save').should('be.visible').click()
+                    cy.contains('button', 'Save').should('be.visible').click() // TODO: select data-e2e
                 })
             })
         })

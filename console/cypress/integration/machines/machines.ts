@@ -37,17 +37,17 @@ describe.skip('machines', () => {
                 })
 
                 it('should add a machine', () => {
-                    cy.contains('a', 'New').click()
+                    cy.contains('a', 'New').click() // TODO: select data-e2e
                     cy.url().should('contain', 'users/create-machine')
                     //force needed due to the prefilled username prefix
                     cy.get('[formcontrolname^=userName]').type(testMachineUserName,{force: true})
                     cy.get('[formcontrolname^=name]').type('e2emachinename')
                     cy.get('[formcontrolname^=description]').type('e2emachinedescription')
-                    cy.get('button').filter(':contains("Create")').should('be.visible').click()
-                    cy.contains('User created successfully')
+                    cy.get('button').filter(':contains("Create")').should('be.visible').click() // TODO: select data-e2e
+                    cy.contains('User created successfully') // TODO: select data-e2e
                     cy.visit(machinesPath);
                     cy.wait(10_000) // TODO: eventual consistency ftw
-                    cy.contains('button', 'refresh').click()
+                    cy.contains('button', 'refresh').click() // TODO: select data-e2e
                     cy.contains("tr", testMachineUserName)
                 })
             })
@@ -61,23 +61,23 @@ describe.skip('machines', () => {
 
                 it('should delete a machine', () => {
                     cy.get('h1')
-                        .contains('Service Users')
+                        .contains('Service Users') // TODO: select data-e2e
                         .parent()
                         .contains("tr", testMachineUserName, { timeout: 1000 })
                         .find('button')
                         //force due to angular hidden buttons
                         .click({force: true})
                     cy.get('span.title')
-                        .contains('Delete User')
+                        .contains('Delete User') // TODO: select data-e2e
                         .parent()
                         .find('button')
-                        .contains('Delete')
+                        .contains('Delete') // TODO: select data-e2e
                         .click()
-                    cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testMachineUserName, Cypress.env('org')))
-                    cy.contains('mat-dialog-container button', 'Delete').click()    
-                    cy.contains('User deleted successfully')
+                    cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testMachineUserName, Cypress.env('org'))) // TODO: select data-e2e
+                    cy.contains('mat-dialog-container button', 'Delete').click() // TODO: select data-e2e
+                    cy.contains('User deleted successfully') // TODO: select data-e2e
                     cy.wait(10_000) // TODO: eventual consistency ftw
-                    cy.contains('button', 'refresh').click()
+                    cy.contains('button', 'refresh').click() // TODO: select data-e2e
                     cy.get(`[text*=${testMachineUserName}]`).should('not.exist');
                 })
             })

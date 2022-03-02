@@ -26,7 +26,7 @@ describe("projects", ()=> {
                     cy.get('.add-project-button').click({ force: true })
                     cy.get('input').type(testProjectName)
                     cy.get('[type^=submit]').click()
-                    cy.get('h1').should('contain', `Project ${testProjectName}`)
+                    cy.get('h1').should('contain', `Project ${testProjectName}`) // TODO: select data-e2e
                     cy.get('a').contains('arrow_back').click()
                     cy.get('[data-e2e=grid-card]').contains(testProjectName)
                     cy.get('[data-e2e=toggle-grid]').click()
@@ -43,12 +43,12 @@ describe("projects", ()=> {
 
                 afterEach('project should be deleted', () => {
                     cy.get('span.title')
-                        .contains('Delete Project')
+                        .contains('Delete Project') // TODO: select data-e2e
                         .parent()
                         .find('button')
-                        .contains('Delete')
+                        .contains('Delete') // TODO: select data-e2e
                         .click()
-                    cy.contains('Deleted Project')
+                    cy.contains('Deleted Project') // TODO: select data-e2e
                     cy.get(`[text*=${testProjectName}]`).should('not.exist');
                     cy.get('[data-e2e=toggle-grid]').click()
                     cy.get(`[text*=${testProjectName}]`).should('not.exist');
@@ -57,7 +57,7 @@ describe("projects", ()=> {
                 it('via list view', () => {
                     cy.get('[data-e2e=toggle-grid]').click()
                     cy.get('[data-cy=timestamp]')
-                    cy.contains('h1', 'Projects')
+                    cy.contains('h1', 'Projects') // TODO: select data-e2e
                         .parent()
                         .contains("tr", testProjectName, { timeout: 1000 })
                         .find('[data-e2e=delete-project-button]')
