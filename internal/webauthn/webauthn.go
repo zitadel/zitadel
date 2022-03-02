@@ -113,7 +113,8 @@ func (w *WebAuthN) FinishRegistration(user *domain.Human, webAuthN *domain.WebAu
 	}
 	credentialData, err := protocol.ParseCredentialCreationResponseBody(bytes.NewReader(credData))
 	if err != nil {
-		logging.Log("WEBAU-aqet2").WithError(err).Error("webauthn credential could not be parsed")
+		e := *err.(*protocol.Error)
+		logging.LogWithFields("WEBAU-aqet2", "error", e).Error("webauthn credential could not be parsed")
 		return nil, caos_errs.ThrowInternal(err, "WEBAU-sEr8c", "Errors.User.WebAuthN.ErrorOnParseCredential")
 	}
 	sessionData := WebAuthNToSessionData(webAuthN)
