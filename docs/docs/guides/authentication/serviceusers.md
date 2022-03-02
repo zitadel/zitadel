@@ -45,10 +45,10 @@ import UserDescription from '../../concepts/structure/_user_description.mdx';
 
 In ZITADEL we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 
-To authenticate a service user and receive a access token, follow these steps:
+To authenticate a service user and receive an access token, follow these steps:
 
 1. Generate a private-public key pair in ZITADEL
-2. Create a JSON Web Token (JWT) and sign with your private key
+2. Create a JSON Web Token (JWT) and sign it with your private key
 3. With this JWT, request an OAuth token from ZITADEL
 
 With this token, you can make subsequent requests, just like a human user.

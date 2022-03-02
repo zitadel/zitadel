@@ -64,7 +64,7 @@ Google Example:
 2. Select **+ CREATE CREDENTIALS**. Choose **OAuth client ID**.
 3. Choose **Web application** as the Application type and give it a name.
 4. Add the redirect URIs from above.
-5. Save the `clientid` and client secret.
+5. Save **Your Client ID** and **Your Client Secret**.
 
 ![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
 
@@ -72,13 +72,13 @@ Google Example:
 
 1. Go to your organization settings by selecting **Organization** in the menu, or by following this link: <https://console.zitadel.ch/org>.
 2. Modify your login policy.
-3. As long as you have the default policy, you can't change the policy. To set your own settings, select **create custom**.
+3. As long as you have the default policy, you can't change the policy. To set your own settings, select **Create Custom Policy**.
 
 ![Add custom login policy](/img/console_org_custom_login_policy.gif)
 
 ### 3.Configure new identity provider
 
-1. Go to the identity providers section. Select **new**.
+1. Go to the identity providers section. Select **New**.
 2. Fill out the form:
    - Use the issuer, `clientid` and client secret provided by your provider
    - The scopes will be prefilled with `openid`, `profile` and `email`, because this information is relevant for ZITADEL.

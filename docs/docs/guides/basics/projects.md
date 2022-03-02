@@ -23,7 +23,7 @@ So, let’s create a straightforward example project.
 ## Exercise - Create a simple project
 
 1. Visit <https://console.zitadel.ch/projects>, or select **Projects** within your organization.
-2. Select **+ Create new project**.
+2. Select **+ Create New Project**.
 
 ![Empty Project](/img/console_projects_empty.png)
 

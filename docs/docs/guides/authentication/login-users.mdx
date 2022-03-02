@@ -40,7 +40,7 @@ The following diagram demonstrates a basic authorization_code flow:
 5. Your application calls on the registered callback path (`redirect_uri`) and will be provided an `authorization_code`.
 6. This `authorization_code` must then be sent together with your application's authentication (`client_id` + `client_secret`) to the token endpoint.
 7. In exchange, the Authorization Server (ZITADEL) returns an `access_token`, and, if requested, a `refresh_token`. In the case of OIDC, it returns an id_token as well.
-8. The `access_token` can then be used to call a Resource Server (API). The token is be sent as an Authorization Header.
+8. The `access_token` can then be used to call a Resource Server (API). The token is sent as an Authorization Header.
 
 This flow is the same when using PKCE or JWT with Private Key for authentication.
 

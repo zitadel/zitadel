@@ -22,7 +22,7 @@ To explain the details and key concepts of a B2B scenario, this topic uses a fic
 
 Octagon tries to solve multiple tasks in the banking field.
 Its portfolio includes several applications for their employees, customers, and partners.
-Some of these applications are web-based, used by only machine users.
+Some of these applications are web-based, other applications are used by machine users only.
 
 When describing multiple-organization scenarios, this topic sometimes also refers to a sub-organization of Octagon, Pentagon.
 
@@ -51,7 +51,7 @@ To define the Portal Application's needs, the application's builders need to con
 
 ### Login
 
-You can decide whether a organization is preselected for the login, or redirected to a login screen.
+You can decide whether an organization is preselected for the login, or redirected to the default login screen.
 
 To set the behavior of the login, go to your projects detail page.
 To send the user to a specific organization, define the organization in a custom scope (primary domain).
@@ -73,8 +73,8 @@ Our sample organization has these users:
 
 - Dimitri: a team leader who is employed by Pentagon, an Octagon department.
   Dimitri uses his Microsoft Account in combination with his one-time password to access the portal.
-  Octagon therefore has set up Microsoft as Identity Provider.
-  Octagon also requires its users to secure their accounts with additional factors.
+  Pentagon therefore has set up Microsoft as Identity Provider.
+  Pentagon also requires its users to secure their accounts with additional factors.
 - Michael: a trainee of Pentagon using the portal only to access his workspace apps.
   Michael uses his Google Account in combination with his laptop's fingerprint.
 - Bill: an employee of Octagon, working as Administrator of the Portal Application.
@@ -104,7 +104,7 @@ Dimitri owns the `writer` role, whereas Michael is only a `reader`.
 
 If you made a dashboard where some users can create user grants, trigger the Management API to do operations with the users' personal access token.
 If you have such a use case, assign ZITADEL manager roles to the relevant users.
-To create a meaningful audit log, do not use machine user's token.
+To create a meaningful audit log, do not use a machine user's token.
 
 ### Noteworthy
 

@@ -35,7 +35,7 @@ There are some different levels for managers:
 
 - **IAM Managers**: This is the highest level. Users with IAM Manager roles can manage the whole IAM. 
 - **Org Managers**: Managers in the Organization Level can manage everything within the granted Organization.
-- **Project Mangers**: These user can manage a project.
+- **Project Mangers**: These users can manage projects.
 - **Project Grant Manager**: The project grant manager is for projects, which are granted by another organization.
 
 Each level has different Roles. [Read more about ZITADEL Manager Roles](../../concepts/structure/managers.md).

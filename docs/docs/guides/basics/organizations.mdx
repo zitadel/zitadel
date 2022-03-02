@@ -21,7 +21,7 @@ Afterwards, you can learn more in several other documentation modules, which det
 
 ## Exercise - Create a new organization
 
-To register your organization and create a user for ZITADEL, visit zitadel.ch or go directly <https://accounts.zitadel.ch/register/org> and fill in the required information.
+To register your organization and create a user for ZITADEL, visit zitadel.ch or go directly to <https://accounts.zitadel.ch/register/org> and fill in the required information.
 
 ![Register new Organization](/img/console_org_register.png)
 
@@ -41,7 +41,7 @@ These usernames include both humans and services.
 
 For example, the username `road.runner` can exist only once and only for one user in an organization called ACME.
 ZITADEL will automatically generate a *loginname* for each user, in the structure `{username}@{domainname}.{zitadeldomain}`.
-In this example, the *loginname*` would be `road.runner@acme.zitadel.ch`.
+In this example, the *loginname* would be `road.runner@acme.zitadel.ch`.
 
 When you verify your domain name, ZITADEL generates additional loginnames for each user with the verified domain.
 If ACME owned the domain acme.ch and verified this domain for the organization ACME, then the resulting loginname in our example would be `road.runner@acme.ch`.
@@ -60,7 +60,7 @@ You can prove the ownership of your domain by DNS or HTTP challenge ([Lets Encry
 An organization can have multiple domain names, but only one domain can be primary.
 The primary domain defines which loginname ZITADEL displays to the user, and what information gets asserted in `access_tokens` (`preferred_username`).
 
-Note that domain verification also removes the loginname from all users, some of whom might have used this combination in the global organization
+Note that for users, who might already have colliding loginnames in the global organization, these loginnames' domains are replaced by a random value on domain verification.
 (i.e. users who do not belong to a specific organization).
 In the example with `acme.ch`, if a user ‘coyote’ exists in the global organization with the loginname `coyote@acme.ch`,
 after ZITADEL verifies `acme.ch`, it will replace this loginname with `coyote@{randomvalue.tld}`.

@@ -6,7 +6,7 @@ title: Recurring Trainings
 
 In this session you can refresh your knowledge about existing concepts, and gain experience with new features of ZITADEL.
 This keeps the quality of your support high.
-We recommend an one day of training per support staff.
+We recommend one day of training per support staff.
 
 **Audience**: 1st / 2nd Level Support Staff, Solution Owner, QA Manager (optional)  
 **Duration**: 1 day / support staff
