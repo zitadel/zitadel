@@ -38,11 +38,16 @@
       top: 0;
       right: 0;
       left: 0;
-      background-color: map-get($background, toolbar) !important;
-      backdrop-filter: blur(10px) !important;
+      background-color: map-get($background, toolbar);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid map-get($foreground, divider);
       z-index: 50;
       transform: all 0.2s ease;
+
+      @-moz-document url-prefix() {
+        background-color: map-get($background, moz-toolbar);
+        backdrop-filter: none;
+      }
 
       &.shadow {
         box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
