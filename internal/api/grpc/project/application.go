@@ -34,6 +34,10 @@ func AppConfigToPb(app *query.App) app_pb.AppConfig {
 	if app.OIDCConfig != nil {
 		return AppOIDCConfigToPb(app.OIDCConfig)
 	}
+	if app.SAMLConfig != nil {
+		return AppSAMLConfigToPb(app.SAMLConfig)
+
+	}
 	return AppAPIConfigToPb(app.APIConfig)
 }
 
@@ -62,6 +66,13 @@ func AppOIDCConfigToPb(app *query.OIDCApp) *app_pb.App_OidcConfig {
 	}
 }
 
+func AppSAMLConfigToPb(app *query.SAMLApp) app_pb.AppConfig {
+	return &app_pb.App_SamlConfig{
+		SamlConfig: &app_pb.SAMLConfig{
+			Metadata: &app_pb.SAMLConfig_MetadataXml{MetadataXml: app.Metadata},
+		},
+	}
+}
 func AppAPIConfigToPb(app *query.APIApp) app_pb.AppConfig {
 	return &app_pb.App_ApiConfig{
 		ApiConfig: &app_pb.APIConfig{

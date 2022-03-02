@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
+	"github.com/caos/zitadel/internal/api/saml/xml/protocol/xml_dsig"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 const (
@@ -43,8 +46,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		}
 		return
 	}
-	authRequestForm.AuthRequest = "PHNhbWxwOkF1dGhuUmVxdWVzdCB4bWxuczpzYW1scD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIiBEZXN0aW5hdGlvbj0iaHR0cHM6Ly9hY2NvdW50cy5vcmJvcy5pby9zYW1sL1NTTyIgSUQ9Il81ZWI0MjM5NWE2ODBiYmI3MDM4ODY5MDg1NGVhZGJmOSIgSXNzdWVJbnN0YW50PSIyMDIyLTAzLTAxVDEyOjE3OjMwWiIgUHJvdG9jb2xCaW5kaW5nPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YmluZGluZ3M6SFRUUC1QT1NUIiBWZXJzaW9uPSIyLjAiPjxzYW1sOklzc3VlciB4bWxuczpzYW1sPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YXNzZXJ0aW9uIj51cm46YXV0aDA6b3Jib3MtaW86b3Jib3M8L3NhbWw6SXNzdWVyPjxTaWduYXR1cmUgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyMiPjxTaWduZWRJbmZvPjxDYW5vbmljYWxpemF0aW9uTWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8xMC94bWwtZXhjLWMxNG4jIi8+PFNpZ25hdHVyZU1ldGhvZCBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMDQveG1sZHNpZy1tb3JlI3JzYS1zaGEyNTYiLz48UmVmZXJlbmNlIFVSST0iI181ZWI0MjM5NWE2ODBiYmI3MDM4ODY5MDg1NGVhZGJmOSI+PFRyYW5zZm9ybXM+PFRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvMDkveG1sZHNpZyNlbnZlbG9wZWQtc2lnbmF0dXJlIi8+PFRyYW5zZm9ybSBBbGdvcml0aG09Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvMTAveG1sLWV4Yy1jMTRuIyIvPjwvVHJhbnNmb3Jtcz48RGlnZXN0TWV0aG9kIEFsZ29yaXRobT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS8wNC94bWxlbmMjc2hhMjU2Ii8+PERpZ2VzdFZhbHVlPlFqdVpUYWgrQm5jM1JObCs2N0JFZlBPclBkSGhyZUpmK0hRdEhQWkoyTkU9PC9EaWdlc3RWYWx1ZT48L1JlZmVyZW5jZT48L1NpZ25lZEluZm8+PFNpZ25hdHVyZVZhbHVlPmtnY1RSdVZUbEFZU2ovYVUrRytlb3FjeExBT0VMYzNFNXhLRUZlK3hHc2tJVGJtWlVScnU3bEFhOWFRVlFQTGI0bFk1S3VRTU9KekttNko0MHVEYVB3U1lpMTlaSWtQZFJ1TVRmYlFFbXNtdDRiNmxBRkQzYWt3SXdnZ2dNNTg4aHAwY09ReEdaNEI4azBWM1RJcDNmKytGQ3F3TkVEaTFmZndHSlNUWm5oYmtmU3BNTlFIbUxyZVJ3ZDBaeGovR3hhblBMSUUvWHRVb0RkZ1M2dGwxemVnYXRVaG5nb1BTZ2RjaXEzNEh5RnB2eVRrTldLcGt0U1R6VjNTWTNzVGl3djRkK3FibzhpT0MwVGI2clZSTXlTaDN1OEZWWXJMWGk3OGdWa01kdmRtZ2hFMDhFSXlOMlFwWFI5aUJyMEVBYklqb3h3cER1SVR6VzI0ZHhSQ0dMQT09PC9TaWduYXR1cmVWYWx1ZT48S2V5SW5mbz48WDUwOURhdGE+PFg1MDlDZXJ0aWZpY2F0ZT5NSUlEQlRDQ0FlMmdBd0lCQWdJSmJ1QU12QVNoZzBrY01BMEdDU3FHU0liM0RRRUJDd1VBTUNBeEhqQWNCZ05WQkFNVEZXOXlZbTl6TFdsdkxtVjFMbUYxZEdnd0xtTnZiVEFlRncweU1qQXpNREV3T1RRMk1EQmFGdzB6TlRFeE1EZ3dPVFEyTURCYU1DQXhIakFjQmdOVkJBTVRGVzl5WW05ekxXbHZMbVYxTG1GMWRHZ3dMbU52YlRDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBSzl2MFY2WldLY2FGR0FJcHdUaGVXMkNDVmhOUFVGNFNRRmQybzRTcDdEOWFaTUY1QzR0SUZGejZJRGZ0T3piV0o2RWYxdWhhbDRxdEsvN08vK3ZOaWJrK2VQNzFORlR2cTVMTFBiN2ovcW42WElkbncwZ3VSNW5zRVlyejljaWR4OUpLZGpacjQzRm9JcWs1enM3dms5cnEwNENLU09LVVpqT2pXbmxiS2xsNGdES2NnZ2p6TStjUHZHVDBPWlIyU3laV21kSTFZQlM0ZnUvT2FodEJmR2JKN2xGUjRjdDlXQVR2MEkyNlB1VGFpUjJyYVd5MWd1T1ZsaDZQOHdTeDBHQjJ5S0lGekFUZUVyZmFla1JZcGd0Q1ZPSTA2WExKSmp2MmRKY0MvdWc3S1V1UnVRTmwvRVdSNjRHdVpMbWZCai8vQXgzZXhLbzQ2eGZwN21IQ3VjQ0F3RUFBYU5DTUVBd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBZEJnTlZIUTRFRmdRVW5LczN4YndyTjBvS3g5cWVqV3Bpd1Qvb3g3NHdEZ1lEVlIwUEFRSC9CQVFEQWdLRU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQmpmeld5YkRneTZDdGpZSy9iVUF3cU92TG1IR0pubHQ0UWI1cVJZb1o0Qm5LWVo0cnlZTjM1NWRSdXhJU0p6T1FuRWZNS3hoS1A0T1pRVzRHdG5rdEQwT1huOVBGdkRwc1lyR2hQUGRzMjdOT2o1RUJMenRKWjMvbk9RV0NBNEdvUkM1WktlNVlKNW1qZGthVVAyTmE1eE9YSGo5OHhPTU1VVXgwVEFBanNnM0Nub0VsWFlVcXc1UC9aRkw0WFVrUFFERU5hUEhIVjE4bEJXSnc2SHVSZ3FwR3pTeWdDVjRrQ21HOW10cXRzeUlBdzJCK0ZXM25XdjRGRGl3aUxlMDNCejR6SFdUUWlXc2hhOEtoaEhFYzB6aDRoU3VkSTZjNkxWYWRjMjJhSytucVlDSjh1bnNKMEVicHR1bFdoaUU0R09qQmJTZVFtbEU3b2ZFMnRkUW1EPC9YNTA5Q2VydGlmaWNhdGU+PC9YNTA5RGF0YT48L0tleUluZm8+PC9TaWduYXR1cmU+PC9zYW1scDpBdXRoblJlcXVlc3Q+"
-
+	authRequestForm.AuthRequest = "PHNhbWxwOkF1dGhuUmVxdWVzdCB4bWxuczpzYW1scD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIiAgICAJRGVzdGluYXRpb249Imh0dHBzOi8vYWNjb3VudHMub3Jib3MuaW8vc2FtbC9TU08iICAgIElEPSJfZmFiYmZmMzNkNDc3ZjAxZGY5Mzk2NTU1NmM2NTU0MDIiICAgIElzc3VlSW5zdGFudD0iMjAyMi0wMy0wMVQxNzo1MzozMFoiICAgIFByb3RvY29sQmluZGluZz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmJpbmRpbmdzOkhUVFAtUE9TVCIgVmVyc2lvbj0iMi4wIj48c2FtbDpJc3N1ZXIgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+dXJuOmF1dGgwOm9yYm9zLWlvOm9yYm9zPC9zYW1sOklzc3Vlcj48L3NhbWxwOkF1dGhuUmVxdWVzdD4="
 	authNRequest, err := decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
 	if err != nil {
 		logging.Log("SAML-837s2s").Error(err)
@@ -81,11 +83,29 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	if sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
 		p.Metadata.WantAuthnRequestsSigned == "true" ||
 		authRequestForm.Sig != "" ||
-		(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue.Text != "") {
-		//DEFLATE encoding sends signature information with the parameters, other encodings include the signed value inside the request
-		if authRequestForm.Encoding != EncodingDeflate {
+		(authNRequest.Signature != nil && authNRequest.Signature.SignatureValue != xml_dsig.SignatureValueType{} && authNRequest.Signature.SignatureValue.Text != "") {
+
+		switch authNRequest.ProtocolBinding {
+		case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
 			authRequestForm.SigAlg = authNRequest.Signature.SignedInfo.SignatureMethod.Algorithm
 			authRequestForm.Sig = authNRequest.Signature.SignatureValue.Text
+
+			authRequestForm.AuthRequest, err = decodeAuthNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
+			if err != nil {
+				logging.Log("SAML-i1o2mh").Error(err)
+				logging.Log("SAML-817n2s").Error(err)
+				if err := sendBackResponse(p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
+					authNRequest.Id,
+					authNRequest.AssertionConsumerServiceURL,
+					p.EntityID,
+					fmt.Errorf("failed to handle signature in request: %w", err).Error(),
+				)); err != nil {
+					http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
+				}
+				return
+			}
+		case "redirect":
+			//do nothing? as everything should be in the form
 		}
 
 		if err := sp.verifySignature(
@@ -257,6 +277,17 @@ func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, e
 	return req, nil
 }
 
+func decodeAuthNRequestIntoStringWithoutSignature(encoding string, message string) (string, error) {
+	reqBytes, err := base64.StdEncoding.DecodeString(message)
+	if err != nil {
+		return "", fmt.Errorf("failed to base64 decode: %w", err)
+	}
+
+	regex := regexp.MustCompile(`(<)(.?)(.?)(:?)(Signature)(.|\n|\t|\r|\f)*(</)(.?)(.?)(:?)(Signature>)`)
+	return regex.ReplaceAllString(string(reqBytes), ""), nil
+
+}
+
 func verifyRequestContent(request *samlp.AuthnRequest, entityID, acsURL string) error {
 	if request.Id == "" {
 		return fmt.Errorf("request with empty id")
@@ -274,12 +305,14 @@ func verifyRequestContent(request *samlp.AuthnRequest, entityID, acsURL string) 
 		return fmt.Errorf("request with unknown issuer")
 	}
 
-	if request.AssertionConsumerServiceURL == "" {
-		return fmt.Errorf("request with empty assertionConsumerServiceURL")
-	}
+	if !strings.Contains(entityID, "auth0.com") {
+		if request.AssertionConsumerServiceURL == "" {
+			return fmt.Errorf("request with empty assertionConsumerServiceURL")
+		}
 
-	if request.AssertionConsumerServiceURL != acsURL {
-		return fmt.Errorf("request with unknown assertionConsumerServiceURL")
+		if request.AssertionConsumerServiceURL != acsURL {
+			return fmt.Errorf("request with unknown assertionConsumerServiceURL")
+		}
 	}
 
 	return nil

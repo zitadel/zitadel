@@ -1329,6 +1329,21 @@ service ManagementService {
         };
     }
 
+
+    // Changes the configuration of the saml application
+    rpc UpdateSAMLAppConfig(UpdateSAMLAppConfigRequest) returns (UpdateSAMLAppConfigResponse) {
+        option (google.api.http) = {
+            put: "/projects/{project_id}/apps/{app_id}/saml_config"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "project.app.write"
+            check_field_name: "ProjectId"
+        };
+    }
+
+
     // Set the state to deactivated
     // Its not possible to request tokens for deactivated apps
     // Returns an error if already deactivated
