@@ -33,7 +33,7 @@ EOF
 # Write the Twiilio sender ID and auth token so that ZITADEL is able to send your users SMS.
 TWILIO_SID=<My Twilio Sender ID>
 TWILIO_AUTH_TOKEN=<My Twilio auth token>
-zitadelctl writesecret zitadel.twiliosid.existing --value $SID
+zitadelctl writesecret zitadel.twiliosid.existing --value $TWILIO_SID
 zitadelctl writesecret zitadel.twilioauthtoken.existing --value $TWILIO_AUTH_TOKEN
 
 # Write your email relays app key so that ZITADEL is able to verify your users email addresses
