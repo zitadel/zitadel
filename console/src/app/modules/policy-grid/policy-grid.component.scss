@@ -62,7 +62,7 @@ h2 {
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
       background: linear-gradient(40deg, rgb(129, 85, 185) 30%, #7b8ada);
 
       &.purple {
@@ -144,10 +144,6 @@ h2 {
 
     .btn-wrapper {
       display: flex;
-    }
-
-    button {
-      margin-right: 1rem;
     }
   }
 }

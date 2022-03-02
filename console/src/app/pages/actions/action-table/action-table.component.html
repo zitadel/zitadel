@@ -1,12 +1,13 @@
-<cnsl-refresh-table [loading]="loading$ | async" (refreshed)="refreshPage()" [dataSize]="dataSource?.data?.length ?? 0"
-  [timestamp]="actionsResult?.details?.viewTimestamp" [selection]="selection">
+<cnsl-refresh-table [hideRefresh]="true" [loading]="loading$ | async" (refreshed)="refreshPage()"
+  [dataSize]="dataSource?.data?.length ?? 0" [timestamp]="actionsResult?.details?.viewTimestamp"
+  [selection]="selection">
   <div actions *ngIf="selection.isEmpty()">
     <a class="cnsl-action-button" color="primary" mat-raised-button (click)="openAddAction()">
       <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
     </a>
   </div>
   <div actions *ngIf="!selection.isEmpty()">
-    <button class="action-state-btn cnsl-action-button bg-state inactive" mat-raised-button
+    <button class="margin-right action-state-btn cnsl-action-button bg-state inactive" mat-raised-button
       (click)="deactivateSelection()">
       <span>{{ 'ACTIONS.DEACTIVATE' | translate }}</span>
       <cnsl-action-keys (actionTriggered)="deactivateSelection()" [type]="ActionKeysType.DEACTIVATE">

@@ -1,9 +1,10 @@
 <div class="max-width-container">
   <div class="enlarged-container">
     <h1>{{ 'FLOWS.TITLE' | translate }}</h1>
-    <p class="desc">{{'FLOWS.DESCRIPTION' | translate }}</p>
+    <p class="desc cnsl-secondary-text">{{'FLOWS.DESCRIPTION' | translate }}</p>
 
-    <cnsl-info-section class="max-actions" *ngIf="maxActions">{{'FLOWS.ACTIONSMAX' | translate: ({value: maxActions}) }}
+    <cnsl-info-section class=" max-actions" *ngIf="maxActions">{{'FLOWS.ACTIONSMAX' | translate: ({value: maxActions})
+      }}
     </cnsl-info-section>
 
     <cnsl-info-section *ngIf="(['actions'] | hasFeature | async) === false" [featureLink]="['/org/features']"
@@ -11,19 +12,18 @@
       <span [innerHTML]="'FEATURES.NOTAVAILABLE' | translate: ({value: 'actions'})"></span>
     </cnsl-info-section>
 
-    <div class="title-section">
-      <h2>{{'FLOWS.ACTIONSTITLE' | translate}}</h2>
-      <i class="las la-code"></i>
-    </div>
-
     <ng-template cnslHasRole [hasRole]="[ 'org.action.read']">
-      <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
+      <cnsl-card title="{{'FLOWS.ACTIONSTITLE' | translate}}" description="{{'FLOWS.ACTIONSDESCRIPTION' | translate}}">
+        <cnsl-action-table (changedSelection)="selection = $event"></cnsl-action-table>
+      </cnsl-card>
     </ng-template>
 
     <div class="title-section">
       <h2>{{'FLOWS.FLOWSTITLE' | translate}}</h2>
       <i class="las la-exchange-alt"></i>
     </div>
+
+    <p class="desc cnsl-secondary-text">{{'FLOWS.FLOWSDESCRIPTION' | translate}}</p>
 
     <ng-template cnslHasRole [hasRole]="[ 'org.flow.read']">
       <div *ngIf="flow" class="flow">

@@ -10,9 +10,9 @@
             <i class="las la-info-circle"></i>
           </a>
         </div>
-        <p class="desc">{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}</p>
+        <p class="desc cnsl-secondary-text">{{ 'ORG.DOMAINS.DESCRIPTION' | translate }}</p>
       </div>
-      <span class="fill-space"></span>
+      <span class=" fill-space"></span>
 
       <button [disabled]="(canwrite$ | async) === false || (['custom_domain'] | hasFeature | async) === false"
         matTooltip="Add domain" mat-raised-button color="primary" class="cnsl-action-button" (click)="addNewDomain()">

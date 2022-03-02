@@ -103,6 +103,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
   }
 
   public savePolicy(): void {
+    console.log(this.iamData);
     switch (this.serviceType) {
       case PolicyComponentServiceType.MGMT:
         if ((this.iamData as OrgIAMPolicy.AsObject).isDefault) {
@@ -110,6 +111,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
             .addCustomOrgIAMPolicy(this.org.id, this.iamData.userLoginMustBeDomain)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
+              this.fetchData();
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -120,6 +122,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
             .updateCustomOrgIAMPolicy(this.org.id, this.iamData.userLoginMustBeDomain)
             .then(() => {
               this.toast.showInfo('POLICY.TOAST.SET', true);
+              this.fetchData();
             })
             .catch((error) => {
               this.toast.showError(error);
@@ -132,6 +135,7 @@ export class OrgIamPolicyComponent implements OnDestroy {
           .updateOrgIAMPolicy(this.iamData.userLoginMustBeDomain)
           .then(() => {
             this.toast.showInfo('POLICY.TOAST.SET', true);
+            this.fetchData();
           })
           .catch((error) => {
             this.toast.showError(error);

@@ -17,10 +17,9 @@
 
   <div class="content" *ngIf="iamData">
     <div class="row">
-      <span class="left-desc">{{'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate}}</span>
-      <span class="fill-space"></span>
       <mat-slide-toggle color="primary" name="hasNumber" ngDefaultControl
         [disabled]="(['iam.policy.write'] | hasRole | async) === false" [(ngModel)]="iamData.userLoginMustBeDomain">
+        {{'POLICY.DATA.USERLOGINMUSTBEDOMAIN' | translate}}
       </mat-slide-toggle>
     </div>
   </div>
