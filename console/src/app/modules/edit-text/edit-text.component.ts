@@ -19,7 +19,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
   public currentMap: { [key: string]: string | boolean } = {}; // boolean because of isDefault
   private destroy$: Subject<void> = new Subject();
   public form!: FormGroup;
-  public warnText: { [key: string]: string | undefined } = {};
+  public warnText: { [key: string]: string | boolean | undefined } = {};
 
   @Input() public chips: any[] = [];
   @Input() public disabled: boolean = true;
@@ -47,7 +47,7 @@ export class EditTextComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  public setWarnText(key: string, text: string | undefined): void {
+  public setWarnText(key: string, text: string | boolean | undefined): void {
     this.warnText[key] = text;
   }
 
