@@ -104,7 +104,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 				}
 				return
 			}
-		case "redirect":
+		case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
 			//do nothing? as everything should be in the form
 		}
 
@@ -217,11 +217,11 @@ func getAuthRequestFromRequest(r *http.Request) (*AuthRequestForm, error) {
 	}
 
 	request := &AuthRequestForm{
-		AuthRequest: r.Form.Get("SAMLRequest"),
-		Encoding:    r.Form.Get("SAMLEncoding"),
-		RelayState:  r.Form.Get("RelayState"),
-		SigAlg:      r.Form.Get("SigAlg"),
-		Sig:         r.Form.Get("Signature"),
+		AuthRequest: r.FormValue("SAMLRequest"),
+		Encoding:    r.FormValue("SAMLEncoding"),
+		RelayState:  r.FormValue("RelayState"),
+		SigAlg:      r.FormValue("SigAlg"),
+		Sig:         r.FormValue("Signature"),
 	}
 
 	return request, nil
@@ -248,7 +248,6 @@ func verifyForm(r *AuthRequestForm) error {
 		if r.Sig == "" {
 			return fmt.Errorf("empty Signature")
 		}
-		return fmt.Errorf("signature algorithm is empty")
 	}
 
 	return nil
@@ -269,8 +268,12 @@ func decodeAuthNRequest(encoding string, message string) (*samlp.AuthnRequest, e
 			return nil, fmt.Errorf("failed to defalte decode: %w", err)
 		}
 	default:
-		if err := xml.Unmarshal(reqBytes, req); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal: %w", err)
+		reader := flate.NewReader(bytes.NewReader(reqBytes))
+		decoder := xml.NewDecoder(reader)
+		if err = decoder.Decode(req); err != nil {
+			if err := xml.Unmarshal(reqBytes, req); err != nil {
+				return nil, fmt.Errorf("failed to unmarshal: %w", err)
+			}
 		}
 	}
 

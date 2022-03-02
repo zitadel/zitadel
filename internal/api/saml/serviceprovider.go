@@ -15,6 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/saml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"math/big"
+	"net/url"
 )
 
 type ServiceProviderConfig struct {
@@ -102,8 +103,7 @@ func (sp *ServiceProvider) getIssuer() *saml.Issuer {
 
 func (sp *ServiceProvider) verifySignature(request, relayState, sigAlg, expectedSig string) error {
 	// Validate the signature
-	sig := []byte(fmt.Sprintf("SAMLRequest=%s&RelayState=%s&SigAlg=%s", request, relayState, sigAlg))
-
+	sig := []byte(fmt.Sprintf("SAMLRequest=%s&RelayState=%s&SigAlg=%s", url.QueryEscape(request), url.QueryEscape(relayState), url.QueryEscape(sigAlg)))
 	signature, err := base64.StdEncoding.DecodeString(expectedSig)
 
 	if err != nil {
