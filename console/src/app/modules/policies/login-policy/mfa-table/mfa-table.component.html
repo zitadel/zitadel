@@ -1,14 +1,6 @@
 <div class="sp_wrapper">
   <mat-spinner diameter="30" *ngIf="loading$ | async"></mat-spinner>
 </div>
-<!-- <cnsl-form-field class="form-field" appearance="outline">
-  <cnsl-label>{{'USER.MACHINE.TYPE' | translate}}</cnsl-label>
-  <mat-select [(ngModel)]="mfas">
-    <mat-option *ngFor="let t of types" [value]="t">
-      {{'USER.MACHINE.KEYTYPES.'+t | translate}}
-    </mat-option>
-  </mat-select>
-</cnsl-form-field> -->
 
 <div class="login-policy-mfa-list">
   <div class="mfa" *ngFor="let mfa of mfas">
@@ -18,11 +10,14 @@
     </span>
 
     <button color="warn" *ngIf="!disabled" mat-icon-button (click)="removeMfa(mfa)" class="rm">
-      <mat-icon matTooltip="{{'ACTIONS.REMOVE' | translate}}">remove_circle</mat-icon>
+      <i matTooltip="{{'ACTIONS.REMOVE' | translate}}" class="las la-times-circle"></i>
     </button>
   </div>
-  <button mat-raised-button color="primary" class="new-mfa" [disabled]="disabled" (click)="!disabled ? addMfa(): null">
-    <span>{{'ACTIONS.ADD' | translate}}</span>
-    <mat-icon class="icon">add</mat-icon>
-  </button>
+  <div class="mfa-list-btns">
+    <button mat-raised-button color="primary" class="new-mfa cnsl-action-button" [disabled]="disabled"
+      (click)="!disabled ? addMfa(): null">
+      <mat-icon class="icon">add</mat-icon>
+      <span>{{'ACTIONS.ADD' | translate}}</span>
+    </button>
+  </div>
 </div>

@@ -45,6 +45,7 @@ export class LoginPolicyComponent implements OnDestroy {
   public currentPolicy: GridPolicy = LOGIN_POLICY;
   public InfoSectionType: any = InfoSectionType;
   public orgName: string = '';
+  public PasswordlessType: any = PasswordlessType;
 
   constructor(
     private route: ActivatedRoute,

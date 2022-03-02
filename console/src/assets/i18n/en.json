@@ -1414,10 +1414,10 @@
   },
   "MFA": {
     "LIST": {
-      "MULTIFACTORTITLE": "Multifactors",
-      "MULTIFACTORDESCRIPTION": "Define your Multifactors for Authentication here.",
-      "SECONDFACTORTITLE": "Secondfactors",
-      "SECONDFACTORDESCRIPTION": "Define your Secondfactors for Authentication here."
+      "MULTIFACTORTITLE": "Passwordless",
+      "MULTIFACTORDESCRIPTION": "Define your Multifactors for your passwordless Authentication here.",
+      "SECONDFACTORTITLE": "Multifactor Authentication",
+      "SECONDFACTORDESCRIPTION": "Define further possible factors with which you can secure your password authentication."
     },
     "CREATE": {
       "TITLE": "New Factor",

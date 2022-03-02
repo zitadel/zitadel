@@ -7,6 +7,15 @@
   font-size: 14px;
 }
 
+.passwordless-allowed {
+  max-width: 400px;
+  display: block;
+}
+
+.force-mfa-toggle {
+  margin-right: 1rem;
+}
+
 .login-policy-content {
   padding-top: 1rem;
 
@@ -31,14 +40,6 @@
     margin-bottom: 3rem;
     display: block;
   }
-}
-
-.idp-table-card {
-  width: 100%;
-}
-
-.subheader {
-  width: 100%;
 }
 
 .grid {
