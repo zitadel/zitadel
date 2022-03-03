@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { merge, Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
@@ -99,14 +99,18 @@ export class ShortcutsComponent implements OnDestroy {
     const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
     if (org && org.id) {
       this.org = org;
-      this.loadShortcuts(org);
+      this.loadProjectShortcuts();
     }
 
-    this.auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
-      this.loadShortcuts(org);
-    });
-
-    this.loadProjectShortcuts();
+    merge(this.auth.activeOrgChanged, this.mgmtService.ownedProjects)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
+        if (org && org.id) {
+          this.org = org;
+        }
+        this.loadProjectShortcuts();
+      });
   }
 
   public loadProjectShortcuts(): void {
@@ -145,7 +149,6 @@ export class ShortcutsComponent implements OnDestroy {
         });
 
         this.ALL_SHORTCUTS = [...routesShortcuts, ...policyShortcuts, ...mapped];
-
         this.loadShortcuts(this.org);
       }
     });
