@@ -73,10 +73,15 @@ func (p *IdentityProviderConfig) getMetadata(
 			CacheDuration:              p.Metadata.CacheDuration,
 			ProtocolSupportEnumeration: "urn:oasis:names:tc:SAML:2.0:protocol",
 			ErrorURL:                   p.Metadata.ErrorURL,
-			SingleSignOnService: []md.EndpointType{{
-				Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
-				Location: p.Endpoints.SingleSignOn.URL,
-			}},
+			SingleSignOnService: []md.EndpointType{
+				{
+					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+					Location: p.Endpoints.SingleSignOn.URL,
+				}, {
+					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+					Location: p.Endpoints.SingleSignOn.URL,
+				},
+			},
 			//TODO definition for more profiles
 			AttributeProfile: []string{
 				"urn:oasis:names:tc:SAML:2.0:profiles:attribute:basic",
@@ -96,6 +101,10 @@ func (p *IdentityProviderConfig) getMetadata(
 				},
 				{
 					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+					Location: p.Endpoints.SingleLogOut.URL,
+				},
+				{
+					Binding:  "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
 					Location: p.Endpoints.SingleLogOut.URL,
 				},
 			},
