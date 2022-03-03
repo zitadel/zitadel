@@ -8,6 +8,7 @@ import (
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	proj_grpc "github.com/caos/zitadel/internal/api/grpc/project"
+	caos_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -168,7 +169,18 @@ func (s *Server) ListProjectGrantMemberRoles(ctx context.Context, req *mgmt_pb.L
 }
 
 func (s *Server) ListProjectGrantMembers(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*mgmt_pb.ListProjectGrantMembersResponse, error) {
-	queries, err := ListProjectGrantMembersRequestToModel(ctx, req)
+	grant, err := s.query.ProjectGrantByID(ctx, req.GrantId)
+	if err != nil {
+		return nil, err
+	}
+	resourceOwner := authz.GetCtxData(ctx).OrgID
+	if grant.ResourceOwner != resourceOwner && grant.GrantedOrgID == resourceOwner {
+		resourceOwner = grant.ResourceOwner
+	} else {
+		return nil, caos_errors.ThrowInvalidArgumentf(nil, "GRANT-93mf0", "Errors.Project.Grant.NotFound")
+	}
+
+	queries, err := ListProjectGrantMembersRequestToModel(resourceOwner, req)
 	if err != nil {
 		return nil, err
 	}

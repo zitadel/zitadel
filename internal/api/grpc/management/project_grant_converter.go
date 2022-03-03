@@ -1,9 +1,6 @@
 package management
 
 import (
-	"context"
-
-	"github.com/caos/zitadel/internal/api/authz"
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
@@ -120,13 +117,13 @@ func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *
 	}
 }
 
-func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
+func ListProjectGrantMembersRequestToModel(resourceOwner string, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
+	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(resourceOwner)
 	if err != nil {
 		return nil, err
 	}
