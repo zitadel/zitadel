@@ -9,6 +9,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
@@ -164,7 +165,10 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	if len(userIDs) == 0 {
 		return nil
 	}
-	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	data := authz.CtxData{
+		UserID: userID,
+	}
+	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, userIDs)
 	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
 	return err
 }
