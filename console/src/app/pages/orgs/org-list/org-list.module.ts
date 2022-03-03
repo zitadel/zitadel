@@ -8,6 +8,10 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
+import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
+import { ActionKeysModule } from 'src/app/modules/action-keys/action-keys.module';
+import { FilterOrgModule } from 'src/app/modules/filter-org/filter-org.module';
 import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
@@ -25,13 +29,17 @@ import { OrgListComponent } from './org-list.component';
     MatTableModule,
     TranslateModule,
     RefreshTableModule,
+    ActionKeysModule,
+    FilterOrgModule,
     TimestampToDatePipeModule,
     LocalizedDatePipeModule,
     MatSortModule,
     MatIconModule,
     PaginatorModule,
+    HasRoleModule,
     MatButtonModule,
     MatTooltipModule,
+    CopyToClipboardModule,
     MatRadioModule,
     InputModule,
     FormsModule,

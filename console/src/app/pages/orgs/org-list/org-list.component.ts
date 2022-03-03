@@ -1,6 +1,5 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -8,8 +7,8 @@ import { BehaviorSubject, from, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { enterAnimations } from 'src/app/animations';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
-import { TextQueryMethod } from 'src/app/proto/generated/zitadel/object_pb';
-import { Org, OrgNameQuery, OrgQuery } from 'src/app/proto/generated/zitadel/org_pb';
+import { Org, OrgQuery, OrgState } from 'src/app/proto/generated/zitadel/org_pb';
+import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 
 enum OrgListSearchKey {
@@ -26,11 +25,10 @@ export class OrgListComponent {
   public orgSearchKey: OrgListSearchKey | undefined = undefined;
 
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('input') public filter!: Input;
 
   public dataSource!: MatTableDataSource<Org.AsObject>;
-  public displayedColumns: string[] = ['select', 'name', 'id', 'creationDate', 'changeDate'];
+  public displayedColumns: string[] = ['select', 'name', 'state', 'primaryDomain', 'creationDate', 'changeDate'];
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public activeOrg!: Org.AsObject;
@@ -38,24 +36,29 @@ export class OrgListComponent {
   public initialLimit: number = 20;
   public timestamp: Timestamp.AsObject | undefined = undefined;
   public totalResult: number = 0;
-
-  constructor(private authService: GrpcAuthService, private router: Router) {
+  public filterOpen: boolean = false;
+  public OrgState: any = OrgState;
+  public copied: string = '';
+  constructor(private authService: GrpcAuthService, private router: Router, breadcrumbService: BreadcrumbService) {
     this.loadOrgs(this.initialLimit, 0);
     this.authService.getActiveOrg().then((org) => (this.activeOrg = org));
+
+    const iamBread = new Breadcrumb({
+      type: BreadcrumbType.IAM,
+      name: 'IAM',
+      routerLink: ['/system'],
+    });
+    const bread: Breadcrumb = {
+      type: BreadcrumbType.ORG,
+      routerLink: ['/org'],
+    };
+    breadcrumbService.setBreadcrumb([iamBread, bread]);
   }
 
-  public loadOrgs(limit: number, offset: number, filter?: string): void {
+  public loadOrgs(limit: number, offset: number, queries?: OrgQuery[]): void {
     this.loadingSubject.next(true);
-    let query;
-    if (filter) {
-      query = new OrgQuery();
-      const orgNameQuery = new OrgNameQuery();
-      orgNameQuery.setMethod(TextQueryMethod.TEXT_QUERY_METHOD_CONTAINS_IGNORE_CASE);
-      orgNameQuery.setName(filter);
-      query.setNameQuery(orgNameQuery);
-    }
 
-    from(this.authService.listMyProjectOrgs(limit, offset, query ? [query] : undefined))
+    from(this.authService.listMyProjectOrgs(limit, offset, queries))
       .pipe(
         map((resp) => {
           this.timestamp = resp.details?.viewTimestamp;
@@ -67,7 +70,6 @@ export class OrgListComponent {
       )
       .subscribe((views) => {
         this.dataSource = new MatTableDataSource(views);
-        this.dataSource.sort = this.sort;
       });
   }
 
@@ -77,6 +79,10 @@ export class OrgListComponent {
 
   public refresh(): void {
     this.loadOrgs(this.paginator.length, this.paginator.pageSize * this.paginator.pageIndex);
+  }
+
+  public applySearchQuery(searchQueries: OrgQuery[]): void {
+    this.loadOrgs(this.paginator.pageSize, this.paginator.pageSize * this.paginator.pageIndex, searchQueries);
   }
 
   public setFilter(key: OrgListSearchKey): void {
@@ -94,15 +100,6 @@ export class OrgListComponent {
     }
   }
 
-  public applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.loadOrgs(
-      this.paginator.pageSize,
-      this.paginator.pageIndex * this.paginator.pageSize,
-      filterValue.trim().toLowerCase(),
-    );
-  }
-
   public setAndNavigateToOrg(org: Org.AsObject): void {
     this.authService.setActiveOrg(org);
     this.router.navigate(['/org']);
@@ -110,5 +107,9 @@ export class OrgListComponent {
 
   public changePage(event: PageEvent): void {
     this.loadOrgs(event.pageSize, event.pageIndex * event.pageSize);
+  }
+
+  public gotoRouterLink(rL: any) {
+    this.router.navigate(rL);
   }
 }
