@@ -87,9 +87,6 @@ func commandsToRepository(cmds []Command) (events []*repository.Event, constrain
 			Version:       repository.Version(cmd.Aggregate().Version),
 			Data:          data,
 		}
-		if events[i].EditorUser == "" {
-			events[i].EditorUser = "SYSTEM"
-		}
 		if len(cmd.UniqueConstraints()) > 0 {
 			constraints = append(constraints, uniqueConstraintsToRepository(cmd.UniqueConstraints())...)
 		}

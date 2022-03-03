@@ -89,7 +89,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	}
-	resp, err := o.command.AddUserToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -117,7 +117,7 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	if request, ok := req.(op.RefreshTokenRequest); ok {
 		request.SetCurrentScopes(scopes)
 	}
-	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
+	resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
 		refreshToken, req.GetAudience(), scopes, authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
@@ -251,4 +251,11 @@ func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.T
 		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return nil
+}
+
+func setContextUserSystem(ctx context.Context) context.Context {
+	data := authz.CtxData{
+		UserID: "SYSTEM",
+	}
+	return authz.SetCtxData(ctx, data)
 }

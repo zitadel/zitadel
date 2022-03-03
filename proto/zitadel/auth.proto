@@ -200,6 +200,28 @@ service AuthService {
         };
     }
 
+    // Returns the label policy of my organization
+    rpc GetMyLabelingPolicy(GetMyLabelingPolicyRequest) returns (GetMyLabelingPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
+    // Returns the label policy of my organization
+    rpc GetMyLabelingPolicy(GetMyLabelingPolicyRequest) returns (GetMyLabelingPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/label"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     // Change the password of the authorized user
     rpc UpdateMyPassword(UpdateMyPasswordRequest) returns (UpdateMyPasswordResponse) {
         option (google.api.http) = {
