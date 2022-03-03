@@ -4,7 +4,7 @@ export function ensureSomethingExists(api: apiCallProperties, searchPath: string
 
     return searchSomething(api, searchPath, find).then(sth => {
         if (sth) {
-            return sth.id
+            return cy.wrap(sth.id)
         }
         return cy.request({
             method: 'POST',
@@ -19,6 +19,9 @@ export function ensureSomethingExists(api: apiCallProperties, searchPath: string
             expect(res.status).to.equal(200)
             return res.body.id
         })
+    }).then((id: number) => {
+        awaitDesired(15, (sth) => !!sth , api, searchPath, find)
+        return cy.wrap(id)
     })
 }
 
@@ -26,7 +29,7 @@ export function ensureSomethingDoesntExist(api: apiCallProperties, searchPath: s
 
     return searchSomething(api, searchPath, find).then(sth => {
         if (!sth) {
-            return null
+            return cy.wrap(null)
         }
         return cy.request({
             method: 'DELETE',
@@ -34,10 +37,13 @@ export function ensureSomethingDoesntExist(api: apiCallProperties, searchPath: s
             headers: {
                 Authorization: api.authHeader
             },
-        }).then(res => {
+            failOnStatusCode: false
+        }).then((res) => {
             expect(res.status).to.equal(200)
-            return null
         })
+    }).then(() => {
+        awaitDesired(15, (sth) => !sth , api, searchPath, find)
+        return null
     })
 }
 
@@ -49,7 +55,15 @@ function searchSomething(api: apiCallProperties, searchPath: string, find: (reso
         headers: {
             Authorization: api.authHeader
         },
-    }).then(res => {
-        return res.body.result?.find(find) || null
-    })    
+    }).then(res => res.body.result?.find(find) || null)
+}
+
+function awaitDesired(trials: number, expectSth: (sth: any) => boolean, api: apiCallProperties, searchPath: string, find: (resource: any) => boolean) {
+    searchSomething(api, searchPath, find).then(sth => {
+        if (!expectSth(sth)) {
+            expect(trials, `trying ${trials} more times`).to.be.greaterThan(0);
+            cy.wait(1000)
+            awaitDesired(trials - 1, expectSth, api, searchPath, find)
+        }            
+    })
 }

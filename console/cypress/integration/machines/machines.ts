@@ -2,18 +2,7 @@ import { apiAuth } from "../../support/api/apiauth";
 import { ensureMachineUserExists, ensureUserDoesntExist } from "../../support/api/users";
 import { login, User, username } from "../../support/login/users";
 
-// NEEDS TO BE DISABLED!!!!!! this is just for testing
-/*
-Cypress.on('uncaught:exception', (err, runnable) => {
-    // returning false here prevents Cypress from
-    if (err.message.includes('addEventListener')) {
-        return false
-    }
-})
- */
-// ###############################
-
-describe.skip('machines', () => {
+describe('machines', () => {
 
     const machinesPath = `${Cypress.env('consoleUrl')}/users/list/machines`
     const testMachineUserName = 'e2emachineusername'
@@ -37,22 +26,20 @@ describe.skip('machines', () => {
                 })
 
                 it('should add a machine', () => {
-                    cy.contains('a', 'New').click() // TODO: select data-e2e
+                    cy.get('a[href="/users/create-machine"]').click()
                     cy.url().should('contain', 'users/create-machine')
                     //force needed due to the prefilled username prefix
-                    cy.get('[formcontrolname^=userName]').type(testMachineUserName,{force: true})
-                    cy.get('[formcontrolname^=name]').type('e2emachinename')
-                    cy.get('[formcontrolname^=description]').type('e2emachinedescription')
-                    cy.get('button').filter(':contains("Create")').should('be.visible').click() // TODO: select data-e2e
-                    cy.contains('User created successfully') // TODO: select data-e2e
-                    cy.visit(machinesPath);
-                    cy.wait(10_000) // TODO: eventual consistency ftw
-                    cy.contains('button', 'refresh').click() // TODO: select data-e2e
-                    cy.contains("tr", testMachineUserName)
+                    cy.get('[formcontrolname="userName"]').type(testMachineUserName,{force: true})
+                    cy.get('[formcontrolname="name"]').type('e2emachinename')
+                    cy.get('[formcontrolname="description"]').type('e2emachinedescription')
+                    cy.get('[type="submit"]').should('be.visible').click()
+                    cy.get('.data-e2e-success')
+                    cy.wait(1000)
+                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })
 
-            describe('remove', () => {
+            describe.only('remove', () => {
                 before('ensure it exists', () => {
                     apiAuth().then(api => {
                         ensureMachineUserExists(api, testMachineUserName)
@@ -60,25 +47,15 @@ describe.skip('machines', () => {
                 })
 
                 it('should delete a machine', () => {
-                    cy.get('h1')
-                        .contains('Service Users') // TODO: select data-e2e
-                        .parent()
-                        .contains("tr", testMachineUserName, { timeout: 1000 })
+                    cy.contains("tr", testMachineUserName, { timeout: 1000 })
                         .find('button')
                         //force due to angular hidden buttons
                         .click({force: true})
-                    cy.get('span.title')
-                        .contains('Delete User') // TODO: select data-e2e
-                        .parent()
-                        .find('button')
-                        .contains('Delete') // TODO: select data-e2e
-                        .click()
-                    cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testMachineUserName, Cypress.env('org'))) // TODO: select data-e2e
-                    cy.contains('mat-dialog-container button', 'Delete').click() // TODO: select data-e2e
-                    cy.contains('User deleted successfully') // TODO: select data-e2e
-                    cy.wait(10_000) // TODO: eventual consistency ftw
-                    cy.contains('button', 'refresh').click() // TODO: select data-e2e
-                    cy.get(`[text*=${testMachineUserName}]`).should('not.exist');
+                    cy.get('mat-dialog-container input').type(username(testMachineUserName, Cypress.env('org')))
+                    cy.get('[e2e-data="confirm-dialog-button"]').click()
+                    cy.get('.data-e2e-success')
+                    cy.wait(1000)
+                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })
         })

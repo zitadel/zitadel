@@ -29,20 +29,20 @@ describe('applications', () => {
                 cy.get('[formcontrolname^=name]').type(testAppName)
                 // select webapp
                 cy.get('[for^=WEB]').click()
-                cy.get('button[data-e2e=continue-button]').should('be.visible').eq(0).click()
+                cy.get('[type=submit]').should('be.visible').eq(0).click()
                 //select authentication
                 cy.get('[for^=PKCE]').click()
-                cy.get('button[data-e2e=continue-button]').should('be.visible').eq(1).click()
+                cy.get('[type=submit]').should('be.visible').eq(1).click()
                 //enter URL
                 cy.get('cnsl-redirect-uris').eq(0).type("https://testurl.org")
                 cy.get('cnsl-redirect-uris').eq(1).type("https://testlogouturl.org")
-                cy.get('button[data-e2e=continue-button]').should('be.visible').eq(2).click()
-                cy.get('button[data-e2e=create-button]').should('be.visible').click().then(() => {
+                cy.get('[type=submit]').should('be.visible').click()
+                cy.get('[type=submit]').should('be.visible').click().then(() => {
                     cy.get('[id*=overlay]').should('exist')
                 }) 
                 //TODO: check client ID/Secret
-                cy.contains('Project not found', {timeout: 4_000}).should('not.exist') // TODO: select data-e2e
-                cy.get('button').filter(':contains("Close")').should('exist').click() // TODO: select data-e2e
+                cy.get('.data-e2e-failure', {timeout: 4_000}).should('not.exist')
+                cy.get('[data-e2e=close-dialog]').click()
                 cy.contains('arrow_back').click()
                 cy.contains('[data-e2e=app-card]', testAppName)
             })

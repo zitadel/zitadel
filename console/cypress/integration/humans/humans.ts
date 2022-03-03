@@ -2,7 +2,7 @@ import { apiAuth } from "../../support/api/apiauth";
 import { ensureHumanUserExists, ensureUserDoesntExist } from "../../support/api/users";
 import { login, User, username } from "../../support/login/users";
 
-describe.skip('humans', () => {
+describe('humans', () => {
 
     const humansPath = `${Cypress.env('consoleUrl')}/users/list/humans`
     const testHumanUserName = 'e2ehumanusername'
@@ -25,20 +25,18 @@ describe.skip('humans', () => {
                 })
 
                 it('should add a user', () => {
-                    cy.contains('a', 'New').click() // TODO: select data-e2e
+                    cy.get('a[href="/users/create"]').click()
                     cy.url().should('contain', 'users/create')
-                    cy.get('[formcontrolname^=email]').type(username('e2ehuman'))
+                    cy.get('[formcontrolname="email"]').type(username('e2ehuman'))
                     //force needed due to the prefilled username prefix
-                    cy.get('[formcontrolname^=userName]').type(testHumanUserName, {force: true})
-                    cy.get('[formcontrolname^=firstName]').type('e2ehumanfirstname')
-                    cy.get('[formcontrolname^=lastName]').type('e2ehumanlastname')
-                    cy.get('[formcontrolname^=phone]').type('+41 123456789')
-                    cy.get('button').filter(':contains("Create")').should('be.visible').click() // TODO: select data-e2e
-                    cy.contains('User created successfully') // TODO: select data-e2e
-                    cy.visit(humansPath);
-                    cy.wait(5_000) // TODO: eventual consistency ftw
-                    cy.contains('button', 'refresh').click()
-                    cy.contains("tr", testHumanUserName)
+                    cy.get('[formcontrolname="userName"]').type(testHumanUserName, {force: true})
+                    cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname')
+                    cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname')
+                    cy.get('[formcontrolname="phone"]').type('+41 123456789')
+                    cy.get('[type="submit"]').should('be.visible').click()
+                    cy.get('.data-e2e-success')
+                    cy.wait(1000)
+                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })        
             })
             
@@ -50,25 +48,15 @@ describe.skip('humans', () => {
                 })
 
                 it('should delete a human user', () => {
-                    cy.get('h1')
-                        .contains('Users') // TODO: select data-e2e
-                        .parent()
-                        .contains("tr", testHumanUserName, { timeout: 1000 })
+                    cy.contains("tr", testHumanUserName, { timeout: 1000 })
                         .find('button')
                         //force due to angular hidden buttons
                         .click({force: true})
-                    cy.get('span.title')
-                        .contains('Delete User') // TODO: select data-e2e
-                        .parent()
-                        .find('button')
-                        .contains('Delete') // TODO: select data-e2e
-                        .click()
-                    cy.contains('mat-dialog-container', 'Delete User').find('input').type(username(testHumanUserName, Cypress.env('org'))) // TODO: select data-e2e
-                    cy.contains('mat-dialog-container button', 'Delete').click() // TODO: select data-e2e
-                    cy.contains('User deleted successfully') // TODO: select data-e2e
-                    cy.wait(5_000) // TODO: eventual consistency ftw
-                    cy.contains('button', 'refresh').click() // TODO: select data-e2e
-                    cy.get(`[text*=${testHumanUserName}]`).should('not.exist');                    
+                    cy.get('mat-dialog-container input').type(username(testHumanUserName, Cypress.env('org')))
+                    cy.get('[e2e-data="confirm-dialog-button"]').click()
+                    cy.get('.data-e2e-success')
+                    cy.wait(1000)
+                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })
         })

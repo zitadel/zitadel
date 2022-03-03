@@ -16,7 +16,7 @@
   </button>
   <span class="fill-space"></span>
   <button color="warn" [disabled]="data.confirmation && confirm !== data.confirmation" mat-raised-button
-    class="ok-button" (click)="closeDialogWithSuccess()">
+    class="ok-button" (click)="closeDialogWithSuccess()" [attr.e2e-data]="'confirm-dialog-button'">
     {{data.confirmKey | translate}}
   </button>
 </div>

@@ -84,7 +84,7 @@ You can switch to `ng serve` for better development experience.
 
 ```
 $ # Stop the frontend container
-$ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop
+$ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop frontend-run
 
 $ # Change to the console directory
 $ cd ./console
