@@ -130,6 +130,7 @@
     }
 
     .shortcuts-avatar {
+      flex-shrink: 0;
       height: 40px;
       width: 40px;
       margin-right: 1rem;
@@ -166,9 +167,43 @@
       .icon,
       i {
         font-size: 1.5rem;
-        height: 1.5rem;
-        line-height: 1.5rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
         color: white;
+      }
+
+      .shortcuts-avatar-label {
+        font-size: 18px;
+        color: white;
+      }
+    }
+
+    .shortcut-col {
+      display: flex;
+      flex-direction: column;
+
+      .shortcut-item-desc {
+        font-size: 13px;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .fill-space {
+      flex: 1;
+    }
+
+    .shortcut-state-dot {
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
+      margin-left: 1rem;
+
+      &.active {
+        background-color: var(--success);
+      }
+
+      &.inactive {
+        background-color: var(--warn);
       }
     }
   }

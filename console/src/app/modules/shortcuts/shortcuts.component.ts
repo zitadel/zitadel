@@ -2,7 +2,9 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { Component, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
+import { ProjectState } from 'src/app/proto/generated/zitadel/project_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
+import { ManagementService } from 'src/app/services/mgmt.service';
 import { StorageLocation, StorageService } from 'src/app/services/storage.service';
 
 import {
@@ -21,10 +23,12 @@ export interface ShortcutItem {
   routerLink: any;
   withRole: string[];
   icon?: string;
+  label?: string;
   svgIcon?: string;
   avatarSrc?: string;
   color?: string;
   disabled?: boolean;
+  state?: ProjectState;
 }
 
 const PROFILE_SHORTCUT: ShortcutItem = {
@@ -32,7 +36,7 @@ const PROFILE_SHORTCUT: ShortcutItem = {
   i18nTitle: 'USER.TITLE',
   icon: 'las la-cog',
   withRole: [''],
-  disabled: true,
+  disabled: false,
 };
 
 const CREATE_ORG: ShortcutItem = {
@@ -40,7 +44,7 @@ const CREATE_ORG: ShortcutItem = {
   routerLink: ['/org', 'create'],
   withRole: ['org.create', 'iam.write'],
   icon: 'las la-plus',
-  disabled: true,
+  disabled: false,
 };
 
 const CREATE_PROJECT: ShortcutItem = {
@@ -48,7 +52,15 @@ const CREATE_PROJECT: ShortcutItem = {
   routerLink: ['/projects', 'create'],
   withRole: ['project.create'],
   icon: 'las la-plus',
-  disabled: true,
+  disabled: false,
+};
+
+const CREATE_USER: ShortcutItem = {
+  i18nTitle: 'USER.CREATE.TITLE',
+  routerLink: ['/users', 'create'],
+  withRole: ['user.write'],
+  icon: 'las la-plus',
+  disabled: false,
 };
 
 @Component({
@@ -57,9 +69,12 @@ const CREATE_PROJECT: ShortcutItem = {
   styleUrls: ['./shortcuts.component.scss'],
 })
 export class ShortcutsComponent implements OnDestroy {
-  public main: ShortcutItem[] = [PROFILE_SHORTCUT, CREATE_ORG];
+  public org!: Org.AsObject;
+  public main: ShortcutItem[] = [];
   public secondary: ShortcutItem[] = [];
   public third: ShortcutItem[] = [];
+
+  public ALL_ROUTES = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT, CREATE_USER];
 
   public ALL_POLICIES = POLICIES.map((p) => {
     const policy: ShortcutItem = {
@@ -75,18 +90,54 @@ export class ShortcutsComponent implements OnDestroy {
     return policy;
   });
 
-  public all: ShortcutItem[] = this.ALL_POLICIES;
+  public ALL_PROJECTS: ShortcutItem[] = [];
+
+  public allPolicies: ShortcutItem[] = this.ALL_POLICIES;
+  public allProjects: ShortcutItem[] = this.ALL_PROJECTS;
+  public allRoutes: ShortcutItem[] = this.ALL_ROUTES;
 
   private destroy$: Subject<void> = new Subject();
   public editState: boolean = false;
-  constructor(private storageService: StorageService, private auth: GrpcAuthService) {
+  public ProjectState: any = ProjectState;
+  constructor(
+    private storageService: StorageService,
+    private auth: GrpcAuthService,
+    private mgmtService: ManagementService,
+  ) {
     const org: Org.AsObject | null = this.storageService.getItem('organization', StorageLocation.session);
     if (org && org.id) {
+      this.org = org;
       this.loadShortcuts(org);
     }
 
     this.auth.activeOrgChanged.pipe(takeUntil(this.destroy$)).subscribe((org) => {
       this.loadShortcuts(org);
+    });
+
+    this.loadProjectShortcuts();
+  }
+
+  public loadProjectShortcuts(): void {
+    this.mgmtService.ownedProjects.pipe(takeUntil(this.destroy$)).subscribe((projects) => {
+      if (projects) {
+        const mapped: ShortcutItem[] = projects.map((p) => {
+          const policy: ShortcutItem = {
+            title: p.name,
+            i18nDesc: 'PROJECT.PAGES.TYPE.OWNED',
+            routerLink: ['/projects', p.id],
+            withRole: ['project.read', `project.read:${p.id}`],
+            label: 'P',
+            disabled: false,
+            state: p.state,
+          };
+          return policy;
+        });
+
+        this.ALL_PROJECTS = mapped;
+        this.allProjects = this.ALL_PROJECTS;
+
+        this.loadShortcuts(this.org);
+      }
     });
   }
 
@@ -98,12 +149,7 @@ export class ShortcutsComponent implements OnDestroy {
         if (parsed) {
           switch (listName) {
             case 'main':
-              const f = parsed.filter(
-                (shortcut: ShortcutItem) =>
-                  JSON.stringify(shortcut) !== JSON.stringify(PROFILE_SHORTCUT) &&
-                  JSON.stringify(shortcut) !== JSON.stringify(CREATE_ORG),
-              );
-              this.main = [PROFILE_SHORTCUT, CREATE_ORG, ...f];
+              this.main = parsed;
               break;
             case 'secondary':
               this.secondary = parsed;
@@ -117,7 +163,7 @@ export class ShortcutsComponent implements OnDestroy {
       } else {
         switch (listName) {
           case 'main':
-            this.main = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT];
+            this.main = [PROFILE_SHORTCUT, CREATE_ORG, CREATE_PROJECT, CREATE_USER];
             break;
           case 'secondary':
             this.secondary = [LOGIN_POLICY, PRIVATELABEL_POLICY].map((p) => {
@@ -155,8 +201,18 @@ export class ShortcutsComponent implements OnDestroy {
 
   private organizeAllItems(): void {
     const list = [this.main, this.secondary, this.third].flat();
-    const filtered = this.ALL_POLICIES.filter((p) => !list.find((l) => l.i18nTitle === p.i18nTitle));
-    this.all = filtered;
+    const filteredPolicies = this.ALL_POLICIES.filter((p) => !list.find((l) => l.i18nTitle === p.i18nTitle));
+    this.allPolicies = filteredPolicies;
+
+    const filteredProjects = this.ALL_PROJECTS.filter((p) => !list.find((l) => l.title === p.title));
+    this.allProjects = filteredProjects;
+
+    const filteredRoutes = this.ALL_ROUTES.filter((p) => !list.find((l) => l.i18nTitle === p.i18nTitle));
+    this.allRoutes = filteredRoutes;
+
+    this.main === this.main.filter((s) => s.title && this.ALL_PROJECTS.map((p) => p.title).includes(s.title));
+    this.secondary === this.secondary.filter((s) => s.title && this.ALL_PROJECTS.map((p) => p.title).includes(s.title));
+    this.third === this.third.filter((s) => s.title && this.ALL_PROJECTS.map((p) => p.title).includes(s.title));
   }
 
   public ngOnDestroy(): void {
