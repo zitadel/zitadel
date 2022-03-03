@@ -197,10 +197,10 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			p.postTemplate,
 			w,
 			authRequestForm.RelayState,
-			"",
+			acsURL,
 			makeUnsupportedBindingResponse(
 				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
+				acsURL,
 				p.EntityID,
 				fmt.Errorf("unsupported binding").Error(),
 			),
@@ -226,7 +226,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			acsURL,
 			makeDeniedResponse(
 				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
+				acsURL,
 				p.EntityID,
 				fmt.Errorf("failed to verify request content: %w", err).Error(),
 			),
@@ -238,7 +238,14 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	authRequest, err := p.storage.CreateAuthRequest(r.Context(), authNRequest, acsURL, authRequestForm.RelayState, sp.ID)
+	authRequest, err := p.storage.CreateAuthRequest(
+		r.Context(),
+		authNRequest,
+		acsURL,
+		protocolBinding,
+		authRequestForm.RelayState,
+		sp.ID,
+	)
 	if err != nil {
 		logging.Log("SAML-8opi22s").Error(err)
 		if err := sendBackResponse(
@@ -250,7 +257,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			acsURL,
 			makeResponderFailResponse(
 				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
+				acsURL,
 				p.EntityID,
 				fmt.Errorf("failed to persist request %w", err).Error(),
 			),
@@ -276,7 +283,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			acsURL,
 			makeUnsupportedBindingResponse(
 				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
+				acsURL,
 				p.EntityID,
 				fmt.Errorf("unsupported binding: %s", authNRequest.ProtocolBinding).Error(),
 			),

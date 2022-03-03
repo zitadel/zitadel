@@ -27,7 +27,7 @@ type IDPStorage interface {
 }
 
 type AuthStorage interface {
-	CreateAuthRequest(context.Context, *samlp.AuthnRequest, string, string, string) (AuthRequestInt, error)
+	CreateAuthRequest(context.Context, *samlp.AuthnRequest, string, string, string, string) (AuthRequestInt, error)
 	AuthRequestByID(context.Context, string) (AuthRequestInt, error)
 	AuthRequestByCode(context.Context, string) (AuthRequestInt, error)
 	GetAttributesFromNameID(ctx context.Context, nameID string) (map[string]interface{}, error)

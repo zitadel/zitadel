@@ -25,11 +25,10 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 	}
 
 	authRequest, err := p.storage.AuthRequestByID(r.Context(), requestID)
-	protocolBinding := authRequest.GetBindingType()
 	if err != nil {
 		logging.Log("SAML-91jp3k").Error(err)
 		if err := sendBackResponse(
-			protocolBinding,
+			"",
 			r,
 			p.postTemplate,
 			w,
@@ -48,6 +47,8 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 		}
 		return
 	}
+	protocolBinding := authRequest.GetBindingType()
+	acsUrl := authRequest.GetAccessConsumerServiceURL()
 
 	if !authRequest.Done() {
 		logging.Log("SAML-91jp2k").Error(err)
@@ -94,10 +95,10 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 				p.postTemplate,
 				w,
 				authRequest.GetRelayState(),
-				"",
+				acsUrl,
 				makeResponderFailResponse(
 					"",
-					"",
+					acsUrl,
 					p.EntityID,
 					fmt.Errorf("failed to sign response: %w", err).Error(),
 				),
@@ -119,10 +120,10 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 				p.postTemplate,
 				w,
 				authRequest.GetRelayState(),
-				"",
+				acsUrl,
 				makeResponderFailResponse(
 					"",
-					"",
+					acsUrl,
 					p.EntityID,
 					fmt.Errorf("failed to sign response: %w", err).Error(),
 				),
@@ -142,7 +143,7 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 		p.postTemplate,
 		w,
 		authRequest.GetRelayState(),
-		authRequest.GetAccessConsumerServiceURL(),
+		acsUrl,
 		resp,
 		signature,
 		sigAlg,
