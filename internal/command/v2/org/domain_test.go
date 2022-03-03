@@ -2,8 +2,6 @@ package org
 
 import (
 	"context"
-	errs "errors"
-	"reflect"
 	"testing"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
@@ -12,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func TestAddDomainCommand(t *testing.T) {
+func TestAddDomain(t *testing.T) {
 	type args struct {
 		a      *org.Aggregate
 		domain string
@@ -21,7 +19,7 @@ func TestAddDomainCommand(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want want
+		want preparation.Want
 	}{
 		{
 			name: "invalid domain",
@@ -29,8 +27,8 @@ func TestAddDomainCommand(t *testing.T) {
 				a:      org.NewAggregate("test", "test"),
 				domain: "",
 			},
-			want: want{
-				validationErr: errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument"),
 			},
 		},
 		{
@@ -39,8 +37,8 @@ func TestAddDomainCommand(t *testing.T) {
 				a:      org.NewAggregate("test", "test"),
 				domain: "domain",
 			},
-			want: want{
-				commands: []eventstore.Command{
+			want: preparation.Want{
+				Commands: []eventstore.Command{
 					org.NewDomainAddedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
 				},
 			},
@@ -48,45 +46,89 @@ func TestAddDomainCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertValidation(t, AddDomainCommand(tt.args.a, tt.args.domain), tt.want)
+			preparation.AssertValidation(t, AddDomain(tt.args.a, tt.args.domain), tt.want)
 		})
 	}
 }
 
-type want struct {
-	validationErr error
-	createErr     error
-	commands      []eventstore.Command
+func TestVerifyDomain(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want preparation.Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "",
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "domain",
+			},
+			want: preparation.Want{
+				Commands: []eventstore.Command{
+					org.NewDomainVerifiedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			preparation.AssertValidation(t, VerifyDomain(tt.args.a, tt.args.domain), tt.want)
+		})
+	}
 }
 
-func assertValidation(t *testing.T, validation preparation.Validation, want want) {
-	t.Helper()
-
-	creates, err := validation()
-	if !errs.Is(err, want.validationErr) {
-		t.Errorf("wrong validation err = %v, want %v", err, want.validationErr)
-		return
-	}
-	if want.validationErr != nil {
-		return
-	}
-	cmds, err := creates(context.Background(), nil)
-	if !errs.Is(err, want.createErr) {
-		t.Errorf("wrong create err = %v, want %v", err, want.createErr)
-		return
-	}
-	if want.createErr != nil {
-		return
+func TestSetDomainPrimary(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		domain string
 	}
 
-	if len(cmds) != len(want.commands) {
-		t.Errorf("wrong length of commands = %d, want %d", len(cmds), len(want.commands))
-		return
+	tests := []struct {
+		name string
+		args args
+		want preparation.Want
+	}{
+		{
+			name: "invalid domain",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "",
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      org.NewAggregate("test", "test"),
+				domain: "domain",
+			},
+			want: preparation.Want{
+				Commands: []eventstore.Command{
+					org.NewDomainPrimarySetEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+				},
+			},
+		},
 	}
-
-	for i, cmd := range want.commands {
-		if !reflect.DeepEqual(cmd, cmds[i]) {
-			t.Errorf("unexpected command: = %v, want %v", cmds[i], cmd)
-		}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			preparation.AssertValidation(t, SetDomainPrimary(tt.args.a, tt.args.domain), tt.want)
+		})
 	}
 }

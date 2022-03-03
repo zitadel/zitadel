@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func AddOrgCommand(a *org.Aggregate, name string) preparation.Validation {
+func AddOrg(a *org.Aggregate, name string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument")

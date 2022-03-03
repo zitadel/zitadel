@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func AddDomainCommand(a *org.Aggregate, domain string) preparation.Validation {
+func AddDomain(a *org.Aggregate, domain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-r3h4J", "Errors.Invalid.Argument")
@@ -21,7 +21,7 @@ func AddDomainCommand(a *org.Aggregate, domain string) preparation.Validation {
 	}
 }
 
-func VerifyDomainCommand(a *org.Aggregate, domain string) preparation.Validation {
+func VerifyDomain(a *org.Aggregate, domain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument")
@@ -32,7 +32,7 @@ func VerifyDomainCommand(a *org.Aggregate, domain string) preparation.Validation
 	}
 }
 
-func SetDomainPrimaryCommand(a *org.Aggregate, domain string) preparation.Validation {
+func SetDomainPrimary(a *org.Aggregate, domain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if domain = strings.TrimSpace(domain); domain == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument")

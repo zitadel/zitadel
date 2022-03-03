@@ -33,10 +33,10 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 	userAgg := user_repo.NewAggregate(userID, orgID)
 
 	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter,
-		org.AddOrgCommand(orgAgg, o.Name),
-		org.AddDomainCommand(orgAgg, o.Domain),
-		org.VerifyDomainCommand(orgAgg, o.Domain),
-		org.SetDomainPrimaryCommand(orgAgg, o.Domain),
+		org.AddOrg(orgAgg, o.Name),
+		org.AddDomain(orgAgg, o.Domain),
+		org.VerifyDomain(orgAgg, o.Domain),
+		org.SetDomainPrimary(orgAgg, o.Domain),
 		// TODO: default domain
 		user.AddHumanCommand(userAgg, &o.Human),
 		org.AddMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
