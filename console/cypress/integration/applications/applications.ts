@@ -43,6 +43,7 @@ describe('applications', () => {
                 //TODO: check client ID/Secret
                 cy.get('.data-e2e-failure', {timeout: 4_000}).should('not.exist')
                 cy.get('[data-e2e=close-dialog]').click()
+                // TODO: Don't expect immediate consistency
                 cy.contains('arrow_back').click()
                 cy.contains('[data-e2e=app-card]', testAppName)
             })

@@ -5,7 +5,8 @@ import { login, User, username } from "../../support/login/users";
 describe('machines', () => {
 
     const machinesPath = `${Cypress.env('consoleUrl')}/users/list/machines`
-    const testMachineUserName = 'e2emachineusername'
+    const testMachineUserNameAdd = 'e2emachineusernameadd'
+    const testMachineUserNameRemove = 'e2emachineusernameremove'
     
     ;[User.OrgOwner].forEach(user => {
 
@@ -21,7 +22,7 @@ describe('machines', () => {
 
                 before(`ensure it doesn't exist already`, () => {
                     apiAuth().then(apiCallProperties => {
-                        ensureUserDoesntExist(apiCallProperties, testMachineUserName)
+                        ensureUserDoesntExist(apiCallProperties, testMachineUserNameAdd)
                     })
                 })
 
@@ -29,32 +30,32 @@ describe('machines', () => {
                     cy.get('a[href="/users/create-machine"]').click()
                     cy.url().should('contain', 'users/create-machine')
                     //force needed due to the prefilled username prefix
-                    cy.get('[formcontrolname="userName"]').type(testMachineUserName,{force: true})
+                    cy.get('[formcontrolname="userName"]').type(testMachineUserNameAdd,{force: true})
                     cy.get('[formcontrolname="name"]').type('e2emachinename')
                     cy.get('[formcontrolname="description"]').type('e2emachinedescription')
                     cy.get('[type="submit"]').should('be.visible').click()
                     cy.get('.data-e2e-success')
-                    cy.wait(1000)
+                    cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })
 
-            describe.only('remove', () => {
+            describe('remove', () => {
                 before('ensure it exists', () => {
                     apiAuth().then(api => {
-                        ensureMachineUserExists(api, testMachineUserName)
+                        ensureMachineUserExists(api, testMachineUserNameRemove)
                     })
                 })
 
                 it('should delete a machine', () => {
-                    cy.contains("tr", testMachineUserName, { timeout: 1000 })
+                    cy.contains("tr", testMachineUserNameRemove, { timeout: 1000 })
                         .find('button')
                         //force due to angular hidden buttons
                         .click({force: true})
-                    cy.get('mat-dialog-container input').type(username(testMachineUserName, Cypress.env('org')))
+                    cy.get('[e2e-data="confirm-dialog-input"]').type(username(testMachineUserNameRemove, Cypress.env('org')))
                     cy.get('[e2e-data="confirm-dialog-button"]').click()
                     cy.get('.data-e2e-success')
-                    cy.wait(1000)
+                    cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })

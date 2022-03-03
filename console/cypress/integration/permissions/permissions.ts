@@ -42,7 +42,7 @@ describe('permissions', () => {
                     cy.get('[formcontrolname="group"]').type(testRoleGroup)
                     cy.get('[type="submit"]').should('be.visible').click()
                     cy.get('.data-e2e-success')
-                    cy.wait(1000)
+                    cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })

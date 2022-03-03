@@ -5,7 +5,8 @@ import { login, User, username } from "../../support/login/users";
 describe('humans', () => {
 
     const humansPath = `${Cypress.env('consoleUrl')}/users/list/humans`
-    const testHumanUserName = 'e2ehumanusername'
+    const testHumanUserNameAdd = 'e2ehumanusernameadd'
+    const testHumanUserNameRemove = 'e2ehumanusernameremove'
 
     ;[User.OrgOwner].forEach(user => {
  
@@ -20,7 +21,7 @@ describe('humans', () => {
             describe('add', () => {
                 before(`ensure it doesn't exist already`, () => {
                     apiAuth().then(apiCallProperties => {
-                        ensureUserDoesntExist(apiCallProperties, testHumanUserName)
+                        ensureUserDoesntExist(apiCallProperties, testHumanUserNameAdd)
                     })
                 })
 
@@ -29,13 +30,13 @@ describe('humans', () => {
                     cy.url().should('contain', 'users/create')
                     cy.get('[formcontrolname="email"]').type(username('e2ehuman'))
                     //force needed due to the prefilled username prefix
-                    cy.get('[formcontrolname="userName"]').type(testHumanUserName, {force: true})
+                    cy.get('[formcontrolname="userName"]').type(testHumanUserNameAdd, {force: true})
                     cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname')
                     cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname')
                     cy.get('[formcontrolname="phone"]').type('+41 123456789')
                     cy.get('[type="submit"]').should('be.visible').click()
                     cy.get('.data-e2e-success')
-                    cy.wait(1000)
+                    cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })        
             })
@@ -43,19 +44,19 @@ describe('humans', () => {
             describe('remove', () => {
                 before('ensure it exists', () => {
                     apiAuth().then(api => {
-                        ensureHumanUserExists(api, testHumanUserName)
+                        ensureHumanUserExists(api, testHumanUserNameRemove)
                     })                    
                 })
 
                 it('should delete a human user', () => {
-                    cy.contains("tr", testHumanUserName, { timeout: 1000 })
+                    cy.contains("tr", testHumanUserNameRemove, { timeout: 1000 })
                         .find('button')
                         //force due to angular hidden buttons
                         .click({force: true})
-                    cy.get('mat-dialog-container input').type(username(testHumanUserName, Cypress.env('org')))
+                    cy.get('[e2e-data="confirm-dialog-input"]').type(username(testHumanUserNameRemove, Cypress.env('org')))
                     cy.get('[e2e-data="confirm-dialog-button"]').click()
                     cy.get('.data-e2e-success')
-                    cy.wait(1000)
+                    cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })

@@ -7,7 +7,7 @@
 
   <cnsl-form-field *ngIf="data.confirmation && data.confirmationKey" class="formfield">
     <cnsl-label>{{data.confirmationKey | translate: {value: data.confirmation} }}</cnsl-label>
-    <input cnslInput [(ngModel)]="confirm" />
+    <input cnslInput [(ngModel)]="confirm" [attr.e2e-data]="'confirm-dialog-input'"/>
   </cnsl-form-field>
 </div>
 <div mat-dialog-actions class="action">

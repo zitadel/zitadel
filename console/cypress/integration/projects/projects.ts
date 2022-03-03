@@ -4,7 +4,9 @@ import { login, User } from "../../support/login/users";
 
 describe("projects", ()=> {
 
-    const testProjectName = 'e2eproject'
+    const testProjectNameCreate = 'e2eprojectcreate'
+    const testProjectNameDeleteList = 'e2eprojectdeletelist'
+    const testProjectNameDeleteGrid = 'e2eprojectdeletegrid'
 
     ;[User.OrgOwner].forEach(user => {
 
@@ -12,63 +14,67 @@ describe("projects", ()=> {
 
             beforeEach(()=> {
                 login(user)
-                cy.visit(`${Cypress.env('consoleUrl')}/projects`)
             })
 
             describe('add project', () => {
-                before(`ensure it doesn't exist already`, () => {
+                beforeEach(`ensure it doesn't exist already`, () => {
                     apiAuth().then(api => {
-                        ensureProjectDoesntExist(api, testProjectName)
+                        ensureProjectDoesntExist(api, testProjectNameCreate)
                     })
+                    cy.visit(`${Cypress.env('consoleUrl')}/projects`)
                 })
 
                 it('should add a project', () => {
                     cy.get('.add-project-button').click({ force: true })
-                    cy.get('input').type(testProjectName)
+                    cy.get('input').type(testProjectNameCreate)
                     cy.get('[type^=submit]').click()
-                    cy.get('h1').should('contain', `Project ${testProjectName}`) // TODO: select data-e2e
-                    cy.get('a').contains('arrow_back').click()
-                    cy.get('[data-e2e=grid-card]').contains(testProjectName)
-                    cy.get('[data-e2e=toggle-grid]').click()
-                    cy.contains("tr", testProjectName)
+                    cy.get('.data-e2e-success')
+                    cy.wait(200)
+                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 })
             })
 
             describe('remove project', () => {
-                beforeEach('ensure it exists', () => {
-                    apiAuth().then(api => {
-                        ensureProjectExists(api, testProjectName)
+
+                describe('list view', () => {
+                    beforeEach('ensure it exists', () => {
+                        apiAuth().then(api => {
+                            ensureProjectExists(api, testProjectNameDeleteList)
+                        })
+                        cy.visit(`${Cypress.env('consoleUrl')}/projects`)
                     })
+
+                    it('removes the project', () => {
+                        cy.get('[data-e2e=toggle-grid]').click()
+                        cy.get('[data-cy=timestamp]')
+                        cy.contains("tr", testProjectNameDeleteList, { timeout: 1000 })
+                            .find('[data-e2e=delete-project-button]')
+                            .click({force: true})
+                        cy.get('[e2e-data="confirm-dialog-button"]').click()
+                        cy.get('.data-e2e-success')
+                        cy.wait(200)
+                        cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
+                    })    
                 })
 
-                afterEach('project should be deleted', () => {
-                    cy.get('span.title')
-                        .contains('Delete Project') // TODO: select data-e2e
-                        .parent()
-                        .find('button')
-                        .contains('Delete') // TODO: select data-e2e
-                        .click()
-                    cy.contains('Deleted Project') // TODO: select data-e2e
-                    cy.get(`[text*=${testProjectName}]`).should('not.exist');
-                    cy.get('[data-e2e=toggle-grid]').click()
-                    cy.get(`[text*=${testProjectName}]`).should('not.exist');
-                })
+                describe('grid view', () => {
+                    beforeEach('ensure it exists', () => {
+                        apiAuth().then(api => {
+                            ensureProjectExists(api, testProjectNameDeleteGrid)
+                        })
+                        cy.visit(`${Cypress.env('consoleUrl')}/projects`)
+                    })
 
-                it('via list view', () => {
-                    cy.get('[data-e2e=toggle-grid]').click()
-                    cy.get('[data-cy=timestamp]')
-                    cy.contains('h1', 'Projects') // TODO: select data-e2e
-                        .parent()
-                        .contains("tr", testProjectName, { timeout: 1000 })
-                        .find('[data-e2e=delete-project-button]')
-                        .click({force: true})
-                })
-
-                it('via grid view', () => {
-                    cy.contains('[data-e2e=grid-card]', testProjectName)
-                        .find('[data-e2e=delete-project-button]')
-                        .trigger('mouseover')
-                        .click()
+                    it('removes the project', () => {
+                        cy.contains('[data-e2e=grid-card]', testProjectNameDeleteGrid)
+                            .find('[data-e2e=delete-project-button]')
+                            .trigger('mouseover')
+                            .click()
+                        cy.get('[e2e-data="confirm-dialog-button"]').click()
+                        cy.get('.data-e2e-success')
+                        cy.wait(200)
+                        cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
+                    })
                 })
             })
         })
