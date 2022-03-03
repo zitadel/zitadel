@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"github.com/caos/zitadel/operator/common"
 
-	"gopkg.in/yaml.v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"github.com/caos/orbos/mntr"
@@ -130,6 +129,7 @@ spec:
                   Use Version and OverwriteVersion methods instead.
                 type: string
               iam:
+                x-kubernetes-preserve-unknown-fields: true
                 type: object
               kind:
                 type: string
@@ -483,6 +483,7 @@ spec:
                 type: string
               database:
                 type: object
+                x-kubernetes-preserve-unknown-fields: true
               kind:
                 type: string
               spec:
