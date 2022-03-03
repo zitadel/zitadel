@@ -73,12 +73,12 @@ func AuthRequestFromBusiness(authReq *domain.AuthRequest) (_ AuthRequestInt, err
 	return &AuthRequest{authReq}, nil
 }
 
-func CreateAuthRequestToBusiness(ctx context.Context, authReq *samlp.AuthnRequest, issuerID, relayState, userAgentID string) *domain.AuthRequest {
+func CreateAuthRequestToBusiness(ctx context.Context, authReq *samlp.AuthnRequest, acsUrl, issuerID, relayState, userAgentID string) *domain.AuthRequest {
 	return &domain.AuthRequest{
 		CreationDate:  time.Now(),
 		AgentID:       userAgentID,
 		ApplicationID: issuerID,
-		CallbackURI:   authReq.AssertionConsumerServiceURL,
+		CallbackURI:   acsUrl,
 		TransferState: relayState,
 		Request: &domain.AuthRequestSAML{
 			ID:          authReq.Id,

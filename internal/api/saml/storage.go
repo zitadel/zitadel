@@ -89,7 +89,7 @@ func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyC
 	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLResponseSinging)
 }
 
-func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest, relayState, issuerID string) (_ AuthRequestInt, err error) {
+func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest, acsUrl, relayState, issuerID string) (_ AuthRequestInt, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, ok := middleware.UserAgentIDFromCtx(ctx)
@@ -97,7 +97,7 @@ func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.Auth
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
 
-	authRequest := CreateAuthRequestToBusiness(ctx, req, issuerID, relayState, userAgentID)
+	authRequest := CreateAuthRequestToBusiness(ctx, req, acsUrl, issuerID, relayState, userAgentID)
 
 	resp, err := p.repo.CreateAuthRequest(ctx, authRequest)
 	if err != nil {

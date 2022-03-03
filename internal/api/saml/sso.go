@@ -193,7 +193,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		logging.Log("SAML-83711s").Error(err)
 		if err := sendBackResponse(
 			protocolBinding,
-			r, p.postTemplate, w, authRequestForm.RelayState, "", makeUnsupportedBindingResponse(
+			r,
+			p.postTemplate,
+			w,
+			authRequestForm.RelayState,
+			"",
+			makeUnsupportedBindingResponse(
 				authNRequest.Id,
 				authNRequest.AssertionConsumerServiceURL,
 				p.EntityID,
@@ -214,7 +219,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		logging.Log("SAML-8kj22s").Error(err)
 		if err := sendBackResponse(
 			protocolBinding,
-			r, p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
+			r,
+			p.postTemplate,
+			w,
+			authRequestForm.RelayState,
+			acsURL,
+			makeDeniedResponse(
 				authNRequest.Id,
 				authNRequest.AssertionConsumerServiceURL,
 				p.EntityID,
@@ -228,7 +238,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	authRequest, err := p.storage.CreateAuthRequest(r.Context(), authNRequest, authRequestForm.RelayState, sp.ID)
+	authRequest, err := p.storage.CreateAuthRequest(r.Context(), authNRequest, acsURL, authRequestForm.RelayState, sp.ID)
 	if err != nil {
 		logging.Log("SAML-8opi22s").Error(err)
 		if err := sendBackResponse(
@@ -237,7 +247,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			p.postTemplate,
 			w,
 			authRequestForm.RelayState,
-			"",
+			acsURL,
 			makeResponderFailResponse(
 				authNRequest.Id,
 				authNRequest.AssertionConsumerServiceURL,
@@ -259,7 +269,12 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		logging.Log("SAML-67722s").Error(err)
 		if err := sendBackResponse(
 			protocolBinding,
-			r, p.postTemplate, w, authRequestForm.RelayState, "", makeUnsupportedBindingResponse(
+			r,
+			p.postTemplate,
+			w,
+			authRequestForm.RelayState,
+			acsURL,
+			makeUnsupportedBindingResponse(
 				authNRequest.Id,
 				authNRequest.AssertionConsumerServiceURL,
 				p.EntityID,
