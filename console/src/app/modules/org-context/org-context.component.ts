@@ -54,7 +54,7 @@ export class OrgContextComponent implements OnInit {
     }
 
     this.orgLoading$.next(true);
-    this.orgs$ = from(this.auth.listMyProjectOrgs(10, 0, query ? [query] : undefined)).pipe(
+    this.orgs$ = from(this.auth.listMyProjectOrgs(undefined, 0, query ? [query] : undefined)).pipe(
       map((resp) => {
         return resp.resultList.sort((left, right) => left.name.localeCompare(right.name));
       }),
