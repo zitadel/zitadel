@@ -10,16 +10,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-/*
-type Client interface {
-	GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (Connection, error)
-	DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error
-	AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error
-	ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error)
-}
-
-*/
-
 const (
 	CertsSecret  = "user-certs" // TODO: make dynamic
 	CACert       = "ca.crt"

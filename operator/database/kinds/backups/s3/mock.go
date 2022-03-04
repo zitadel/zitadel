@@ -1,5 +1,7 @@
 package s3
 
+/* Deprecated in V2
+
 import (
 	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket/backup"
@@ -10,13 +12,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
-
-func SetQueriedForDatabases(databases, users []string) map[string]interface{} {
-	queried := map[string]interface{}{}
-	//	core.SetQueriedForDatabaseDBList(queried, databases, users)
-
-	return queried
-}
 
 func SetInstantBackup(
 	k8sClient *kubernetesmock.MockClientInt,
@@ -146,3 +141,5 @@ func SetRestore(
 	k8sClient.EXPECT().WaitUntilJobCompleted(namespace, restore.GetJobName(backupName), gomock.Any()).Times(1).Return(nil)
 	k8sClient.EXPECT().DeleteJob(namespace, restore.GetJobName(backupName)).Times(1).Return(nil)
 }
+
+*/

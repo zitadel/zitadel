@@ -248,7 +248,6 @@ func AdaptFunc(
 
 		queryCfg := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc operator.EnsureFunc, err error) {
 			return concatQueriers(
-				//				queryDB,
 				getQueryC,
 				operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(
 					monitor,
@@ -265,15 +264,11 @@ func AdaptFunc(
 		queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				/*				allZitadelUsers, err := getAllUsers(k8sClient, desiredKind)
-								if err != nil {
-									return nil, err
-								}
-				*/
+
 				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespace, action))
-				querySetup := getQuerySetup( /*allZitadelUsers, */ getConfigurationHashes)
+				querySetup := getQuerySetup(getConfigurationHashes)
 				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespace, action))
-				queryD := queryD( /*allZitadelUsers, */ getConfigurationHashes)
+				queryD := queryD(getConfigurationHashes)
 
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {

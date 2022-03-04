@@ -97,21 +97,6 @@ func GetContainer(
 			},
 		}},
 	}
-	/*
-		sort.Strings(users)
-		for _, user := range users {
-			envVars = append(envVars, corev1.EnvVar{
-				Name: "CR_" + strings.ToUpper(user) + "_PASSWORD",
-				ValueFrom: &corev1.EnvVarSource{
-					SecretKeyRef: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{Name: secretPasswordsName},
-						Key:                  user,
-					},
-				},
-			})
-		}
-
-	*/
 
 	crpwSecret, crpwKey := dbConn.PasswordSecret()
 	if crpwSecret != nil {

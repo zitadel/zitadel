@@ -97,12 +97,6 @@ func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPassw
 			Name: "FLYWAY_PLACEHOLDERS_" + strings.ToUpper(user) + "PASSWORD",
 			// TODO: Drop users in a new migration
 			Value: "'to-be-deleted'",
-			/*			ValueFrom: &corev1.EnvVarSource{
-						SecretKeyRef: &corev1.SecretKeySelector{
-							LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-							Key:                  user,
-						},
-					},*/
 		})
 	}
 	return vars

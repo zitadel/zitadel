@@ -22,17 +22,6 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 )
 
-/*
-var _ db.Connection = (*GitOpsClient)(nil)
-var _ db.Connection = (*CrdClient)(nil)
-
-type GitOpsClient struct {
-	Monitor   mntr.Monitor
-	gitClient *git.Client
-}
-
-*/
-
 func NewConnection(monitor mntr.Monitor, k8sClient kubernetes.ClientInt, gitops bool, orbconfig *orb.Orb) (db.Connection, error) {
 	if gitops {
 		return newGitOpsConnection(monitor, k8sClient, orbconfig.URL, orbconfig.Repokey)
@@ -65,17 +54,6 @@ func newGit(monitor mntr.Monitor, repoURL string, repoKey string) (*git.Client, 
 	return gitClient, nil
 }
 
-/*
-func (c *GitOpsClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, func(string) string, error) {
-	return gitOpsGetConnectionInfo(
-		monitor,
-		k8sClient,
-		c.gitClient,
-	)
-}
-
-*/
-
 type CrdClient struct {
 	Monitor mntr.Monitor
 }
@@ -87,91 +65,6 @@ func newCrdConnection(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (db.
 		return database.ReadCrd(k8sClient)
 	})
 }
-
-/*
-func (c *CrdClient) GetConnectionInfo(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) (string, string, func(string) string, error) {
-	return crdGetConnectionInfo(
-		monitor,
-		k8sClient,
-	)
-}
-
-func crdGetConnectionInfo(
-	monitor mntr.Monitor,
-	k8sClient kubernetes.ClientInt,
-) (db.Connection, error) {
-
-	return connection(monitor, k8sClient, false, func() (*tree.Tree, error) {
-		return zitadel.ReadCrd(k8sClient)
-	}, func() (*tree.Tree, error) {
-		return database.ReadCrd(k8sClient)
-	})
-}
-
-func gitOpsGetConnectionInfo(
-	monitor mntr.Monitor,
-	k8sClient kubernetes.ClientInt,
-	gitClient *git.Client,
-) (db.Connection, error) {
-
-	return connection(monitor, k8sClient, true, func() (*tree.Tree, error) {
-		return gitClient.ReadTree(git.ZitadelFile)
-	}, func() (*tree.Tree, error) {
-		return gitClient.ReadTree(git.DatabaseFile)
-	})
-}
-*/
-
-/*
-func (c *GitOpsClient) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return GitOpsDeleteUser(
-		monitor,
-		user,
-		k8sClient,
-		c.gitClient,
-	)
-}
-
-func (c *GitOpsClient) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return GitOpsAddUser(
-		monitor,
-		user,
-		k8sClient,
-		c.gitClient,
-	)
-}
-
-func (c *GitOpsClient) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
-	return GitOpsListUsers(
-		monitor,
-		k8sClient,
-		c.gitClient,
-	)
-}
-
-func (c *CrdClient) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return CrdDeleteUser(
-		monitor,
-		user,
-		k8sClient,
-	)
-}
-
-func (c *CrdClient) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return CrdAddUser(
-		monitor,
-		user,
-		k8sClient,
-	)
-}
-
-func (c *CrdClient) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
-	return CrdListUsers(
-		monitor,
-		k8sClient,
-	)
-}
-*/
 
 func connection(
 	monitor mntr.Monitor,

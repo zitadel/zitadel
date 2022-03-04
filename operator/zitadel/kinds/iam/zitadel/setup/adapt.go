@@ -62,7 +62,7 @@ func AdaptFunc(
 	}
 
 	return func(
-			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{} /*, necessaryUsers map[string]string*/) (map[string]string, error),
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				jobDef := jobDef(
@@ -83,7 +83,7 @@ func AdaptFunc(
 					dbConn,
 				)
 
-				hashes, err := getConfigurationHashes(k8sClient, queried /*, necessaryUsers*/)
+				hashes, err := getConfigurationHashes(k8sClient, queried)
 				if err != nil {
 					return nil, err
 				}

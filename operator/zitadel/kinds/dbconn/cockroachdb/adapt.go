@@ -114,21 +114,6 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(pwQuerier))
 				}
 
-				/*
-
-					if password != "" {
-						certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
-							: certificate,
-						})
-						if err != nil {
-							return nil, err
-						}
-						queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
-
-					}
-
-				*/
-
 				db.SetQueriedForDatabase(queried, current)
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			}, func(k8sClient kubernetes.ClientInt) error { return nil },

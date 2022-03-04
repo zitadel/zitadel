@@ -60,16 +60,3 @@ func (c *Current) ConnectionParams(certsDir string) string {
 
 	return strings.Join(params, "&")
 }
-
-/*
-func (c *Current) DeleteUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return nil
-}
-func (c *Current) AddUser(monitor mntr.Monitor, user string, k8sClient kubernetes.ClientInt) error {
-	return nil
-}
-
-func (c *Current) ListUsers(monitor mntr.Monitor, k8sClient kubernetes.ClientInt) ([]string, error) {
-	return nil, nil
-}
-*/
