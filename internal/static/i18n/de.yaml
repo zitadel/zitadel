@@ -177,22 +177,22 @@ Errors:
       NotChanged: Default Message Text wurde nicht verändert
       AlreadyExists: Default Message Text existiert bereits
       Invalid: Default Message Text ist ungültig
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
       NotExisting: Passwort Komplexitäts Policy existiert nicht
       AlreadyExists: Passwort Komplexitäts Policy existiert bereits
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Password Lockout Policy konnte nicht gefunden werden
       Empty: Passwort Lockout Policy ist leer
       NotExisting: Passwort Lockout Policy existiert nicht
       AlreadyExists: Passwort Lockout Policy existiert bereits
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Password Age Policy konnte nicht gefunden werden
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Org IAM Policy ist leer
       NotExisting: Org IAM Policy existiert nicht
       AlreadyExists: Org IAM Policy existiert bereits
