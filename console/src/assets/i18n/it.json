@@ -873,6 +873,7 @@
       "DESCRIPTION": "Imposta i tuoi link all'informativa sulla privacy e ai termini di servizio",
       "TOSLINK": "Link ai termini di servizio",
       "POLICYLINK": "Link all'informativa sulla privacy",
+      "HELPLINK": "link per l'aiuto",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"

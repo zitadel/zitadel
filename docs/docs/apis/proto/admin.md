@@ -684,6 +684,7 @@ Returns the privacy policy defined by the administrators of ZITADEL
 
 Updates the default privacy policy of ZITADEL
 it impacts all organisations without a customised policy
+Variable {{.Lang}} can be set to have different links based on the language
 
 
 
@@ -3359,6 +3360,7 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
+| help_link |  string | - |  |
 
 
 

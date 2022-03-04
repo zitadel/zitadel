@@ -93,7 +93,6 @@ title: zitadel/text.proto
 | tos |  string | - | string.max_len: 200<br />  |
 | privacy_policy |  string | - | string.max_len: 200<br />  |
 | help |  string | - | string.max_len: 200<br />  |
-| help_link |  string | - | string.max_len: 500<br />  |
 
 
 

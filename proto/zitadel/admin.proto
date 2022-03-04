@@ -1574,6 +1574,7 @@ service AdminService {
 
     //Updates the default privacy policy of ZITADEL
     // it impacts all organisations without a customised policy
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy";
@@ -3407,6 +3408,7 @@ message GetPrivacyPolicyResponse {
 message UpdatePrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdatePrivacyPolicyResponse {

@@ -873,6 +873,7 @@
       "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",
       "TOSLINK": "Link to Terms of Service",
       "POLICYLINK": "Link to Privacy Policy",
+      "HELPLINK": "Link to Help",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
