@@ -198,12 +198,6 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
             });
 
             this.selection.select(...toSelect);
-            // this.selection.clear();
-            // toSelect.forEach((toSel) => {
-            //   if ((this.selection.selected as Project.AsObject[]).findIndex((isSel) => isSel.id === toSel.id) === -1) {
-            //     this.selection.select(toSel);
-            //   }
-            // });
           }
         });
         break;
@@ -220,16 +214,6 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
             });
 
             this.selection.select(...toSelect);
-            // this.selection.clear();
-            // toSelect.forEach((toSel) => {
-            //   if (
-            //     (this.selection.selected as GrantedProject.AsObject[]).findIndex(
-            //       (isSel) => isSel.projectId === toSel.projectId,
-            //     ) === -1
-            //   ) {
-            //     this.selection.select(toSel);
-            //   }
-            // });
           }
         });
         break;

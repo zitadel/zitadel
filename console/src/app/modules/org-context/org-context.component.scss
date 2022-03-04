@@ -37,12 +37,53 @@
     overflow-y: auto;
     width: 100%;
 
-    button {
+    .org-button-with-pin {
       min-height: 36px;
       position: relative;
       overflow: hidden;
-      text-align: start;
-      text-overflow: ellipsis;
+
+      .org-flex-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .org-span {
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        button {
+          height: 36px;
+          width: 36px;
+          font-size: 1.2rem;
+          line-height: 1rem;
+          margin-right: -0.5rem;
+          visibility: hidden;
+          opacity: 0.5;
+
+          &:hover {
+            opacity: 1;
+          }
+
+          mat-icon {
+            font-size: 20px;
+            height: 20px;
+            width: 20px;
+          }
+        }
+      }
+
+      &.border-bottom {
+        border-bottom: 1px solid #66666630;
+      }
+
+      &:hover {
+        .org-flex-row {
+          button {
+            visibility: visible;
+          }
+        }
+      }
     }
   }
 }
