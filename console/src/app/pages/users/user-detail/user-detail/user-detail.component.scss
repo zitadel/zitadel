@@ -92,6 +92,8 @@
     margin: 0 -2rem;
     padding: 0 2rem 1rem 2rem;
     background-color: if($is-dark-theme, #00000020, #605f5f0f);
+    box-sizing: border-box;
+    min-height: 184px;
 
     @media only screen and (max-width: 500px) {
       margin: 0 -1rem;

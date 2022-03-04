@@ -1,4 +1,6 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AfterViewInit, Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { map, Observable } from 'rxjs';
 
 export enum ActionKeysType {
   ADD,
@@ -65,10 +67,15 @@ export class ActionKeysComponent implements AfterViewInit {
       }
     }
   }
+  public isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
+    map((result) => {
+      return result.matches;
+    }),
+  );
 
   public ActionKeysType: any = ActionKeysType;
 
-  constructor() {}
+  constructor(public breakpointObserver: BreakpointObserver) {}
 
   ngAfterViewInit(): void {
     window.focus();

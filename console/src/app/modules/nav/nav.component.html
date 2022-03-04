@@ -40,22 +40,21 @@
 
           <ng-container *ngSwitchCase="BreadcrumbType.ORG">
             <div class="nav-row-abs" @navroworg>
-              <a matTooltip="{{'MENU.TOOLTIP.HOME' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                [routerLinkActiveOptions]="{ exact: true }" [routerLink]="[ '/']">
+              <a class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }"
+                [routerLink]="[ '/']">
                 <span class="label">{{'MENU.DASHBOARD' | translate}}</span>
               </a>
 
               <ng-container class="org-list" *ngIf="org" [@navAnimation]="org">
                 <ng-template cnslHasRole [hasRole]="['org.read']">
-                  <a matTooltip="{{'MENU.TOOLTIP.ORG' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                    [routerLinkActiveOptions]="{ exact: false }" [routerLink]="[ '/org']">
+                  <a class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
+                    [routerLink]="[ '/org']">
                     <span class="label">{{'MENU.ORGANIZATION' | translate}}</span>
                   </a>
                 </ng-template>
 
                 <ng-template cnslHasRole [hasRole]="['project.read(:[0-9]*)?']">
-                  <a matTooltip="{{'MENU.TOOLTIP.SELFPROJECTS' | translate}}" class="nav-item"
-                    [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
+                  <a class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: false }"
                     [routerLink]="[ '/projects']">
 
                     <div class="c_label">
@@ -69,24 +68,22 @@
                 </ng-template>
 
                 <ng-template cnslHasRole [hasRole]="['user.read(:[0-9]*)?']">
-                  <a matTooltip="{{'MENU.TOOLTIP.HUMANUSERS' | translate}}" class="nav-item"
-                    [routerLinkActive]="['active']" [routerLink]="[ '/users']"
+                  <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/users']"
                     [routerLinkActiveOptions]="{ exact: false }">
                     <span class="label">{{ 'MENU.HUMANUSERS' | translate }}</span>
                   </a>
                 </ng-template>
 
                 <ng-template cnslHasRole [hasRole]="['user.grant.read(:[0-9]*)?']">
-                  <a matTooltip="{{'MENU.TOOLTIP.AUTHZ' | translate}}" class="nav-item" [routerLinkActive]="['active']"
-                    [routerLink]="[ '/grants']" [routerLinkActiveOptions]="{ exact: true }">
+                  <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/grants']"
+                    [routerLinkActiveOptions]="{ exact: true }">
                     <span class="label">{{ 'MENU.GRANTS' | translate }}</span>
                   </a>
                 </ng-template>
 
                 <ng-template cnslHasFeature [hasFeature]="['actions']">
                   <ng-template cnslHasRole [hasRole]="['org.action.read']">
-                    <a matTooltip="{{'MENU.TOOLTIP.ACTIONS' | translate}}" class="nav-item"
-                      [routerLinkActive]="['active']" [routerLink]="[ '/actions']"
+                    <a class="nav-item" [routerLinkActive]="['active']" [routerLink]="[ '/actions']"
                       [routerLinkActiveOptions]="{ exact: true }">
                       <span class="label">{{ 'MENU.ACTIONS' | translate }}</span>
                     </a>
