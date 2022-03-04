@@ -27,7 +27,7 @@ describe("projects", ()=> {
                 it('should add a project', () => {
                     cy.get('.add-project-button').click({ force: true })
                     cy.get('input').type(testProjectNameCreate)
-                    cy.get('[type^=submit]').click()
+                    cy.get('[data-e2e="continue-button"]').click()
                     cy.get('.data-e2e-success')
                     cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')

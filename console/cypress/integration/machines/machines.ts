@@ -33,7 +33,7 @@ describe('machines', () => {
                     cy.get('[formcontrolname="userName"]').type(testMachineUserNameAdd,{force: true})
                     cy.get('[formcontrolname="name"]').type('e2emachinename')
                     cy.get('[formcontrolname="description"]').type('e2emachinedescription')
-                    cy.get('[type="submit"]').should('be.visible').click()
+                    cy.get('[data-e2e="create-button"]').click()
                     cy.get('.data-e2e-success')
                     cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')

@@ -40,7 +40,7 @@ export class ToastService {
 
     private showMessage(message: string, action: string, success: boolean): Observable<void> {
         const ref = this.snackBar.open(message, action, { 
-            duration: 400000,
+            duration: 4000,
             panelClass: success ? "data-e2e-success" : "data-e2e-failure"
          });
 

@@ -40,7 +40,7 @@ describe('permissions', () => {
                     cy.get('[formcontrolname="key"]').type(testRoleName)
                     cy.get('[formcontrolname="displayName"]').type(testRoleDisplay)
                     cy.get('[formcontrolname="group"]').type(testRoleGroup)
-                    cy.get('[type="submit"]').should('be.visible').click()
+                    cy.get('[data-e2e="save-button"]').click()
                     cy.get('.data-e2e-success')
                     cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')

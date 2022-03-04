@@ -80,11 +80,11 @@ $ npm run e2e:open
 
 ### Developing the Frontend
 
-You can switch to `ng serve` for better development experience.
+You can switch to `ng serve` for better developer experience.
 
 ```
 $ # Stop the frontend container
-$ docker compose -f ./build/local/docker-compose-local.yml --profile frontend stop frontend-run
+$ docker stop local-frontend-run-1
 
 $ # Change to the console directory
 $ cd ./console
@@ -100,6 +100,9 @@ $ npm run e2e
 
 $ # Or open the end-to-end test suite interactively
 $ npm run e2e:open
+
+$ # If you want, you can stop `ng serve`, rebuild, and rerun the frontend in a new container
+$ docker compose -f ./build/local/docker-compose-local.yml --profile frontend up --detach --build
 ```
 
 

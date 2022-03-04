@@ -25,27 +25,25 @@ describe('applications', () => {
             it('add app', () => {
                 cy.get('mat-spinner')
                 cy.get('mat-spinner').should('not.exist')
-                cy.get('[data-e2e=app-card-add]').should('be.visible').click()
-                cy.get('[formcontrolname^=name]').type(testAppName)
+                cy.get('[data-e2e="app-card-add"]').should('be.visible').click()
                 // select webapp
-                cy.get('[for^=WEB]').click()
-                cy.get('[type=submit]').should('be.visible').eq(0).click()
+                cy.get('[formcontrolname="name"]').type(testAppName)
+                cy.get('[for="WEB"]').click()
+                cy.get('[data-e2e="continue-button-nameandtype"]').click()
                 //select authentication
-                cy.get('[for^=PKCE]').click()
-                cy.get('[type=submit]').should('be.visible').eq(1).click()
+                cy.get('[for="PKCE"]').click()
+                cy.get('[data-e2e="continue-button-authmethod"]').click()
                 //enter URL
                 cy.get('cnsl-redirect-uris').eq(0).type("https://testurl.org")
                 cy.get('cnsl-redirect-uris').eq(1).type("https://testlogouturl.org")
-                cy.get('[type=submit]').should('be.visible').click()
-                cy.get('[type=submit]').should('be.visible').click().then(() => {
+                cy.get('[data-e2e="continue-button-redirecturis"]').click()
+                cy.get('[data-e2e="create-button"]').click().then(() => {
                     cy.get('[id*=overlay]').should('exist')
-                }) 
+                })
+                cy.get('.data-e2e-success')
+                cy.wait(200)
+                cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
                 //TODO: check client ID/Secret
-                cy.get('.data-e2e-failure', {timeout: 4_000}).should('not.exist')
-                cy.get('[data-e2e=close-dialog]').click()
-                // TODO: Don't expect immediate consistency
-                cy.contains('arrow_back').click()
-                cy.contains('[data-e2e=app-card]', testAppName)
             })
         })
     }) 

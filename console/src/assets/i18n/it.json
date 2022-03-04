@@ -1232,10 +1232,12 @@
       "MEMBERSADDED": "Manager aggiunto con successo.",
       "MEMBERADDED": "Manager aggiunto con successo.",
       "MEMBERCHANGED": "Manager cambiato con successo.",
+      "ROLESCREATED": "Ruoli creato con successo.",
       "ROLEREMOVED": "Ruolo rimosso con successo.",
       "ROLECHANGED": "Ruolo cambiato con successo.",
       "REACTIVATED": "Riattivato con successo.",
       "DEACTIVATED": "Disattivato con successo.",
+      "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
       "DELETED": "Progetto rimosso con successo."
@@ -1572,6 +1574,7 @@
       "OIDCUPDATED": "Configurazione OIDC aggiornata.",
       "APIUPDATED": "Configurazione API aggiornata",
       "UPDATED": "App aggiornata.",
+      "CREATED": "App creato.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",
       "DELETED": "App rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"

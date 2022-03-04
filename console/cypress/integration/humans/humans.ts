@@ -34,7 +34,7 @@ describe('humans', () => {
                     cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname')
                     cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname')
                     cy.get('[formcontrolname="phone"]').type('+41 123456789')
-                    cy.get('[type="submit"]').should('be.visible').click()
+                    cy.get('[data-e2e="create-button"]').click()
                     cy.get('.data-e2e-success')
                     cy.wait(200)
                     cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')

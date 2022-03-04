@@ -35,7 +35,7 @@
                 </cnsl-type-radio>
                 <div class="actions">
                     <button mat-raised-button [disabled]="firstFormGroup.invalid" color="primary"
-                        matStepperNext [attr.data-e2e]="'continue-button'">{{'ACTIONS.CONTINUE' | translate}}</button>
+                        matStepperNext [attr.data-e2e]="'continue-button-nameandtype'">{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -55,7 +55,7 @@
                     <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' |
                         translate}}</button>
                     <button mat-raised-button color="primary" [disabled]="secondFormGroup.invalid"
-                        matStepperNext [attr.data-e2e]="'continue-button'">{{'ACTIONS.CONTINUE' | translate}}</button>
+                        matStepperNext [attr.data-e2e]="'continue-button-authmethod'">{{'ACTIONS.CONTINUE' | translate}}</button>
                 </div>
             </form>
         </mat-step>
@@ -92,7 +92,7 @@
 
             <div class="actions">
                 <button mat-stroked-button color="primary" matStepperPrevious>{{'ACTIONS.BACK' | translate}}</button>
-                <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button'">{{'ACTIONS.CONTINUE' | translate}}</button>
+                <button mat-raised-button color="primary" matStepperNext [attr.data-e2e]="'continue-button-redirecturis'">{{'ACTIONS.CONTINUE' | translate}}</button>
             </div>
         </mat-step>
 
@@ -195,7 +195,7 @@
     </mat-horizontal-stepper>
 
     <div *ngIf="devmode" class="dev">
-        <form [formGroup]="form" (ngSubmit)="createApp()">
+        <form [formGroup]="form" (ngSubmit)="createApp()" [attr.data-e2e]="'create-app-wizzard-3'">
             <div class="content">
                 <cnsl-form-field appearance="outline" class="formfield">
                     <cnsl-label>{{ 'APP.NAME' | translate }}</cnsl-label>

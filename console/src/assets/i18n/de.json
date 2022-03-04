@@ -1232,10 +1232,12 @@
       "MEMBERSADDED": "Manager hinzugefügt.",
       "MEMBERADDED": "Manager hinzugefügt.",
       "MEMBERCHANGED": "Manager geändert.",
+      "ROLESCREATED": "Rollen erstellt.",
       "ROLEREMOVED": "Rolle entfernt.",
       "ROLECHANGED": "Rolle geändert.",
       "REACTIVATED": "Reaktiviert",
       "DEACTIVATED": "Deaktiviert",
+      "CREATED": "Projekt erstellt.",
       "UPDATED": "Projekt gespeichert.",
       "GRANTUPDATED": "Berechtigung geändert.",
       "DELETED": "Projekt gelöscht."
@@ -1572,6 +1574,7 @@
       "OIDCUPDATED": "OIDC-Konfiguration geändert.",
       "APIUPDATED": "API Konfiguration geändert.",
       "UPDATED": "App geändert.",
+      "CREATED": "App erstellt.",
       "CLIENTSECRETREGENERATED": "Client Secret generiert.",
       "DELETED": "App gelöscht.",
       "CONFIGCHANGED": "Konfigurationsänderung entdeckt."
