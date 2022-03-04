@@ -1575,7 +1575,7 @@
       "OIDCUPDATED": "Configurazione OIDC aggiornata.",
       "APIUPDATED": "Configurazione API aggiornata",
       "UPDATED": "App aggiornata.",
-      "CREATED": "App creato.",
+      "CREATED": "App creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",
       "DELETED": "App rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"
