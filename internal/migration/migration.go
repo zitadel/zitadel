@@ -17,6 +17,11 @@ const (
 	aggregateID   = "SYSTEM"
 )
 
+type Migration interface {
+	String() string
+	Execute(context.Context) error
+}
+
 func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration) (err error) {
 	if should, err := shouldExec(ctx, es, migration); !should || err != nil {
 		return err
@@ -26,7 +31,7 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 		return err
 	}
 
-	err = migration.Execute()
+	err = migration.Execute(ctx)
 	logging.OnError(err).Error("migration failed")
 
 	_, err = es.Push(ctx, setupDoneCmd(migration, err))
@@ -45,6 +50,10 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		return false, err
 	}
 
+	if events[len(events)-1].Type() == startedType {
+		return false, nil
+	}
+
 	for _, e := range events {
 		step := new(SetupStep)
 
@@ -53,7 +62,7 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 			return false, err
 		}
 
-		if step.Name != migration.Name() {
+		if step.Name != migration.String() {
 			continue
 		}
 
@@ -63,14 +72,9 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 			return false, nil
 		case failedType:
 			//TODO: how to allow retries?
-			logging.WithFields("migration", migration.Name()).Error("failed before")
+			logging.WithFields("migration", migration.String()).Error("failed before")
 			return false, errors.ThrowInternal(nil, "MIGRA-mjI2E", "migration failed before")
 		}
 	}
 	return true, nil
-}
-
-type Migration interface {
-	Name() string
-	Execute() error
 }

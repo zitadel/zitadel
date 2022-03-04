@@ -39,7 +39,7 @@ func AssertValidation(t *testing.T, validation Validation, want Want) {
 	}
 
 	if len(cmds) != len(want.Commands) {
-		t.Errorf("wrong length of commands = %d, want %d", len(cmds), len(want.Commands))
+		t.Errorf("wrong length of commands = %v, want %v", eventTypes(cmds), eventTypes(want.Commands))
 		return
 	}
 
@@ -48,4 +48,12 @@ func AssertValidation(t *testing.T, validation Validation, want Want) {
 			t.Errorf("unexpected command: = %v, want %v", cmds[i], cmd)
 		}
 	}
+}
+
+func eventTypes(cmds []eventstore.Command) []eventstore.EventType {
+	types := make([]eventstore.EventType, len(cmds))
+	for i, cmd := range cmds {
+		types[i] = cmd.Type()
+	}
+	return types
 }

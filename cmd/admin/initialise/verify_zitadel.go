@@ -15,8 +15,9 @@ const (
 )
 
 var (
-	searchEventsTable = "SELECT table_name FROM [SHOW TABLES] WHERE table_name = 'events'"
-	searchSchema      = "SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1"
+	searchTable          = "SELECT table_name FROM [SHOW TABLES] WHERE table_name = $1"
+	searchSystemSequence = "SELECT sequence_name FROM [SHOW SEQUENCES] WHERE sequence_name = 'system_seq'"
+	searchSchema         = "SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1"
 	//go:embed sql/06_enable_hash_sharded_indexes.sql
 	enableHashShardedIdx string
 	//go:embed sql/07_events_table.sql
@@ -25,6 +26,10 @@ var (
 	createProjectionsStmt string
 	//go:embed sql/04_eventstore.sql
 	createEventstoreStmt string
+	//go:embed sql/08_system_sequence.sql
+	createSystemSequenceStmt string
+	//go:embed sql/09_unique_constraints_table.sql
+	createUniqueConstraints string
 )
 
 func newZitadel() *cobra.Command {
@@ -60,7 +65,15 @@ func verifyZitadel(config database.Config) error {
 		return err
 	}
 
-	if err := verify(db, exists(searchSchema, projectionsSchema), createEvents); err != nil {
+	if err := verify(db, exists(searchTable, "events"), createEvents); err != nil {
+		return err
+	}
+
+	if err := verify(db, exists(searchSystemSequence), exec(createSystemSequenceStmt)); err != nil {
+		return err
+	}
+
+	if err := verify(db, exists(searchTable, "unique_constraints"), exec(createUniqueConstraints)); err != nil {
 		return err
 	}
 

@@ -1,0 +1,21 @@
+S1AdminOrg:
+  Org:
+    Name: ZITADEL
+    Domain: localhost
+  User:
+    Human:
+      UserName: admin
+      Password: Password1!
+      Profile:
+        FirstName: admin
+        LastName: admin
+        NickName:
+        DisplayName:
+        PreferredLanguage:
+        Gender:
+      Email:
+        Email: admin@zitadel.ch
+        IsEmailVerified: true
+      Phone:
+        Phone:
+        IsPhoneVerified:

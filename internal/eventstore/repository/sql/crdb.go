@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
@@ -51,8 +52,11 @@ const (
 		" editor_user," +
 		" editor_service," +
 		" resource_owner," +
+		" event_sequence," +
 		" previous_aggregate_sequence," +
-		" previous_aggregate_type_sequence" +
+		" previous_aggregate_type_sequence," +
+		" tenant," +
+		" region" +
 		") " +
 		// defines the data to be inserted
 		"SELECT" +
@@ -65,8 +69,11 @@ const (
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner," +
+		" NEXTVAL(CONCAT('eventstore.', $9, '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
-		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
+		" aggregate_type_sequence AS previous_aggregate_type_sequence, " +
+		" $9::STRING AS tenant, " +
+		" $10::STRING AS region " +
 		"FROM previous_data " +
 		"RETURNING id, event_sequence, previous_aggregate_sequence, previous_aggregate_type_sequence, creation_date, resource_owner"
 
@@ -97,6 +104,10 @@ func (db *CRDB) Health(ctx context.Context) error { return db.client.Ping() }
 // Push adds all events to the eventstreams of the aggregates.
 // This call is transaction save. The transaction will be rolled back if one event fails
 func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueConstraints ...*repository.UniqueConstraint) error {
+	tenant := authz.GetTenant(ctx)
+	if tenant == "" {
+		return caos_errs.ThrowInvalidArgument(nil, "SQL-FBjXu", "Errors.Tenant.Missing")
+	}
 	err := crdb.ExecuteTx(ctx, db.client, nil, func(tx *sql.Tx) error {
 
 		var (
@@ -113,6 +124,8 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
+				tenant,
+				authz.GetRegion(ctx),
 			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousAggregateSequence = uint64(previousAggregateSequence)

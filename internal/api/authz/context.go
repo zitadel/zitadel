@@ -15,6 +15,8 @@ const (
 	requestPermissionsKey key = 1
 	dataKey               key = 2
 	allPermissionsKey     key = 3
+	tenantKey             key = 4
+	regionKey             key = 5
 )
 
 type CtxData struct {

@@ -16,6 +16,9 @@ func TestAddOrg(t *testing.T) {
 		name string
 	}
 
+	ctx := context.Background()
+	agg := org.NewAggregate("test", "test")
+
 	tests := []struct {
 		name string
 		args args
@@ -24,7 +27,7 @@ func TestAddOrg(t *testing.T) {
 		{
 			name: "invalid domain",
 			args: args{
-				a:    org.NewAggregate("test", "test"),
+				a:    agg,
 				name: "",
 			},
 			want: preparation.Want{
@@ -34,19 +37,22 @@ func TestAddOrg(t *testing.T) {
 		{
 			name: "correct",
 			args: args{
-				a:    org.NewAggregate("test", "test"),
-				name: "domain",
+				a:    agg,
+				name: "caos ag",
 			},
 			want: preparation.Want{
 				Commands: []eventstore.Command{
-					org.NewOrgAddedEvent(context.Background(), &org.NewAggregate("test", "test").Aggregate, "domain"),
+					org.NewOrgAddedEvent(ctx, &agg.Aggregate, "caos ag"),
+					org.NewDomainAddedEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
+					org.NewDomainVerifiedEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
+					org.NewDomainPrimarySetEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddOrg(tt.args.a, tt.args.name), tt.want)
+			preparation.AssertValidation(t, AddOrg(tt.args.a, tt.args.name, "localhost"), tt.want)
 		})
 	}
 }

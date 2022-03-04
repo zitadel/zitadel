@@ -27,20 +27,20 @@ The user provided by flags needs priviledge to
 - see other users and create a new one if the user does not exist
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Run: func(cmd *cobra.Command, args []string) {
 			config := Config{}
-			if err := viper.Unmarshal(&config); err != nil {
-				return err
-			}
-			if err := initialise(config,
+			err := viper.Unmarshal(&config)
+			logging.OnError(err).Fatal("unable to read config")
+
+			err = initialise(config,
 				verifyUser(config.Database),
 				verifyDatabase(config.Database),
 				verifyGrant(config.Database),
-			); err != nil {
-				return err
-			}
+			)
+			logging.OnError(err).Fatal("unable to initialize the database")
 
-			return verifyZitadel(config.Database)
+			err = verifyZitadel(config.Database)
+			logging.OnError(err).Fatal("unable to initialize ZITADEL")
 		},
 	}
 

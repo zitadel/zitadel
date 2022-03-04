@@ -7,8 +7,11 @@ import (
 )
 
 type Config struct {
-	AdminOrg       AdminOrg
 	Database       database.Config
 	SystemDefaults systemdefaults.SystemDefaults
 	InternalAuthZ  authz.Config
+}
+
+type Steps struct {
+	S1AdminOrg *AdminOrg
 }

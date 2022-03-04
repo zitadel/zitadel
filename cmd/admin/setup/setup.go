@@ -1,14 +1,23 @@
 package setup
 
 import (
+	"bytes"
+	"context"
 	_ "embed"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/api/authz"
+	command "github.com/caos/zitadel/internal/command/v2"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/migration"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	//go:embed steps.yaml
+	defaultSteps []byte
 )
 
 func New() *cobra.Command {
@@ -23,19 +32,31 @@ Requirements:
 			err := viper.Unmarshal(config)
 			logging.OnError(err).Fatal("unable to read config")
 
-			setup(config)
+			v := viper.New()
+			v.SetConfigType("yaml")
+			err = v.ReadConfig(bytes.NewBuffer(defaultSteps))
+			logging.OnError(err).Fatal("unable to read setup steps")
+
+			steps := new(Steps)
+			err = v.Unmarshal(steps)
+			logging.OnError(err).Fatal("unable to read steps")
+
+			setup(config, steps)
 		},
 	}
 }
 
-func setup(config *Config) {
+func setup(config *Config, steps *Steps) {
 	dbClient, err := database.Connect(config.Database)
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	eventstoreClient, err := eventstore.Start(dbClient)
 	logging.OnError(err).Fatal("unable to start eventstore")
 
-	commands, err := command.StartCommands(eventstoreClient, config.SystemDefaults, config.InternalAuthZ, nil, nil, nil, nil, nil, nil)
-	logging.OnError(err).Fatal("unable to start commands")
+	cmd := command.New(eventstoreClient, "localhost")
 
+	steps.S1AdminOrg.cmd = cmd
+
+	ctx := authz.WithTenant(context.Background(), "system")
+	migration.Migrate(ctx, eventstoreClient, steps.S1AdminOrg)
 }

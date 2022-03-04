@@ -7,13 +7,14 @@ type SetupStep struct {
 	typ       eventstore.EventType
 	migration Migration
 	Name      string `json:"name"`
+	done      bool
 }
 
 func setupStartedCmd(migration Migration) eventstore.Command {
 	return &SetupStep{
 		migration: migration,
 		typ:       startedType,
-		Name:      migration.Name(),
+		Name:      migration.String(),
 	}
 }
 
@@ -21,7 +22,7 @@ func setupDoneCmd(migration Migration, err error) eventstore.Command {
 	s := &SetupStep{
 		typ:       doneType,
 		migration: migration,
-		Name:      migration.Name(),
+		Name:      migration.String(),
 	}
 
 	if err != nil {
@@ -59,10 +60,10 @@ func (s *SetupStep) Data() interface{} {
 func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
 	if s.typ == startedType {
 		return []*eventstore.EventUniqueConstraint{
-			eventstore.NewAddEventUniqueConstraint("migration_started", s.migration.Name(), "Errors.Step.Started.AlreadyExists"),
+			eventstore.NewAddEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
 		}
 	}
 	return []*eventstore.EventUniqueConstraint{
-		eventstore.NewAddEventUniqueConstraint("migration_done", s.migration.Name(), "Errors.Step.Done.AlreadyExists"),
+		eventstore.NewAddEventUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
 	}
 }
