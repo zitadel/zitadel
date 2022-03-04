@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/templates"
 	"github.com/caos/zitadel/internal/renderer"
 	"github.com/caos/zitadel/internal/static"
 )
@@ -28,6 +29,10 @@ type Renderer struct {
 	*renderer.Renderer
 	pathPrefix    string
 	staticStorage static.Storage
+}
+
+type LanguageData struct {
+	Lang string
 }
 
 func CreateRenderer(pathPrefix string, staticDir http.FileSystem, staticStorage static.Storage, cookieName string, defaultLanguage language.Tag) *Renderer {
@@ -345,24 +350,23 @@ func (l *Login) getBaseData(r *http.Request, authReq *domain.AuthRequest, title 
 		CSRF:                   csrf.TemplateField(r),
 		Nonce:                  http_mw.GetNonce(r),
 	}
+	var privacyPolicy *domain.PrivacyPolicy
 	if authReq != nil {
 		baseData.LoginPolicy = authReq.LoginPolicy
 		baseData.LabelPolicy = authReq.LabelPolicy
 		baseData.IDPProviders = authReq.AllowedExternalIDPs
-		if authReq.PrivacyPolicy != nil {
-			baseData.TOSLink = authReq.PrivacyPolicy.TOSLink
-			baseData.PrivacyLink = authReq.PrivacyPolicy.PrivacyLink
+		if authReq.PrivacyPolicy == nil {
+			return baseData
 		}
+		privacyPolicy = authReq.PrivacyPolicy
 	} else {
-		privacyPolicy, err := l.query.DefaultPrivacyPolicy(r.Context())
+		policy, err := l.query.DefaultPrivacyPolicy(r.Context())
 		if err != nil {
 			return baseData
 		}
-		if privacyPolicy != nil {
-			baseData.TOSLink = privacyPolicy.TOSLink
-			baseData.PrivacyLink = privacyPolicy.PrivacyLink
-		}
+		privacyPolicy = policy.ToDomain()
 	}
+	baseData = l.setLinksOnBaseData(baseData, privacyPolicy)
 	return baseData
 }
 
@@ -390,6 +394,26 @@ func (l *Login) getProfileData(authReq *domain.AuthRequest) profileData {
 		DisplayName: displayName,
 		AvatarKey:   avatar,
 	}
+}
+
+func (l *Login) setLinksOnBaseData(baseData baseData, privacyPolicy *domain.PrivacyPolicy) baseData {
+	lang := LanguageData{
+		Lang: baseData.Lang,
+	}
+	baseData.TOSLink = privacyPolicy.TOSLink
+	baseData.PrivacyLink = privacyPolicy.PrivacyLink
+	baseData.HelpLink = privacyPolicy.HelpLink
+
+	if link, err := templates.ParseTemplateText(privacyPolicy.TOSLink, lang); err == nil {
+		baseData.TOSLink = link
+	}
+	if link, err := templates.ParseTemplateText(privacyPolicy.PrivacyLink, lang); err == nil {
+		baseData.PrivacyLink = link
+	}
+	if link, err := templates.ParseTemplateText(privacyPolicy.HelpLink, lang); err == nil {
+		baseData.HelpLink = link
+	}
+	return baseData
 }
 
 func (l *Login) getErrorMessage(r *http.Request, err error) (errID, errMsg string) {
@@ -519,6 +543,7 @@ type baseData struct {
 	DisplayLoginNameSuffix bool
 	TOSLink                string
 	PrivacyLink            string
+	HelpLink               string
 	AuthReqID              string
 	CSRF                   template.HTML
 	Nonce                  string
