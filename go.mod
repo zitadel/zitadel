@@ -21,8 +21,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.16.1
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
-	github.com/caos/oidc v0.15.11
-	github.com/caos/orbos v1.5.14-0.20211105133355-c3d718cf3a4d
+	github.com/caos/oidc v1.0.0
+	github.com/caos/orbos v1.5.14-0.20220114130251-011d127bc256
 	github.com/cockroachdb/cockroach-go/v2 v2.2.1
 	github.com/dop251/goja v0.0.0-20211019164913-00bb30d12573
 	github.com/dop251/goja_nodejs v0.0.0-20210920152751-582170a1676b
@@ -92,5 +92,3 @@ require (
 	k8s.io/client-go v0.22.2
 	sigs.k8s.io/controller-runtime v0.10.2
 )
-
-replace github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.4
