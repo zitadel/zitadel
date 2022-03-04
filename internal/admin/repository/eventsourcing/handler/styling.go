@@ -232,7 +232,8 @@ const fontFaceTemplate = `
 
 func (m *Styling) uploadFilesToBucket(aggregateID, contentType string, reader io.Reader, size int64) error {
 	fileName := domain.CssPath + "/" + domain.CssVariablesFileName
-	_, err := m.static.PutObject(context.Background(), aggregateID, fileName, contentType, reader, size, true)
+	//TODO: handle tenantID and location as soon as possible
+	_, err := m.static.PutObject(context.Background(), "0", "", aggregateID, fileName, contentType, static.ObjectTypeStyling, reader, size)
 	return err
 }
 

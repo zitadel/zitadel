@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/static"
 )
 
 func (c *Commands) AddLabelPolicy(ctx context.Context, resourceOwner string, policy *domain.LabelPolicy) (*domain.LabelPolicy, error) {
@@ -189,7 +190,7 @@ func (c *Commands) RemoveLogoLabelPolicy(ctx context.Context, orgID string) (*do
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-4MVsf", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, orgID, existingPolicy.LogoKey)
+	err = c.removeAsset(ctx, orgID, existingPolicy.LogoKey)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +246,7 @@ func (c *Commands) RemoveIconLabelPolicy(ctx context.Context, orgID string) (*do
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-1nd9f", "Errors.Org.LabelPolicy.NotFound")
 	}
 
-	err = c.RemoveAsset(ctx, orgID, existingPolicy.IconKey)
+	err = c.removeAsset(ctx, orgID, existingPolicy.IconKey)
 	if err != nil {
 		return nil, err
 	}
@@ -300,7 +301,7 @@ func (c *Commands) RemoveLogoDarkLabelPolicy(ctx context.Context, orgID string) 
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-0peQw", "Errors.Org.LabelPolicy.NotFound")
 	}
-	err = c.RemoveAsset(ctx, orgID, existingPolicy.LogoDarkKey)
+	err = c.removeAsset(ctx, orgID, existingPolicy.LogoDarkKey)
 	if err != nil {
 		return nil, err
 	}
@@ -447,7 +448,7 @@ func (c *Commands) removeLabelPolicy(ctx context.Context, existingPolicy *OrgLab
 		return nil, caos_errs.ThrowNotFound(nil, "Org-3M9df", "Errors.Org.LabelPolicy.NotFound")
 	}
 
-	err = c.RemoveAssetsFolder(ctx, existingPolicy.AggregateID, domain.LabelPolicyPrefix+"/", true)
+	err = c.removeAssetsFolder(ctx, existingPolicy.AggregateID, static.ObjectTypeStyling)
 	if err != nil {
 		return nil, err
 	}
@@ -463,7 +464,7 @@ func (c *Commands) removeLabelPolicyIfExists(ctx context.Context, orgID string) 
 	if existingPolicy.State != domain.PolicyStateActive {
 		return nil, nil
 	}
-	err = c.RemoveAssetsFolder(ctx, orgID, domain.LabelPolicyPrefix+"/", true)
+	err = c.removeAssetsFolder(ctx, orgID, static.ObjectTypeStyling)
 	if err != nil {
 		return nil, err
 	}
@@ -472,7 +473,7 @@ func (c *Commands) removeLabelPolicyIfExists(ctx context.Context, orgID string) 
 }
 
 func (c *Commands) removeLabelPolicyAssets(ctx context.Context, existingPolicy *OrgLabelPolicyWriteModel) (*org.LabelPolicyAssetsRemovedEvent, error) {
-	err := c.RemoveAssetsFolder(ctx, existingPolicy.AggregateID, domain.LabelPolicyPrefix+"/", true)
+	err := c.removeAssetsFolder(ctx, existingPolicy.AggregateID, static.ObjectTypeStyling)
 	if err != nil {
 		return nil, err
 	}

@@ -132,12 +132,11 @@ func startZitadel(config *startConfig) error {
 	if err != nil {
 		return fmt.Errorf("cannot start client for projection: %w", err)
 	}
-	var storage static.Storage
-	//TODO: enable when storage is implemented again
-	//if *assetsEnabled {
-	//storage, err = config.AssetStorage.Config.NewStorage()
-	//logging.Log("MAIN-Bfhe2").OnError(err).Fatal("Unable to start asset storage")
-	//}
+	storage, err := config.AssetStorage.NewStorage(dbClient)
+	if err != nil {
+		return fmt.Errorf("cannot start asset storage client: %w", err)
+	}
+
 	eventstoreClient, err := eventstore.Start(dbClient)
 	if err != nil {
 		return fmt.Errorf("cannot start eventstore for queries: %w", err)

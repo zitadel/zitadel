@@ -46,7 +46,7 @@ func (c *Commands) RemoveHumanAvatar(ctx context.Context, orgID, userID string) 
 	if existingUser.UserState == domain.UserStateUnspecified || existingUser.UserState == domain.UserStateDeleted {
 		return nil, caos_errs.ThrowNotFound(nil, "USER-35N8f", "Errors.Users.NotFound")
 	}
-	err = c.RemoveAsset(ctx, orgID, existingUser.Avatar)
+	err = c.removeAsset(ctx, orgID, existingUser.Avatar)
 	if err != nil {
 		return nil, err
 	}

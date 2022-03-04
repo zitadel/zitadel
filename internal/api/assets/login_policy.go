@@ -9,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/static"
 )
 
 func (h *Handler) UploadDefaultLabelPolicyLogo() Uploader {
@@ -44,6 +45,10 @@ func (l *labelPolicyLogoUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *labelPolicyLogoUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
 func (l *labelPolicyLogoUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -67,20 +72,20 @@ func (l *labelPolicyLogoUploader) BucketName(ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, info.Key)
+			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, info.Name)
 			return err
 		}
-		_, err := commands.AddLogoDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddLogoDefaultLabelPolicy(ctx, info.Name)
 		return err
 	}
 	if l.darkMode {
-		_, err := commands.AddLogoDarkLabelPolicy(ctx, orgID, info.Key)
+		_, err := commands.AddLogoDarkLabelPolicy(ctx, orgID, info.Name)
 		return err
 	}
-	_, err := commands.AddLogoLabelPolicy(ctx, orgID, info.Key)
+	_, err := commands.AddLogoLabelPolicy(ctx, orgID, info.Name)
 	return err
 }
 
@@ -171,6 +176,10 @@ func (l *labelPolicyIconUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *labelPolicyIconUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
 func (l *labelPolicyIconUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -194,21 +203,21 @@ func (l *labelPolicyIconUploader) BucketName(ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, info.Key)
+			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, info.Name)
 			return err
 		}
-		_, err := commands.AddIconDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddIconDefaultLabelPolicy(ctx, info.Name)
 		return err
 	}
 
 	if l.darkMode {
-		_, err := commands.AddIconDarkLabelPolicy(ctx, orgID, info.Key)
+		_, err := commands.AddIconDarkLabelPolicy(ctx, orgID, info.Name)
 		return err
 	}
-	_, err := commands.AddIconLabelPolicy(ctx, orgID, info.Key)
+	_, err := commands.AddIconLabelPolicy(ctx, orgID, info.Name)
 	return err
 }
 
@@ -290,6 +299,10 @@ func (l *labelPolicyFontUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *labelPolicyFontUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeStyling
+}
+
 func (l *labelPolicyFontUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -310,12 +323,12 @@ func (l *labelPolicyFontUploader) BucketName(ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
+func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
 	if l.defaultPolicy {
-		_, err := commands.AddFontDefaultLabelPolicy(ctx, info.Key)
+		_, err := commands.AddFontDefaultLabelPolicy(ctx, info.Name)
 		return err
 	}
-	_, err := commands.AddFontLabelPolicy(ctx, orgID, info.Key)
+	_, err := commands.AddFontLabelPolicy(ctx, orgID, info.Name)
 	return err
 }
 

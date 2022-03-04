@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -666,15 +667,20 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 			CreationDate:  policy.CreationDate,
 			ChangeDate:    policy.ChangeDate,
 		},
-		Default:               policy.IsDefault,
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIDP:      policy.AllowExternalIDPs,
-		ForceMFA:              policy.ForceMFA,
-		SecondFactors:         policy.SecondFactors,
-		MultiFactors:          policy.MultiFactors,
-		PasswordlessType:      policy.PasswordlessType,
-		HidePasswordReset:     policy.HidePasswordReset,
+		Default:                    policy.IsDefault,
+		AllowUsernamePassword:      policy.AllowUsernamePassword,
+		AllowRegister:              policy.AllowRegister,
+		AllowExternalIDP:           policy.AllowExternalIDPs,
+		ForceMFA:                   policy.ForceMFA,
+		SecondFactors:              policy.SecondFactors,
+		MultiFactors:               policy.MultiFactors,
+		PasswordlessType:           policy.PasswordlessType,
+		HidePasswordReset:          policy.HidePasswordReset,
+		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
+		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
+		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
+		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
+		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
 	}
 }
 

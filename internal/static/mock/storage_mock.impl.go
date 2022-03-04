@@ -14,21 +14,21 @@ func NewStorage(t *testing.T) *MockStorage {
 
 func (m *MockStorage) ExpectAddObjectNoError() *MockStorage {
 	m.EXPECT().
-		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(nil, nil)
 	return m
 }
 
 func (m *MockStorage) ExpectAddObjectError() *MockStorage {
 	m.EXPECT().
-		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
+		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(nil, caos_errors.ThrowInternal(nil, "", ""))
 	return m
 }
 
 func (m *MockStorage) ExpectRemoveObjectNoError() *MockStorage {
 	m.EXPECT().
-		RemoveObject(gomock.Any(), gomock.Any(), gomock.Any()).
+		RemoveObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(nil)
 	return m
 }
@@ -42,7 +42,7 @@ func (m *MockStorage) ExpectRemoveObjectsNoError() *MockStorage {
 
 func (m *MockStorage) ExpectRemoveObjectError() *MockStorage {
 	m.EXPECT().
-		RemoveObject(gomock.Any(), gomock.Any(), gomock.Any()).
+		RemoveObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(caos_errors.ThrowInternal(nil, "", ""))
 	return m
 }

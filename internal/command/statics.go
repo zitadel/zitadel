@@ -4,24 +4,29 @@ import (
 	"context"
 	"io"
 
-	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/static"
 )
 
-func (c *Commands) UploadAsset(ctx context.Context, bucketName, objectName, contentType string, file io.Reader, size int64) (*domain.AssetInfo, error) {
+func (c *Commands) UploadAsset(ctx context.Context, resourceOwner, objectName, contentType string, objectType static.ObjectType, file io.Reader, size int64) (*static.Asset, error) {
+	//TODO: handle tenantID and location as soon as possible
 	return c.static.PutObject(ctx,
-		bucketName,
+		"0",
+		"",
+		resourceOwner,
 		objectName,
 		contentType,
+		objectType,
 		file,
 		size,
-		true,
 	)
 }
 
-func (c *Commands) RemoveAsset(ctx context.Context, bucketName, storeKey string) error {
-	return c.static.RemoveObject(ctx, bucketName, storeKey)
+func (c *Commands) removeAsset(ctx context.Context, resourceOwner, storeKey string) error {
+	//TODO: handle tenantID as soon as possible
+	return c.static.RemoveObject(ctx, "0", resourceOwner, storeKey)
 }
 
-func (c *Commands) RemoveAssetsFolder(ctx context.Context, bucketName, path string, recursive bool) error {
-	return c.static.RemoveObjects(ctx, bucketName, path, recursive)
+func (c *Commands) removeAssetsFolder(ctx context.Context, resourceOwner string, objectType static.ObjectType) error {
+	//TODO: handle tenantID as soon as possible
+	return c.static.RemoveObjects(ctx, "0", resourceOwner, objectType)
 }

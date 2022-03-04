@@ -7,6 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/static"
 )
 
 func (h *Handler) UploadMyUserAvatar() Uploader {
@@ -27,6 +28,10 @@ func (l *myHumanAvatarUploader) ContentTypeAllowed(contentType string) bool {
 	return false
 }
 
+func (l *myHumanAvatarUploader) ObjectType() static.ObjectType {
+	return static.ObjectTypeUserAvatar
+}
+
 func (l *myHumanAvatarUploader) MaxFileSize() int64 {
 	return l.maxSize
 }
@@ -39,8 +44,8 @@ func (l *myHumanAvatarUploader) BucketName(ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 
-func (l *myHumanAvatarUploader) Callback(ctx context.Context, info *domain.AssetInfo, orgID string, commands *command.Commands) error {
-	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Key)
+func (l *myHumanAvatarUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
+	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Name)
 	return err
 }
 
