@@ -573,6 +573,10 @@ EventTypes:
       cascade:
         removed: Berechtigung entfernt
         changed: Berechtigung geändert
+      metadata:
+        set: Benutzer Metadaten gesetzt
+        removed: Benutzer Metadaten gelöscht
+          all: Alle Benutzer Metadaten gelöscht
   org:
     added: Organisation hinzugefügt
     changed: Organisation geändert
