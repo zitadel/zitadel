@@ -75,7 +75,8 @@
         </svg>
 
         <div class="breadcrumb-context">
-          <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
+          <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [ngClass]="{'maxwidth': bc.length > 1}"
+            [routerLink]="bread.routerLink">
             <ng-container *ngIf="i !== bc.length - 1; else defLabel">
               <span class="desk">{{bread.name}}</span>
               <span class="mob">...</span>

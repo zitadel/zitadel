@@ -56,7 +56,6 @@ export class ChangesComponent implements OnInit, OnDestroy {
   @Input() public sortDirectionAsc: boolean = true;
   @Input() public refresh!: Observable<void>;
   public bottom: boolean = false;
-  public limitHeight: boolean = false;
 
   private _done: BehaviorSubject<any> = new BehaviorSubject(false);
   private _loading: BehaviorSubject<any> = new BehaviorSubject(false);

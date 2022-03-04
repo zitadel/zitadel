@@ -23,6 +23,8 @@
 
   .header-wrapper {
     padding: 0.5rem 1rem;
+    height: 60px;
+    box-sizing: border-box;
     background-color: map-get($background, toolbar) !important;
 
     @media only screen and (min-width: 500px) {
@@ -165,7 +167,7 @@
           @media only screen and (max-width: 500px) {
             padding: 0;
 
-            span {
+            span.maxwidth {
               max-width: 50px;
             }
 

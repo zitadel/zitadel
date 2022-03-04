@@ -197,6 +197,7 @@
       width: 8px;
       border-radius: 50%;
       margin-left: 1rem;
+      flex-shrink: 0;
 
       &.active {
         background-color: var(--success);

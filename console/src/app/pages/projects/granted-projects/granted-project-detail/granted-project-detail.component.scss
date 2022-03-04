@@ -13,7 +13,7 @@
     background: if($is-dark-theme, #00000020, #605f5f0f);
 
     @media only screen and (max-width: 500px) {
-      margin: 0 -1.5rem;
+      margin: 0 -1rem;
     }
 
     .granted-project-top-row {
@@ -46,6 +46,7 @@
             height: 8px;
             width: 8px;
             border-radius: 50%;
+            flex-shrink: 0;
 
             &.active {
               background-color: var(--success);

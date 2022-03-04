@@ -23,9 +23,10 @@
 
     .router-container {
       padding: 0 2rem;
+      overflow-x: hidden;
 
       @media only screen and (max-width: 500px) {
-        padding: 0 1.5rem;
+        padding: 0 1rem;
       }
 
       .outlet {

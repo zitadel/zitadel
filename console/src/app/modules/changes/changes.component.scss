@@ -26,14 +26,9 @@
   $secondary-text: map-get($foreground, secondary-text);
 
   .scroll-container {
-    overflow-y: auto;
     border-bottom: 1px solid map-get($foreground, divider);
     margin-bottom: 0.5rem;
     box-sizing: border-box;
-
-    &.maxheight {
-      max-height: 500px;
-    }
 
     .date {
       font-weight: 500;

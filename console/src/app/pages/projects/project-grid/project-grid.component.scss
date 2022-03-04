@@ -99,6 +99,7 @@
             height: 8px;
             width: 8px;
             border-radius: 50%;
+            flex-shrink: 0;
 
             &.active {
               background-color: var(--success);

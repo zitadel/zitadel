@@ -2,7 +2,7 @@
   <span class="ch-header">{{ 'CHANGES.LISTTITLE' | translate }}</span>
 </div>
 
-<div class="scroll-container" [ngClass]="{'maxheight': limitHeight}">
+<div class="scroll-container">
   <li class="item" *ngFor="let hist of data | async; index as histindex">
     <span *ngIf="hist.values[0].dates[0]" class="date">
       {{ hist.values[0].dates[0]| timestampToDate | localizedDate: 'dd. MMMM YYYY' }}
