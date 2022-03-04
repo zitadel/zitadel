@@ -51,9 +51,9 @@ func (h *Handler) Storage() static.Storage {
 }
 
 type Uploader interface {
-	Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error
+	UploadAsset(ctx context.Context, info string, asset *command.AssetUpload, commands *command.Commands) error
 	ObjectName(data authz.CtxData) (string, error)
-	BucketName(data authz.CtxData) string
+	ResourceOwner(data authz.CtxData) string
 	ContentTypeAllowed(contentType string) bool
 	MaxFileSize() int64
 	ObjectType() static.ObjectType
@@ -131,18 +131,21 @@ func UploadHandleFunc(s AssetsService, uploader Uploader) func(http.ResponseWrit
 			return
 		}
 
-		bucketName := uploader.BucketName(ctxData)
+		resourceOwner := uploader.ResourceOwner(ctxData)
 		objectName, err := uploader.ObjectName(ctxData)
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return
 		}
-		info, err := s.Commands().UploadAsset(ctx, bucketName, objectName, contentType, uploader.ObjectType(), file, size)
-		if err != nil {
-			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
-			return
+		uploadInfo := &command.AssetUpload{
+			ResourceOwner: resourceOwner,
+			ObjectName:    objectName,
+			ContentType:   contentType,
+			ObjectType:    uploader.ObjectType(),
+			File:          file,
+			Size:          size,
 		}
-		err = uploader.Callback(ctx, info, ctxData.OrgID, s.Commands())
+		err = uploader.UploadAsset(ctx, ctxData.OrgID, uploadInfo, s.Commands())
 		if err != nil {
 			s.ErrorHandler()(w, r, fmt.Errorf("upload failed: %v", err), http.StatusInternalServerError)
 			return

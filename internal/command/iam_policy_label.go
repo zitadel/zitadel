@@ -2,11 +2,13 @@ package command
 
 import (
 	"context"
+	"io"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/static"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
@@ -123,10 +125,7 @@ func (c *Commands) ActivateDefaultLabelPolicy(ctx context.Context) (*domain.Obje
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-3m20c", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -135,8 +134,12 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, storageKey str
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-Qw0pd", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-3m20c", "Errors.Assets.Object.PutFailed")
+	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoAddedEvent(ctx, iamAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -173,10 +176,7 @@ func (c *Commands) RemoveLogoDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-yxE4f", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -185,8 +185,12 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, storageKey str
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-1yMx0", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-yxE4f", "Errors.Assets.Object.PutFailed")
+	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconAddedEvent(ctx, iamAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -222,10 +226,7 @@ func (c *Commands) RemoveIconDefaultLabelPolicy(ctx context.Context) (*domain.Ob
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-4fMs9", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -234,8 +235,12 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, storageKey
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-ZR9fs", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-4fMs9", "Errors.Assets.Object.PutFailed")
+	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoDarkAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoDarkAddedEvent(ctx, iamAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -271,10 +276,7 @@ func (c *Commands) RemoveLogoDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1cxM3", "Errors.Assets.EmptyKey")
-	}
+func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -283,8 +285,12 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, storageKey
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-vMsf9", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-1cxM3", "Errors.Assets.Object.PutFailed")
+	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconDarkAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconDarkAddedEvent(ctx, iamAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}
@@ -320,10 +326,16 @@ func (c *Commands) RemoveIconDarkDefaultLabelPolicy(ctx context.Context) (*domai
 	return writeModelToObjectDetails(&existingPolicy.LabelPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey string) (*domain.ObjectDetails, error) {
-	if storageKey == "" {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1N8fs", "Errors.Assets.EmptyKey")
-	}
+type AssetUpload struct {
+	ResourceOwner string
+	ObjectName    string
+	ContentType   string
+	ObjectType    static.ObjectType
+	File          io.Reader
+	Size          int64
+}
+
+func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetUpload) (*domain.ObjectDetails, error) {
 	existingPolicy, err := c.defaultLabelPolicyWriteModelByID(ctx)
 	if err != nil {
 		return nil, err
@@ -332,8 +344,12 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, storageKey str
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
 		return nil, caos_errs.ThrowNotFound(nil, "IAM-1N8fE", "Errors.IAM.LabelPolicy.NotFound")
 	}
+	asset, err := c.uploadAsset(ctx, upload)
+	if err != nil {
+		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1N8fs", "Errors.Assets.Object.PutFailed")
+	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyFontAddedEvent(ctx, iamAgg, storageKey))
+	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyFontAddedEvent(ctx, iamAgg, asset.Name))
 	if err != nil {
 		return nil, err
 	}

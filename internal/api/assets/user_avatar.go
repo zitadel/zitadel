@@ -40,12 +40,12 @@ func (l *myHumanAvatarUploader) ObjectName(ctxData authz.CtxData) (string, error
 	return domain.GetHumanAvatarAssetPath(ctxData.UserID), nil
 }
 
-func (l *myHumanAvatarUploader) BucketName(ctxData authz.CtxData) string {
+func (l *myHumanAvatarUploader) ResourceOwner(ctxData authz.CtxData) string {
 	return ctxData.OrgID
 }
 
-func (l *myHumanAvatarUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
-	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, info.Name)
+func (l *myHumanAvatarUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
+	_, err := commands.AddHumanAvatar(ctx, orgID, authz.GetCtxData(ctx).UserID, upload)
 	return err
 }
 

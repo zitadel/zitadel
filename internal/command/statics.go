@@ -2,22 +2,21 @@ package command
 
 import (
 	"context"
-	"io"
 
 	"github.com/caos/zitadel/internal/static"
 )
 
-func (c *Commands) UploadAsset(ctx context.Context, resourceOwner, objectName, contentType string, objectType static.ObjectType, file io.Reader, size int64) (*static.Asset, error) {
+func (c *Commands) uploadAsset(ctx context.Context, upload *AssetUpload) (*static.Asset, error) {
 	//TODO: handle tenantID and location as soon as possible
 	return c.static.PutObject(ctx,
 		"0",
 		"",
-		resourceOwner,
-		objectName,
-		contentType,
-		objectType,
-		file,
-		size,
+		upload.ResourceOwner,
+		upload.ObjectName,
+		upload.ContentType,
+		upload.ObjectType,
+		upload.File,
+		upload.Size,
 	)
 }
 

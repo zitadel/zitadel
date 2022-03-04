@@ -449,8 +449,8 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 		storage    static.Storage
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx    context.Context
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -485,8 +485,15 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "logo",
+					ContentType:   "text/css",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -528,8 +535,15 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "logo",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -543,7 +557,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddLogoDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.AddLogoDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -707,8 +721,8 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx    context.Context
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -743,8 +757,15 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "icon",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -786,8 +807,15 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "icon",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -801,7 +829,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIconDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.AddIconDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -925,8 +953,8 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx    context.Context
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -961,8 +989,15 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "logo",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1004,8 +1039,15 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "logo",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1019,7 +1061,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.AddLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1182,8 +1224,8 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx    context.Context
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1218,8 +1260,15 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "icon",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1261,8 +1310,15 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "icon",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1276,7 +1332,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.AddIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -1439,8 +1495,8 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx        context.Context
-		storageKey string
+		ctx    context.Context
+		upload *AssetUpload
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -1475,8 +1531,15 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "font",
+					ContentType:   "ttf",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -1518,8 +1581,15 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:        context.Background(),
-				storageKey: "key",
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "font",
+					ContentType:   "ttf",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          nil,
+					Size:          0,
+				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1533,7 +1603,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddFontDefaultLabelPolicy(tt.args.ctx, tt.args.storageKey)
+			got, err := r.AddFontDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

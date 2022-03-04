@@ -65,27 +65,27 @@ func (l *labelPolicyLogoUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyLogoUploader) BucketName(ctxData authz.CtxData) string {
+func (l *labelPolicyLogoUploader) ResourceOwner(ctxData authz.CtxData) string {
 	if l.defaultPolicy {
 		return domain.IAMID
 	}
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyLogoUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
+func (l *labelPolicyLogoUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, info.Name)
+			_, err := commands.AddLogoDarkDefaultLabelPolicy(ctx, upload)
 			return err
 		}
-		_, err := commands.AddLogoDefaultLabelPolicy(ctx, info.Name)
+		_, err := commands.AddLogoDefaultLabelPolicy(ctx, upload)
 		return err
 	}
 	if l.darkMode {
-		_, err := commands.AddLogoDarkLabelPolicy(ctx, orgID, info.Name)
+		_, err := commands.AddLogoDarkLabelPolicy(ctx, orgID, upload)
 		return err
 	}
-	_, err := commands.AddLogoLabelPolicy(ctx, orgID, info.Name)
+	_, err := commands.AddLogoLabelPolicy(ctx, orgID, upload)
 	return err
 }
 
@@ -196,28 +196,28 @@ func (l *labelPolicyIconUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyIconUploader) BucketName(ctxData authz.CtxData) string {
+func (l *labelPolicyIconUploader) ResourceOwner(ctxData authz.CtxData) string {
 	if l.defaultPolicy {
 		return domain.IAMID
 	}
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyIconUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
+func (l *labelPolicyIconUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
 	if l.defaultPolicy {
 		if l.darkMode {
-			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, info.Name)
+			_, err := commands.AddIconDarkDefaultLabelPolicy(ctx, upload)
 			return err
 		}
-		_, err := commands.AddIconDefaultLabelPolicy(ctx, info.Name)
+		_, err := commands.AddIconDefaultLabelPolicy(ctx, upload)
 		return err
 	}
 
 	if l.darkMode {
-		_, err := commands.AddIconDarkLabelPolicy(ctx, orgID, info.Name)
+		_, err := commands.AddIconDarkLabelPolicy(ctx, orgID, upload)
 		return err
 	}
-	_, err := commands.AddIconLabelPolicy(ctx, orgID, info.Name)
+	_, err := commands.AddIconLabelPolicy(ctx, orgID, upload)
 	return err
 }
 
@@ -316,19 +316,19 @@ func (l *labelPolicyFontUploader) ObjectName(_ authz.CtxData) (string, error) {
 	return prefix + "-" + suffixID, nil
 }
 
-func (l *labelPolicyFontUploader) BucketName(ctxData authz.CtxData) string {
+func (l *labelPolicyFontUploader) ResourceOwner(ctxData authz.CtxData) string {
 	if l.defaultPolicy {
 		return domain.IAMID
 	}
 	return ctxData.OrgID
 }
 
-func (l *labelPolicyFontUploader) Callback(ctx context.Context, info *static.Asset, orgID string, commands *command.Commands) error {
+func (l *labelPolicyFontUploader) UploadAsset(ctx context.Context, orgID string, upload *command.AssetUpload, commands *command.Commands) error {
 	if l.defaultPolicy {
-		_, err := commands.AddFontDefaultLabelPolicy(ctx, info.Name)
+		_, err := commands.AddFontDefaultLabelPolicy(ctx, upload)
 		return err
 	}
-	_, err := commands.AddFontLabelPolicy(ctx, orgID, info.Name)
+	_, err := commands.AddFontLabelPolicy(ctx, orgID, upload)
 	return err
 }
 
