@@ -350,9 +350,11 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
+/* stylelint-disable */
 $custom-typography: mat.define-typography-config(
   $font-family: 'Lato',
 );
+/* stylelint-enable */
 
 @include mat.core($custom-typography);
 @include component-themes($caos-dark-app-theme);
