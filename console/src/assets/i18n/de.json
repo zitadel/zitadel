@@ -1008,6 +1008,7 @@
     "MESSAGE_TEXTS": {
       "TITLE": "Email Texte",
       "DESCRIPTION": "Definiere die Texte für deine Benachrichtigungsmails",
+      "TYPE": "Benachrichtigung",
       "TYPES": {
         "INIT": "Initialisierung",
         "VE": "Emailverifikation",

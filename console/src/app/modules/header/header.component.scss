@@ -182,6 +182,12 @@
         }
       }
 
+      .hide-on-small {
+        @media only screen and (max-width: 500px) {
+          display: none;
+        }
+      }
+
       .title {
         text-decoration: none;
         color: white;

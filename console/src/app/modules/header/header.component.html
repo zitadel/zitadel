@@ -25,12 +25,12 @@
     <ng-container *ngFor="let bread of (breadcrumbService.breadcrumbs$ | async) as bc; index as i">
       <ng-container *ngIf="bread.type === BreadcrumbType.IAM">
         <ng-template cnslHasRole [hasRole]="['iam.read']">
-          <svg class=" slash" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="1"
-            stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
+          <svg class="slash hide-on-small" viewBox="0 0 24 24" width="32" height="32" stroke="currentColor"
+            stroke-width="1" stroke-linecap="round" stroke-linejoin="round" shape-rendering="geometricPrecision">
             <path d="M16.88 3.549L7.12 20.451"></path>
           </svg>
 
-          <div class="breadcrumb-context">
+          <div class="breadcrumb-context hide-on-small">
             <a matRipple [matRippleUnbounded]="false" class="breadcrumb-link" [routerLink]="bread.routerLink">
               {{'MENU.SYSTEM' | translate}}
             </a>

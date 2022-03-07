@@ -2,6 +2,7 @@
 
 @mixin idp-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
   $is-dark-theme: map-get($theme, is-dark);
   $warn: map-get($theme, warn);
   $warn-color: map-get($warn, 500);
@@ -13,7 +14,7 @@
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 2rem 2rem 1rem 2rem;
-    background: if($is-dark-theme, #00000020, #605f5f0f);
+    background: map-get($background, metadata-section);
 
     @media only screen and (max-width: 500px) {
       margin: 0 -1rem;

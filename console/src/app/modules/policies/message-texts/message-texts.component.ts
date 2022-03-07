@@ -655,8 +655,7 @@ export class MessageTextsComponent implements OnDestroy {
     this.sub.unsubscribe();
   }
 
-  public setCurrentType(key: MESSAGETYPES): void {
-    this.currentType = key;
+  public changedCurrentType(): void {
     this.loadData(this.currentType);
   }
 }

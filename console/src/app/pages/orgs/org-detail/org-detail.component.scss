@@ -3,12 +3,13 @@
 @mixin org-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
   $is-dark-theme: map-get($theme, is-dark);
+  $background: map-get($theme, background);
 
   .org-top {
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 2rem 2rem 1rem 2rem;
-    background: if($is-dark-theme, #00000020, #605f5f0f);
+    background: map-get($background, metadata-section);
     box-sizing: border-box;
     min-height: 190px;
 

@@ -13,31 +13,19 @@
 
   .message-texts-top-actions {
     display: flex;
-    margin: 0 -0.5rem;
     justify-content: space-between;
     align-items: flex-end;
 
-    .message-type {
-      display: flex;
-      flex-wrap: wrap;
-      margin-bottom: 11px;
-
-      .active {
-        background: $primary-color;
-        color: mat.get-color-from-palette($primary, default-contrast);
-      }
+    .type {
+      display: block;
+      min-width: 200px;
+      width: fit-content;
+      margin-right: 1rem;
     }
 
     .language {
       display: block;
-      margin: 0 0.5rem;
       min-width: 150px;
-
-      mat-select {
-        height: 36px;
-        padding: 0 10px !important;
-        line-height: 36px;
-      }
 
       .lighter {
         font-size: 12px;

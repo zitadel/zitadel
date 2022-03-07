@@ -1008,6 +1008,7 @@
     "MESSAGE_TEXTS": {
       "TITLE": "Message Texts",
       "DESCRIPTION": "Define your texts for your notication mails.",
+      "TYPE": "Notification",
       "TYPES": {
         "INIT": "Initialization",
         "VE": "Verify Email",

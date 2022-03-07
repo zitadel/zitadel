@@ -2,6 +2,7 @@
 
 @mixin user-detail-theme($theme) {
   $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
   $is-dark-theme: map-get($theme, is-dark);
 
   .user-container {
@@ -91,7 +92,7 @@
     border-bottom: 1px solid map-get($foreground, divider);
     margin: 0 -2rem;
     padding: 0 2rem 1rem 2rem;
-    background-color: if($is-dark-theme, #00000020, #605f5f0f);
+    background-color: map-get($background, metadata-section);
     box-sizing: border-box;
     min-height: 184px;
 

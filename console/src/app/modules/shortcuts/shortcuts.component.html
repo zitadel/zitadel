@@ -17,7 +17,7 @@
         <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
         <ng-container *ngFor="let shortcut of main">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <a [routerLink]="shortcut.routerLink" class="shortcut-box"
+            <a [routerLink]="!editState ? shortcut.routerLink : null" class="shortcut-box"
               [ngClass]="{'edit-state': editState && !shortcut.disabled, 'disabled': editState && shortcut.disabled}"
               cdkDrag [cdkDragDisabled]="shortcut.disabled || !editState">
               <div class="shortcuts-avatar {{shortcut.color}}">
@@ -46,7 +46,7 @@
         <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
         <ng-container *ngFor="let shortcut of secondary">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <a [routerLink]="shortcut.routerLink" class="shortcut-box"
+            <a [routerLink]="!editState ? shortcut.routerLink : null" class="shortcut-box"
               [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
               [cdkDragDisabled]="shortcut.disabled || !editState">
               <div class="shortcuts-avatar {{shortcut.color}}">
@@ -74,7 +74,7 @@
         <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>
         <ng-container *ngFor="let shortcut of third">
           <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <a [routerLink]="shortcut.routerLink" class="shortcut-box"
+            <a [routerLink]="!editState ? shortcut.routerLink : null" class="shortcut-box"
               [ngClass]="{'edit-state': editState  && !shortcut.disabled}" cdkDrag
               [cdkDragDisabled]="shortcut.disabled || !editState">
               <div class="shortcuts-avatar {{shortcut.color}}">
@@ -105,21 +105,6 @@
     <h2>{{'HOME.SHORTCUTS.SETTINGS' | translate}}</h2>
 
     <div class="shortcut-list-row">
-
-      <!-- <div cdkDropList [cdkDropListData]="all" class="shortcut-grid" (cdkDropListDropped)="drop($event, '')">
-        <ng-container *ngFor="let shortcut of all">
-          <ng-template cnslHasRole [hasRole]="shortcut.withRole">
-            <div class="shortcut-box no-margin edit-state" cdkDrag [cdkDragDisabled]="shortcut.disabled">
-              <div class="shortcuts-avatar {{shortcut.color}}">
-                <mat-icon *ngIf="shortcut.svgIcon" class="icon" [svgIcon]="shortcut.svgIcon"></mat-icon>
-                <i *ngIf="shortcut.icon" class="icon {{shortcut.icon}}"></i>
-              </div>
-              <span *ngIf="shortcut.i18nTitle">{{shortcut.i18nTitle | translate}}</span>
-              <span *ngIf="shortcut.title">{{shortcut.title}}</span>
-            </div>
-          </ng-template>
-        </ng-container>
-      </div> -->
 
       <div cdkDropList [cdkDropListData]="allRoutes" class="shortcut-list" (cdkDropListDropped)="drop($event, 'main')">
         <p *ngIf="editState" class="shortcut-desc">{{'HOME.SHORTCUTS.REORDER' | translate}}</p>

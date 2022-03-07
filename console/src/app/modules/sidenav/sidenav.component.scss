@@ -74,6 +74,7 @@
 
     .sidenav-content {
       width: 100%;
+      overflow-x: auto;
     }
 
     @media only screen and (min-width: 824px) {
