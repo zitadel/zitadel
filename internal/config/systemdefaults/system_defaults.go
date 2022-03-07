@@ -6,7 +6,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/notification/channels/chat"
 	"github.com/caos/zitadel/internal/notification/channels/fs"
 	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
@@ -54,9 +53,10 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	DebugMode bool
-	Endpoints Endpoints
-	Providers Channels
+	DebugMode      bool
+	Endpoints      Endpoints
+	FileSystemPath string
+	//Providers Channels
 }
 
 type Endpoints struct {
@@ -68,7 +68,6 @@ type Endpoints struct {
 }
 
 type Channels struct {
-	Chat       chat.ChatConfig
 	Twilio     twilio.TwilioConfig
 	FileSystem fs.FSConfig
 	Log        log.LogConfig
