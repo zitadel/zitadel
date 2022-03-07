@@ -1287,7 +1287,7 @@
       "OPTIONS": "Opzioni",
       "ASSERTION": "Includi ruoli con autenticazione",
       "ASSERTION_DESCRIPTION": "Le informazioni sui ruoli sono inviate dall'endpoint Userinfo e a seconda delle impostazioni dell'applicazione in token.",
-      "CHECK": "Verifica i ruoli con l'autenticazione",
+      "CHECK": "Verifica l'autorizzazione durante l'autenticazione",
       "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account."
     },
     "HAS_PROJECT": "Controlla project grant con l'autenticazione",

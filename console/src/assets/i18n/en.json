@@ -1287,7 +1287,7 @@
       "OPTIONS": "Options",
       "ASSERTION": "Assert Roles on Authentication",
       "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
-      "CHECK": "Check roles on Authentication",
+      "CHECK": "Check authorization on Authentication",
       "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
     "HAS_PROJECT": "Check for Project on Authentication",
