@@ -1,5 +1,7 @@
 package restore
 
+/* Deprecated in V2
+
 import (
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator/helpers"
@@ -238,3 +240,4 @@ func TestBackup_Job2(t *testing.T) {
 		image,
 		command))
 }
+*/
