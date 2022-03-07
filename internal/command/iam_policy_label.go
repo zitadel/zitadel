@@ -136,7 +136,7 @@ func (c *Commands) AddLogoDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-3m20c", "Errors.Assets.Object.PutFailed")
+		return nil, caos_errs.ThrowInternal(err, "IAM-3m20c", "Errors.Assets.Object.PutFailed")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoAddedEvent(ctx, iamAgg, asset.Name))
@@ -187,7 +187,7 @@ func (c *Commands) AddIconDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-yxE4f", "Errors.Assets.Object.PutFailed")
+		return nil, caos_errs.ThrowInternal(err, "IAM-yxE4f", "Errors.Assets.Object.PutFailed")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconAddedEvent(ctx, iamAgg, asset.Name))
@@ -237,7 +237,7 @@ func (c *Commands) AddLogoDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-4fMs9", "Errors.Assets.Object.PutFailed")
+		return nil, caos_errs.ThrowInternal(err, "IAM-4fMs9", "Errors.Assets.Object.PutFailed")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyLogoDarkAddedEvent(ctx, iamAgg, asset.Name))
@@ -287,7 +287,7 @@ func (c *Commands) AddIconDarkDefaultLabelPolicy(ctx context.Context, upload *As
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "IAM-1cxM3", "Errors.Assets.Object.PutFailed")
+		return nil, caos_errs.ThrowInternal(err, "IAM-1cxM3", "Errors.Assets.Object.PutFailed")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyIconDarkAddedEvent(ctx, iamAgg, asset.Name))
@@ -346,7 +346,7 @@ func (c *Commands) AddFontDefaultLabelPolicy(ctx context.Context, upload *AssetU
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(nil, "IAM-1N8fs", "Errors.Assets.Object.PutFailed")
+		return nil, caos_errs.ThrowInternal(nil, "IAM-1N8fs", "Errors.Assets.Object.PutFailed")
 	}
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.LabelPolicyWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam_repo.NewLabelPolicyFontAddedEvent(ctx, iamAgg, asset.Name))

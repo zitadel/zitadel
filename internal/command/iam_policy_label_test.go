@@ -1,6 +1,7 @@
 package command
 
 import (
+	"bytes"
 	"context"
 	"testing"
 
@@ -463,20 +464,6 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -497,6 +484,47 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "logo",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -527,12 +555,13 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewLabelPolicyLogoAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
-									"key",
+									"logo",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -541,8 +570,8 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "logo",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
@@ -556,6 +585,7 @@ func TestCommandSide_AddLogoDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
 			got, err := r.AddLogoDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
@@ -604,7 +634,6 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 				err: caos_errs.IsNotFound,
 			},
 		},
-
 		{
 			name: "asset remove error, internal error",
 			fields: fields{
@@ -719,6 +748,7 @@ func TestCommandSide_RemoveLogoDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
 		ctx    context.Context
@@ -735,20 +765,6 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -763,12 +779,53 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "icon",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "icon",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -799,12 +856,13 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewLabelPolicyIconAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
-									"key",
+									"icon",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -813,8 +871,8 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "icon",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
@@ -828,6 +886,7 @@ func TestCommandSide_AddIconDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
 			got, err := r.AddIconDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
@@ -951,6 +1010,7 @@ func TestCommandSide_RemoveIconDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
 		ctx    context.Context
@@ -967,20 +1027,6 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -995,12 +1041,53 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "logo",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "logo",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1031,12 +1118,13 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewLabelPolicyLogoDarkAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
-									"key",
+									"logo",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1045,8 +1133,8 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "logo",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
@@ -1060,6 +1148,7 @@ func TestCommandSide_AddLogoDarkDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
 			got, err := r.AddLogoDarkDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
@@ -1222,6 +1311,7 @@ func TestCommandSide_RemoveLogoDarkDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
 		ctx    context.Context
@@ -1238,20 +1328,6 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1266,12 +1342,53 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "icon",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "icon",
+					ContentType:   "image/png",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1302,12 +1419,13 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewLabelPolicyIconDarkAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
-									"key",
+									"icon",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1316,8 +1434,8 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "icon",
 					ContentType:   "image/png",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
@@ -1331,6 +1449,7 @@ func TestCommandSide_AddIconDarkDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
 			got, err := r.AddIconDarkDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {
@@ -1493,6 +1612,7 @@ func TestCommandSide_RemoveIconDarkDefaultLabelPolicy(t *testing.T) {
 func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
+		storage    static.Storage
 	}
 	type args struct {
 		ctx    context.Context
@@ -1509,20 +1629,6 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "storage key empty, invalid argument error",
-			fields: fields{
-				eventstore: eventstoreExpect(
-					t,
-				),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			res: res{
-				err: caos_errs.IsErrorInvalidArgument,
-			},
-		},
-		{
 			name: "label policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
@@ -1537,12 +1643,53 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "font",
 					ContentType:   "ttf",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
+			},
+		},
+		{
+			name: "upload failed, error",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewLabelPolicyAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								"#ffffff",
+								true,
+								true,
+								true,
+							),
+						),
+					),
+				),
+				storage: mock.NewStorage(t).ExpectPutObjectError(),
+			},
+			args: args{
+				ctx: context.Background(),
+				upload: &AssetUpload{
+					ResourceOwner: "IAM",
+					ObjectName:    "font",
+					ContentType:   "ttf",
+					ObjectType:    static.ObjectTypeStyling,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
+				},
+			},
+			res: res{
+				err: caos_errs.IsInternal,
 			},
 		},
 		{
@@ -1573,12 +1720,13 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewLabelPolicyFontAddedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate,
-									"key",
+									"font",
 								),
 							),
 						},
 					),
 				),
+				storage: mock.NewStorage(t).ExpectPutObject(),
 			},
 			args: args{
 				ctx: context.Background(),
@@ -1587,8 +1735,8 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 					ObjectName:    "font",
 					ContentType:   "ttf",
 					ObjectType:    static.ObjectTypeStyling,
-					File:          nil,
-					Size:          0,
+					File:          bytes.NewReader([]byte("test")),
+					Size:          4,
 				},
 			},
 			res: res{
@@ -1602,6 +1750,7 @@ func TestCommandSide_AddFontDefaultLabelPolicy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
+				static:     tt.fields.storage,
 			}
 			got, err := r.AddFontDefaultLabelPolicy(tt.args.ctx, tt.args.upload)
 			if tt.res.err == nil {

@@ -1,25 +1,40 @@
 package mock
 
 import (
+	"context"
+	"io"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 
 	caos_errors "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/static"
 )
 
 func NewStorage(t *testing.T) *MockStorage {
 	return NewMockStorage(gomock.NewController(t))
 }
 
-func (m *MockStorage) ExpectAddObjectNoError() *MockStorage {
+func (m *MockStorage) ExpectPutObject() *MockStorage {
 	m.EXPECT().
 		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
-		Return(nil, nil)
+		DoAndReturn(func(ctx context.Context, tenantID, location, resourceOwner, name, contentType string, objectType static.ObjectType, object io.Reader, objectSize int64) (*static.Asset, error) {
+			hash, _ := io.ReadAll(object)
+			return &static.Asset{
+				TenantID:     tenantID,
+				Name:         name,
+				Hash:         string(hash),
+				Size:         objectSize,
+				LastModified: time.Now(),
+				Location:     location,
+				ContentType:  contentType,
+			}, nil
+		})
 	return m
 }
 
-func (m *MockStorage) ExpectAddObjectError() *MockStorage {
+func (m *MockStorage) ExpectPutObjectError() *MockStorage {
 	m.EXPECT().
 		PutObject(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 		Return(nil, caos_errors.ThrowInternal(nil, "", ""))

@@ -197,6 +197,7 @@ func GetAsset(w http.ResponseWriter, r *http.Request, resourceOwner, objectName 
 	w.Header().Set(http_util.ContentType, info.ContentType)
 	w.Header().Set(http_util.LastModified, info.LastModified.Format(time.RFC1123))
 	w.Header().Set(http_util.Etag, info.Hash)
-	w.Write(data)
+	_, err = w.Write(data)
+	logging.New().OnError(err).Error("error writing response for asset")
 	return nil
 }

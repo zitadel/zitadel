@@ -22,7 +22,7 @@ func (c *Commands) AddHumanAvatar(ctx context.Context, orgID, userID string, upl
 	}
 	asset, err := c.uploadAsset(ctx, upload)
 	if err != nil {
-		return nil, caos_errs.ThrowInvalidArgument(err, "USER-1Xyud", "Errors.Assets.Object.PutFailed")
+		return nil, caos_errs.ThrowInternal(err, "USER-1Xyud", "Errors.Assets.Object.PutFailed")
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, user.NewHumanAvatarAddedEvent(ctx, userAgg, asset.Name))
