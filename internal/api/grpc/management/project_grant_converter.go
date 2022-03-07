@@ -136,9 +136,9 @@ func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.Lis
 			},
 			Queries: queries,
 		},
-		ProjectID:  req.ProjectId,
-		GrantID:    req.GrantId,
-		GrantedOrg: authz.GetCtxData(ctx).OrgID,
+		ProjectID: req.ProjectId,
+		GrantID:   req.GrantId,
+		OrgID:     authz.GetCtxData(ctx).OrgID,
 	}, nil
 }
 

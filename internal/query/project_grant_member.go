@@ -52,16 +52,21 @@ var (
 
 type ProjectGrantMembersQuery struct {
 	MembersQuery
-	ProjectID, GrantID, GrantedOrg string
+	ProjectID, GrantID, OrgID string
 }
 
 func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return q.MembersQuery.
 		toQuery(query).
-		Where(sq.Eq{
-			ProjectGrantMemberProjectID.identifier():    q.ProjectID,
-			ProjectGrantMemberGrantID.identifier():      q.GrantID,
-			ProjectGrantColumnGrantedOrgID.identifier(): q.GrantedOrg,
+		Where(sq.And{
+			sq.Eq{
+				ProjectGrantMemberProjectID.identifier(): q.ProjectID,
+				ProjectGrantMemberGrantID.identifier():   q.GrantID,
+			},
+			sq.Or{
+				sq.Eq{ProjectGrantColumnResourceOwner.identifier(): q.OrgID},
+				sq.Eq{ProjectGrantColumnGrantedOrgID.identifier(): q.OrgID},
+			},
 		})
 }
 
