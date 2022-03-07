@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  margin: 0 -.5rem;
+  margin: 0 -0.5rem;
   max-width: 500px;
 }
 
@@ -17,23 +17,23 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($theme, background);
   $fg: map-get($theme, foreground);
-  $cardback: map-get($back, card);
+  $cardback: map-get($back, cards);
   $text: map-get($fg, text);
 
-  input[type="radio"].idp {
+  input[type='radio'].idp {
     appearance: none;
     opacity: 0;
     display: none;
   }
 
   .cnsl-idp-type-radio-button {
-    margin: .5rem;
-    border-radius: .5rem;
+    margin: 0.5rem;
+    border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
     cursor: pointer;
     position: relative;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, .1);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
     background-color: $cardback;
 
     .cnsl-idp-type-radio-header {

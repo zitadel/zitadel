@@ -234,7 +234,10 @@ $caos-dark-theme-background: (
   app-bar: map_get($caos-dark-background, 500),
   background: map_get($caos-dark-background, 500),
   hover: rgba(black, 0.04),
-  card: map_get($caos-dark-background, 400),
+  card: #222222,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-dark-background, 400),
   dialog: map_get($caos-dark-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -255,7 +258,10 @@ $caos-light-theme-background: (
   app-bar: map_get($caos-light-background, 100),
   background: map_get($caos-light-background, 500),
   hover: rgba(black, 0.04),
-  card: map_get($caos-light-background, 400),
+  card: #ffffff,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-light-background, 400),
   dialog: map_get($caos-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
