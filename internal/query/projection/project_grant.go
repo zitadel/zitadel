@@ -20,7 +20,7 @@ type ProjectGrantProjection struct {
 const ProjectGrantProjectionTable = "zitadel.projections.project_grants"
 
 func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantProjection {
-	p := &ProjectGrantProjection{}
+	p := new(ProjectGrantProjection)
 	config.ProjectionName = ProjectGrantProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

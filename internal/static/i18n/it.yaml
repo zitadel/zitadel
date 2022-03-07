@@ -29,6 +29,20 @@ Errors:
     ExceedsDefault: Il limite supera quello predefinito
   Language:
     NotParsed: Impossibile analizzare la lingua
+  OIDCSettings:
+    NotFound: Impossibile trovare la configurazione OIDC
+    AlreadyExists: La configurazione OIDC esiste già
+  SecretGenerator:
+    AlreadyExists: Il generatore di segreti esiste già
+    TypeMissing: Manca il tipo di generatore segreto
+    NotFound: Generatore segreto non trovato
+  SMSConfig:
+    NotFound: Configurazione SMS non trovata
+    AlreadyActive: Configurazione SMS già attiva
+    AlreadyDeactivated: Configurazione SMS già disattivata
+  SMTPConfig:
+    NotFound: Configurazione SMTP non trovata
+    AlreadyExists: La configurazione SMTP esiste già
   User:
     NotFound: L'utente non è stato trovato
     AlreadyExists: L'utente già esistente
@@ -811,6 +825,35 @@ EventTypes:
           removed: Font rimosso
         assets:
           removed: Asset rimosse
+    default:
+      language:
+        set: lingua predefinita impostata
+    oidc:
+      settings:
+        added: Configurazione OIDC aggiunta
+        changed: Configurazione OIDC cambiata
+        removed: Configurazione OIDC rimossa
+    secret:
+      generator:
+        added: Generatore di segreti aggiunto
+        changed: Generatore di segreti cambiato
+        removed: Generatore di segreti cambiato
+    smtp:
+      config:
+        added: SMTP configuration added
+        changed: SMTP configuration changed
+        password:
+          changed: SMTP configuration secret changed
+    sms:
+      config:
+        twilio:
+          added: Aggiunto il fornitore di SMS Twilio
+          changed: Twilio SMS Provider cambiato
+          token:
+            changed: Twilio SMS Provider token cambiato
+          removed: Provider SMS Twilio rimosso
+          activated: Provider SMS Twilio attivato
+          deactivated: Provider SMS Twilio disattivato
   key_pair:
     added: Keypair aggiunto
   action:

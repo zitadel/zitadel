@@ -21,7 +21,7 @@ const (
 )
 
 func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
-	p := &ProjectProjection{}
+	p := new(ProjectProjection)
 	config.ProjectionName = ProjectProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

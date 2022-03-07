@@ -18,7 +18,7 @@ type ProjectRoleProjection struct {
 const ProjectRoleProjectionTable = "zitadel.projections.project_roles"
 
 func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectRoleProjection {
-	p := &ProjectRoleProjection{}
+	p := new(ProjectRoleProjection)
 	config.ProjectionName = ProjectRoleProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

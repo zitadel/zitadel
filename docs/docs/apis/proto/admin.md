@@ -212,6 +212,30 @@ Get log notification provider
     GET: /notification/provider/log
 
 
+### GetOIDCSettings
+
+> **rpc** GetOIDCSettings([GetOIDCSettingsRequest](#getoidcsettingsrequest))
+[GetOIDCSettingsResponse](#getoidcsettingsresponse)
+
+Get OIDC settings (e.g token lifetimes, etc.)
+
+
+
+    GET: /settings/oidc
+
+
+### UpdateOIDCSettings
+
+> **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
+[UpdateOIDCSettingsResponse](#updateoidcsettingsresponse)
+
+Update oidc settings (e.g token lifetimes, etc)
+
+
+
+    PUT: /settings/oidc
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -2104,6 +2128,23 @@ This is an empty request
 
 
 
+### GetOIDCSettingsRequest
+This is an empty request
+
+
+
+
+### GetOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| settings |  zitadel.settings.v1.OIDCSettings | - |  |
+
+
+
+
 ### GetOrgByIDRequest
 
 
@@ -3661,6 +3702,31 @@ This is an empty request
 
 
 ### UpdateLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### UpdateOIDCSettingsResponse
 
 
 

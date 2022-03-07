@@ -23,7 +23,7 @@ const (
 )
 
 func NewLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LabelPolicyProjection {
-	p := &LabelPolicyProjection{}
+	p := new(LabelPolicyProjection)
 	config.ProjectionName = LabelPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

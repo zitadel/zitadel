@@ -22,7 +22,7 @@ const (
 )
 
 func NewOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgMemberProjection {
-	p := &OrgMemberProjection{}
+	p := new(OrgMemberProjection)
 	config.ProjectionName = OrgMemberProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

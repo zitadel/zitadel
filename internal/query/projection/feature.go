@@ -25,7 +25,7 @@ const (
 )
 
 func NewFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FeatureProjection {
-	p := &FeatureProjection{}
+	p := new(FeatureProjection)
 	config.ProjectionName = FeatureTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

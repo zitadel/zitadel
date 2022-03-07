@@ -31,7 +31,7 @@ const (
 )
 
 func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MailTemplateProjection {
-	p := &MailTemplateProjection{}
+	p := new(MailTemplateProjection)
 	config.ProjectionName = MailTemplateTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -32,7 +32,7 @@ type ActionProjection struct {
 }
 
 func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ActionProjection {
-	p := &ActionProjection{}
+	p := new(ActionProjection)
 	config.ProjectionName = ActionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

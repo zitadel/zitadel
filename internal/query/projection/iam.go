@@ -20,7 +20,7 @@ const (
 )
 
 func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMProjection {
-	p := &IAMProjection{}
+	p := new(IAMProjection)
 	config.ProjectionName = IAMProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

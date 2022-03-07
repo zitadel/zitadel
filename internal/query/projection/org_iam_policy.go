@@ -32,7 +32,7 @@ const (
 )
 
 func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgIAMPolicyProjection {
-	p := &OrgIAMPolicyProjection{}
+	p := new(OrgIAMPolicyProjection)
 	config.ProjectionName = OrgIAMPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
