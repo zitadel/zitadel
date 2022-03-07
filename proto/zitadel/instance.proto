@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.instance.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/org";
+
+message Instance {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    InstanceState state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the instance";
+        }
+    ];
+    string domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"zitadel.com\"";
+        }
+    ];
+    string name = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string version = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"1.0.0\"";
+        }
+    ];
+    string subscription_name = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current name ";
+        }
+    ];
+
+}
+
+enum InstanceState {
+    INSTANCE_STATE_UNSPECIFIED = 0;
+    INSTANCE_STATE_CREATING = 1;
+    INSTANCE_STATE_RUNNING = 2;
+    INSTANCE_STATE_STOPPED = 3;
+}
+
+enum Region {
+    REGION_UNSPECIFIED = 0;
+    REGION_GLOBAL = 1;
+    REGION_SWITZERLAND = 2;
+}
+
+message InstanceQuery {
+    oneof query {
+        option (validate.required) = true;
+
+        InstanceDomainsQuery domains_query = 1;
+        InstanceStateQuery state_query = 2;
+    }
+}
+
+message InstanceDomainsQuery {
+    repeated strring domains = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"caos ag\"";
+        }
+    ];
+    zitadel.v1.ListQueryIn method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which list equality method is used";
+        }
+    ];
+}
+
+//InstanceStateQuery is always equals
+message InstanceStateQuery {
+    InstanceState state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the instance";
+        }
+    ];
+}
+
+enum InstanceFieldName {
+    INSTANCE_FIELD_NAME_UNSPECIFIED = 0;
+    INSTANCE_FIELD_NAME_DOMAIN = 1;
+    INSTANCE_FIELD_NAME_NAME = 2;
+    INSTANCE_FIELD_NAME_CREATION_DATE = 3;
+    INSTANCE_FIELD_NAME_SUBSCRIPTION_NAME = 4;
+}
