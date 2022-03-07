@@ -177,6 +177,8 @@ github.com/caos/oidc v1.0.1 h1:8UHAPynCObwaqortppDtJFktjqLDLYSLidkNy0Num4o=
 github.com/caos/oidc v1.0.1/go.mod h1:4l0PPwdc6BbrdCFhNrRTUddsG292uHGa7gE2DSEIqoU=
 github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2 h1:WqWpTGAUUC07G44CsNw4WyotuqRY4nSF9xadcEC4Yrc=
 github.com/caos/orbos v1.5.14-0.20211102124704-34db02bceed2/go.mod h1:/49/y2DW47eHx38cNFFTM/sd4KA5L5SjASdYBQ5lraY=
+github.com/caos/orbos v1.5.14-0.20220114130251-011d127bc256 h1:CT/3k7vrZf0e+AghiaFDoW77fsI5uX0jXT7r0rxbCyQ=
+github.com/caos/orbos v1.5.14-0.20220114130251-011d127bc256/go.mod h1:PoepiMb5M3VgFCcggjU2yXlDZ3EvRsgccsy/UVo9LN8=
 github.com/cenkalti/backoff v2.1.1+incompatible h1:tKJnvO2kl0zmb/jA5UKAt4VoEVw1qxKWjE/Bpp46npY=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff/v4 v4.1.1 h1:G2HAfAmvm/GcKan2oOQpBXOd2tT2G57ZnZGWa1PxPBQ=
@@ -1313,6 +1315,7 @@ golang.org/x/sys v0.0.0-20210908233432-aa78b53d3365/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210917161153-d61c044b1678/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20210927094055-39ccf1dd6fa6/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20211013075003-97ac67df715c/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211019181941-9d821ace8654/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211124211545-fe61309f8881/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20211205182925-97ca703d548d h1:FjkYO/PPp4Wi0EAUOVLxePm7qVW4r4ctbWpURyuOD0E=

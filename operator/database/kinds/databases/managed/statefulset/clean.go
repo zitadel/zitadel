@@ -17,7 +17,7 @@ func CleanPVCs(
 	replicaCount int,
 ) resources.QueryFunc {
 	name := sfsSelectable.Name()
-	return func(k8sClient kubernetes.ClientInt) (resources.EnsureFunc, error) {
+	return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (resources.EnsureFunc, error) {
 		pvcs, err := k8sClient.ListPersistentVolumeClaims(namespace)
 		if err != nil {
 			return nil, err

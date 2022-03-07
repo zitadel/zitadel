@@ -93,9 +93,9 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			_, found, err := k8sClient.CheckCRD("mappings.getambassador.io")
+			if err != nil || !found {
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, err
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
@@ -111,146 +111,156 @@ func AdaptFunc(
 				MaxAge:         "86400",
 			}
 
-			queryAdminR, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, AdminRName),
-				false,
-				apiDomain,
-				"/admin/v1",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryAdminR, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, AdminRName),
+				GRPC:             false,
+				Host:             apiDomain,
+				Prefix:           "/admin/v1",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryUpload, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, Upload),
-				false,
-				apiDomain,
-				"/assets/v1",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryUpload, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, Upload),
+				GRPC:             false,
+				Host:             apiDomain,
+				Prefix:           "/assets/v1",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryMgmtRest, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, MgmtName),
-				false,
-				apiDomain,
-				"/management/v1/",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryMgmtRest, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, MgmtName),
+				GRPC:             false,
+				Host:             apiDomain,
+				Prefix:           "/management/v1/",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
+
 			if err != nil {
 				return nil, err
 			}
 
-			queryOAuthv2, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, OauthName),
-				false,
-				apiDomain,
-				"/oauth/v2/",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryOAuthv2, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, OauthName),
+				GRPC:             false,
+				Host:             apiDomain,
+				Prefix:           "/oauth/v2/",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryAuthR, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, AuthRName),
-				false,
-				apiDomain,
-				"/auth/v1/",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryAuthR, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, AuthRName),
+				GRPC:             false,
+				Host:             apiDomain,
+				Prefix:           "/auth/v1/",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryAuthorize, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, AuthorizeName),
-				false,
-				accountsDomain,
-				"/oauth/v2/authorize",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryAuthorize, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, AuthorizeName),
+				GRPC:             false,
+				Host:             accountsDomain,
+				Prefix:           "/oauth/v2/authorize",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryEndsession, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, EndsessionName),
-				false,
-				accountsDomain,
-				"/oauth/v2/endsession",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryEndsession, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, EndsessionName),
+				GRPC:             false,
+				Host:             accountsDomain,
+				Prefix:           "/oauth/v2/endsession",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryIssuer, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, IssuerName),
-				false,
-				issuerDomain,
-				"/.well-known/openid-configuration",
-				"/oauth/v2/.well-known/openid-configuration",
-				httpUrl,
-				30000,
-				30000,
-				cors,
-			)
+			queryIssuer, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, IssuerName),
+				GRPC:             false,
+				Host:             issuerDomain,
+				Prefix:           "/.well-known/openid-configuration",
+				Rewrite:          "/oauth/v2/.well-known/openid-configuration",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryOpenAPI, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, OpenAPIName),
-				false,
-				apiDomain,
-				"/openapi/v2/swagger",
-				"",
-				httpUrl,
-				30000,
-				30000,
-				nil,
-			)
+			queryOpenAPI, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, OpenAPIName),
+				GRPC:             false,
+				Host:             apiDomain,
+				Prefix:           "/openapi/v2/swagger",
+				Rewrite:          "",
+				Service:          httpUrl,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             nil,
+			})
 			if err != nil {
 				return nil, err
 			}

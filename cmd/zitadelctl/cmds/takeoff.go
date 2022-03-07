@@ -33,13 +33,14 @@ func TakeoffCommand(getRv GetRootValues) *cobra.Command {
 		orbConfig := rv.OrbConfig
 		gitClient := rv.GitClient
 
-		k8sClient, err := cli.Client(
+		k8sClient, err := cli.Init(
 			monitor,
 			orbConfig,
 			gitClient,
 			rv.Kubeconfig,
 			rv.Gitops,
 			true,
+			false,
 		)
 		if err != nil {
 			return err

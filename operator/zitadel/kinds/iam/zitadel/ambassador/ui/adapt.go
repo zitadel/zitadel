@@ -43,42 +43,44 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			_, found, err := k8sClient.CheckCRD("mappings.getambassador.io")
+			if err != nil || !found {
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, err
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain
 
-			queryConsole, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, ConsoleName),
-				false,
-				consoleDomain,
-				"/",
-				"/console/",
-				uiURL,
-				0,
-				0,
-				nil,
-			)
+			queryConsole, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, ConsoleName),
+				GRPC:             false,
+				Host:             consoleDomain,
+				Prefix:           "/",
+				Rewrite:          "/console/",
+				Service:          uiURL,
+				TimeoutMS:        0,
+				ConnectTimeoutMS: 0,
+				CORS:             nil,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryAcc, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, AccountsName),
-				false,
-				accountsDomain,
-				"/",
-				"/login/",
-				uiURL,
-				30000,
-				30000,
-				nil,
-			)
+			queryAcc, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, AccountsName),
+				GRPC:             false,
+				Host:             accountsDomain,
+				Prefix:           "/",
+				Rewrite:          "/login/",
+				Service:          uiURL,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             nil,
+			})
 			if err != nil {
 				return nil, err
 			}

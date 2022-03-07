@@ -56,13 +56,14 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 		gitClient := rv.GitClient
 		version := rv.Version
 
-		k8sClient, err := cli.Client(
+		k8sClient, err := cli.Init(
 			monitor,
 			orbConfig,
 			gitClient,
 			rv.Kubeconfig,
 			rv.Gitops,
 			true,
+			false,
 		)
 		if err != nil {
 			return err

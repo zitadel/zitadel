@@ -56,9 +56,9 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("hosts.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			_, found, err := k8sClient.CheckCRD("hosts.getambassador.io")
+			if err != nil || !found {
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, err
 			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
@@ -74,7 +74,17 @@ func AdaptFunc(
 			accountsSelector := map[string]string{
 				"hostname": accountsDomain,
 			}
-			queryAccounts, err := host.AdaptFuncToEnsure(namespace, AccountsHostName, labels.MustForNameK8SMap(componentLabels, AccountsHostName), accountsDomain, authority, "", accountsSelector, originCASecretName)
+			queryAccounts, err := host.AdaptFuncToEnsure(&host.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				Name:             AccountsHostName,
+				Labels:           labels.MustForNameK8SMap(componentLabels, AccountsHostName),
+				Hostname:         accountsDomain,
+				Authority:        authority,
+				PrivateKeySecret: "",
+				Selector:         accountsSelector,
+				TlsSecret:        originCASecretName,
+			})
 			if err != nil {
 				return nil, err
 			}
@@ -82,7 +92,17 @@ func AdaptFunc(
 			apiSelector := map[string]string{
 				"hostname": apiDomain,
 			}
-			queryAPI, err := host.AdaptFuncToEnsure(namespace, ApiHostName, labels.MustForNameK8SMap(componentLabels, ApiHostName), apiDomain, authority, "", apiSelector, originCASecretName)
+			queryAPI, err := host.AdaptFuncToEnsure(&host.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				Name:             ApiHostName,
+				Labels:           labels.MustForNameK8SMap(componentLabels, ApiHostName),
+				Hostname:         apiDomain,
+				Authority:        authority,
+				PrivateKeySecret: "",
+				Selector:         apiSelector,
+				TlsSecret:        originCASecretName,
+			})
 			if err != nil {
 				return nil, err
 			}
@@ -90,7 +110,17 @@ func AdaptFunc(
 			consoleSelector := map[string]string{
 				"hostname": consoleDomain,
 			}
-			queryConsole, err := host.AdaptFuncToEnsure(namespace, ConsoleHostName, labels.MustForNameK8SMap(componentLabels, ConsoleHostName), consoleDomain, authority, "", consoleSelector, originCASecretName)
+			queryConsole, err := host.AdaptFuncToEnsure(&host.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				Name:             ConsoleHostName,
+				Labels:           labels.MustForNameK8SMap(componentLabels, ConsoleHostName),
+				Hostname:         consoleDomain,
+				Authority:        authority,
+				PrivateKeySecret: "",
+				Selector:         consoleSelector,
+				TlsSecret:        originCASecretName,
+			})
 			if err != nil {
 				return nil, err
 			}
@@ -98,7 +128,17 @@ func AdaptFunc(
 			issuerSelector := map[string]string{
 				"hostname": issuerDomain,
 			}
-			queryIssuer, err := host.AdaptFuncToEnsure(namespace, IssuerHostName, labels.MustForNameK8SMap(componentLabels, IssuerHostName), issuerDomain, authority, "", issuerSelector, originCASecretName)
+			queryIssuer, err := host.AdaptFuncToEnsure(&host.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				Name:             IssuerHostName,
+				Labels:           labels.MustForNameK8SMap(componentLabels, IssuerHostName),
+				Hostname:         issuerDomain,
+				Authority:        authority,
+				PrivateKeySecret: "",
+				Selector:         issuerSelector,
+				TlsSecret:        originCASecretName,
+			})
 			if err != nil {
 				return nil, err
 			}

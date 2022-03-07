@@ -56,11 +56,10 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			return err
 		}
 
-		k8sClient, err := cli.Client(monitor, orbConfig, gitClient, rv.Kubeconfig, rv.Gitops, true)
-		if err != nil && !rv.Gitops {
+		k8sClient, err := cli.Init(monitor, rv.OrbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops, rv.Gitops, !rv.Gitops)
+		if err != nil && (!rv.Gitops || !errors.Is(err, cli.ErrNotInitialized)) {
 			return err
 		}
-		err = nil
 
 		return secret.Write(
 			monitor,

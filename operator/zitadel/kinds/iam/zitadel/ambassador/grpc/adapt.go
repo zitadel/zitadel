@@ -48,9 +48,9 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			crd, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if crd == nil || err != nil {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, nil
+			_, found, err := k8sClient.CheckCRD("mappings.getambassador.io")
+			if err != nil || !found {
+				return func(k8sClient kubernetes.ClientInt) error { return nil }, err
 			}
 
 			apiDomain := dns.Subdomains.API + "." + dns.Domain
@@ -66,50 +66,53 @@ func AdaptFunc(
 				MaxAge:         "86400",
 			}
 
-			queryAdminG, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, AdminMName),
-				true,
-				apiDomain,
-				"/zitadel.admin.v1.AdminService/",
-				"",
-				grpcURL,
-				30000,
-				30000,
-				cors,
-			)
+			queryAdminG, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, AdminMName),
+				GRPC:             true,
+				Host:             apiDomain,
+				Prefix:           "/zitadel.admin.v1.AdminService/",
+				Rewrite:          "",
+				Service:          grpcURL,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryAuthG, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, AuthMName),
-				true,
-				apiDomain,
-				"/zitadel.auth.v1.AuthService/",
-				"",
-				grpcURL,
-				30000,
-				30000,
-				cors,
-			)
+			queryAuthG, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, AuthMName),
+				GRPC:             true,
+				Host:             apiDomain,
+				Prefix:           "/zitadel.auth.v1.AuthService/",
+				Rewrite:          "",
+				Service:          grpcURL,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}
 
-			queryMgmtGRPC, err := mapping.AdaptFuncToEnsure(
-				namespace,
-				labels.MustForName(componentLabels, MgmtMName),
-				true,
-				apiDomain,
-				"/zitadel.management.v1.ManagementService/",
-				"",
-				grpcURL,
-				30000,
-				30000,
-				cors,
-			)
+			queryMgmtGRPC, err := mapping.AdaptFuncToEnsure(&mapping.Arguments{
+				Monitor:          internalMonitor,
+				Namespace:        namespace,
+				ID:               labels.MustForName(componentLabels, MgmtMName),
+				GRPC:             true,
+				Host:             apiDomain,
+				Prefix:           "/zitadel.management.v1.ManagementService/",
+				Rewrite:          "",
+				Service:          grpcURL,
+				TimeoutMS:        30000,
+				ConnectTimeoutMS: 30000,
+				CORS:             cors,
+			})
 			if err != nil {
 				return nil, err
 			}

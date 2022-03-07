@@ -66,7 +66,7 @@ func ConfigCommand(getRv GetRootValues, ghClientID, ghClientSecret string) *cobr
 			return err
 		}
 
-		k8sClient, err := cli.Client(rv.Monitor, rv.OrbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops, false)
+		k8sClient, err := cli.Init(rv.Monitor, rv.OrbConfig, rv.GitClient, rv.Kubeconfig, rv.Gitops, false, false)
 		if err != nil {
 			rv.Monitor.WithField("reason", err.Error()).Info("Continuing without having a Kubernetes connection")
 			err = nil
