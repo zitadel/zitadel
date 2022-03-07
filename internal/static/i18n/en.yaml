@@ -576,7 +576,7 @@ EventTypes:
     metadata:
       set: User metadata set
       removed: User metadata removed
-        all: All user metadata removed
+      removed.all: All user metadata removed
   org:
     added: Organization added
     changed: Organization changed

@@ -574,7 +574,7 @@ EventTypes:
     metadata:
       set: Set di metadati utente
       removed: Metadati utente rimossi
-        all: Tutti i metadati utente rimossi
+      removed.all: Tutti i metadati utente rimossi
   org:
     added: Organizzazione aggiunta
     changed: Organizzazione cambiata
