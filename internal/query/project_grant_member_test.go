@@ -34,6 +34,8 @@ var (
 		"ON members.user_id = zitadel.projections.users_machines.user_id " +
 		"LEFT JOIN zitadel.projections.login_names " +
 		"ON members.user_id = zitadel.projections.login_names.user_id " +
+		"LEFT JOIN zitadel.projections.project_grants " +
+		"ON members.grant_id = zitadel.projections.project_grants.grant_id " +
 		"WHERE zitadel.projections.login_names.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",
