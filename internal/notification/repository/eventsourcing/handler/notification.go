@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/notification/channels/fs"
 	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
@@ -69,7 +70,7 @@ func newNotification(
 		queries:            query,
 		userDataCrypto:     userEncryption,
 		smtpPasswordCrypto: smtpEncryption,
-		smsTokenCrypto: smsEncryption,
+		smsTokenCrypto:     smsEncryption,
 	}
 
 	h.subscribe()

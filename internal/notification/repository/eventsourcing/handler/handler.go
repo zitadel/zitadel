@@ -44,7 +44,7 @@ func Register(configs Configs,
 	assetsPrefix string,
 	userEncryption crypto.EncryptionAlgorithm,
 	smtpEncryption crypto.EncryptionAlgorithm,
-	smsEncryption *crypto.EncryptionAlgorithm,
+	smsEncryption crypto.EncryptionAlgorithm,
 ) []queryv1.Handler {
 	return []queryv1.Handler{
 		newNotifyUser(
