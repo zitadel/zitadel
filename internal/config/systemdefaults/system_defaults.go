@@ -6,10 +6,6 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/notification/templates"
 )
 
 type SystemDefaults struct {
@@ -47,10 +43,8 @@ type DomainVerification struct {
 }
 
 type Notifications struct {
-	DebugMode      bool
 	Endpoints      Endpoints
 	FileSystemPath string
-	//Providers Channels
 }
 
 type Endpoints struct {
@@ -59,20 +53,6 @@ type Endpoints struct {
 	VerifyEmail              string
 	DomainClaimed            string
 	PasswordlessRegistration string
-}
-
-type Channels struct {
-	Twilio     twilio.TwilioConfig
-	FileSystem fs.FSConfig
-	Log        log.LogConfig
-}
-
-type TemplateData struct {
-	InitCode      templates.TemplateData
-	PasswordReset templates.TemplateData
-	VerifyEmail   templates.TemplateData
-	VerifyPhone   templates.TemplateData
-	DomainClaimed templates.TemplateData
 }
 
 type KeyConfig struct {
