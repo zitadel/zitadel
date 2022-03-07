@@ -271,7 +271,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 
 	switch protocolBinding {
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
-		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusTemporaryRedirect)
+		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusSeeOther)
 	default:
 		logging.Log("SAML-67722s").Error(err)
 		if err := sendBackResponse(

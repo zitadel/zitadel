@@ -53,7 +53,7 @@ func (r *Response) DoResponse(request *http.Request, w http.ResponseWriter) erro
 		if r.Signature != "" && r.SigAlg != "" {
 			redirectURL = fmt.Sprintf("%s&Signature=%s&SigAlg=%s", redirectURL, url.QueryEscape(r.Signature), url.QueryEscape(r.SigAlg))
 		}
-		http.Redirect(w, request, redirectURL, http.StatusTemporaryRedirect)
+		http.Redirect(w, request, redirectURL, http.StatusFound)
 	default:
 		//TODO: no binding
 	}
