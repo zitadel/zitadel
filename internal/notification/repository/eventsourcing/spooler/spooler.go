@@ -32,12 +32,13 @@ func StartSpooler(c SpoolerConfig,
 	assetsPrefix string,
 	userEncryption crypto.EncryptionAlgorithm,
 	smtpEncryption crypto.EncryptionAlgorithm,
+	smsEncryption crypto.EncryptionAlgorithm,
 ) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

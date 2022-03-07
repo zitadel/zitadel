@@ -188,7 +188,7 @@ func startZitadel(config *startConfig, masterKey string) error {
 		return fmt.Errorf("cannot start commands: %w", err)
 	}
 
-	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP)
+	notification.Start(config.Notification, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.User, keys.SMTP, keys.SMS)
 
 	router := mux.NewRouter()
 	err = startAPIs(ctx, router, commands, queries, eventstoreClient, dbClient, keyChan, config, storage, authZRepo, keys)

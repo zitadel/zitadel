@@ -31,6 +31,7 @@ func Start(conf Config,
 	assetsPrefix string,
 	userEncryption crypto.EncryptionAlgorithm,
 	smtpEncryption crypto.EncryptionAlgorithm,
+	smsEncryption crypto.EncryptionAlgorithm,
 ) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
@@ -42,7 +43,7 @@ func Start(conf Config,
 		return nil, err
 	}
 
-	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption)
+	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption)
 
 	return &EsRepository{
 		spool,
