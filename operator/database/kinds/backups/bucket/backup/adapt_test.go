@@ -1,5 +1,7 @@
 package backup
 
+/* Deprecated in V2
+
 import (
 	"testing"
 
@@ -322,3 +324,4 @@ func TestBackup_AdaptBackup2(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(client))
 }
+*/

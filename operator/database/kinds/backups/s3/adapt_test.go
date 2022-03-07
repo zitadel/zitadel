@@ -1,5 +1,7 @@
 package s3
 
+/* Deprecated in V2
+
 import (
 	"testing"
 
@@ -417,7 +419,7 @@ func TestBucket_AdaptRestore(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(client))
 }
-
+*/
 /*
 func TestBucket_AdaptClean(t *testing.T) {
 	masterkey := "testMk"

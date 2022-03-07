@@ -3,6 +3,7 @@ package restore
 import (
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator/helpers"
+	"github.com/caos/zitadel/pkg/databases/db"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,8 +22,15 @@ func getJob(
 	sessionTokenKey string,
 	image string,
 	command string,
+	env *corev1.EnvVar,
 
 ) *batchv1.Job {
+
+	var envs []corev1.EnvVar
+	if env != nil {
+		envs = []corev1.EnvVar{*env}
+	}
+
 	return &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      nameLabels.Name(),
@@ -43,6 +51,7 @@ func getJob(
 							"-c",
 							command,
 						},
+						Env: envs,
 						VolumeMounts: []corev1.VolumeMount{{
 							Name:      internalSecretName,
 							MountPath: certPath,
@@ -65,7 +74,7 @@ func getJob(
 						Name: internalSecretName,
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName:  rootSecretName,
+								SecretName:  db.CertsSecret,
 								DefaultMode: helpers.PointerInt32(defaultMode),
 							},
 						},

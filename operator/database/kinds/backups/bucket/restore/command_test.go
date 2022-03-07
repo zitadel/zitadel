@@ -1,5 +1,7 @@
 package restore
 
+/* Deprecated in V2
+
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -45,3 +47,4 @@ func TestBackup_Command2(t *testing.T) {
 	equals := "export SAJSON=$(cat /secrets/sa.json | base64 | tr -d '\n' ) && cockroach sql --certs-dir=/cockroach/cockroach-certs --host=testDB2 --port=81 -e \"RESTORE FROM \\\"gs://testBucket/testBackup/test2?AUTH=specified&CREDENTIALS=${SAJSON}\\\";\""
 	assert.Equal(t, equals, cmd)
 }
+*/

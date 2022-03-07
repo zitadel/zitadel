@@ -1,6 +1,8 @@
 package setup
 
 import (
+	"fmt"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
@@ -9,6 +11,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
+	"github.com/caos/zitadel/pkg/databases/db"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,8 +20,6 @@ import (
 const (
 	jobNamePrefix = "zitadel-setup-"
 	containerName = "zitadel"
-	rootSecret    = "client-root"
-	dbSecrets     = "db-secrets"
 )
 
 func AdaptFunc(
@@ -38,10 +39,10 @@ func AdaptFunc(
 	secretVarsName string,
 	secretPasswordsName string,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) (
 	func(
-		necessaryUsers map[string]string,
-		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
@@ -61,18 +62,11 @@ func AdaptFunc(
 	}
 
 	return func(
-			necessaryUsers map[string]string,
-			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				users := make([]string, 0)
-				for user := range necessaryUsers {
-					users = append(users, user)
-				}
-
 				jobDef := jobDef(
 					nameLabels,
-					users,
 					version,
 					resources,
 					cmName,
@@ -86,9 +80,10 @@ func AdaptFunc(
 					nodeselector,
 					tolerations,
 					customImageRegistry,
+					dbConn,
 				)
 
-				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
+				hashes, err := getConfigurationHashes(k8sClient, queried)
 				if err != nil {
 					return nil, err
 				}
@@ -118,7 +113,6 @@ func AdaptFunc(
 
 func jobDef(
 	name *labels.Name,
-	users []string,
 	version *string,
 	resources *k8s.Resources,
 	cmName string,
@@ -132,15 +126,18 @@ func jobDef(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) *batchv1.Job {
-	initContainers := []corev1.Container{
-		deployment.GetInitContainer(
-			rootSecret,
-			dbSecrets,
-			users,
-			deployment.RunAsUser,
-			customImageRegistry,
-		)}
+
+	chownedVolumeMount := corev1.VolumeMount{
+		Name:      "chowned-certs",
+		MountPath: certPath,
+	}
+
+	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
+		Name:      "certs",
+		MountPath: "/certificates",
+	}, chownedVolumeMount)
 
 	containers := []corev1.Container{
 		deployment.GetContainer(
@@ -150,19 +147,15 @@ func jobDef(
 			true,
 			deployment.GetResourcesFromDefault(resources),
 			cmName,
-			certPath,
 			secretName,
 			secretPath,
 			consoleCMName,
 			secretVarsName,
-			secretPasswordsName,
-			users,
-			dbSecrets,
+			chownedVolumeMount,
 			"setup",
 			customImageRegistry,
+			dbConn,
 		)}
-
-	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName, users)
 
 	return &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
@@ -178,16 +171,19 @@ func jobDef(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector:   nodeselector,
-					Tolerations:    tolerations,
-					InitContainers: initContainers,
-					Containers:     containers,
-
+					NodeSelector:                  nodeselector,
+					Tolerations:                   tolerations,
+					InitContainers:                []corev1.Container{chownCertsContainer},
+					Containers:                    containers,
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
 					SchedulerName:                 "default-scheduler",
 					TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-					Volumes:                       volumes,
+					Volumes: append(
+						deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName),
+						srcVolume,
+						destVolume,
+					),
 				},
 			},
 		},

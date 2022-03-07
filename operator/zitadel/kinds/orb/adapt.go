@@ -1,30 +1,33 @@
 package orb
 
 import (
+	"errors"
 	"fmt"
+
+	cockroachdb "github.com/caos/zitadel/operator/zitadel/kinds/dbconn"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/namespace"
-	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam"
-	zitadeldb "github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
-const (
-	namespaceName = "caos-zitadel"
-)
+const namespaceName = "caos-zitadel"
+
+var ErrUndefinedDBConn = errors.New("desired state for database connection is undefined")
 
 func AdaptFunc(
-	orbconfig *orb.Orb,
 	action string,
 	binaryVersion *string,
 	gitops bool,
 	features []string,
+	dbConn db.Connection,
 ) operator.AdaptFunc {
 	return func(
 		monitor mntr.Monitor,
@@ -57,23 +60,22 @@ func AdaptFunc(
 		desiredTree.Parsed = desiredKind
 		currentTree = &tree.Tree{}
 
+		iamCurrent := &tree.Tree{}
+		databaseConnectionCurrent := &tree.Tree{}
+
+		currentTree.Parsed = &DesiredV0{
+			Common:             tree.NewCommon("zitadel.caos.ch/Orb", "v0", false),
+			IAM:                iamCurrent,
+			DatabaseConnection: databaseConnectionCurrent,
+		}
+
 		if desiredKind.Spec.Verbose && !orbMonitor.IsVerbose() {
 			orbMonitor = orbMonitor.Verbose()
 		}
 
-		var dbClient zitadeldb.Client
-		if gitops {
-			dbClientT, err := zitadeldb.NewGitOpsClient(monitor, orbconfig.URL, orbconfig.Repokey)
-			if err != nil {
-				monitor.Error(err)
-				return nil, nil, nil, nil, nil, false, err
-			}
-			dbClient = dbClientT
-		} else {
-			dbClient = zitadeldb.NewCrdClient(monitor)
-		}
-
 		operatorLabels := mustZITADELOperator(binaryVersion)
+
+		queriers := make([]operator.QueryFunc, 0)
 
 		queryNS, err := namespace.AdaptFuncToEnsure(namespaceName)
 		if err != nil {
@@ -84,7 +86,16 @@ func AdaptFunc(
 			return nil, nil, allSecrets, err
 		}*/
 
-		iamCurrent := &tree.Tree{}
+		configurers := make([]operator.ConfigureFunc, 0)
+
+		queryDBConn, destroyDBConn, configureDBConn, dbConnEncryptedSecrets, dbConnExistingSecrets, migrateDBConn, err := cockroachdb.Adapt(orbMonitor, operatorLabels, desiredKind.DatabaseConnection, databaseConnectionCurrent)
+		if err != nil {
+			return nil, nil, nil, nil, nil, false, err
+		}
+
+		configurers = append(configurers, configureDBConn)
+		secret.AppendSecrets("dbconn", allSecrets, dbConnEncryptedSecrets, allExisting, dbConnExistingSecrets)
+
 		queryIAM, destroyIAM, configureIAM, zitadelSecrets, zitadelExisting, migrateIAM, err := iam.Adapt(
 			orbMonitor,
 			operatorLabels,
@@ -92,7 +103,7 @@ func AdaptFunc(
 			iamCurrent,
 			desiredKind.Spec.NodeSelector,
 			desiredKind.Spec.Tolerations,
-			dbClient,
+			dbConn,
 			namespaceName,
 			action,
 			&desiredKind.Spec.Version,
@@ -102,49 +113,53 @@ func AdaptFunc(
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
-		migrate = migrate || migrateIAM
+		configurers = append(configurers, configureIAM)
 		secret.AppendSecrets("", allSecrets, zitadelSecrets, allExisting, zitadelExisting)
 
 		rec, _ := Reconcile(monitor, desiredKind.Spec, gitops)
 
 		destroyers := make([]operator.DestroyFunc, 0)
-		queriers := make([]operator.QueryFunc, 0)
 		for _, feature := range features {
 			switch feature {
 			case "iam", "migration", "scaleup", "scaledown":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
+					queryDBConn,
 					queryIAM,
 				)
-				destroyers = append(destroyers, destroyIAM)
+				destroyers = append(destroyers, destroyIAM, destroyDBConn)
 			case "operator":
 				queriers = append(queriers,
 					operator.ResourceQueryToZitadelQuery(queryNS),
 					operator.EnsureFuncToQueryFunc(rec),
 				)
+			case "dbconnection":
+				queriers = append(queriers, queryDBConn)
+				destroyers = append(destroyers, destroyDBConn)
 			}
 		}
 
-		currentTree.Parsed = &DesiredV0{
-			Common: tree.NewCommon("zitadel.caos.ch/Orb", "v0", false),
-			IAM:    iamCurrent,
-		}
-
-		return func(k8sClient kubernetes.ClientInt, _ map[string]interface{}) (operator.EnsureFunc, error) {
-				queried := map[string]interface{}{}
-				monitor.WithField("queriers", len(queriers)).Info("Querying")
-				return operator.QueriersToEnsureFunc(monitor, true, queriers, k8sClient, queried)
+		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				monitor.WithField("queriers", len(queriers)).Debug("Querying")
+				return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 			},
 			func(k8sClient kubernetes.ClientInt) error {
 				monitor.WithField("destroyers", len(queriers)).Info("Destroy")
 				return operator.DestroyersToDestroyFunc(monitor, destroyers)(k8sClient)
 			},
 			func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, gitops bool) error {
-				return configureIAM(k8sClient, queried, gitops)
+
+				for _, configurer := range configurers {
+					if err := configurer(k8sClient, queried, gitops); err != nil {
+						return err
+					}
+				}
+
+				return nil
 			},
 			allSecrets,
 			allExisting,
-			migrate,
+			migrateIAM || migrateDBConn,
 			nil
 	}
 }
