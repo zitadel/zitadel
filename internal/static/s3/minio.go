@@ -31,7 +31,7 @@ func (m *Minio) PutObject(ctx context.Context, tenantID, location, resourceOwner
 		return nil, err
 	}
 	bucketName := m.prefixBucketName(tenantID)
-	objectName := fmt.Sprintf("%s/%d/%s", resourceOwner, objectType, name)
+	objectName := fmt.Sprintf("%s/%s", resourceOwner, name)
 	info, err := m.Client.PutObject(ctx, bucketName, objectName, object, objectSize, minio.PutObjectOptions{ContentType: contentType})
 	if err != nil {
 		return nil, caos_errs.ThrowInternal(err, "MINIO-590sw", "Errors.Assets.Object.PutFailed")

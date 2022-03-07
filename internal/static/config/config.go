@@ -17,7 +17,7 @@ type AssetStorageConfig struct {
 func (a *AssetStorageConfig) NewStorage(client *sql.DB) (static.Storage, error) {
 	t, ok := storage[a.Type]
 	if !ok {
-		return nil, errors.ThrowInternalf(nil, "STATIC-dsbjh", "config type %s not supported")
+		return nil, errors.ThrowInternalf(nil, "STATIC-dsbjh", "config type %s not supported", a.Type)
 	}
 
 	return t(client, a.Config)
