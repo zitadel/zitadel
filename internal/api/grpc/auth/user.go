@@ -168,6 +168,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		if err != nil {
 			return nil, err
 		}
+
 		grants, err := s.query.UserGrants(ctx, &query.UserGrantsQueries{Queries: []query.SearchQuery{userGrantProjectID, userGrantUserID}})
 		if err != nil {
 			return nil, err
