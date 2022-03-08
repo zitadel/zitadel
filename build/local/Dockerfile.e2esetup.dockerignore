@@ -1,0 +1,17 @@
+/.git/
+.codecov
+/.github/
+.gitignore
+.dockerignore
+**/Dockerfile
+/k8s/
+/operator/
+/docs/
+/console/
+!/console/e2e.env
+.releaserc.js
+changelog.config.js
+CONTRIBUTING.md
+LICENSE
+README.md
+SECURITY.md

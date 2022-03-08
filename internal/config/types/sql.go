@@ -20,7 +20,7 @@ type SQL struct {
 	Password        string
 	Database        string
 	Schema          string
-	SSL             *ssl
+	SSL             *SSL
 	MaxOpenConns    uint32
 	MaxConnLifetime Duration
 	MaxConnIdleTime Duration
@@ -35,7 +35,7 @@ type SQLBase struct {
 	Port     string
 	Database string
 	Schema   string
-	SSL      sslBase
+	SSL      SSLBase
 
 	//Additional options to be appended as options=<Options>
 	//The value will be taken as is. So be sure to separate multiple options by a space
@@ -45,22 +45,22 @@ type SQLBase struct {
 type SQLUser struct {
 	User     string
 	Password string
-	SSL      sslUser
+	SSL      SSLUser
 }
 
-type ssl struct {
-	sslBase
-	sslUser
+type SSL struct {
+	SSLBase
+	SSLUser
 }
 
-type sslBase struct {
+type SSLBase struct {
 	// type of connection security
 	Mode string
 	// RootCert Path to the CA certificate
 	RootCert string
 }
 
-type sslUser struct {
+type SSLUser struct {
 	// Cert Path to the client certificate
 	Cert string
 	// Key Path to the client private key
@@ -112,7 +112,7 @@ func (s *SQL) Start() (*sql.DB, error) {
 
 func (s *SQL) checkSSL() {
 	if s.SSL == nil || s.SSL.Mode == sslDisabledMode || s.SSL.Mode == "" {
-		s.SSL = &ssl{sslBase: sslBase{Mode: sslDisabledMode}}
+		s.SSL = &SSL{SSLBase: SSLBase{Mode: sslDisabledMode}}
 		return
 	}
 	if s.SSL.RootCert == "" {
@@ -132,12 +132,12 @@ func (u SQLUser) Start(base SQLBase) (*sql.DB, error) {
 		Password: u.Password,
 		Database: base.Database,
 		Options:  base.Options,
-		SSL: &ssl{
-			sslBase: sslBase{
+		SSL: &SSL{
+			SSLBase: SSLBase{
 				Mode:     base.SSL.Mode,
 				RootCert: base.SSL.RootCert,
 			},
-			sslUser: sslUser{
+			SSLUser: SSLUser{
 				Cert: u.SSL.Cert,
 				Key:  u.SSL.Key,
 			},

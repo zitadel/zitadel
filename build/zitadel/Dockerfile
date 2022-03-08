@@ -20,7 +20,7 @@ ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-${PROTOC_ARCH}.zip
 ARG GATEWAY_VERSION=2.6.0
 ARG VALIDATOR_VERSION=0.6.2
 
-RUN apk add tar curl
+RUN apk add tar curl rsync
 WORKDIR /proto
 
 #protoc
@@ -106,6 +106,7 @@ FROM go-stub as go-base
 # copy remaining zitadel files
 COPY . .
 
+
 #######################
 ## copy for local dev
 #######################
@@ -125,6 +126,21 @@ COPY --from=go-stub /go/src/github.com/caos/zitadel/docs/apis/assets docs/docs/a
 
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/authz.go ./internal/api/assets/authz.go
 COPY --from=go-stub /go/src/github.com/caos/zitadel/internal/api/assets/router.go ./internal/api/assets/router.go
+
+######################
+## Output generated files by running a container from this target mounting the target dir to /dest
+######################
+FROM base as merge-go-copy
+
+RUN apk add rsync
+
+COPY --from=go-copy / /src
+
+ENV UID=1000
+ENV GID=1000
+
+ENTRYPOINT [ "sh", "-c" ]
+CMD [ "rsync -a --chown $UID:$GID /src/ /dest" ]
 
 #######################
 ## Go test

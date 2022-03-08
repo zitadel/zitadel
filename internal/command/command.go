@@ -61,6 +61,12 @@ type orgFeatureChecker interface {
 	CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error
 }
 
+type OrgFeatureCheckerFunc func(ctx context.Context, orgID string, requiredFeatures ...string) error
+
+func (o OrgFeatureCheckerFunc) CheckOrgFeatures(ctx context.Context, orgID string, requiredFeatures ...string) error {
+	return o(ctx, orgID, requiredFeatures...)
+}
+
 type Config struct {
 	Eventstore types.SQLUser
 }
