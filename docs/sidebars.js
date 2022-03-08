@@ -218,7 +218,7 @@ module.exports = {
     {
       type: "category",
       label: "Structure",
-      collapsed: true,
+      collapsed: false,
       items: [
         "concepts/structure/overview",
         "concepts/structure/organizations",
