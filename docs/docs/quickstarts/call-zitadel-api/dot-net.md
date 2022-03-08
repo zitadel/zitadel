@@ -2,18 +2,22 @@
 title: .NET
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your .NET application.
+This guide shows you how to integrate **ZITADEL** into your .NET application.
 It demonstrates how to fetch some data from the ZITADEL management API.
 
-At the end of the guide you should have an application able to read the details of your organization.
+At the end of the guide, you should have an application that can read the details of your organization.
 
-If you need any other information about the .NET SDK go to the [documentation](https://caos.github.io/zitadel-net/) of the SDK itself.
+If you need any other information about the .NET SDK, go to the [.NET SDK documentation](https://caos.github.io/zitadel-net/).
+
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-net) will handle all necessary OAuth 2.0 requests and send the required headers to the ZITADEL API.
-All that is required, is a service account with an Org Owner (or another role, depending on the needed api requests) role assigned and its key JSON.
+The client [SDK](https://github.com/caos/zitadel-net) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API.
 
-However, we recommend you read the guide on [how to access ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
+You'll need a service account assigned with the Org-owner role. 
+(or another role, depending on the needed API requests).
+You'll also need the account's service key in a JSON file.
+
+For background information, we recommend reading the guide on [how to access ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
  - [Recommended Authorization Flows](../../guides/authorization/oauth-recommended-flows)
  - [Service Users](../../guides/authentication/serviceusers)
 
@@ -31,7 +35,7 @@ dotnet new web
 
 ### Install the package
 
-Install the package via nuget
+Install the package via nuget.
 
 ```bash
 dotnet add package Zitadel.Api
@@ -39,8 +43,11 @@ dotnet add package Zitadel.Api
 
 ### Create example client
 
-Change the program.cs file to the content below. This will create a client for the management api and call its `GetMyOrg` function.
-The SDK will make sure you will have access to the API by retrieving a Bearer Token using JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
+Change the program.cs file to the content below.
+This creates a client for the management API and calls its `GetMyOrg` function.
+
+To make sure you can access the API,
+the SDK retrieving a Bearer Token using a JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
 
 ```csharp
 using System;
@@ -75,7 +82,7 @@ Console.WriteLine($"{myOrg.Org.Name} was created on: {myOrg.Org.Details.Creation
 
 #### Custom ZITADEL instance
 
-If your client will not use ZITADEL Cloud (zitadel.ch), be sure to provide the correct values for the ZITADEL ProjectID, Issuer and API options:
+If your client does not use ZITADEL Cloud (zitadel.ch), be sure to provide the correct values for the ZITADEL `ProjectID`, `Issuer` and `API` options:
 ```csharp
 
 // Which api endpoint (self hosted or public)
@@ -91,7 +98,7 @@ ServiceAccountAuthentication = (sa, new()
 
 ### Test client
 
-After you have configured everything correctly, you can simply start the example by:
+After you have configured everything correctly, you can start the example with this command:
 
 ```bash
 dotnet run
@@ -108,8 +115,10 @@ ACME was created on: "2020-09-21T14:44:48.090431Z"
 You have successfully used the ZITADEL .NET SDK to call the management API!
 
 If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
-ensure your service user has the required permissions by assigning the `ORG_OWNER` or `ORG_OWNER_VIEWER` role
-and check the mentioned [guides](#prerequisites) at the beginning.
+make sure your service user has the required permissions.
+The service user needs the `ORG_OWNER` or `ORG_OWNER_VIEWER` role.
+
+For more help, check the [guides](#prerequisites) mentioned at the beginning.
 
 If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
 
