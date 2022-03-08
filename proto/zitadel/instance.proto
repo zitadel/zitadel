@@ -69,7 +69,7 @@ message InstanceDomainsQuery {
     repeated string domains = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"caos ag\"";
+            example: "\"caos.ch\"";
         }
     ];
     zitadel.v1.ListQueryIn method = 2 [
