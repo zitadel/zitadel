@@ -45,7 +45,7 @@
     border: 1px solid $border-color;
     display: flex;
     flex-direction: column;
-    background-color: map-get($background, card);
+    background-color: map-get($background, cards);
     flex: 0 1 230px;
     box-sizing: border-box;
     cursor: pointer;

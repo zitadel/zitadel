@@ -4,7 +4,7 @@
   $background: map-get($theme, background);
   $accent: map-get($theme, accent);
   $primary-color: mat.get-color-from-palette($primary, 500);
-  $card-background-color: mat.get-color-from-palette($background, card);
+  $card-background-color: mat.get-color-from-palette($background, cards);
 
   $warn-color: mat.get-color-from-palette($warn, 500);
   $accent-color: mat.get-color-from-palette($accent, 500);

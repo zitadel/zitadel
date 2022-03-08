@@ -20,7 +20,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: map-get($background, card);
+    background-color: map-get($background, cards);
     border-radius: 6px;
     padding: 1rem;
     font-size: 14px;
@@ -36,7 +36,7 @@
       border: 0.75rem solid transparent;
       border-top: none;
       border-radius: 4px;
-      border-bottom-color: map-get($background, card);
+      border-bottom-color: map-get($background, cards);
     }
   }
 

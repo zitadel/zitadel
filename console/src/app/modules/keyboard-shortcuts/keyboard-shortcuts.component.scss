@@ -9,7 +9,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   $accent-color: mat.get-color-from-palette($primary, 500);
   $back: map-get($background, background);
-  $card-background-color: mat.get-color-from-palette($background, card);
+  $card-background-color: mat.get-color-from-palette($background, cards);
 
   .keyboard-shortcuts-group {
     $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));

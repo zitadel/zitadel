@@ -14,7 +14,7 @@
   $back: map-get($background, background);
 
   $list-background-color: mat.get-color-from-palette($background, 300);
-  $card-background-color: mat.get-color-from-palette($background, card);
+  $card-background-color: mat.get-color-from-palette($background, cards);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #fff, #000);
 
