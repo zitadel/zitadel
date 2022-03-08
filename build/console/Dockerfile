@@ -1,4 +1,4 @@
-ARG NODE_VERSION=14
+ARG NODE_VERSION=16
 
 #######################
 ## These steps set platform / arch type specific variables

@@ -11,4 +11,4 @@ RUN mkdir /.cache && chmod 777 /.cache
 COPY ./go.* ./
 RUN go mod download
 
-CMD [ "./build/local/e2e-setup.sh" ]
+ENTRYPOINT [ "./build/local/e2e-setup.sh" ]
