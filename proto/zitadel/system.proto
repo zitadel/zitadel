@@ -53,42 +53,6 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
         url: "https://docs.zitadel.ch"
     }
 
-    security_definitions: {
-		security: {
-			key: "BasicAuth";
-			value: {
-				type: TYPE_BASIC;
-			}
-		}
-		security: {
-			key: "OAuth2";
-			value: {
-				type: TYPE_OAUTH2;
-				flow: FLOW_ACCESS_CODE;
-				authorization_url: "https://accounts.zitadel.io/oauth/v2/authorize";
-				token_url: "https://api.zitadel.io/oauth/v2/token";
-                scopes: {
-					scope: {
-						key: "openid";
-						value: "openid";
-					}
-                    scope: {
-                        key: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
-                        value: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
-                    }
-				}
-			}
-		}
-	}
-    security: {
-		security_requirement: {
-			key: "OAuth2";
-            value: {
-                scope: "openid";
-                scope: "urn:zitadel:iam:org:project:id:100992085158584780:aud";
-            }
-		}
-	}
     responses: {
         key: "403";
         value: {

@@ -20,22 +20,27 @@ message Instance {
             description: "current state of the instance";
         }
     ];
-    string domain = 4 [
+    string generated_domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"organization.zitadel.com\"";
+        }
+    ];
+    repeated string custom_domains = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"zitadel.com\"";
         }
     ];
-    string name = 5 [
+    string name = 6 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"ZITADEL\"";
         }
     ];
-    string version = 6 [
+    string version = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             example: "\"1.0.0\"";
         }
     ];
-    string subscription_name = 7 [
+    string subscription_name = 8 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "current name ";
         }
