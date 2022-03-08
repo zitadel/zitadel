@@ -87,9 +87,9 @@ func startE2ESetup(configPaths []string, debug bool) {
 	}}
 
 	err = execute(ctx, commands, conf.E2E, users)
-	logging.Log("MAIN-cgZ3p").OnError(err).Fatal("failed to execute commands steps")
+	logging.Log("MAIN-cgZ3p").OnError(err).Errorf("failed to execute commands steps")
 
-	eventualConsistencyCtx, cancel := context.WithTimeout(ctx, 15*time.Minute)
+	eventualConsistencyCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
 	err = awaitConsistency(
 		eventualConsistencyCtx,

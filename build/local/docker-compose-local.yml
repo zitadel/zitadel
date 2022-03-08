@@ -8,6 +8,8 @@ services:
       - zitadel
     image: cockroachdb/cockroach:v21.2.5
     command: start-single-node --insecure --listen-addr=0.0.0.0
+    volumes:
+      - zitadel-data:/cockroach/cockroach-data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
       interval: 10s
@@ -74,7 +76,7 @@ services:
       dockerfile: build/local/Dockerfile.keys
       target: gen-keys
     volumes:
-      - ../../.:/zitadel
+      - zitadel-keys:/zitadel
     env_file:
       - ./local.env
 
@@ -99,7 +101,7 @@ services:
       args:
         ENV: dev
     volumes:
-      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+      - zitadel-keys:/go/src/github.com/caos/zitadel/.keys
     env_file:
       - ./local.env
     environment:
@@ -295,3 +297,7 @@ services:
 
 networks:
   zitadel: {}
+
+volumes:
+  zitadel-data: {}
+  zitadel-keys: {}
