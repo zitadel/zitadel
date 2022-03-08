@@ -37,7 +37,7 @@ Create a new go file with the following snippet.
 This creates a client for the management API and calls its `GetMyOrg` function.
 
 To make sure you can access the API,
-the SDK retrieving a Bearer Token using a JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
+the SDK retrieves a Bearer Token using a JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
 
 ```go
 package main
@@ -78,7 +78,7 @@ func main() {
 }
 ```
 
-#### Key JSON
+#### JSON
 
 To provide the JSON key to the SDK, simply set an environment variable `ZITADEL_KEY_PATH`, using the path to the JSON as the value.
 
@@ -110,7 +110,7 @@ client, err := management.NewClient(
 
 ### Test client
 
-After you have configured everything correctly, you can start the example with this command:
+After correctly configuring everything, start the example with this command:
 
 ```bash
 go run main.go
@@ -136,7 +136,8 @@ If you've run into any other problems, don't hesitate to contact us or raise an 
 
 ### Whats next?
 
-Now you can implement our APIs by adding more calls or by trying to overwrite the organization context:
+Now develop on our APIs by adding more calls.
+You can also try to overwrite the organization context:
 
 ```go
     respOverwrite, err := client.GetMyOrg(middleware.SetOrgID(ctx, "74161146763996133"), &pb.GetMyOrgRequest{})

@@ -13,7 +13,7 @@ If you need any other information about the .NET SDK, go to the [.NET SDK docume
 
 The client [SDK](https://github.com/caos/zitadel-net) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API.
 
-You'll need a service account assigned with the Org-owner role. 
+You'll need a service account assigned with the Org-owner role
 (or another role, depending on the needed API requests).
 You'll also need the account's service key in a JSON file.
 
@@ -21,7 +21,7 @@ For background information, we recommend reading the guide on [how to access ZIT
  - [Recommended Authorization Flows](../../guides/authorization/oauth-recommended-flows)
  - [Service Users](../../guides/authentication/serviceusers)
 
-> Be sure to have a valid key JSON and that its service account is either ORG_OWNER or at least ORG_OWNER_VIEWER before you continue with this guide.
+> Be sure that you have a valid JSON key and that its service account is either `ORG_OWNER` or at least `ORG_OWNER_VIEWER`.
 
 ## .NET Setup
 
@@ -47,7 +47,7 @@ Change the program.cs file to the content below.
 This creates a client for the management API and calls its `GetMyOrg` function.
 
 To make sure you can access the API,
-the SDK retrieving a Bearer Token using a JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
+the SDK retrieves a Bearer Token using a JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
 
 ```csharp
 using System;
@@ -98,7 +98,7 @@ ServiceAccountAuthentication = (sa, new()
 
 ### Test client
 
-After you have configured everything correctly, you can start the example with this command:
+After correctly configuring everything, start the example with this command:
 
 ```bash
 dotnet run
@@ -124,7 +124,7 @@ If you've run into any other problem, don't hesitate to contact us or raise an i
 
 ### Whats next?
 
-Now you can proceed implementing our APIs by adding more calls.
+Now you can develop on the APIs by adding more calls.
 
 Checkout more [examples from the SDK](https://github.com/caos/zitadel-go/blob/main/example) or refer to our [API Docs](../../apis/introduction).
 
