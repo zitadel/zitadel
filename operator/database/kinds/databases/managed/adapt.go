@@ -39,8 +39,7 @@ const (
 	Clean              = "clean"
 	DBReady            = "dbready"
 	rootCertsSecret    = "root-certs"
-	nodeCertsSecret    = "node-certs"
-	zitadelCertsSecret = "zitadel-certs"
+	nodeCertsSecret    = "cockroachdb.node" // for backward compatibility
 	clientCertsPath    = "/cockroach/cockroach-client-certs"
 )
 
