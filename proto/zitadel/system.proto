@@ -75,12 +75,6 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
             }
         }
     }
-    extensions: {
-        key: "x-zitadel-domain";
-        value: {
-            string_value: "your-instance-domain";
-        }
-    }
 };
 
 service SystemService {
@@ -119,7 +113,7 @@ service SystemService {
     // Returns the detail of an instance
     rpc GetInstance(GetInstanceRequest) returns (GetInstanceResponse) {
         option (google.api.http) = {
-            get: "/instances/{domain}";
+            get: "/instances/{id}";
         };
     }
 
@@ -127,7 +121,7 @@ service SystemService {
     // This might take some time
     rpc AddInstance(AddInstanceRequest) returns (AddInstanceResponse) {
         option (google.api.http) = {
-            post: "/instances/{domain}"
+            post: "/instances"
             body: "*"
         };
     }
@@ -136,50 +130,57 @@ service SystemService {
     // This might take some time
     rpc RemoveInstance(RemoveInstanceRequest) returns (RemoveInstanceResponse) {
         option (google.api.http) = {
-            delete: "/instances/{domain}"
+            delete: "/instances/{id}"
         };
     }
 
     // Returns the usage metrics of an instance
-    rpc GetUsageMetrics(GetUsageMetricsRequest) returns (GetUsageMetricsResponse) {
+    rpc GetUsage(GetUsageRequest) returns (GetUsageResponse) {
         option (google.api.http) = {
-            get: "/usage/metrics/{domain}";
+            get: "/instances/{id}/usage";
         };
     }
 
     // Returns the metrics of an instance
-    rpc GetInstanceMetrics(GetInstanceMetricsRequest) returns (GetInstanceMetricsResponse) {
+    rpc GetInstanceMetrics(GetMetricsRequest) returns (GetMetricsResponse) {
         option (google.api.http) = {
-            get: "/instance/metrics/{domain}";
+            get: "/instances/{id}/metrics";
         };
     }
 
     // Returns the region of an instance
     rpc GetRegion(GetRegionRequest) returns (GetRegionResponse) {
         option (google.api.http) = {
-            get: "/region/{domain}";
+            get: "/instances/{id}/region";
         };
     }
 
     // Change the region of an instance
     rpc ChangeRegion(ChangeRegionRequest) returns (ChangeRegionResponse) {
         option (google.api.http) = {
-            put: "/region/{domain}";
+            put: "/instances/{id}/region";
             body: "*"
         };
     }
 
     // Returns the domain of an instance
-    rpc GetDomain(GetDomainRequest) returns (GetDomainResponse) {
+    rpc GetGeneratedDomain(GetGeneratedDomainRequest) returns (GetGeneratedDomainResponse) {
         option (google.api.http) = {
-            get: "/domain/{domain}";
+            get: "/instances/{id}/domains/generated";
+        };
+    }
+
+    // Returns the custom domains of an instance
+    rpc GetCustomDomains(GetCustomDomainsRequest) returns (GetCustomDomainsResponse) {
+        option (google.api.http) = {
+            get: "/instances/{id}/domains/custom";
         };
     }
 
     // Returns the domain of an instance
-    rpc AddDomain(AddDomainRequest) returns (AddDomainResponse) {
+    rpc AddCustomDomain(AddCustomDomainRequest) returns (AddCustomDomainResponse) {
         option (google.api.http) = {
-            post: "/domain/{domain}";
+            post: "/instances/{id}/domains/custom";
             body: "*"
         };
     }
@@ -190,10 +191,6 @@ service SystemService {
     rpc ListViews(ListViewsRequest) returns (ListViewsResponse) {
         option (google.api.http) = {
             post: "/views/_search";
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.read";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -217,7 +214,7 @@ service SystemService {
     // Search requests will return wrong results until all deltas are recomputed
     rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
         option (google.api.http) = {
-            post: "/views/{database}/{view_name}";
+            post: "/instances/{id}/views/{database}/{view_name}";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -244,11 +241,7 @@ service SystemService {
     // For example if the SMTP-API wasn't able to send an email at the first time
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
-            post: "/failedevents/_search";
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.read";
+            post: "/instances/{id}/failedevents/_search";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -273,11 +266,7 @@ service SystemService {
     // failed event. You can find out if it worked on the `failure_count`
     rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
         option (google.api.http) = {
-            delete: "/failedevents/{database}/{view_name}/{failed_sequence}";
-        };
-
-        option (zitadel.v1.auth_option) = {
-            permission: "iam.write";
+            delete: "/instances/{id}/failedevents/{database}/{view_name}/{failed_sequence}";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -337,7 +326,7 @@ message ListInstancesResponse {
 }
 
 message GetInstanceRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetInstanceResponse {
@@ -345,10 +334,10 @@ message GetInstanceResponse {
 }
 
 message AddInstanceRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string instance_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string first_org_name = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.instance.v1.Region region = 4;
+    string instance_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string first_org_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    zitadel.instance.v1.Region region = 3;
+    string custom_domain = 4 [(validate.rules).string = {max_len: 200}];
     string owner_first_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string owner_last_name = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string owner_email = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
@@ -364,28 +353,28 @@ message AddInstanceResponse {
 }
 
 message RemoveInstanceRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message RemoveInstanceResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetUsageMetricsRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+message GetUsageRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetUsageMetricsResponse {
+message GetUsageResponse {
     zitadel.v1.ObjectDetails details = 1;
     uint64 executed_requests = 2;
     uint64 executed_action_mins = 3;
 }
 
-message GetInstanceMetricsRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+message GetMetricsRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message GetInstanceMetricsResponse {
+message GetMetricsResponse {
     zitadel.v1.ObjectDetails details = 1;
     uint64 org_count = 2;
     uint64 user_count = 3;
@@ -394,7 +383,7 @@ message GetInstanceMetricsResponse {
 }
 
 message GetRegionRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
 message GetRegionResponse {
@@ -403,7 +392,7 @@ message GetRegionResponse {
 }
 
 message ChangeRegionRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     zitadel.instance.v1.Region region = 4;
 }
 
@@ -411,21 +400,30 @@ message ChangeRegionResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
-message GetDomainRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+message GetGeneratedDomainRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-//TODO: I don't know what we should send here? Do we really need this request?
-message GetDomainResponse {
+message GetGeneratedDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
+    string domain = 2;
 }
 
-message AddDomainRequest {
-    string domain = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string new_domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+message GetCustomDomainsRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
 
-message AddDomainResponse {
+message GetCustomDomainsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    repeated string domains = 2;
+}
+
+message AddCustomDomainRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string custom_domain = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddCustomDomainResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

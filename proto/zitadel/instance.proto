@@ -37,7 +37,7 @@ message Instance {
     ];
     string version = 7 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"1.0.0\"";
+            example: "\"v1.0.0\"";
         }
     ];
     string subscription_name = 8 [
@@ -77,7 +77,7 @@ message InstanceDomainsQuery {
             example: "\"caos.ch\"";
         }
     ];
-    zitadel.v1.ListQueryIn method = 2 [
+    zitadel.v1.ListQueryMethod method = 2 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "defines which list equality method is used";
