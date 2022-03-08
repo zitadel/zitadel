@@ -415,13 +415,13 @@ type AssertionType struct {
 type SubjectType struct {
 	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion Subject"`
 
-	SubjectConfirmation []SubjectConfirmationType `xml:"SubjectConfirmation"`
-
 	BaseID *BaseIDAbstractType `xml:"BaseID"`
 
 	NameID *NameIDType `xml:"urn:oasis:names:tc:SAML:2.0:assertion NameID"`
 
 	EncryptedID *EncryptedElementType `xml:"EncryptedID"`
+
+	SubjectConfirmation []SubjectConfirmationType `xml:"SubjectConfirmation"`
 
 	InnerXml string `xml:",innerxml"`
 }
