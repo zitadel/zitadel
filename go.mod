@@ -12,10 +12,10 @@ require (
 	github.com/VictoriaMetrics/fastcache v1.8.0
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b
 	github.com/allegro/bigcache v1.2.1
-	github.com/aws/aws-sdk-go-v2 v1.11.2
+	github.com/aws/aws-sdk-go-v2 v1.15.0
 	github.com/aws/aws-sdk-go-v2/config v1.11.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.6.4
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.21.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.0
 	github.com/boombuler/barcode v1.0.1
 	github.com/caos/logging v0.0.2
 	github.com/caos/oidc v1.0.1
@@ -27,6 +27,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-oss/image v0.1.0
+	github.com/golang-jwt/jwt/v4 v4.1.0
 	github.com/golang/glog v1.0.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
@@ -71,7 +72,6 @@ require (
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.8
 	google.golang.org/api v0.61.0
-	google.golang.org/genproto v0.0.0-20211129164237-f09f9a12af12
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/square/go-jose.v2 v2.6.0
@@ -92,17 +92,18 @@ require (
 	github.com/AppsFlyer/go-sundheit v0.2.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.8.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.2 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.0.2 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.6 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.5.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.5.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.9.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.11.1 // indirect
-	github.com/aws/smithy-go v1.9.0 // indirect
+	github.com/aws/smithy-go v1.11.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.2.1 // indirect
@@ -134,12 +135,11 @@ require (
 	github.com/gofrs/flock v0.8.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
-	github.com/google/go-cmp v0.5.6 // indirect
+	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/go-github/v31 v31.0.0 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
@@ -200,13 +200,14 @@ require (
 	go.opentelemetry.io/proto/otlp v0.10.0 // indirect
 	golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
+	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sys v0.0.0-20211205182925-97ca703d548d // indirect
 	golang.org/x/term v0.0.0-20210503060354-a79de5458b56 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.2.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto v0.0.0-20211129164237-f09f9a12af12 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
