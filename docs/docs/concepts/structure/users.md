@@ -22,8 +22,6 @@ ZITADEL allows storing arbitrary key-value metadata on a user object. This can b
 
 Instead of an [Organization Grant](/docs/guides/basics/projects#exercise---grant-a-project) you can also grant roles from a project to an individual user from another Organization. This feature is called User Grant.
 
-## Human vs. Machine (Service Users)
+import UserDescription from './_user_description.mdx';
 
-ZITADEL supports human an machine users. We call human users simply "Users" and machine users "Service Users".
-
-With Service Users you would typically secure backend services. For example in ZITADEL you would require an authenticated Service User to access the Management API. The main difference between human and machine users is the type of credentials that can be used for authentication: Human users typically logon via an login prompt, but Machine users require a non-interactive logon process.
+<UserDescription name="UserDescription" />
