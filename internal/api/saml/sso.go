@@ -74,7 +74,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 
 	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
 	if err != nil {
-		logging.Log("SAML-317s2s").Error(err)
+		logging.Log(" SAML-317s2s").Error(err)
 		http.Error(w, fmt.Errorf("failed to find registered serviceprovider: %w", err).Error(), http.StatusInternalServerError)
 		return
 	}

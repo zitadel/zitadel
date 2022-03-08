@@ -16,6 +16,7 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"math/big"
 	"net/url"
+	"strings"
 )
 
 type ServiceProviderConfig struct {
@@ -65,6 +66,8 @@ func NewServiceProvider(id string, config *ServiceProviderConfig, defaultLoginUR
 		}
 
 		if certStr != "" {
+			certStr = strings.ReplaceAll(certStr, "\n", "")
+			certStr = strings.ReplaceAll(certStr, " ", "")
 			block, err := base64.StdEncoding.DecodeString(certStr)
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse PEM block containing the public key")
