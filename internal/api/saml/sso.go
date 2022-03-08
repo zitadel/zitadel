@@ -326,9 +326,9 @@ func verifyForm(r *AuthRequestForm) error {
 		return fmt.Errorf("empty RelayState")
 	}
 	//should be 80, but google / SNOW implement it wrong
-	if len(r.RelayState) > 300 {
+	/*if len(r.RelayState) > 80 {
 		return fmt.Errorf("relaystate should not be longer than 300")
-	}
+	}*/
 
 	if r.SigAlg != "" {
 		if r.Sig == "" {
