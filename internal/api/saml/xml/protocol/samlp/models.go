@@ -305,11 +305,11 @@ type Response struct {
 
 	Signature *xml_dsig.SignatureType `xml:"Signature"`
 
+	Status StatusType `xml:"Status"`
+
 	Assertion saml.Assertion `xml:"Assertion"`
 
 	Extensions *ExtensionsType `xml:"Extensions"`
-
-	Status StatusType `xml:"Status"`
 }
 
 // Element
