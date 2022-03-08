@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -47,7 +46,6 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     CardModule,
     MatIconModule,
     ReactiveFormsModule,
-    MatButtonToggleModule,
     MetaLayoutModule,
     MatTabsModule,
     MatTooltipModule,
@@ -67,4 +65,4 @@ import { OrgsRoutingModule } from './orgs-routing.module';
     ZitadelTierModule,
   ],
 })
-export class OrgsModule { }
+export class OrgsModule {}
