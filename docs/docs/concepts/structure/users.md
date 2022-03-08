@@ -20,7 +20,7 @@ ZITADEL allows storing arbitrary key-value metadata on a user object. This can b
 
 ## User Grant
 
-Instead of an [Organization Grant](/docs/guides/basics/projects#exercise---grant-a-project) you can also grant roles from a project to an individual user from another Organization. This feature is called User Grant.
+You can grant roles from a project to an individual user from your own or another Organization. This feature is called User Grant.
 
 import UserDescription from './_user_description.mdx';
 
