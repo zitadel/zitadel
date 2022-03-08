@@ -2,6 +2,7 @@ package bucket
 
 import (
 	"fmt"
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -32,8 +33,7 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	version string,
-	dbURL string,
-	dbPort int32,
+	dbConn db.Connection,
 	features []string,
 	customImageRegistry string,
 ) operator.AdaptFunc {
@@ -85,8 +85,7 @@ func AdaptFunc(
 			timestamp,
 			nodeselector,
 			tolerations,
-			dbURL,
-			dbPort,
+			dbConn,
 			features,
 			image,
 		)
@@ -106,31 +105,12 @@ func AdaptFunc(
 			checkDBReady,
 			secretName,
 			secretKey,
-			dbURL,
-			dbPort,
+			dbConn,
 			image,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
-
-		/*_, destroyC, err := clean.AdaptFunc(
-			monitor,
-			name,
-			namespace,
-			componentLabels,
-			[]string{},
-			[]string{},
-			nodeselector,
-			tolerations,
-			checkDBReady,
-			secretName,
-			secretKey,
-			image,
-		)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}*/
 
 		destroyers := make([]operator.DestroyFunc, 0)
 		for _, feature := range features {
@@ -140,10 +120,7 @@ func AdaptFunc(
 					operator.ResourceDestroyToZitadelDestroy(destroyS),
 					destroyB,
 				)
-			/*case clean.Instant:
-			destroyers = append(destroyers,
-				destroyC,
-			)*/
+
 			case restore.Instant:
 				destroyers = append(destroyers,
 					destroyR,
@@ -180,8 +157,7 @@ func AdaptFunc(
 					timestamp,
 					nodeselector,
 					tolerations,
-					dbURL,
-					dbPort,
+					dbConn,
 					features,
 					image,
 				)
@@ -201,31 +177,12 @@ func AdaptFunc(
 					checkDBReady,
 					secretName,
 					secretKey,
-					dbURL,
-					dbPort,
+					dbConn,
 					image,
 				)
 				if err != nil {
 					return nil, err
 				}
-
-				/*queryC, _, err := clean.AdaptFunc(
-					monitor,
-					name,
-					namespace,
-					componentLabels,
-					databases,
-					users,
-					nodeselector,
-					tolerations,
-					checkDBReady,
-					secretName,
-					secretKey,
-					image,
-				)
-				if err != nil {
-					return nil, err
-				}*/
 
 				queriers := make([]operator.QueryFunc, 0)
 				cleanupQueries := make([]operator.QueryFunc, 0)
@@ -244,14 +201,7 @@ func AdaptFunc(
 						cleanupQueries = append(cleanupQueries,
 							operator.EnsureFuncToQueryFunc(backup.GetCleanupFunc(monitor, namespace, name)),
 						)
-					/*case clean.Instant:
-					queriers = append(queriers,
-						operator.ResourceQueryToZitadelQuery(queryS),
-						queryC,
-					)
-					cleanupQueries = append(cleanupQueries,
-						operator.EnsureFuncToQueryFunc(clean.GetCleanupFunc(monitor, namespace, name)),
-					)*/
+
 					case restore.Instant:
 						queriers = append(queriers,
 							operator.ResourceQueryToZitadelQuery(queryS),

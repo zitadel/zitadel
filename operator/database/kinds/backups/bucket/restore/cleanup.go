@@ -19,9 +19,11 @@ func GetCleanupFunc(
 			return fmt.Errorf("error while waiting for restore to be completed: %w", err)
 		}
 		monitor.Info("restore is completed, cleanup")
+
 		if err := k8sClient.DeleteJob(namespace, GetJobName(backupName)); err != nil {
 			return fmt.Errorf("error while trying to cleanup restore: %w", err)
 		}
+
 		monitor.Info("restore cleanup is completed")
 		return nil
 	}

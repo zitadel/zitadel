@@ -2,7 +2,6 @@ package backups
 
 import (
 	"fmt"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
@@ -11,6 +10,7 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/backups/bucket"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3"
+	"github.com/caos/zitadel/pkg/databases/db"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -26,8 +26,7 @@ func Adapt(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	version string,
-	dbURL string,
-	dbPort int32,
+	dbConn db.Connection,
 	features []string,
 	customImageRegistry string,
 ) (
@@ -39,6 +38,7 @@ func Adapt(
 	bool,
 	error,
 ) {
+
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/BucketBackup":
 		return bucket.AdaptFunc(
@@ -56,8 +56,7 @@ func Adapt(
 			nodeselector,
 			tolerations,
 			version,
-			dbURL,
-			dbPort,
+			dbConn,
 			features,
 			customImageRegistry,
 		)(monitor, desiredTree, currentTree)
@@ -77,8 +76,7 @@ func Adapt(
 			nodeselector,
 			tolerations,
 			version,
-			dbURL,
-			dbPort,
+			dbConn,
 			features,
 			customImageRegistry,
 		)(monitor, desiredTree, currentTree)

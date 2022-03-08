@@ -1,5 +1,7 @@
 package migration
 
+/* Deprecated in V2
+
 import (
 	"testing"
 
@@ -178,3 +180,4 @@ func TestMigration_AdaptFunc(t *testing.T) {
 	assert.NoError(t, ensure(client))
 
 }
+*/

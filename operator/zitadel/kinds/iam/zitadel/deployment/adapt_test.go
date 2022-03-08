@@ -1,5 +1,7 @@
 package deployment
 
+/* Deprecated in V2
+
 import (
 	"testing"
 
@@ -167,3 +169,6 @@ func TestDeployment_Adapt(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(k8sClient))
 }
+
+
+*/

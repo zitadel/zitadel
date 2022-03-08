@@ -52,15 +52,21 @@ var (
 
 type ProjectGrantMembersQuery struct {
 	MembersQuery
-	ProjectID, GrantID string
+	ProjectID, GrantID, OrgID string
 }
 
 func (q *ProjectGrantMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return q.MembersQuery.
 		toQuery(query).
-		Where(sq.Eq{
-			ProjectGrantMemberProjectID.identifier(): q.ProjectID,
-			ProjectGrantMemberGrantID.identifier():   q.GrantID,
+		Where(sq.And{
+			sq.Eq{
+				ProjectGrantMemberProjectID.identifier(): q.ProjectID,
+				ProjectGrantMemberGrantID.identifier():   q.GrantID,
+			},
+			sq.Or{
+				sq.Eq{ProjectGrantColumnResourceOwner.identifier(): q.OrgID},
+				sq.Eq{ProjectGrantColumnGrantedOrgID.identifier(): q.OrgID},
+			},
 		})
 }
 
@@ -108,6 +114,7 @@ func prepareProjectGrantMembersQuery() (sq.SelectBuilder, func(*sql.Rows) (*Memb
 			LeftJoin(join(HumanUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(MachineUserIDCol, ProjectGrantMemberUserID)).
 			LeftJoin(join(LoginNameUserIDCol, ProjectGrantMemberUserID)).
+			LeftJoin(join(ProjectGrantColumnGrantID, ProjectGrantMemberGrantID)).
 			Where(
 				sq.Eq{LoginNameIsPrimaryCol.identifier(): true},
 			).PlaceholderFormat(sq.Dollar),

@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/pkg/databases"
+
 	"github.com/caos/zitadel/operator/database"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	"github.com/caos/zitadel/operator/zitadel"
@@ -34,7 +36,12 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			return err
 		}
 
-		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "iam"}), k8sClient)
+		dbClient, err := databases.NewConnection(monitor, k8sClient, gitops, orbConfig)
+		if err != nil {
+			return err
+		}
+
+		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc("ensure", version, gitops, []string{"operator", "iam", "dbconnection"}, dbClient), k8sClient)
 
 		go func() {
 			started := time.Now()

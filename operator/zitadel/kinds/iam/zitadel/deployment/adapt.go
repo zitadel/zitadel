@@ -1,7 +1,10 @@
 package deployment
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -16,7 +19,6 @@ import (
 )
 
 const (
-	rootSecret    = "client-root"
 	dbSecrets     = "db-secrets"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
@@ -47,10 +49,10 @@ func AdaptFunc(
 	configurationDone operator.EnsureFunc,
 	setupDone operator.EnsureFunc,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) (
 	func(
-		necessaryUsers map[string]string,
-		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
@@ -66,15 +68,9 @@ func AdaptFunc(
 	}
 
 	return func(
-			necessaryUsers map[string]string,
-			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				users := make([]string, 0)
-				for user := range necessaryUsers {
-					users = append(users, user)
-				}
-
 				deploymentDef := deploymentDef(
 					nameLabels,
 					namespace,
@@ -83,7 +79,6 @@ func AdaptFunc(
 					nodeSelector,
 					tolerations,
 					affinity,
-					users,
 					version,
 					resources,
 					cmName,
@@ -94,9 +89,10 @@ func AdaptFunc(
 					secretVarsName,
 					secretPasswordsName,
 					customImageRegistry,
+					dbConn,
 				)
 
-				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
+				hashes, err := getConfigurationHashes(k8sClient, queried)
 				if err != nil {
 					return nil, err
 				}
@@ -135,7 +131,6 @@ func deploymentDef(
 	nodeSelector map[string]string,
 	tolerations []corev1.Toleration,
 	affinity *k8s.Affinity,
-	users []string,
 	version *string,
 	resources *k8s.Resources,
 	cmName string,
@@ -146,7 +141,19 @@ func deploymentDef(
 	secretVarsName string,
 	secretPasswordsName string,
 	customImageRegistry string,
+	dbConn db.Connection,
 ) *appsv1.Deployment {
+
+	chownedVolumeMount := corev1.VolumeMount{
+		Name:      "chowned-certs",
+		MountPath: certPath,
+	}
+
+	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", RunAsUser, RunAsUser), corev1.VolumeMount{
+		Name:      "certs",
+		MountPath: "certificates",
+	}, chownedVolumeMount)
+
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        nameLabels.Name(),
@@ -172,18 +179,10 @@ func deploymentDef(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector: nodeSelector,
-					Tolerations:  tolerations,
-					Affinity:     affinity.K8s(),
-					InitContainers: []corev1.Container{
-						GetInitContainer(
-							rootSecret,
-							dbSecrets,
-							users,
-							RunAsUser,
-							customImageRegistry,
-						),
-					},
+					NodeSelector:   nodeSelector,
+					Tolerations:    tolerations,
+					Affinity:       affinity.K8s(),
+					InitContainers: []corev1.Container{chownCertsContainer},
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
@@ -192,24 +191,21 @@ func deploymentDef(
 							true,
 							GetResourcesFromDefault(resources),
 							cmName,
-							certPath,
 							secretName,
 							secretPath,
 							consoleCMName,
 							secretVarsName,
-							secretPasswordsName,
-							users,
-							dbSecrets,
+							chownedVolumeMount,
 							"start",
 							customImageRegistry,
+							dbConn,
 						),
 					},
-					Volumes: GetVolumes(
+					Volumes: append(GetVolumes(
 						secretName,
 						secretPasswordsName,
 						consoleCMName,
-						users,
-					),
+					), srcVolume, destVolume),
 				},
 			},
 		},

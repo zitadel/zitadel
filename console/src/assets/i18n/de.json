@@ -1206,7 +1206,7 @@
       "OPTIONS": "Optionen",
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
       "ASSERTION_DESCRIPTION": "Rolleninformationen werden auf dem UserInfo Endpoint oder je nach Applikationseinstellungen in Tokens oder anderen Methoden bereitgestellt.",
-      "CHECK": "Rollen bei Authentisierung prüfen",
+      "CHECK": "Berechtigung bei Authentisierung prüfen",
       "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden."
     },
     "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
