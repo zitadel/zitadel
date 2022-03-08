@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
@@ -70,28 +69,6 @@ export class OrgDetailComponent implements OnInit {
       });
     this.loadMembers();
     this.loadFeatures();
-  }
-
-  public changeState(event: MatButtonToggleChange | any): void {
-    if (event.value === OrgState.ORG_STATE_ACTIVE) {
-      this.mgmtService
-        .reactivateOrg()
-        .then(() => {
-          this.toast.showInfo('ORG.TOAST.REACTIVATED', true);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    } else if (event.value === OrgState.ORG_STATE_INACTIVE) {
-      this.mgmtService
-        .deactivateOrg()
-        .then(() => {
-          this.toast.showInfo('ORG.TOAST.DEACTIVATED', true);
-        })
-        .catch((error) => {
-          this.toast.showError(error);
-        });
-    }
   }
 
   public openAddMember(): void {

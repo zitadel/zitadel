@@ -6,6 +6,7 @@ declare const tinycolor: any;
 export interface Color {
   name: string;
   hex: string;
+  rgb: string;
   darkContrast: boolean;
 }
 
@@ -88,6 +89,7 @@ export class ThemeService {
     return {
       name: name,
       hex: c.toHexString(),
+      rgb: c.toRgbString(),
       darkContrast: c.isLight(),
     };
   }

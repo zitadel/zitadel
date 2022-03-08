@@ -17,7 +17,7 @@
   $is-dark-theme: map-get($theme, is-dark);
   $back: map-get($theme, background);
   $fg: map-get($theme, foreground);
-  $cardback: map-get($back, card);
+  $cardback: map-get($back, cards);
   $text: map-get($fg, text);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 

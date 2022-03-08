@@ -235,6 +235,10 @@ $caos-dark-theme-background: (
   background: map_get($caos-dark-background, 500),
   hover: rgba(black, 0.04),
   card: map_get($caos-dark-background, 400),
+  card: #222,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-dark-background, 400),
   contributor: map_get($caos-dark-background, 400),
   contributor-avatar: map_get($caos-dark-background, 300),
   dialog: map_get($caos-dark-background, 500),
@@ -264,9 +268,12 @@ $caos-light-theme-background: (
   app-bar: map_get($caos-light-background, 100),
   background: map_get($caos-light-background, 500),
   hover: rgba(black, 0.04),
-  card: map_get($caos-light-background, 400),
   contributor: #00000010,
   contributor-avatar: map_get($caos-light-primary, 300),
+  card: #fff,
+  // set fixed color due to https://github.com/angular/components/pull/14253
+  // change where a scss mix function can't use a css var
+  cards: map_get($caos-light-background, 400),
   dialog: map_get($caos-light-background, 500),
   disabled-button: rgba(black, 0.12),
   raised-button: white,
@@ -357,8 +364,6 @@ $custom-typography: mat.define-typography-config(
 /* stylelint-enable */
 
 @include mat.core($custom-typography);
-@include component-themes($caos-dark-app-theme);
-@include mat.all-component-themes($caos-dark-app-theme);
 
 .mat-dialog-container,
 .mat-raised-button,

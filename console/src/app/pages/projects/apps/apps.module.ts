@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -70,7 +69,6 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     ClientKeysModule,
     MatIconModule,
     MatSelectModule,
-    MatButtonToggleModule,
     MatButtonModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,

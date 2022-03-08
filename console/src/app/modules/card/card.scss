@@ -4,7 +4,7 @@
   $primary: map-get($theme, primary);
   $primary-color: mat.get-color-from-palette($primary, 500);
   $background: map-get($theme, background);
-  $card-background-color: mat.get-color-from-palette($background, card);
+  $card-background-color: mat.get-color-from-palette($background, cards);
   $is-dark-theme: map-get($theme, is-dark);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
   $border-selected-color: if($is-dark-theme, #fff, #000);
