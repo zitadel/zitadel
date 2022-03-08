@@ -23,6 +23,8 @@ jobs:
 
     steps:
 
+    - run: echo "$(id -u):$(id -g)"
+
     - name: Checkout
       uses: actions/checkout@v2
 
