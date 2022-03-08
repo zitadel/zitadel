@@ -20,8 +20,8 @@ jobs:
       TERM: xterm
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
-      UID: 1001
-      GID: 121
+      UID: 501
+      GID: 20
 
     steps:
 
