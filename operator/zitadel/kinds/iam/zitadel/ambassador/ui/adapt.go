@@ -43,10 +43,6 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			_, found, err := k8sClient.CheckCRD("mappings.getambassador.io")
-			if err != nil || !found {
-				return func(k8sClient kubernetes.ClientInt) error { return nil }, err
-			}
 
 			accountsDomain := dns.Subdomains.Accounts + "." + dns.Domain
 			consoleDomain := dns.Subdomains.Console + "." + dns.Domain

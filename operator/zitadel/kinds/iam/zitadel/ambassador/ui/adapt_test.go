@@ -34,7 +34,7 @@ func SetReturnResourceVersion(
 }
 
 func SetCheckCRD(k8sClient *kubernetesmock.MockClientInt) {
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(2).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 }
 
 func SetMappingsEmpty(

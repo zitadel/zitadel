@@ -314,7 +314,7 @@ func TestStatefulset_Adapt1(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
-	ensure, err := query(k8sClient)
+	ensure, err := query(k8sClient, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
 
@@ -516,7 +516,7 @@ func TestStatefulset_Adapt2(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
-	ensure, err := query(k8sClient)
+	ensure, err := query(k8sClient, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, ensure)
 

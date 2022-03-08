@@ -53,7 +53,7 @@ func TestGrpc_Adapt(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(3).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 
 	group := "getambassador.io"
 	version := "v2"
@@ -169,7 +169,7 @@ func TestGrpc_Adapt2(t *testing.T) {
 
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(3).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 
 	group := "getambassador.io"
 	version := "v2"

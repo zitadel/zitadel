@@ -45,7 +45,7 @@ func SetMappingsUI(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Mapping"
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(2).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, ui.AccountsName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, ui.AccountsName, gomock.Any()).MinTimes(1).MaxTimes(1)
@@ -60,7 +60,7 @@ func SetMappingsHTTP(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Mapping"
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(9).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, http.AdminRName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, http.AdminRName, gomock.Any()).MinTimes(1).MaxTimes(1)
@@ -89,7 +89,7 @@ func SetMappingsGRPC(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Mapping"
-	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("mappings.getambassador.io").Times(3).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, grpc.AdminMName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, grpc.AdminMName, gomock.Any()).MinTimes(1).MaxTimes(1)
@@ -106,7 +106,7 @@ func SetHosts(
 	group := "getambassador.io"
 	version := "v2"
 	kind := "Host"
-	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").MinTimes(1).MaxTimes(1).Return(&apixv1beta1.CustomResourceDefinition{}, nil)
+	k8sClient.EXPECT().CheckCRD("hosts.getambassador.io").Times(4).Return(&apixv1beta1.CustomResourceDefinition{}, true, nil)
 
 	SetReturnResourceVersion(k8sClient, group, version, kind, namespace, hosts.AccountsHostName, "")
 	k8sClient.EXPECT().ApplyNamespacedCRDResource(group, version, kind, namespace, hosts.AccountsHostName, gomock.Any()).MinTimes(1).MaxTimes(1)
@@ -138,10 +138,10 @@ func TestAmbassador_Adapt(t *testing.T) {
 	}
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 
+	SetHosts(k8sClient, namespace)
+	SetMappingsGRPC(k8sClient, namespace)
 	SetMappingsUI(k8sClient, namespace)
 	SetMappingsHTTP(k8sClient, namespace)
-	SetMappingsGRPC(k8sClient, namespace)
-	SetHosts(k8sClient, namespace)
 
 	query, _, err := AdaptFunc(monitor, mocklabels.Component, namespace, grpcURL, httpURL, uiURL, dns)
 	assert.NoError(t, err)
