@@ -77,7 +77,7 @@
     <div *ngIf="previewData && data" class="lab-policy-content">
       <mat-accordion class="settings">
         <mat-expansion-panel class="expansion">
-          <mat-expansion-panel-header>
+          <mat-expansion-panel-header [attr.data-e2e]="'policy-category'">
             <mat-panel-title>
               <div class="panel-title">
                 <i class="icon las la-image"></i>
@@ -101,7 +101,7 @@
               {{'POLICY.PRIVATELABELING.EMAILNOSVG' | translate}}
             </cnsl-info-section>
 
-            <div class="logo-view">
+            <div class="logo-view" [attr.data-e2e]="'image-part-logo'">
               <span class="label cnsl-secondary-text">Logo</span>
               <div class="img-wrapper">
                 <ng-container
@@ -125,7 +125,7 @@
               </div>
             </div>
 
-            <div class="logo-view">
+            <div class="logo-view" [attr.data-e2e]="'image-part-icon'">
               <span class="label cnsl-secondary-text">Icon</span>
               <div class="img-wrapper icon">
                 <ng-container
@@ -228,7 +228,7 @@
         </mat-expansion-panel>
 
         <mat-expansion-panel class="expansion">
-          <mat-expansion-panel-header class="header">
+          <mat-expansion-panel-header class="header" [attr.data-e2e]="'policy-category'">
             <mat-panel-title>
               <div class="panel-title">
                 <i class="icon las la-font"></i>

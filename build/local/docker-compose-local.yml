@@ -8,6 +8,8 @@ services:
       - zitadel
     image: cockroachdb/cockroach:v21.2.5
     command: start-single-node --insecure --listen-addr=0.0.0.0
+    volumes:
+      - zitadel-data:/cockroach/cockroach-data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
       interval: 10s
@@ -74,7 +76,7 @@ services:
       dockerfile: build/local/Dockerfile.keys
       target: gen-keys
     volumes:
-      - ../../.:/zitadel
+      - zitadel-keys:/zitadel
     env_file:
       - ./local.env
 
@@ -99,11 +101,11 @@ services:
       args:
         ENV: dev
     volumes:
-      - ../../.keys:/go/src/github.com/caos/zitadel/.keys
+      - zitadel-keys:/go/src/github.com/caos/zitadel/.keys
     env_file:
       - ./local.env
     environment:
-      - ZITADEL_EVENTSTORE_HOST=db
+      - CR_HOST=db
     command:
       [
         '-setup-files=cmd/zitadel/setup.yaml',
@@ -146,7 +148,7 @@ services:
     env_file:
       - ./local.env
     environment:
-      - ZITADEL_EVENTSTORE_HOST=db
+      - CR_HOST=db
     ports:
       - 50001:50001
       - 50002:50002
@@ -167,8 +169,6 @@ services:
   grpc-web-gateway:
     profiles: ['backend']
     restart: on-failure
-    logging:
-      driver: none
     depends_on:
       backend-run:
         condition: service_healthy
@@ -181,12 +181,43 @@ services:
     ports:
       - '50000:8080'
 
+  go-copy:
+    profiles: ['backend']
+    restart: on-failure
+    build:
+      context: ../..
+      dockerfile: build/zitadel/Dockerfile
+      target: merge-go-copy
+    environment:
+      UID: $UID
+      GID: $GID
+    volumes:
+      - ../../:/dest
+
+  e2e-setup:
+    profiles: ['backend']
+    restart: on-failure
+    networks:
+      - zitadel
+    build:
+      context: ../..
+      dockerfile: build/local/Dockerfile.e2esetup
+    user: $UID:$GID
+    depends_on:
+      backend-run:
+        condition: service_healthy
+      go-copy:
+        condition: service_completed_successfully
+    volumes:
+      - ../..:/go/src/github.com/caos/zitadel/
+
+
 # this service generates the environemnt.json
 # needed in console.
 # It curl's the client id of console and writes it to 
 # the environment.json
   client-id:
-    profiles: ['frontend', 'console-stub']
+    profiles: ['frontend', 'console-stub' ]
     depends_on:
       backend-run:
         condition: service_healthy
@@ -197,16 +228,29 @@ services:
       dockerfile: build/local/Dockerfile.clientid
       target: client-id
     volumes:
-      - ./environment.json:/environment.json
+      - ../../console/src/assets:/assets
     environment:
       - HOST=backend-run
       - PORT=50002
 
+  init-frontend-dev:
+    profiles: ['frontend']
+    restart: on-failure
+    build:
+      context: ../..
+      dockerfile: build/console/Dockerfile
+      target: init-dev
+    environment:
+      UID: $UID
+      GID: $GID
+    volumes:
+      - ../../console:/console
+
 # starts console in development mode
   frontend-run:
-    profiles: ['frontend']
+    profiles: ['frontend' ]
     networks:
-      - zitadel
+    - zitadel 
     depends_on:
       grpc-web-gateway:
         condition: service_started
@@ -215,14 +259,45 @@ services:
     build:
       context: ../..
       dockerfile: build/console/Dockerfile
-      target: dev-angular-build
-      args:
-        ENV: dev
+      target: prod-angular-build
     volumes:
-      - ./environment.json:/console/src/assets/environment.json
-    command: sh -c "ng serve --host 0.0.0.0 --disable-host-check"
+      - ../../console/src/assets/environment.json:/console/dist/console/assets/environment.json
+    command: [ "-p", "4200" ]
     ports:
-      - 4200:4200
+    - 4200:4200
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4200"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 20s
+
+  await-setup:
+    profiles: [ "backend" ]
+    depends_on:
+      e2e-setup:
+        condition: service_completed_successfully
+    image: alpine:latest
+
+  await-frontend:
+    profiles: [ "frontend" ]
+    depends_on:
+      frontend-run:
+        condition: service_healthy
+    image: alpine:latest
+    command: [ "sleep", "30" ]
+
+  await-init-frontend-dev:
+    profiles: [ "frontend" ]
+    depends_on:
+      init-frontend-dev:
+        condition: service_completed_successfully
+    image: alpine:latest
+
 
 networks:
   zitadel: {}
+
+volumes:
+  zitadel-data: {}
+  zitadel-keys: {}

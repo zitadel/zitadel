@@ -138,8 +138,9 @@
           </cnsl-form-field>
         </div>
         <div class="user-create-btn-container">
-          <button color="primary" [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)"
-            type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+          <button [attr.data-e2e]="'create-button'" color="primary"
+            [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)" type="submit"
+            mat-raised-button>{{ 'ACTIONS.CREATE' |
             translate }}</button>
         </div>
       </form>
