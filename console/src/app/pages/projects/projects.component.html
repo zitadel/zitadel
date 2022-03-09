@@ -18,7 +18,7 @@
           ({{((mgmtService?.grantedProjectsCount | async) ?? 0)}})</button>
       </div>
       <span class="fill-space"></span>
-      <button class="grid-btn" (click)="grid = !grid" mat-icon-button>
+      <button class="grid-btn" (click)="grid = !grid" mat-icon-button [attr.data-e2e]="'toggle-grid'">
         <i *ngIf="grid" class="show list view las la-th-list"></i>
         <i *ngIf="!grid" class="las la-border-all"></i>
       </button>
