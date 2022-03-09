@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,23 +14,96 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/idpconfig"
 	"github.com/caos/zitadel/internal/repository/org"
-	"github.com/lib/pq"
+)
+
+const (
+	IDPTable     = "zitadel.projections.idps"
+	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
+	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
+
+	IDPOIDCSuffix = "oidc_config"
+	IDPJWTSuffix  = "jwt_config"
+
+	IDPIDCol            = "id"
+	IDPCreationDateCol  = "creation_date"
+	IDPChangeDateCol    = "change_date"
+	IDPSequenceCol      = "sequence"
+	IDPResourceOwnerCol = "resource_owner"
+	IDPStateCol         = "state"
+	IDPNameCol          = "name"
+	IDPStylingTypeCol   = "styling_type"
+	IDPOwnerTypeCol     = "owner_type"
+	IDPAutoRegisterCol  = "auto_register"
+	IDPTypeCol          = "type"
+
+	OIDCConfigIDPIDCol                 = "idp_id"
+	OIDCConfigClientIDCol              = "client_id"
+	OIDCConfigClientSecretCol          = "client_secret"
+	OIDCConfigIssuerCol                = "issuer"
+	OIDCConfigScopesCol                = "scopes"
+	OIDCConfigDisplayNameMappingCol    = "display_name_mapping"
+	OIDCConfigUsernameMappingCol       = "username_mapping"
+	OIDCConfigAuthorizationEndpointCol = "authorization_endpoint"
+	OIDCConfigTokenEndpointCol         = "token_endpoint"
+
+	JWTConfigIDPIDCol        = "idp_id"
+	JWTConfigIssuerCol       = "issuer"
+	JWTConfigKeysEndpointCol = "keys_endpoint"
+	JWTConfigHeaderNameCol   = "header_name"
+	JWTConfigEndpointCol     = "endpoint"
 )
 
 type IDPProjection struct {
 	crdb.StatementHandler
 }
 
-const (
-	IDPTable     = "zitadel.projections.idps"
-	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
-	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
-)
-
 func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPProjection {
 	p := new(IDPProjection)
 	config.ProjectionName = IDPTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewMultiTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(IDPIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IDPChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IDPSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(IDPResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(IDPNameCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPStylingTypeCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(IDPOwnerTypeCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
+			},
+				crdb.NewPrimaryKey(IDPIDCol),
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+				crdb.NewColumn(OIDCConfigClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigDisplayNameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigUsernameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigAuthorizationEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(OIDCConfigTokenEndpointCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(OIDCConfigIDPIDCol),
+				IDPOIDCSuffix,
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+				crdb.NewColumn(JWTConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(JWTConfigKeysEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(JWTConfigEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(JWTConfigIDPIDCol),
+				IDPJWTSuffix,
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -119,39 +194,6 @@ func (p *IDPProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	IDPOIDCSuffix = "oidc_config"
-	IDPJWTSuffix  = "jwt_config"
-
-	IDPIDCol            = "id"
-	IDPCreationDateCol  = "creation_date"
-	IDPChangeDateCol    = "change_date"
-	IDPSequenceCol      = "sequence"
-	IDPResourceOwnerCol = "resource_owner"
-	IDPStateCol         = "state"
-	IDPNameCol          = "name"
-	IDPStylingTypeCol   = "styling_type"
-	IDPOwnerTypeCol     = "owner_type"
-	IDPAutoRegisterCol  = "auto_register"
-	IDPTypeCol          = "type"
-
-	OIDCConfigIDPIDCol                 = "idp_id"
-	OIDCConfigClientIDCol              = "client_id"
-	OIDCConfigClientSecretCol          = "client_secret"
-	OIDCConfigIssuerCol                = "issuer"
-	OIDCConfigScopesCol                = "scopes"
-	OIDCConfigDisplayNameMappingCol    = "display_name_mapping"
-	OIDCConfigUsernameMappingCol       = "username_mapping"
-	OIDCConfigAuthorizationEndpointCol = "authorization_endpoint"
-	OIDCConfigTokenEndpointCol         = "token_endpoint"
-
-	JWTConfigIDPIDCol        = "idp_id"
-	JWTConfigIssuerCol       = "issuer"
-	JWTConfigKeysEndpointCol = "keys_endpoint"
-	JWTConfigHeaderNameCol   = "header_name"
-	JWTConfigEndpointCol     = "endpoint"
-)
 
 func (p *IDPProjection) reduceIDPAdded(event eventstore.Event) (*handler.Statement, error) {
 	var idpEvent idpconfig.IDPConfigAddedEvent

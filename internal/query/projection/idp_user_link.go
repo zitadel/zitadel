@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -11,6 +12,18 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
+)
+
+const (
+	IDPUserLinkTable             = "zitadel.projections.idp_user_links"
+	IDPUserLinkIDPIDCol          = "idp_id"
+	IDPUserLinkUserIDCol         = "user_id"
+	IDPUserLinkExternalUserIDCol = "external_user_id"
+	IDPUserLinkCreationDateCol   = "creation_date"
+	IDPUserLinkChangeDateCol     = "change_date"
+	IDPUserLinkSequenceCol       = "sequence"
+	IDPUserLinkResourceOwnerCol  = "resource_owner"
+	IDPUserLinkDisplayNameCol    = "display_name"
 )
 
 type IDPUserLinkProjection struct {
@@ -21,6 +34,23 @@ func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(IDPUserLinkProjection)
 	config.ProjectionName = IDPUserLinkTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(IDPUserLinkIDPIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPUserLinkUserIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPUserLinkExternalUserIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPUserLinkCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IDPUserLinkChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IDPUserLinkSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(IDPUserLinkResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
+			),
+		),
+		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol})),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -72,18 +102,6 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	IDPUserLinkTable             = "zitadel.projections.idp_user_links"
-	IDPUserLinkIDPIDCol          = "idp_id"
-	IDPUserLinkUserIDCol         = "user_id"
-	IDPUserLinkExternalUserIDCol = "external_user_id"
-	IDPUserLinkCreationDateCol   = "creation_date"
-	IDPUserLinkChangeDateCol     = "change_date"
-	IDPUserLinkSequenceCol       = "sequence"
-	IDPUserLinkResourceOwnerCol  = "resource_owner"
-	IDPUserLinkDisplayNameCol    = "display_name"
-)
 
 func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkAddedEvent)

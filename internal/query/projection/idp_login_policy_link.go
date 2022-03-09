@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,18 +15,40 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+const (
+	IDPLoginPolicyLinkTable = "zitadel.projections.idp_login_policy_links"
+
+	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
+	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
+	IDPLoginPolicyLinkCreationDateCol  = "creation_date"
+	IDPLoginPolicyLinkChangeDateCol    = "change_date"
+	IDPLoginPolicyLinkSequenceCol      = "sequence"
+	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
+	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
+)
+
 type IDPLoginPolicyLinkProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	IDPLoginPolicyLinkTable = "zitadel.projections.idp_login_policy_links"
-)
 
 func NewIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPLoginPolicyLinkProjection {
 	p := new(IDPLoginPolicyLinkProjection)
 	config.ProjectionName = IDPLoginPolicyLinkTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(IDPLoginPolicyLinkIDPIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPLoginPolicyLinkAggregateIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(IDPLoginPolicyLinkCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IDPLoginPolicyLinkChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IDPLoginPolicyLinkSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -80,16 +103,6 @@ func (p *IDPLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
-	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
-	IDPLoginPolicyLinkCreationDateCol  = "creation_date"
-	IDPLoginPolicyLinkChangeDateCol    = "change_date"
-	IDPLoginPolicyLinkSequenceCol      = "sequence"
-	IDPLoginPolicyLinkResourceOwnerCol = "resource_owner"
-	IDPLoginPolicyLinkProviderTypeCol  = "provider_type"
-)
 
 func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (

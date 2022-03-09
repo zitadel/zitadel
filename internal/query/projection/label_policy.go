@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,18 +15,75 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+const (
+	LabelPolicyTable = "zitadel.projections.label_policies"
+
+	LabelPolicyIDCol                  = "id"
+	LabelPolicyCreationDateCol        = "creation_date"
+	LabelPolicyChangeDateCol          = "change_date"
+	LabelPolicySequenceCol            = "sequence"
+	LabelPolicyStateCol               = "state"
+	LabelPolicyIsDefaultCol           = "is_default"
+	LabelPolicyResourceOwnerCol       = "resource_owner"
+	LabelPolicyHideLoginNameSuffixCol = "hide_login_name_suffix"
+	LabelPolicyWatermarkDisabledCol   = "watermark_disabled"
+	LabelPolicyShouldErrorPopupCol    = "should_error_popup"
+	LabelPolicyFontURLCol             = "font_url"
+
+	LabelPolicyLightPrimaryColorCol    = "light_primary_color"
+	LabelPolicyLightWarnColorCol       = "light_warn_color"
+	LabelPolicyLightBackgroundColorCol = "light_background_color"
+	LabelPolicyLightFontColorCol       = "light_font_color"
+	LabelPolicyLightLogoURLCol         = "light_logo_url"
+	LabelPolicyLightIconURLCol         = "light_icon_url"
+
+	LabelPolicyDarkPrimaryColorCol    = "dark_primary_color"
+	LabelPolicyDarkWarnColorCol       = "dark_warn_color"
+	LabelPolicyDarkBackgroundColorCol = "dark_background_color"
+	LabelPolicyDarkFontColorCol       = "dark_font_color"
+	LabelPolicyDarkLogoURLCol         = "dark_logo_url"
+	LabelPolicyDarkIconURLCol         = "dark_icon_url"
+)
+
 type LabelPolicyProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	LabelPolicyTable = "zitadel.projections.label_policies"
-)
 
 func NewLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LabelPolicyProjection {
 	p := new(LabelPolicyProjection)
 	config.ProjectionName = LabelPolicyTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(LabelPolicyIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(LabelPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(LabelPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(LabelPolicySequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(LabelPolicyStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(LabelPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(LabelPolicyResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(LabelPolicyHideLoginNameSuffixCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(LabelPolicyWatermarkDisabledCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(LabelPolicyShouldErrorPopupCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(LabelPolicyFontURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyLightPrimaryColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyLightWarnColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyLightBackgroundColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyLightFontColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyLightLogoURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyLightIconURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyDarkPrimaryColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyDarkWarnColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyDarkBackgroundColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyDarkFontColorCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyDarkLogoURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+				crdb.NewColumn(LabelPolicyDarkIconURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(LabelPolicyIDCol, LabelPolicyStateCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -501,31 +559,3 @@ func (p *LabelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*ha
 			handler.NewCond(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
 		}), nil
 }
-
-const (
-	LabelPolicyCreationDateCol        = "creation_date"
-	LabelPolicyChangeDateCol          = "change_date"
-	LabelPolicySequenceCol            = "sequence"
-	LabelPolicyIDCol                  = "id"
-	LabelPolicyStateCol               = "state"
-	LabelPolicyIsDefaultCol           = "is_default"
-	LabelPolicyResourceOwnerCol       = "resource_owner"
-	LabelPolicyHideLoginNameSuffixCol = "hide_login_name_suffix"
-	LabelPolicyFontURLCol             = "font_url"
-	LabelPolicyWatermarkDisabledCol   = "watermark_disabled"
-	LabelPolicyShouldErrorPopupCol    = "should_error_popup"
-
-	LabelPolicyLightPrimaryColorCol    = "light_primary_color"
-	LabelPolicyLightWarnColorCol       = "light_warn_color"
-	LabelPolicyLightBackgroundColorCol = "light_background_color"
-	LabelPolicyLightFontColorCol       = "light_font_color"
-	LabelPolicyLightLogoURLCol         = "light_logo_url"
-	LabelPolicyLightIconURLCol         = "light_icon_url"
-
-	LabelPolicyDarkPrimaryColorCol    = "dark_primary_color"
-	LabelPolicyDarkWarnColorCol       = "dark_warn_color"
-	LabelPolicyDarkBackgroundColorCol = "dark_background_color"
-	LabelPolicyDarkFontColorCol       = "dark_font_color"
-	LabelPolicyDarkLogoURLCol         = "dark_logo_url"
-	LabelPolicyDarkIconURLCol         = "dark_icon_url"
-)

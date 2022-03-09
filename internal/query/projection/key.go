@@ -14,22 +14,71 @@ import (
 	"github.com/caos/zitadel/internal/repository/keypair"
 )
 
+const (
+	KeyProjectionTable = "zitadel.projections.keys"
+	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
+	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
+
+	KeyColumnID            = "id"
+	KeyColumnCreationDate  = "creation_date"
+	KeyColumnChangeDate    = "change_date"
+	KeyColumnResourceOwner = "resource_owner"
+	KeyColumnSequence      = "sequence"
+	KeyColumnAlgorithm     = "algorithm"
+	KeyColumnUse           = "use"
+
+	privateKeyTableSuffix  = "private"
+	KeyPrivateColumnID     = "id"
+	KeyPrivateColumnExpiry = "expiry"
+	KeyPrivateColumnKey    = "key"
+
+	publicKeyTableSuffix  = "public"
+	KeyPublicColumnID     = "id"
+	KeyPublicColumnExpiry = "expiry"
+	KeyPublicColumnKey    = "key"
+)
+
 type KeyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
 	keyChan             chan<- interface{}
 }
 
-const (
-	KeyProjectionTable = "zitadel.projections.keys"
-	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
-	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
-)
-
 func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig *crypto.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
 	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewMultiTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(KeyColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(KeyColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(KeyColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(KeyColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
+				crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeText, crdb.Default("")),
+			},
+				crdb.NewPrimaryKey(KeyColumnID),
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+				crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
+			},
+				crdb.NewPrimaryKey(KeyPrivateColumnID),
+				privateKeyTableSuffix,
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+				crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
+			},
+				crdb.NewPrimaryKey(KeyPublicColumnID),
+				publicKeyTableSuffix,
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.keyChan = keyChan
 	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig)
@@ -52,26 +101,6 @@ func (p *KeyProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	KeyColumnID            = "id"
-	KeyColumnCreationDate  = "creation_date"
-	KeyColumnChangeDate    = "change_date"
-	KeyColumnResourceOwner = "resource_owner"
-	KeyColumnSequence      = "sequence"
-	KeyColumnAlgorithm     = "algorithm"
-	KeyColumnUse           = "use"
-
-	privateKeyTableSuffix  = "private"
-	KeyPrivateColumnID     = "id"
-	KeyPrivateColumnExpiry = "expiry"
-	KeyPrivateColumnKey    = "key"
-
-	publicKeyTableSuffix  = "public"
-	KeyPublicColumnID     = "id"
-	KeyPublicColumnExpiry = "expiry"
-	KeyPublicColumnKey    = "key"
-)
 
 func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
