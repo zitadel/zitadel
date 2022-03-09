@@ -1,0 +1,124 @@
+@use '@angular/material' as mat;
+
+@mixin top-view-theme($theme) {
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+  $is-dark-theme: map-get($theme, is-dark);
+  $warn: map-get($theme, warn);
+  $warn-color: map-get($warn, 500);
+
+  .cnsl-top-view {
+    border-bottom: 1px solid map-get($foreground, divider);
+    margin: 0 -2rem;
+    padding: 2rem 2rem 1rem 2rem;
+    background: map-get($background, metadata-section);
+    box-sizing: border-box;
+    min-height: 182px;
+
+    @media only screen and (max-width: 500px) {
+      margin: 0 -1rem;
+      padding: 2rem 1rem 1rem 1rem;
+    }
+
+    .cnsl-top-row {
+      display: flex;
+      align-items: center;
+      padding-bottom: 1rem;
+      flex-wrap: wrap;
+
+      .cnsl-link-row {
+        display: flex;
+        align-items: center;
+
+        .cnsl-link {
+          margin-right: 1rem;
+          display: block;
+          position: relative;
+        }
+
+        .cnsl-title-row {
+          display: flex;
+          align-items: center;
+
+          .cnsl-title {
+            margin: 0;
+            margin-right: 0.5rem;
+            font-size: 2rem;
+          }
+
+          .cnsl-state-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+
+            &.active {
+              background-color: var(--success);
+            }
+
+            &.inactive {
+              background-color: var(--warn);
+            }
+          }
+        }
+
+        .cnsl-doc-row {
+          display: flex;
+          align-items: center;
+          margin-top: -10px;
+
+          i {
+            font-size: 1.2rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+          }
+        }
+      }
+
+      .cnsl-type {
+        font-size: 14px;
+      }
+
+      .cnsl-sub {
+        margin: 1rem 1rem 0 0;
+        font-size: 14px;
+      }
+
+      .fill-space {
+        flex: 1;
+      }
+
+      .cnsl-actions-trigger-desk {
+        margin-top: 0.25rem;
+        display: none;
+        align-items: center;
+        margin-right: 2rem;
+
+        @media only screen and (min-width: 700px) {
+          display: flex;
+        }
+
+        .icon {
+          margin-left: 0.25rem;
+          margin-right: -0.5rem;
+        }
+      }
+
+      .cnsl-actions-trigger-mob {
+        display: inline;
+
+        @media only screen and (min-width: 700px) {
+          display: none;
+        }
+      }
+
+      .mob-full-width {
+        flex-basis: 100%;
+
+        @media only screen and (min-width: 700px) {
+          flex-basis: auto;
+        }
+      }
+    }
+  }
+}
