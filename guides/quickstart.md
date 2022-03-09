@@ -115,7 +115,7 @@ $ # Backend
 $ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build go-copy
 
 $ # Frontend
-$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build npm-copy
+$ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --build init-frontend-dev
 ```
 
 
