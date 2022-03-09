@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/settings"
 
@@ -14,18 +15,43 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
+const (
+	DebugNotificationProviderTable = "zitadel.projections.notification_providers"
+
+	DebugNotificationProviderAggIDCol         = "aggregate_id"
+	DebugNotificationProviderCreationDateCol  = "creation_date"
+	DebugNotificationProviderChangeDateCol    = "change_date"
+	DebugNotificationProviderSequenceCol      = "sequence"
+	DebugNotificationProviderResourceOwnerCol = "resource_owner"
+	DebugNotificationProviderStateCol         = "state"
+	DebugNotificationProviderTypeCol          = "provider_type"
+	DebugNotificationProviderCompactCol       = "compact"
+)
+
 type DebugNotificationProviderProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	DebugNotificationProviderTable = "zitadel.projections.notification_providers"
-)
 
 func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.StatementHandlerConfig) *DebugNotificationProviderProjection {
 	p := &DebugNotificationProviderProjection{}
 	config.ProjectionName = DebugNotificationProviderTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(DebugNotificationProviderAggIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(DebugNotificationProviderCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(DebugNotificationProviderChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(DebugNotificationProviderSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(DebugNotificationProviderResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
+			},
+				crdb.NewPrimaryKey(DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -63,17 +89,6 @@ func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateRedu
 		},
 	}
 }
-
-const (
-	DebugNotificationProviderAggIDCol         = "aggregate_id"
-	DebugNotificationProviderCreationDateCol  = "creation_date"
-	DebugNotificationProviderChangeDateCol    = "change_date"
-	DebugNotificationProviderSequenceCol      = "sequence"
-	DebugNotificationProviderResourceOwnerCol = "resource_owner"
-	DebugNotificationProviderStateCol         = "state"
-	DebugNotificationProviderTypeCol          = "provider_type"
-	DebugNotificationProviderCompactCol       = "compact"
-)
 
 func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdded(event eventstore.Event) (*handler.Statement, error) {
 	var providerEvent settings.DebugNotificationProviderAddedEvent

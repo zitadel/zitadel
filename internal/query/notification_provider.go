@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -66,7 +67,8 @@ func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID str
 	stmt, args, err := query.Where(
 		sq.Or{
 			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): aggID,
+				NotificationProviderColumnAggID.identifier(): aggID,
+				NotificationProviderColumnType.identifier():  providerType,
 			},
 		}).
 		Limit(1).ToSql()
