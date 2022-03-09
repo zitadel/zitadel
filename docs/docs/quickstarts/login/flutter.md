@@ -2,7 +2,7 @@
 title: Flutter
 ---
 
-This guide shows you how you to integrate **ZITADEL** as an idendity provider for a Flutter app.
+This guide shows you how to integrate **ZITADEL** as an identity provider for a Flutter app.
 
 At the end of the guide, you will have a mobile application on Android and iOS that can authenticate users via ZITADEL.
 
@@ -19,10 +19,10 @@ Before starting, there are a few things you'll need to do:
 
 ## Flutter with ZITADEL
 
-In your native application on ZITADEL, you need to add a callback (redirect) URI
-that matches the selected custom url scheme.
-As an example, if you intend to use `ch.myexample.app://sign-me-in` as a redirect URI on ZITADEL and in your app,
-you need to register the `ch.myexample.app://` custom URL scheme within Android and iOS.
+In your native application on ZITADEL, add a callback (redirect) URI
+that matches the selected custom URL scheme.
+As an example, if you want to use `ch.myexample.app://sign-me-in` as a redirect URI on ZITADEL and in your app,
+register the `ch.myexample.app://` custom URL within Android and iOS.
 
 :::caution Use a Custom Redirect URI!
 
@@ -114,8 +114,8 @@ defaultConfig {
 
 #### Important on iOS
 
-In a similar way to Android, you need to register the custom URL scheme within iOS to
-be able to use custom redirect schemes.
+Similar to Android,
+to use custom redirect schemes in iOS, you need to register the custom URL.
 
 In the `Info.plist` file of the Runner
 project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
@@ -139,7 +139,8 @@ project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
 :::note
 
 The auth redirect scheme "`ch.myexample.app`" registers all auth URLs with the given
-scheme for the app. So a URL pointing to `ch.myexample.app://signin` pointing to `ch.myexample.app://logout` will work with the same registration.
+scheme for the app.
+So, a URL that points to `ch.myexample.app://signin` works with the same registration.
 
 :::
 
@@ -193,7 +194,9 @@ var _username = '';
 ```
 
 2. Then add the builder method.
-This shows the login button if you're not authenticated, a loading bar if the login process is going on, and your name if you are authenticated:
+If you're not authenticated, this shows the login button.
+If the login process is going on, it shows a loading bar.
+If you are authenticated, it shows your name.
 
 ```dart
 @override
@@ -241,7 +244,7 @@ Widget build(BuildContext context) {
 
 3. Finally add the `_authenticate` method.
 This calls the authorization endpoint,
-then fetches the user info and stores the tokens into the secure storage.
+then fetches the user info and stores the tokens in secure storage.
 
 ```dart
 Future<void> _authenticate() async {
@@ -294,7 +297,7 @@ Future<void> _authenticate() async {
 }
 ```
 
-Now, you should be able to login with a valid ZITADEL user.
+Now, you can log in as a valid ZITADEL user.
 
 #### Result
 

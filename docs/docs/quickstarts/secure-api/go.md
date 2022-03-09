@@ -2,8 +2,8 @@
 title: Go
 ---
 
-This guide shows you how to integrate **ZITADEL** into your Go API.
-It covers how to secure your API using an OAuth 2 Token Introspection.
+This guide shows you how to integrate ZITADEL into your Go API.
+You'll use an OAuth 2 Token Introspection to secure your API.
 
 At the end of the guide, you should have an API with a protected endpoint.
 
@@ -29,9 +29,9 @@ go get github.com/caos/zitadel-go
 
 Create a new go file with the content below.
 This creates an API with two endpoints.
-The path `/public` will always responds `ok` and the current timestamp.
-The path `/protected` responds with the same, but only if a valid `access_token` is sent. 
-The token must not be expired and the API has to be part of the audience (either `client_id` or `project_id`).
+The path `/public` always responds with `ok` and the current timestamp.
+The path `/protected` responds with the same, but only if a valid `access_token` is sent.
+The token must not be expired, and the API has to be part of the audience (either `client_id` or `project_id`).
 
 ```go
 package main
@@ -67,7 +67,7 @@ func writeOK(w http.ResponseWriter, r *http.Request) {
 
 ```
 
-#### Key JSON
+#### JSON key
 
 To provide the JSON key to the SDK, set an environment variable `ZITADEL_KEY_PATH`, using the path to the JSON as the value.
 
@@ -77,7 +77,7 @@ export ZITADEL_KEY_PATH=/Users/test/apikey.json
 
 For development purposes, you should be able to set this in your IDE.
 
-If you're not able to set it via environment variable, you can also exchange the `middleware.OSKeyPath()` and pass it directly:
+If you can't set it via environment variable, you can also exchange the `middleware.OSKeyPath()` and pass it directly:
 
 ```go
 introspection, err := http_mw.NewIntrospectionInterceptor(
@@ -92,7 +92,7 @@ If your client does not use ZITADEL Cloud (zitadel.ch), be sure to provide the c
 ```go
 introspection, err := http_mw.NewIntrospectionInterceptor(
 	"https://issuer.custom.ch",
-	middleware.OSKeyPath(), 
+	middleware.OSKeyPath(),
 )
 ```
 

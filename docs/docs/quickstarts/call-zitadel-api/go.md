@@ -88,7 +88,7 @@ export ZITADEL_KEY_PATH=/Users/test/servicekey.json
 
 For development purposes, you should be able to set this in your IDE.
 
-If you're can't set it via environment variable, you can also pass it with an additional option:
+If can't set it via environment variable, you can also pass it with an additional option:
 
 ```go
 client, err := management.NewClient(
@@ -134,7 +134,7 @@ For more help, check the [guides](#prerequisites) mentioned at the beginning.
 
 If you've run into any other problems, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
 
-### Whats next?
+### What's next?
 
 Now develop on our APIs by adding more calls.
 You can also try to overwrite the organization context:

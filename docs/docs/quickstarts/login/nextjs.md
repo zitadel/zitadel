@@ -2,17 +2,17 @@
 title: Next.js
 ---
 
-This guide shows you how to integrate ZITADEL with your [Next.js](https://nextjs.org/) app. 
+This guide shows you how to integrate ZITADEL with your [Next.js](https://nextjs.org/) app.
 
 It covers how to
 - Authenticate as a user
 - Retrieve user information from the OIDC endpoint.
 
-> The template code is part of our zitadel-example repo. Take a look [here](https://github.com/caos/zitadel-examples/tree/main/nextjs).
+> The template code is part of our [zitadel-example repo](https://github.com/caos/zitadel-examples/tree/main/nextjs).
 
 ## Get Started
 
-1. To start, create a new NextJS app with `npx create-next-app`. This sets up everything automatically for you. 
+1. To start, create a new NextJS app with `npx create-next-app`. This sets up everything automatically for you.
 
 1. Then, create a project with:
 
@@ -24,7 +24,7 @@ yarn create next-app --typescript
 
 ## Install Authentication library
 
-To keep the template as easy as possible, we use [next-auth](https://next-auth.js.org/) as our main authentication library. 
+To keep the template as easy as possible, we use [next-auth](https://next-auth.js.org/) as our main authentication library.
 
 1. To install, run:
 
@@ -40,14 +40,14 @@ yarn add next-auth
 npm run dev
 ```
 
-3. To check the result, open [http://localhost:3000](http://localhost:3000) 
+3. To check the result, open [http://localhost:3000](http://localhost:3000)
 in your browser.
 
 ## Configuration
 
 NextAuth.js exposes a REST API that your client uses.
 
-1. To setup your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
+1. To set up your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
 
 2. Paste the following snippet in.
 
@@ -93,14 +93,14 @@ export default NextAuth({
 If you use ZITADEL CLOUD tier, the endpoint is `https://api.zitadel.ch/`.
 If you use a self-hosted ENTERPRISE tier, replace it with your own endpoint.
 
-We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
+For authentication flow, we recommend using the Authentication Code flow secured by PKCE.
 
 To connect to ZITADEL:
 
 1. Navigate to your [Console Projects](https://console.zitadel.ch/projects).
 1. Create or select an existing project.
-1. To add your app, select **WEB**, then **PKCE**. 
-1. Add `http://localhost:3000/api/auth/callback/zitadel` as the redirect URL to your app. 
+1. To add your app, select **WEB**, then **PKCE**.
+1. Add `http://localhost:3000/api/auth/callback/zitadel` as the redirect URL to your app.
 
    For simplicity, we use the same default as the one that next-auth provides.
    You can change the redirect later if you want.
@@ -110,7 +110,7 @@ To connect to ZITADEL:
 
 ## Environment
 
-1. Create a file `.env` in the root of the project. 
+1. Create a file `.env` in the root of the project.
 1. Add the following keys to it.
 
 ```
@@ -122,13 +122,13 @@ ZITADEL_CLIENT_ID=[yourClientId]
 
 Now we can start editing the homepage by modifying `pages/index.tsx`.
 
-Add this snippet your file. This code gets your auth session from next-auth.
+Add this snippet to your file. This code gets your auth session from next-auth.
 If you are authenticated, it renders a Logout button.
 If you aren't, it shows a Signup button.
 
 Note that the `signIn` method requires the id of the provider we provided earlier.
 It also lets you add a callback URL.
-If login is successful, 
+If login is successful,
 Auth Next will redirect you to the specified route.
 
 ```ts

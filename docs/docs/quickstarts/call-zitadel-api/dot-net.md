@@ -2,12 +2,12 @@
 title: .NET
 ---
 
-This guide shows you how to integrate **ZITADEL** into your .NET application.
+This guide shows you how to integrate ZITADEL into your .NET application.
 It demonstrates how to fetch some data from the ZITADEL management API.
 
 At the end of the guide, you should have an application that can read the details of your organization.
 
-If you need any other information about the .NET SDK, go to the [.NET SDK documentation](https://caos.github.io/zitadel-net/).
+For detailed information about the SDK, refer to the [.NET SDK documentation](https://caos.github.io/zitadel-net/).
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ You'll need a service account assigned with the Org-owner role
 (or another role, depending on the needed API requests).
 You'll also need the account's service key in a JSON file.
 
-For background information, we recommend reading the guide on [how to access ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
+For background information, we recommend reading the guide on [how to access the ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
  - [Recommended Authorization Flows](../../guides/authorization/oauth-recommended-flows)
  - [Service Users](../../guides/authentication/serviceusers)
 
@@ -27,7 +27,7 @@ For background information, we recommend reading the guide on [how to access ZIT
 
 ### Create a .NET application
 
-Use the IDE of your choice or the command line to create a new application.
+With the command line or IDE of your choice, create a new application.
 
 ```bash
 dotnet new web
@@ -35,7 +35,7 @@ dotnet new web
 
 ### Install the package
 
-Install the package via nuget.
+Install the package via NuGet.
 
 ```bash
 dotnet add package Zitadel.Api
@@ -43,7 +43,7 @@ dotnet add package Zitadel.Api
 
 ### Create example client
 
-Change the program.cs file to the content below.
+Change the `program.cs` file to the content below.
 This creates a client for the management API and calls its `GetMyOrg` function.
 
 To make sure you can access the API,
@@ -115,14 +115,14 @@ ACME was created on: "2020-09-21T14:44:48.090431Z"
 You have successfully used the ZITADEL .NET SDK to call the management API!
 
 If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
-make sure your service user has the required permissions.
-The service user needs the `ORG_OWNER` or `ORG_OWNER_VIEWER` role.
+make sure your service user has the required permissions:
+either the `ORG_OWNER` or `ORG_OWNER_VIEWER` roles.
 
 For more help, check the [guides](#prerequisites) mentioned at the beginning.
 
 If you've run into any other problem, don't hesitate to contact us or raise an issue on [ZITADEL](https://github.com/caos/zitadel/issues) or in the [SDK](https://github.com/caos/zitadel-go/issues).
 
-### Whats next?
+### What's next?
 
 Now you can develop on the APIs by adding more calls.
 

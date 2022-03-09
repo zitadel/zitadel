@@ -4,16 +4,16 @@ title: OAuth 2.0 Proxy
 
 The [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) project lets services delegate the authentication flow to an IDP like **ZITADEL**
 
-## Configure Zitadel
+## Configure ZITADEL
 
 ### Setup Application and get Keys
 
-Before building your application, you'll need to head to the ZITADEL console and add some information about your app.
+Before you build your application, head to the ZITADEL console and add some information about your app.
 To start, we recommend creating a new app from scratch.
 To do so:
 
 1. Navigate to your [Project](https://console.zitadel.ch/projects).
-1. Add a new application at the top of the page.
+1. At the top of the page, add a new application.
 1. Select **Web Application** and continue.
 
 For the OAuth 2.0 Proxy, we recommend using [Authorization Code](../../apis/openidoauth/grant-types#authorization-code).
@@ -24,10 +24,10 @@ For the OAuth 2.0 Proxy, we recommend using [Authorization Code](../../apis/open
 
 Set a redirect URL.
 After users authenticate, ZITADEL will redirect them to this URL.
-Set your URL to the domain the proxy will deploy to.
+Set your URL to the domain where the proxy will deploy.
 You can also use the default, `http://127.0.0.1:4180/oauth2/callback`.
 
-> If you are following along with the sample project you downloaded from our templates,
+> If you are following along with the sample project,
 > set the Allowed Callback URL to <http://localhost:4200/auth/callback>.
 > You will also have to set dev mode to `true`.
 > This enables unsecure http for the moment.
@@ -35,7 +35,7 @@ You can also use the default, `http://127.0.0.1:4180/oauth2/callback`.
 After users log out, you can redirect users back to a route on your application.
 To do so, add an optional redirect in the post redirectURI field.
 
-Continue and Create the application.
+**Continue** and **Create** the application.
 
 ### Client ID and Secret
 
@@ -76,4 +76,4 @@ http_address = "127.0.0.1:4180" #localdev only
 
 You have successfully integrated ZITADEL in your proxy!
 
-### What next?
+### What's next?

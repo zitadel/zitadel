@@ -22,19 +22,21 @@ To do so:
 1. At the top of the page, add a new application.
 1. Select **Web application type** and continue.
 
-We recommend you use an [Authorization Code](../../apis/openidoauth/grant-types#authorization-code) in combination with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange) for all web applications.
+For all applications, we recommend combining an
+[Authorization Code](../../apis/openidoauth/grant-types#authorization-code)
+with a [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
 
 ![Create app in console](/img/angular/app-create-light.png)
 
 ### Add redirect URIs
 
-In the Redirect URIs field, tell ZITADEL where to redirect users after authentication. 
-For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.  
+In the Redirect URIs field, tell ZITADEL where to redirect users after authentication.
+For development, you can set dev mode to `true` to enable insecure HTTP and redirect to a `localhost` URI.
 
-> If you are following along with the [example](https://github.com/caos/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.  
+> If you are following along with the [example](https://github.com/caos/zitadel-examples/tree/main/angular), set dev mode to `true` and the Redirect URIs to <http://localhost:4200/auth/callback>.
 
 After users log out, you can redirect them back to a route on your application.
-To do so, add an optional redirect in the Post Logout URIs field.  
+To do so, add an optional redirect in the Post Logout URIs field.
 
 Continue and create the application.
 
@@ -64,9 +66,9 @@ npm install angular-oauth2-oidc
    * Import the _HTTPClientModule_.
 
 2. In the `AuthConfig` object, add the following values:
-   * For `scope`, set `openid`, `profile` and `email`. 
+   * For `scope`, set `openid`, `profile` and `email`.
    * For `responseType`, use `code`
-   * Set `oidc` to `true`. 
+   * Set `oidc` to `true`.
 ```ts
 ...
 import { AuthConfig, OAuthModule } from 'angular-oauth2-oidc';
@@ -87,14 +89,14 @@ const authConfig: AuthConfig = {
 ...
     imports: [
         OAuthModule.forRoot(),
-        HttpClientModule,        
+        HttpClientModule,
 ...
     providers: [
         {
             provide: AuthConfig,
             useValue: authConfig
         }
-...        
+...
 ```
 
 3. Create an authentication service to provide the functions to authenticate your user.
@@ -107,7 +109,7 @@ const authConfig: AuthConfig = {
 
 4. Copy the following code to your service.
 
-  This code provides a function `authenticate()`, which redirects the user to ZITADEL. 
+  This code provides a function `authenticate()`, which redirects the user to ZITADEL.
   After successful login, ZITADEL redirects the user back to the redirect URI configured in _AuthModule_ and ZITADEL Console.
   Make sure both correspond, otherwise ZITADEL throws an error.
 
@@ -219,7 +221,8 @@ To log a user in, you probably need a _component_ or _guard_.
 
 - A component could provide a button, starting the login flow on click.
 
-- A guard starts a login flow when a user without a stored access token tries to access a protected route.
+- A guard starts a login flow when a user tries to access a protected route
+  without a stored access token.
 
 How you use these components depends on your application.
 In most cases, you need both.
@@ -252,7 +255,7 @@ import { AuthenticationService } from '../services/authentication.service';
 export class AuthGuard implements CanActivate {
 
   constructor(private auth: AuthenticationService) { }
-  
+
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
@@ -260,7 +263,7 @@ export class AuthGuard implements CanActivate {
             return this.auth.authenticate();
         }
         return this.auth.authenticated;
-    }  
+    }
 }
 ```
 
@@ -346,7 +349,7 @@ If you run into issues, contact us or raise an issue on [GitHub](https://github.
 
 ### What's next?
 
-Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs. 
+Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs.
 Refer to the [docs](../../apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/caos/zitadel), which uses gRPC to access data.
 
 For more information about creating an Angular application, refer to [Angular](https://angular.io/start) and for more information about the OAuth/OIDC library used above, consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).
