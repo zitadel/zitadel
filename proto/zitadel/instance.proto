@@ -27,7 +27,7 @@ message Instance {
     ];
     repeated string custom_domains = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            example: "\"zitadel.com\"";
+            example: "[\"zitadel.com\", \"zitadel.cloud\", \"zitadel.ch\"]";
         }
     ];
     string name = 6 [
@@ -40,37 +40,43 @@ message Instance {
             example: "\"v1.0.0\"";
         }
     ];
-    string subscription_name = 8 [
-        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
-            description: "current name ";
-        }
-    ];
-
 }
 
-enum InstanceState {
-    INSTANCE_STATE_UNSPECIFIED = 0;
-    INSTANCE_STATE_CREATING = 1;
-    INSTANCE_STATE_RUNNING = 2;
-    INSTANCE_STATE_STOPPED = 3;
+enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_CREATING = 1;
+    STATE_RUNNING = 2;
+    STATE_STOPPING = 3;
+    STATE_STOPPED = 4;
 }
 
 enum Region {
     REGION_UNSPECIFIED = 0;
-    REGION_GLOBAL = 1;
-    REGION_SWITZERLAND = 2;
+    REGION_SWITZERLAND = 1;
+    REGION_GDPR_COMPLIANT = 2;
 }
 
-message InstanceQuery {
+message Query {
     oneof query {
         option (validate.required) = true;
 
-        InstanceDomainsQuery domains_query = 1;
-        InstanceStateQuery state_query = 2;
+        IdQuery id_query = 1;
+        DomainsQuery domains_query = 2;
+        StateQuery state_query = 3;
     }
 }
 
-message InstanceDomainsQuery {
+//IdQuery is always equals
+message IdQuery {
+    string id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "4820840938402429";
+        }
+    ];
+}
+
+message DomainsQuery {
     repeated string domains = 1 [
         (validate.rules).string = {max_len: 200},
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
@@ -85,9 +91,9 @@ message InstanceDomainsQuery {
     ];
 }
 
-//InstanceStateQuery is always equals
-message InstanceStateQuery {
-    InstanceState state = 1 [
+//StateQuery is always equals
+message StateQuery {
+    State state = 1 [
         (validate.rules).enum.defined_only = true,
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "current state of the instance";
@@ -95,10 +101,10 @@ message InstanceStateQuery {
     ];
 }
 
-enum InstanceFieldName {
-    INSTANCE_FIELD_NAME_UNSPECIFIED = 0;
-    INSTANCE_FIELD_NAME_DOMAIN = 1;
-    INSTANCE_FIELD_NAME_NAME = 2;
-    INSTANCE_FIELD_NAME_CREATION_DATE = 3;
-    INSTANCE_FIELD_NAME_SUBSCRIPTION_NAME = 4;
+enum FieldName {
+    FIELD_NAME_UNSPECIFIED = 0;
+    FIELD_NAME_ID = 1;
+    FIELD_NAME_GENERATED_DOMAIN = 2;
+    FIELD_NAME_NAME = 3;
+    FIELD_NAME_CREATION_DATE = 4;
 }

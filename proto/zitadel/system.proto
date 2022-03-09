@@ -214,7 +214,7 @@ service SystemService {
     // Search requests will return wrong results until all deltas are recomputed
     rpc ClearView(ClearViewRequest) returns (ClearViewResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/views/{database}/{view_name}";
+            post: "/views/{database}/{view_name}";
         };
 
         option (zitadel.v1.auth_option) = {
@@ -241,7 +241,7 @@ service SystemService {
     // For example if the SMTP-API wasn't able to send an email at the first time
     rpc ListFailedEvents(ListFailedEventsRequest) returns (ListFailedEventsResponse) {
         option (google.api.http) = {
-            post: "/instances/{id}/failedevents/_search";
+            post: "/failedevents/_search";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -266,7 +266,7 @@ service SystemService {
     // failed event. You can find out if it worked on the `failure_count`
     rpc RemoveFailedEvent(RemoveFailedEventRequest) returns (RemoveFailedEventResponse) {
         option (google.api.http) = {
-            delete: "/instances/{id}/failedevents/{database}/{view_name}/{failed_sequence}";
+            delete: "/failedevents/{database}/{view_name}/{failed_sequence}";
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -343,13 +343,12 @@ message AddInstanceRequest {
     string owner_email = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string owner_username = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string subscription_name = 10;
-    uint64 request_limit = 11;
-    uint64 action_mins_limit = 12;
+    uint64 request_limit = 10;
+    uint64 action_mins_limit = 11;
 }
 
 message AddInstanceResponse {
-    zitadel.instance.v1.Instance instance = 1;
+    string id = 1;
 }
 
 message RemoveInstanceRequest {
