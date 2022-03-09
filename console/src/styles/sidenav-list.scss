@@ -18,15 +18,15 @@
 
   .sidenav {
     box-shadow: inset -1px 0 map-get($foreground, divider);
-    transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
   }
 
   .nav-item {
     color: mat.get-color-from-palette($foreground, text) !important;
-    transition: all .2s ease;
+    transition: all 0.2s ease;
 
     i {
-      opacity: .6;
+      opacity: 0.6;
     }
 
     &:hover {
@@ -56,29 +56,16 @@
     }
   }
 
-  .mat-menu-content,
-  .mat-menu-panel {
-    background-color: $back;
-    border-radius: .5rem;
-
-    @include mat.elevation(5);
-
-    .active {
-      color: $primary-color !important;
-      background-color: rgba($color: $primary-color, $alpha: .1) !important;
-    }
-  }
-
   .root-header {
     background-color: $back !important;
-    transition: all .3s cubic-bezier(.645, .045, .355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
 
     .slash {
       color: if($is-dark-theme, #525454, #d1d5d9);
     }
 
     .org-button {
-      transition: all .3s cubic-bezier(.645, .045, .355, 1) !important;
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1) !important;
     }
   }
 
@@ -95,7 +82,7 @@
     font-size: 13px;
     padding: 3px 2rem;
     transform: translateY(75%);
-    transition: all .2s;
+    transition: all 0.2s;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
 

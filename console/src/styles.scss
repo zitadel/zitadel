@@ -337,10 +337,9 @@ $caos-light-app-theme: (
   background: $caos-light-theme-background,
 );
 
-$custom-typography:
-  mat.define-typography-config(
-    $font-family: 'Lato',
-  );
+$custom-typography: mat.define-typography-config(
+  $font-family: 'Lato',
+);
 
 @include mat.core($custom-typography);
 
@@ -370,6 +369,12 @@ $custom-typography:
   .mat-dialog-container {
     background-color: map-get($background, background);
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  }
+
+  .mat-menu-panel {
+    background-color: map-get($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 6px;
   }
 
   ::-webkit-scrollbar-track {
@@ -412,6 +417,12 @@ $custom-typography:
     transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 
+  .mat-menu-panel {
+    background-color: map-get($background, cards);
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border-radius: 6px;
+  }
+
   ::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -449,19 +460,8 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    'Lato',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    'Roboto',
-    'Oxygen',
-    'Ubuntu',
-    'Cantarell',
-    'Fira Sans',
-    'Droid Sans',
-    'Helvetica Neue',
-    sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 h1 {
