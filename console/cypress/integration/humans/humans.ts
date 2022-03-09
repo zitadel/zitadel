@@ -1,68 +1,65 @@
-import { apiAuth } from "../../support/api/apiauth";
-import { ensureHumanUserExists, ensureUserDoesntExist } from "../../support/api/users";
-import { login, User, username } from "../../support/login/users";
+import { apiAuth } from '../../support/api/apiauth';
+import { ensureHumanUserExists, ensureUserDoesntExist } from '../../support/api/users';
+import { login, User, username } from '../../support/login/users';
 
 describe('humans', () => {
+  const humansPath = `${Cypress.env('consoleUrl')}/users?type=human`;
+  const testHumanUserNameAdd = 'e2ehumanusernameadd';
+  const testHumanUserNameRemove = 'e2ehumanusernameremove';
 
-    const humansPath = `${Cypress.env('consoleUrl')}/users/list/humans`
-    const testHumanUserNameAdd = 'e2ehumanusernameadd'
-    const testHumanUserNameRemove = 'e2ehumanusernameremove'
+  [User.OrgOwner].forEach((user) => {
+    describe(`as user "${user}"`, () => {
+      beforeEach(() => {
+        login(user);
+        cy.visit(humansPath);
+        cy.get('[data-cy=timestamp]');
+      });
 
-    ;[User.OrgOwner].forEach(user => {
- 
-        describe(`as user "${user}"`, () => {
+      describe('add', () => {
+        before(`ensure it doesn't exist already`, () => {
+          apiAuth().then((apiCallProperties) => {
+            ensureUserDoesntExist(apiCallProperties, testHumanUserNameAdd);
+          });
+        });
 
-            beforeEach(()=> {
-                login(user)
-                cy.visit(humansPath)
-                cy.get('[data-cy=timestamp]')
-            })
+        it('should add a user', () => {
+          cy.get('a[href="/users/create"]').click();
+          cy.url().should('contain', 'users/create');
+          cy.get('[formcontrolname="email"]').type(username('e2ehuman'));
+          //force needed due to the prefilled username prefix
+          cy.get('[formcontrolname="userName"]').type(testHumanUserNameAdd, { force: true });
+          cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname');
+          cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname');
+          cy.get('[formcontrolname="phone"]').type('+41 123456789');
+          cy.get('[data-e2e="create-button"]').click();
+          cy.get('.data-e2e-success');
+          cy.wait(200);
+          cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+        });
+      });
 
-            describe('add', () => {
-                before(`ensure it doesn't exist already`, () => {
-                    apiAuth().then(apiCallProperties => {
-                        ensureUserDoesntExist(apiCallProperties, testHumanUserNameAdd)
-                    })
-                })
+      describe('remove', () => {
+        before('ensure it exists', () => {
+          apiAuth().then((api) => {
+            ensureHumanUserExists(api, testHumanUserNameRemove);
+          });
+        });
 
-                it('should add a user', () => {
-                    cy.get('a[href="/users/create"]').click()
-                    cy.url().should('contain', 'users/create')
-                    cy.get('[formcontrolname="email"]').type(username('e2ehuman'))
-                    //force needed due to the prefilled username prefix
-                    cy.get('[formcontrolname="userName"]').type(testHumanUserNameAdd, {force: true})
-                    cy.get('[formcontrolname="firstName"]').type('e2ehumanfirstname')
-                    cy.get('[formcontrolname="lastName"]').type('e2ehumanlastname')
-                    cy.get('[formcontrolname="phone"]').type('+41 123456789')
-                    cy.get('[data-e2e="create-button"]').click()
-                    cy.get('.data-e2e-success')
-                    cy.wait(200)
-                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
-                })        
-            })
-            
-            describe('remove', () => {
-                before('ensure it exists', () => {
-                    apiAuth().then(api => {
-                        ensureHumanUserExists(api, testHumanUserNameRemove)
-                    })                    
-                })
-
-                it('should delete a human user', () => {
-                    cy.contains("tr", testHumanUserNameRemove, { timeout: 1000 })
-                        .find('button')
-                        //force due to angular hidden buttons
-                        .click({force: true})
-                    cy.get('[e2e-data="confirm-dialog-input"]').type(username(testHumanUserNameRemove, Cypress.env('org')))
-                    cy.get('[e2e-data="confirm-dialog-button"]').click()
-                    cy.get('.data-e2e-success')
-                    cy.wait(200)
-                    cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist')
-                })
-            })
-        })
-    })
-})
+        it('should delete a human user', () => {
+          cy.contains('tr', testHumanUserNameRemove, { timeout: 1000 })
+            .find('button')
+            //force due to angular hidden buttons
+            .click({ force: true });
+          cy.get('[e2e-data="confirm-dialog-input"]').type(username(testHumanUserNameRemove, Cypress.env('org')));
+          cy.get('[e2e-data="confirm-dialog-button"]').click();
+          cy.get('.data-e2e-success');
+          cy.wait(200);
+          cy.get('.data-e2e-failure', { timeout: 0 }).should('not.exist');
+        });
+      });
+    });
+  });
+});
 /*
 describe("users", ()=> {
 
