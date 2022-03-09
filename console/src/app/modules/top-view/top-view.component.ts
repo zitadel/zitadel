@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'cnsl-top-view',
   templateUrl: './top-view.component.html',
   styleUrls: ['./top-view.component.scss'],
 })
-export class TopViewComponent implements OnInit {
+export class TopViewComponent {
   @Input() public title: string = '';
   @Input() public sub: string = '';
   @Input() public stateTooltip: string = '';
@@ -17,6 +17,4 @@ export class TopViewComponent implements OnInit {
   @Input() public docLink: string = '';
 
   constructor() {}
-
-  ngOnInit(): void {}
 }
