@@ -25,6 +25,7 @@ import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { ProjectRolesTableModule } from 'src/app/modules/project-roles-table/project-roles-table.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
@@ -62,6 +63,7 @@ import { GrantedProjectsRoutingModule } from './granted-projects-routing.module'
     MatSortModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,
+    TopViewModule,
     SharedModule,
     InfoRowModule,
     LocalizedDatePipeModule,

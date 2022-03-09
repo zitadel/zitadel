@@ -3,7 +3,8 @@
     <div class="cnsl-top-row">
       <div>
         <div class="cnsl-link-row">
-          <a *ngIf="backRouterLink" class="cnsl-link" [routerLink]="backRouterLink" mat-icon-button>
+          <a *ngIf="backRouterLink" class="cnsl-link" [routerLink]="backRouterLink" [queryParams]="backQueryParams"
+            mat-icon-button>
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
           <div>
@@ -14,7 +15,7 @@
               </div>
             </div>
             <div class="cnsl-doc-row">
-              <span class="cnsl-type">{{sub}}</span>
+              <span class="cnsl-type" [innerHtml]="sub"></span>
               <a *ngIf="docLink" mat-icon-button [href]="docLink" rel="noreferrer" target="_blank">
                 <i class="las la-info-circle"></i>
               </a>
@@ -23,19 +24,22 @@
         </div>
       </div>
       <span class="fill-space"></span>
-      <button class="cnsl-actions-trigger-desk cnsl-action-button" mat-raised-button color="primary"
-        [matMenuTriggerFor]="actions">
-        <span>{{'ACTIONS.ACTIONS' | translate}}</span>
-        <mat-icon class="icon">keyboard_arrow_down</mat-icon>
-      </button>
-      <button class="cnsl-actions-trigger-mob" matTooltip="{{'ACTIONS.ACTIONS' | translate}}" mat-icon-button
-        [matMenuTriggerFor]="actions">
-        <i class="las la-ellipsis-v"></i>
-      </button>
 
-      <mat-menu #actions="matMenu" xPosition="before">
-        <ng-content select="[topActions]"></ng-content>
-      </mat-menu>
+      <ng-container *ngIf="hasActions">
+        <button class="cnsl-actions-trigger-desk cnsl-action-button" mat-raised-button color="primary"
+          [matMenuTriggerFor]="actions">
+          <span>{{'ACTIONS.ACTIONS' | translate}}</span>
+          <mat-icon class="icon">keyboard_arrow_down</mat-icon>
+        </button>
+        <button class="cnsl-actions-trigger-mob" matTooltip="{{'ACTIONS.ACTIONS' | translate}}" mat-icon-button
+          [matMenuTriggerFor]="actions">
+          <i class="las la-ellipsis-v"></i>
+        </button>
+
+        <mat-menu #actions="matMenu" xPosition="before">
+          <ng-content select="[topActions]"></ng-content>
+        </mat-menu>
+      </ng-container>
 
       <div class="mob-full-width">
         <ng-content select="[topContributors]"></ng-content>

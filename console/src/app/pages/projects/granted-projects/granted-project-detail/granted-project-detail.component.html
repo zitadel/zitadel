@@ -1,45 +1,21 @@
-<div class="granted-project-top">
-  <div class="max-width-container">
-    <div class="granted-project-top-row">
-      <div>
-        <div class="granted-project-link-row">
-          <a class="link" [routerLink]="[ '/projects' ]" [queryParams]="{'type':'granted'}" mat-icon-button>
-            <mat-icon class="icon">arrow_back</mat-icon>
-          </a>
-          <div>
-            <div class="granted-project-title-row">
-              <h2 class="granted-project-title">{{project?.projectName}}</h2>
-              <div class="granted-project-state-dot" *ngIf="project && project.state !== undefined"
-                matTooltip="{{'ORG.STATE.'+project.state | translate}}"
-                [ngClass]="{'active': project.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE, 'inactive': project.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE }">
-              </div>
-            </div>
-            <div class="doc-row">
-              <span class="project-type">{{'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate}} {{'ACTIONS.OF' |
-                translate}}
-                <strong>{{project?.projectOwnerName}}</strong></span>
-              <a mat-icon-button href="https://docs.zitadel.ch/docs/guides/basics/projects#what-is-a-granted-project"
-                rel="noreferrer" target="_blank">
-                <i class="las la-info-circle"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-        <p *ngIf="isZitadel" class="granted-project-sub zitadel-warning">
-          {{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
-        </p>
-      </div>
-      <span class="fill-space"></span>
-      <cnsl-contributors class="project-contributors" *ngIf="project" [loading]="loading$ | async"
-        [totalResult]="totalMemberResult" [membersSubject]="membersSubject"
-        title="{{ 'PROJECT.MEMBER.TITLE' | translate }}" description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}"
-        (addClicked)="openAddMember()" (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
-        [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) === false">
-      </cnsl-contributors>
-    </div>
-    <cnsl-info-row *ngIf="project" [grantedProject]="project"></cnsl-info-row>
-  </div>
-</div>
+<cnsl-top-view title="{{project?.projectName}}" [backRouterLink]="[ '/projects' ]" [hasActions]="true"
+  [backQueryParams]="{'type':'granted'}"
+  docLink="https://docs.zitadel.ch/docs/guides/basics/projects#what-is-a-granted-project"
+  sub="{{'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate}} {{'ACTIONS.OF' | translate}} <strong>{{project?.projectOwnerName}}</strong>"
+  [isActive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
+  [isInactive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
+  stateTooltip="{{'ORG.STATE.'+project.state | translate}}">
+  <p topContent *ngIf="isZitadel" class="granted-project-sub zitadel-warning">
+    {{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
+  </p>
+  <cnsl-contributors topContributors class="project-contributors" *ngIf="project" [loading]="loading$ | async"
+    [totalResult]="totalMemberResult" [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()"
+    [disabled]="(['project.member.write$', 'project.member.write:'+ project.projectId]| hasRole | async) === false">
+  </cnsl-contributors>
+  <cnsl-info-row topContent *ngIf="project" [grantedProject]="project"></cnsl-info-row>
+</cnsl-top-view>
 
 <div class="max-width-container">
   <cnsl-meta-layout>
