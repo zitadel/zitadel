@@ -24,6 +24,7 @@ jobs:
       sha_short: ${{ steps.refs.outputs.sha_short }}
       short_ref: ${{ steps.refs.outputs.short_ref }}
       version: ${{ steps.refs.outputs.version }}
+      published: ${{ steps.refs.outputs.published }}
     steps:
       - name: Source checkout
         uses: actions/checkout@v2
@@ -53,6 +54,7 @@ jobs:
           echo "New semantic release: ${{ steps.semantic.outputs.new_release_published }}"
           echo "version: ${VERSION}"
 
+          echo "::set-output name=published::${{steps.semantic.outputs.new_release_published == 'true'}}"
           echo "::set-output name=short_ref::${BRANCHTRANSLATED}"
           echo "::set-output name=sha_short::SHA-$(git rev-parse --short=12 HEAD)"
           echo "::set-output name=version::${VERSION}"
@@ -400,12 +402,12 @@ jobs:
           version: zitadel-${{ needs.refs.outputs.version }}
           projects: "console database-operator zitadel zitadel-operator zitadelctl"
 
-  test_message:
-    name: Trigger the discord channel on release
-    needs: [ release ]
+  webhook:
+    name: Send Webhook
+    needs: [ refs, release ]
     runs-on: ubuntu-20.04
     # Skip in case it's a prerelease
-    if: ${{ github.event.release.released }}
+    if: ${{ needs.refs.outputs.published == 'true' }}
 
     steps:
 
@@ -413,6 +415,8 @@ jobs:
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.2.3
+        with:
+          tag: v${{ needs.refs.outputs.version }}
     
       # Send Webhook to Discord
       - name: Discord Webhook
