@@ -1,11 +1,12 @@
 package projection
 
 import (
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/lib/pq"
 )
 
 const (
@@ -16,6 +17,17 @@ const (
 	MemberChangeDate    = "change_date"
 	MemberSequence      = "sequence"
 	MemberResourceOwner = "resource_owner"
+)
+
+var (
+	memberColumns = []*crdb.Column{
+		crdb.NewColumn(MemberCreationDate, crdb.ColumnTypeTimestamp),
+		crdb.NewColumn(MemberChangeDate, crdb.ColumnTypeTimestamp),
+		crdb.NewColumn(MemberUserIDCol, crdb.ColumnTypeText),
+		crdb.NewColumn(MemberRolesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		crdb.NewColumn(MemberSequence, crdb.ColumnTypeInt64),
+		crdb.NewColumn(MemberResourceOwner, crdb.ColumnTypeText),
+	}
 )
 
 type reduceMemberConfig struct {

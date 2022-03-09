@@ -13,18 +13,29 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+const (
+	IAMMemberProjectionTable = "zitadel.projections.iam_members"
+
+	IAMMemberIAMIDCol = "iam_id"
+)
+
 type IAMMemberProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	IAMMemberProjectionTable = "zitadel.projections.iam_members"
-)
 
 func NewIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMMemberProjection {
 	p := new(IAMMemberProjection)
 	config.ProjectionName = IAMMemberProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable(
+				append(memberColumns, crdb.NewColumn(IAMColumnID, crdb.ColumnTypeEnum)),
+				crdb.NewPrimaryKey(IAMColumnID, MemberUserIDCol),
+			),
+		),
+		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -63,12 +74,6 @@ func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-type IAMMemberColumn string
-
-const (
-	IAMMemberIAMIDCol = "iam_id"
-)
 
 func (p *IAMMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberAddedEvent)

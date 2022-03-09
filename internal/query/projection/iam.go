@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -11,18 +12,43 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
+const (
+	IAMProjectionTable = "zitadel.projections.iam"
+
+	IAMColumnID              = "id"
+	IAMColumnChangeDate      = "change_date"
+	IAMColumnGlobalOrgID     = "global_org_id"
+	IAMColumnProjectID       = "iam_project_id"
+	IAMColumnSequence        = "sequence"
+	IAMColumnSetUpStarted    = "setup_started"
+	IAMColumnSetUpDone       = "setup_done"
+	IAMColumnDefaultLanguage = "default_language"
+)
+
 type IAMProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	IAMProjectionTable = "zitadel.projections.iam"
-)
 
 func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMProjection {
 	p := new(IAMProjection)
 	config.ProjectionName = IAMProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(IAMColumnID, crdb.ColumnTypeEnum),
+				crdb.NewColumn(IAMColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(IAMColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
+				crdb.NewColumn(IAMColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
+				crdb.NewColumn(IAMColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(IAMColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
+				crdb.NewColumn(IAMColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
+				crdb.NewColumn(IAMColumnDefaultLanguage, crdb.ColumnTypeText, crdb.Default("")),
+			},
+				crdb.NewPrimaryKey(IAMColumnID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -56,19 +82,6 @@ func (p *IAMProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-type IAMColumn string
-
-const (
-	IAMColumnID              = "id"
-	IAMColumnChangeDate      = "change_date"
-	IAMColumnGlobalOrgID     = "global_org_id"
-	IAMColumnProjectID       = "iam_project_id"
-	IAMColumnSequence        = "sequence"
-	IAMColumnSetUpStarted    = "setup_started"
-	IAMColumnSetUpDone       = "setup_done"
-	IAMColumnDefaultLanguage = "default_language"
-)
 
 func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.GlobalOrgSetEvent)

@@ -130,6 +130,18 @@ func createTable(table *Table, tableName string, suffix string) string {
 	)
 }
 
+func NewIndex(name string, columns []string, opts ...indexOpts) *Index {
+	i := &Index{
+		Name:        name,
+		Columns:     columns,
+		bucketCount: 0,
+	}
+	for _, opt := range opts {
+		opt(i)
+	}
+	return i
+}
+
 type Index struct {
 	Name        string
 	Columns     []string
@@ -144,7 +156,7 @@ func Hash(bucketsCount uint16) indexOpts {
 	}
 }
 
-func NewIndexCheck(index Index, opts ...execOption) *handler.Check {
+func NewIndexCheck(index *Index, opts ...execOption) *handler.Check {
 	config := execConfig{}
 	create := func(config execConfig) string {
 		stmt := fmt.Sprintf("CREATE INDEX %s IF NOT EXISTS ON %s (%s)",

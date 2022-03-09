@@ -29,6 +29,19 @@ func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 	p := new(FlowProjection)
 	config.ProjectionName = FlowTriggerTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(FlowTypeCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(FlowTriggerTypeCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(FlowResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
