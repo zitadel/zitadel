@@ -130,7 +130,8 @@
     </div>
     <div class="btn-container">
       <button color="primary" [disabled]="userForm.invalid || (this.usePassword && this.pwdForm.invalid)" type="submit"
-        mat-raised-button>{{ 'ACTIONS.CREATE' |
+        mat-raised-button
+        [attr.data-e2e]="'create-button'">{{ 'ACTIONS.CREATE' |
         translate }}</button>
     </div>
   </form>

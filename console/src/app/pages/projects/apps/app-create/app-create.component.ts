@@ -306,6 +306,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         .addOIDCApp(this.oidcAppRequest)
         .then((resp) => {
           this.loading = false;
+          this.toast.showInfo('APP.TOAST.CREATED', true)
           if (resp.clientId || resp.clientSecret) {
             this.showSavedDialog(resp);
           } else {
@@ -318,6 +319,7 @@ export class AppCreateComponent implements OnInit, OnDestroy {
         });
     } else if (appAPICheck) {
       this.loading = true;
+      this.toast.showInfo('APP.TOAST.CREATED', true)
       this.mgmtService
         .addAPIApp(this.apiAppRequest)
         .then((resp) => {

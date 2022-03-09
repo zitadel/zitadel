@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"gopkg.in/yaml.v3"
 	core "k8s.io/api/core/v1"
 
@@ -19,7 +21,6 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/services"
@@ -30,7 +31,7 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	dbClient database.Client,
+	dbConn db.Connection,
 	namespace string,
 	action string,
 	version *string,
@@ -96,7 +97,6 @@ func AdaptFunc(
 		httpPort := 80
 		uiServiceName := "ui-v1"
 		uiPort := 80
-		usersWithoutPWs := getUserListWithoutPasswords(desiredKind)
 
 		zitadelComponent := labels.MustForComponent(apiLabels, "ZITADEL")
 		zitadelDeploymentName := labels.MustForName(zitadelComponent, "zitadel")
@@ -128,16 +128,8 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			dbClient,
 			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
-		)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
-		queryDB, err := database.AdaptFunc(
-			monitor,
-			dbClient,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -146,11 +138,10 @@ func AdaptFunc(
 		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "database"),
+			dbConn,
 			namespace,
 			action,
 			secretPasswordName,
-			migrationUser,
-			usersWithoutPWs,
 			nodeselector,
 			tolerations,
 			customImageRegistry,
@@ -176,6 +167,7 @@ func AdaptFunc(
 			secretVarsName,
 			secretPasswordName,
 			customImageRegistry,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -204,6 +196,7 @@ func AdaptFunc(
 			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			setup.GetDoneFunc(monitor, namespace, action),
 			customImageRegistry,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -254,13 +247,8 @@ func AdaptFunc(
 		}
 
 		queryCfg := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc operator.EnsureFunc, err error) {
-			users, err := getAllUsers(k8sClient, desiredKind)
-			if err != nil {
-				return nil, err
-			}
 			return concatQueriers(
-				queryDB,
-				getQueryC(users),
+				getQueryC,
 				operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(
 					monitor,
 					namespace,
@@ -276,15 +264,11 @@ func AdaptFunc(
 		queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
-				if err != nil {
-					return nil, err
-				}
 
 				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespace, action))
-				querySetup := getQuerySetup(allZitadelUsers, getConfigurationHashes)
+				querySetup := getQuerySetup(getConfigurationHashes)
 				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespace, action))
-				queryD := queryD(allZitadelUsers, getConfigurationHashes)
+				queryD := queryD(getConfigurationHashes)
 
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {

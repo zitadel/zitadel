@@ -1206,7 +1206,7 @@
       "OPTIONS": "Options",
       "ASSERTION": "Assert Roles on Authentication",
       "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
-      "CHECK": "Check roles on Authentication",
+      "CHECK": "Check authorization on Authentication",
       "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
     "HAS_PROJECT": "Check for Project on Authentication",
@@ -1233,13 +1233,15 @@
       "MEMBERSADDED": "Managers added.",
       "MEMBERADDED": "Manager added.",
       "MEMBERCHANGED": "Manager changed.",
+      "ROLESCREATED": "Roles created.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
       "REACTIVATED": "Reactivated.",
       "DEACTIVATED": "Deactivated.",
+      "CREATED": "Project created.",
       "UPDATED": "Project changed.",
       "GRANTUPDATED": "Grant changed.",
-      "DELETED": "Deleted Project."
+      "DELETED": "Project deleted."
     }
   },
   "NEXTSTEPS": {
@@ -1573,6 +1575,7 @@
       "OIDCUPDATED": "OIDC configuration updated.",
       "APIUPDATED": "API configuration updated",
       "UPDATED": "App updated.",
+      "CREATED": "App created.",
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",
       "CONFIGCHANGED": "Changes detected!"

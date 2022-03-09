@@ -12,16 +12,11 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed"
-	"github.com/caos/zitadel/operator/database/kinds/databases/provided"
 )
 
 const (
 	component = "database"
 )
-
-func ComponentSelector() *labels.Selector {
-	return labels.OpenComponentSelector("ZITADEL", component)
-}
 
 func Adapt(
 	monitor mntr.Monitor,
@@ -51,7 +46,7 @@ func Adapt(
 	case "databases.caos.ch/CockroachDB":
 		return managed.Adapter(componentLabels, namespace, timestamp, nodeselector, tolerations, version, features, customImageRegistry)(internalMonitor, desiredTree, currentTree)
 	case "databases.caos.ch/ProvidedDatabase":
-		return provided.Adapter()(internalMonitor, desiredTree, currentTree)
+		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("please use zitadel.caos.ch/CockroachDB in zitadel.yml's DatabaseConnection field instead of %s", desiredTree.Common.Kind))
 	default:
 		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("unknown database kind %s: %w", desiredTree.Common.Kind, err))
 	}
@@ -68,8 +63,8 @@ func GetBackupList(
 	switch desiredTree.Common.Kind {
 	case "databases.caos.ch/CockroachDB":
 		return managed.BackupList()(monitor, k8sClient, desiredTree)
-	case "databases.caos.ch/ProvidedDatabse":
-		return nil, mntr.ToUserError(fmt.Errorf("no backups supported for database kind %s", desiredTree.Common.Kind))
+	case "databases.caos.ch/ProvidedDatabase":
+		return nil, mntr.ToUserError(fmt.Errorf("please use zitadel.caos.ch/CockroachDB in zitadel.yml's DatabaseConnection field instead of %s", desiredTree.Common.Kind))
 	default:
 		return nil, mntr.ToUserError(fmt.Errorf("unknown database kind %s", desiredTree.Common.Kind))
 	}

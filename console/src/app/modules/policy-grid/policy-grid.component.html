@@ -10,7 +10,7 @@
   <ng-container *ngFor="let policy of filteredPolicies">
     <ng-template cnslHasRole
         [hasRole]="type === PolicyComponentServiceType.ADMIN ? policy.iamWithRole : type === PolicyComponentServiceType.MGMT ? policy.orgWithRole : []">
-        <div class="p-item card">
+        <div class="p-item card"  [attr.data-e2e]="'policy-card'">
             <div class="avatar {{policy.color}}">
                 <mat-icon *ngIf="policy.svgIcon" class="icon" [svgIcon]="policy.svgIcon"></mat-icon>
                 <i *ngIf="policy.icon" class="icon {{policy.icon}}"></i>

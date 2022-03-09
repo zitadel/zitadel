@@ -1,4 +1,4 @@
-ARG NODE_VERSION=14
+ARG NODE_VERSION=16
 
 #######################
 ## These steps set platform / arch type specific variables
@@ -52,7 +52,7 @@ FROM node:${NODE_VERSION} as npm-base
 WORKDIR /console
 
 COPY console/package.json console/package-lock.json ./
-RUN npm install
+RUN npm ci --loglevel verbose
 
 COPY console .
 COPY --from=base /proto /proto
@@ -66,6 +66,21 @@ RUN build/console/generate-grpc.sh
 FROM scratch as npm-copy
 COPY --from=npm-base /console/src/app/proto/generated ./console/src/app/proto/generated
 
+######################
+## Output generated files by running a container from this target mounting the console dir to /console and your ~/.cache dir to /cache
+######################
+FROM base as init-dev
+
+RUN apk add rsync
+
+COPY --from=npm-base /console/src/app/proto/generated /builtconsole/src/app/proto/generated
+
+ENV UID=1000
+ENV GID=1000
+
+ENTRYPOINT [ "sh", "-c" ]
+CMD [ "rsync -a --chown $UID:$GID /builtconsole/ /console" ]
+
 #######################
 ## angular dev build
 #######################
@@ -78,6 +93,11 @@ RUN npm install -g @angular/cli
 FROM npm-base as prod-angular-build
 RUN npm run lint
 RUN npm run prodbuild
+RUN cp /console/dist/console/index.html /console/dist/console/404.html
+
+RUN npm install --global angular-http-server
+
+ENTRYPOINT [ "angular-http-server", "--path", "/console/dist/console/" ]
 
 #######################
 ## Only Copy Assets

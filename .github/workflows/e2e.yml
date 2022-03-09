@@ -1,0 +1,89 @@
+name: End-to-End Tests
+on:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      # prevents extra Cypress installation progress messages
+      CI: 1
+      # avoid warnings like "tput: No value for $TERM and no -T specified"
+      TERM: xterm
+      DOCKER_BUILDKIT: 1
+      COMPOSE_DOCKER_CLI_BUILD: 1
+      UID: 1001
+      GID: 121
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # The following is inspired by https://github.com/bahmutov/cypress-gh-action-split-install
+    # install NPM dependencies but SKIP Cypress binary installation
+    # see https://on.cypress.io/installing-cypress#Environment-variables
+    - uses: bahmutov/npm-install@v1
+      env:
+        CYPRESS_INSTALL_BINARY: 0
+      with:
+        working-directory: ./console
+    # confirm there is no Cypress installed
+    - run: npx cypress cache path
+      working-directory: ./console
+    # should return empty list of installed versions
+    - run: npx cypress cache list
+      working-directory: ./console
+    # restore / cache the binary ourselves on Linux
+    # see https://github.com/actions/cache
+    - name: Cache Cypress
+      id: cache-cypress
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/Cypress
+        key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+    # now let's install Cypress binary
+    - run: npx cypress install
+      working-directory: ./console
+    - run: npx cypress cache list
+      working-directory: ./console
+
+    - name: Setup Test Environment
+      run: docker compose -f ./build/local/docker-compose-local.yml --profile backend --profile frontend up --detach
+
+    - run: docker compose -f ./build/local/docker-compose-local.yml logs
+      if: failure()
+
+    - name: Install Dev Dependencies
+      working-directory: ./console
+      run: npm ci --only dev
+
+    - name: Run Tests
+      working-directory: ./console
+      run: npm run e2e
+
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-videos
+        path: ./console/cypress/videos
+
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-snapshots
+        path: ./console/cypress/snapshots
+
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-mochawesome
+        path: ./console/cypress/results

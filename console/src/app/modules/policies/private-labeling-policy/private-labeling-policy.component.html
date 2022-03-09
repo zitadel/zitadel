@@ -56,7 +56,7 @@
 
     <mat-accordion class="settings">
       <mat-expansion-panel class="expansion">
-        <mat-expansion-panel-header>
+        <mat-expansion-panel-header [attr.data-e2e]="'policy-category'">
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-image"></i>
@@ -76,7 +76,7 @@
 
         <!-- <span class="title">{{ theme === Theme.DARK ? ('POLICY.PRIVATELABELING.DARK' | translate) : ('POLICY.PRIVATELABELING.LIGHT' | translate)}}</span> -->
         <div class="logo-setup-wrapper">
-          <div class="part">
+          <div class="part" [attr.data-e2e]="'image-part-logo'">
             <span class="label">Logo</span>
             <!-- <mat-spinner class="spinner" color="primary" diameter="25" *ngIf="loadingImages"></mat-spinner> -->
             <container [ngSwitch]="theme">
@@ -119,7 +119,7 @@
             </div>
           </div>
 
-          <div class="part">
+          <div class="part" [attr.data-e2e]="'image-part-icon'">
             <span class="label">Icon</span>
             <container [ngSwitch]="theme">
               <div class="logo-view" *ngSwitchCase="Theme.DARK">
@@ -232,7 +232,7 @@
       </mat-expansion-panel>
 
       <mat-expansion-panel class="expansion">
-        <mat-expansion-panel-header class="header">
+        <mat-expansion-panel-header class="header" [attr.data-e2e]="'policy-category'">
           <mat-panel-title>
             <div class="panel-title">
               <i class="icon las la-font"></i>

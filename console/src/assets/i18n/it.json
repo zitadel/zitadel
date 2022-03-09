@@ -1206,7 +1206,7 @@
       "OPTIONS": "Opzioni",
       "ASSERTION": "Includi ruoli con autenticazione",
       "ASSERTION_DESCRIPTION": "Le informazioni sui ruoli sono inviate dall'endpoint Userinfo e a seconda delle impostazioni dell'applicazione in token.",
-      "CHECK": "Verifica i ruoli con l'autenticazione",
+      "CHECK": "Verifica l'autorizzazione durante l'autenticazione",
       "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account."
     },
     "HAS_PROJECT": "Controlla project grant con l'autenticazione",
@@ -1233,10 +1233,12 @@
       "MEMBERSADDED": "Manager aggiunto con successo.",
       "MEMBERADDED": "Manager aggiunto con successo.",
       "MEMBERCHANGED": "Manager cambiato con successo.",
+      "ROLESCREATED": "Ruoli creati con successo.",
       "ROLEREMOVED": "Ruolo rimosso con successo.",
       "ROLECHANGED": "Ruolo cambiato con successo.",
       "REACTIVATED": "Riattivato con successo.",
       "DEACTIVATED": "Disattivato con successo.",
+      "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
       "DELETED": "Progetto rimosso con successo."
@@ -1573,6 +1575,7 @@
       "OIDCUPDATED": "Configurazione OIDC aggiornata.",
       "APIUPDATED": "Configurazione API aggiornata",
       "UPDATED": "App aggiornata.",
+      "CREATED": "App creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",
       "DELETED": "App rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"
