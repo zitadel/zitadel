@@ -26,7 +26,8 @@ type StatementHandlerConfig struct {
 	MaxFailureCount   uint
 	BulkLimit         uint64
 
-	Reducers []handler.AggregateReducer
+	Reducers   []handler.AggregateReducer
+	InitChecks []*handler.Check
 }
 
 type StatementHandler struct {
@@ -75,6 +76,8 @@ func NewStatementHandler(
 		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
 	}
 
+	h.ProjectionHandler.Initialize(ctx, h.Lock, h.Unlock, h.Init, config.InitChecks)
+
 	go h.ProjectionHandler.Process(
 		ctx,
 		h.reduce,
@@ -104,6 +107,21 @@ func (h *StatementHandler) SearchQuery() (*eventstore.SearchQueryBuilder, uint64
 	}
 
 	return queryBuilder, h.bulkLimit, nil
+}
+
+//Init implements handler.Init
+func (h *StatementHandler) Init(ctx context.Context, checks ...*handler.Check) error {
+	tx, err := h.client.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.ThrowInternal(err, "CRDB-SAdf2", "begin failed")
+	}
+	for _, check := range checks {
+		if err := check.Execute(tx, h.ProjectionName); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
 }
 
 //Update implements handler.Update

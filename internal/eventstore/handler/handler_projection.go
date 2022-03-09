@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -17,6 +18,9 @@ type ProjectionHandlerConfig struct {
 	RequeueEvery     time.Duration
 	RetryFailedAfter time.Duration
 }
+
+//Init initializes the projection with the given checks
+type Init func(context.Context, ...*Check) error
 
 //Update updates the projection with the given statements
 type Update func(context.Context, []*Statement, Reduce) (unexecutedStmts []*Statement, err error)
@@ -179,22 +183,32 @@ func (h *ProjectionHandler) bulk(
 	executeBulk executeBulk,
 	unlock Unlock,
 ) error {
+	return h.executeWithLock(ctx, lock, unlock, executeBulk)
+}
+
+func (h *ProjectionHandler) executeWithLock(
+	ctx context.Context,
+	lock Lock,
+	unlock Unlock,
+
+	execution func(context.Context) error,
+) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	errs := lock(ctx, h.requeueAfter)
 	//wait until projection is locked
 	if err, ok := <-errs; err != nil || !ok {
-		logging.LogWithFields("HANDL-XDJ4i", "projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
+		logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("initial lock failed")
 		return err
 	}
 	go h.cancelOnErr(ctx, errs, cancel)
 
-	execErr := executeBulk(ctx)
-	logging.LogWithFields("EVENT-gwiu4", "projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
+	execErr := execution(ctx)
+	logging.WithFields("projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
 
 	unlockErr := unlock()
-	logging.LogWithFields("EVENT-boPv1", "projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
+	logging.WithFields("projection", h.ProjectionName).OnError(unlockErr).Warn("unable to unlock")
 
 	if execErr != nil {
 		return execErr
