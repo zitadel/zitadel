@@ -24,7 +24,6 @@ const (
 	jobPrefix           = "backup-"
 	jobSuffix           = "-restore"
 	internalSecretName  = "client-certs"
-	rootSecretName      = db.CertsSecret
 	timeout             = 15 * time.Minute
 )
 
@@ -60,7 +59,6 @@ func AdaptFunc(
 		bucketName,
 		backupName,
 		timestamp,
-		certPath,
 		accessKeyIDPath,
 		secretAccessKeyPath,
 		sessionTokenPath,

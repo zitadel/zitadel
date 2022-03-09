@@ -22,7 +22,6 @@ const (
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
 	internalSecretName = "client-certs"
-	rootSecretName     = db.CertsSecret
 	timeout            = 45 * time.Minute
 )
 

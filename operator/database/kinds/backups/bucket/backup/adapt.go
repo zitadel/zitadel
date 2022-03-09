@@ -22,7 +22,6 @@ const (
 	backupNameEnv            = "BACKUP_NAME"
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
-	rootSecretName           = db.CertsSecret
 	timeout                  = 45 * time.Minute
 	Normal                   = "backup"
 	Instant                  = "instantbackup"

@@ -11,7 +11,6 @@ import (
 )
 
 const (
-	CertsSecret  = "user-certs" // TODO: make dynamic
 	CACert       = "ca.crt"
 	RootUserCert = "client.root.crt"
 	RootUserKey  = "client.root.key"
@@ -29,17 +28,18 @@ type Connection interface {
 }
 
 type SSL struct {
+	CertsSecret    string
 	RootCert       bool
 	UserCertAndKey bool
 }
 
-func InitChownCerts(customImageRegistry string, permissions string, from, to corev1.VolumeMount) (source, chowned corev1.Volume, init corev1.Container) {
+func InitChownCerts(ssl *SSL, customImageRegistry string, permissions string, from, to corev1.VolumeMount) (source, chowned corev1.Volume, init corev1.Container) {
 
 	return corev1.Volume{
 			Name: from.Name,
 			VolumeSource: corev1.VolumeSource{
 				Secret: &corev1.SecretVolumeSource{
-					SecretName:  CertsSecret,
+					SecretName:  ssl.CertsSecret,
 					DefaultMode: helpers.PointerInt32(0400),
 				},
 			},

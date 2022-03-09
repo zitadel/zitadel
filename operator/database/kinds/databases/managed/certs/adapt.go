@@ -1,4 +1,4 @@
-package user
+package certs
 
 import (
 	"github.com/caos/orbos/mntr"
@@ -7,16 +7,19 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/client"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/dbuser"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/node"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certs/client"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certs/dbuser"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certs/node"
 	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 const (
-	execDBPod       = "cockroachdb-0"
-	execDBContainer = "cockroachdb"
-	rootUserName    = "root"
+	execDBPod          = "cockroachdb-0"
+	execDBContainer    = "cockroachdb"
+	rootUserName       = "root"
+	ZitadelCertsSecret = "cockroachdb.client.flyway" // TODO: Change for V2
+	RootCertsSecret    = "cockroachdb.client.root"
+	NodeCertsSecret    = "node-certs"
 )
 
 func AdaptFunc(
@@ -30,9 +33,7 @@ func AdaptFunc(
 	dbPasswdExisting *secret.Existing,
 	pwSecretLabels *labels.Selectable,
 	pwSecretKey string,
-	rootCertsSecret string,
 	containerCertsDir string,
-	nodeSecret string,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -45,7 +46,7 @@ func AdaptFunc(
 	queryNode, destroyNode, err := node.AdaptFunc(
 		cMonitor,
 		namespace,
-		labels.MustForName(componentLabels, nodeSecret),
+		labels.MustForName(componentLabels, NodeCertsSecret),
 		clusterDns,
 		generateNodeIfNotExists,
 	)
@@ -88,13 +89,13 @@ func AdaptFunc(
 
 	beforeCRqueriers := []operator.QueryFunc{
 		queryNode,
-		queryCert(rootUserName, rootCertsSecret, db.RootUserCert, db.RootUserKey),
-		queryCert(userName, db.CertsSecret, db.UserCert, db.UserKey),
+		queryCert(rootUserName, RootCertsSecret, db.RootUserCert, db.RootUserKey),
+		queryCert(userName, ZitadelCertsSecret, db.UserCert, db.UserKey),
 	}
 
 	beforeCRdestroyers := []operator.DestroyFunc{
-		destroyCert(db.CertsSecret),
-		destroyCert(rootCertsSecret),
+		destroyCert(ZitadelCertsSecret),
+		destroyCert(RootCertsSecret),
 		destroyNode,
 	}
 

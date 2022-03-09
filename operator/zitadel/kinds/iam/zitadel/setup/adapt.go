@@ -129,15 +129,25 @@ func jobDef(
 	dbConn db.Connection,
 ) *batchv1.Job {
 
-	chownedVolumeMount := corev1.VolumeMount{
-		Name:      "chowned-certs",
-		MountPath: certPath,
-	}
+	volumes := deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName)
+	var initContainers []corev1.Container
+	var chownedVolumeMount *corev1.VolumeMount
 
-	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
-		Name:      "certs",
-		MountPath: "/certificates",
-	}, chownedVolumeMount)
+	ssl := dbConn.SSL()
+	if ssl != nil {
+		chownedVolumeMount = &corev1.VolumeMount{
+			Name:      "chowned-certs",
+			MountPath: certPath,
+		}
+
+		srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(ssl, customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
+			Name:      "certs",
+			MountPath: "/certificates",
+		}, *chownedVolumeMount)
+
+		volumes = append(volumes, srcVolume, destVolume)
+		initContainers = []corev1.Container{chownCertsContainer}
+	}
 
 	containers := []corev1.Container{
 		deployment.GetContainer(
@@ -173,17 +183,13 @@ func jobDef(
 				Spec: corev1.PodSpec{
 					NodeSelector:                  nodeselector,
 					Tolerations:                   tolerations,
-					InitContainers:                []corev1.Container{chownCertsContainer},
+					InitContainers:                initContainers,
 					Containers:                    containers,
 					RestartPolicy:                 "Never",
 					DNSPolicy:                     "ClusterFirst",
 					SchedulerName:                 "default-scheduler",
 					TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-					Volumes: append(
-						deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName),
-						srcVolume,
-						destVolume,
-					),
+					Volumes:                       volumes,
 				},
 			},
 		},

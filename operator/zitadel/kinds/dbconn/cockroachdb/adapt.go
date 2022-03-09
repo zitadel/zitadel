@@ -20,8 +20,9 @@ import (
 )
 
 const (
-	namespace = "caos-zitadel"
-	component = "dbconnection"
+	namespace   = "caos-zitadel"
+	component   = "dbconnection"
+	certsSecret = "user-certs"
 )
 
 func Adapter(apiLabels *labels.API) operator.AdaptFunc {
@@ -63,7 +64,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		current.Parsed = currentDB
 
 		componentLabels := labels.MustForComponent(apiLabels, component)
-		certLabels := labels.MustForName(componentLabels, db.CertsSecret)
+		certLabels := labels.MustForName(componentLabels, certsSecret)
 		pwLabels := labels.AsSelectable(labels.MustForName(componentLabels, "db-connection-password"))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -94,8 +95,8 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 						return nil, err
 					}
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
+					currentDB.Current.CertsSecret = certsSecret
 				}
-				currentDB.Current.Secure = certificate != ""
 
 				password, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Password, desiredKind.Spec.ExistingPassword)
 				if err != nil {

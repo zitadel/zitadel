@@ -1,10 +1,7 @@
 package cockroachdb
 
 import (
-	"fmt"
 	"github.com/caos/orbos/pkg/labels"
-	"strings"
-
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/pkg/databases/db"
 )
@@ -20,7 +17,7 @@ type Current struct {
 		User              string
 		PasswordSecret    *labels.Selectable
 		PasswordSecretKey string
-		Secure            bool
+		CertsSecret       string
 	}
 }
 
@@ -32,8 +29,12 @@ func (c *Current) PasswordSecret() (*labels.Selectable, string) {
 }
 
 func (c *Current) SSL() *db.SSL {
+	if c.Current.CertsSecret == "" {
+		return nil
+	}
 	return &db.SSL{
-		RootCert:       c.Current.Secure,
+		CertsSecret:    c.Current.CertsSecret,
+		RootCert:       true,
 		UserCertAndKey: false,
 	}
 }
@@ -43,20 +44,4 @@ func (c *Current) Options() string {
 		return "--cluster=" + c.Current.Cluster
 	}
 	return ""
-}
-
-func (c *Current) ConnectionParams(certsDir string) string {
-
-	var params []string
-	certs := fmt.Sprintf("sslmode=verify-full&sslrootcert=%s/client.%s.crt", certsDir, c.Current.User)
-	if !c.Current.Secure {
-		certs = "sslmode=disable"
-	}
-	params = append(params, certs)
-
-	if c.Current.Cluster != "" {
-		params = append(params, "options=--cluster%3D"+c.Current.Cluster)
-	}
-
-	return strings.Join(params, "&")
 }

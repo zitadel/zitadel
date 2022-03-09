@@ -73,15 +73,40 @@ func AdaptFunc(
 
 			allScripts := getMigrationFiles(monitor, "/cockroach/")
 
-			chownedVolumeMount := corev1.VolumeMount{
-				Name:      "chowned-certs",
-				MountPath: "/chownedcerts",
-			}
+			initContainers := getPreContainer(dbConn, customImageRegistry)
 
-			srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, "101:101", corev1.VolumeMount{
-				Name:      "certs",
-				MountPath: "certificates",
-			}, chownedVolumeMount)
+			volumes := []corev1.Volume{{
+				Name: migrationConfigmap,
+				VolumeSource: corev1.VolumeSource{
+					ConfigMap: &corev1.ConfigMapVolumeSource{
+						LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
+					},
+				},
+			}, {
+				Name: secretPasswordName,
+				VolumeSource: corev1.VolumeSource{
+					Secret: &corev1.SecretVolumeSource{
+						SecretName: secretPasswordName,
+					},
+				},
+			}}
+
+			var chownedVolumeMount *corev1.VolumeMount
+
+			ssl := dbConn.SSL()
+			if ssl != nil {
+				chownedVolumeMount = &corev1.VolumeMount{
+					Name:      "chowned-certs",
+					MountPath: "/chownedcerts",
+				}
+
+				srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(ssl, customImageRegistry, "101:101", corev1.VolumeMount{
+					Name:      "certs",
+					MountPath: "certificates",
+				}, *chownedVolumeMount)
+				volumes = append(volumes, srcVolume, destVolume)
+				initContainers = append(initContainers, chownCertsContainer)
+			}
 
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
@@ -104,7 +129,7 @@ func AdaptFunc(
 						Spec: corev1.PodSpec{
 							NodeSelector:   nodeselector,
 							Tolerations:    tolerations,
-							InitContainers: append(getPreContainer(dbConn, customImageRegistry), chownCertsContainer),
+							InitContainers: initContainers,
 							Containers: []corev1.Container{
 								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount),
 							},
@@ -112,21 +137,7 @@ func AdaptFunc(
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
 							TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-							Volumes: []corev1.Volume{srcVolume, destVolume, {
-								Name: migrationConfigmap,
-								VolumeSource: corev1.VolumeSource{
-									ConfigMap: &corev1.ConfigMapVolumeSource{
-										LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
-									},
-								},
-							}, {
-								Name: secretPasswordName,
-								VolumeSource: corev1.VolumeSource{
-									Secret: &corev1.SecretVolumeSource{
-										SecretName: secretPasswordName,
-									},
-								},
-							}},
+							Volumes:                       volumes,
 						},
 					},
 				},

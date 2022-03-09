@@ -20,7 +20,7 @@ func GetContainer(
 	secretPath string,
 	consoleCMName string,
 	secretVarsName string,
-	dbcerts corev1.VolumeMount,
+	dbcerts *corev1.VolumeMount,
 	command string,
 	customImageRegistry string,
 	dbConn db.Connection,
@@ -114,7 +114,10 @@ func GetContainer(
 	volMounts := []corev1.VolumeMount{
 		{Name: secretName, MountPath: secretPath},
 		{Name: consoleCMName, MountPath: "/console/environment.json", SubPath: "environment.json"},
-		dbcerts,
+	}
+
+	if dbcerts != nil {
+		volMounts = append(volMounts, *dbcerts)
 	}
 
 	return corev1.Container{

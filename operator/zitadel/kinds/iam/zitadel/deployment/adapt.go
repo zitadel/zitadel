@@ -144,15 +144,24 @@ func deploymentDef(
 	dbConn db.Connection,
 ) *appsv1.Deployment {
 
-	chownedVolumeMount := corev1.VolumeMount{
-		Name:      "chowned-certs",
-		MountPath: certPath,
-	}
+	volumes := GetVolumes(secretName, secretPasswordsName, consoleCMName)
+	var chownedVolumeMount *corev1.VolumeMount
+	var initContainers []corev1.Container
 
-	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", RunAsUser, RunAsUser), corev1.VolumeMount{
-		Name:      "certs",
-		MountPath: "certificates",
-	}, chownedVolumeMount)
+	ssl := dbConn.SSL()
+	if ssl != nil {
+		chownedVolumeMount = &corev1.VolumeMount{
+			Name:      "chowned-certs",
+			MountPath: certPath,
+		}
+
+		srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(dbConn.SSL(), customImageRegistry, fmt.Sprintf("%d:%d", RunAsUser, RunAsUser), corev1.VolumeMount{
+			Name:      "certs",
+			MountPath: "certificates",
+		}, *chownedVolumeMount)
+		volumes = append(volumes, srcVolume, destVolume)
+		initContainers = []corev1.Container{chownCertsContainer}
+	}
 
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -182,7 +191,7 @@ func deploymentDef(
 					NodeSelector:   nodeSelector,
 					Tolerations:    tolerations,
 					Affinity:       affinity.K8s(),
-					InitContainers: []corev1.Container{chownCertsContainer},
+					InitContainers: initContainers,
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
@@ -201,11 +210,7 @@ func deploymentDef(
 							dbConn,
 						),
 					},
-					Volumes: append(GetVolumes(
-						secretName,
-						secretPasswordsName,
-						consoleCMName,
-					), srcVolume, destVolume),
+					Volumes: volumes,
 				},
 			},
 		},

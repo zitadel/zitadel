@@ -2,7 +2,7 @@ package managed
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certs"
 	"strconv"
 	"strings"
 
@@ -21,11 +21,11 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
+	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certs/current"
 	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
-	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
 )
 
 const (
@@ -37,10 +37,10 @@ const (
 	cockroachPort      = int32(26257)
 	cockroachHTTPPort  = int32(8080)
 	Clean              = "clean"
-	DBReady            = "dbready"
-	rootCertsSecret    = "root-certs"
-	nodeCertsSecret    = "cockroachdb.node" // for backward compatibility
 	clientCertsPath    = "/cockroach/cockroach-client-certs"
+	dbUser             = "flyway"            // TODO: Change for V2
+	pwSecretName       = "zitadel-passwords" // TODO: Change for V2
+	pwSecretKey        = "flyway"            // TODO: Change for V2
 )
 
 func Adapter(
@@ -114,25 +114,20 @@ func Adapter(
 		}
 		current.Parsed = currentDB
 
-		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, "managed-db-password"))
-		currentDB.Current.PasswordSecretKey = "zitadel"
-		currentDB.Current.PasswordSecret = pwSecretLabels
-		currentDB.Current.User = "zitadel"
+		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, pwSecretName))
 
-		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := user.AdaptFunc(
+		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := certs.AdaptFunc(
 			internalMonitor,
 			namespace,
 			componentLabels,
 			desiredKind.Spec.ClusterDns,
 			isFeatureDatabase,
-			currentDB.Current.User,
+			dbUser,
 			desiredKind.Spec.ZitadelUserPassword,
 			desiredKind.Spec.ZitadelUserPasswordExisting,
 			pwSecretLabels,
-			currentDB.Current.PasswordSecretKey,
-			rootCertsSecret,
+			pwSecretKey,
 			clientCertsPath,
-			nodeCertsSecret,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -165,8 +160,8 @@ func Adapter(
 			desiredKind.Spec.Cache,
 			desiredKind.Spec.MaxSQLMemory,
 			clientCertsPath,
-			rootCertsSecret,
-			nodeCertsSecret,
+			certs.ZitadelCertsSecret,
+			certs.NodeCertsSecret,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -222,7 +217,7 @@ func Adapter(
 				),
 				operator.EnsureFuncToQueryFunc(ensureInit),
 				operator.EnsureFuncToQueryFunc(checkDBReady),
-				queryDBSetupAfterCR,
+				queryDBSetupBeforeCR,
 			)
 		}
 
@@ -271,11 +266,13 @@ func Adapter(
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriedCurrentDB, err := db.ParseQueriedForDatabase(queried)
 				if err != nil || queriedCurrentDB == nil {
-					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
-					currentDB.Current.URL = PublicServiceName
+					currentDB.Current.Host = PublicServiceName
+					currentDB.Current.CertsSecret = certs.ZitadelCertsSecret
+					currentDB.Current.User = dbUser
+					currentDB.Current.PasswordSecretKey = pwSecretKey
+					currentDB.Current.PasswordSecret = pwSecretLabels
 					db.SetQueriedForDatabase(queried, current)
-					internalMonitor.Info("set current state of managed database")
 				}
 
 				ensure, err := operator.QueriersToEnsureFunc(internalMonitor, true, queriers, k8sClient, queried)

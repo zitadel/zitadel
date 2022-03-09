@@ -14,7 +14,7 @@ import (
 func getMigrationContainer(
 	dbConn db.Connection,
 	customImageRegistry string,
-	certsVolumeMount corev1.VolumeMount,
+	certsVolumeMount *corev1.VolumeMount,
 ) corev1.Container {
 
 	pwSecret, pwSecretKey := dbConn.PasswordSecret()
@@ -24,19 +24,26 @@ func getMigrationContainer(
 		pwSecretName = pwSecret.Name()
 	}
 
+	var certsDir string
+	volumeMounts := []corev1.VolumeMount{{
+		Name:      migrationConfigmap,
+		MountPath: migrationsPath,
+	}}
+	if certsVolumeMount != nil {
+		volumeMounts = append(volumeMounts, *certsVolumeMount)
+		certsDir = certsVolumeMount.MountPath
+	}
+
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
 		Args: []string{
-			fmt.Sprintf("-url=%s", connectionURL(dbConn, certsVolumeMount.MountPath)),
+			fmt.Sprintf("-url=%s", connectionURL(dbConn, certsDir)),
 			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
-		VolumeMounts: []corev1.VolumeMount{certsVolumeMount, {
-			Name:      migrationConfigmap,
-			MountPath: migrationsPath,
-		}},
+		Env:                      migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
+		VolumeMounts:             volumeMounts,
 		TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 		TerminationMessagePolicy: "File",
 		ImagePullPolicy:          "IfNotPresent",

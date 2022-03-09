@@ -24,7 +24,6 @@ const (
 	backupNameEnv             = "BACKUP_NAME"
 	cronJobNamePrefix         = "backup-"
 	internalSecretName        = "client-certs"
-	rootSecretName            = db.CertsSecret
 	timeout                   = 15 * time.Minute
 	Normal                    = "backup"
 	Instant                   = "instantbackup"
@@ -67,7 +66,6 @@ func AdaptFunc(
 		bucketName,
 		backupName,
 		backupTime,
-		certPath,
 		accessKeyIDPath,
 		secretAccessKeyPath,
 		sessionTokenPath,

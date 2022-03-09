@@ -6,7 +6,7 @@ import (
 
 	"github.com/caos/zitadel/pkg/databases/db"
 
-	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
+	cacurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/certs/current"
 
 	"github.com/caos/orbos/pkg/tree"
 )
@@ -19,12 +19,10 @@ type Current struct {
 }
 
 type CurrentDB struct {
-	URL               string
-	Port              string
-	User              string
-	PasswordSecret    *labels.Selectable
-	PasswordSecretKey string
-	CA                *cacurr.Current
+	CA                            *cacurr.Current
+	CertsSecret, Host, Port, User string
+	PasswordSecret                *labels.Selectable
+	PasswordSecretKey             string
 }
 
 func (c *Current) GetCA() *cacurr.Current {
@@ -47,8 +45,8 @@ func (c *Current) SetCertificate(cert []byte) {
 	c.Current.CA.Certificate = cert
 }
 
-func (c *Current) Host() string { return "cockroachdb-public" }
-func (c *Current) Port() string { return "26257" }
+func (c *Current) Host() string { return c.Current.Host }
+func (c *Current) Port() string { return c.Current.Port }
 func (c *Current) User() string { return c.Current.User }
 func (c *Current) PasswordSecret() (*labels.Selectable, string) {
 	return c.Current.PasswordSecret, c.Current.PasswordSecretKey
@@ -56,6 +54,7 @@ func (c *Current) PasswordSecret() (*labels.Selectable, string) {
 
 func (c *Current) SSL() *db.SSL {
 	return &db.SSL{
+		CertsSecret:    c.Current.CertsSecret,
 		RootCert:       true,
 		UserCertAndKey: true,
 	}

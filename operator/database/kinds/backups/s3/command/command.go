@@ -18,7 +18,6 @@ func GetCommand(
 	bucketName string,
 	backupName string,
 	backupTime string,
-	certsFolder string,
 	accessKeyIDPath string,
 	secretAccessKeyPath string,
 	sessionTokenPath string,
@@ -64,9 +63,15 @@ func GetCommand(
 		dbURL = fmt.Sprintf("%s?options=%s", dbURL, options)
 	}
 
+	sslArgument := "--insecure"
+	ssl := dbConn.SSL()
+	if ssl != nil {
+		sslArgument = fmt.Sprintf("--certs-dir=%s", ssl.CertsSecret)
+	}
+
 	return fmt.Sprintf(
-		`cockroach sql --certs-dir=%s --url=%s --execute "%s \"s3://%s/%s/%s?%s\";"`,
-		certsFolder,
+		`cockroach sql %s --url=%s --execute "%s \"s3://%s/%s/%s?%s\";"`,
+		sslArgument,
 		dbURL,
 		action,
 		bucketName,

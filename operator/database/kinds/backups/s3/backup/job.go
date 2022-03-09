@@ -2,8 +2,8 @@ package backup
 
 import (
 	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certs"
 	"github.com/caos/zitadel/operator/helpers"
-	"github.com/caos/zitadel/pkg/databases/db"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -104,7 +104,7 @@ func getJobSpecDef(
 					Name: internalSecretName,
 					VolumeSource: corev1.VolumeSource{
 						Secret: &corev1.SecretVolumeSource{
-							SecretName:  db.CertsSecret,
+							SecretName:  certs.ZitadelCertsSecret,
 							DefaultMode: helpers.PointerInt32(defaultMode),
 						},
 					},
