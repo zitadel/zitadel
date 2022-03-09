@@ -14,20 +14,101 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-type AppProjection struct {
-	crdb.StatementHandler
-}
-
 const (
 	AppProjectionTable = "zitadel.projections.apps"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
+
+	AppColumnID            = "id"
+	AppColumnName          = "name"
+	AppColumnProjectID     = "project_id"
+	AppColumnCreationDate  = "creation_date"
+	AppColumnChangeDate    = "change_date"
+	AppColumnResourceOwner = "resource_owner"
+	AppColumnState         = "state"
+	AppColumnSequence      = "sequence"
+
+	appAPITableSuffix              = "api_configs"
+	AppAPIConfigColumnAppID        = "app_id"
+	AppAPIConfigColumnClientID     = "client_id"
+	AppAPIConfigColumnClientSecret = "client_secret"
+	AppAPIConfigColumnAuthMethod   = "auth_method"
+
+	appOIDCTableSuffix                          = "oidc_configs"
+	AppOIDCConfigColumnAppID                    = "app_id"
+	AppOIDCConfigColumnVersion                  = "version"
+	AppOIDCConfigColumnClientID                 = "client_id"
+	AppOIDCConfigColumnClientSecret             = "client_secret"
+	AppOIDCConfigColumnRedirectUris             = "redirect_uris"
+	AppOIDCConfigColumnResponseTypes            = "response_types"
+	AppOIDCConfigColumnGrantTypes               = "grant_types"
+	AppOIDCConfigColumnApplicationType          = "application_type"
+	AppOIDCConfigColumnAuthMethodType           = "auth_method_type"
+	AppOIDCConfigColumnPostLogoutRedirectUris   = "post_logout_redirect_uris"
+	AppOIDCConfigColumnDevMode                  = "is_dev_mode"
+	AppOIDCConfigColumnAccessTokenType          = "access_token_type"
+	AppOIDCConfigColumnAccessTokenRoleAssertion = "access_token_role_assertion"
+	AppOIDCConfigColumnIDTokenRoleAssertion     = "id_token_role_assertion"
+	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
+	AppOIDCConfigColumnClockSkew                = "clock_skew"
+	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
 )
+
+type AppProjection struct {
+	crdb.StatementHandler
+}
 
 func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *AppProjection {
 	p := new(AppProjection)
 	config.ProjectionName = AppProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewMultiTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(AppColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
+				crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
+				crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(AppColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
+				crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
+			},
+				crdb.NewPrimaryKey(ActionIDCol),
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+				crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
+				crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+				crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
+			},
+				crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
+				appAPITableSuffix,
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+				crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
+				crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
+				crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+				crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+				crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()), //TODO: null?
+				crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),    //TODO: null?
+				crdb.NewColumn(AppOIDCConfigColumnApplicationType, crdb.ColumnTypeEnum),
+				crdb.NewColumn(AppOIDCConfigColumnAuthMethodType, crdb.ColumnTypeEnum),
+				crdb.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+				crdb.NewColumn(AppOIDCConfigColumnDevMode, crdb.ColumnTypeBool),
+				crdb.NewColumn(AppOIDCConfigColumnAccessTokenType, crdb.ColumnTypeEnum),
+				crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
+				crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()),     //TODO: null?
+				crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
+				crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Nullable()),               //TODO: null?
+				crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),
+				appOIDCTableSuffix,
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -89,42 +170,6 @@ func (p *AppProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	AppColumnID            = "id"
-	AppColumnName          = "name"
-	AppColumnProjectID     = "project_id"
-	AppColumnCreationDate  = "creation_date"
-	AppColumnChangeDate    = "change_date"
-	AppColumnResourceOwner = "resource_owner"
-	AppColumnState         = "state"
-	AppColumnSequence      = "sequence"
-
-	appAPITableSuffix              = "api_configs"
-	AppAPIConfigColumnAppID        = "app_id"
-	AppAPIConfigColumnClientID     = "client_id"
-	AppAPIConfigColumnClientSecret = "client_secret"
-	AppAPIConfigColumnAuthMethod   = "auth_method"
-
-	appOIDCTableSuffix                          = "oidc_configs"
-	AppOIDCConfigColumnAppID                    = "app_id"
-	AppOIDCConfigColumnVersion                  = "version"
-	AppOIDCConfigColumnClientID                 = "client_id"
-	AppOIDCConfigColumnClientSecret             = "client_secret"
-	AppOIDCConfigColumnRedirectUris             = "redirect_uris"
-	AppOIDCConfigColumnResponseTypes            = "response_types"
-	AppOIDCConfigColumnGrantTypes               = "grant_types"
-	AppOIDCConfigColumnApplicationType          = "application_type"
-	AppOIDCConfigColumnAuthMethodType           = "auth_method_type"
-	AppOIDCConfigColumnPostLogoutRedirectUris   = "post_logout_redirect_uris"
-	AppOIDCConfigColumnDevMode                  = "is_dev_mode"
-	AppOIDCConfigColumnAccessTokenType          = "access_token_type"
-	AppOIDCConfigColumnAccessTokenRoleAssertion = "access_token_role_assertion"
-	AppOIDCConfigColumnIDTokenRoleAssertion     = "id_token_role_assertion"
-	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
-	AppOIDCConfigColumnClockSkew                = "clock_skew"
-	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
-)
 
 func (p *AppProjection) reduceAppAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationAddedEvent)

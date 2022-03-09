@@ -14,10 +14,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type CustomTextProjection struct {
-	crdb.StatementHandler
-}
-
 const (
 	CustomTextTable = "zitadel.projections.custom_texts"
 
@@ -32,10 +28,31 @@ const (
 	CustomTextTextCol         = "text"
 )
 
+type CustomTextProjection struct {
+	crdb.StatementHandler
+}
+
 func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *CustomTextProjection {
 	p := new(CustomTextProjection)
 	config.ProjectionName = CustomTextTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(CustomTextAggregateIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(CustomTextIsDefaultCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(CustomTextTemplateCol, crdb.ColumnTypeText),
+				crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
+				crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
+				crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

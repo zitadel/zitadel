@@ -38,6 +38,25 @@ func NewAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 	p := new(AuthNKeyProjection)
 	config.ProjectionName = AuthNKeyTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(AuthNKeyIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AuthNKeyCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AuthNKeySequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(AuthNKeyObjectIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AuthNKeyExpirationCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(AuthNKeyIdentifierCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AuthNKeyPublicKeyCol, crdb.ColumnTypeBytes),
+				crdb.NewColumn(AuthNKeyEnabledCol, crdb.ColumnTypeBool, crdb.Default(true)),
+				crdb.NewColumn(AuthNKeyTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+			},
+				crdb.NewPrimaryKey(AuthNKeyIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

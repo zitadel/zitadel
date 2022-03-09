@@ -35,6 +35,24 @@ func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 	p := new(ActionProjection)
 	config.ProjectionName = ActionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(ActionIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ActionCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ActionChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ActionResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ActionStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(ActionSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ActionNameCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ActionScriptCol, crdb.ColumnTypeText, crdb.Default("")),
+				crdb.NewColumn(ActionTimeoutCol, crdb.ColumnTypeInt64, crdb.Default(0)),
+				crdb.NewColumn(ActionAllowedToFailCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			},
+				crdb.NewPrimaryKey(ActionIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
