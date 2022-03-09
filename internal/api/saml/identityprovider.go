@@ -211,17 +211,19 @@ func (p *IdentityProvider) getIssuer() *saml.Issuer {
 }
 
 func (p *IdentityProvider) verifyRequestDestination(request *samlp.AuthnRequest) error {
-	foundEndpoint := false
-	for _, sso := range p.Metadata.SingleSignOnService {
-		if request.Destination == sso.Location {
-			foundEndpoint = true
-			break
+	// google provides no destination in their requests
+	if request.Destination != "" {
+		foundEndpoint := false
+		for _, sso := range p.Metadata.SingleSignOnService {
+			if request.Destination == sso.Location {
+				foundEndpoint = true
+				break
+			}
+		}
+		if !foundEndpoint {
+			return fmt.Errorf("destination of request is unknown")
 		}
 	}
-	if !foundEndpoint {
-		return fmt.Errorf("destination of request is unknown")
-	}
-
 	return nil
 }
 
