@@ -35,7 +35,7 @@
   <div class="owned-project-grid-container">
     <div class="item card" matRipple *ngFor="let item of notPinned; index as i"
       (click)="navigateToProject(type, $any(item), $event)"
-      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}">
+      [ngClass]="{ inactive: item.state !== ProjectState.PROJECT_STATE_ACTIVE}" [attr.data-e2e]="'grid-card'">
       <div class="text-part">
         <span *ngIf="item.details && item.details.changeDate"
           class="top cnsl-secondary-text">{{'PROJECT.PAGES.LASTMODIFIED' | translate}}
@@ -84,7 +84,8 @@
 
 <ng-template #deleteButton let-key="key">
   <button *ngIf="key.id !== zitadelProjectId" matTooltip="{{'ACTIONS.DELETE' | translate}}" color="warn"
-    (click)="deleteProject($event, key)" class="delete-button" mat-icon-button>
+    (click)="deleteProject($event, key)" class="delete-button" mat-icon-button
+    [attr.data-e2e]="'delete-project-button'">
     <i class="las la-trash"></i>
   </button>
 </ng-template>

@@ -35,7 +35,8 @@
           </cnsl-form-field>
         </div>
         <div class="machine-btn-container">
-          <button color="primary" [disabled]="userForm.invalid" type="submit" mat-raised-button>{{ 'ACTIONS.CREATE' |
+          <button color="primary" [attr.data-e2e]="'create-button'" [disabled]="userForm.invalid" type="submit"
+            mat-raised-button>{{ 'ACTIONS.CREATE' |
             translate }}</button>
         </div>
       </form>

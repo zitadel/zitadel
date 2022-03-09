@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "prodbuild": "ng build --configuration production",
-    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss"
+    "lint": "ng lint && stylelint './src/**/*.scss' --syntax scss",
+    "e2e": "./cypress.sh run e2e.env",
+    "e2e:open": "./cypress.sh open e2e.env"
   },
   "private": true,
   "dependencies": {
@@ -60,24 +62,28 @@
     "@angular/language-service": "~13.2.5",
     "@types/jasmine": "~3.10.3",
     "@types/jasminewd2": "~2.0.10",
+    "@types/jsonwebtoken": "^8.5.5",
     "@types/node": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "5.10.0",
     "@typescript-eslint/parser": "5.10.0",
     "codelyzer": "^6.0.0",
+    "cypress": "^9.5.1",
+    "cypress-terminal-report": "^3.4.1",
     "eslint": "^8.10.0",
     "jasmine-core": "~4.0.0",
     "jasmine-spec-reporter": "~7.0.0",
+    "jsonwebtoken": "^8.5.1",
     "karma": "~6.3.16",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.7.0",
+    "mochawesome": "^6.2.2",
     "prettier": "^2.4.1",
     "protractor": "~7.0.0",
     "stylelint": "^13.10.0",
     "stylelint-config-standard": "^22.0.0",
     "stylelint-scss": "^3.21.0",
-    "ts-node": "~10.2.1",
     "typescript": "^4.4.4"
   }
 }

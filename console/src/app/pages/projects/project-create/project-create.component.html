@@ -21,7 +21,7 @@
         </div>
 
         <button color="primary" mat-raised-button class="continue-button" [disabled]="!project.name" cdkFocusInitial
-          type="submit">
+          type="submit" [attr.data-e2e]="'continue-button'">
           {{'ACTIONS.CONTINUE' | translate}}
         </button>
       </form>

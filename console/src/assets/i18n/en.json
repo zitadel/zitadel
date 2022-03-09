@@ -1314,13 +1314,15 @@
       "MEMBERSADDED": "Managers added.",
       "MEMBERADDED": "Manager added.",
       "MEMBERCHANGED": "Manager changed.",
+      "ROLESCREATED": "Roles created.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
       "REACTIVATED": "Reactivated.",
       "DEACTIVATED": "Deactivated.",
+      "CREATED": "Project created.",
       "UPDATED": "Project changed.",
       "GRANTUPDATED": "Grant changed.",
-      "DELETED": "Deleted Project."
+      "DELETED": "Project deleted."
     }
   },
   "NEXTSTEPS": {
@@ -1664,6 +1666,7 @@
       "OIDCUPDATED": "OIDC configuration updated.",
       "APIUPDATED": "API configuration updated",
       "UPDATED": "App updated.",
+      "CREATED": "App created.",
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",
       "CONFIGCHANGED": "Changes detected!"
