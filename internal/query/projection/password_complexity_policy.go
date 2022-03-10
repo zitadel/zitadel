@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,18 +15,51 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+const (
+	PasswordComplexityTable = "zitadel.projections.password_complexity_policies"
+
+	ComplexityPolicyIDCol            = "id"
+	ComplexityPolicyCreationDateCol  = "creation_date"
+	ComplexityPolicyChangeDateCol    = "change_date"
+	ComplexityPolicySequenceCol      = "sequence"
+	ComplexityPolicyStateCol         = "state"
+	ComplexityPolicyIsDefaultCol     = "is_default"
+	ComplexityPolicyResourceOwnerCol = "resource_owner"
+	ComplexityPolicyMinLengthCol     = "min_length"
+	ComplexityPolicyHasLowercaseCol  = "has_lowercase"
+	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
+	ComplexityPolicyHasSymbolCol     = "has_symbol"
+	ComplexityPolicyHasNumberCol     = "has_number"
+)
+
 type PasswordComplexityProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	PasswordComplexityTable = "zitadel.projections.password_complexity_policies"
-)
 
 func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordComplexityProjection {
 	p := new(PasswordComplexityProjection)
 	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(ComplexityPolicyIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ComplexityPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ComplexityPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ComplexityPolicySequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ComplexityPolicyStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(ComplexityPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(ComplexityPolicyResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ComplexityPolicyMinLengthCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ComplexityPolicyHasLowercaseCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(ComplexityPolicyHasUppercaseCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(ComplexityPolicyHasSymbolCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(ComplexityPolicyHasNumberCol, crdb.ColumnTypeBool),
+			},
+				crdb.NewPrimaryKey(ComplexityPolicyIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -147,18 +181,3 @@ func (p *PasswordComplexityProjection) reduceRemoved(event eventstore.Event) (*h
 			handler.NewCond(ComplexityPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
-
-const (
-	ComplexityPolicyCreationDateCol  = "creation_date"
-	ComplexityPolicyChangeDateCol    = "change_date"
-	ComplexityPolicySequenceCol      = "sequence"
-	ComplexityPolicyIDCol            = "id"
-	ComplexityPolicyStateCol         = "state"
-	ComplexityPolicyMinLengthCol     = "min_length"
-	ComplexityPolicyHasLowercaseCol  = "has_lowercase"
-	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
-	ComplexityPolicyHasSymbolCol     = "has_symbol"
-	ComplexityPolicyHasNumberCol     = "has_number"
-	ComplexityPolicyIsDefaultCol     = "is_default"
-	ComplexityPolicyResourceOwnerCol = "resource_owner"
-)

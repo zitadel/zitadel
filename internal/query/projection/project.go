@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,18 +13,51 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	ProjectProjectionTable = "zitadel.projections.projects"
+
+	ProjectColumnID                     = "id"
+	ProjectColumnCreationDate           = "creation_date"
+	ProjectColumnChangeDate             = "change_date"
+	ProjectColumnSequence               = "sequence"
+	ProjectColumnState                  = "state"
+	ProjectColumnResourceOwner          = "resource_owner"
+	ProjectColumnName                   = "name"
+	ProjectColumnProjectRoleAssertion   = "project_role_assertion"
+	ProjectColumnProjectRoleCheck       = "project_role_check"
+	ProjectColumnHasProjectCheck        = "has_project_check"
+	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
+	ProjectColumnCreator                = "creator_id" //TODO: necessary?
+)
+
 type ProjectProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	ProjectProjectionTable = "zitadel.projections.projects"
-)
 
 func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
 	p := new(ProjectProjection)
 	config.ProjectionName = ProjectProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(ProjectColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ProjectColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ProjectColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ProjectColumnState, crdb.ColumnTypeEnum),
+				crdb.NewColumn(ProjectColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectColumnName, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectColumnProjectRoleAssertion, crdb.ColumnTypeBool),
+				crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
+				crdb.NewColumn(ProjectColumnHasProjectCheck, crdb.ColumnTypeBool),
+				crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
+				crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(ProjectColumnID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -57,21 +91,6 @@ func (p *ProjectProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	ProjectColumnID                     = "id"
-	ProjectColumnName                   = "name"
-	ProjectColumnProjectRoleAssertion   = "project_role_assertion"
-	ProjectColumnProjectRoleCheck       = "project_role_check"
-	ProjectColumnHasProjectCheck        = "has_project_check"
-	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
-	ProjectColumnCreationDate           = "creation_date"
-	ProjectColumnChangeDate             = "change_date"
-	ProjectColumnResourceOwner          = "resource_owner"
-	ProjectColumnCreator                = "creator_id"
-	ProjectColumnState                  = "state"
-	ProjectColumnSequence               = "sequence"
-)
 
 func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectAddedEvent)

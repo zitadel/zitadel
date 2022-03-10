@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,10 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type MailTemplateProjection struct {
-	crdb.StatementHandler
-}
-
 const (
 	MailTemplateTable = "zitadel.projections.mail_templates"
 
@@ -26,14 +23,33 @@ const (
 	MailTemplateChangeDateCol   = "change_date"
 	MailTemplateSequenceCol     = "sequence"
 	MailTemplateStateCol        = "state"
-	MailTemplateTemplateCol     = "template"
 	MailTemplateIsDefaultCol    = "is_default"
+	MailTemplateTemplateCol     = "template"
 )
+
+type MailTemplateProjection struct {
+	crdb.StatementHandler
+}
 
 func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandlerConfig) *MailTemplateProjection {
 	p := new(MailTemplateProjection)
 	config.ProjectionName = MailTemplateTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(MailTemplateAggregateIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
+			},
+				crdb.NewPrimaryKey(MailTemplateAggregateIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

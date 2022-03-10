@@ -16,18 +16,49 @@ import (
 	"github.com/caos/zitadel/internal/repository/usergrant"
 )
 
+const (
+	UserGrantProjectionTable = "zitadel.projections.user_grants"
+
+	UserGrantID            = "id"
+	UserGrantCreationDate  = "creation_date"
+	UserGrantChangeDate    = "change_date"
+	UserGrantSequence      = "sequence"
+	UserGrantState         = "state"
+	UserGrantResourceOwner = "resource_owner"
+	UserGrantUserID        = "user_id"
+	UserGrantProjectID     = "project_id"
+	UserGrantGrantID       = "grant_id"
+	UserGrantRoles         = "roles"
+)
+
 type UserGrantProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	UserGrantProjectionTable = "zitadel.projections.user_grants"
-)
 
 func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserGrantProjection {
 	p := new(UserGrantProjection)
 	config.ProjectionName = UserGrantProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(UserGrantID, crdb.ColumnTypeText),
+				crdb.NewColumn(UserGrantCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(UserGrantChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(UserGrantSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(UserGrantState, crdb.ColumnTypeEnum),
+				crdb.NewColumn(UserGrantResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(UserGrantUserID, crdb.ColumnTypeText),
+				crdb.NewColumn(UserGrantProjectID, crdb.ColumnTypeText),
+				crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
+				crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(UserGrantID),
+			),
+		),
+		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{UserGrantUserID})),
+		crdb.NewIndexCheck(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -103,21 +134,6 @@ func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-type UserGrantColumn string
-
-const (
-	UserGrantID            = "id"
-	UserGrantResourceOwner = "resource_owner"
-	UserGrantCreationDate  = "creation_date"
-	UserGrantChangeDate    = "change_date"
-	UserGrantSequence      = "sequence"
-	UserGrantUserID        = "user_id"
-	UserGrantProjectID     = "project_id"
-	UserGrantGrantID       = "grant_id"
-	UserGrantRoles         = "roles"
-	UserGrantState         = "state"
-)
 
 func (p *UserGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*usergrant.UserGrantAddedEvent)

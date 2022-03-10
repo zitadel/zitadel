@@ -4,25 +4,57 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/lib/pq"
+)
+
+const (
+	ProjectGrantProjectionTable = "zitadel.projections.project_grants"
+
+	ProjectGrantColumnGrantID       = "grant_id"
+	ProjectGrantColumnCreationDate  = "creation_date"
+	ProjectGrantColumnChangeDate    = "change_date"
+	ProjectGrantColumnSequence      = "sequence"
+	ProjectGrantColumnState         = "state"
+	ProjectGrantColumnResourceOwner = "resource_owner"
+	ProjectGrantColumnProjectID     = "project_id"
+	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
+	ProjectGrantColumnRoleKeys      = "granted_role_keys"
+	ProjectGrantColumnCreator       = "creator_id" //TODO: necessary?
 )
 
 type ProjectGrantProjection struct {
 	crdb.StatementHandler
 }
 
-const ProjectGrantProjectionTable = "zitadel.projections.project_grants"
-
 func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantProjection {
 	p := new(ProjectGrantProjection)
 	config.ProjectionName = ProjectGrantProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(ProjectGrantColumnGrantID, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ProjectGrantColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
+				crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
+				crdb.NewColumn(ProjectGrantColumnCreator, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(ProjectGrantColumnGrantID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -64,19 +96,6 @@ func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	ProjectGrantColumnProjectID     = "project_id"
-	ProjectGrantColumnGrantID       = "grant_id"
-	ProjectGrantColumnCreationDate  = "creation_date"
-	ProjectGrantColumnChangeDate    = "change_date"
-	ProjectGrantColumnResourceOwner = "resource_owner"
-	ProjectGrantColumnState         = "state"
-	ProjectGrantColumnSequence      = "sequence"
-	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
-	ProjectGrantColumnRoleKeys      = "granted_role_keys"
-	ProjectGrantColumnCreator       = "creator_id"
-)
 
 func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)

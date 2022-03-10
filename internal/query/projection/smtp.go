@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -12,18 +13,49 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	SMTPConfigProjectionTable = "zitadel.projections.smtp_configs"
+
+	SMTPConfigColumnAggregateID   = "aggregate_id"
+	SMTPConfigColumnCreationDate  = "creation_date"
+	SMTPConfigColumnChangeDate    = "change_date"
+	SMTPConfigColumnSequence      = "sequence"
+	SMTPConfigColumnResourceOwner = "resource_owner"
+	SMTPConfigColumnTLS           = "tls"
+	SMTPConfigColumnSenderAddress = "sender_address"
+	SMTPConfigColumnSenderName    = "sender_name"
+	SMTPConfigColumnSMTPHost      = "host"
+	SMTPConfigColumnSMTPUser      = "username"
+	SMTPConfigColumnSMTPPassword  = "password"
+)
+
 type SMTPConfigProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	SMTPConfigProjectionTable = "zitadel.projections.smtp_configs"
-)
 
 func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SMTPConfigProjection {
 	p := new(SMTPConfigProjection)
 	config.ProjectionName = SMTPConfigProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewMultiTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(SMTPConfigColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
+				crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(SMTPConfigColumnAggregateID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -50,20 +82,6 @@ func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	SMTPConfigColumnAggregateID   = "aggregate_id"
-	SMTPConfigColumnCreationDate  = "creation_date"
-	SMTPConfigColumnChangeDate    = "change_date"
-	SMTPConfigColumnResourceOwner = "resource_owner"
-	SMTPConfigColumnSequence      = "sequence"
-	SMTPConfigColumnTLS           = "tls"
-	SMTPConfigColumnFromAddress   = "sender_address"
-	SMTPConfigColumnFromName      = "sender_name"
-	SMTPConfigColumnSMTPHost      = "host"
-	SMTPConfigColumnSMTPUser      = "username"
-	SMTPConfigColumnSMTPPassword  = "password"
-)
-
 func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMTPConfigAddedEvent)
 	if !ok {
@@ -79,8 +97,8 @@ func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 			handler.NewCol(SMTPConfigColumnResourceOwner, e.Aggregate().ResourceOwner),
 			handler.NewCol(SMTPConfigColumnSequence, e.Sequence()),
 			handler.NewCol(SMTPConfigColumnTLS, e.TLS),
-			handler.NewCol(SMTPConfigColumnFromAddress, e.SenderAddress),
-			handler.NewCol(SMTPConfigColumnFromName, e.SenderName),
+			handler.NewCol(SMTPConfigColumnSenderAddress, e.SenderAddress),
+			handler.NewCol(SMTPConfigColumnSenderName, e.SenderName),
 			handler.NewCol(SMTPConfigColumnSMTPHost, e.Host),
 			handler.NewCol(SMTPConfigColumnSMTPUser, e.User),
 			handler.NewCol(SMTPConfigColumnSMTPPassword, e.Password),
@@ -102,10 +120,10 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 		columns = append(columns, handler.NewCol(SMTPConfigColumnTLS, *e.TLS))
 	}
 	if e.FromAddress != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnFromAddress, *e.FromAddress))
+		columns = append(columns, handler.NewCol(SMTPConfigColumnSenderAddress, *e.FromAddress))
 	}
 	if e.FromName != nil {
-		columns = append(columns, handler.NewCol(SMTPConfigColumnFromName, *e.FromName))
+		columns = append(columns, handler.NewCol(SMTPConfigColumnSenderName, *e.FromName))
 	}
 	if e.Host != nil {
 		columns = append(columns, handler.NewCol(SMTPConfigColumnSMTPHost, *e.Host))

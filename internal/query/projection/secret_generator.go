@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -12,18 +13,51 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	SecretGeneratorProjectionTable = "zitadel.projections.secret_generators"
+
+	SecretGeneratorColumnGeneratorType       = "generator_type"
+	SecretGeneratorColumnAggregateID         = "aggregate_id"
+	SecretGeneratorColumnCreationDate        = "creation_date"
+	SecretGeneratorColumnChangeDate          = "change_date"
+	SecretGeneratorColumnSequence            = "sequence"
+	SecretGeneratorColumnResourceOwner       = "resource_owner"
+	SecretGeneratorColumnLength              = "length"
+	SecretGeneratorColumnExpiry              = "expiry"
+	SecretGeneratorColumnIncludeLowerLetters = "include_lower_letters"
+	SecretGeneratorColumnIncludeUpperLetters = "include_upper_letters"
+	SecretGeneratorColumnIncludeDigits       = "include_digits"
+	SecretGeneratorColumnIncludeSymbols      = "include_symbols"
+)
+
 type SecretGeneratorProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	SecretGeneratorProjectionTable = "zitadel.projections.secret_generators"
-)
 
 func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SecretGeneratorProjection {
 	p := new(SecretGeneratorProjection)
 	config.ProjectionName = SecretGeneratorProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeText),
+				crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
+				crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(SecretGeneratorColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(SecretGeneratorColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(SecretGeneratorColumnLength, crdb.ColumnTypeInt64),
+				crdb.NewColumn(SecretGeneratorColumnExpiry, crdb.ColumnTypeInt64),
+				crdb.NewColumn(SecretGeneratorColumnIncludeLowerLetters, crdb.ColumnTypeBool),
+				crdb.NewColumn(SecretGeneratorColumnIncludeUpperLetters, crdb.ColumnTypeBool),
+				crdb.NewColumn(SecretGeneratorColumnIncludeDigits, crdb.ColumnTypeBool),
+				crdb.NewColumn(SecretGeneratorColumnIncludeSymbols, crdb.ColumnTypeBool),
+			},
+				crdb.NewPrimaryKey(SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -49,21 +83,6 @@ func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	SecretGeneratorColumnGeneratorType       = "generator_type"
-	SecretGeneratorColumnAggregateID         = "aggregate_id"
-	SecretGeneratorColumnCreationDate        = "creation_date"
-	SecretGeneratorColumnChangeDate          = "change_date"
-	SecretGeneratorColumnResourceOwner       = "resource_owner"
-	SecretGeneratorColumnSequence            = "sequence"
-	SecretGeneratorColumnLength              = "length"
-	SecretGeneratorColumnExpiry              = "expiry"
-	SecretGeneratorColumnIncludeLowerLetters = "include_lower_letters"
-	SecretGeneratorColumnIncludeUpperLetters = "include_upper_letters"
-	SecretGeneratorColumnIncludeDigits       = "include_digits"
-	SecretGeneratorColumnIncludeSymbols      = "include_symbols"
-)
 
 func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SecretGeneratorAddedEvent)

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query/projection"
 
@@ -41,12 +42,12 @@ var (
 		name:  projection.SMTPConfigColumnTLS,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnFromAddress = Column{
-		name:  projection.SMTPConfigColumnFromAddress,
+	SMTPConfigColumnSenderAddress = Column{
+		name:  projection.SMTPConfigColumnSenderAddress,
 		table: smtpConfigsTable,
 	}
-	SMTPConfigColumnFromName = Column{
-		name:  projection.SMTPConfigColumnFromName,
+	SMTPConfigColumnSenderName = Column{
+		name:  projection.SMTPConfigColumnSenderName,
 		table: smtpConfigsTable,
 	}
 	SMTPConfigColumnSMTPHost = Column{
@@ -106,8 +107,8 @@ func prepareSMTPConfigQuery() (sq.SelectBuilder, func(*sql.Row) (*SMTPConfig, er
 			SMTPConfigColumnResourceOwner.identifier(),
 			SMTPConfigColumnSequence.identifier(),
 			SMTPConfigColumnTLS.identifier(),
-			SMTPConfigColumnFromAddress.identifier(),
-			SMTPConfigColumnFromName.identifier(),
+			SMTPConfigColumnSenderAddress.identifier(),
+			SMTPConfigColumnSenderName.identifier(),
 			SMTPConfigColumnSMTPHost.identifier(),
 			SMTPConfigColumnSMTPUser.identifier(),
 			SMTPConfigColumnSMTPPassword.identifier()).

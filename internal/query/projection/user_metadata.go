@@ -12,16 +12,42 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+const (
+	UserMetadataProjectionTable = "zitadel.projections.user_metadata"
+
+	UserMetadataColumnUserID        = "user_id"
+	UserMetadataColumnCreationDate  = "creation_date"
+	UserMetadataColumnChangeDate    = "change_date"
+	UserMetadataColumnSequence      = "sequence"
+	UserMetadataColumnResourceOwner = "resource_owner"
+	UserMetadataColumnKey           = "key"
+	UserMetadataColumnValue         = "value"
+)
+
 type UserMetadataProjection struct {
 	crdb.StatementHandler
 }
-
-const UserMetadataProjectionTable = "zitadel.projections.user_metadata"
 
 func NewUserMetadataProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserMetadataProjection {
 	p := new(UserMetadataProjection)
 	config.ProjectionName = UserMetadataProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(UserMetadataColumnUserID, crdb.ColumnTypeText),
+				crdb.NewColumn(UserMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(UserMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(UserMetadataColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(UserMetadataColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
+				crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
+			},
+				crdb.NewPrimaryKey(UserMetadataColumnUserID),
+			),
+		),
+		crdb.NewIndexCheck(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -51,16 +77,6 @@ func (p *UserMetadataProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	UserMetadataColumnUserID        = "user_id"
-	UserMetadataColumnResourceOwner = "resource_owner"
-	UserMetadataColumnCreationDate  = "creation_date"
-	UserMetadataColumnChangeDate    = "change_date"
-	UserMetadataColumnSequence      = "sequence"
-	UserMetadataColumnKey           = "key"
-	UserMetadataColumnValue         = "value"
-)
 
 func (p *UserMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataSetEvent)

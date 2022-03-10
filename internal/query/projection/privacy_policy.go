@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,28 +15,45 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type PrivacyPolicyProjection struct {
-	crdb.StatementHandler
-}
-
 const (
 	PrivacyPolicyTable = "zitadel.projections.privacy_policies"
 
+	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyCreationDateCol  = "creation_date"
 	PrivacyPolicyChangeDateCol    = "change_date"
 	PrivacyPolicySequenceCol      = "sequence"
-	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyStateCol         = "state"
-	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
-	PrivacyPolicyTOSLinkCol       = "tos_link"
 	PrivacyPolicyIsDefaultCol     = "is_default"
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
+	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
+	PrivacyPolicyTOSLinkCol       = "tos_link"
 )
+
+type PrivacyPolicyProjection struct {
+	crdb.StatementHandler
+}
 
 func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PrivacyPolicyProjection {
 	p := new(PrivacyPolicyProjection)
 	config.ProjectionName = PrivacyPolicyTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(PrivacyPolicyIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(PrivacyPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(PrivacyPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(PrivacyPolicySequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(PrivacyPolicyStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(PrivacyPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(PrivacyPolicyResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
+				crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(PrivacyPolicyIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,19 +13,57 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-type SMSConfigProjection struct {
-	crdb.StatementHandler
-}
-
 const (
 	SMSConfigProjectionTable = "zitadel.projections.sms_configs"
 	SMSTwilioTable           = SMSConfigProjectionTable + "_" + smsTwilioTableSuffix
+
+	SMSColumnID            = "id"
+	SMSColumnAggregateID   = "aggregate_id"
+	SMSColumnCreationDate  = "creation_date"
+	SMSColumnChangeDate    = "change_date"
+	SMSColumnSequence      = "sequence"
+	SMSColumnState         = "state"
+	SMSColumnResourceOwner = "resource_owner"
+
+	smsTwilioTableSuffix              = "twilio"
+	SMSTwilioConfigColumnSMSID        = "sms_id"
+	SMSTwilioConfigColumnSID          = "sid"
+	SMSTwilioConfigColumnSenderNumber = "sender_number"
+	SMSTwilioConfigColumnToken        = "token"
 )
+
+type SMSConfigProjection struct {
+	crdb.StatementHandler
+}
 
 func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerConfig) *SMSConfigProjection {
 	p := new(SMSConfigProjection)
 	config.ProjectionName = SMSConfigProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewMultiTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(SMSColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(SMSColumnAggregateID, crdb.ColumnTypeText),
+				crdb.NewColumn(SMSColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(SMSColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(SMSColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(SMSColumnState, crdb.ColumnTypeEnum),
+				crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(SMSColumnID),
+			),
+			crdb.NewSecondaryTable([]*crdb.Column{
+				crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText, crdb.Default(SMSColumnID)),
+				crdb.NewColumn(SMSTwilioConfigColumnSID, crdb.ColumnTypeText),
+				crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
+				crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
+			},
+				crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID),
+				smsTwilioTableSuffix,
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -58,22 +97,6 @@ func (p *SMSConfigProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	SMSColumnID            = "id"
-	SMSColumnAggregateID   = "aggregate_id"
-	SMSColumnCreationDate  = "creation_date"
-	SMSColumnChangeDate    = "change_date"
-	SMSColumnResourceOwner = "resource_owner"
-	SMSColumnState         = "state"
-	SMSColumnSequence      = "sequence"
-
-	smsTwilioTableSuffix              = "twilio"
-	SMSTwilioConfigColumnSMSID        = "sms_id"
-	SMSTwilioConfigColumnSID          = "sid"
-	SMSTwilioConfigColumnToken        = "token"
-	SMSTwilioConfigColumnSenderNumber = "sender_number"
-)
 
 func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMSConfigTwilioAddedEvent)

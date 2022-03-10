@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,18 +15,45 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+const (
+	PasswordAgeTable = "zitadel.projections.password_age_policies"
+
+	AgePolicyIDCol             = "id"
+	AgePolicyCreationDateCol   = "creation_date"
+	AgePolicyChangeDateCol     = "change_date"
+	AgePolicySequenceCol       = "sequence"
+	AgePolicyStateCol          = "state"
+	AgePolicyIsDefaultCol      = "is_default"
+	AgePolicyResourceOwnerCol  = "resource_owner"
+	AgePolicyExpireWarnDaysCol = "expire_warn_days"
+	AgePolicyMaxAgeDaysCol     = "max_age_days"
+)
+
 type PasswordAgeProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	PasswordAgeTable = "zitadel.projections.password_age_policies"
-)
 
 func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordAgeProjection {
 	p := new(PasswordAgeProjection)
 	config.ProjectionName = PasswordAgeTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(AgePolicyIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AgePolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(AgePolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(AgePolicySequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(AgePolicyStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(AgePolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(AgePolicyResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(AgePolicyExpireWarnDaysCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(AgePolicyMaxAgeDaysCol, crdb.ColumnTypeInt64),
+			},
+				crdb.NewPrimaryKey(AgePolicyIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -135,15 +163,3 @@ func (p *PasswordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.
 			handler.NewCond(AgePolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
-
-const (
-	AgePolicyCreationDateCol   = "creation_date"
-	AgePolicyChangeDateCol     = "change_date"
-	AgePolicySequenceCol       = "sequence"
-	AgePolicyIDCol             = "id"
-	AgePolicyStateCol          = "state"
-	AgePolicyExpireWarnDaysCol = "expire_warn_days"
-	AgePolicyMaxAgeDaysCol     = "max_age_days"
-	AgePolicyIsDefaultCol      = "is_default"
-	AgePolicyResourceOwnerCol  = "resource_owner"
-)

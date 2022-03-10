@@ -14,18 +14,63 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
+const (
+	LoginPolicyTable = "zitadel.projections.login_policies"
+
+	LoginPolicyIDCol                    = "aggregate_id"
+	LoginPolicyCreationDateCol          = "creation_date"
+	LoginPolicyChangeDateCol            = "change_date"
+	LoginPolicySequenceCol              = "sequence"
+	LoginPolicyIsDefaultCol             = "is_default"
+	LoginPolicyAllowRegisterCol         = "allow_register"
+	LoginPolicyAllowUsernamePasswordCol = "allow_username_password"
+	LoginPolicyAllowExternalIDPsCol     = "allow_external_idps"
+	LoginPolicyForceMFACol              = "force_mfa"
+	LoginPolicy2FAsCol                  = "second_factors"
+	LoginPolicyMFAsCol                  = "multi_factors"
+	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
+	LoginPolicyHidePWResetCol           = "hide_password_reset"
+	PasswordCheckLifetimeCol            = "password_check_lifetime"
+	ExternalLoginCheckLifetimeCol       = "external_login_check_lifetime"
+	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
+	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
+	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
+)
+
 type LoginPolicyProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	LoginPolicyTable = "zitadel.projections.login_policies"
-)
 
 func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginPolicyProjection {
 	p := new(LoginPolicyProjection)
 	config.ProjectionName = LoginPolicyTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(LoginPolicyIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(LoginPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(LoginPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(LoginPolicySequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(LoginPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+				crdb.NewColumn(LoginPolicyAllowRegisterCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(LoginPolicyAllowUsernamePasswordCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(LoginPolicyAllowExternalIDPsCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(LoginPolicyForceMFACol, crdb.ColumnTypeBool),
+				crdb.NewColumn(LoginPolicy2FAsCol, crdb.ColumnTypeEnumArray),
+				crdb.NewColumn(LoginPolicyMFAsCol, crdb.ColumnTypeEnumArray),
+				crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			},
+				crdb.NewPrimaryKey(LoginPolicyIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -96,27 +141,6 @@ func (p *LoginPolicyProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	LoginPolicyIDCol                    = "aggregate_id"
-	LoginPolicyCreationDateCol          = "creation_date"
-	LoginPolicyChangeDateCol            = "change_date"
-	LoginPolicySequenceCol              = "sequence"
-	LoginPolicyAllowRegisterCol         = "allow_register"
-	LoginPolicyAllowUsernamePasswordCol = "allow_username_password"
-	LoginPolicyAllowExternalIDPsCol     = "allow_external_idps"
-	LoginPolicyForceMFACol              = "force_mfa"
-	LoginPolicy2FAsCol                  = "second_factors"
-	LoginPolicyMFAsCol                  = "multi_factors"
-	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
-	LoginPolicyIsDefaultCol             = "is_default"
-	LoginPolicyHidePWResetCol           = "hide_password_reset"
-	PasswordCheckLifetimeCol            = "password_check_lifetime"
-	ExternalLoginCheckLifetimeCol       = "external_login_check_lifetime"
-	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
-	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
-	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
-)
 
 func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LoginPolicyAddedEvent

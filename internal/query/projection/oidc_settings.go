@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -12,18 +13,46 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	OIDCSettingsProjectionTable = "zitadel.projections.oidc_settings"
+
+	OIDCSettingsColumnAggregateID                = "aggregate_id"
+	OIDCSettingsColumnCreationDate               = "creation_date"
+	OIDCSettingsColumnChangeDate                 = "change_date"
+	OIDCSettingsColumnResourceOwner              = "resource_owner"
+	OIDCSettingsColumnSequence                   = "sequence"
+	OIDCSettingsColumnAccessTokenLifetime        = "access_token_lifetime"
+	OIDCSettingsColumnIdTokenLifetime            = "id_token_lifetime"
+	OIDCSettingsColumnRefreshTokenIdleExpiration = "refresh_token_idle_expiration"
+	OIDCSettingsColumnRefreshTokenExpiration     = "refresh_token_expiration"
+)
+
 type OIDCSettingsProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	OIDCSettingsProjectionTable = "zitadel.projections.oidc_settings"
-)
 
 func NewOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OIDCSettingsProjection {
 	p := new(OIDCSettingsProjection)
 	config.ProjectionName = OIDCSettingsProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(OIDCSettingsColumnAggregateID, crdb.ColumnTypeText),
+				crdb.NewColumn(OIDCSettingsColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(OIDCSettingsColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(OIDCSettingsColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(OIDCSettingsColumnIdTokenLifetime, crdb.ColumnTypeInt64),
+				crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
+				crdb.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, crdb.ColumnTypeInt64),
+			},
+				crdb.NewPrimaryKey(OIDCSettingsColumnAggregateID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -45,18 +74,6 @@ func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	OIDCSettingsColumnAggregateID                = "aggregate_id"
-	OIDCSettingsColumnCreationDate               = "creation_date"
-	OIDCSettingsColumnChangeDate                 = "change_date"
-	OIDCSettingsColumnResourceOwner              = "resource_owner"
-	OIDCSettingsColumnSequence                   = "sequence"
-	OIDCSettingsColumnAccessTokenLifetime        = "access_token_lifetime"
-	OIDCSettingsColumnIdTokenLifetime            = "id_token_lifetime"
-	OIDCSettingsColumnRefreshTokenIdleExpiration = "refresh_token_idle_expiration"
-	OIDCSettingsColumnRefreshTokenExpiration     = "refresh_token_expiration"
-)
 
 func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.OIDCSettingsAddedEvent)

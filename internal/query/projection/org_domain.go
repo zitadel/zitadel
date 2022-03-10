@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -13,18 +14,43 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
+const (
+	OrgDomainTable = "zitadel.projections.org_domains"
+
+	OrgDomainOrgIDCol          = "org_id"
+	OrgDomainCreationDateCol   = "creation_date"
+	OrgDomainChangeDateCol     = "change_date"
+	OrgDomainSequenceCol       = "sequence"
+	OrgDomainDomainCol         = "domain"
+	OrgDomainIsVerifiedCol     = "is_verified"
+	OrgDomainIsPrimaryCol      = "is_primary"
+	OrgDomainValidationTypeCol = "validation_type"
+)
+
 type OrgDomainProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	OrgDomainTable = "zitadel.projections.org_domains"
-)
 
 func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgDomainProjection {
 	p := new(OrgDomainProjection)
 	config.ProjectionName = OrgDomainTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(OrgDomainOrgIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(OrgDomainCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(OrgDomainChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(OrgDomainSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(OrgDomainDomainCol, crdb.ColumnTypeText),
+				crdb.NewColumn(OrgDomainIsVerifiedCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
+				crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
+			},
+				crdb.NewPrimaryKey(OrgColumnID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -58,17 +84,6 @@ func (p *OrgDomainProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	OrgDomainCreationDateCol   = "creation_date"
-	OrgDomainChangeDateCol     = "change_date"
-	OrgDomainSequenceCol       = "sequence"
-	OrgDomainDomainCol         = "domain"
-	OrgDomainOrgIDCol          = "org_id"
-	OrgDomainIsVerifiedCol     = "is_verified"
-	OrgDomainIsPrimaryCol      = "is_primary"
-	OrgDomainValidationTypeCol = "validation_type"
-)
 
 func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainAddedEvent)

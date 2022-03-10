@@ -15,18 +15,30 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+const (
+	ProjectMemberProjectionTable = "zitadel.projections.project_members"
+	ProjectMemberProjectIDCol    = "project_id"
+)
+
 type ProjectMemberProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	ProjectMemberProjectionTable = "zitadel.projections.project_members"
-)
 
 func NewProjectMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectMemberProjection {
 	p := new(ProjectMemberProjection)
 	config.ProjectionName = ProjectMemberProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable(
+				append(memberColumns,
+					crdb.NewColumn(ProjectMemberProjectIDCol, crdb.ColumnTypeText),
+				),
+				crdb.NewPrimaryKey(ProjectMemberProjectIDCol, MemberUserIDCol),
+			),
+		),
+		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -78,12 +90,6 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-type ProjectMemberColumn string
-
-const (
-	ProjectMemberProjectIDCol = "project_id"
-)
 
 func (p *ProjectMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberAddedEvent)

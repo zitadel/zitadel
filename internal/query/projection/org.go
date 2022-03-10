@@ -13,18 +13,43 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
+const (
+	OrgProjectionTable = "zitadel.projections.orgs"
+
+	OrgColumnID            = "id"
+	OrgColumnCreationDate  = "creation_date"
+	OrgColumnChangeDate    = "change_date"
+	OrgColumnResourceOwner = "resource_owner"
+	OrgColumnState         = "org_state"
+	OrgColumnSequence      = "sequence"
+	OrgColumnName          = "name"
+	OrgColumnDomain        = "primary_domain"
+)
+
 type OrgProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	OrgProjectionTable = "zitadel.projections.orgs"
-)
 
 func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgProjection {
 	p := new(OrgProjection)
 	config.ProjectionName = OrgProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(OrgColumnID, crdb.ColumnTypeText),
+				crdb.NewColumn(OrgColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(OrgColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(OrgColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
+				crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
+				crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(OrgColumnID),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -58,19 +83,6 @@ func (p *OrgProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-type OrgColumn string
-
-const (
-	OrgColumnID            = "id"
-	OrgColumnCreationDate  = "creation_date"
-	OrgColumnChangeDate    = "change_date"
-	OrgColumnResourceOwner = "resource_owner"
-	OrgColumnState         = "org_state"
-	OrgColumnSequence      = "sequence"
-	OrgColumnName          = "name"
-	OrgColumnDomain        = "primary_domain"
-)
 
 func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)

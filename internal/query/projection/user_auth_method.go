@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,33 +13,48 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+const (
+	UserAuthMethodTable = "zitadel.projections.user_auth_methods"
+
+	UserAuthMethodUserIDCol        = "user_id"
+	UserAuthMethodTypeCol          = "method_type"
+	UserAuthMethodTokenIDCol       = "token_id"
+	UserAuthMethodCreationDateCol  = "creation_date"
+	UserAuthMethodChangeDateCol    = "change_date"
+	UserAuthMethodSequenceCol      = "sequence"
+	UserAuthMethodResourceOwnerCol = "resource_owner"
+	UserAuthMethodStateCol         = "state"
+	UserAuthMethodNameCol          = "name"
+)
+
 type UserAuthMethodProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	UserAuthMethodTable = "zitadel.projections.user_auth_methods"
-)
 
 func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserAuthMethodProjection {
 	p := new(UserAuthMethodProjection)
 	config.ProjectionName = UserAuthMethodTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeText),
+				crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(UserAuthMethodSequenceCol, crdb.ColumnTypeInt64),
+				crdb.NewColumn(UserAuthMethodStateCol, crdb.ColumnTypeEnum),
+				crdb.NewColumn(UserAuthMethodResourceOwnerCol, crdb.ColumnTypeText),
+				crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
-
-const (
-	UserAuthMethodTokenIDCol       = "token_id"
-	UserAuthMethodCreationDateCol  = "creation_date"
-	UserAuthMethodChangeDateCol    = "change_date"
-	UserAuthMethodResourceOwnerCol = "resource_owner"
-	UserAuthMethodUserIDCol        = "user_id"
-	UserAuthMethodSequenceCol      = "sequence"
-	UserAuthMethodNameCol          = "name"
-	UserAuthMethodStateCol         = "state"
-	UserAuthMethodTypeCol          = "method_type"
-)
 
 func (p *UserAuthMethodProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{

@@ -122,11 +122,34 @@ func NewMultiTableCheck(primaryTable *Table, secondaryTables ...*Table) *handler
 	}
 }
 
+func NewViewCheck(selectStmt string, secondaryTables ...*Table) *handler.Check {
+	config := execConfig{}
+	create := func(config execConfig) string {
+		var stmt string
+		for _, table := range secondaryTables {
+			stmt += createTable(table, config.tableName, "_"+table.suffix)
+		}
+		stmt += createView(config.tableName, selectStmt)
+		return stmt
+	}
+
+	return &handler.Check{
+		Execute: exec(config, create, nil),
+	}
+}
+
 func createTable(table *Table, tableName string, suffix string) string {
 	return fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (%s, PRIMARY KEY (%s));",
 		tableName+suffix,
 		createColumnsToQuery(table.columns, tableName),
 		strings.Join(table.primaryKey, ", "),
+	)
+}
+
+func createView(viewName string, selectStmt string) string {
+	return fmt.Sprintf("CREATE VIEW IF NOT EXISTS %s AS %s",
+		viewName,
+		selectStmt,
 	)
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -11,16 +12,45 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	ProjectRoleProjectionTable = "zitadel.projections.project_roles"
+
+	ProjectRoleColumnProjectID     = "project_id"
+	ProjectRoleColumnKey           = "role_key"
+	ProjectRoleColumnCreationDate  = "creation_date"
+	ProjectRoleColumnChangeDate    = "change_date"
+	ProjectRoleColumnSequence      = "sequence"
+	ProjectRoleColumnResourceOwner = "resource_owner"
+	ProjectRoleColumnDisplayName   = "display_name"
+	ProjectRoleColumnGroupName     = "group_name"
+	ProjectRoleColumnCreator       = "creator_id" //TODO: necessary?
+)
+
 type ProjectRoleProjection struct {
 	crdb.StatementHandler
 }
-
-const ProjectRoleProjectionTable = "zitadel.projections.project_roles"
 
 func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectRoleProjection {
 	p := new(ProjectRoleProjection)
 	config.ProjectionName = ProjectRoleProjectionTable
 	config.Reducers = p.reducers()
+	config.InitChecks = []*handler.Check{
+		crdb.NewTableCheck(
+			crdb.NewTable([]*crdb.Column{
+				crdb.NewColumn(ProjectRoleColumnProjectID, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectRoleColumnKey, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectRoleColumnCreationDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ProjectRoleColumnChangeDate, crdb.ColumnTypeTimestamp),
+				crdb.NewColumn(ProjectRoleColumnSequence, crdb.ColumnTypeInt64),
+				crdb.NewColumn(ProjectRoleColumnResourceOwner, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectRoleColumnCreator, crdb.ColumnTypeText),
+			},
+				crdb.NewPrimaryKey(ProjectRoleColumnProjectID, ProjectRoleColumnKey),
+			),
+		),
+	}
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -50,18 +80,6 @@ func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	ProjectRoleColumnProjectID     = "project_id"
-	ProjectRoleColumnKey           = "role_key"
-	ProjectRoleColumnCreationDate  = "creation_date"
-	ProjectRoleColumnChangeDate    = "change_date"
-	ProjectRoleColumnResourceOwner = "resource_owner"
-	ProjectRoleColumnSequence      = "sequence"
-	ProjectRoleColumnDisplayName   = "display_name"
-	ProjectRoleColumnGroupName     = "group_name"
-	ProjectRoleColumnCreator       = "creator_id"
-)
 
 func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)

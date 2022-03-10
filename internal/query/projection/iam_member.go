@@ -30,7 +30,7 @@ func NewIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 	config.InitChecks = []*handler.Check{
 		crdb.NewTableCheck(
 			crdb.NewTable(
-				append(memberColumns, crdb.NewColumn(IAMColumnID, crdb.ColumnTypeEnum)),
+				append(memberColumns, crdb.NewColumn(IAMColumnID, crdb.ColumnTypeText)),
 				crdb.NewPrimaryKey(IAMColumnID, MemberUserIDCol),
 			),
 		),
