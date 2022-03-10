@@ -18,7 +18,7 @@ import (
 // ------------------------------------------------------------
 func NewUserAggregate(id string) *eventstore.Aggregate {
 	return eventstore.NewAggregate(
-		authz.NewMockContext("caos", "adlerhurst"),
+		authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 		id,
 		"test.user",
 		"v1",

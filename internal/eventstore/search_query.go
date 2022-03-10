@@ -12,6 +12,7 @@ type SearchQueryBuilder struct {
 	limit         uint64
 	desc          bool
 	resourceOwner string
+	tenant        string
 	queries       []*SearchQuery
 }
 
@@ -64,6 +65,12 @@ func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 //ResourceOwner defines the resource owner (org) of the events
 func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
 	factory.resourceOwner = resourceOwner
+	return factory
+}
+
+//Tenant defines the tenant (system) of the events
+func (factory *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
+	factory.tenant = tenant
 	return factory
 }
 
@@ -155,6 +162,7 @@ func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
 			query.builder.resourceOwnerFilter,
+			query.builder.tenantFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {
@@ -236,6 +244,13 @@ func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldResourceOwner, builder.resourceOwner, repository.OperationEquals)
+}
+
+func (builder *SearchQueryBuilder) tenantFilter() *repository.Filter {
+	if builder.tenant == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldTenant, builder.tenant, repository.OperationEquals)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

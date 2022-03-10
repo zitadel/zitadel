@@ -1,9 +1,10 @@
 package spooler
 
 import (
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"math/rand"
 	"os"
+
+	"github.com/caos/zitadel/internal/eventstore/v1"
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -21,7 +22,7 @@ func (c *Config) New() *Spooler {
 	lockID, err := os.Hostname()
 	if err != nil || lockID == "" {
 		lockID, err = id.SonyFlakeGenerator.Next()
-		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
+		logging.New().OnError(err).Panic("unable to generate lockID")
 	}
 
 	//shuffle the handlers for better balance when running multiple pods
