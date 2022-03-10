@@ -314,14 +314,14 @@ message ListInstancesRequest {
     //list limitations and ordering
     zitadel.v1.ListQuery query = 1;
     // the field the result is sorted
-    zitadel.instance.v1.InstanceFieldName sorting_column = 2;
+    zitadel.instance.v1.FieldName sorting_column = 2;
     //criterias the client is looking for
-    repeated zitadel.instance.v1.OrgQuery queries = 3;
+    repeated zitadel.instance.v1.Query queries = 3;
 }
 
 message ListInstancesResponse {
     zitadel.v1.ListDetails details = 1;
-    zitadel.instance.v1.OrgFieldName sorting_column = 2;
+    zitadel.instance.v1.FieldName sorting_column = 2;
     repeated zitadel.instance.v1.Instance result = 3;
 }
 
@@ -539,6 +539,11 @@ message View {
     google.protobuf.Timestamp last_successful_spooler_run = 5 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "The timestamp the event occured";
+        }
+    ];
+    string instance = 6  [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"840498034930840\"";
         }
     ];
 }
