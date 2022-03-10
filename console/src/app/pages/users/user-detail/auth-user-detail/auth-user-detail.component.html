@@ -1,34 +1,14 @@
-<div class="user-top">
-  <div class="max-width-container">
-    <div class="header-row">
-      <div class="text">
-        <div class="user-title-wrapper">
-          <a *ngIf="['org.read'] | hasRole | async" [routerLink]="['/']" mat-icon-button>
-            <mat-icon class="icon">arrow_back</mat-icon>
-          </a>
-          <div>
-            <div *ngIf="user" class="user-title-row">
-              <h1 class="user-title">
-                {{user.human ? user.human?.profile?.displayName :
-                user.machine?.name}}
-              </h1>
-              <div class="user-state-dot" matTooltip="{{'USER.STATE.'+user?.state | translate}}"
-                [ngClass]="{'active': user?.state === UserState.USER_STATE_ACTIVE, 'inactive': user?.state === UserState.USER_STATE_INACTIVE }">
-              </div>
-            </div>
-            <span class="user-loginname" *ngIf="user?.preferredLoginName">{{user?.preferredLoginName}}</span>
-          </div>
-        </div>
-      </div>
-    </div>
+<cnsl-top-view title="{{user.human ? user.human?.profile?.displayName :
+  user.machine?.name}}" [backRouterLink]="[ '/projects' ]" sub="{{user?.preferredLoginName}}"
+  [isActive]="user?.state === UserState.USER_STATE_ACTIVE" [isInactive]="user?.state === UserState.USER_STATE_INACTIVE"
+  stateTooltip="{{'USER.STATE.'+user?.state | translate}}" [hasBackButton]="(['org.read'] | hasRole | async)"
+  (backRouterLink)="['/']">
 
-    <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
+  <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
+  <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
+</cnsl-top-view>
 
-    <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
-
-    <cnsl-info-row *ngIf="user" [user]="user"></cnsl-info-row>
-  </div>
-</div>
 <div class="max-width-container">
   <cnsl-meta-layout>
     <cnsl-sidenav [(ngModel)]="currentSetting" [settingsList]="settingsList">

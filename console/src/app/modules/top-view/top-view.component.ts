@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'cnsl-top-view',
@@ -15,6 +15,12 @@ export class TopViewComponent {
   @Input() public backRouterLink!: any[];
   @Input() public backQueryParams!: any;
   @Input() public docLink: string = '';
+  @Input() public hasBackButton: boolean | null = true;
+  @Output() public backClicked: EventEmitter<void> = new EventEmitter();
 
   constructor() {}
+
+  public backClick(): void {
+    this.backClicked.emit();
+  }
 }

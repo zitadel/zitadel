@@ -3,10 +3,13 @@
     <div class="cnsl-top-row">
       <div>
         <div class="cnsl-link-row">
-          <a *ngIf="backRouterLink" class="cnsl-link" [routerLink]="backRouterLink" [queryParams]="backQueryParams"
-            mat-icon-button>
+          <a *ngIf="backRouterLink && hasBackButton" class="cnsl-link" [routerLink]="backRouterLink"
+            [queryParams]="backQueryParams" mat-icon-button>
             <mat-icon class="icon">arrow_back</mat-icon>
           </a>
+          <button *ngIf="!backRouterLink && hasBackButton" mat-icon-button (click)="backClick()">
+            <mat-icon class="icon">arrow_back</mat-icon>
+          </button>
           <div>
             <div class="cnsl-title-row">
               <h2 class="cnsl-title">{{title}}</h2>
