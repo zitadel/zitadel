@@ -2,8 +2,8 @@
   docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
   sub="{{'PROJECT.PAGES.TYPE.OWNED_SINGULAR' | translate}}"
   [isActive]="project?.state === ProjectState.PROJECT_STATE_ACTIVE"
-  [isInactive]="project?.state === ProjectState.PROJECT_STATE_INACTIVE"
-  stateTooltip="{{'PROJECT.STATE.'+project?.state | translate}}">
+  [isInactive]="project?.state === ProjectState.PROJECT_STATE_INACTIVE" [hasContributors]="true"
+  stateTooltip="{{'PROJECT.STATE.'+project?.state | translate}}" [hasActions]="true">
   <ng-template topActions cnslHasRole [hasRole]="['project.write:'+projectId, 'project.write']">
     <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
       {{'ACTIONS.RENAME' | translate}}

@@ -11,7 +11,8 @@ export class TopViewComponent {
   @Input() public stateTooltip: string = '';
   @Input() public isActive: boolean = false;
   @Input() public isInactive: boolean = false;
-  @Input() public hasActions: boolean = false;
+  @Input() public hasActions: boolean | null = false;
+  @Input() public hasContributors: boolean | null = false;
   @Input() public backRouterLink!: any[];
   @Input() public backQueryParams!: any;
   @Input() public docLink: string = '';

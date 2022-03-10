@@ -4,7 +4,7 @@
   sub="{{'PROJECT.PAGES.TYPE.GRANTED_SINGULAR' | translate}} {{'ACTIONS.OF' | translate}} <strong>{{project?.projectOwnerName}}</strong>"
   [isActive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_ACTIVE"
   [isInactive]="project?.state === ProjectGrantState.PROJECT_GRANT_STATE_INACTIVE"
-  stateTooltip="{{'ORG.STATE.'+project.state | translate}}">
+  stateTooltip="{{'ORG.STATE.'+project.state | translate}}" [hasContributors]="true">
   <p topContent *ngIf="isZitadel" class="granted-project-sub zitadel-warning">
     {{'PROJECT.PAGES.ZITADELPROJECT' | translate}}
   </p>

@@ -1,8 +1,8 @@
-<cnsl-top-view title="{{user.human ? user.human?.profile?.displayName :
-  user.machine?.name}}" [backRouterLink]="[ '/users' ]" docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
+<cnsl-top-view title="{{user?.human ? user.human?.profile?.displayName :
+  user?.machine?.name}}" [backRouterLink]="[ '/users' ]" docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
   sub="{{user?.preferredLoginName}}" [isActive]="user?.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user?.state === UserState.USER_STATE_INACTIVE" stateTooltip="{{'USER.STATE.'+user?.state | translate}}"
-  (backClicked)="navigateBack()">
+  (backClicked)="navigateBack()" [hasActions]="['user.write$', 'user.write:'+user?.id] | hasRole | async">
   <ng-template topActions cnslHasRole [hasRole]="['user.write$', 'user.write:'+user?.id]">
     <button mat-menu-item color="warn" *ngIf="user?.state === UserState.USER_STATE_LOCKED"
       (click)="unlockUser()">{{'USER.PAGES.UNLOCK' |

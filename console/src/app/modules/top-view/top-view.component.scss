@@ -93,7 +93,6 @@
         margin-top: 0.25rem;
         display: none;
         align-items: center;
-        margin-right: 2rem;
 
         @media only screen and (min-width: 700px) {
           display: flex;
@@ -118,6 +117,7 @@
 
         @media only screen and (min-width: 700px) {
           flex-basis: auto;
+          margin-left: 2rem;
         }
       }
     }

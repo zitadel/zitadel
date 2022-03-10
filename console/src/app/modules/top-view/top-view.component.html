@@ -44,7 +44,7 @@
         </mat-menu>
       </ng-container>
 
-      <div class="mob-full-width">
+      <div *ngIf="hasContributors" class="mob-full-width">
         <ng-content select="[topContributors]"></ng-content>
       </div>
     </div>

@@ -1,5 +1,5 @@
-<cnsl-top-view title="{{user.human ? user.human?.profile?.displayName :
-  user.machine?.name}}" [backRouterLink]="[ '/projects' ]" sub="{{user?.preferredLoginName}}"
+<cnsl-top-view title="{{user?.human ? user.human?.profile?.displayName :
+  user?.machine?.name}}" [backRouterLink]="[ '/projects' ]" sub="{{user?.preferredLoginName}}"
   [isActive]="user?.state === UserState.USER_STATE_ACTIVE" [isInactive]="user?.state === UserState.USER_STATE_INACTIVE"
   stateTooltip="{{'USER.STATE.'+user?.state | translate}}" [hasBackButton]="(['org.read'] | hasRole | async)"
   (backRouterLink)="['/']">
