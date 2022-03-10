@@ -344,7 +344,8 @@ func Test_eventData(t *testing.T) {
 
 func TestEventstore_aggregatesToEvents(t *testing.T) {
 	type args struct {
-		events []Command
+		tenantID string
+		events   []Command
 	}
 	type res struct {
 		wantErr bool
@@ -358,6 +359,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate one event",
 			args: args{
+				tenantID: "tenant",
 				events: []Command{
 					newTestEvent(
 						"1",
@@ -378,6 +380,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "caos", Valid: true},
+						Tenant:        sql.NullString{String: "tenant", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -387,6 +390,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "one aggregate multiple events",
 			args: args{
+				tenantID: "tenant",
 				events: []Command{
 					newTestEvent(
 						"1",
@@ -414,6 +418,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "caos", Valid: true},
+						Tenant:        sql.NullString{String: "tenant", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -424,6 +429,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 						EditorService: "editorService",
 						EditorUser:    "editorUser",
 						ResourceOwner: sql.NullString{String: "caos", Valid: true},
+						Tenant:        sql.NullString{String: "tenant", Valid: true},
 						Type:          "test.event",
 						Version:       "v1",
 					},
@@ -433,6 +439,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 		{
 			name: "invalid data",
 			args: args{
+				tenantID: "tenant",
 				events: []Command{
 					newTestEvent(
 						"1",
@@ -658,7 +665,7 @@ func TestEventstore_aggregatesToEvents(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			events, _, err := commandsToRepository(tt.args.events)
+			events, _, err := commandsToRepository(tt.args.tenantID, tt.args.events)
 			if (err != nil) != tt.res.wantErr {
 				t.Errorf("Eventstore.aggregatesToEvents() error = %v, wantErr %v", err, tt.res.wantErr)
 				return

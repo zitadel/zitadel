@@ -48,7 +48,7 @@ func query(ctx context.Context, criteria querier, searchQuery *repository.Search
 
 	rows, err := criteria.db().QueryContext(ctx, query, values...)
 	if err != nil {
-		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
+		logging.New().WithError(err).Info("query failed")
 		return z_errors.ThrowInternal(err, "SQL-KyeAx", "unable to filter events")
 	}
 	defer rows.Close()
@@ -114,7 +114,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 	)
 
 	if err != nil {
-		logging.Log("SQL-3mofs").WithError(err).Warn("unable to scan row")
+		logging.New().WithError(err).Warn("unable to scan row")
 		return z_errors.ThrowInternal(err, "SQL-M0dsf", "unable to scan row")
 	}
 
@@ -147,7 +147,7 @@ func prepareCondition(criteria querier, filters [][]*repository.Filter) (clause 
 				var err error
 				value, err = json.Marshal(value)
 				if err != nil {
-					logging.Log("SQL-BSsNy").WithError(err).Warn("unable to marshal search value")
+					logging.New().WithError(err).Warn("unable to marshal search value")
 					continue
 				}
 			}

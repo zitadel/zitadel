@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 )
@@ -40,7 +41,7 @@ func (es *Eventstore) Health(ctx context.Context) error {
 //Push pushes the events in a single transaction
 // an event needs at least an aggregate
 func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error) {
-	events, constraints, err := commandsToRepository(cmds)
+	events, constraints, err := commandsToRepository(authz.GetCtxData(ctx).TenantID, cmds)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,7 @@ func (es *Eventstore) Push(ctx context.Context, cmds ...Command) ([]Event, error
 	return eventReaders, nil
 }
 
-func commandsToRepository(cmds []Command) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
+func commandsToRepository(tenantID string, cmds []Command) (events []*repository.Event, constraints []*repository.UniqueConstraint, err error) {
 	events = make([]*repository.Event, len(cmds))
 	for i, cmd := range cmds {
 		data, err := EventData(cmd)
@@ -81,7 +82,7 @@ func commandsToRepository(cmds []Command) (events []*repository.Event, constrain
 			AggregateID:   cmd.Aggregate().ID,
 			AggregateType: repository.AggregateType(cmd.Aggregate().Type),
 			ResourceOwner: sql.NullString{String: cmd.Aggregate().ResourceOwner, Valid: cmd.Aggregate().ResourceOwner != ""},
-			Tenant:        sql.NullString{String: cmd.Aggregate().Tenant, Valid: cmd.Aggregate().Tenant != ""},
+			Tenant:        sql.NullString{String: tenantID, Valid: tenantID != ""},
 			EditorService: cmd.EditorService(),
 			EditorUser:    cmd.EditorUser(),
 			Type:          repository.EventType(cmd.Type()),
@@ -112,6 +113,7 @@ func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (unique
 //Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
+	queryFactory.tenant = authz.GetCtxData(ctx).TenantID
 	query, err := queryFactory.build()
 	if err != nil {
 		return nil, err
@@ -169,6 +171,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 //LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
+	queryFactory.tenant = authz.GetCtxData(ctx).TenantID
 	query, err := queryFactory.build()
 	if err != nil {
 		return 0, err

@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -16,23 +15,23 @@ import (
 )
 
 var (
-	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/caos/zitadel/migrations/cockroach")
+	migrationsPath = os.ExpandEnv("${GOPATH}/src/github.com/caos/zitadel/cmd/admin/initialise/sql")
 	testCRDBClient *sql.DB
 )
 
 func TestMain(m *testing.M) {
 	ts, err := testserver.NewTestServer()
 	if err != nil {
-		logging.LogWithFields("REPOS-RvjLG", "error", err).Fatal("unable to start db")
+		logging.WithFields("error", err).Fatal("unable to start db")
 	}
 
 	testCRDBClient, err = sql.Open("postgres", ts.PGURL().String())
 
 	if err != nil {
-		logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to connect to db")
+		logging.WithFields("error", err).Fatal("unable to connect to db")
 	}
 	if err = testCRDBClient.Ping(); err != nil {
-		logging.LogWithFields("REPOS-CF6dQ", "error", err).Fatal("unable to ping db")
+		logging.WithFields("error", err).Fatal("unable to ping db")
 	}
 
 	defer func() {
@@ -41,7 +40,7 @@ func TestMain(m *testing.M) {
 	}()
 
 	if err = executeMigrations(); err != nil {
-		logging.LogWithFields("REPOS-jehDD", "error", err).Fatal("migrations failed")
+		logging.WithFields("error", err).Fatal("migrations failed")
 	}
 
 	os.Exit(m.Run())
@@ -52,7 +51,7 @@ func executeMigrations() error {
 	if err != nil {
 		return err
 	}
-	sort.Sort(files)
+	//sort.Sort(files)
 	if err = setPasswordNULL(); err != nil {
 		return err
 	}

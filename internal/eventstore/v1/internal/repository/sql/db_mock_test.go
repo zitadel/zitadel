@@ -145,7 +145,7 @@ func (db *dbMock) expectFilterEventsDesc(aggregateType string, eventCount int) *
 func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID string, limit uint64) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := limit; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "tenant", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDLimit).
 		WithArgs(aggregateType, aggregateID, limit).
@@ -156,7 +156,7 @@ func (db *dbMock) expectFilterEventsAggregateIDLimit(aggregateType, aggregateID 
 func (db *dbMock) expectFilterEventsAggregateIDTypeLimit(aggregateType, aggregateID string, limit uint64) *dbMock {
 	rows := sqlmock.NewRows(eventColumns)
 	for i := limit; i > 0; i-- {
-		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "aggType", "aggID", "v1.0.0")
+		rows.AddRow(time.Now(), "eventType", Sequence(i+1), Sequence(i), nil, "svc", "hodor", "org", "tenant", "aggType", "aggID", "v1.0.0")
 	}
 	db.mock.ExpectQuery(expectedFilterEventsAggregateIDTypeLimit).
 		WithArgs(aggregateType, aggregateID, limit).
