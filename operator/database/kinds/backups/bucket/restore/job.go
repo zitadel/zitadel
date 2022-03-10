@@ -17,14 +17,7 @@ func getJob(
 	secretKey string,
 	command string,
 	image string,
-	env *corev1.EnvVar,
 ) *batchv1.Job {
-
-	var envs []corev1.EnvVar
-	if env != nil {
-		envs = []corev1.EnvVar{*env}
-	}
-
 	return &batchv1.Job{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      nameLabels.Name(),
@@ -45,7 +38,6 @@ func getJob(
 							"-c",
 							command,
 						},
-						Env: envs,
 						VolumeMounts: []corev1.VolumeMount{{
 							Name:      internalSecretName,
 							MountPath: certPath,

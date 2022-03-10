@@ -1,7 +1,5 @@
 package backup
 
-/* Deprecated in V2
-
 import (
 	"testing"
 
@@ -124,4 +122,3 @@ func TestBackup_JobSpec2(t *testing.T) {
 
 	assert.Equal(t, equals, getJobSpecDef(nodeselector, tolerations, secretName, secretKey, backupName, command, image))
 }
-*/

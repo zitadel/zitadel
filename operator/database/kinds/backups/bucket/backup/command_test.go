@@ -1,7 +1,5 @@
 package backup
 
-/* Deprecated in V2
-
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -46,4 +44,3 @@ func TestBackup_Command2(t *testing.T) {
 	equals := "export " + backupNameEnv + "=test && export SAJSON=$(cat /secrets/sa.json | base64 | tr -d '\n' ) && cockroach sql --certs-dir=/cockroach/cockroach-certs --host=testDB --port=80 -e \"BACKUP TO \\\"gs://test/test/${BACKUP_NAME}?AUTH=specified&CREDENTIALS=${SAJSON}\\\";\""
 	assert.Equal(t, equals, cmd)
 }
-*/

@@ -9,7 +9,6 @@ import (
 	"github.com/caos/zitadel/operator/crtlgitops"
 	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
 	orbzit "github.com/caos/zitadel/operator/zitadel/kinds/orb"
-	"github.com/caos/zitadel/pkg/databases"
 	kuberneteszit "github.com/caos/zitadel/pkg/kubernetes"
 	"github.com/spf13/cobra"
 )
@@ -69,11 +68,6 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
-		dbClient, err := databases.NewConnection(rv.Monitor, k8sClient, rv.Gitops, rv.OrbConfig)
-		if err != nil {
-			return err
-		}
-
 		monitor.WithFields(map[string]interface{}{
 			"version": version,
 		}).Info("Destroying Orb")
@@ -95,7 +89,7 @@ func TeardownCommand(getRv GetRootValues) *cobra.Command {
 				return err
 			}
 		} else {
-			if err := crtlcrd.Destroy(monitor, k8sClient, dbClient, version, "zitadel", "database"); err != nil {
+			if err := crtlcrd.Destroy(monitor, k8sClient, version, "zitadel", "database"); err != nil {
 				return err
 			}
 		}

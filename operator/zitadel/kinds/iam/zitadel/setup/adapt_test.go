@@ -1,7 +1,5 @@
 package setup
 
-/* Deprecated in V2
-
 import (
 	"testing"
 
@@ -151,4 +149,3 @@ func TestSetup_AdaptFunc(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, ensure(client))
 }
-*/

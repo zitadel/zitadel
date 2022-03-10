@@ -1,7 +1,5 @@
 package managed
 
-/* Deprecated in V2
-
 import (
 	"testing"
 	"time"
@@ -172,4 +170,3 @@ func TestManaged_AdaptBucketCleanAndRestore(t *testing.T) {
 
 	assert.NoError(t, ensure(k8sClient))
 }
-*/

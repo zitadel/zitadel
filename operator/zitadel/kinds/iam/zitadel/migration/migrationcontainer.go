@@ -1,10 +1,7 @@
 package migration
 
 import (
-	"fmt"
 	"strings"
-
-	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/zitadel/operator/common"
 
@@ -12,30 +9,29 @@ import (
 )
 
 func getMigrationContainer(
-	dbConn db.Connection,
+	dbHost string,
+	dbPort string,
+	migrationUser string,
+	secretPasswordName string,
+	users []string,
 	customImageRegistry string,
-	certsVolumeMount corev1.VolumeMount,
 ) corev1.Container {
-
-	pwSecret, pwSecretKey := dbConn.PasswordSecret()
-
-	var pwSecretName string
-	if pwSecret != nil {
-		pwSecretName = pwSecret.Name()
-	}
 
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
 		Args: []string{
-			fmt.Sprintf("-url=%s", connectionURL(dbConn, certsVolumeMount.MountPath)),
-			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
+			"-url=jdbc:postgresql://" + dbHost + ":" + dbPort + "/defaultdb?&sslmode=verify-full&ssl=true&sslrootcert=" + rootUserPath + "/ca.crt&sslfactory=org.postgresql.ssl.NonValidatingFactory",
+			"-locations=filesystem:" + migrationsPath,
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
-		VolumeMounts: []corev1.VolumeMount{certsVolumeMount, {
+		Env: migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName, users),
+		VolumeMounts: []corev1.VolumeMount{{
 			Name:      migrationConfigmap,
 			MountPath: migrationsPath,
+		}, {
+			Name:      rootUserInternal,
+			MountPath: rootUserPath,
 		}},
 		TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 		TerminationMessagePolicy: "File",
@@ -43,61 +39,23 @@ func getMigrationContainer(
 	}
 }
 
-func connectionURL(conn db.Connection, certsDir string) string {
+func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string, users []string) []corev1.EnvVar {
+	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret)
 
-	url := fmt.Sprintf("jdbc:postgresql://%s:%s/defaultdb?%s", conn.Host(), conn.Port(), sslParams(conn.SSL(), certsDir))
-
-	options := conn.Options()
-	if options != "" {
-		url += "&options=" + options
-	}
-
-	return url
-
-}
-
-func sslParams(ssl *db.SSL, certsDir string) string {
-
-	if ssl == nil {
-		return "sslmode=disable"
-	}
-
-	params := "sslmode=verify-full&ssl=true"
-
-	if ssl.RootCert {
-		params += fmt.Sprintf("&sslrootcert=%s/%s", certsDir, db.CACert)
-	}
-
-	if ssl.UserCertAndKey {
-		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s&sslfactory=org.postgresql.ssl.NonValidatingFactory", certsDir, db.UserCert, certsDir, db.UserKey)
-	}
-
-	return params
-}
-
-func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string) []corev1.EnvVar {
-	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey)
-
-	vars := make([]corev1.EnvVar, 0)
+	migrationEnvVars := make([]corev1.EnvVar, 0)
 	for _, v := range envVars {
-		vars = append(vars, v)
+		migrationEnvVars = append(migrationEnvVars, v)
 	}
-
-	deprecatedUsers := []string{
-		"management",
-		"adminapi",
-		"auth",
-		"authz",
-		"notification",
-		"eventstore",
-		"queries",
-	}
-	for _, user := range deprecatedUsers {
-		vars = append(vars, corev1.EnvVar{
+	for _, user := range users {
+		migrationEnvVars = append(migrationEnvVars, corev1.EnvVar{
 			Name: "FLYWAY_PLACEHOLDERS_" + strings.ToUpper(user) + "PASSWORD",
-			// TODO: Drop users in a new migration
-			Value: "'to-be-deleted'",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
+					Key:                  user,
+				},
+			},
 		})
 	}
-	return vars
+	return migrationEnvVars
 }

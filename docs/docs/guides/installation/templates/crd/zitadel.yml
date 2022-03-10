@@ -15,25 +15,6 @@ spec:
     version: 1.0.0
     # If true, the operator overwrites its own deployment using the version above
     selfReconciling: true
-
-  # If you don't want to have a managed in-cluster database, you need to configure the connections to a self-managed CockroachDB here.
-  # You can delete the database operator deployment if you configure a self-managed CockroachDB.
-  # The user you pass must have the admin role
-  # The ZITADEL operator is responsible for the database migrations
-  # You are responsible for backup and restore tasks
-  databaseConnection:
-    kind: zitadel.caos.ch/CockroachDB
-    version: v0
-    spec:
-      # Print debug logs
-      verbose: true
-      host: free-tier13.aws-eu-central-1.cockroachlabs.cloud
-      port: 26257
-      # This value is added to the connection urls using the --options flag (for example needed by Cockroach Cloud)
-      cluster: your-cluster-123
-      # Pass the users password and a certificate using the zitadelctl writesecret command
-      user: your_user_with_admin_role
-
   iam:
     kind: zitadel.caos.ch/ZITADEL
     version: v0

@@ -1,7 +1,5 @@
 package deployment
 
-/* Deprecated in V2
-
 import (
 	"github.com/caos/zitadel/operator/helpers"
 	"github.com/stretchr/testify/assert"
@@ -113,4 +111,3 @@ func TestDeployment_UserVolumes(t *testing.T) {
 	assert.ElementsMatch(t, equals, userVolumes(users))
 
 }
-*/

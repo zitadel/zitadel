@@ -1,6 +1,7 @@
 package migration
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,7 +64,6 @@ func TestMigration_CreateUserCommand(t *testing.T) {
 
 }
 
-/* Deprecated in V2
 func TestMigration_GrantUserCommand(t *testing.T) {
 	user := "test"
 	file := "test"
@@ -76,4 +76,3 @@ func TestMigration_GrantUserCommand(t *testing.T) {
 	cmd := grantUserCommand(user, file)
 	assert.Equal(t, cmd, equals)
 }
-*/

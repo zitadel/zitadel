@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 var (
@@ -44,6 +46,15 @@ var (
 				AuthToken:  &secret.Secret{Value: ""},
 				SID:        &secret.Secret{Value: ""},
 			},
+		},
+		Passwords: &Passwords{
+			Migration:    &secret.Secret{Value: ""},
+			Management:   &secret.Secret{Value: ""},
+			Auth:         &secret.Secret{Value: ""},
+			Authz:        &secret.Secret{Value: ""},
+			Adminapi:     &secret.Secret{Value: ""},
+			Notification: &secret.Secret{Value: ""},
+			Eventstore:   &secret.Secret{Value: ""},
 		},
 		DebugMode: false,
 		LogLevel:  "info",
@@ -110,6 +121,15 @@ var (
 				SID:        &secret.Secret{Value: "sid"},
 			},
 		},
+		Passwords: &Passwords{
+			Migration:    &secret.Secret{Value: "migration"},
+			Management:   &secret.Secret{Value: "management"},
+			Auth:         &secret.Secret{Value: "auth"},
+			Authz:        &secret.Secret{Value: "authz"},
+			Adminapi:     &secret.Secret{Value: "adminapi"},
+			Notification: &secret.Secret{Value: "notification"},
+			Eventstore:   &secret.Secret{Value: "eventstore"},
+		},
 		DebugMode: true,
 		LogLevel:  "debug",
 		DNS: &DNS{
@@ -175,6 +195,15 @@ var (
 				ExistingSID:       &secret.Existing{"sid", "sid", "sid"},
 			},
 		},
+		Passwords: &Passwords{
+			ExistingMigration:    &secret.Existing{"migration", "migration", "migration"},
+			ExistingEventstore:   &secret.Existing{"eventstore", "eventstore", "eventstore"},
+			ExistingNotification: &secret.Existing{"notification", "notification", "notification"},
+			ExistingAuthz:        &secret.Existing{"authz", "authz", "authz"},
+			ExistingAuth:         &secret.Existing{"auth", "auth", "auth"},
+			ExistingAdminapi:     &secret.Existing{"adminapi", "adminapi", "adminapi"},
+			ExistingManagement:   &secret.Existing{"management", "management", "management"},
+		},
 		DebugMode: true,
 		LogLevel:  "debug",
 		DNS: &DNS{
@@ -208,8 +237,6 @@ var (
 		},
 	}
 )
-
-/* Deprecated in V2
 
 func TestConfiguration_LiteralsConfigMap(t *testing.T) {
 	certPath := "test"
@@ -385,7 +412,7 @@ func TestConfiguration_LiteralsConfigMapFull(t *testing.T) {
 
 	assert.EqualValues(t, equals, literals)
 }
-*/
+
 func TestConfiguration_LiteralsSecrets(t *testing.T) {
 	client := kubernetesmock.NewMockClientInt(gomock.NewController(t))
 	googleSA := "sajson"

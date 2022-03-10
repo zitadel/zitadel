@@ -3,8 +3,6 @@ package cmds
 import (
 	"os"
 
-	"github.com/caos/zitadel/pkg/databases"
-
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 
 	"github.com/caos/zitadel/operator/secrets"
@@ -41,15 +39,10 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 				return err
 			}
 
-			dbClient, err := databases.NewConnection(rv.Monitor, k8sClient, rv.Gitops, rv.OrbConfig)
-			if err != nil {
-				return err
-			}
-
 			value, err := secret.Read(
 				k8sClient,
 				path,
-				secrets.GetAllSecretsFunc(monitor, path == "", rv.Gitops, gitClient, k8sClient, dbClient),
+				secrets.GetAllSecretsFunc(monitor, path == "", rv.Gitops, gitClient, k8sClient, orbConfig),
 			)
 			if err != nil {
 				return err

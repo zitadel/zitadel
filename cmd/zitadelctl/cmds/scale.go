@@ -4,9 +4,9 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
 	"github.com/caos/orbos/pkg/kubernetes"
+	orbconfig "github.com/caos/orbos/pkg/orb"
 	"github.com/caos/zitadel/operator/crtlcrd/zitadel"
 	"github.com/caos/zitadel/operator/crtlgitops"
-	"github.com/caos/zitadel/pkg/databases/db"
 	kubernetes2 "github.com/caos/zitadel/pkg/kubernetes"
 	macherrs "k8s.io/apimachinery/pkg/api/errors"
 )
@@ -14,8 +14,8 @@ import (
 func scaleForFunction(
 	monitor mntr.Monitor,
 	gitClient *git.Client,
+	orbCfg *orbconfig.Orb,
 	k8sClient *kubernetes.Client,
-	dbConn db.Connection,
 	version *string,
 	gitops bool,
 	ensureFunc func() error,
@@ -31,13 +31,13 @@ func scaleForFunction(
 
 	noZitadel := false
 	if gitops {
-		noZitadelT, err := crtlgitops.ScaleDown(monitor, gitClient, k8sClient, dbConn, version, gitops)
+		noZitadelT, err := crtlgitops.ScaleDown(monitor, gitClient, k8sClient, orbCfg, version, gitops)
 		if err != nil {
 			return err
 		}
 		noZitadel = noZitadelT
 	} else {
-		noZitadelT, err := zitadel.ScaleDown(monitor, k8sClient, dbConn, version)
+		noZitadelT, err := zitadel.ScaleDown(monitor, k8sClient, version)
 		if err != nil {
 			return err
 		}
@@ -65,11 +65,11 @@ func scaleForFunction(
 
 	if !noZitadel {
 		if gitops {
-			if err := crtlgitops.ScaleUp(monitor, gitClient, k8sClient, dbConn, version, gitops); err != nil {
+			if err := crtlgitops.ScaleUp(monitor, gitClient, k8sClient, orbCfg, version, gitops); err != nil {
 				return err
 			}
 		} else {
-			if err := zitadel.ScaleUp(monitor, k8sClient, dbConn, version); err != nil {
+			if err := zitadel.ScaleUp(monitor, k8sClient, version); err != nil {
 				return err
 			}
 		}

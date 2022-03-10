@@ -1,7 +1,5 @@
 package deployment
 
-/* Deprecated in V2
-
 import (
 	"strings"
 	"testing"
@@ -111,4 +109,3 @@ func TestDeployment_GetInitContainer2(t *testing.T) {
 
 	assert.Equal(t, equals, init)
 }
-*/

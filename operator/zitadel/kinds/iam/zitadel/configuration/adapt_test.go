@@ -1,7 +1,5 @@
 package configuration
 
-/* Deprecated in V2
-
 import (
 	"errors"
 	"testing"
@@ -340,6 +338,3 @@ func TestConfiguration_AdaptFull(t *testing.T) {
 	assert.NoError(t, ensure(k8sClient))
 
 }
-
-
-*/

@@ -77,11 +77,11 @@ func EnsureFuncToQueryFunc(ensure EnsureFunc) QueryFunc {
 }
 
 func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryFunc, k8sClient kubernetes.ClientInt, queried map[string]interface{}) (EnsureFunc, error) {
-	log := monitor.Debug
 	if infoLogs {
-		log = monitor.Info
+		monitor.Info("querying...")
+	} else {
+		monitor.Debug("querying...")
 	}
-	log("querying...")
 	ensurers := make([]EnsureFunc, 0)
 	for _, querier := range queriers {
 		ensurer, err := querier(k8sClient, queried)
@@ -90,16 +90,27 @@ func QueriersToEnsureFunc(monitor mntr.Monitor, infoLogs bool, queriers []QueryF
 		}
 		ensurers = append(ensurers, ensurer)
 	}
-
-	log("queried")
+	if infoLogs {
+		monitor.Info("queried")
+	} else {
+		monitor.Debug("queried")
+	}
 	return func(k8sClient kubernetes.ClientInt) error {
-		log("ensuring...")
+		if infoLogs {
+			monitor.Info("ensuring...")
+		} else {
+			monitor.Debug("ensuring...")
+		}
 		for _, ensurer := range ensurers {
 			if err := ensurer(k8sClient); err != nil {
 				return fmt.Errorf("error while ensuring: %w", err)
 			}
 		}
-		log("ensured")
+		if infoLogs {
+			monitor.Info("ensured")
+		} else {
+			monitor.Debug("ensured")
+		}
 		return nil
 	}, nil
 }

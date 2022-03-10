@@ -3,15 +3,16 @@ package migration
 import (
 	"strings"
 
-	"github.com/caos/zitadel/pkg/databases/db"
-
 	"github.com/caos/zitadel/operator/common"
 
 	corev1 "k8s.io/api/core/v1"
 )
 
 func getPreContainer(
-	dbConn db.Connection,
+	dbHost string,
+	dbPort string,
+	migrationUser string,
+	secretPasswordName string,
 	customImageRegistry string,
 ) []corev1.Container {
 
@@ -22,7 +23,28 @@ func getPreContainer(
 			Command: []string{
 				"sh",
 				"-c",
-				"until pg_isready -h " + dbConn.Host() + " -p " + dbConn.Port() + "; do echo waiting for database; sleep 2; done;",
+				"until pg_isready -h " + dbHost + " -p " + dbPort + "; do echo waiting for database; sleep 2; done;",
+			},
+			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
+			TerminationMessagePolicy: "File",
+			ImagePullPolicy:          "IfNotPresent",
+		},
+		{
+			Name:  "create-flyway-user",
+			Image: common.CockroachImage.Reference(customImageRegistry),
+			Env:   baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
+			VolumeMounts: []corev1.VolumeMount{{
+				Name:      rootUserInternal,
+				MountPath: rootUserPath,
+			}},
+			Command: []string{"/bin/bash", "-c", "--"},
+			Args: []string{
+				strings.Join([]string{
+					createUserCommand(envMigrationUser, envMigrationPW, createFile),
+					grantUserCommand(envMigrationUser, grantFile),
+					"cockroach.sh sql --certs-dir=/certificates --host=" + dbHost + ":" + dbPort + " -e \"$(cat " + createFile + ")\" -e \"$(cat " + grantFile + ")\";",
+				},
+					";"),
 			},
 			TerminationMessagePath:   corev1.TerminationMessagePathDefault,
 			TerminationMessagePolicy: "File",
@@ -54,4 +76,12 @@ func createUserCommand(user, pw, file string) string {
 	}
 
 	return createUser
+}
+
+func grantUserCommand(user, file string) string {
+	return strings.Join([]string{
+		"echo -n 'GRANT admin TO ' > " + file,
+		"echo -n ${" + user + "} >> " + file,
+		"echo -n ' WITH ADMIN OPTION;'  >> " + file,
+	}, ";")
 }

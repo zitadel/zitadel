@@ -28,8 +28,8 @@ Metrics:
     MeterName: 'github.com/caos/zitadel'
 
 EventstoreBase:
-  Host: $CR_HOST
-  Port: $CR_PORT
+  Host: $ZITADEL_EVENTSTORE_HOST
+  Port: $ZITADEL_EVENTSTORE_PORT
   Database: 'eventstore'
   MaxOpenConns: 3
   MaxConnLifetime: 30m
@@ -38,26 +38,26 @@ EventstoreBase:
   SSL:
     Mode: $CR_SSL_MODE
     RootCert: $CR_ROOT_CERT
-    Cert: $CR_USER_CERT
-    Key: $CR_USER_KEY
+    Cert: $CR_EVENTSTORE_CERT
+    Key: $CR_EVENTSTORE_KEY
 
 Commands:
   Eventstore:
-    User: $CR_USER
-    Password: $CR_PASSWORD
+    User: 'eventstore'
+    Password: $CR_EVENTSTORE_PASSWORD
     MaxOpenConns: 5
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_USER_CERT
-      Key: $CR_USER_KEY
+      Cert: $CR_EVENTSTORE_CERT
+      Key: $CR_EVENTSTORE_KEY
 
 Queries:
   Eventstore:
-    User: $CR_USER
-    Password: $CR_PASSWORD
+    User: 'queries'
+    Password: $CR_QUERIES_PASSWORD
     MaxOpenConns: 2
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
@@ -65,8 +65,8 @@ Queries:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_USER_CERT
-      Key: $CR_USER_KEY
+      Cert: $CR_QUERIES_CERT
+      Key: $CR_QUERIES_KEY
 
 Projections:  
   RequeueEvery: 10s
@@ -75,12 +75,12 @@ Projections:
   BulkLimit: 200
   MaxIterators: 1
   CRDB:
-    Host: $CR_HOST
-    Port: $CR_PORT
-    User: $CR_USER
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'queries'
     Database: 'zitadel'
     Schema: 'projections'
-    Password: $CR_PASSWORD
+    Password: $CR_QUERIES_PASSWORD
     MaxOpenConns: 3
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
@@ -88,8 +88,8 @@ Projections:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_USER_CERT
-      Key: $CR_USER_KEY
+      Cert: $CR_QUERIES_CERT
+      Key: $CR_QUERIES_KEY
   Customizations:
     projects:
       BulkLimit: 2000
@@ -100,11 +100,11 @@ AuthZ:
       ServiceName: 'AuthZ'
       Repository:
         SQL:
-          Host: $CR_HOST
-          Port: $CR_PORT
-          User: $CR_USER
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'authz'
           Database: 'eventstore'
-          Password: $CR_PASSWORD
+          Password: $CR_AUTHZ_PASSWORD
           MaxOpenConns: 3
           MaxConnLifetime: 30m
           MaxConnIdleTime: 30m
@@ -112,18 +112,18 @@ AuthZ:
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_USER_CERT
-            Key: $CR_USER_KEY
+            Cert: $CR_AUTHZ_CERT
+            Key: $CR_AUTHZ_KEY
       Cache:
         Type: 'fastcache'
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
     View:
-      Host: $CR_HOST
-      Port: $CR_PORT
-      User: $CR_USER
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'authz'
       Database: 'authz'
-      Password: $CR_PASSWORD
+      Password: $CR_AUTHZ_PASSWORD
       MaxOpenConns: 3
       MaxConnLifetime: 30m
       MaxConnIdleTime: 30m
@@ -131,8 +131,8 @@ AuthZ:
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_USER_CERT
-        Key: $CR_USER_KEY
+        Cert: $CR_AUTHZ_CERT
+        Key: $CR_AUTHZ_KEY
     Spooler:
       ConcurrentWorkers: 1
       BulkLimit: 10000
@@ -146,11 +146,11 @@ Auth:
     ServiceName: 'authAPI'
     Repository:
       SQL:
-        Host: $CR_HOST
-        Port: $CR_PORT
-        User: $CR_USER
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'auth'
         Database: 'eventstore'
-        Password: $CR_PASSWORD
+        Password: $CR_AUTH_PASSWORD
         MaxOpenConns: 3
         MaxConnLifetime: 30m
         MaxConnIdleTime: 30m
@@ -158,19 +158,19 @@ Auth:
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_USER_CERT
-          Key: $CR_USER_KEY
+          Cert: $CR_AUTH_CERT
+          Key: $CR_AUTH_KEY
     Cache:
       Type: 'fastcache'
       Config:
         MaxCacheSizeInByte: 10485760 #10mb
   AuthRequest:
     Connection:
-      Host: $CR_HOST
-      Port: $CR_PORT
-      User: $CR_USER
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'auth'
       Database: 'auth'
-      Password: $CR_PASSWORD
+      Password: $CR_AUTH_PASSWORD
       MaxOpenConns: 3
       MaxConnLifetime: 30m
       MaxConnIdleTime: 30m
@@ -178,14 +178,14 @@ Auth:
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_USER_CERT
-        Key: $CR_USER_KEY
+        Cert: $CR_AUTH_CERT
+        Key: $CR_AUTH_KEY
   View:
-    Host: $CR_HOST
-    Port: $CR_PORT
-    User: $CR_USER
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'auth'
     Database: 'auth'
-    Password: $CR_PASSWORD
+    Password: $CR_AUTH_PASSWORD
     MaxOpenConns: 3
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
@@ -193,8 +193,8 @@ Auth:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_USER_CERT
-      Key: $CR_USER_KEY
+      Cert: $CR_AUTH_CERT
+      Key: $CR_AUTH_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -208,11 +208,11 @@ Admin:
     ServiceName: 'Admin'
     Repository:
       SQL:
-        Host: $CR_HOST
-        Port: $CR_PORT
-        User: $CR_USER
+        Host: $ZITADEL_EVENTSTORE_HOST
+        Port: $ZITADEL_EVENTSTORE_PORT
+        User: 'adminapi'
         Database: 'eventstore'
-        Password: $CR_PASSWORD
+        Password: $CR_ADMINAPI_PASSWORD
         MaxOpenConns: 3
         MaxConnLifetime: 30m
         MaxConnIdleTime: 30m
@@ -220,18 +220,18 @@ Admin:
         SSL:
           Mode: $CR_SSL_MODE
           RootCert: $CR_ROOT_CERT
-          Cert: $CR_USER_CERT
-          Key: $CR_USER_KEY
+          Cert: $CR_ADMINAPI_CERT
+          Key: $CR_ADMINAPI_KEY
     Cache:
       Type: 'fastcache'
       Config:
         MaxCacheSizeInByte: 10485760 #10mb
   View:
-    Host: $CR_HOST
-    Port: $CR_PORT
-    User: $CR_USER
+    Host: $ZITADEL_EVENTSTORE_HOST
+    Port: $ZITADEL_EVENTSTORE_PORT
+    User: 'adminapi'
     Database: 'adminapi'
-    Password: $CR_PASSWORD
+    Password: $CR_ADMINAPI_PASSWORD
     MaxOpenConns: 3
     MaxConnLifetime: 30m
     MaxConnIdleTime: 30m
@@ -239,8 +239,8 @@ Admin:
     SSL:
       Mode: $CR_SSL_MODE
       RootCert: $CR_ROOT_CERT
-      Cert: $CR_USER_CERT
-      Key: $CR_USER_KEY
+      Cert: $CR_ADMINAPI_CERT
+      Key: $CR_ADMINAPI_KEY
   Spooler:
     ConcurrentWorkers: 1
     BulkLimit: 10000
@@ -342,11 +342,11 @@ Notification:
       ServiceName: 'Notification'
       Repository:
         SQL:
-          Host: $CR_HOST
-          Port: $CR_PORT
-          User: $CR_USER
+          Host: $ZITADEL_EVENTSTORE_HOST
+          Port: $ZITADEL_EVENTSTORE_PORT
+          User: 'notification'
           Database: 'eventstore'
-          Password: $CR_PASSWORD
+          Password: $CR_NOTIFICATION_PASSWORD
           MaxOpenConns: 2
           MaxConnLifetime: 30m
           MaxConnIdleTime: 30m
@@ -354,18 +354,18 @@ Notification:
           SSL:
             Mode: $CR_SSL_MODE
             RootCert: $CR_ROOT_CERT
-            Cert: $CR_USER_CERT
-            Key: $CR_USER_KEY
+            Cert: $CR_NOTIFICATION_CERT
+            Key: $CR_NOTIFICATION_KEY
       Cache:
         Type: 'fastcache'
         Config:
           MaxCacheSizeInByte: 10485760 #10mb
     View:
-      Host: $CR_HOST
-      Port: $CR_PORT
-      User: $CR_USER
+      Host: $ZITADEL_EVENTSTORE_HOST
+      Port: $ZITADEL_EVENTSTORE_PORT
+      User: 'notification'
       Database: 'notification'
-      Password: $CR_PASSWORD
+      Password: $CR_NOTIFICATION_PASSWORD
       MaxOpenConns: 2
       MaxConnLifetime: 30m
       MaxConnIdleTime: 30m
@@ -373,8 +373,8 @@ Notification:
       SSL:
         Mode: $CR_SSL_MODE
         RootCert: $CR_ROOT_CERT
-        Cert: $CR_USER_CERT
-        Key: $CR_USER_KEY
+        Cert: $CR_NOTIFICATION_CERT
+        Key: $CR_NOTIFICATION_KEY
     Spooler:
       ConcurrentWorkers: 1
       BulkLimit: 10000

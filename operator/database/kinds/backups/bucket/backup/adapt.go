@@ -1,8 +1,6 @@
 package backup
 
 import (
-	command "github.com/caos/zitadel/operator/database/kinds/backups/bucket/command"
-	"github.com/caos/zitadel/pkg/databases/db"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -19,10 +17,12 @@ const (
 	defaultMode        int32 = 256
 	certPath                 = "/cockroach/cockroach-certs"
 	secretPath               = "/secrets/sa.json"
+	backupPath               = "/cockroach"
 	backupNameEnv            = "BACKUP_NAME"
+	saJsonBase64Env          = "SAJSON"
 	cronJobNamePrefix        = "backup-"
 	internalSecretName       = "client-certs"
-	rootSecretName           = db.CertsSecret
+	rootSecretName           = "cockroachdb.client.root"
 	timeout                  = 45 * time.Minute
 	Normal                   = "backup"
 	Instant                  = "instantbackup"
@@ -41,7 +41,8 @@ func AdaptFunc(
 	timestamp string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
-	dbConn db.Connection,
+	dbURL string,
+	dbPort int32,
 	features []string,
 	image string,
 ) (
@@ -50,21 +51,14 @@ func AdaptFunc(
 	err error,
 ) {
 
-	backupTime := timestamp
-	if timestamp == "" {
-		backupTime = "$(date +%Y-%m-%dT%H:%M:%SZ)"
-	}
-
-	cmd, env := command.GetSQLCommand(
-		dbConn,
+	command := getBackupCommand(
+		timestamp,
+		bucketName,
+		backupName,
 		certPath,
-		command.GetBackupRestoreStatement(
-			bucketName,
-			backupName,
-			backupTime,
-			secretPath,
-			command.Backup,
-		),
+		secretPath,
+		dbURL,
+		dbPort,
 	)
 
 	jobSpecDef := getJobSpecDef(
@@ -73,9 +67,8 @@ func AdaptFunc(
 		secretName,
 		secretKey,
 		backupName,
-		cmd,
+		command,
 		image,
-		env,
 	)
 
 	destroyers := []operator.DestroyFunc{}

@@ -59,4 +59,3 @@ func clear(
 
 	return nil
 }
-

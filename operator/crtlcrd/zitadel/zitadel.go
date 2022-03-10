@@ -3,9 +3,7 @@ package zitadel
 import (
 	"context"
 	"fmt"
-
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/pkg/databases"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -38,12 +36,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 
-	dbClient, err := databases.NewConnection(r.Monitor, r.ClientInt, false, nil)
-	if err != nil {
-		return res, err
-	}
-
-	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc("ensure", &r.Version, false, []string{"operator", "iam", "dbconnection"}, dbClient)); err != nil {
+	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})); err != nil {
 		return res, err
 	}
 

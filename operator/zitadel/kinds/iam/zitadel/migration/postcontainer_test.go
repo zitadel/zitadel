@@ -1,7 +1,5 @@
 package migration
 
-/* Deprecated in V2
-
 import (
 	"github.com/stretchr/testify/assert"
 	"strings"
@@ -20,4 +18,3 @@ func TestMigration_DropUserCommand(t *testing.T) {
 	cmd := deleteUserCommand(user, file)
 	assert.Equal(t, cmd, equals)
 }
-*/

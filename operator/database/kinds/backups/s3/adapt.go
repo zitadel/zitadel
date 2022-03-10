@@ -13,7 +13,6 @@ import (
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3/backup"
 	"github.com/caos/zitadel/operator/database/kinds/backups/s3/restore"
-	"github.com/caos/zitadel/pkg/databases/db"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -35,7 +34,8 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	version string,
-	dbConn db.Connection,
+	dbURL string,
+	dbPort int32,
 	features []string,
 	customImageRegistry string,
 ) operator.AdaptFunc {
@@ -103,7 +103,8 @@ func AdaptFunc(
 			timestamp,
 			nodeselector,
 			tolerations,
-			dbConn,
+			dbURL,
+			dbPort,
 			features,
 			image,
 		)
@@ -129,7 +130,8 @@ func AdaptFunc(
 			nodeselector,
 			tolerations,
 			checkDBReady,
-			dbConn,
+			dbURL,
+			dbPort,
 			image,
 		)
 		if err != nil {
@@ -208,7 +210,8 @@ func AdaptFunc(
 					timestamp,
 					nodeselector,
 					tolerations,
-					dbConn,
+					dbURL,
+					dbPort,
 					features,
 					image,
 				)
@@ -234,7 +237,8 @@ func AdaptFunc(
 					nodeselector,
 					tolerations,
 					checkDBReady,
-					dbConn,
+					dbURL,
+					dbPort,
 					image,
 				)
 				if err != nil {

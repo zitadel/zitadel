@@ -1,7 +1,5 @@
 package restore
 
-/* Deprecated in V2
-
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -59,4 +57,3 @@ func TestBackup_Command2(t *testing.T) {
 	equals := "cockroach sql --certs-dir=" + certPath + " --host=testDB2 --port=81 -e \"RESTORE FROM \\\"s3://testBucket/testBackup/test2?AWS_ACCESS_KEY_ID=$(cat " + accessKeyIDPath + ")&AWS_SECRET_ACCESS_KEY=$(cat " + secretAccessKeyPath + ")&AWS_SESSION_TOKEN=$(cat " + sessionTokenPath + ")&AWS_ENDPOINT=endpoint2&AWS_REGION=region2\\\";\""
 	assert.Equal(t, equals, cmd)
 }
-*/

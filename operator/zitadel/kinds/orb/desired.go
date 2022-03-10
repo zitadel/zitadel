@@ -10,10 +10,9 @@ import (
 )
 
 type DesiredV0 struct {
-	Common             *tree.Common `yaml:",inline"`
-	Spec               *Spec        `json:"spec" yaml:"spec"`
-	IAM                *tree.Tree   `json:"iam" yaml:"iam"`
-	DatabaseConnection *tree.Tree   `json:"databaseConnection" yaml:"databaseConnection"`
+	Common *tree.Common `yaml:",inline"`
+	Spec   *Spec        `json:"spec" yaml:"spec"`
+	IAM    *tree.Tree   `json:"iam" yaml:"iam"`
 }
 
 // +kubebuilder:object:generate=true

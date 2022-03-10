@@ -3,10 +3,18 @@ package statefulset
 import (
 	"testing"
 
+	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
+	kubernetesmock "github.com/caos/orbos/pkg/kubernetes/mock"
+	"github.com/caos/orbos/pkg/labels"
+	"github.com/caos/zitadel/operator/helpers"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func TestStatefulset_JoinExec0(t *testing.T) {
@@ -111,8 +119,6 @@ func TestStatefulset_Resources2(t *testing.T) {
 
 	assert.Equal(t, equals, getResources(res))
 }
-
-/* Deprecated in V2
 
 func TestStatefulset_Adapt1(t *testing.T) {
 	k8sClient := kubernetesmock.NewMockClientInt(gomock.NewController(t))
@@ -517,4 +523,3 @@ func TestStatefulset_Adapt2(t *testing.T) {
 	assert.NoError(t, ensure(k8sClient))
 
 }
-*/

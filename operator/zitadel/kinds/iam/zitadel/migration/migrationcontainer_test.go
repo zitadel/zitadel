@@ -1,7 +1,5 @@
 package migration
 
-/* Deprecated in V2
-
 import (
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
@@ -113,4 +111,3 @@ func TestMigration_MigrationsEnvVars(t *testing.T) {
 	envVars = migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, users)
 	assert.ElementsMatch(t, envVars, equals)
 }
-*/

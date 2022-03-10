@@ -1,7 +1,5 @@
 package deployment
 
-/* Deprecated in V2
-
 import (
 	"fmt"
 	"testing"
@@ -150,18 +148,18 @@ func TestDeployment_GetContainer(t *testing.T) {
 				LocalObjectReference: corev1.LocalObjectReference{Name: cmName},
 			}}},
 		VolumeMounts: volMounts,
-//		LivenessProbe: &corev1.Probe{
-//			Handler: corev1.Handler{
-//				HTTPGet: &corev1.HTTPGetAction{
-//					Path:   "/healthz",
-//					Port:   intstr.Parse("http"),
-//					Scheme: "HTTP",
-//				},
-//			},
-//			PeriodSeconds:       5,
-//			FailureThreshold:    2,
-//			InitialDelaySeconds: 60,
-//		},
+		/*LivenessProbe: &corev1.Probe{
+			Handler: corev1.Handler{
+				HTTPGet: &corev1.HTTPGetAction{
+					Path:   "/healthz",
+					Port:   intstr.Parse("http"),
+					Scheme: "HTTP",
+				},
+			},
+			PeriodSeconds:       5,
+			FailureThreshold:    2,
+			InitialDelaySeconds: 60,
+		},*/
 		ReadinessProbe: &corev1.Probe{
 			Handler: corev1.Handler{
 				HTTPGet: &corev1.HTTPGetAction{
@@ -198,4 +196,3 @@ func TestDeployment_GetContainer(t *testing.T) {
 
 	assert.Equal(t, equals, container)
 }
-*/

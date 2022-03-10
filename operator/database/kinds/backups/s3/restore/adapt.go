@@ -1,8 +1,6 @@
 package restore
 
 import (
-	"github.com/caos/zitadel/operator/database/kinds/backups/s3/command"
-	"github.com/caos/zitadel/pkg/databases/db"
 	"time"
 
 	"github.com/caos/zitadel/operator"
@@ -24,7 +22,7 @@ const (
 	jobPrefix           = "backup-"
 	jobSuffix           = "-restore"
 	internalSecretName  = "client-certs"
-	rootSecretName      = db.CertsSecret
+	rootSecretName      = "cockroachdb.client.root"
 	timeout             = 15 * time.Minute
 )
 
@@ -46,7 +44,8 @@ func AdaptFunc(
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	checkDBReady operator.EnsureFunc,
-	dbConn db.Connection,
+	dbURL string,
+	dbPort int32,
 	image string,
 ) (
 	queryFunc operator.QueryFunc,
@@ -55,19 +54,18 @@ func AdaptFunc(
 ) {
 
 	jobName := jobPrefix + backupName + jobSuffix
-
-	cmd, env := command.GetCommand(
+	command := getCommand(
+		timestamp,
 		bucketName,
 		backupName,
-		timestamp,
 		certPath,
 		accessKeyIDPath,
 		secretAccessKeyPath,
 		sessionTokenPath,
 		region,
 		endpoint,
-		dbConn,
-		command.Restore,
+		dbURL,
+		dbPort,
 	)
 
 	jobdef := getJob(
@@ -82,8 +80,7 @@ func AdaptFunc(
 		sessionTokenName,
 		sessionTokenKey,
 		image,
-		cmd,
-		env,
+		command,
 	)
 
 	destroyJ, err := job.AdaptFuncToDestroy(jobName, namespace)

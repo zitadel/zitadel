@@ -1,118 +1,72 @@
 package user
 
 import (
+	"fmt"
+	"github.com/caos/zitadel/operator"
+
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/labels"
-	"github.com/caos/orbos/pkg/secret"
-	"github.com/caos/orbos/pkg/secret/read"
-	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/client"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/dbuser"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/node"
-	"github.com/caos/zitadel/pkg/databases/db"
-)
-
-const (
-	execDBPod       = "cockroachdb-0"
-	execDBContainer = "cockroachdb"
-	rootUserName    = "root"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
-	componentLabels *labels.Component,
-	clusterDns string,
-	generateNodeIfNotExists bool,
+	deployName string,
+	containerName string,
+	certsDir string,
 	userName string,
-	dbPasswd *secret.Secret,
-	dbPasswdExisting *secret.Existing,
-	pwSecretLabels *labels.Selectable,
-	pwSecretKey string,
-	rootCertsSecret string,
-	containerCertsDir string,
-	nodeSecret string,
+	password string,
+	componentLabels *labels.Component,
 ) (
-	operator.QueryFunc,
-	operator.DestroyFunc,
 	operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
 ) {
-	cMonitor := monitor.WithField("type", "users")
+	cmdSql := fmt.Sprintf("cockroach sql --certs-dir=%s", certsDir)
 
-	queryNode, destroyNode, err := node.AdaptFunc(
-		cMonitor,
-		namespace,
-		labels.MustForName(componentLabels, nodeSecret),
-		clusterDns,
-		generateNodeIfNotExists,
-	)
+	createSql := fmt.Sprintf("CREATE USER IF NOT EXISTS %s ", userName)
+	if password != "" {
+		createSql = fmt.Sprintf("%s WITH PASSWORD %s", createSql, password)
+	}
+
+	deleteSql := fmt.Sprintf("DROP USER IF EXISTS %s", userName)
+
+	_, _, addUserFunc, deleteUserFunc, _, err := certificate.AdaptFunc(monitor, namespace, componentLabels, "", false)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	queryDBUser, destroyDBUser, err := dbuser.AdaptFunc(
-		monitor,
-		namespace,
-		execDBPod,
-		execDBContainer,
-		containerCertsDir,
-		userName,
-		pwSecretLabels,
-		pwSecretKey,
-		func(k8sClient kubernetes.ClientInt) (string, error) {
-			pwValue, err := read.GetSecretValue(k8sClient, dbPasswd, dbPasswdExisting)
-			if err != nil {
-				return "", err
-			}
-			if pwValue == "" {
-				pwValue = userName
-			}
-			return pwValue, nil
-		},
-	)
+	addUser, err := addUserFunc(userName)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, err
+	}
+	ensureUser := func(k8sClient kubernetes.ClientInt) error {
+		return k8sClient.ExecInPodOfDeployment(namespace, deployName, containerName, fmt.Sprintf("%s -e '%s;'", cmdSql, createSql))
 	}
 
-	queryCert, destroyCert, err := client.AdaptFunc(
-		cMonitor,
-		namespace,
-		componentLabels,
-	)
+	deleteUser, err := deleteUserFunc(userName)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, err
+	}
+	destoryUser := func(k8sClient kubernetes.ClientInt) error {
+		return k8sClient.ExecInPodOfDeployment(namespace, deployName, containerName, fmt.Sprintf("%s -e '%s;'", cmdSql, deleteSql))
 	}
 
-	beforeCRqueriers := []operator.QueryFunc{
-		queryNode,
-		queryCert(rootUserName, rootCertsSecret, db.RootUserCert, db.RootUserKey),
-		queryCert(userName, db.CertsSecret, db.UserCert, db.UserKey),
+	queriers := []operator.QueryFunc{
+		addUser,
+		operator.EnsureFuncToQueryFunc(ensureUser),
 	}
 
-	beforeCRdestroyers := []operator.DestroyFunc{
-		destroyCert(db.CertsSecret),
-		destroyCert(rootCertsSecret),
-		destroyNode,
-	}
-
-	afterCRqueriers := []operator.QueryFunc{
-		queryDBUser,
-	}
-
-	afterCRdestroyers := []operator.DestroyFunc{
-		destroyDBUser,
+	destroyers := []operator.DestroyFunc{
+		destoryUser,
+		deleteUser,
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			return operator.QueriersToEnsureFunc(cMonitor, false, beforeCRqueriers, k8sClient, queried)
+			return operator.QueriersToEnsureFunc(monitor, false, queriers, k8sClient, queried)
 		},
-		operator.DestroyersToDestroyFunc(cMonitor, beforeCRdestroyers),
-		func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			return operator.QueriersToEnsureFunc(cMonitor, false, afterCRqueriers, k8sClient, queried)
-		},
-		operator.DestroyersToDestroyFunc(cMonitor, afterCRdestroyers),
+		operator.DestroyersToDestroyFunc(monitor, destroyers),
 		nil
 }

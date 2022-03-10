@@ -3,8 +3,9 @@
 package v1
 
 import (
+	"github.com/caos/orbos/pkg/tree"
+	orbz "github.com/caos/zitadel/operator/zitadel/kinds/orb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
@@ -27,14 +28,22 @@ type Zitadel struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   unstructured.Unstructured `json:"spec,omitempty"`
-	Status Status                    `json:"status,omitempty"`
+	Spec   Spec   `json:"spec,omitempty"`
+	Status Status `json:"status,omitempty"`
 }
 
 type Status struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
+
+type Spec struct {
+	Common *tree.Common `json:",inline" yaml:",inline"`
+	Spec   *orbz.Spec   `json:"spec" yaml:"spec"`
+	IAM    *Empty       `json:"iam" yaml:"iam"`
+}
+
+type Empty struct{}
 
 // +kubebuilder:object:root=true
 type ZitadelList struct {

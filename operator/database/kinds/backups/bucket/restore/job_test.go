@@ -1,7 +1,5 @@
 package restore
 
-/* Deprecated in V2
-
 import (
 	"testing"
 
@@ -164,4 +162,3 @@ func TestBackup_Job2(t *testing.T) {
 
 	assert.Equal(t, equals, getJob(namespace, nameLabels, nodeselector, tolerations, secretName, secretKey, command, testImage))
 }
-*/

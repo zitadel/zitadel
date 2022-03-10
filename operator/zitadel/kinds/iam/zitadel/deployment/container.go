@@ -1,8 +1,10 @@
 package deployment
 
 import (
+	"sort"
+	"strings"
+
 	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	corev1 "k8s.io/api/core/v1"
@@ -16,96 +18,98 @@ func GetContainer(
 	runAsNonRoot bool,
 	resources *k8s.Resources,
 	cmName string,
+	certPath string,
 	secretName string,
 	secretPath string,
 	consoleCMName string,
 	secretVarsName string,
-	dbcerts corev1.VolumeMount,
+	secretPasswordsName string,
+	users []string,
+	dbSecrets string,
 	command string,
 	customImageRegistry string,
-	dbConn db.Connection,
 ) corev1.Container {
 
-	envVars := []corev1.EnvVar{{
-		Name: "POD_IP",
-		ValueFrom: &corev1.EnvVarSource{
-			FieldRef: &corev1.ObjectFieldSelector{
-				FieldPath: "status.podIP",
-			},
-		}}, {
-		Name: "CHAT_URL",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "ZITADEL_GOOGLE_CHAT_URL",
-			},
-		}}, {
-		Name: "TWILIO_TOKEN",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "ZITADEL_TWILIO_AUTH_TOKEN",
-			},
-		}}, {
-		Name: "TWILIO_SERVICE_SID",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "ZITADEL_TWILIO_SID",
-			},
-		}}, {
-		Name: "SMTP_PASSWORD",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "ZITADEL_EMAILAPPKEY",
-			},
-		}}, {
-		Name: "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
-			},
-		}}, {
-		Name: "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
-			},
-		}}, {
-		Name: "HTTP_PROXY",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "HTTP_PROXY",
-			},
-		}}, {
-		Name: "HTTPS_PROXY",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "HTTPS_PROXY",
-			},
-		}}, {
-		Name: "SENTRY_DSN",
-		ValueFrom: &corev1.EnvVarSource{
-			SecretKeyRef: &corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-				Key:                  "SENTRY_DSN",
-			},
-		}},
-	}
-
-	crpwSecret, crpwKey := dbConn.PasswordSecret()
-	if crpwSecret != nil {
-		envVars = append(envVars, corev1.EnvVar{
-			Name: "CR_PASSWORD",
+	envVars := []corev1.EnvVar{
+		{Name: "POD_IP",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					FieldPath: "status.podIP",
+				},
+			}},
+		{Name: "CHAT_URL",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: crpwSecret.Name()},
-					Key:                  crpwKey,
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "ZITADEL_GOOGLE_CHAT_URL",
+				},
+			}},
+		{Name: "TWILIO_TOKEN",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "ZITADEL_TWILIO_AUTH_TOKEN",
+				},
+			}},
+		{Name: "TWILIO_SERVICE_SID",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "ZITADEL_TWILIO_SID",
+				},
+			}},
+		{Name: "SMTP_PASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "ZITADEL_EMAILAPPKEY",
+				},
+			}},
+		{Name: "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
+				},
+			}},
+		{Name: "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
+				},
+			}},
+		{Name: "HTTP_PROXY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "HTTP_PROXY",
+				},
+			}},
+		{Name: "HTTPS_PROXY",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "HTTPS_PROXY",
+				},
+			}},
+		{Name: "SENTRY_DSN",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+					Key:                  "SENTRY_DSN",
+				},
+			}},
+	}
+
+	sort.Strings(users)
+	for _, user := range users {
+		envVars = append(envVars, corev1.EnvVar{
+			Name: "CR_" + strings.ToUpper(user) + "_PASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretPasswordsName},
+					Key:                  user,
 				},
 			},
 		})
@@ -114,12 +118,14 @@ func GetContainer(
 	volMounts := []corev1.VolumeMount{
 		{Name: secretName, MountPath: secretPath},
 		{Name: consoleCMName, MountPath: "/console/environment.json", SubPath: "environment.json"},
-		dbcerts,
+		{Name: dbSecrets, MountPath: certPath},
 	}
 
 	return corev1.Container{
 		Resources: corev1.ResourceRequirements(*resources),
-		Args:      []string{command},
+		//Command:   []string{"/bin/sh", "-c"},
+		//Args:      []string{"tail -f /dev/null;"},
+		Args: []string{command},
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:    &runAsUser,
 			RunAsNonRoot: &runAsNonRoot,

@@ -2,7 +2,6 @@ package managed
 
 import (
 	"fmt"
-	"github.com/caos/orbos/pkg/secret"
 
 	corev1 "k8s.io/api/core/v1"
 
@@ -17,20 +16,18 @@ type DesiredV0 struct {
 }
 
 type Spec struct {
-	Verbose                     bool
-	Force                       bool                  `yaml:"force,omitempty"`
-	ReplicaCount                int                   `yaml:"replicaCount,omitempty"`
-	StorageCapacity             string                `yaml:"storageCapacity,omitempty"`
-	StorageClass                string                `yaml:"storageClass,omitempty"`
-	NodeSelector                map[string]string     `yaml:"nodeSelector,omitempty"`
-	Tolerations                 []corev1.Toleration   `yaml:"tolerations,omitempty"`
-	ClusterDns                  string                `yaml:"clusterDNS,omitempty"`
-	Backups                     map[string]*tree.Tree `yaml:"backups,omitempty"`
-	Resources                   *k8s.Resources        `yaml:"resources,omitempty"`
-	MaxSQLMemory                string                `yaml:"maxSqlMemory,omitempty"`
-	Cache                       string                `yaml:"cache,omitempty"`
-	ZitadelUserPassword         *secret.Secret        `yaml:"zitadelUserPassword,omitempty"`
-	ZitadelUserPasswordExisting *secret.Existing      `yaml:"zitadelUserPasswordExisting,omitempty"`
+	Verbose         bool
+	Force           bool                  `yaml:"force,omitempty"`
+	ReplicaCount    int                   `yaml:"replicaCount,omitempty"`
+	StorageCapacity string                `yaml:"storageCapacity,omitempty"`
+	StorageClass    string                `yaml:"storageClass,omitempty"`
+	NodeSelector    map[string]string     `yaml:"nodeSelector,omitempty"`
+	Tolerations     []corev1.Toleration   `yaml:"tolerations,omitempty"`
+	ClusterDns      string                `yaml:"clusterDNS,omitempty"`
+	Backups         map[string]*tree.Tree `yaml:"backups,omitempty"`
+	Resources       *k8s.Resources        `yaml:"resources,omitempty"`
+	MaxSQLMemory    string                `yaml:"maxSqlMemory,omitempty"`
+	Cache           string                `yaml:"cache,omitempty"`
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
