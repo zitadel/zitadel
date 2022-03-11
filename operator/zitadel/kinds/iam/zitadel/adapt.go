@@ -3,6 +3,7 @@ package zitadel
 import (
 	"errors"
 	"fmt"
+	"github.com/caos/zitadel/pkg/databases/db"
 	"strconv"
 	"strings"
 
@@ -30,7 +31,7 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	dbClient database.Client,
+	dbClient db.Client,
 	namespace string,
 	action string,
 	version *string,

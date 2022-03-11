@@ -9,16 +9,13 @@ import (
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate/node"
 )
 
-var (
-	nodeSecret = "cockroachdb.node"
-)
-
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
 	componentLabels *labels.Component,
 	clusterDns string,
 	generateNodeIfNotExists bool,
+	nodeSecret *labels.Name,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -32,9 +29,9 @@ func AdaptFunc(
 	queryNode, destroyNode, err := node.AdaptFunc(
 		cMonitor,
 		namespace,
-		labels.MustForName(componentLabels, nodeSecret),
 		clusterDns,
 		generateNodeIfNotExists,
+		nodeSecret,
 	)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err

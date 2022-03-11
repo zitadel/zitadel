@@ -44,6 +44,11 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 			return err
 		}
 
+		dbClient, err := databases.NewClient(rv.Monitor, rv.OrbConfig, rv.Gitops)
+		if err != nil {
+			return err
+		}
+
 		list := make([]string, 0)
 		if rv.Gitops {
 			listT, err := databases.GitOpsListBackups(monitor, gitClient, k8sClient)
@@ -92,7 +97,7 @@ func RestoreCommand(getRv GetRootValues) *cobra.Command {
 				return crtlcrd.Restore(monitor, k8sClient, backup)
 			}
 		}
-		return scaleForFunction(monitor, gitClient, orbConfig, k8sClient, &version, rv.Gitops, ensure)
+		return scaleForFunction(monitor, gitClient, k8sClient, &version, rv.Gitops, ensure, dbClient)
 	}
 	return cmd
 }

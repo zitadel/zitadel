@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"github.com/caos/zitadel/pkg/databases"
 	"os"
 
 	"github.com/caos/orbos/pkg/kubernetes/cli"
@@ -39,10 +40,15 @@ func ReadSecretCommand(getRv GetRootValues) *cobra.Command {
 				return err
 			}
 
+			dbClient, err := databases.NewClient(rv.Monitor, rv.OrbConfig, rv.Gitops)
+			if err != nil {
+				return err
+			}
+
 			value, err := secret.Read(
 				k8sClient,
 				path,
-				secrets.GetAllSecretsFunc(monitor, path == "", rv.Gitops, gitClient, k8sClient, orbConfig),
+				secrets.GetAllSecretsFunc(monitor, path == "", rv.Gitops, gitClient, k8sClient, dbClient),
 			)
 			if err != nil {
 				return err

@@ -4,11 +4,12 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/zitadel/operator"
+	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 func AdaptFunc(
 	monitor mntr.Monitor,
-	dbClient Client,
+	dbClient db.Client,
 ) (
 	operator.QueryFunc,
 	error,

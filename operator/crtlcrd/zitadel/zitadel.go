@@ -3,14 +3,14 @@ package zitadel
 import (
 	"context"
 	"fmt"
-	"github.com/caos/zitadel/operator"
-
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
+	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/api/zitadel"
 	v1 "github.com/caos/zitadel/operator/api/zitadel/v1"
 	orbz "github.com/caos/zitadel/operator/zitadel/kinds/orb"
+	"github.com/caos/zitadel/pkg/databases"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
@@ -36,7 +36,12 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (res ctrl.
 		return res, fmt.Errorf("resource must be named %s and namespaced in %s", zitadel.Name, zitadel.Namespace)
 	}
 
-	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc(nil, "ensure", &r.Version, false, []string{"operator", "iam"})); err != nil {
+	dbClient, err := databases.NewClient(internalMonitor, nil, false)
+	if err != nil {
+		return res, err
+	}
+
+	if err := Takeoff(internalMonitor, r.ClientInt, orbz.AdaptFunc("ensure", &r.Version, false, []string{"operator", "iam"}, dbClient)); err != nil {
 		return res, err
 	}
 

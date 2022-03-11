@@ -19,6 +19,7 @@ func AdaptFunc(
 	userName string,
 	password string,
 	componentLabels *labels.Component,
+	nodeCertsSecret *labels.Name,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -33,7 +34,7 @@ func AdaptFunc(
 
 	deleteSql := fmt.Sprintf("DROP USER IF EXISTS %s", userName)
 
-	_, _, addUserFunc, deleteUserFunc, _, err := certificate.AdaptFunc(monitor, namespace, componentLabels, "", false)
+	_, _, addUserFunc, deleteUserFunc, _, err := certificate.AdaptFunc(monitor, namespace, componentLabels, "", false, nodeCertsSecret)
 	if err != nil {
 		return nil, nil, err
 	}

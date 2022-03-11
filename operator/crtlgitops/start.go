@@ -2,6 +2,7 @@ package crtlgitops
 
 import (
 	"context"
+	"github.com/caos/zitadel/pkg/databases"
 	"time"
 
 	"github.com/caos/zitadel/operator/database"
@@ -33,8 +34,12 @@ func Operator(monitor mntr.Monitor, orbConfigPath string, k8sClient *kubernetes.
 			monitor.Error(err)
 			return err
 		}
+		dbClient, err := databases.NewClient(monitor, orbConfig, gitops)
+		if err != nil {
+			return err
+		}
 
-		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc(orbConfig, "ensure", version, gitops, []string{"operator", "iam"}), k8sClient)
+		takeoff := zitadel.Takeoff(monitor, gitClient, orb.AdaptFunc("ensure", version, gitops, []string{"operator", "iam"}, dbClient), k8sClient)
 
 		go func() {
 			started := time.Now()

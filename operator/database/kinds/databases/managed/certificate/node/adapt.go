@@ -26,9 +26,9 @@ const (
 func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
-	nameLabels *labels.Name,
 	clusterDns string,
 	generateIfNotExists bool,
+	nodeSecret *labels.Name,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -37,7 +37,7 @@ func AdaptFunc(
 
 	caPrivKey := new(rsa.PrivateKey)
 	caCert := make([]byte, 0)
-	nodeSecretSelector := labels.MustK8sMap(labels.DeriveNameSelector(nameLabels, false))
+	nodeSecretSelector := labels.MustK8sMap(labels.DeriveNameSelector(nodeSecret, false))
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 			queriers := make([]operator.QueryFunc, 0)
@@ -107,7 +107,7 @@ func AdaptFunc(
 						nodePrivKeyKey: string(pemNodePrivKey),
 						nodeCertKey:    string(pemNodeCert),
 					}
-					queryNodeSecret, err := secret.AdaptFuncToEnsure(namespace, labels.AsSelectable(nameLabels), nodeSecretData)
+					queryNodeSecret, err := secret.AdaptFuncToEnsure(namespace, labels.AsSelectable(nodeSecret), nodeSecretData)
 					if err != nil {
 						return nil, err
 					}

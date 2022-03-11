@@ -6,21 +6,19 @@ import (
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/tree"
 	"github.com/caos/zitadel/operator/api/database"
-	coredb "github.com/caos/zitadel/operator/database/kinds/databases/core"
-	orbdb "github.com/caos/zitadel/operator/database/kinds/orb"
+	"github.com/caos/zitadel/operator/api/zitadel"
 )
 
 func CrdListUsers(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
 ) ([]string, error) {
-	desired, err := database.ReadCrd(k8sClient)
-	if err != nil {
-		monitor.Error(err)
-		return nil, err
-	}
-
-	return listUsers(monitor, k8sClient, desired)
+	return listUsers(monitor, k8sClient, false,
+		func() (*tree.Tree, error) {
+			return database.ReadCrd(k8sClient)
+		}, func() (*tree.Tree, error) {
+			return zitadel.ReadCrd(k8sClient)
+		})
 }
 
 func GitOpsListUsers(
@@ -28,33 +26,22 @@ func GitOpsListUsers(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) ([]string, error) {
-	desired, err := gitClient.ReadTree(git.DatabaseFile)
-	if err != nil {
-		monitor.Error(err)
-		return nil, err
-	}
-
-	return listUsers(monitor, k8sClient, desired)
+	return listUsers(monitor, k8sClient, true, func() (*tree.Tree, error) {
+		return gitClient.ReadTree(git.DatabaseFile)
+	}, func() (*tree.Tree, error) {
+		return gitClient.ReadTree(git.ZitadelFile)
+	})
 }
 
 func listUsers(
 	monitor mntr.Monitor,
 	k8sClient kubernetes.ClientInt,
-	desired *tree.Tree,
+	gitOps bool,
+	databaseTree func() (*tree.Tree, error),
+	zitadelTree func() (*tree.Tree, error),
 ) ([]string, error) {
-	current := &tree.Tree{}
 
-	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
-	if err != nil {
-		return nil, err
-	}
-
-	queried := map[string]interface{}{}
-	_, err = query(k8sClient, queried)
-	if err != nil {
-		return nil, err
-	}
-	currentDB, err := coredb.ParseQueriedForDatabase(queried)
+	currentDB, _, err := queryDatabase(monitor, k8sClient, gitOps, databaseTree, zitadelTree)
 	if err != nil {
 		return nil, err
 	}
@@ -79,12 +66,12 @@ func CrdAddUser(
 	user string,
 	k8sClient kubernetes.ClientInt,
 ) error {
-	desired, err := database.ReadCrd(k8sClient)
-	if err != nil {
-		monitor.Error(err)
-		return err
-	}
-	return addUser(monitor, user, k8sClient, desired)
+	return addUser(monitor, user, k8sClient, false,
+		func() (*tree.Tree, error) {
+			return database.ReadCrd(k8sClient)
+		}, func() (*tree.Tree, error) {
+			return zitadel.ReadCrd(k8sClient)
+		})
 }
 
 func GitOpsAddUser(
@@ -93,37 +80,25 @@ func GitOpsAddUser(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) error {
-	desired, err := gitClient.ReadTree(git.DatabaseFile)
-	if err != nil {
-		monitor.Error(err)
-		return err
-	}
-	return addUser(monitor, user, k8sClient, desired)
+	return addUser(monitor, user, k8sClient, true, func() (*tree.Tree, error) {
+		return gitClient.ReadTree(git.DatabaseFile)
+	}, func() (*tree.Tree, error) {
+		return gitClient.ReadTree(git.ZitadelFile)
+	})
 }
 
 func addUser(
 	monitor mntr.Monitor,
 	user string,
 	k8sClient kubernetes.ClientInt,
-	desired *tree.Tree,
+	gitOps bool,
+	databaseTree func() (*tree.Tree, error),
+	zitadelTree func() (*tree.Tree, error),
 ) error {
-	current := &tree.Tree{}
-
-	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	currentDB, queried, err := queryDatabase(monitor, k8sClient, gitOps, databaseTree, zitadelTree)
 	if err != nil {
 		return err
 	}
-
-	queried := map[string]interface{}{}
-	_, err = query(k8sClient, queried)
-	if err != nil {
-		return err
-	}
-	currentDB, err := coredb.ParseQueriedForDatabase(queried)
-	if err != nil {
-		return err
-	}
-
 	queryUser, err := currentDB.GetAddUserFunc()(user)
 	if err != nil {
 		return err
@@ -141,13 +116,11 @@ func GitOpsDeleteUser(
 	k8sClient kubernetes.ClientInt,
 	gitClient *git.Client,
 ) error {
-	desired, err := gitClient.ReadTree(git.DatabaseFile)
-	if err != nil {
-		monitor.Error(err)
-		return err
-	}
-
-	return deleteUser(monitor, user, k8sClient, desired)
+	return deleteUser(monitor, user, k8sClient, true, func() (*tree.Tree, error) {
+		return gitClient.ReadTree(git.DatabaseFile)
+	}, func() (*tree.Tree, error) {
+		return gitClient.ReadTree(git.ZitadelFile)
+	})
 }
 
 func CrdDeleteUser(
@@ -155,41 +128,29 @@ func CrdDeleteUser(
 	user string,
 	k8sClient kubernetes.ClientInt,
 ) error {
-	desired, err := database.ReadCrd(k8sClient)
-	if err != nil {
-		monitor.Error(err)
-		return err
-	}
-
-	return deleteUser(monitor, user, k8sClient, desired)
+	return deleteUser(monitor, user, k8sClient, false,
+		func() (*tree.Tree, error) {
+			return database.ReadCrd(k8sClient)
+		}, func() (*tree.Tree, error) {
+			return zitadel.ReadCrd(k8sClient)
+		})
 }
 
 func deleteUser(
 	monitor mntr.Monitor,
 	user string,
 	k8sClient kubernetes.ClientInt,
-	desired *tree.Tree,
+	gitOps bool,
+	databaseTree func() (*tree.Tree, error),
+	zitadelTree func() (*tree.Tree, error),
 ) error {
-	current := &tree.Tree{}
-
-	query, _, _, _, _, _, err := orbdb.AdaptFunc("", nil, false, "database")(monitor, desired, current)
+	currentDB, _, err := queryDatabase(monitor, k8sClient, gitOps, databaseTree, zitadelTree)
 	if err != nil {
 		return err
 	}
-
-	queried := map[string]interface{}{}
-	_, err = query(k8sClient, queried)
+	delUser, err := currentDB.GetDeleteUserFunc()(user)
 	if err != nil {
 		return err
 	}
-	currentDB, err := coredb.ParseQueriedForDatabase(queried)
-	if err != nil {
-		return err
-	}
-
-	deleteUser, err := currentDB.GetDeleteUserFunc()(user)
-	if err != nil {
-		return err
-	}
-	return deleteUser(k8sClient)
+	return delUser(k8sClient)
 }

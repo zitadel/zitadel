@@ -1,10 +1,11 @@
-package iam
+package cockroachdb
 
 import (
 	"fmt"
-	"github.com/caos/zitadel/pkg/databases/db"
 
-	core "k8s.io/api/core/v1"
+	"github.com/caos/orbos/pkg/kubernetes"
+
+	"github.com/caos/zitadel/operator/zitadel/kinds/dbconn/cockroachdb"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/labels"
@@ -12,7 +13,6 @@ import (
 	"github.com/caos/orbos/pkg/tree"
 
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel"
 )
 
 func Adapt(
@@ -20,14 +20,6 @@ func Adapt(
 	operatorLabels *labels.Operator,
 	desiredTree *tree.Tree,
 	currentTree *tree.Tree,
-	nodeselector map[string]string,
-	tolerations []core.Toleration,
-	dbClient db.Client,
-	namespace string,
-	action string,
-	version *string,
-	features []string,
-	customImageRegistry string,
 ) (
 	query operator.QueryFunc,
 	destroy operator.DestroyFunc,
@@ -44,20 +36,18 @@ func Adapt(
 		}
 	}()
 
+	if desiredTree == nil {
+		return func(_ kubernetes.ClientInt, _ map[string]interface{}) (operator.EnsureFunc, error) {
+				return func(_ kubernetes.ClientInt) error { return nil }, nil
+			},
+			func(_ kubernetes.ClientInt) error { return nil },
+			func(_ kubernetes.ClientInt, _ map[string]interface{}, _ bool) error { return nil }, nil, nil, false, err
+	}
+
 	switch desiredTree.Common.Kind {
-	case "zitadel.caos.ch/ZITADEL":
-		apiLabels := labels.MustForAPI(operatorLabels, "ZITADEL", desiredTree.Common.Version())
-		return zitadel.AdaptFunc(
-			apiLabels,
-			nodeselector,
-			tolerations,
-			dbClient,
-			namespace,
-			action,
-			version,
-			features,
-			customImageRegistry,
-		)(monitor, desiredTree, currentTree)
+	case "zitadel.caos.ch/CockroachDB":
+		apiLabels := labels.MustForAPI(operatorLabels, "CockroachDB", desiredTree.Common.Version())
+		return cockroachdb.Adapter(apiLabels)(monitor, desiredTree, currentTree)
 	default:
 		return nil, nil, nil, nil, nil, false, mntr.ToUserError(fmt.Errorf("unknown iam kind %s", desiredTree.Common.Kind))
 	}

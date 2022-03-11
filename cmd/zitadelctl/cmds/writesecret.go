@@ -3,6 +3,7 @@ package cmds
 import (
 	"errors"
 	"fmt"
+	"github.com/caos/zitadel/pkg/databases"
 	"io/ioutil"
 	"os"
 
@@ -62,6 +63,11 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 		}
 		err = nil
 
+		dbClient, err := databases.NewClient(rv.Monitor, rv.OrbConfig, rv.Gitops)
+		if err != nil {
+			return err
+		}
+
 		return secret.Write(
 			monitor,
 			k8sClient,
@@ -69,7 +75,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			s,
 			"zitadelctl",
 			fmt.Sprintf(rv.Version),
-			secrets.GetAllSecretsFunc(monitor, path != "", rv.Gitops, gitClient, k8sClient, orbConfig),
+			secrets.GetAllSecretsFunc(monitor, path != "", rv.Gitops, gitClient, k8sClient, dbClient),
 			secrets.PushFunc(monitor, rv.Gitops, gitClient, k8sClient),
 		)
 	}

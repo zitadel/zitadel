@@ -35,6 +35,7 @@ const (
 	cockroachHTTPPort  = int32(8080)
 	Clean              = "clean"
 	DBReady            = "dbready"
+	nodeCertsName      = "cockroachdb.node"
 )
 
 func Adapter(
@@ -102,7 +103,14 @@ func Adapter(
 			}
 		}
 
-		queryCert, destroyCert, addUser, deleteUser, listUsers, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
+		queryCert, destroyCert, addUser, deleteUser, listUsers, err := certificate.AdaptFunc(
+			internalMonitor,
+			namespace,
+			componentLabels,
+			desiredKind.Spec.ClusterDns,
+			isFeatureDatabase,
+			labels.MustForName(componentLabels, nodeCertsName),
+		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
