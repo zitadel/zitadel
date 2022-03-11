@@ -20,7 +20,7 @@ To connect to another environment, change the domains, for example if you would 
 
 Last part of this step, you have to download the ZITADEL-used certificate to sign the responses, so that AWS can validation the signature.
 
-You can download the certificate from following URL: [https://accounts.zitadel.ch/saml/metadata](https://accounts.zitadel.ch/saml/metadata)
+You can download the certificate from following URL: [https://accounts.zitadel.ch/saml/certificate](https://accounts.zitadel.ch/saml/certificate)
 Then just upload the ".crt"-file to AWS and click "next".
 
 Lastly, you only have to accept to confirm the change and ZITADEL is used as the external identity provider for AWS SSO to provide connectivity to your AWS Accounts.
