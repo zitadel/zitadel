@@ -25,7 +25,7 @@ This includes:
 - which binding should be used to call ZITADEL
 
 All the information is filled out as an example, and to connect with any other environment you only have to change the used domain, for example "example.com" with "zitadel.ch". 
-Lastly, upload the certificate used to sign the reponses, provided for you under the URL [https://accounts.zitadel.ch/saml/metadata](https://accounts.zitadel.ch/saml/metadata).
+Lastly, upload the certificate used to sign the reponses, provided for you under the URL [https://accounts.zitadel.ch/saml/certificate](https://accounts.zitadel.ch/saml/certificate).
 
 Then just press the button "Create" and the connection on Auth0 is configured.
 
