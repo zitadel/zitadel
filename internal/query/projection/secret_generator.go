@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SecretGeneratorProjectionTable = "zitadel.projections.secret_generators"
+	SecretGeneratorProjectionTable = "projections.secret_generators"
 
 	SecretGeneratorColumnGeneratorType       = "generator_type"
 	SecretGeneratorColumnAggregateID         = "aggregate_id"
@@ -38,26 +38,24 @@ func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 	p := new(SecretGeneratorProjection)
 	config.ProjectionName = SecretGeneratorProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeText),
-				crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
-				crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(SecretGeneratorColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(SecretGeneratorColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(SecretGeneratorColumnLength, crdb.ColumnTypeInt64),
-				crdb.NewColumn(SecretGeneratorColumnExpiry, crdb.ColumnTypeInt64),
-				crdb.NewColumn(SecretGeneratorColumnIncludeLowerLetters, crdb.ColumnTypeBool),
-				crdb.NewColumn(SecretGeneratorColumnIncludeUpperLetters, crdb.ColumnTypeBool),
-				crdb.NewColumn(SecretGeneratorColumnIncludeDigits, crdb.ColumnTypeBool),
-				crdb.NewColumn(SecretGeneratorColumnIncludeSymbols, crdb.ColumnTypeBool),
-			},
-				crdb.NewPrimaryKey(SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(SecretGeneratorColumnGeneratorType, crdb.ColumnTypeText),
+			crdb.NewColumn(SecretGeneratorColumnAggregateID, crdb.ColumnTypeText),
+			crdb.NewColumn(SecretGeneratorColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(SecretGeneratorColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SecretGeneratorColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(SecretGeneratorColumnLength, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SecretGeneratorColumnExpiry, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SecretGeneratorColumnIncludeLowerLetters, crdb.ColumnTypeBool),
+			crdb.NewColumn(SecretGeneratorColumnIncludeUpperLetters, crdb.ColumnTypeBool),
+			crdb.NewColumn(SecretGeneratorColumnIncludeDigits, crdb.ColumnTypeBool),
+			crdb.NewColumn(SecretGeneratorColumnIncludeSymbols, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

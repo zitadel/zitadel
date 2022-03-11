@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	DebugNotificationProviderTable = "zitadel.projections.notification_providers"
+	DebugNotificationProviderTable = "projections.notification_providers"
 
 	DebugNotificationProviderAggIDCol         = "aggregate_id"
 	DebugNotificationProviderCreationDateCol  = "creation_date"
@@ -36,22 +36,20 @@ func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 	p := &DebugNotificationProviderProjection{}
 	config.ProjectionName = DebugNotificationProviderTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(DebugNotificationProviderAggIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(DebugNotificationProviderCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(DebugNotificationProviderChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(DebugNotificationProviderSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(DebugNotificationProviderResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
-			},
-				crdb.NewPrimaryKey(DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(DebugNotificationProviderAggIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DebugNotificationProviderCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DebugNotificationProviderChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DebugNotificationProviderSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(DebugNotificationProviderResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

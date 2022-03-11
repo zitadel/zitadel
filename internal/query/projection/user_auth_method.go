@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	UserAuthMethodTable = "zitadel.projections.user_auth_methods"
+	UserAuthMethodTable = "projections.user_auth_methods"
 
 	UserAuthMethodUserIDCol        = "user_id"
 	UserAuthMethodTypeCol          = "method_type"
@@ -35,23 +35,22 @@ func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 	p := new(UserAuthMethodProjection)
 	config.ProjectionName = UserAuthMethodTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserAuthMethodSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(UserAuthMethodStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(UserAuthMethodResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(UserAuthMethodUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodTokenIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserAuthMethodChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserAuthMethodSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(UserAuthMethodStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(UserAuthMethodResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
+			crdb.NewIndex("ro_idx", []string{UserAuthMethodResourceOwnerCol}),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

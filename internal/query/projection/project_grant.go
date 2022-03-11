@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	ProjectGrantProjectionTable = "zitadel.projections.project_grants"
+	ProjectGrantProjectionTable = "projections.project_grants"
 
 	ProjectGrantColumnGrantID       = "grant_id"
 	ProjectGrantColumnCreationDate  = "creation_date"
@@ -37,24 +37,24 @@ func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 	p := new(ProjectGrantProjection)
 	config.ProjectionName = ProjectGrantProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(ProjectGrantColumnGrantID, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ProjectGrantColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
-				crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
-				crdb.NewColumn(ProjectGrantColumnCreator, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(ProjectGrantColumnGrantID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ProjectGrantColumnGrantID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectGrantColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(ProjectGrantColumnCreator, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(ProjectGrantColumnGrantID),
+			crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner}),
+			crdb.NewIndex("granted_org_idx", []string{ProjectGrantColumnGrantedOrgID}),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

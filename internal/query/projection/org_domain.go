@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	OrgDomainTable = "zitadel.projections.org_domains"
+	OrgDomainTable = "projections.org_domains"
 
 	OrgDomainOrgIDCol          = "org_id"
 	OrgDomainCreationDateCol   = "creation_date"
@@ -35,22 +35,20 @@ func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerCon
 	p := new(OrgDomainProjection)
 	config.ProjectionName = OrgDomainTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(OrgDomainOrgIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(OrgDomainCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OrgDomainChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OrgDomainSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OrgDomainDomainCol, crdb.ColumnTypeText),
-				crdb.NewColumn(OrgDomainIsVerifiedCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
-			},
-				crdb.NewPrimaryKey(OrgColumnID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgDomainOrgIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgDomainChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgDomainSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgDomainDomainCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainIsVerifiedCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
+		},
+			crdb.NewPrimaryKey(OrgDomainOrgIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

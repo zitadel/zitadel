@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	KeyProjectionTable = "zitadel.projections.keys"
+	KeyProjectionTable = "projections.keys"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
 
@@ -48,37 +48,35 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 	p := new(KeyProjection)
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewMultiTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(KeyColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(KeyColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(KeyColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(KeyColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
-				crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeText, crdb.Default("")),
-			},
-				crdb.NewPrimaryKey(KeyColumnID),
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
-				crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
-			},
-				crdb.NewPrimaryKey(KeyPrivateColumnID),
-				privateKeyTableSuffix,
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
-				crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
-			},
-				crdb.NewPrimaryKey(KeyPublicColumnID),
-				publicKeyTableSuffix,
-			),
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(KeyColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(KeyColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(KeyColumnAlgorithm, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeText, crdb.Default("")),
+		},
+			crdb.NewPrimaryKey(KeyColumnID),
 		),
-	}
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
+		},
+			crdb.NewPrimaryKey(KeyPrivateColumnID),
+			privateKeyTableSuffix,
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
+			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
+		},
+			crdb.NewPrimaryKey(KeyPublicColumnID),
+			publicKeyTableSuffix,
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	p.keyChan = keyChan
 	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig)

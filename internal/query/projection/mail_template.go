@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	MailTemplateTable = "zitadel.projections.mail_templates"
+	MailTemplateTable = "projections.mail_templates"
 
 	MailTemplateAggregateIDCol  = "aggregate_id"
 	MailTemplateCreationDateCol = "creation_date"
@@ -35,21 +35,19 @@ func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandler
 	p := new(MailTemplateProjection)
 	config.ProjectionName = MailTemplateTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(MailTemplateAggregateIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
-			},
-				crdb.NewPrimaryKey(MailTemplateAggregateIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(MailTemplateAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MailTemplateStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
+		},
+			crdb.NewPrimaryKey(MailTemplateAggregateIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

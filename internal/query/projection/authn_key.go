@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	AuthNKeyTable            = "zitadel.projections.authn_keys"
+	AuthNKeyTable            = "projections.authn_keys"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
 	AuthNKeyResourceOwnerCol = "resource_owner"
@@ -38,25 +38,25 @@ func NewAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 	p := new(AuthNKeyProjection)
 	config.ProjectionName = AuthNKeyTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(AuthNKeyIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AuthNKeyCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AuthNKeySequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(AuthNKeyObjectIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AuthNKeyExpirationCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(AuthNKeyIdentifierCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AuthNKeyPublicKeyCol, crdb.ColumnTypeBytes),
-				crdb.NewColumn(AuthNKeyEnabledCol, crdb.ColumnTypeBool, crdb.Default(true)),
-				crdb.NewColumn(AuthNKeyTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
-			},
-				crdb.NewPrimaryKey(AuthNKeyIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(AuthNKeyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AuthNKeyObjectIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyExpirationCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AuthNKeyIdentifierCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyPublicKeyCol, crdb.ColumnTypeBytes),
+			crdb.NewColumn(AuthNKeyEnabledCol, crdb.ColumnTypeBool, crdb.Default(true)),
+			crdb.NewColumn(AuthNKeyTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+		},
+			crdb.NewPrimaryKey(AuthNKeyIDCol),
+			crdb.NewIndex("enabled_idx", []string{AuthNKeyEnabledCol}),
+			crdb.NewIndex("identifier_idx", []string{AuthNKeyIdentifierCol}),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

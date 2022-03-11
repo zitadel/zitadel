@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	OIDCSettingsProjectionTable = "zitadel.projections.oidc_settings"
+	OIDCSettingsProjectionTable = "projections.oidc_settings"
 
 	OIDCSettingsColumnAggregateID                = "aggregate_id"
 	OIDCSettingsColumnCreationDate               = "creation_date"
@@ -35,24 +35,22 @@ func NewOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 	p := new(OIDCSettingsProjection)
 	config.ProjectionName = OIDCSettingsProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(OIDCSettingsColumnAggregateID, crdb.ColumnTypeText),
-				crdb.NewColumn(OIDCSettingsColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OIDCSettingsColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OIDCSettingsColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OIDCSettingsColumnIdTokenLifetime, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, crdb.ColumnTypeInt64),
-			},
-				crdb.NewPrimaryKey(OIDCSettingsColumnAggregateID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OIDCSettingsColumnAggregateID, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCSettingsColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OIDCSettingsColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OIDCSettingsColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OIDCSettingsColumnIdTokenLifetime, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, crdb.ColumnTypeInt64),
+		},
+			crdb.NewPrimaryKey(OIDCSettingsColumnAggregateID),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

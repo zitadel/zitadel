@@ -21,6 +21,14 @@ var (
 		name:  projection.FlowTypeCol,
 		table: flowsTriggersTable,
 	}
+	FlowsTriggersColumnChangeDate = Column{
+		name:  projection.FlowChangeDateCol,
+		table: flowsTriggersTable,
+	}
+	FlowsTriggersColumnSequence = Column{
+		name:  projection.FlowSequenceCol,
+		table: flowsTriggersTable,
+	}
 	FlowsTriggersColumnTriggerType = Column{
 		name:  projection.FlowTriggerTypeCol,
 		table: flowsTriggersTable,
@@ -40,10 +48,9 @@ var (
 )
 
 type Flow struct {
-	CreationDate  time.Time //TODO: add in projection
-	ChangeDate    time.Time //TODO: add in projection
-	ResourceOwner string    //TODO: add in projection
-	Sequence      uint64    //TODO: add in projection
+	ChangeDate    time.Time
+	ResourceOwner string
+	Sequence      uint64
 	Type          domain.FlowType
 
 	TriggerActions map[domain.TriggerType][]*Action
@@ -185,6 +192,8 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 			FlowsTriggersColumnTriggerType.identifier(),
 			FlowsTriggersColumnTriggerSequence.identifier(),
 			FlowsTriggersColumnFlowType.identifier(),
+			FlowsTriggersColumnChangeDate.identifier(),
+			FlowsTriggersColumnSequence.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
@@ -207,7 +216,6 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 
 					triggerType     domain.TriggerType
 					triggerSequence int
-					flowType        domain.FlowType
 				)
 				err := rows.Scan(
 					&actionID,
@@ -220,12 +228,13 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 					&actionScript,
 					&triggerType,
 					&triggerSequence,
-					&flowType,
+					&flow.Type,
+					&flow.Sequence,
+					&flow.ChangeDate,
 				)
 				if err != nil {
 					return nil, err
 				}
-				flow.Type = flowType
 				if !actionID.Valid {
 					continue
 				}

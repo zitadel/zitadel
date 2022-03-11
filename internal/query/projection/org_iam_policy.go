@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	OrgIAMPolicyTable = "zitadel.projections.org_iam_policies"
+	OrgIAMPolicyTable = "projections.org_iam_policies"
 
 	OrgIAMPolicyIDCol                    = "id"
 	OrgIAMPolicyCreationDateCol          = "creation_date"
@@ -36,22 +36,20 @@ func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandler
 	p := new(OrgIAMPolicyProjection)
 	config.ProjectionName = OrgIAMPolicyTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(OrgIAMPolicyIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(OrgIAMPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OrgIAMPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OrgIAMPolicySequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OrgIAMPolicyStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(OrgIAMPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(OrgIAMPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(OrgIAMPolicyResourceOwnerCol, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(OrgIAMPolicyIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgIAMPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgIAMPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgIAMPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgIAMPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgIAMPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(OrgIAMPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(OrgIAMPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(OrgIAMPolicyResourceOwnerCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(OrgIAMPolicyIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/errors"
+	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 )
@@ -327,7 +327,7 @@ func exec(config execConfig, q query, opts []execOption) Exec {
 		}
 
 		if _, err := ex.Exec(q(config), config.args...); err != nil {
-			return errors.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
+			return caos_errs.ThrowInternal(err, "CRDB-pKtsr", "exec failed")
 		}
 
 		return nil

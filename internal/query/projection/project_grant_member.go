@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	ProjectGrantMemberProjectionTable = "zitadel.projections.project_grant_members"
+	ProjectGrantMemberProjectionTable = "projections.project_grant_members"
 	ProjectGrantMemberProjectIDCol    = "project_id"
 	ProjectGrantMemberGrantIDCol      = "grant_id"
 )
@@ -29,18 +29,17 @@ func NewProjectGrantMemberProjection(ctx context.Context, config crdb.StatementH
 	p := new(ProjectGrantMemberProjection)
 	config.ProjectionName = ProjectGrantMemberProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable(
-				append(memberColumns,
-					crdb.NewColumn(ProjectGrantMemberProjectIDCol, crdb.ColumnTypeText),
-					crdb.NewColumn(ProjectGrantMemberGrantIDCol, crdb.ColumnTypeText),
-				),
-				crdb.NewPrimaryKey(ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable(
+			append(memberColumns,
+				crdb.NewColumn(ProjectGrantMemberProjectIDCol, crdb.ColumnTypeText),
+				crdb.NewColumn(ProjectGrantMemberGrantIDCol, crdb.ColumnTypeText),
 			),
+			crdb.NewPrimaryKey(ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
+			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
-	}
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

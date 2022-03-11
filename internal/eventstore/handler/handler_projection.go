@@ -19,9 +19,6 @@ type ProjectionHandlerConfig struct {
 	RetryFailedAfter time.Duration
 }
 
-//Init initializes the projection with the given checks
-type Init func(context.Context, ...*Check) error
-
 //Update updates the projection with the given statements
 type Update func(context.Context, []*Statement, Reduce) (unexecutedStmts []*Statement, err error)
 
@@ -73,12 +70,12 @@ func NewProjectionHandler(config ProjectionHandlerConfig) *ProjectionHandler {
 		if !h.shouldBulk.Stop() {
 			<-h.shouldBulk.C
 		}
-		logging.LogWithFields("HANDL-mC9Xx", "projection", h.ProjectionName).Info("starting handler without requeue")
+		logging.WithFields("projection", h.ProjectionName).Info("starting handler without requeue")
 		return h
 	} else if config.RequeueEvery < 500*time.Millisecond {
-		logging.LogWithFields("HANDL-IEFsG", "projection", h.ProjectionName).Fatal("requeue every must be greater 500ms or <= 0")
+		logging.WithFields("projection", h.ProjectionName).Fatal("requeue every must be greater 500ms or <= 0")
 	}
-	logging.LogWithFields("HANDL-fAC5O", "projection", h.ProjectionName).Info("starting handler")
+	logging.WithFields("projection", h.ProjectionName).Info("starting handler")
 	return h
 }
 
@@ -111,7 +108,7 @@ func (h *ProjectionHandler) Process(
 	//handle panic
 	defer func() {
 		cause := recover()
-		logging.LogWithFields("HANDL-utWkv", "projection", h.ProjectionName, "cause", cause, "stack", string(debug.Stack())).Error("projection handler paniced")
+		logging.WithFields("projection", h.ProjectionName, "cause", cause, "stack", string(debug.Stack())).Error("projection handler paniced")
 	}()
 
 	execBulk := h.prepareExecuteBulk(query, reduce, update)
@@ -125,7 +122,7 @@ func (h *ProjectionHandler) Process(
 			return
 		case event := <-h.Handler.EventQueue:
 			if err := h.processEvent(ctx, event, reduce); err != nil {
-				logging.LogWithFields("HANDL-TUk5J", "projection", h.ProjectionName).WithError(err).Warn("process failed")
+				logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("process failed")
 				continue
 			}
 			h.triggerShouldPush(0)
@@ -143,7 +140,7 @@ func (h *ProjectionHandler) Process(
 				return
 			case event := <-h.Handler.EventQueue:
 				if err := h.processEvent(ctx, event, reduce); err != nil {
-					logging.LogWithFields("HANDL-horKq", "projection", h.ProjectionName).WithError(err).Warn("process failed")
+					logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("process failed")
 					continue
 				}
 				h.triggerShouldPush(0)
@@ -183,16 +180,6 @@ func (h *ProjectionHandler) bulk(
 	executeBulk executeBulk,
 	unlock Unlock,
 ) error {
-	return h.executeWithLock(ctx, lock, unlock, executeBulk)
-}
-
-func (h *ProjectionHandler) executeWithLock(
-	ctx context.Context,
-	lock Lock,
-	unlock Unlock,
-
-	execution func(context.Context) error,
-) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -204,7 +191,7 @@ func (h *ProjectionHandler) executeWithLock(
 	}
 	go h.cancelOnErr(ctx, errs, cancel)
 
-	execErr := execution(ctx)
+	execErr := executeBulk(ctx)
 	logging.WithFields("projection", h.ProjectionName).OnError(execErr).Warn("unable to execute")
 
 	unlockErr := unlock()
@@ -222,7 +209,7 @@ func (h *ProjectionHandler) cancelOnErr(ctx context.Context, errs <-chan error, 
 		select {
 		case err := <-errs:
 			if err != nil {
-				logging.LogWithFields("HANDL-cVop2", "projection", h.ProjectionName).WithError(err).Warn("bulk canceled")
+				logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("bulk canceled")
 				cancel()
 				return
 			}
@@ -249,7 +236,7 @@ func (h *ProjectionHandler) prepareExecuteBulk(
 			default:
 				hasLimitExeeded, err := h.fetchBulkStmts(ctx, query, reduce)
 				if err != nil || len(h.stmts) == 0 {
-					logging.LogWithFields("HANDL-CzQvn", "projection", h.ProjectionName).OnError(err).Warn("unable to fetch stmts")
+					logging.WithFields("projection", h.ProjectionName).OnError(err).Warn("unable to fetch stmts")
 					return err
 				}
 
@@ -272,19 +259,19 @@ func (h *ProjectionHandler) fetchBulkStmts(
 ) (limitExeeded bool, err error) {
 	eventQuery, eventsLimit, err := query()
 	if err != nil {
-		logging.LogWithFields("HANDL-x6qvs", "projection", h.ProjectionName).WithError(err).Warn("unable to create event query")
+		logging.WithFields("projection", h.ProjectionName).WithError(err).Warn("unable to create event query")
 		return false, err
 	}
 
 	events, err := h.Eventstore.Filter(ctx, eventQuery)
 	if err != nil {
-		logging.LogWithFields("HANDL-X8vlo", "projection", h.ProjectionName).WithError(err).Info("Unable to bulk fetch events")
+		logging.WithFields("projection", h.ProjectionName).WithError(err).Info("Unable to bulk fetch events")
 		return false, err
 	}
 
 	for _, event := range events {
 		if err = h.processEvent(ctx, event, reduce); err != nil {
-			logging.LogWithFields("HANDL-PaKlz", "projection", h.ProjectionName, "seq", event.Sequence()).WithError(err).Warn("unable to process event in bulk")
+			logging.WithFields("projection", h.ProjectionName, "seq", event.Sequence()).WithError(err).Warn("unable to process event in bulk")
 			return false, err
 		}
 	}

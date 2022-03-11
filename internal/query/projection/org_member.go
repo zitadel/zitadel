@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	OrgMemberProjectionTable = "zitadel.projections.org_members"
+	OrgMemberProjectionTable = "projections.org_members"
 	OrgMemberOrgIDCol        = "org_id"
 )
 
@@ -26,15 +26,13 @@ func NewOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 	p := new(OrgMemberProjection)
 	config.ProjectionName = OrgMemberProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable(
-				append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
-				crdb.NewPrimaryKey(OrgMemberOrgIDCol, MemberUserIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable(
+			append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
+			crdb.NewPrimaryKey(OrgMemberOrgIDCol, MemberUserIDCol),
+			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

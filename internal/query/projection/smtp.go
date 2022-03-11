@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SMTPConfigProjectionTable = "zitadel.projections.smtp_configs"
+	SMTPConfigProjectionTable = "projections.smtp_configs"
 
 	SMTPConfigColumnAggregateID   = "aggregate_id"
 	SMTPConfigColumnCreationDate  = "creation_date"
@@ -37,25 +37,23 @@ func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 	p := new(SMTPConfigProjection)
 	config.ProjectionName = SMTPConfigProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewMultiTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(SMTPConfigColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
-				crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(SMTPConfigColumnAggregateID),
-			),
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(SMTPConfigColumnAggregateID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(SMTPConfigColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(SMTPConfigColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SMTPConfigColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnTLS, crdb.ColumnTypeBool),
+			crdb.NewColumn(SMTPConfigColumnSenderAddress, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnSenderName, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnSMTPHost, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
+			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(SMTPConfigColumnAggregateID),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

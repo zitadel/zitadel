@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	LoginPolicyTable = "zitadel.projections.login_policies"
+	LoginPolicyTable = "projections.login_policies"
 
 	LoginPolicyIDCol                    = "aggregate_id"
 	LoginPolicyCreationDateCol          = "creation_date"
@@ -45,32 +45,30 @@ func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(LoginPolicyProjection)
 	config.ProjectionName = LoginPolicyTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(LoginPolicyIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(LoginPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(LoginPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(LoginPolicySequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(LoginPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(LoginPolicyAllowRegisterCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(LoginPolicyAllowUsernamePasswordCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(LoginPolicyAllowExternalIDPsCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(LoginPolicyForceMFACol, crdb.ColumnTypeBool),
-				crdb.NewColumn(LoginPolicy2FAsCol, crdb.ColumnTypeEnumArray),
-				crdb.NewColumn(LoginPolicyMFAsCol, crdb.ColumnTypeEnumArray),
-				crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
-			},
-				crdb.NewPrimaryKey(LoginPolicyIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(LoginPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LoginPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LoginPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LoginPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(LoginPolicyAllowRegisterCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyAllowUsernamePasswordCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyAllowExternalIDPsCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicyForceMFACol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginPolicy2FAsCol, crdb.ColumnTypeEnumArray),
+			crdb.NewColumn(LoginPolicyMFAsCol, crdb.ColumnTypeEnumArray),
+			crdb.NewColumn(LoginPolicyPasswordlessTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(LoginPolicyHidePWResetCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(PasswordCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MFAInitSkipLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
+		},
+			crdb.NewPrimaryKey(LoginPolicyIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

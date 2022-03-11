@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	UserGrantProjectionTable = "zitadel.projections.user_grants"
+	UserGrantProjectionTable = "projections.user_grants"
 
 	UserGrantID            = "id"
 	UserGrantCreationDate  = "creation_date"
@@ -39,26 +39,25 @@ func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 	p := new(UserGrantProjection)
 	config.ProjectionName = UserGrantProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(UserGrantID, crdb.ColumnTypeText),
-				crdb.NewColumn(UserGrantCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserGrantChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserGrantSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(UserGrantState, crdb.ColumnTypeEnum),
-				crdb.NewColumn(UserGrantResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(UserGrantUserID, crdb.ColumnTypeText),
-				crdb.NewColumn(UserGrantProjectID, crdb.ColumnTypeText),
-				crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
-				crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(UserGrantID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(UserGrantID, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserGrantChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserGrantSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(UserGrantState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(UserGrantResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantUserID, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(UserGrantID),
+			crdb.NewIndex("user_idx", []string{UserGrantUserID}),
+			crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{UserGrantUserID})),
-		crdb.NewIndexCheck(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
-	}
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

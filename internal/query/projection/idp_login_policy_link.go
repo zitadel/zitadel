@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	IDPLoginPolicyLinkTable = "zitadel.projections.idp_login_policy_links"
+	IDPLoginPolicyLinkTable = "projections.idp_login_policy_links"
 
 	IDPLoginPolicyLinkIDPIDCol         = "idp_id"
 	IDPLoginPolicyLinkAggregateIDCol   = "aggregate_id"
@@ -35,20 +35,19 @@ func NewIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 	p := new(IDPLoginPolicyLinkProjection)
 	config.ProjectionName = IDPLoginPolicyLinkTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(IDPLoginPolicyLinkIDPIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPLoginPolicyLinkAggregateIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPLoginPolicyLinkCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IDPLoginPolicyLinkChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IDPLoginPolicyLinkSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(IDPLoginPolicyLinkIDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPLoginPolicyLinkCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPLoginPolicyLinkChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPLoginPolicyLinkSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
+			crdb.NewIndex("ro_idx", []string{IDPLoginPolicyLinkResourceOwnerCol}),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

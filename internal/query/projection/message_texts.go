@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	MessageTextTable = "zitadel.projections.message_texts"
+	MessageTextTable = "projections.message_texts"
 
 	MessageTextAggregateIDCol  = "aggregate_id"
 	MessageTextCreationDateCol = "creation_date"
@@ -42,28 +42,26 @@ func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(MessageTextProjection)
 	config.ProjectionName = MessageTextTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(MessageTextAggregateIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(MessageTextCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(MessageTextChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(MessageTextSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(MessageTextStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(MessageTextTypeCol, crdb.ColumnTypeText),
-				crdb.NewColumn(MessageTextLanguageCol, crdb.ColumnTypeText),
-				crdb.NewColumn(MessageTextTitleCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(MessageTextPreHeaderCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(MessageTextSubjectCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(MessageTextGreetingCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(MessageTextTextCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(MessageTextButtonTextCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(MessageTextFooterCol, crdb.ColumnTypeBool),
-			},
-				crdb.NewPrimaryKey(MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(MessageTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MessageTextChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(MessageTextSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(MessageTextStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(MessageTextTypeCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextLanguageCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextTitleCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(MessageTextPreHeaderCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(MessageTextSubjectCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(MessageTextGreetingCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(MessageTextTextCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(MessageTextButtonTextCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(MessageTextFooterCol, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	PasswordComplexityTable = "zitadel.projections.password_complexity_policies"
+	PasswordComplexityTable = "projections.password_complexity_policies"
 
 	ComplexityPolicyIDCol            = "id"
 	ComplexityPolicyCreationDateCol  = "creation_date"
@@ -40,26 +40,24 @@ func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 	p := new(PasswordComplexityProjection)
 	config.ProjectionName = PasswordComplexityTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(ComplexityPolicyIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(ComplexityPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ComplexityPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ComplexityPolicySequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ComplexityPolicyStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(ComplexityPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(ComplexityPolicyResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(ComplexityPolicyMinLengthCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ComplexityPolicyHasLowercaseCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(ComplexityPolicyHasUppercaseCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(ComplexityPolicyHasSymbolCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(ComplexityPolicyHasNumberCol, crdb.ColumnTypeBool),
-			},
-				crdb.NewPrimaryKey(ComplexityPolicyIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ComplexityPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ComplexityPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ComplexityPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ComplexityPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ComplexityPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ComplexityPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(ComplexityPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ComplexityPolicyMinLengthCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ComplexityPolicyHasLowercaseCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyHasUppercaseCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyHasSymbolCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(ComplexityPolicyHasNumberCol, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(ComplexityPolicyIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

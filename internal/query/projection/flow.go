@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	FlowTriggerTable             = "zitadel.projections.flows_triggers"
+	FlowTriggerTable             = "projections.flows_triggers"
 	FlowTypeCol                  = "flow_type"
+	FlowChangeDateCol            = "change_date"
+	FlowSequenceCol              = "sequence"
 	FlowTriggerTypeCol           = "trigger_type"
 	FlowResourceOwnerCol         = "resource_owner"
 	FlowActionTriggerSequenceCol = "trigger_sequence"
@@ -29,19 +31,19 @@ func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 	p := new(FlowProjection)
 	config.ProjectionName = FlowTriggerTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(FlowTypeCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(FlowTriggerTypeCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(FlowResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(FlowTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(FlowChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(FlowSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(FlowTriggerTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(FlowResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -82,6 +84,8 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 			[]handler.Column{
 				handler.NewCol(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
 				handler.NewCol(FlowTypeCol, e.FlowType),
+				handler.NewCol(FlowChangeDateCol, e.CreationDate()),
+				handler.NewCol(FlowSequenceCol, e.Sequence()),
 				handler.NewCol(FlowTriggerTypeCol, e.TriggerType),
 				handler.NewCol(FlowActionIDCol, id),
 				handler.NewCol(FlowActionTriggerSequenceCol, i),

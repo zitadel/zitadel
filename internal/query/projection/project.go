@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	ProjectProjectionTable = "zitadel.projections.projects"
+	ProjectProjectionTable = "projections.projects"
 
 	ProjectColumnID                     = "id"
 	ProjectColumnCreationDate           = "creation_date"
@@ -38,26 +38,25 @@ func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 	p := new(ProjectProjection)
 	config.ProjectionName = ProjectProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(ProjectColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ProjectColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ProjectColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ProjectColumnState, crdb.ColumnTypeEnum),
-				crdb.NewColumn(ProjectColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectColumnName, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectColumnProjectRoleAssertion, crdb.ColumnTypeBool),
-				crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
-				crdb.NewColumn(ProjectColumnHasProjectCheck, crdb.ColumnTypeBool),
-				crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
-				crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(ProjectColumnID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ProjectColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ProjectColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnProjectRoleAssertion, crdb.ColumnTypeBool),
+			crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
+			crdb.NewColumn(ProjectColumnHasProjectCheck, crdb.ColumnTypeBool),
+			crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(ProjectColumnID),
+			crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner}),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

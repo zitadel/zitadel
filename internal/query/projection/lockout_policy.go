@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	LockoutPolicyTable = "zitadel.projections.lockout_policies"
+	LockoutPolicyTable = "projections.lockout_policies"
 
 	LockoutPolicyIDCol                  = "id"
 	LockoutPolicyCreationDateCol        = "creation_date"
@@ -37,23 +37,21 @@ func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 	p := new(LockoutPolicyProjection)
 	config.ProjectionName = LockoutPolicyTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(LockoutPolicyIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(LockoutPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(LockoutPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(LockoutPolicySequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(LockoutPolicyStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(LockoutPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(LockoutPolicyResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(LockoutPolicyShowLockOutFailuresCol, crdb.ColumnTypeBool),
-			},
-				crdb.NewPrimaryKey(LockoutPolicyIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(LockoutPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LockoutPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LockoutPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(LockoutPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LockoutPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(LockoutPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(LockoutPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(LockoutPolicyShowLockOutFailuresCol, crdb.ColumnTypeBool),
+		},
+			crdb.NewPrimaryKey(LockoutPolicyIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	IAMProjectionTable = "zitadel.projections.iam"
+	IAMProjectionTable = "projections.iam"
 
 	IAMColumnID              = "id"
 	IAMColumnChangeDate      = "change_date"
@@ -33,22 +33,20 @@ func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	p := new(IAMProjection)
 	config.ProjectionName = IAMProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(IAMColumnID, crdb.ColumnTypeEnum),
-				crdb.NewColumn(IAMColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IAMColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
-				crdb.NewColumn(IAMColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
-				crdb.NewColumn(IAMColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(IAMColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
-				crdb.NewColumn(IAMColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
-				crdb.NewColumn(IAMColumnDefaultLanguage, crdb.ColumnTypeText, crdb.Default("")),
-			},
-				crdb.NewPrimaryKey(IAMColumnID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(IAMColumnID, crdb.ColumnTypeEnum),
+			crdb.NewColumn(IAMColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IAMColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(IAMColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
+			crdb.NewColumn(IAMColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(IAMColumnSetUpStarted, crdb.ColumnTypeInt64, crdb.Default(0)),
+			crdb.NewColumn(IAMColumnSetUpDone, crdb.ColumnTypeInt64, crdb.Default(0)),
+			crdb.NewColumn(IAMColumnDefaultLanguage, crdb.ColumnTypeText, crdb.Default("")),
+		},
+			crdb.NewPrimaryKey(IAMColumnID),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

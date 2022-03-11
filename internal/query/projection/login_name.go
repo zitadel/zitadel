@@ -2,8 +2,10 @@ package projection
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -14,21 +16,105 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-type LoginNameProjection struct {
-	crdb.StatementHandler
-}
-
 const (
-	LoginNameProjectionTable       = "zitadel.projections.login_names"
+	LoginNameProjectionTable       = "projections.login_names2"
 	LoginNameUserProjectionTable   = LoginNameProjectionTable + "_" + loginNameUserSuffix
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix
+
+	LoginNameCol = "login_name"
+
+	loginNameUserSuffix           = "users"
+	LoginNameUserIDCol            = "id"
+	LoginNameUserUserNameCol      = "user_name"
+	LoginNameUserResourceOwnerCol = "resource_owner"
+
+	loginNameDomainSuffix           = "domains"
+	LoginNameDomainNameCol          = "name"
+	LoginNameDomainIsPrimaryCol     = "is_primary"
+	LoginNameDomainResourceOwnerCol = "resource_owner"
+
+	loginNamePolicySuffix             = "policies"
+	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
+	LoginNamePoliciesIsDefaultCol     = "is_default"
+	LoginNamePoliciesResourceOwnerCol = "resource_owner"
 )
+
+var (
+	viewStmt = fmt.Sprintf("SELECT"+
+		" user_id"+
+		" , IF(%[1]s, CONCAT(%[2]s, '@', domain), %[2]s) AS login_name"+
+		" , IFNULL(%[3]s, true) AS %[3]s"+
+		" FROM ("+
+		" SELECT"+
+		" policy_users.user_id"+
+		" , policy_users.%[2]s"+
+		" , policy_users.%[4]s"+
+		" , policy_users.%[1]s"+
+		" , domains.%[5]s AS domain"+
+		" , domains.%[3]s"+
+		" FROM ("+
+		" SELECT"+
+		" users.id as user_id"+
+		" , users.%[2]s"+
+		" , users.%[4]s"+
+		" , IFNULL(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
+		" FROM %[6]s users"+
+		" LEFT JOIN %[7]s policy_custom on policy_custom.%[8]s = users.%[4]s"+
+		" LEFT JOIN %[7]s policy_default on policy_default.%[9]s = true) policy_users"+
+		" LEFT JOIN %[10]s domains ON policy_users.%[1]s AND policy_users.%[4]s = domains.%[11]s"+
+		");",
+		LoginNamePoliciesMustBeDomainCol,
+		LoginNameUserUserNameCol,
+		LoginNameDomainIsPrimaryCol,
+		LoginNameUserResourceOwnerCol,
+		LoginNameDomainNameCol,
+		LoginNameUserProjectionTable,
+		LoginNamePolicyProjectionTable,
+		LoginNamePoliciesResourceOwnerCol,
+		LoginNamePoliciesIsDefaultCol,
+		LoginNameDomainProjectionTable,
+		LoginNameDomainResourceOwnerCol,
+	)
+)
+
+type LoginNameProjection struct {
+	crdb.StatementHandler
+}
 
 func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginNameProjection {
 	p := new(LoginNameProjection)
 	config.ProjectionName = LoginNameProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewViewCheck(
+		viewStmt,
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(LoginNameUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameUserUserNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameUserResourceOwnerCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(LoginNameUserIDCol),
+			loginNameUserSuffix,
+			crdb.NewIndex("ro_idx", []string{LoginNameUserResourceOwnerCol}),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameDomainIsPrimaryCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginNameDomainResourceOwnerCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
+			loginNameDomainSuffix,
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(LoginNamePoliciesMustBeDomainCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginNamePoliciesIsDefaultCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(LoginNamePoliciesResourceOwnerCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(LoginNamePoliciesResourceOwnerCol),
+			loginNamePolicySuffix,
+			crdb.NewIndex("is_default_idx", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol}),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -119,25 +205,6 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 		},
 	}
 }
-
-const (
-	LoginNameCol = "login_name"
-
-	loginNameUserSuffix           = "users"
-	LoginNameUserIDCol            = "id"
-	LoginNameUserUserNameCol      = "user_name"
-	LoginNameUserResourceOwnerCol = "resource_owner"
-
-	loginNameDomainSuffix           = "domains"
-	LoginNameDomainNameCol          = "name"
-	LoginNameDomainIsPrimaryCol     = "is_primary"
-	LoginNameDomainResourceOwnerCol = "resource_owner"
-
-	loginNamePolicySuffix             = "policies"
-	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
-	LoginNamePoliciesIsDefaultCol     = "is_default"
-	LoginNamePoliciesResourceOwnerCol = "resource_owner"
-)
 
 func (p *LoginNameProjection) reduceUserCreated(event eventstore.Event) (*handler.Statement, error) {
 	var userName string

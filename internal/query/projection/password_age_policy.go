@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	PasswordAgeTable = "zitadel.projections.password_age_policies"
+	PasswordAgeTable = "projections.password_age_policies"
 
 	AgePolicyIDCol             = "id"
 	AgePolicyCreationDateCol   = "creation_date"
@@ -37,23 +37,21 @@ func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(PasswordAgeProjection)
 	config.ProjectionName = PasswordAgeTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(AgePolicyIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AgePolicyCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(AgePolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(AgePolicySequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(AgePolicyStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(AgePolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(AgePolicyResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(AgePolicyExpireWarnDaysCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(AgePolicyMaxAgeDaysCol, crdb.ColumnTypeInt64),
-			},
-				crdb.NewPrimaryKey(AgePolicyIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(AgePolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AgePolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AgePolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AgePolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AgePolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AgePolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(AgePolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AgePolicyExpireWarnDaysCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AgePolicyMaxAgeDaysCol, crdb.ColumnTypeInt64),
+		},
+			crdb.NewPrimaryKey(AgePolicyIDCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

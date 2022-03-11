@@ -21,13 +21,14 @@ type FeatureProjection struct {
 }
 
 const (
-	FeatureTable = "zitadel.projections.features"
+	FeatureTable = "projections.features"
 )
 
 func NewFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfig) *FeatureProjection {
 	p := new(FeatureProjection)
 	config.ProjectionName = FeatureTable
 	config.Reducers = p.reducers()
+	config.InitCheck = &handler.Check{} //TODO: ?
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

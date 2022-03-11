@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	PersonalAccessTokenProjectionTable = "zitadel.projections.personal_access_tokens"
+	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens"
 
 	PersonalAccessTokenColumnID            = "id"
 	PersonalAccessTokenColumnCreationDate  = "creation_date"
@@ -34,24 +34,23 @@ func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 	p := new(PersonalAccessTokenProjection)
 	config.ProjectionName = PersonalAccessTokenProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(PersonalAccessTokenColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(PersonalAccessTokenColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(PersonalAccessTokenColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(PersonalAccessTokenColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(PersonalAccessTokenColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(PersonalAccessTokenColumnUserID, crdb.ColumnTypeText),
-				crdb.NewColumn(PersonalAccessTokenColumnExpiration, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(PersonalAccessTokenColumnScopes, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(PersonalAccessTokenColumnID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(PersonalAccessTokenColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(PersonalAccessTokenColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnUserID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnExpiration, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnScopes, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(PersonalAccessTokenColumnID),
+			crdb.NewIndex("user_idx", []string{PersonalAccessTokenColumnUserID}),
+			crdb.NewIndex("ro_idx", []string{PersonalAccessTokenColumnResourceOwner}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{PersonalAccessTokenColumnUserID})),
-		crdb.NewIndexCheck(crdb.NewIndex("ro_idx", []string{PersonalAccessTokenColumnResourceOwner})),
-	}
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

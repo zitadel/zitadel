@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	IAMMemberProjectionTable = "zitadel.projections.iam_members"
+	IAMMemberProjectionTable = "projections.iam_members"
 
 	IAMMemberIAMIDCol = "iam_id"
 )
@@ -27,15 +27,14 @@ func NewIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 	p := new(IAMMemberProjection)
 	config.ProjectionName = IAMMemberProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable(
-				append(memberColumns, crdb.NewColumn(IAMColumnID, crdb.ColumnTypeText)),
-				crdb.NewPrimaryKey(IAMColumnID, MemberUserIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable(
+			append(memberColumns, crdb.NewColumn(IAMColumnID, crdb.ColumnTypeText)),
+			crdb.NewPrimaryKey(IAMColumnID, MemberUserIDCol),
+			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{MemberUserIDCol})),
-	}
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

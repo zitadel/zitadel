@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	UserMetadataProjectionTable = "zitadel.projections.user_metadata"
+	UserMetadataProjectionTable = "projections.user_metadata"
 
 	UserMetadataColumnUserID        = "user_id"
 	UserMetadataColumnCreationDate  = "creation_date"
@@ -32,22 +32,21 @@ func NewUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 	p := new(UserMetadataProjection)
 	config.ProjectionName = UserMetadataProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(UserMetadataColumnUserID, crdb.ColumnTypeText),
-				crdb.NewColumn(UserMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserMetadataColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(UserMetadataColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
-				crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(UserMetadataColumnUserID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(UserMetadataColumnUserID, crdb.ColumnTypeText),
+			crdb.NewColumn(UserMetadataColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserMetadataColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(UserMetadataColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
+			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(UserMetadataColumnUserID),
+			crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner})),
-	}
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

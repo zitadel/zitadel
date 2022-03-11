@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	ProjectRoleProjectionTable = "zitadel.projections.project_roles"
+	ProjectRoleProjectionTable = "projections.project_roles"
 
 	ProjectRoleColumnProjectID     = "project_id"
 	ProjectRoleColumnKey           = "role_key"
@@ -34,23 +34,21 @@ func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(ProjectRoleProjection)
 	config.ProjectionName = ProjectRoleProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(ProjectRoleColumnProjectID, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectRoleColumnKey, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectRoleColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ProjectRoleColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(ProjectRoleColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(ProjectRoleColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
-				crdb.NewColumn(ProjectRoleColumnCreator, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(ProjectRoleColumnProjectID, ProjectRoleColumnKey),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ProjectRoleColumnProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectRoleColumnKey, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectRoleColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectRoleColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectRoleColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ProjectRoleColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectRoleColumnCreator, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(ProjectRoleColumnProjectID, ProjectRoleColumnKey),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	SMSConfigProjectionTable = "zitadel.projections.sms_configs"
+	SMSConfigProjectionTable = "projections.sms_configs"
 	SMSTwilioTable           = SMSConfigProjectionTable + "_" + smsTwilioTableSuffix
 
 	SMSColumnID            = "id"
@@ -40,30 +40,28 @@ func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 	p := new(SMSConfigProjection)
 	config.ProjectionName = SMSConfigProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewMultiTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(SMSColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(SMSColumnAggregateID, crdb.ColumnTypeText),
-				crdb.NewColumn(SMSColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(SMSColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(SMSColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(SMSColumnState, crdb.ColumnTypeEnum),
-				crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(SMSColumnID),
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText, crdb.Default(SMSColumnID)),
-				crdb.NewColumn(SMSTwilioConfigColumnSID, crdb.ColumnTypeText),
-				crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
-				crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
-			},
-				crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID),
-				smsTwilioTableSuffix,
-			),
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(SMSColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMSColumnAggregateID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMSColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(SMSColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(SMSColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(SMSColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(SMSColumnID),
 		),
-	}
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText, crdb.Default(SMSColumnID)),
+			crdb.NewColumn(SMSTwilioConfigColumnSID, crdb.ColumnTypeText),
+			crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
+			crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
+		},
+			crdb.NewPrimaryKey(SMSTwilioConfigColumnSMSID),
+			smsTwilioTableSuffix,
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

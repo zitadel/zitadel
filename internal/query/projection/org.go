@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	OrgProjectionTable = "zitadel.projections.orgs"
+	OrgProjectionTable = "projections.orgs"
 
 	OrgColumnID            = "id"
 	OrgColumnCreationDate  = "creation_date"
@@ -34,22 +34,22 @@ func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	p := new(OrgProjection)
 	config.ProjectionName = OrgProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(OrgColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(OrgColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OrgColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(OrgColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
-				crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
-				crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
-				crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(OrgColumnID),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(OrgColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(OrgColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnDomain, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(OrgColumnID),
+			crdb.NewIndex("domain_idx", []string{OrgColumnDomain}),
+			crdb.NewIndex("name_idx", []string{OrgColumnName}),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

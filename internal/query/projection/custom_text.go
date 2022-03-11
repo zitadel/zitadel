@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	CustomTextTable = "zitadel.projections.custom_texts"
+	CustomTextTable = "projections.custom_texts"
 
 	CustomTextAggregateIDCol  = "aggregate_id"
 	CustomTextCreationDateCol = "creation_date"
@@ -36,23 +36,21 @@ func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 	p := new(CustomTextProjection)
 	config.ProjectionName = CustomTextTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(CustomTextAggregateIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(CustomTextIsDefaultCol, crdb.ColumnTypeBool),
-				crdb.NewColumn(CustomTextTemplateCol, crdb.ColumnTypeText),
-				crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
-				crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
-				crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(CustomTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(CustomTextIsDefaultCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(CustomTextTemplateCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
 		),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

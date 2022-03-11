@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	IDPUserLinkTable             = "zitadel.projections.idp_user_links"
+	IDPUserLinkTable             = "projections.idp_user_links"
 	IDPUserLinkIDPIDCol          = "idp_id"
 	IDPUserLinkUserIDCol         = "user_id"
 	IDPUserLinkExternalUserIDCol = "external_user_id"
@@ -34,23 +34,21 @@ func NewIDPUserLinkProjection(ctx context.Context, config crdb.StatementHandlerC
 	p := new(IDPUserLinkProjection)
 	config.ProjectionName = IDPUserLinkTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(IDPUserLinkIDPIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPUserLinkUserIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPUserLinkExternalUserIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPUserLinkCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IDPUserLinkChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IDPUserLinkSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(IDPUserLinkResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
-			},
-				crdb.NewPrimaryKey(IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
-			),
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(IDPUserLinkIDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkExternalUserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPUserLinkChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPUserLinkSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(IDPUserLinkResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPUserLinkDisplayNameCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(IDPUserLinkIDPIDCol, IDPUserLinkExternalUserIDCol),
+			crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("user_idx", []string{IDPUserLinkUserIDCol})),
-	}
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	AppProjectionTable = "zitadel.projections.apps"
+	AppProjectionTable = "projections.apps"
 	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
 	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
 
@@ -62,53 +62,54 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	p := new(AppProjection)
 	config.ProjectionName = AppProjectionTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewMultiTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(AppColumnID, crdb.ColumnTypeText),
-				crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
-				crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
-				crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(AppColumnResourceOwner, crdb.ColumnTypeText),
-				crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
-				crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
-			},
-				crdb.NewPrimaryKey(ActionIDCol),
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
-				crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
-				crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
-				crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
-			},
-				crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
-				appAPITableSuffix,
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
-				crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
-				crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
-				crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
-				crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
-				crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()), //TODO: null?
-				crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),    //TODO: null?
-				crdb.NewColumn(AppOIDCConfigColumnApplicationType, crdb.ColumnTypeEnum),
-				crdb.NewColumn(AppOIDCConfigColumnAuthMethodType, crdb.ColumnTypeEnum),
-				crdb.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
-				crdb.NewColumn(AppOIDCConfigColumnDevMode, crdb.ColumnTypeBool),
-				crdb.NewColumn(AppOIDCConfigColumnAccessTokenType, crdb.ColumnTypeEnum),
-				crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
-				crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()),     //TODO: null?
-				crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
-				crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Nullable()),               //TODO: null?
-				crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),
-				appOIDCTableSuffix,
-			),
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(AppColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AppColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
+		},
+			crdb.NewPrimaryKey(ActionIDCol),
+			crdb.NewIndex("project_id_idx", []string{AppColumnProjectID}),
 		),
-	}
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+			crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
+		},
+			crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
+			appAPITableSuffix,
+			crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID}),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
+			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()), //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),    //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnApplicationType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnAuthMethodType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnDevMode, crdb.ColumnTypeBool),
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()),     //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Nullable()),               //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),
+			appOIDCTableSuffix,
+			crdb.NewIndex("client_id_idx", []string{AppOIDCConfigColumnClientID}),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

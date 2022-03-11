@@ -19,7 +19,7 @@ type UserProjection struct {
 }
 
 const (
-	UserTable        = "zitadel.projections.users"
+	UserTable        = "projections.users"
 	UserHumanTable   = UserTable + "_" + UserHumanSuffix
 	UserMachineTable = UserTable + "_" + UserMachineSuffix
 
@@ -63,49 +63,47 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 	p := new(UserProjection)
 	config.ProjectionName = UserTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewMultiTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(UserIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(UserSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(UserStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(UserResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserUsernameCol, crdb.ColumnTypeText),
-				crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
-			},
-				crdb.NewPrimaryKey(UserIDCol),
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
-				crdb.NewColumn(HumanFirstNameCol, crdb.ColumnTypeText),
-				crdb.NewColumn(HumanLastNameCol, crdb.ColumnTypeText),
-				crdb.NewColumn(HumanNickNameCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(HumanDisplayNameCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(HumanPreferredLanguageCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(HumanGenderCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(HumanAvatarURLCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(HumanEmailCol, crdb.ColumnTypeText),
-				crdb.NewColumn(HumanIsEmailVerifiedCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(HumanPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(HumanIsPhoneVerifiedCol, crdb.ColumnTypeBool, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(HumanUserIDCol),
-				UserHumanSuffix,
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
-				crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
-				crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(MachineUserIDCol),
-				UserMachineSuffix,
-			),
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(UserIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(UserSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(UserStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(UserResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserUsernameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
+		},
+			crdb.NewPrimaryKey(UserIDCol),
+			crdb.NewIndex("username_idx", []string{UserUsernameCol}),
+			crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol}),
 		),
-		crdb.NewIndexCheck(crdb.NewIndex("username_idx", []string{UserUsernameCol})),
-		crdb.NewIndexCheck(crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol})),
-	}
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
+			crdb.NewColumn(HumanFirstNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(HumanLastNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(HumanNickNameCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(HumanDisplayNameCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(HumanPreferredLanguageCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(HumanGenderCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(HumanAvatarURLCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(HumanEmailCol, crdb.ColumnTypeText),
+			crdb.NewColumn(HumanIsEmailVerifiedCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(HumanPhoneCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(HumanIsPhoneVerifiedCol, crdb.ColumnTypeBool, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(HumanUserIDCol),
+			UserHumanSuffix,
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
+			crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(MachineUserIDCol),
+			UserMachineSuffix,
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }

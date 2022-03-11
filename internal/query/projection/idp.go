@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	IDPTable     = "zitadel.projections.idps"
+	IDPTable     = "projections.idps"
 	IDPOIDCTable = IDPTable + "_" + IDPOIDCSuffix
 	IDPJWTTable  = IDPTable + "_" + IDPJWTSuffix
 
@@ -61,49 +61,48 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	p := new(IDPProjection)
 	config.ProjectionName = IDPTable
 	config.Reducers = p.reducers()
-	config.InitChecks = []*handler.Check{
-		crdb.NewMultiTableCheck(
-			crdb.NewTable([]*crdb.Column{
-				crdb.NewColumn(IDPIDCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPCreationDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IDPChangeDateCol, crdb.ColumnTypeTimestamp),
-				crdb.NewColumn(IDPSequenceCol, crdb.ColumnTypeInt64),
-				crdb.NewColumn(IDPResourceOwnerCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPStateCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(IDPNameCol, crdb.ColumnTypeText),
-				crdb.NewColumn(IDPStylingTypeCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(IDPOwnerTypeCol, crdb.ColumnTypeEnum),
-				crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
-				crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
-			},
-				crdb.NewPrimaryKey(IDPIDCol),
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
-				crdb.NewColumn(OIDCConfigClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigDisplayNameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigUsernameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigAuthorizationEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(OIDCConfigTokenEndpointCol, crdb.ColumnTypeEnum, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(OIDCConfigIDPIDCol),
-				IDPOIDCSuffix,
-			),
-			crdb.NewSecondaryTable([]*crdb.Column{
-				crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
-				crdb.NewColumn(JWTConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(JWTConfigKeysEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
-				crdb.NewColumn(JWTConfigEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
-			},
-				crdb.NewPrimaryKey(JWTConfigIDPIDCol),
-				IDPJWTSuffix,
-			),
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(IDPIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(IDPSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(IDPResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(IDPNameCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPStylingTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(IDPOwnerTypeCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
+		},
+			crdb.NewPrimaryKey(IDPIDCol),
+			crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol}),
 		),
-	}
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+			crdb.NewColumn(OIDCConfigClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigScopesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigDisplayNameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigUsernameMappingCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigAuthorizationEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(OIDCConfigTokenEndpointCol, crdb.ColumnTypeEnum, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(OIDCConfigIDPIDCol),
+			IDPOIDCSuffix,
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+			crdb.NewColumn(JWTConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(JWTConfigKeysEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
+			crdb.NewColumn(JWTConfigEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(JWTConfigIDPIDCol),
+			IDPJWTSuffix,
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
