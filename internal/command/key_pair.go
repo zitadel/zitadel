@@ -22,7 +22,7 @@ const (
 func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 	ctx = setSAMLCtx(ctx)
 	now := time.Now().UTC()
-	after := now.Add(c.privateKeyLifetime)
+	after := now.Add(c.certificateLifetime)
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCACertificate(c.certKeySize, c.keyAlgorithm, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"caos AG"},
@@ -54,7 +54,7 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, reason string, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	ctx = setSAMLCtx(ctx)
 	now := time.Now().UTC()
-	after := now.Add(c.privateKeyLifetime)
+	after := now.Add(c.certificateLifetime)
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"caos AG"},
@@ -87,7 +87,7 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, reason s
 func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, reason string, algorithm string, caPrivateKey *rsa.PrivateKey, caCertificate []byte) error {
 	ctx = setSAMLCtx(ctx)
 	now := time.Now().UTC()
-	after := now.Add(c.privateKeyLifetime)
+	after := now.Add(c.certificateLifetime)
 	privateCrypto, publicCrypto, certificateCrypto, err := crypto.GenerateEncryptedKeyPairWithCertificate(c.certKeySize, c.keyAlgorithm, caPrivateKey, caCertificate, &crypto.CertificateInformations{
 		SerialNumber: big.NewInt(int64(rand.Intn(50000))),
 		Organisation: []string{"caos AG"},

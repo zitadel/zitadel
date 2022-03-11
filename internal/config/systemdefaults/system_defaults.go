@@ -106,6 +106,7 @@ type KeyConfig struct {
 	Size                     int
 	PrivateKeyLifetime       types.Duration
 	PublicKeyLifetime        types.Duration
+	CertificateLifetime      types.Duration
 	EncryptionConfig         *crypto.KeyConfig
 	SigningKeyRotationCheck  types.Duration
 	SigningKeyGracefulPeriod types.Duration

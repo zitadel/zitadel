@@ -50,13 +50,14 @@ type Commands struct {
 	domainVerificationValidator func(domain, token, verifier string, checkType http.CheckType) error
 	multifactors                domain.MultifactorConfigs
 
-	webauthn           *webauthn_helper.WebAuthN
-	keySize            int
-	keyAlgorithm       crypto.EncryptionAlgorithm
-	certKeySize        int
-	privateKeyLifetime time.Duration
-	publicKeyLifetime  time.Duration
-	tokenVerifier      orgFeatureChecker
+	webauthn            *webauthn_helper.WebAuthN
+	keySize             int
+	keyAlgorithm        crypto.EncryptionAlgorithm
+	certKeySize         int
+	privateKeyLifetime  time.Duration
+	publicKeyLifetime   time.Duration
+	certificateLifetime time.Duration
+	tokenVerifier       orgFeatureChecker
 }
 
 type orgFeatureChecker interface {
@@ -75,15 +76,16 @@ func StartCommands(
 	authZRepo *authz_repo.EsRepository,
 ) (repo *Commands, err error) {
 	repo = &Commands{
-		eventstore:         es,
-		static:             staticStore,
-		idGenerator:        id.SonyFlakeGenerator,
-		iamDomain:          defaults.Domain,
-		zitadelRoles:       authZConfig.RolePermissionMappings,
-		keySize:            defaults.KeyConfig.Size,
-		privateKeyLifetime: defaults.KeyConfig.PrivateKeyLifetime.Duration,
-		publicKeyLifetime:  defaults.KeyConfig.PublicKeyLifetime.Duration,
-		certKeySize:        4096,
+		eventstore:          es,
+		static:              staticStore,
+		idGenerator:         id.SonyFlakeGenerator,
+		iamDomain:           defaults.Domain,
+		zitadelRoles:        authZConfig.RolePermissionMappings,
+		keySize:             defaults.KeyConfig.Size,
+		privateKeyLifetime:  defaults.KeyConfig.PrivateKeyLifetime.Duration,
+		publicKeyLifetime:   defaults.KeyConfig.PublicKeyLifetime.Duration,
+		certificateLifetime: defaults.KeyConfig.CertificateLifetime.Duration,
+		certKeySize:         4096,
 	}
 	iam_repo.RegisterEventMappers(repo.eventstore)
 	org.RegisterEventMappers(repo.eventstore)

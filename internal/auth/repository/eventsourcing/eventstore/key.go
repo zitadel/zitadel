@@ -23,20 +23,22 @@ import (
 )
 
 type KeyRepository struct {
-	Commands                 *command.Commands
-	Eventstore               *eventstore.Eventstore
-	View                     *view.View
-	SigningKeyRotationCheck  time.Duration
-	SigningKeyGracefulPeriod time.Duration
-	KeyAlgorithm             crypto.EncryptionAlgorithm
-	KeyChan                  <-chan *model.KeyView
-	CaCertChan               <-chan *model.CertificateAndKeyView
-	MetadataCertChan         <-chan *model.CertificateAndKeyView
-	ResponseCertChan         <-chan *model.CertificateAndKeyView
-	Locker                   spooler.Locker
-	lockID                   string
-	currentKeyID             string
-	currentKeyExpiration     time.Time
+	Commands                  *command.Commands
+	Eventstore                *eventstore.Eventstore
+	View                      *view.View
+	SigningKeyRotationCheck   time.Duration
+	SigningKeyGracefulPeriod  time.Duration
+	SigningCertRotationCheck  time.Duration
+	SigningCertGracefulPeriod time.Duration
+	KeyAlgorithm              crypto.EncryptionAlgorithm
+	KeyChan                   <-chan *model.KeyView
+	CaCertChan                <-chan *model.CertificateAndKeyView
+	MetadataCertChan          <-chan *model.CertificateAndKeyView
+	ResponseCertChan          <-chan *model.CertificateAndKeyView
+	Locker                    spooler.Locker
+	lockID                    string
+	currentKeyID              string
+	currentKeyExpiration      time.Time
 }
 
 const (

@@ -143,6 +143,7 @@ SystemDefaults:
     Size: 2048
     PrivateKeyLifetime: 6h
     PublicKeyLifetime: 30h
+    CertificateLifetime: 8760h
     EncryptionConfig:
       EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
     SigningKeyRotationCheck: 10s
