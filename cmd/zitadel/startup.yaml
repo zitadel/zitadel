@@ -373,6 +373,9 @@ API:
       NameIDFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent'
       WantAuthRequestsSigned: 'false'
       Endpoints:
+        Certificate:
+          Path: 'certificate'
+          URL: '$ZITADEL_SAML/certificate'
         Callback:
           Path: 'callback'
           URL: '$ZITADEL_SAML/callback'

@@ -1,10 +1,12 @@
 package saml
 
 import (
+	"bytes"
 	"context"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"github.com/amdonov/xmlsig"
@@ -15,6 +17,7 @@ import (
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"gopkg.in/square/go-jose.v2"
+	"io"
 	"net/http"
 	"text/template"
 )
@@ -53,6 +56,7 @@ type IdentityProviderConfig struct {
 }
 
 type EndpointConfig struct {
+	Certificate   Endpoint `yaml:"Certificate"`
 	Callback      Endpoint `yaml:"Callback"`
 	SingleSignOn  Endpoint `yaml:"SingleSignOn"`
 	SingleLogOut  Endpoint `yaml:"SingleLogOut"`
@@ -77,6 +81,7 @@ type IdentityProvider struct {
 	AAMetadata *md.AttributeAuthorityDescriptorType
 	signer     xmlsig.Signer
 
+	CertificateEndpoint           op.Endpoint
 	CallbackEndpoint              op.Endpoint
 	SingleSignOnEndpoint          op.Endpoint
 	SingleLogoutEndpoint          op.Endpoint
@@ -134,6 +139,7 @@ func NewIdentityProvider(metadataEndpoint *op.Endpoint, conf *IdentityProviderCo
 		Metadata:                      metadata,
 		AAMetadata:                    aaMetadata,
 		signer:                        signer,
+		CertificateEndpoint:           op.NewEndpointWithURL(conf.Endpoints.Certificate.Path, conf.Endpoints.Certificate.URL),
 		CallbackEndpoint:              op.NewEndpointWithURL(conf.Endpoints.Callback.Path, conf.Endpoints.Callback.URL),
 		SingleSignOnEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleSignOn.Path, conf.Endpoints.SingleSignOn.URL),
 		SingleLogoutEndpoint:          op.NewEndpointWithURL(conf.Endpoints.SingleLogOut.Path, conf.Endpoints.SingleLogOut.URL),
@@ -153,6 +159,7 @@ type Route struct {
 
 func (p *IdentityProvider) GetRoutes() []*Route {
 	return []*Route{
+		{p.CertificateEndpoint.Relative(), p.certificateHandleFunc},
 		{p.CallbackEndpoint.Relative(), p.callbackHandleFunc},
 		{p.SingleSignOnEndpoint.Relative(), p.ssoHandleFunc},
 		{p.SingleLogoutEndpoint.Relative(), p.logoutHandleFunc},
@@ -250,5 +257,32 @@ func getResponseCert(storage Storage) ([]byte, *rsa.PrivateKey) {
 
 			return certWebKey.Key.([]byte), keyWebKey.Key.(*rsa.PrivateKey)
 		}
+	}
+}
+
+func (i *IdentityProvider) certificateHandleFunc(w http.ResponseWriter, r *http.Request) {
+	cert := i.Metadata.KeyDescriptor[0].KeyInfo.X509Data[0].X509Certificate[0]
+
+	data, err := base64.StdEncoding.DecodeString(cert)
+	if err != nil {
+		http.Error(w, fmt.Errorf("failed to read certificate: %w", err).Error(), http.StatusInternalServerError)
+		return
+	}
+
+	certPem := new(bytes.Buffer)
+	if err := pem.Encode(certPem, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: []byte(data),
+	}); err != nil {
+		http.Error(w, fmt.Errorf("failed to pem encode certificate: %w", err).Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Disposition", "attachment; filename=idp.crt")
+	w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+	_, err = io.Copy(w, certPem)
+	if err != nil {
+		http.Error(w, fmt.Errorf("failed to response with certificate: %w", err).Error(), http.StatusInternalServerError)
+		return
 	}
 }

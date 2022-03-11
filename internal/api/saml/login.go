@@ -71,13 +71,10 @@ func (p *IdentityProvider) callbackHandleFunc(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	ip := getIP(r).String()
-	ip = "192.168.0.1"
-
 	resp := makeSuccessfulResponse(
 		authRequest,
 		p.EntityID,
-		ip,
+		getIP(r).String(),
 		attrs,
 		entityID,
 	)

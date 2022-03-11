@@ -267,6 +267,7 @@ func makeAssertion(
 						Address:      sendIP,
 						InResponseTo: requestID,
 						Recipient:    acsURL,
+						NotBefore:    issueInstant,
 						NotOnOrAfter: untilInstant,
 					},
 				},
