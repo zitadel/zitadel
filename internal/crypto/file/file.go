@@ -40,5 +40,5 @@ func (d *Storage) ReadKey(id string) (*crypto.Key, error) {
 }
 
 func (d *Storage) CreateKeys(keys ...*crypto.Key) error {
-	return fmt.Errorf("unimplemented") //TODO: ?
+	return fmt.Errorf("this provider is not able to store new keys")
 }
