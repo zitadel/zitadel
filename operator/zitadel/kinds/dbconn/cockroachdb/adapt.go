@@ -63,7 +63,11 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		current.Parsed = currentDB
 
 		componentLabels := labels.MustForComponent(apiLabels, component)
-		certLabels := labels.MustForName(componentLabels, db.CertsSecret)
+		user := "root"
+		if desiredKind.Spec.User != "" {
+			user = desiredKind.Spec.User
+		}
+		certLabels := labels.MustForName(componentLabels, user)
 		pwLabels := labels.AsSelectable(labels.MustForName(componentLabels, "db-connection-password"))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -71,13 +75,9 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 				currentDB.Current.Host = desiredKind.Spec.Host
 				currentDB.Current.Cluster = desiredKind.Spec.Cluster
 				currentDB.Current.Port = strconv.Itoa(int(desiredKind.Spec.Port))
+				currentDB.Current.User = user
 				if currentDB.Current.Port == "" {
 					currentDB.Current.Port = "26257"
-				}
-
-				currentDB.Current.User = desiredKind.Spec.User
-				if currentDB.Current.User == "" {
-					currentDB.Current.User = "root"
 				}
 
 				certificate, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Certificate, desiredKind.Spec.ExistingCertificate)

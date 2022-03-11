@@ -89,11 +89,11 @@ func AdaptFunc(
 	beforeCRqueriers := []operator.QueryFunc{
 		queryNode,
 		queryCert(rootUserName, rootCertsSecret, db.RootUserCert, db.RootUserKey),
-		queryCert(userName, db.CertsSecret, db.UserCert, db.UserKey),
+		queryCert(userName, db.CertsSecret(userName), db.UserCert, db.UserKey),
 	}
 
 	beforeCRdestroyers := []operator.DestroyFunc{
-		destroyCert(db.CertsSecret),
+		destroyCert(db.CertsSecret(userName)),
 		destroyCert(rootCertsSecret),
 		destroyNode,
 	}
