@@ -15,7 +15,7 @@ message Instance {
         }
     ];
     zitadel.v1.ObjectDetails details = 2;
-    InstanceState state = 3 [
+    State state = 3 [
         (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
             description: "current state of the instance";
         }
