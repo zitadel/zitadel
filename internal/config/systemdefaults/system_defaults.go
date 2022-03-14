@@ -6,25 +6,17 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/notification/channels/fs"
-	"github.com/caos/zitadel/internal/notification/channels/log"
-	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/notification/templates"
 )
 
 type SystemDefaults struct {
-	DefaultLanguage             language.Tag
-	Domain                      string
-	ZitadelDocs                 ZitadelDocs
-	SecretGenerators            SecretGenerators
-	UserVerificationKey         *crypto.KeyConfig
-	IDPConfigVerificationKey    *crypto.KeyConfig
-	SMTPPasswordVerificationKey *crypto.KeyConfig
-	SMSVerificationKey          *crypto.KeyConfig
-	Multifactors                MultifactorConfig
-	DomainVerification          DomainVerification
-	Notifications               Notifications
-	KeyConfig                   KeyConfig
+	DefaultLanguage    language.Tag
+	Domain             string
+	ZitadelDocs        ZitadelDocs
+	SecretGenerators   SecretGenerators
+	Multifactors       MultifactorConfig
+	DomainVerification DomainVerification
+	Notifications      Notifications
+	KeyConfig          KeyConfig
 }
 
 type ZitadelDocs struct {
@@ -43,20 +35,16 @@ type MultifactorConfig struct {
 }
 
 type OTPConfig struct {
-	Issuer          string
-	VerificationKey *crypto.KeyConfig
+	Issuer string
 }
 
 type DomainVerification struct {
-	VerificationKey       *crypto.KeyConfig
 	VerificationGenerator crypto.GeneratorConfig
 }
 
 type Notifications struct {
-	DebugMode      bool
 	Endpoints      Endpoints
 	FileSystemPath string
-	//Providers Channels
 }
 
 type Endpoints struct {
@@ -65,20 +53,6 @@ type Endpoints struct {
 	VerifyEmail              string
 	DomainClaimed            string
 	PasswordlessRegistration string
-}
-
-type Channels struct {
-	Twilio     twilio.TwilioConfig
-	FileSystem fs.FSConfig
-	Log        log.LogConfig
-}
-
-type TemplateData struct {
-	InitCode      templates.TemplateData
-	PasswordReset templates.TemplateData
-	VerifyEmail   templates.TemplateData
-	VerifyPhone   templates.TemplateData
-	DomainClaimed templates.TemplateData
 }
 
 type KeyConfig struct {

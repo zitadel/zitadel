@@ -4,10 +4,12 @@ import (
 	_ "embed"
 
 	"github.com/caos/logging"
+	"github.com/spf13/cobra"
+
 	"github.com/caos/zitadel/cmd/admin/initialise"
+	"github.com/caos/zitadel/cmd/admin/key"
 	"github.com/caos/zitadel/cmd/admin/setup"
 	"github.com/caos/zitadel/cmd/admin/start"
-	"github.com/spf13/cobra"
 )
 
 func New() *cobra.Command {
@@ -24,6 +26,7 @@ func New() *cobra.Command {
 		initialise.New(),
 		setup.New(),
 		start.New(),
+		key.New(),
 	)
 
 	return adminCMD
