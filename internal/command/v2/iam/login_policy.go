@@ -44,3 +44,23 @@ func AddLoginPolicy(
 		}, nil
 	}
 }
+
+func AddSecondFactorToLoginPolicy(a *iam.Aggregate, factor domain.SecondFactorType) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				iam.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor),
+			}, nil
+		}, nil
+	}
+}
+
+func AddMultiFactorToLoginPolicy(a *iam.Aggregate, factor domain.MultiFactorType) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				iam.NewLoginPolicyMultiFactorAddedEvent(ctx, &a.Aggregate, factor),
+			}, nil
+		}, nil
+	}
+}

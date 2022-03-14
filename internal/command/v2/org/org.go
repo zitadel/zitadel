@@ -11,6 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
+//AddOrg defines the commands to create a new org,
+// this includes the verified default domain
 func AddOrg(a *org.Aggregate, name, iamDomain string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if name = strings.TrimSpace(name); name == "" {

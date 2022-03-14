@@ -98,6 +98,7 @@ func AddAPIConfig(
 	authMethodType domain.APIAuthMethodType,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
+		// TODO: exists app?
 		if appID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument")
 		}

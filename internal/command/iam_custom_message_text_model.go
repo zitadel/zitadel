@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/iam"
 )
 
-type IAMCustomMessageTextReadModel struct {
+type IAMCustomMessageTextWriteModel struct {
 	CustomMessageTextReadModel
 }
 
-func NewIAMCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *IAMCustomMessageTextReadModel {
-	return &IAMCustomMessageTextReadModel{
+func NewIAMCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *IAMCustomMessageTextWriteModel {
+	return &IAMCustomMessageTextWriteModel{
 		CustomMessageTextReadModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
@@ -25,7 +25,7 @@ func NewIAMCustomMessageTextWriteModel(messageTextType string, lang language.Tag
 	}
 }
 
-func (wm *IAMCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event) {
+func (wm *IAMCustomMessageTextWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.CustomTextSetEvent:
@@ -38,11 +38,11 @@ func (wm *IAMCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event
 	}
 }
 
-func (wm *IAMCustomMessageTextReadModel) Reduce() error {
+func (wm *IAMCustomMessageTextWriteModel) Reduce() error {
 	return wm.CustomMessageTextReadModel.Reduce()
 }
 
-func (wm *IAMCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *IAMCustomMessageTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().

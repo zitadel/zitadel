@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -27,6 +28,10 @@ func AddProject(
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			owner := authz.GetCtxData(ctx).UserID
+			if owner == "" {
+				return nil, errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument")
+			}
 			return []eventstore.Command{
 				project.NewProjectAddedEvent(ctx, &a.Aggregate,
 					name,
@@ -35,6 +40,9 @@ func AddProject(
 					hasProjectCheck,
 					privateLabelingSetting,
 				),
+				project.NewProjectMemberAddedEvent(ctx, &a.Aggregate,
+					owner,
+					domain.RoleProjectOwner),
 			}, nil
 		}, nil
 	}

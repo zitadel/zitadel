@@ -15,6 +15,7 @@ func AddMemberCommand(a *org.Aggregate, userID string, roles ...string) preparat
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+				//TODO: check if memeber already exists
 				return []eventstore.Command{org.NewMemberAddedEvent(ctx, &a.Aggregate, userID, roles...)}, nil
 			},
 			nil
