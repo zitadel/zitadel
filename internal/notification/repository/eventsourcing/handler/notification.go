@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/notification/channels/fs"
 	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
@@ -40,26 +41,36 @@ type Notification struct {
 	handler
 	command            *command.Commands
 	systemDefaults     sd.SystemDefaults
-	AesCrypto          crypto.EncryptionAlgorithm
 	statikDir          http.FileSystem
 	subscription       *v1.Subscription
 	assetsPrefix       string
 	queries            *query.Queries
+	userDataCrypto     crypto.EncryptionAlgorithm
 	smtpPasswordCrypto crypto.EncryptionAlgorithm
 	smsTokenCrypto     crypto.EncryptionAlgorithm
 }
 
-func newNotification(handler handler, command *command.Commands, query *query.Queries, defaults sd.SystemDefaults, aesCrypto crypto.EncryptionAlgorithm, statikDir http.FileSystem, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm, smsCrypto *crypto.AESCrypto) *Notification {
+func newNotification(
+	handler handler,
+	command *command.Commands,
+	query *query.Queries,
+	defaults sd.SystemDefaults,
+	statikDir http.FileSystem,
+	assetsPrefix string,
+	userEncryption crypto.EncryptionAlgorithm,
+	smtpEncryption crypto.EncryptionAlgorithm,
+	smsEncryption crypto.EncryptionAlgorithm,
+) *Notification {
 	h := &Notification{
 		handler:            handler,
 		command:            command,
 		systemDefaults:     defaults,
 		statikDir:          statikDir,
-		AesCrypto:          aesCrypto,
 		assetsPrefix:       assetsPrefix,
 		queries:            query,
-		smtpPasswordCrypto: smtpPasswordEncAlg,
-		smsTokenCrypto:     smsCrypto,
+		userDataCrypto:     userEncryption,
+		smtpPasswordCrypto: smtpEncryption,
+		smsTokenCrypto:     smsEncryption,
 	}
 
 	h.subscribe()
@@ -161,7 +172,7 @@ func (n *Notification) handleInitUserCode(event *models.Event) (err error) {
 		return err
 	}
 
-	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendUserInitCode(ctx, string(template.Template), translator, user, initCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -199,7 +210,7 @@ func (n *Notification) handlePasswordCode(event *models.Event) (err error) {
 	if err != nil {
 		return err
 	}
-	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendPasswordCode(ctx, string(template.Template), translator, user, pwCode, n.systemDefaults, n.getSMTPConfig, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -238,7 +249,7 @@ func (n *Notification) handleEmailVerificationCode(event *models.Event) (err err
 		return err
 	}
 
-	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendEmailVerificationCode(ctx, string(template.Template), translator, user, emailCode, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}
@@ -264,7 +275,7 @@ func (n *Notification) handlePhoneVerificationCode(event *models.Event) (err err
 	if err != nil {
 		return err
 	}
-	err = types.SendPhoneVerificationCode(context.Background(), translator, user, phoneCode, n.systemDefaults, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.AesCrypto)
+	err = types.SendPhoneVerificationCode(context.Background(), translator, user, phoneCode, n.systemDefaults, n.getTwilioConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto)
 	if err != nil {
 		return err
 	}
@@ -351,7 +362,7 @@ func (n *Notification) handlePasswordlessRegistrationLink(event *models.Event) (
 		return err
 	}
 
-	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.AesCrypto, colors, n.assetsPrefix)
+	err = types.SendPasswordlessRegistrationLink(ctx, string(template.Template), translator, user, addedEvent, n.systemDefaults, n.getSMTPConfig, n.getFileSystemProvider, n.getLogProvider, n.userDataCrypto, colors, n.assetsPrefix)
 	if err != nil {
 		return err
 	}

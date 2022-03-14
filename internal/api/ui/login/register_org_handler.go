@@ -65,12 +65,12 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordlessInitCode, l.UserCodeAlg)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordlessInitCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
 	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.UserCodeAlg)
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOrg(w, r, authRequest, data, err)
 		return
@@ -81,7 +81,7 @@ func (l *Login) handleRegisterOrgCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authRequest == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		http.Redirect(w, r, l.consolePath, http.StatusFound)
 		return
 	}
 	l.renderNextStep(w, r, authRequest)

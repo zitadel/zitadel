@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/admin/repository"
@@ -9,6 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/admin"
 )
@@ -26,22 +26,27 @@ type Server struct {
 	administrator   repository.AdministratorRepository
 	iamDomain       string
 	assetsAPIDomain string
-
-	UserCodeAlg crypto.EncryptionAlgorithm
+	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, iamDomain, assetsAPIDomain string, userCrypto *crypto.AESCrypto) *Server {
+func CreateServer(command *command.Commands,
+	query *query.Queries,
+	repo repository.Repository,
+	iamDomain,
+	assetsAPIDomain string,
+	userCodeAlg crypto.EncryptionAlgorithm,
+) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		administrator:   repo,
 		iamDomain:       iamDomain,
 		assetsAPIDomain: assetsAPIDomain,
-		UserCodeAlg:     userCrypto,
+		userCodeAlg:     userCodeAlg,
 	}
 }
 

@@ -18,8 +18,8 @@ type AESCrypto struct {
 	keyIDs          []string
 }
 
-func NewAESCrypto(config *KeyConfig) (*AESCrypto, error) {
-	keys, ids, err := LoadKeys(config)
+func NewAESCrypto(config *KeyConfig, keyStorage KeyStorage) (*AESCrypto, error) {
+	keys, ids, err := LoadKeys(config, keyStorage)
 	if err != nil {
 		return nil, err
 	}

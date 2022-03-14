@@ -188,30 +188,6 @@ Update twilio sms provider token
     PUT: /sms/twilio/{id}/token
 
 
-### GetFileSystemNotificationProvider
-
-> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
-[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
-
-Get file system notification provider
-
-
-
-    GET: /notification/provider/file
-
-
-### GetLogNotificationProvider
-
-> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
-[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
-
-Get log notification provider
-
-
-
-    GET: /notification/provider/log
-
-
 ### GetOIDCSettings
 
 > **rpc** GetOIDCSettings([GetOIDCSettingsRequest](#getoidcsettingsrequest))
@@ -234,6 +210,30 @@ Update oidc settings (e.g token lifetimes, etc)
 
 
     PUT: /settings/oidc
+
+
+### GetFileSystemNotificationProvider
+
+> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
+[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+
+Get file system notification provider
+
+
+
+    GET: /notification/provider/file
+
+
+### GetLogNotificationProvider
+
+> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
+[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+
+Get log notification provider
+
+
+
+    GET: /notification/provider/log
 
 
 ### GetOrgByID

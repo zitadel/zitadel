@@ -74,7 +74,7 @@ func (l *Login) handleExternalLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		http.Redirect(w, r, l.consolePath, http.StatusFound)
 		return
 	}
 	l.handleIDP(w, r, authReq, data.IDPConfigID)
@@ -121,7 +121,7 @@ func (l *Login) handleJWTAuthorize(w http.ResponseWriter, r *http.Request, authR
 		l.renderLogin(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-dsgg3", "Errors.AuthRequest.UserAgentNotFound"))
 		return
 	}
-	nonce, err := l.IDPConfigAesCrypto.Encrypt([]byte(userAgentID))
+	nonce, err := l.idpConfigAlg.Encrypt([]byte(userAgentID))
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -167,7 +167,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 }
 
 func (l *Login) getRPConfig(idpConfig *iam_model.IDPConfigView, callbackEndpoint string) (rp.RelyingParty, error) {
-	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.IDPConfigAesCrypto)
+	oidcClientSecret, err := crypto.DecryptString(idpConfig.OIDCClientSecret, l.idpConfigAlg)
 	if err != nil {
 		return nil, err
 	}
