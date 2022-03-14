@@ -12,7 +12,7 @@ CREATE TABLE eventstore.events (
 	, editor_user TEXT NOT NULL 
 	, editor_service TEXT NOT NULL
 	, resource_owner TEXT NOT NULL
-    , tenant TEXT
+	, tenant TEXT
 
 	, PRIMARY KEY (event_sequence DESC) USING HASH WITH BUCKET_COUNT = 10
 	, INDEX agg_type_agg_id (aggregate_type, aggregate_id)
