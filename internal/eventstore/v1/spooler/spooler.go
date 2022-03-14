@@ -6,11 +6,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/caos/logging"
 	"github.com/getsentry/sentry-go"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
-
-	"github.com/caos/logging"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -141,7 +140,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	}
 	factory := models.FactoryFromSearchQuery(query)
 	sequence, err := s.eventstore.LatestSequence(ctx, factory)
-	logging.New().OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
+	logging.OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
 	var processedSequence uint64
 	for _, filter := range query.Filters {
 		if filter.GetField() == models.Field_LatestSequence {

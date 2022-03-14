@@ -145,12 +145,13 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
+func (builder *SearchQueryBuilder) build(tenantID string) (*repository.SearchQuery, error) {
 	if builder == nil ||
 		len(builder.queries) < 1 ||
 		builder.columns.Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
+	builder.tenant = tenantID
 	filters := make([][]*repository.Filter, len(builder.queries))
 
 	for i, query := range builder.queries {

@@ -113,8 +113,7 @@ func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (unique
 //Filter filters the stored events based on the searchQuery
 // and maps the events to the defined event structs
 func (es *Eventstore) Filter(ctx context.Context, queryFactory *SearchQueryBuilder) ([]Event, error) {
-	queryFactory.tenant = authz.GetCtxData(ctx).TenantID
-	query, err := queryFactory.build()
+	query, err := queryFactory.build(authz.GetCtxData(ctx).TenantID)
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +170,7 @@ func (es *Eventstore) FilterToReducer(ctx context.Context, searchQuery *SearchQu
 
 //LatestSequence filters the latest sequence for the given search query
 func (es *Eventstore) LatestSequence(ctx context.Context, queryFactory *SearchQueryBuilder) (uint64, error) {
-	queryFactory.tenant = authz.GetCtxData(ctx).TenantID
-	query, err := queryFactory.build()
+	query, err := queryFactory.build(authz.GetCtxData(ctx).TenantID)
 	if err != nil {
 		return 0, err
 	}

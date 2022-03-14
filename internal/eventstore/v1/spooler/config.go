@@ -4,9 +4,9 @@ import (
 	"math/rand"
 	"os"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
-
 	"github.com/caos/logging"
+
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/id"
 )
@@ -22,7 +22,7 @@ func (c *Config) New() *Spooler {
 	lockID, err := os.Hostname()
 	if err != nil || lockID == "" {
 		lockID, err = id.SonyFlakeGenerator.Next()
-		logging.New().OnError(err).Panic("unable to generate lockID")
+		logging.OnError(err).Panic("unable to generate lockID")
 	}
 
 	//shuffle the handlers for better balance when running multiple pods
