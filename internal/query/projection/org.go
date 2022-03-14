@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -87,8 +85,7 @@ func (p *OrgProjection) reducers() []handler.AggregateReducer {
 func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence(), "expectedType", org.OrgAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.OrgAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -107,8 +104,7 @@ func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Stateme
 func (p *OrgProjection) reduceOrgChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-q4oq8", "seq", event.Sequence(), "expected", org.OrgChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Bg8oM", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.OrgChangedEventType)
 	}
 	if e.Name == "" {
 		return crdb.NewNoOpStatement(e), nil
@@ -129,8 +125,7 @@ func (p *OrgProjection) reduceOrgChanged(event eventstore.Event) (*handler.State
 func (p *OrgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgDeactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-1gwdc", "seq", event.Sequence(), "expectedType", org.OrgDeactivatedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BApK4", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BApK4", "reduce.wrong.event.type %s", org.OrgDeactivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -148,8 +143,7 @@ func (p *OrgProjection) reduceOrgDeactivated(event eventstore.Event) (*handler.S
 func (p *OrgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgReactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Vjwiy", "seq", event.Sequence(), "expectedType", org.OrgReactivatedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-o37De", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o37De", "reduce.wrong.event.type %s", org.OrgReactivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -167,8 +161,7 @@ func (p *OrgProjection) reduceOrgReactivated(event eventstore.Event) (*handler.S
 func (p *OrgProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-79OhB", "seq", event.Sequence(), "expectedType", org.OrgDomainPrimarySetEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-4TbKT", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4TbKT", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,

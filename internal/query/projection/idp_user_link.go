@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -104,8 +102,7 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-v2qC3", "seq", event.Sequence(), "expectedType", user.UserIDPLinkAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DpmXq", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DpmXq", "reduce.wrong.event.type %s", user.UserIDPLinkAddedType)
 	}
 
 	return crdb.NewCreateStatement(e,
@@ -125,8 +122,7 @@ func (p *IDPUserLinkProjection) reduceAdded(event eventstore.Event) (*handler.St
 func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", user.UserIDPLinkRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", user.UserIDPLinkRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -141,8 +137,7 @@ func (p *IDPUserLinkProjection) reduceRemoved(event eventstore.Event) (*handler.
 func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserIDPLinkCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-I0s2H", "seq", event.Sequence(), "expectedType", user.UserIDPLinkCascadeRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jQpv9", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jQpv9", "reduce.wrong.event.type %s", user.UserIDPLinkCascadeRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -157,8 +152,7 @@ func (p *IDPUserLinkProjection) reduceCascadeRemoved(event eventstore.Event) (*h
 func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zX5m9", "seq", event.Sequence(), "expectedType", org.OrgRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AZmfJ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AZmfJ", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -171,8 +165,7 @@ func (p *IDPUserLinkProjection) reduceOrgRemoved(event eventstore.Event) (*handl
 func (p *IDPUserLinkProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-yM6u6", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uwlWE", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uwlWE", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(e,
@@ -191,8 +184,7 @@ func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	case *iam.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-iCKSj", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,

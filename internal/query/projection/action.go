@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -89,8 +87,7 @@ func (p *ActionProjection) reducers() []handler.AggregateReducer {
 func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.AddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Sgg31", "seq", event.Sequence, "expectedType", action.AddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dff21", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff21", "reduce.wrong.event.type% s", action.AddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -112,8 +109,7 @@ func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 func (p *ActionProjection) reduceActionChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Dg2th", "seq", event.Sequence, "expected", action.ChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Gg43d", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Gg43d", "reduce.wrong.event.type %s", action.ChangedEventType)
 	}
 	values := []handler.Column{
 		handler.NewCol(ActionChangeDateCol, e.CreationDate()),
@@ -143,8 +139,7 @@ func (p *ActionProjection) reduceActionChanged(event eventstore.Event) (*handler
 func (p *ActionProjection) reduceActionDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.DeactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Fhhjd", "seq", event.Sequence, "expectedType", action.DeactivatedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Fgh32", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Fgh32", "reduce.wrong.event.type %s", action.DeactivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -162,8 +157,7 @@ func (p *ActionProjection) reduceActionDeactivated(event eventstore.Event) (*han
 func (p *ActionProjection) reduceActionReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.ReactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Fg4r3", "seq", event.Sequence, "expectedType", action.ReactivatedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-hwdqa", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-hwdqa", "reduce.wrong.event.type% s", action.ReactivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -181,8 +175,7 @@ func (p *ActionProjection) reduceActionReactivated(event eventstore.Event) (*han
 func (p *ActionProjection) reduceActionRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*action.RemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Dgwh2", "seq", event.Sequence, "expectedType", action.RemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dgh2d", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dgh2d", "reduce.wrong.event.type% s", action.RemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

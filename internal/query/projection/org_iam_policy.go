@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -100,8 +98,7 @@ func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 		policyEvent = e.OrgIAMPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-XakxJ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-CSE7A", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -125,8 +122,7 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	case *iam.OrgIAMPolicyChangedEvent:
 		policyEvent = e.OrgIAMPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-SvTK0", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-qgVug", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(OrgIAMPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -146,8 +142,7 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.OrgIAMPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-ovQya", "seq", event.Sequence(), "expectedType", org.OrgIAMPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-JAENd", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JAENd", "reduce.wrong.event.type %s", org.OrgIAMPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

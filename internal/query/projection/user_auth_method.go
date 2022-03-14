@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -114,8 +112,7 @@ func (p *UserAuthMethodProjection) reduceInitAuthMethod(event eventstore.Event) 
 	case *user.HumanOTPAddedEvent:
 		methodType = domain.UserAuthMethodTypeOTP
 	default:
-		logging.LogWithFields("PROJE-9j3f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-f92f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
 
 	return crdb.NewUpsertStatement(
@@ -152,8 +149,7 @@ func (p *UserAuthMethodProjection) reduceActivateEvent(event eventstore.Event) (
 		methodType = domain.UserAuthMethodTypeOTP
 
 	default:
-		logging.LogWithFields("PROJE-9j3f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-f92f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -187,8 +183,7 @@ func (p *UserAuthMethodProjection) reduceRemoveAuthMethod(event eventstore.Event
 		methodType = domain.UserAuthMethodTypeOTP
 
 	default:
-		logging.LogWithFields("PROJE-9j3f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-f92f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-f92f", "reduce.wrong.event.type %v", []eventstore.EventType{user.HumanPasswordlessTokenAddedType, user.HumanU2FTokenAddedType})
 	}
 	conditions := []handler.Condition{
 		handler.NewCond(UserAuthMethodUserIDCol, event.Aggregate().ID),

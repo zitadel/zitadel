@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -137,8 +136,7 @@ func (p *UserGrantProjection) reducers() []handler.AggregateReducer {
 func (p *UserGrantProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*usergrant.UserGrantAddedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-WYOHD", "seq", event.Sequence(), "expectedType", usergrant.UserGrantAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-MQHVB", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-MQHVB", "reduce.wrong.event.type %s", usergrant.UserGrantAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -166,8 +164,7 @@ func (p *UserGrantProjection) reduceChanged(event eventstore.Event) (*handler.St
 	case *usergrant.UserGrantCascadeChangedEvent:
 		roles = e.RoleKeys
 	default:
-		logging.LogWithFields("PROJE-dIflx", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-hOr1E", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-hOr1E", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantChangedType, usergrant.UserGrantCascadeChangedType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -188,8 +185,7 @@ func (p *UserGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 	case *usergrant.UserGrantRemovedEvent, *usergrant.UserGrantCascadeRemovedEvent:
 		// ok
 	default:
-		logging.LogWithFields("PROJE-Nw0cR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{usergrant.UserGrantRemovedType, usergrant.UserGrantCascadeRemovedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-7OBEC", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-7OBEC", "reduce.wrong.event.type %v", []eventstore.EventType{usergrant.UserGrantRemovedType, usergrant.UserGrantCascadeRemovedType})
 	}
 
 	return crdb.NewDeleteStatement(
@@ -202,8 +198,7 @@ func (p *UserGrantProjection) reduceRemoved(event eventstore.Event) (*handler.St
 
 func (p *UserGrantProjection) reduceDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
-		logging.LogWithFields("PROJE-V3txf", "seq", event.Sequence(), "expectedType", usergrant.UserGrantDeactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-oP7Gm", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-oP7Gm", "reduce.wrong.event.type %s", usergrant.UserGrantDeactivatedType)
 	}
 
 	return crdb.NewUpdateStatement(
@@ -221,8 +216,7 @@ func (p *UserGrantProjection) reduceDeactivated(event eventstore.Event) (*handle
 
 func (p *UserGrantProjection) reduceReactivated(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*usergrant.UserGrantDeactivatedEvent); !ok {
-		logging.LogWithFields("PROJE-ly6oe", "seq", event.Sequence(), "expectedType", usergrant.UserGrantReactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-DGsKh", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-DGsKh", "reduce.wrong.event.type %s", usergrant.UserGrantReactivatedType)
 	}
 
 	return crdb.NewUpdateStatement(
@@ -240,8 +234,7 @@ func (p *UserGrantProjection) reduceReactivated(event eventstore.Event) (*handle
 
 func (p *UserGrantProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*user.UserRemovedEvent); !ok {
-		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bner2a", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bner2a", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(
@@ -254,8 +247,7 @@ func (p *UserGrantProjection) reduceUserRemoved(event eventstore.Event) (*handle
 
 func (p *UserGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	if _, ok := event.(*project.ProjectRemovedEvent); !ok {
-		logging.LogWithFields("PROJE-Vfeg3", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bne2a", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bne2a", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(
@@ -269,8 +261,7 @@ func (p *UserGrantProjection) reduceProjectRemoved(event eventstore.Event) (*han
 func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-DGfe2", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-dGr2a", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dGr2a", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(
@@ -284,8 +275,7 @@ func (p *UserGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) 
 func (p *UserGrantProjection) reduceRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-Edg22", "seq", event.Sequence(), "expectedType", project.RoleRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-dswg2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dswg2", "reduce.wrong.event.type %s", project.RoleRemovedType)
 	}
 
 	return crdb.NewUpdateStatement(
@@ -310,8 +300,7 @@ func (p *UserGrantProjection) reduceProjectGrantChanged(event eventstore.Event) 
 		grantID = e.GrantID
 		keys = e.RoleKeys
 	default:
-		logging.LogWithFields("PROJE-FGgw2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.GrantChangedType, project.GrantCascadeChangedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Fh3gw", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Fh3gw", "reduce.wrong.event.type %v", []eventstore.EventType{project.GrantChangedType, project.GrantCascadeChangedType})
 	}
 
 	return crdb.NewUpdateStatement(

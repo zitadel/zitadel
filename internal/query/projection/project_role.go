@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -82,8 +80,7 @@ func (p *ProjectRoleProjection) reducers() []handler.AggregateReducer {
 func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Fmre5", "seq", event.Sequence(), "expectedType", project.RoleAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g92Fg", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.RoleAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -104,8 +101,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-M0fwg", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sM0f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sM0f", "reduce.wrong.event.type %s", project.GrantChangedType)
 	}
 	if e.DisplayName == nil && e.Group == nil {
 		return crdb.NewNoOpStatement(e), nil
@@ -132,8 +128,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleChanged(event eventstore.Event)
 func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.RoleRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-MlokF", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-L0fJf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-L0fJf", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -147,8 +142,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleRemoved(event eventstore.Event)
 func (p *ProjectRoleProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-hm90R", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-l0geG", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-l0geG", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

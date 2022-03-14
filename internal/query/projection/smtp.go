@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -83,8 +81,7 @@ func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMTPConfigAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-wkofs", "seq", event.Sequence(), "expectedType", iam.SMTPConfigAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sk99F", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", iam.SMTPConfigAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -107,8 +104,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMTPConfigChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-wo00f", "seq", event.Sequence(), "expected", iam.SMTPConfigChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-wl0wd", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-wl0wd", "reduce.wrong.event.type %s", iam.SMTPConfigChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 7)
@@ -141,8 +137,7 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 func (p *SMTPConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMTPConfigPasswordChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-f92sf", "seq", event.Sequence(), "expected", iam.SMTPConfigChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fk02f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fk02f", "reduce.wrong.event.type %s", iam.SMTPConfigChangedEventType)
 	}
 
 	return crdb.NewUpdateStatement(

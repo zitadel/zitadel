@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -69,8 +67,7 @@ func (p *FlowProjection) reducers() []handler.AggregateReducer {
 func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.TriggerActionsSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", org.TriggerActionsSetEventType).Error("was not an trigger actions set event")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.TriggerActionsSetEventType)
 	}
 	stmts := make([]func(reader eventstore.Event) crdb.Exec, len(e.ActionIDs)+1)
 	stmts[0] = crdb.AddDeleteStatement(
@@ -98,8 +95,7 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FlowClearedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zWCk3", "seq", event.Sequence, "expectedType", org.FlowClearedEventType).Error("was not a flow cleared event")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.FlowClearedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

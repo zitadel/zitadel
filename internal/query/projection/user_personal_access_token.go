@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -80,8 +79,7 @@ func (p *PersonalAccessTokenProjection) reducers() []handler.AggregateReducer {
 func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Dbfg2", "seq", event.Sequence(), "expectedType", user.PersonalAccessTokenAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DVgf7", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DVgf7", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -101,8 +99,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Edf32", "seq", event.Sequence(), "expectedType", user.PersonalAccessTokenRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g7u3F", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g7u3F", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -115,8 +112,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 func (p *PersonalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-GEg43", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dff3h", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff3h", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

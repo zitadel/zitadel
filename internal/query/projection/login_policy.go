@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -151,8 +149,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		policyEvent = e.LoginPolicyAddedEvent
 		isDefault = false
 	default:
-		logging.LogWithFields("HANDL-IW6So", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(&policyEvent, []handler.Column{
@@ -183,8 +180,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	case *org.LoginPolicyChangedEvent:
 		policyEvent = e.LoginPolicyChangedEvent
 	default:
-		logging.LogWithFields("HANDL-NIvFo", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyChangedEventType, iam.LoginPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BpaO6", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BpaO6", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyChangedEventType, iam.LoginPolicyChangedEventType})
 	}
 
 	cols := []handler.Column{
@@ -242,8 +238,7 @@ func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 	case *org.LoginPolicyMultiFactorAddedEvent:
 		policyEvent = e.MultiFactorAddedEvent
 	default:
-		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, iam.LoginPolicyMultiFactorAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WMhAV", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, iam.LoginPolicyMultiFactorAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -267,8 +262,7 @@ func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 	case *org.LoginPolicyMultiFactorRemovedEvent:
 		policyEvent = e.MultiFactorRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-vtC31", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, iam.LoginPolicyMultiFactorRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-czU7n", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-czU7n", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, iam.LoginPolicyMultiFactorRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -287,8 +281,7 @@ func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.LoginPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-gF5q6", "seq", event.Sequence(), "expectedType", org.LoginPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-oRSvD", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-oRSvD", "reduce.wrong.event.type %s", org.LoginPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -306,8 +299,7 @@ func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 	case *org.LoginPolicySecondFactorAddedEvent:
 		policyEvent = e.SecondFactorAddedEvent
 	default:
-		logging.LogWithFields("HANDL-dwadQ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, iam.LoginPolicySecondFactorAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-agB2E", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-agB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, iam.LoginPolicySecondFactorAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -331,8 +323,7 @@ func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 	case *org.LoginPolicySecondFactorRemovedEvent:
 		policyEvent = e.SecondFactorRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-2IE8Y", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, iam.LoginPolicySecondFactorRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-KYJvA", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-KYJvA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, iam.LoginPolicySecondFactorRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(

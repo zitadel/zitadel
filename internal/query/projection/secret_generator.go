@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -85,8 +83,7 @@ func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
 func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SecretGeneratorAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-nf9sl", "seq", event.Sequence(), "expectedType", iam.SecretGeneratorAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sk99F", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", iam.SecretGeneratorAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -110,8 +107,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SecretGeneratorChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-sn9jd", "seq", event.Sequence(), "expected", iam.SecretGeneratorChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-s00Fs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", iam.SecretGeneratorChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 7)
@@ -148,8 +144,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 func (p *SecretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SecretGeneratorRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-30oEF", "seq", event.Sequence(), "expectedType", iam.SecretGeneratorRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fmiIf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", iam.SecretGeneratorRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

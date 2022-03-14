@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -80,8 +78,7 @@ func (p *UserMetadataProjection) reducers() []handler.AggregateReducer {
 func (p *UserMetadataProjection) reduceMetadataSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Sgn5w", "seq", event.Sequence(), "expectedType", user.MetadataSetType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Ghn52", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Ghn52", "reduce.wrong.event.type %s", user.MetadataSetType)
 	}
 	return crdb.NewUpsertStatement(
 		e,
@@ -100,8 +97,7 @@ func (p *UserMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 func (p *UserMetadataProjection) reduceMetadataRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.MetadataRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Dbfg2", "seq", event.Sequence(), "expectedType", user.MetadataRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Bm542", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bm542", "reduce.wrong.event.type %s", user.MetadataRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -118,8 +114,7 @@ func (p *UserMetadataProjection) reduceMetadataRemovedAll(event eventstore.Event
 		*user.UserRemovedEvent:
 		//ok
 	default:
-		logging.LogWithFields("HANDL-Dfbh2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.MetadataRemovedAllType, user.UserRemovedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Bmnf2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bmnf2", "reduce.wrong.event.type %v", []eventstore.EventType{user.MetadataRemovedAllType, user.UserRemovedType})
 	}
 	return crdb.NewDeleteStatement(
 		event,

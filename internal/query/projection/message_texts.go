@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -113,8 +111,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	case *iam.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
 	default:
-		logging.LogWithFields("PROJE-2N9fg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n90r", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -163,8 +160,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	case *iam.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-3m022", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-fm0ge", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -213,8 +209,7 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 	case *iam.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-m03ng", "seq", event.Sequence(), "expectedType", org.CustomTextTemplateRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n9rs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n9rs", "reduce.wrong.event.type %s", org.CustomTextTemplateRemovedEventType)
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil

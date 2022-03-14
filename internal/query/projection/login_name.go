@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -217,8 +215,7 @@ func (p *LoginNameProjection) reduceUserCreated(event eventstore.Event) (*handle
 	case *user.MachineAddedEvent:
 		userName = e.UserName
 	default:
-		logging.LogWithFields("HANDL-tDUx3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{user.UserV1AddedType, user.HumanAddedType, user.UserV1RegisteredType, user.HumanRegisteredType, user.MachineAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ayo69", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ayo69", "reduce.wrong.event.type %v", []eventstore.EventType{user.UserV1AddedType, user.HumanAddedType, user.UserV1RegisteredType, user.HumanRegisteredType, user.MachineAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(
@@ -235,8 +232,7 @@ func (p *LoginNameProjection) reduceUserCreated(event eventstore.Event) (*handle
 func (p *LoginNameProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-8XEdC", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-QIe3C", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QIe3C", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 
 	return crdb.NewDeleteStatement(
@@ -251,8 +247,7 @@ func (p *LoginNameProjection) reduceUserRemoved(event eventstore.Event) (*handle
 func (p *LoginNameProjection) reduceUserNameChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UsernameChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-UGo7U", "seq", event.Sequence(), "expectedType", user.UserUserNameChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-QlwjC", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-QlwjC", "reduce.wrong.event.type %s", user.UserUserNameChangedType)
 	}
 
 	return crdb.NewUpdateStatement(
@@ -270,8 +265,7 @@ func (p *LoginNameProjection) reduceUserNameChanged(event eventstore.Event) (*ha
 func (p *LoginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.DomainClaimedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zIbyU", "seq", event.Sequence(), "expectedType", user.UserDomainClaimedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-AQMBY", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-AQMBY", "reduce.wrong.event.type %s", user.UserDomainClaimedType)
 	}
 
 	return crdb.NewUpdateStatement(
@@ -300,8 +294,7 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*
 		policyEvent = &e.OrgIAMPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("HANDL-PQluH", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-yCV6S", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-yCV6S", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(
@@ -324,8 +317,7 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyChanged(event eventstore.Event) 
 	case *iam.OrgIAMPolicyChangedEvent:
 		policyEvent = &e.OrgIAMPolicyChangedEvent
 	default:
-		logging.LogWithFields("HANDL-Z27QN", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ArFDd", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ArFDd", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType})
 	}
 
 	if policyEvent.UserLoginMustBeDomain == nil {
@@ -347,8 +339,7 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyChanged(event eventstore.Event) 
 func (p *LoginNameProjection) reduceOrgIAMPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.OrgIAMPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-1ZFHL", "seq", event.Sequence(), "expectedType", org.OrgIAMPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ysEeB", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ysEeB", "reduce.wrong.event.type %s", org.OrgIAMPolicyRemovedEventType)
 	}
 
 	return crdb.NewDeleteStatement(
@@ -363,8 +354,7 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyRemoved(event eventstore.Event) 
 func (p *LoginNameProjection) reduceDomainVerified(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainVerifiedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Rr7Tq", "seq", event.Sequence(), "expectedType", org.OrgDomainVerifiedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-weGAh", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-weGAh", "reduce.wrong.event.type %s", org.OrgDomainVerifiedEventType)
 	}
 
 	return crdb.NewCreateStatement(
@@ -380,8 +370,7 @@ func (p *LoginNameProjection) reduceDomainVerified(event eventstore.Event) (*han
 func (p *LoginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainPrimarySetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-0L5tW", "seq", event.Sequence(), "expectedType", org.OrgDomainPrimarySetEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-eOXPN", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eOXPN", "reduce.wrong.event.type %s", org.OrgDomainPrimarySetEventType)
 	}
 
 	return crdb.NewMultiStatement(
@@ -412,8 +401,7 @@ func (p *LoginNameProjection) reducePrimaryDomainSet(event eventstore.Event) (*h
 func (p *LoginNameProjection) reduceDomainRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.DomainRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-reP2u", "seq", event.Sequence(), "expectedType", org.OrgDomainRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-4RHYq", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4RHYq", "reduce.wrong.event.type %s", org.OrgDomainRemovedEventType)
 	}
 
 	return crdb.NewDeleteStatement(

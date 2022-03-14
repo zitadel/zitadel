@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/settings"
 
@@ -99,8 +97,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		providerEvent = e.DebugNotificationProviderAddedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileAddedEventType, iam.DebugNotificationProviderLogAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{iam.DebugNotificationProviderFileAddedEventType, iam.DebugNotificationProviderLogAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(&providerEvent, []handler.Column{
@@ -126,8 +123,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		providerEvent = e.DebugNotificationProviderChangedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileChangedEventType, iam.DebugNotificationProviderLogChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{iam.DebugNotificationProviderFileChangedEventType, iam.DebugNotificationProviderLogChangedEventType})
 	}
 
 	cols := []handler.Column{
@@ -159,8 +155,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		providerEvent = e.DebugNotificationProviderRemovedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileRemovedEventType, iam.DebugNotificationProviderLogRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-dow9f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dow9f", "reduce.wrong.event.type %v", []eventstore.EventType{iam.DebugNotificationProviderFileRemovedEventType, iam.DebugNotificationProviderLogRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(

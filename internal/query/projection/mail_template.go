@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -98,8 +96,7 @@ func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 		templateEvent = e.MailTemplateAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-94jfG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateAddedEventType, iam.MailTemplateAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-0pJ3f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-0pJ3f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateAddedEventType, iam.MailTemplateAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&templateEvent,
@@ -122,8 +119,7 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 	case *iam.MailTemplateChangedEvent:
 		policyEvent = e.MailTemplateChangedEvent
 	default:
-		logging.LogWithFields("PROJE-02J9f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateChangedEventType, iam.MailTemplateChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-gJ03f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gJ03f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateChangedEventType, iam.MailTemplateChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(MailTemplateChangeDateCol, policyEvent.CreationDate()),
@@ -143,8 +139,7 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 func (p *MailTemplateProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.MailTemplateRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-2m0fp", "seq", event.Sequence(), "expectedType", org.MailTemplateRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-3jJGs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-3jJGs", "reduce.wrong.event.type %s", org.MailTemplateRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

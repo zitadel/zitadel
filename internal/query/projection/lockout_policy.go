@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -102,8 +100,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		policyEvent = e.LockoutPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-uFqFM", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LockoutPolicyAddedEventType, iam.LockoutPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-d8mZO", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, iam.LockoutPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -128,8 +125,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	case *iam.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-iIkej", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LockoutPolicyChangedEventType, iam.LockoutPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-pT3mQ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, iam.LockoutPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(LockoutPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -152,8 +148,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 func (p *LockoutPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.LockoutPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-U5cys", "seq", event.Sequence(), "expectedType", org.LockoutPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Bqut9", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Bqut9", "reduce.wrong.event.type %s", org.LockoutPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

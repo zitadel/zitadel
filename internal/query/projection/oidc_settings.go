@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -76,8 +74,7 @@ func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
 func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.OIDCSettingsAddedEvent)
 	if !ok {
-		logging.WithFields("seq", event.Sequence(), "expectedType", iam.OIDCSettingsAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-f9nwf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-f9nwf", "reduce.wrong.event.type %s", iam.OIDCSettingsAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -98,8 +95,7 @@ func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 func (p *OIDCSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.OIDCSettingsChangedEvent)
 	if !ok {
-		logging.WithFields("seq", event.Sequence(), "expected", iam.OIDCSettingsChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-8JJ2d", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-8JJ2d", "reduce.wrong.event.type %s", iam.OIDCSettingsChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 6)

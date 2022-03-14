@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -105,8 +103,7 @@ func (p *CustomTextProjection) reduceSet(event eventstore.Event) (*handler.State
 		customTextEvent = e.CustomTextSetEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-g0Jfs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KKfw4", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KKfw4", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType})
 	}
 	return crdb.NewUpsertStatement(
 		&customTextEvent,
@@ -131,8 +128,7 @@ func (p *CustomTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	case *iam.CustomTextRemovedEvent:
 		customTextEvent = e.CustomTextRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-2Nigw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-n9wJg", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-n9wJg", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType})
 	}
 	return crdb.NewDeleteStatement(
 		&customTextEvent,
@@ -152,8 +148,7 @@ func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 	case *iam.CustomTextTemplateRemovedEvent:
 		customTextEvent = e.CustomTextTemplateRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-J9wfg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, iam.CustomTextTemplateRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-29iPf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-29iPf", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, iam.CustomTextTemplateRemovedEventType})
 	}
 	return crdb.NewDeleteStatement(
 		&customTextEvent,

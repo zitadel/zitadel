@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -101,8 +99,7 @@ func (p *KeyProjection) reducers() []handler.AggregateReducer {
 func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-GEdg3", "seq", event.Sequence(), "expectedType", keypair.AddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-SAbr2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-SAbr2", "reduce.wrong.event.type %s", keypair.AddedEventType)
 	}
 	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
 		return crdb.NewNoOpStatement(e), nil
@@ -136,7 +133,6 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
 		if err != nil {
-			logging.LogWithFields("HANDL-SDfw2", "seq", event.Sequence()).Error("cannot decrypt public key")
 			return nil, errors.ThrowInternal(err, "HANDL-DAg2f", "cannot decrypt public key")
 		}
 		creates = append(creates, crdb.AddCreateStatement(

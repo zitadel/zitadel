@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -77,8 +75,7 @@ func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
 func (p *IAMMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-c8SBb", "seq", event.Sequence(), "expectedType", iam.MemberAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pGNCu", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", iam.MemberAddedEventType)
 	}
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(IAMMemberIAMIDCol, e.Aggregate().ID))
 }
@@ -86,8 +83,7 @@ func (p *IAMMemberProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 func (p *IAMMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-QsjwO", "seq", event.Sequence(), "expected", iam.MemberChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-5WQcZ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5WQcZ", "reduce.wrong.event.type %s", iam.MemberChangedEventType)
 	}
 	return reduceMemberChanged(e.MemberChangedEvent)
 }
@@ -95,8 +91,7 @@ func (p *IAMMemberProjection) reduceChanged(event eventstore.Event) (*handler.St
 func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-mOncs", "seq", event.Sequence(), "expected", iam.MemberCascadeRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dmdf2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dmdf2", "reduce.wrong.event.type %s", iam.MemberCascadeRemovedEventType)
 	}
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent)
 }
@@ -104,8 +99,7 @@ func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*han
 func (p *IAMMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.MemberRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-lW1Zv", "seq", event.Sequence(), "expected", iam.MemberRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-exVqy", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-exVqy", "reduce.wrong.event.type %s", iam.MemberRemovedEventType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.UserID))
 }
@@ -113,8 +107,7 @@ func (p *IAMMemberProjection) reduceRemoved(event eventstore.Event) (*handler.St
 func (p *IAMMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-rBuvT", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-mkDHF", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-mkDHF", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }

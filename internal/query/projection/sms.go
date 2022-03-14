@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -99,8 +97,7 @@ func (p *SMSConfigProjection) reducers() []handler.AggregateReducer {
 func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMSConfigTwilioAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-9jiWf", "seq", event.Sequence(), "expectedType", iam.SMSConfigTwilioAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-s8efs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s8efs", "reduce.wrong.event.type %s", iam.SMSConfigTwilioAddedEventType)
 	}
 
 	return crdb.NewMultiStatement(
@@ -131,8 +128,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMSConfigTwilioChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-fm9el", "seq", event.Sequence(), "expectedType", iam.SMSConfigTwilioChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fi99F", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fi99F", "reduce.wrong.event.type %s", iam.SMSConfigTwilioChangedEventType)
 	}
 	columns := make([]handler.Column, 0)
 	if e.SID != nil {
@@ -166,8 +162,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioChanged(event eventstore.Even
 func (p *SMSConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMSConfigActivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-fm03F", "seq", event.Sequence(), "expectedType", iam.SMSConfigActivatedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fj9Ef", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fj9Ef", "reduce.wrong.event.type %s", iam.SMSConfigActivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -185,8 +180,7 @@ func (p *SMSConfigProjection) reduceSMSConfigActivated(event eventstore.Event) (
 func (p *SMSConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMSConfigDeactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-9fnHS", "seq", event.Sequence(), "expectedType", iam.SMSConfigDeactivatedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-dj9Js", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dj9Js", "reduce.wrong.event.type %s", iam.SMSConfigDeactivatedEventType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -204,8 +198,7 @@ func (p *SMSConfigProjection) reduceSMSConfigDeactivated(event eventstore.Event)
 func (p *SMSConfigProjection) reduceSMSConfigRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SMSConfigRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-0Opew", "seq", event.Sequence(), "expectedType", iam.SMSConfigRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-s9JJf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s9JJf", "reduce.wrong.event.type %s", iam.SMSConfigRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

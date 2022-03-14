@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -84,8 +82,7 @@ func (p *IAMProjection) reducers() []handler.AggregateReducer {
 func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.GlobalOrgSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-3n89fs", "seq", event.Sequence(), "expectedType", iam.GlobalOrgSetEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-2n9f2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", iam.GlobalOrgSetEventType)
 	}
 	return crdb.NewUpsertStatement(
 		e,
@@ -101,8 +98,7 @@ func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Sta
 func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.ProjectSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-2j9fw", "seq", event.Sequence(), "expectedType", iam.ProjectSetEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-30o0e", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", iam.ProjectSetEventType)
 	}
 	return crdb.NewUpsertStatement(
 		e,
@@ -118,8 +114,7 @@ func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.St
 func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.DefaultLanguageSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-3n9le", "seq", event.Sequence(), "expectedType", iam.DefaultLanguageSetEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-30o0e", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", iam.DefaultLanguageSetEventType)
 	}
 	return crdb.NewUpsertStatement(
 		e,
@@ -135,8 +130,7 @@ func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handl
 func (p *IAMProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*iam.SetupStepEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-39fjw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.SetupDoneEventType, iam.SetupStartedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-d9nfw", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-d9nfw", "reduce.wrong.event.type %v", []eventstore.EventType{iam.SetupDoneEventType, iam.SetupStartedEventType})
 	}
 	columns := []handler.Column{
 		handler.NewCol(IAMColumnID, e.Aggregate().ID),

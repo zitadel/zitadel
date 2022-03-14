@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -79,8 +77,7 @@ func (p *OrgMemberProjection) reducers() []handler.AggregateReducer {
 func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-BoKBr", "seq", event.Sequence(), "expectedType", org.MemberAddedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-uYq4r", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-uYq4r", "reduce.wrong.event.type %s", org.MemberAddedEventType)
 	}
 	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
@@ -88,8 +85,7 @@ func (p *OrgMemberProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-bfqNl", "seq", event.Sequence(), "expected", org.MemberChangedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Bg8oM", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Bg8oM", "reduce.wrong.event.type %s", org.MemberChangedEventType)
 	}
 	return reduceMemberChanged(e.MemberChangedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
@@ -97,8 +93,7 @@ func (p *OrgMemberProjection) reduceChanged(event eventstore.Event) (*handler.St
 func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-zgb6w", "seq", event.Sequence(), "expected", org.MemberCascadeRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-4twP2", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-4twP2", "reduce.wrong.event.type %s", org.MemberCascadeRemovedEventType)
 	}
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }
@@ -106,8 +101,7 @@ func (p *OrgMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*han
 func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.MemberRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-KPyxE", "seq", event.Sequence(), "expected", org.MemberRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-avatH", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-avatH", "reduce.wrong.event.type %s", org.MemberRemovedEventType)
 	}
 	return reduceMemberRemoved(e,
 		withMemberCond(MemberUserIDCol, e.UserID),
@@ -118,8 +112,7 @@ func (p *OrgMemberProjection) reduceRemoved(event eventstore.Event) (*handler.St
 func (p *OrgMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-f5pgn", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-eBMqH", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eBMqH", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
@@ -131,8 +124,7 @@ func (p *OrgMemberProjection) reduceOrgRemoved(event eventstore.Event) (*handler
 	// if org A is deleted, the membership wouldn't be deleted
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-E5lDs", "seq", event.Sequence(), "expected", org.OrgRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-jnGAV", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-jnGAV", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(OrgMemberOrgIDCol, e.Aggregate().ID))
 }

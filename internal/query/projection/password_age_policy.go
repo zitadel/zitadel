@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -102,8 +100,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 		policyEvent = e.PasswordAgePolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-stxcL", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-CJqF0", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -128,8 +125,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 	case *iam.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-EZ53p", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-i7FZt", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(AgePolicyChangeDateCol, policyEvent.CreationDate()),
@@ -152,8 +148,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 func (p *PasswordAgeProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PasswordAgePolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-iwqfN", "seq", event.Sequence(), "expectedType", org.PasswordAgePolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-EtHWB", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-EtHWB", "reduce.wrong.event.type %s", org.PasswordAgePolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

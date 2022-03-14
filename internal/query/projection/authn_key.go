@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -140,8 +138,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
 	default:
-		logging.LogWithFields("PROJE-Dbr3g", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dgb32", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
 	return crdb.NewMultiStatement(
 		&authNKeyEvent,
@@ -179,8 +176,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 		appID = e.AppID
 		enabled = *e.AuthMethodType == domain.OIDCAuthMethodTypePrivateKeyJWT
 	default:
-		logging.LogWithFields("PROJE-Db5u3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dbrt1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dbrt1", "reduce.wrong.event.type %v", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType})
 	}
 	return crdb.NewUpdateStatement(
 		event,
@@ -203,9 +199,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	case *user.UserRemovedEvent:
 		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
 	default:
-		logging.LogWithFields("PROJE-Sfdg3", "seq", event.Sequence(), "expectedTypes",
-			[]eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-BGge42", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-BGge42", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType})
 	}
 	return crdb.NewDeleteStatement(
 		event,
