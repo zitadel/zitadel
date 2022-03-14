@@ -24,7 +24,7 @@ func (l *Login) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		http.Redirect(w, r, l.consolePath, http.StatusFound)
 		return
 	}
 	l.renderNextStep(w, r, authReq)
