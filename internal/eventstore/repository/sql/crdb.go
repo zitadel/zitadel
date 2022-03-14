@@ -9,10 +9,11 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/lib/pq"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -51,6 +52,7 @@ const (
 		" editor_user," +
 		" editor_service," +
 		" resource_owner," +
+		" event_sequence," +
 		" previous_aggregate_sequence," +
 		" previous_aggregate_type_sequence" +
 		") " +
@@ -65,6 +67,7 @@ const (
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
 		" IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner," +
+		" NEXTVAL(CONCAT('eventstore.', $9, '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +
@@ -113,6 +116,7 @@ func (db *CRDB) Push(ctx context.Context, events []*repository.Event, uniqueCons
 				event.EditorUser,
 				event.EditorService,
 				event.ResourceOwner,
+				"SYSTEM", //TODO: tenant
 			).Scan(&event.ID, &event.Sequence, &previousAggregateSequence, &previousAggregateTypeSequence, &event.CreationDate, &event.ResourceOwner)
 
 			event.PreviousAggregateSequence = uint64(previousAggregateSequence)

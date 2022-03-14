@@ -35,7 +35,7 @@ func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(IAMColumnID, crdb.ColumnTypeEnum),
+			crdb.NewColumn(IAMColumnID, crdb.ColumnTypeText),
 			crdb.NewColumn(IAMColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(IAMColumnGlobalOrgID, crdb.ColumnTypeText, crdb.Default("")),
 			crdb.NewColumn(IAMColumnProjectID, crdb.ColumnTypeText, crdb.Default("")),
