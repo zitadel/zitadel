@@ -33,19 +33,14 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig, assetsPrefix string, userCrypto *crypto.AESCrypto) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
-	if err != nil {
-		return nil, err
-	}
-
-	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}
 	idGenerator := id.SonyFlakeGenerator
 
-	view, err := auth_view.StartView(dbClient, keyAlgorithm, queries, idGenerator, assetsPrefix)
+	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator, assetsPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +75,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			AuthRequests:              authReq,
 			View:                      view,
 			Eventstore:                es,
-			UserCodeAlg:               userCrypto,
+			UserCodeAlg:               userEncryption,
 			UserSessionViewProvider:   view,
 			UserViewProvider:          view,
 			UserCommandProvider:       command,
@@ -101,7 +96,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			View:         view,
 			Eventstore:   es,
 			SearchLimit:  conf.SearchLimit,
-			KeyAlgorithm: keyAlgorithm,
+			KeyAlgorithm: oidcEncryption,
 		},
 		eventstore.UserSessionRepo{
 			View: view,

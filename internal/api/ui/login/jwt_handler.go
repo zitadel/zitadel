@@ -39,7 +39,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	userAgentID, err := l.IDPConfigAesCrypto.DecryptString(id, l.IDPConfigAesCrypto.EncryptionKeyID())
+	userAgentID, err := l.idpConfigAlg.DecryptString(id, l.idpConfigAlg.EncryptionKeyID())
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return
@@ -181,7 +181,7 @@ func (l *Login) redirectToJWTCallback(authReq *domain.AuthRequest) (string, erro
 	}
 	q := redirect.Query()
 	q.Set(QueryAuthRequestID, authReq.ID)
-	nonce, err := l.IDPConfigAesCrypto.Encrypt([]byte(authReq.AgentID))
+	nonce, err := l.idpConfigAlg.Encrypt([]byte(authReq.AgentID))
 	if err != nil {
 		return "", err
 	}
@@ -202,7 +202,7 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	userAgentID, err := l.IDPConfigAesCrypto.DecryptString(id, l.IDPConfigAesCrypto.EncryptionKeyID())
+	userAgentID, err := l.idpConfigAlg.DecryptString(id, l.idpConfigAlg.EncryptionKeyID())
 	if err != nil {
 		l.renderError(w, r, nil, err)
 		return

@@ -21,12 +21,24 @@ type SpoolerConfig struct {
 	Handlers              handler.Configs
 }
 
-func StartSpooler(c SpoolerConfig, es v1.Eventstore, view *view.View, sql *sql.DB, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm) *spooler.Spooler {
+func StartSpooler(c SpoolerConfig,
+	es v1.Eventstore,
+	view *view.View,
+	sql *sql.DB,
+	command *command.Commands,
+	queries *query.Queries,
+	systemDefaults sd.SystemDefaults,
+	dir http.FileSystem,
+	assetsPrefix string,
+	userEncryption crypto.EncryptionAlgorithm,
+	smtpEncryption crypto.EncryptionAlgorithm,
+	smsEncryption crypto.EncryptionAlgorithm,
+) *spooler.Spooler {
 	spoolerConfig := spooler.Config{
 		Eventstore:        es,
 		Locker:            &locker{dbClient: sql},
 		ConcurrentWorkers: c.ConcurrentWorkers,
-		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, systemDefaults, dir, assetsPrefix, smtpPasswordEncAlg),
+		ViewHandlers:      handler.Register(c.Handlers, c.BulkLimit, c.FailureCountUntilSkip, view, es, command, queries, systemDefaults, dir, assetsPrefix, userEncryption, smtpEncryption, smsEncryption),
 	}
 	spool := spoolerConfig.New()
 	spool.Start()

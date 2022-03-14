@@ -6,13 +6,12 @@ import (
 
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/crypto"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"

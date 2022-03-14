@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"github.com/caos/zitadel/internal/crypto"
 	"google.golang.org/grpc"
 
 	"github.com/caos/zitadel/internal/api/authz"
@@ -10,6 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/auth"
 )
@@ -27,21 +27,27 @@ type Server struct {
 	repo            repository.Repository
 	defaults        systemdefaults.SystemDefaults
 	assetsAPIDomain string
-	UserCodeAlg     crypto.EncryptionAlgorithm
+	userCodeAlg     crypto.EncryptionAlgorithm
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository, defaults systemdefaults.SystemDefaults, assetsAPIDomain string, userCrypto *crypto.AESCrypto) *Server {
+func CreateServer(command *command.Commands,
+	query *query.Queries,
+	authRepo repository.Repository,
+	defaults systemdefaults.SystemDefaults,
+	assetsAPIDomain string,
+	userCodeAlg crypto.EncryptionAlgorithm,
+) *Server {
 	return &Server{
 		command:         command,
 		query:           query,
 		repo:            authRepo,
 		defaults:        defaults,
 		assetsAPIDomain: assetsAPIDomain,
-		UserCodeAlg:     userCrypto,
+		userCodeAlg:     userCodeAlg,
 	}
 }
 

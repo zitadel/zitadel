@@ -72,6 +72,11 @@ enum SMSProviderConfigState {
   SMS_PROVIDER_CONFIG_INACTIVE = 2;
 }
 
+message DebugNotificationProvider {
+    zitadel.v1.ObjectDetails details = 1;
+    bool compact = 2;
+}
+
 message OIDCSettings {
   zitadel.v1.ObjectDetails details = 1;
   google.protobuf.Duration  access_token_lifetime = 2;
