@@ -1,31 +1,31 @@
 <div class="cnsl-top-view">
   <div class="max-width-container">
     <div class="cnsl-top-row">
-      <div>
-        <div class="cnsl-link-row">
-          <a *ngIf="backRouterLink && hasBackButton" class="cnsl-link" [routerLink]="backRouterLink"
-            [queryParams]="backQueryParams" mat-icon-button>
-            <mat-icon class="icon">arrow_back</mat-icon>
-          </a>
-          <button *ngIf="!backRouterLink && hasBackButton" mat-icon-button (click)="backClick()">
-            <mat-icon class="icon">arrow_back</mat-icon>
-          </button>
-          <div>
-            <div class="cnsl-title-row">
-              <h2 class="cnsl-title">{{title}}</h2>
-              <div class="cnsl-state-dot" *ngIf="isActive || isInactive" [matTooltip]="stateTooltip"
-                [ngClass]="{'active': isActive, 'inactive': isInactive }">
-              </div>
+
+      <div class="cnsl-link-row">
+        <a *ngIf="backRouterLink && hasBackButton" class="cnsl-link" [routerLink]="backRouterLink"
+          [queryParams]="backQueryParams" mat-icon-button>
+          <mat-icon class="icon">arrow_back</mat-icon>
+        </a>
+        <button *ngIf="!backRouterLink && hasBackButton" mat-icon-button (click)="backClick()">
+          <mat-icon class="icon">arrow_back</mat-icon>
+        </button>
+        <div class="cnsl-title-row-wrapper">
+          <div class="cnsl-title-row">
+            <h2 class="cnsl-title">{{title}}</h2>
+            <div class="cnsl-state-dot" *ngIf="isActive || isInactive" [matTooltip]="stateTooltip"
+              [ngClass]="{'active': isActive, 'inactive': isInactive }">
             </div>
-            <div class="cnsl-doc-row">
-              <span class="cnsl-type" [innerHtml]="sub"></span>
-              <a *ngIf="docLink" mat-icon-button [href]="docLink" rel="noreferrer" target="_blank">
-                <i class="las la-info-circle"></i>
-              </a>
-            </div>
+          </div>
+          <div class="cnsl-doc-row">
+            <span class="cnsl-type" [innerHtml]="sub"></span>
+            <a *ngIf="docLink" mat-icon-button [href]="docLink" rel="noreferrer" target="_blank">
+              <i class="las la-info-circle"></i>
+            </a>
           </div>
         </div>
       </div>
+
       <span class="fill-space"></span>
 
       <ng-container *ngIf="hasActions">

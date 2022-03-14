@@ -7,6 +7,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
@@ -76,6 +77,7 @@ import { RedirectUrisComponent } from './redirect-uris/redirect-uris.component';
     MatCheckboxModule,
     CardModule,
     TopViewModule,
+    MatMenuModule,
     MatTooltipModule,
     TranslateModule,
     MatStepperModule,

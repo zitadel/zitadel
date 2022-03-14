@@ -36,29 +36,35 @@
           position: relative;
         }
 
-        .cnsl-title-row {
-          display: flex;
-          align-items: center;
+        .cnsl-title-row-wrapper {
+          .cnsl-title-row {
+            display: flex;
+            align-items: center;
 
-          .cnsl-title {
-            margin: 0;
-            margin-right: 0.5rem;
-            font-size: 2rem;
+            .cnsl-title {
+              margin: 0;
+              margin-right: 0.5rem;
+              font-size: 2rem;
+            }
+
+            .cnsl-state-dot {
+              height: 8px;
+              width: 8px;
+              border-radius: 50%;
+              flex-shrink: 0;
+
+              &.active {
+                background-color: var(--success);
+              }
+
+              &.inactive {
+                background-color: var(--warn);
+              }
+            }
           }
 
-          .cnsl-state-dot {
-            height: 8px;
-            width: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-
-            &.active {
-              background-color: var(--success);
-            }
-
-            &.inactive {
-              background-color: var(--warn);
-            }
+          @media only screen and (max-width: 500px) {
+            margin-bottom: 0.5rem;
           }
         }
 

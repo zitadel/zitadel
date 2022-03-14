@@ -4,37 +4,36 @@
   [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType | translate): 'API'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE" [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
   stateTooltip="{{('APP.PAGES.DETAIL.STATE.'+app?.state) | translate}}" [backRouterLink]="[ '/projects', projectId ]">
-  <ng-container *ngIf="isZitadel === false">
-    <ng-template topActions cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
-      <!-- <div class="regen-secret"
-      *ngIf="this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')">
-      <button type="button" [disabled]="!canWrite" mat-stroked-button
+  <ng-template topActions cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
+    <div class="regen-secret"
+      *ngIf="isZitadel === false && this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')">
+      <button type="button" [disabled]="!canWrite" mat-menu-item
         (click)="regenerateOIDCClientSecret()">{{'APP.OIDC.REGENERATESECRET' | translate}}</button>
     </div>
 
-    <div class="regen-secret" *ngIf="this.app?.apiConfig && currentAuthMethod === 'BASIC'">
-      <button [disabled]="!canWrite" mat-stroked-button
-        (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' | translate}}</button>
-    </div> -->
+    <div class="regen-secret" *ngIf="isZitadel === false && this.app?.apiConfig && currentAuthMethod === 'BASIC'">
+      <button [disabled]="!canWrite" mat-menu-item (click)="regenerateAPIClientSecret()">{{'APP.API.REGENERATESECRET' |
+        translate}}</button>
+    </div>
 
-      <button mat-menu-item (click)="openNameDialog()" aria-label="Edit project name" *ngIf="isZitadel === false">
-        {{'ACTIONS.RENAME' | translate}}
+    <button *ngIf="isZitadel === false" mat-menu-item (click)="openNameDialog()" aria-label="Edit project name">
+      {{'ACTIONS.RENAME' | translate}}
+    </button>
+    <button mat-menu-item *ngIf="isZitadel === false && app?.state !== AppState.APP_STATE_INACTIVE"
+      (click)="changeState(AppState.APP_STATE_INACTIVE)">
+      {{'ACTIONS.DEACTIVATE' | translate}}
+    </button>
+    <button mat-menu-item *ngIf="isZitadel === false && app?.state === AppState.APP_STATE_INACTIVE"
+      (click)="changeState(AppState.APP_STATE_ACTIVE)">
+      {{'ACTIONS.REACTIVATE' | translate}}
+    </button>
+    <ng-template cnslHasRole [hasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
+      <button *ngIf="isZitadel === false" mat-menu-item matTooltip="{{'APP.PAGES.DELETE' | translate}}"
+        (click)="deleteApp()">
+        <span [style.color]="'var(--warn)'">{{'APP.PAGES.DELETE' | translate}}</span>
       </button>
-      <button mat-menu-item *ngIf="app?.state !== AppState.APP_STATE_INACTIVE"
-        (click)="changeState(AppState.APP_STATE_INACTIVE)">
-        {{'ACTIONS.DEACTIVATE' | translate}}
-      </button>
-      <button mat-menu-item *ngIf="app?.state === AppState.APP_STATE_INACTIVE"
-        (click)="changeState(AppState.APP_STATE_ACTIVE)">
-        {{'ACTIONS.REACTIVATE' | translate}}
-      </button>
-      <ng-template cnslHasRole [hasRole]="['project.app.delete:'+projectId, 'project.app.delete']">
-        <button mat-menu-item matTooltip="{{'APP.PAGES.DELETE' | translate}}" (click)="deleteApp()">
-          <span [style.color]="'var(--warn)'">{{'APP.PAGES.DELETE' | translate}}</span>
-        </button>
-      </ng-template>
     </ng-template>
-  </ng-container>
+  </ng-template>
   <span *ngIf="errorMessage" class="app-err-container">{{errorMessage}}</span>
 
   <cnsl-info-row topContent *ngIf="app" [app]="app"></cnsl-info-row>

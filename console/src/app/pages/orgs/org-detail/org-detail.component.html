@@ -1,24 +1,14 @@
-<div class="org-top">
-  <div class="max-width-container">
-    <div class="org-top-row">
-      <div>
-        <div class="org-title-row">
-          <h1 class="org-title">{{org?.name}}</h1>
-          <div class="org-state-dot" matTooltip="{{'ORG.STATE.'+org?.state | translate}}"
-            [ngClass]="{'active': org?.state === OrgState.ORG_STATE_ACTIVE, 'inactive': org?.state === OrgState.ORG_STATE_INACTIVE }">
-          </div>
-        </div>
-      </div>
-      <span class="fill-space"></span>
-      <cnsl-contributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
-        [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
-        description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
-        (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
-      </cnsl-contributors>
-    </div>
-    <cnsl-info-row *ngIf="org" [org]="org"></cnsl-info-row>
-  </div>
-</div>
+<cnsl-top-view [hasBackButton]="false" title="{{org?.name}}" [isActive]="org?.state === OrgState.ORG_STATE_ACTIVE"
+  [isInactive]="org?.state === OrgState.ORG_STATE_INACTIVE" [hasContributors]="true"
+  stateTooltip="{{'ORG.STATE.'+org?.state | translate}}">
+  <cnsl-contributors topContributors [totalResult]="totalMemberResult" [loading]="loading$ | async"
+    [membersSubject]="membersSubject" title="{{ 'PROJECT.MEMBER.TITLE' | translate }}"
+    description="{{ 'PROJECT.MEMBER.TITLEDESC' | translate }}" (addClicked)="openAddMember()"
+    (showDetailClicked)="showDetail()" (refreshClicked)="loadMembers()" [disabled]="false">
+  </cnsl-contributors>
+
+  <cnsl-info-row topContent *ngIf="org" [org]="org"></cnsl-info-row>
+</cnsl-top-view>
 <div class="max-width-container">
   <cnsl-meta-layout>
     <ng-container *ngIf="['features.read'] | hasRole | async">

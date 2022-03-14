@@ -1,50 +1,24 @@
-<div class="idp-top">
-  <div class="max-width-container">
-    <div class="idp-top-row">
-      <div class="idp-title-wrapper">
-        <a [routerLink]="backroutes" mat-icon-button>
-          <mat-icon class="icon">arrow_back</mat-icon>
-        </a>
-        <div>
-          <div class="idp-title-row">
-            <h2 class="idp-title">{{'IDP.DETAIL.TITLE' | translate}}</h2>
-            <div class="idp-state-dot" *ngIf="idp && idp.state !== undefined"
-              matTooltip="{{'IDP.STATES.'+idp.state | translate}}"
-              [ngClass]="{'active': idp.state === IDPState.IDP_STATE_ACTIVE, 'inactive': idp.state === IDPState.IDP_STATE_INACTIVE }">
-            </div>
-          </div>
-          <span *ngIf="idp?.oidcConfig">{{'IDP.OIDC.TITLE' | translate}}</span>
-          <span *ngIf="idp?.jwtConfig">{{'IDP.JWT.TITLE' | translate}}</span>
-        </div>
-      </div>
-      <span class="fill-space"></span>
-
-      <div *ngIf="canWrite | async" actions>
-        <button class="actions-trigger" mat-raised-button color="primary" [matMenuTriggerFor]="idpactions">
-          <span>{{'ACTIONS.ACTIONS' | translate}}</span>
-          <mat-icon class="icon">keyboard_arrow_down</mat-icon>
-        </button>
-        <mat-menu #idpactions="matMenu" xPosition="before">
-          <button mat-menu-item *ngIf="idp?.state !== IDPState.IDP_STATE_INACTIVE"
-            (click)="changeState(IDPState.IDP_STATE_INACTIVE)">
-            {{'ACTIONS.DEACTIVATE' | translate}}
-          </button>
-          <button mat-menu-item *ngIf="idp?.state === IDPState.IDP_STATE_INACTIVE"
-            (click)="changeState(IDPState.IDP_STATE_ACTIVE)">
-            {{'ACTIONS.REACTIVATE' | translate}}
-          </button>
-          <button mat-menu-item matTooltip="{{'IDP.DELETE' | translate}}" (click)="deleteIdp()">
-            <span [style.color]="'var(--warn)'">{{'IDP.DELETE_TITLE' | translate}}</span>
-          </button>
-        </mat-menu>
-      </div>
-    </div>
-
-    <cnsl-info-row *ngIf="idp" [idp]="idp"></cnsl-info-row>
-  </div>
-
-</div>
-
+<cnsl-top-view title="{{'IDP.DETAIL.TITLE' | translate}}" [backRouterLink]="backroutes"
+  [sub]="idp?.oidcConfig ? ('IDP.OIDC.TITLE' | translate) : idp?.jwtConfig ? ('IDP.JWT.TITLE' | translate) : ''"
+  [isActive]="idp?.state === IDPState.IDP_STATE_ACTIVE" [isInactive]="idp?.state === IDPState.IDP_STATE_INACTIVE"
+  [hasContributors]="false" stateTooltip="{{'IDP.STATES.'+idp?.state | translate}}"
+  [hasActions]="(serviceType === PolicyComponentServiceType.MGMT ? ['org.idp.write'] : ['iam.idp.write']) | hasRole | async">
+  <ng-template topActions cnslHasRole
+    [hasRole]="serviceType === PolicyComponentServiceType.MGMT ? ['org.idp.write'] : ['iam.idp.write']">
+    <button mat-menu-item *ngIf="idp?.state !== IDPState.IDP_STATE_INACTIVE"
+      (click)="changeState(IDPState.IDP_STATE_INACTIVE)">
+      {{'ACTIONS.DEACTIVATE' | translate}}
+    </button>
+    <button mat-menu-item *ngIf="idp?.state === IDPState.IDP_STATE_INACTIVE"
+      (click)="changeState(IDPState.IDP_STATE_ACTIVE)">
+      {{'ACTIONS.REACTIVATE' | translate}}
+    </button>
+    <button mat-menu-item matTooltip="{{'IDP.DELETE' | translate}}" (click)="deleteIdp()">
+      <span [style.color]="'var(--warn)'">{{'IDP.DELETE_TITLE' | translate}}</span>
+    </button>
+  </ng-template>
+  <cnsl-info-row topContent *ngIf="idp" [idp]="idp"></cnsl-info-row>
+</cnsl-top-view>
 
 <div class="max-width-container">
   <form class="idp-form" (ngSubmit)="updateIdp()">
