@@ -44,7 +44,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.custom_texts (aggregate_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.custom_texts (aggregate_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -83,7 +83,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
@@ -117,7 +117,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
@@ -151,7 +151,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.custom_texts (aggregate_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.custom_texts (aggregate_id, creation_date, change_date, sequence, is_default, template, language, key, text) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -190,7 +190,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (key = $3) AND (language = $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
@@ -224,7 +224,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3)",
+							expectedStmt: "DELETE FROM projections.custom_texts WHERE (aggregate_id = $1) AND (template = $2) AND (language = $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",

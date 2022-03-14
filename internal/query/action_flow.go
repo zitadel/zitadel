@@ -194,6 +194,7 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 			FlowsTriggersColumnFlowType.identifier(),
 			FlowsTriggersColumnChangeDate.identifier(),
 			FlowsTriggersColumnSequence.identifier(),
+			FlowsTriggersColumnResourceOwner.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
@@ -203,7 +204,6 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 				TriggerActions: make(map[domain.TriggerType][]*Action),
 			}
 			for rows.Next() {
-				// action := new(Action)
 				var (
 					actionID            sql.NullString
 					actionCreationDate  pq.NullTime
@@ -229,8 +229,9 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 					&triggerType,
 					&triggerSequence,
 					&flow.Type,
-					&flow.Sequence,
 					&flow.ChangeDate,
+					&flow.Sequence,
+					&flow.ResourceOwner,
 				)
 				if err != nil {
 					return nil, err

@@ -50,7 +50,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -63,7 +63,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"first-name",
@@ -108,7 +108,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -121,7 +121,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"first-name",
@@ -161,7 +161,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -174,7 +174,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"first-name",
@@ -219,7 +219,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -232,7 +232,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"first-name",
@@ -277,7 +277,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -290,7 +290,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"first-name",
@@ -330,7 +330,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -343,7 +343,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.users_humans (user_id, first_name, last_name, nick_name, display_name, preferred_language, gender, email, phone) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"first-name",
@@ -378,7 +378,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								domain.UserStateInitial,
 								"agg-id",
@@ -406,7 +406,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								domain.UserStateInitial,
 								"agg-id",
@@ -434,7 +434,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								domain.UserStateActive,
 								"agg-id",
@@ -462,7 +462,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.users SET (state) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								domain.UserStateActive,
 								"agg-id",
@@ -490,7 +490,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateLocked,
@@ -520,7 +520,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateActive,
@@ -550,7 +550,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateInactive,
@@ -580,7 +580,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, state, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								domain.UserStateActive,
@@ -610,7 +610,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.users WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.users WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -639,7 +639,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.users SET (change_date, username, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								"username",
@@ -676,7 +676,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -684,7 +684,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
+							expectedStmt: "UPDATE projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
 							expectedArgs: []interface{}{
 								"first-name",
 								"last-name",
@@ -724,7 +724,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -732,7 +732,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
+							expectedStmt: "UPDATE projections.users_humans SET (first_name, last_name, nick_name, display_name, preferred_language, gender) = ($1, $2, $3, $4, $5, $6) WHERE (user_id = $7)",
 							expectedArgs: []interface{}{
 								"first-name",
 								"last-name",
@@ -767,7 +767,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -775,7 +775,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								"+41 00 000 00 00",
 								false,
@@ -806,7 +806,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -814,7 +814,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								"+41 00 000 00 00",
 								false,
@@ -843,7 +843,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -851,7 +851,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
@@ -880,7 +880,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -888,7 +888,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (phone, is_phone_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								nil,
 								nil,
@@ -917,7 +917,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -925,7 +925,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -953,7 +953,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -961,7 +961,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_phone_verified) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -991,7 +991,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -999,7 +999,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								"email@zitadel.ch",
 								false,
@@ -1030,7 +1030,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1038,7 +1038,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_humans SET (email, is_email_verified) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								"email@zitadel.ch",
 								false,
@@ -1067,7 +1067,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1075,7 +1075,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -1103,7 +1103,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1111,7 +1111,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (is_email_verified) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								true,
 								"agg-id",
@@ -1141,7 +1141,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1149,7 +1149,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								"users/agg-id/avatar",
 								"agg-id",
@@ -1177,7 +1177,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1185,7 +1185,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								nil,
 								"agg-id",
@@ -1216,7 +1216,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -1229,7 +1229,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_machines (user_id, name, description) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.users_machines (user_id, name, description) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-name",
@@ -1262,7 +1262,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -1275,7 +1275,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users_machines (user_id, name, description) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.users_machines (user_id, name, description) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-name",
@@ -1307,7 +1307,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1315,7 +1315,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_machines SET (name, description) = ($1, $2) WHERE (user_id = $3)",
+							expectedStmt: "UPDATE projections.users_machines SET (name, description) = ($1, $2) WHERE (user_id = $3)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"description",
@@ -1346,7 +1346,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1354,7 +1354,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_machines SET (name) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_machines SET (name) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								"machine-name",
 								"agg-id",
@@ -1384,7 +1384,7 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.users SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -1392,7 +1392,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_machines SET (description) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE projections.users_machines SET (description) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								"description",
 								"agg-id",

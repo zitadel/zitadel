@@ -43,7 +43,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -79,7 +79,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -110,7 +110,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -141,7 +141,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -177,7 +177,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -208,7 +208,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (idp_id = $1) AND (aggregate_id = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -236,7 +236,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (resource_owner = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -265,7 +265,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (idp_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",
@@ -295,7 +295,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.idp_login_policy_links WHERE (idp_id = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.idp_login_policy_links WHERE (idp_id = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"ro-id",

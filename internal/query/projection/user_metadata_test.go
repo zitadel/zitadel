@@ -41,7 +41,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.user_metadata (user_id, resource_owner, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "UPSERT INTO projections.user_metadata (user_id, resource_owner, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
@@ -76,7 +76,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.user_metadata WHERE (user_id = $1) AND (key = $2)",
+							expectedStmt: "DELETE FROM projections.user_metadata WHERE (user_id = $1) AND (key = $2)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"key",
@@ -104,7 +104,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.user_metadata WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -131,7 +131,7 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.user_metadata WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.user_metadata WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

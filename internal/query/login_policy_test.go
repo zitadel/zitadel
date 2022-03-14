@@ -9,9 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
-	"github.com/lib/pq"
 )
 
 func Test_LoginPolicyPrepares(t *testing.T) {
@@ -30,25 +31,25 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.aggregate_id,`+
-						` zitadel.projections.login_policies.creation_date,`+
-						` zitadel.projections.login_policies.change_date,`+
-						` zitadel.projections.login_policies.sequence,`+
-						` zitadel.projections.login_policies.allow_register,`+
-						` zitadel.projections.login_policies.allow_username_password,`+
-						` zitadel.projections.login_policies.allow_external_idps,`+
-						` zitadel.projections.login_policies.force_mfa,`+
-						` zitadel.projections.login_policies.second_factors,`+
-						` zitadel.projections.login_policies.multi_factors,`+
-						` zitadel.projections.login_policies.passwordless_type,`+
-						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset,`+
-						` zitadel.projections.login_policies.password_check_lifetime,`+
-						` zitadel.projections.login_policies.external_login_check_lifetime,`+
-						` zitadel.projections.login_policies.mfa_init_skip_lifetime,`+
-						` zitadel.projections.login_policies.second_factor_check_lifetime,`+
-						` zitadel.projections.login_policies.multi_factor_check_lifetime`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.aggregate_id,`+
+						` projections.login_policies.creation_date,`+
+						` projections.login_policies.change_date,`+
+						` projections.login_policies.sequence,`+
+						` projections.login_policies.allow_register,`+
+						` projections.login_policies.allow_username_password,`+
+						` projections.login_policies.allow_external_idps,`+
+						` projections.login_policies.force_mfa,`+
+						` projections.login_policies.second_factors,`+
+						` projections.login_policies.multi_factors,`+
+						` projections.login_policies.passwordless_type,`+
+						` projections.login_policies.is_default,`+
+						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.password_check_lifetime,`+
+						` projections.login_policies.external_login_check_lifetime,`+
+						` projections.login_policies.mfa_init_skip_lifetime,`+
+						` projections.login_policies.second_factor_check_lifetime,`+
+						` projections.login_policies.multi_factor_check_lifetime`+
+						` FROM projections.login_policies`),
 					nil,
 					nil,
 				),
@@ -66,25 +67,25 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.aggregate_id,`+
-						` zitadel.projections.login_policies.creation_date,`+
-						` zitadel.projections.login_policies.change_date,`+
-						` zitadel.projections.login_policies.sequence,`+
-						` zitadel.projections.login_policies.allow_register,`+
-						` zitadel.projections.login_policies.allow_username_password,`+
-						` zitadel.projections.login_policies.allow_external_idps,`+
-						` zitadel.projections.login_policies.force_mfa,`+
-						` zitadel.projections.login_policies.second_factors,`+
-						` zitadel.projections.login_policies.multi_factors,`+
-						` zitadel.projections.login_policies.passwordless_type,`+
-						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset,`+
-						` zitadel.projections.login_policies.password_check_lifetime,`+
-						` zitadel.projections.login_policies.external_login_check_lifetime,`+
-						` zitadel.projections.login_policies.mfa_init_skip_lifetime,`+
-						` zitadel.projections.login_policies.second_factor_check_lifetime,`+
-						` zitadel.projections.login_policies.multi_factor_check_lifetime`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.aggregate_id,`+
+						` projections.login_policies.creation_date,`+
+						` projections.login_policies.change_date,`+
+						` projections.login_policies.sequence,`+
+						` projections.login_policies.allow_register,`+
+						` projections.login_policies.allow_username_password,`+
+						` projections.login_policies.allow_external_idps,`+
+						` projections.login_policies.force_mfa,`+
+						` projections.login_policies.second_factors,`+
+						` projections.login_policies.multi_factors,`+
+						` projections.login_policies.passwordless_type,`+
+						` projections.login_policies.is_default,`+
+						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.password_check_lifetime,`+
+						` projections.login_policies.external_login_check_lifetime,`+
+						` projections.login_policies.mfa_init_skip_lifetime,`+
+						` projections.login_policies.second_factor_check_lifetime,`+
+						` projections.login_policies.multi_factor_check_lifetime`+
+						` FROM projections.login_policies`),
 					[]string{
 						"aggregate_id",
 						"creation_date",
@@ -153,25 +154,25 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.aggregate_id,`+
-						` zitadel.projections.login_policies.creation_date,`+
-						` zitadel.projections.login_policies.change_date,`+
-						` zitadel.projections.login_policies.sequence,`+
-						` zitadel.projections.login_policies.allow_register,`+
-						` zitadel.projections.login_policies.allow_username_password,`+
-						` zitadel.projections.login_policies.allow_external_idps,`+
-						` zitadel.projections.login_policies.force_mfa,`+
-						` zitadel.projections.login_policies.second_factors,`+
-						` zitadel.projections.login_policies.multi_factors,`+
-						` zitadel.projections.login_policies.passwordless_type,`+
-						` zitadel.projections.login_policies.is_default,`+
-						` zitadel.projections.login_policies.hide_password_reset,`+
-						` zitadel.projections.login_policies.password_check_lifetime,`+
-						` zitadel.projections.login_policies.external_login_check_lifetime,`+
-						` zitadel.projections.login_policies.mfa_init_skip_lifetime,`+
-						` zitadel.projections.login_policies.second_factor_check_lifetime,`+
-						` zitadel.projections.login_policies.multi_factor_check_lifetime`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.aggregate_id,`+
+						` projections.login_policies.creation_date,`+
+						` projections.login_policies.change_date,`+
+						` projections.login_policies.sequence,`+
+						` projections.login_policies.allow_register,`+
+						` projections.login_policies.allow_username_password,`+
+						` projections.login_policies.allow_external_idps,`+
+						` projections.login_policies.force_mfa,`+
+						` projections.login_policies.second_factors,`+
+						` projections.login_policies.multi_factors,`+
+						` projections.login_policies.passwordless_type,`+
+						` projections.login_policies.is_default,`+
+						` projections.login_policies.hide_password_reset,`+
+						` projections.login_policies.password_check_lifetime,`+
+						` projections.login_policies.external_login_check_lifetime,`+
+						` projections.login_policies.mfa_init_skip_lifetime,`+
+						` projections.login_policies.second_factor_check_lifetime,`+
+						` projections.login_policies.multi_factor_check_lifetime`+
+						` FROM projections.login_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -188,8 +189,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.second_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
+						` FROM projections.login_policies`),
 					[]string{
 						"second_factors",
 					},
@@ -209,8 +210,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.second_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
+						` FROM projections.login_policies`),
 					[]string{
 						"second_factors",
 					},
@@ -231,8 +232,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.second_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
+						` FROM projections.login_policies`),
 					[]string{
 						"second_factors",
 					},
@@ -248,8 +249,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicy2FAsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.second_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.second_factors`+
+						` FROM projections.login_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -267,8 +268,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.multi_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
+						` FROM projections.login_policies`),
 					[]string{
 						"multi_factors",
 					},
@@ -288,8 +289,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.multi_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
+						` FROM projections.login_policies`),
 					[]string{
 						"multi_factors",
 					},
@@ -310,8 +311,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.multi_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
+						` FROM projections.login_policies`),
 					[]string{
 						"multi_factors",
 					},
@@ -327,8 +328,8 @@ func Test_LoginPolicyPrepares(t *testing.T) {
 			prepare: prepareLoginPolicyMFAsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.login_policies.multi_factors`+
-						` FROM zitadel.projections.login_policies`),
+					regexp.QuoteMeta(`SELECT projections.login_policies.multi_factors`+
+						` FROM projections.login_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

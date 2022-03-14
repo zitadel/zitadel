@@ -16,42 +16,42 @@ import (
 )
 
 var (
-	userQuery = `SELECT zitadel.projections.users.id,` +
-		` zitadel.projections.users.creation_date,` +
-		` zitadel.projections.users.change_date,` +
-		` zitadel.projections.users.resource_owner,` +
-		` zitadel.projections.users.sequence,` +
-		` zitadel.projections.users.state,` +
-		` zitadel.projections.users.type,` +
-		` zitadel.projections.users.username,` +
+	userQuery = `SELECT projections.users.id,` +
+		` projections.users.creation_date,` +
+		` projections.users.change_date,` +
+		` projections.users.resource_owner,` +
+		` projections.users.sequence,` +
+		` projections.users.state,` +
+		` projections.users.type,` +
+		` projections.users.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` zitadel.projections.users_humans.user_id,` +
-		` zitadel.projections.users_humans.first_name,` +
-		` zitadel.projections.users_humans.last_name,` +
-		` zitadel.projections.users_humans.nick_name,` +
-		` zitadel.projections.users_humans.display_name,` +
-		` zitadel.projections.users_humans.preferred_language,` +
-		` zitadel.projections.users_humans.gender,` +
-		` zitadel.projections.users_humans.avatar_key,` +
-		` zitadel.projections.users_humans.email,` +
-		` zitadel.projections.users_humans.is_email_verified,` +
-		` zitadel.projections.users_humans.phone,` +
-		` zitadel.projections.users_humans.is_phone_verified,` +
-		` zitadel.projections.users_machines.user_id,` +
-		` zitadel.projections.users_machines.name,` +
-		` zitadel.projections.users_machines.description` +
-		` FROM zitadel.projections.users` +
-		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id` +
-		` LEFT JOIN zitadel.projections.users_machines ON zitadel.projections.users.id = zitadel.projections.users_machines.user_id` +
+		` projections.users_humans.user_id,` +
+		` projections.users_humans.first_name,` +
+		` projections.users_humans.last_name,` +
+		` projections.users_humans.nick_name,` +
+		` projections.users_humans.display_name,` +
+		` projections.users_humans.preferred_language,` +
+		` projections.users_humans.gender,` +
+		` projections.users_humans.avatar_key,` +
+		` projections.users_humans.email,` +
+		` projections.users_humans.is_email_verified,` +
+		` projections.users_humans.phone,` +
+		` projections.users_humans.is_phone_verified,` +
+		` projections.users_machines.user_id,` +
+		` projections.users_machines.name,` +
+		` projections.users_machines.description` +
+		` FROM projections.users` +
+		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id` +
+		` LEFT JOIN projections.users_machines ON projections.users.id = projections.users_machines.user_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM zitadel.projections.login_names as login_names` +
+		` FROM projections.login_names as login_names` +
 		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = zitadel.projections.users.id` +
+		` on login_names.user_id = projections.users.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM zitadel.projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
-		` on preferred_login_name.user_id = zitadel.projections.users.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
+		` on preferred_login_name.user_id = projections.users.id`
 	userCols = []string{
 		"id",
 		"creation_date",
@@ -81,22 +81,22 @@ var (
 		"name",
 		"description",
 	}
-	profileQuery = `SELECT zitadel.projections.users.id,` +
-		` zitadel.projections.users.creation_date,` +
-		` zitadel.projections.users.change_date,` +
-		` zitadel.projections.users.resource_owner,` +
-		` zitadel.projections.users.sequence,` +
-		//` zitadel.projections.users.state,` + //TODO:
-		` zitadel.projections.users_humans.user_id,` +
-		` zitadel.projections.users_humans.first_name,` +
-		` zitadel.projections.users_humans.last_name,` +
-		` zitadel.projections.users_humans.nick_name,` +
-		` zitadel.projections.users_humans.display_name,` +
-		` zitadel.projections.users_humans.preferred_language,` +
-		` zitadel.projections.users_humans.gender,` +
-		` zitadel.projections.users_humans.avatar_key` +
-		` FROM zitadel.projections.users` +
-		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id`
+	profileQuery = `SELECT projections.users.id,` +
+		` projections.users.creation_date,` +
+		` projections.users.change_date,` +
+		` projections.users.resource_owner,` +
+		` projections.users.sequence,` +
+		//` projections.users.state,` + //TODO:
+		` projections.users_humans.user_id,` +
+		` projections.users_humans.first_name,` +
+		` projections.users_humans.last_name,` +
+		` projections.users_humans.nick_name,` +
+		` projections.users_humans.display_name,` +
+		` projections.users_humans.preferred_language,` +
+		` projections.users_humans.gender,` +
+		` projections.users_humans.avatar_key` +
+		` FROM projections.users` +
+		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id`
 	profileCols = []string{
 		"id",
 		"creation_date",
@@ -113,17 +113,17 @@ var (
 		"gender",
 		"avatar_key",
 	}
-	emailQuery = `SELECT zitadel.projections.users.id,` +
-		` zitadel.projections.users.creation_date,` +
-		` zitadel.projections.users.change_date,` +
-		` zitadel.projections.users.resource_owner,` +
-		` zitadel.projections.users.sequence,` +
-		//` zitadel.projections.users.state,` + //TODO:
-		` zitadel.projections.users_humans.user_id,` +
-		` zitadel.projections.users_humans.email,` +
-		` zitadel.projections.users_humans.is_email_verified` +
-		` FROM zitadel.projections.users` +
-		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id`
+	emailQuery = `SELECT projections.users.id,` +
+		` projections.users.creation_date,` +
+		` projections.users.change_date,` +
+		` projections.users.resource_owner,` +
+		` projections.users.sequence,` +
+		//` projections.users.state,` + //TODO:
+		` projections.users_humans.user_id,` +
+		` projections.users_humans.email,` +
+		` projections.users_humans.is_email_verified` +
+		` FROM projections.users` +
+		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id`
 	emailCols = []string{
 		"id",
 		"creation_date",
@@ -135,17 +135,17 @@ var (
 		"email",
 		"is_email_verified",
 	}
-	phoneQuery = `SELECT zitadel.projections.users.id,` +
-		` zitadel.projections.users.creation_date,` +
-		` zitadel.projections.users.change_date,` +
-		` zitadel.projections.users.resource_owner,` +
-		` zitadel.projections.users.sequence,` +
-		//` zitadel.projections.users.state,` + //TODO:
-		` zitadel.projections.users_humans.user_id,` +
-		` zitadel.projections.users_humans.phone,` +
-		` zitadel.projections.users_humans.is_phone_verified` +
-		` FROM zitadel.projections.users` +
-		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id`
+	phoneQuery = `SELECT projections.users.id,` +
+		` projections.users.creation_date,` +
+		` projections.users.change_date,` +
+		` projections.users.resource_owner,` +
+		` projections.users.sequence,` +
+		//` projections.users.state,` + //TODO:
+		` projections.users_humans.user_id,` +
+		` projections.users_humans.phone,` +
+		` projections.users_humans.is_phone_verified` +
+		` FROM projections.users` +
+		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id`
 	phoneCols = []string{
 		"id",
 		"creation_date",
@@ -158,24 +158,24 @@ var (
 		"is_phone_verified",
 	}
 
-	userUniqueQuery = `SELECT zitadel.projections.users.id,` +
-		` zitadel.projections.users.state,` +
-		` zitadel.projections.users.username,` +
+	userUniqueQuery = `SELECT projections.users.id,` +
+		` projections.users.state,` +
+		` projections.users.username,` +
 		//` login_names.login_names,` +
 		//` preferred_login_name.login_name,` +
-		` zitadel.projections.users_humans.user_id,` +
-		` zitadel.projections.users_humans.email,` +
-		` zitadel.projections.users_humans.is_email_verified` +
-		` FROM zitadel.projections.users` +
-		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id`
+		` projections.users_humans.user_id,` +
+		` projections.users_humans.email,` +
+		` projections.users_humans.is_email_verified` +
+		` FROM projections.users` +
+		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id`
 	//` LEFT JOIN` +
 	//` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as login_names` +
-	//` FROM zitadel.projections.login_names as login_names` +
+	//` FROM projections.login_names as login_names` +
 	//` GROUP BY login_names.user_id) as login_names` +
-	//` on login_names.user_id = zitadel.projections.users.id` +
+	//` on login_names.user_id = projections.users.id` +
 	//` LEFT JOIN` +
-	//` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM zitadel.projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
-	//` on preferred_login_name.user_id = zitadel.projections.users.id`
+	//` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
+	//` on preferred_login_name.user_id = projections.users.id`
 	userUniqueCols = []string{
 		"id",
 		"state",
@@ -187,43 +187,43 @@ var (
 		"email",
 		"is_email_verified",
 	}
-	usersQuery = `SELECT zitadel.projections.users.id,` +
-		` zitadel.projections.users.creation_date,` +
-		` zitadel.projections.users.change_date,` +
-		` zitadel.projections.users.resource_owner,` +
-		` zitadel.projections.users.sequence,` +
-		` zitadel.projections.users.state,` +
-		` zitadel.projections.users.type,` +
-		` zitadel.projections.users.username,` +
+	usersQuery = `SELECT projections.users.id,` +
+		` projections.users.creation_date,` +
+		` projections.users.change_date,` +
+		` projections.users.resource_owner,` +
+		` projections.users.sequence,` +
+		` projections.users.state,` +
+		` projections.users.type,` +
+		` projections.users.username,` +
 		` login_names.loginnames,` +
 		` preferred_login_name.login_name,` +
-		` zitadel.projections.users_humans.user_id,` +
-		` zitadel.projections.users_humans.first_name,` +
-		` zitadel.projections.users_humans.last_name,` +
-		` zitadel.projections.users_humans.nick_name,` +
-		` zitadel.projections.users_humans.display_name,` +
-		` zitadel.projections.users_humans.preferred_language,` +
-		` zitadel.projections.users_humans.gender,` +
-		` zitadel.projections.users_humans.avatar_key,` +
-		` zitadel.projections.users_humans.email,` +
-		` zitadel.projections.users_humans.is_email_verified,` +
-		` zitadel.projections.users_humans.phone,` +
-		` zitadel.projections.users_humans.is_phone_verified,` +
-		` zitadel.projections.users_machines.user_id,` +
-		` zitadel.projections.users_machines.name,` +
-		` zitadel.projections.users_machines.description,` +
+		` projections.users_humans.user_id,` +
+		` projections.users_humans.first_name,` +
+		` projections.users_humans.last_name,` +
+		` projections.users_humans.nick_name,` +
+		` projections.users_humans.display_name,` +
+		` projections.users_humans.preferred_language,` +
+		` projections.users_humans.gender,` +
+		` projections.users_humans.avatar_key,` +
+		` projections.users_humans.email,` +
+		` projections.users_humans.is_email_verified,` +
+		` projections.users_humans.phone,` +
+		` projections.users_humans.is_phone_verified,` +
+		` projections.users_machines.user_id,` +
+		` projections.users_machines.name,` +
+		` projections.users_machines.description,` +
 		` COUNT(*) OVER ()` +
-		` FROM zitadel.projections.users` +
-		` LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.users.id = zitadel.projections.users_humans.user_id` +
-		` LEFT JOIN zitadel.projections.users_machines ON zitadel.projections.users.id = zitadel.projections.users_machines.user_id` +
+		` FROM projections.users` +
+		` LEFT JOIN projections.users_humans ON projections.users.id = projections.users_humans.user_id` +
+		` LEFT JOIN projections.users_machines ON projections.users.id = projections.users_machines.user_id` +
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
-		` FROM zitadel.projections.login_names as login_names` +
+		` FROM projections.login_names as login_names` +
 		` GROUP BY login_names.user_id) as login_names` +
-		` on login_names.user_id = zitadel.projections.users.id` +
+		` on login_names.user_id = projections.users.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM zitadel.projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
-		` on preferred_login_name.user_id = zitadel.projections.users.id`
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
+		` on preferred_login_name.user_id = projections.users.id`
 	usersCols = []string{
 		"id",
 		"creation_date",

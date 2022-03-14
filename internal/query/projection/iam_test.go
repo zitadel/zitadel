@@ -39,7 +39,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.iam (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -69,7 +69,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.iam (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -99,7 +99,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.iam (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -129,7 +129,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.iam (id, change_date, sequence, setup_started) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, setup_started) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -159,7 +159,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.iam (id, change_date, sequence, setup_done) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, setup_done) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},

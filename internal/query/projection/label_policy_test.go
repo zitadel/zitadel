@@ -40,7 +40,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -84,7 +84,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (state = $8)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color) = ($1, $2, $3, $4, $5, $6) WHERE (id = $7) AND (state = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -118,7 +118,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.label_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.label_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -145,7 +145,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.label_policies (change_date, sequence, state, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM zitadel.projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5",
+							expectedStmt: "UPSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -176,7 +176,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -207,7 +207,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -238,7 +238,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -269,7 +269,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -300,7 +300,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -331,7 +331,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -362,7 +362,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -393,7 +393,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -424,7 +424,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -455,7 +455,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -486,7 +486,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -521,7 +521,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -565,7 +565,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (id = $14) AND (state = $15)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (id = $14) AND (state = $15)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -606,7 +606,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.label_policies (change_date, sequence, state, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM zitadel.projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5",
+							expectedStmt: "UPSERT INTO projections.label_policies (change_date, sequence, state, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url) SELECT $1, $2, $3, creation_date, resource_owner, id, is_default, hide_login_name_suffix, font_url, watermark_disabled, should_error_popup, light_primary_color, light_warn_color, light_background_color, light_font_color, light_logo_url, light_icon_url, dark_primary_color, dark_warn_color, dark_background_color, dark_font_color, dark_logo_url, dark_icon_url FROM projections.label_policies AS copy_table WHERE copy_table.id = $4 AND copy_table.state = $5",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -637,7 +637,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -668,7 +668,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -699,7 +699,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -730,7 +730,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -761,7 +761,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -792,7 +792,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_logo_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -823,7 +823,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -854,7 +854,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, dark_icon_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -885,7 +885,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -916,7 +916,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, font_url) = ($1, $2, $3) WHERE (id = $4) AND (state = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -947,7 +947,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
+							expectedStmt: "UPDATE projections.label_policies SET (change_date, sequence, light_logo_url, light_icon_url, dark_logo_url, dark_icon_url, font_url) = ($1, $2, $3, $4, $5, $6, $7) WHERE (id = $8) AND (state = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

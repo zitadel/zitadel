@@ -3,13 +3,14 @@ package projection
 import (
 	"testing"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/lib/pq"
 )
 
 func TestProjectGrantProjection_reduces(t *testing.T) {
@@ -40,7 +41,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grants WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grants WHERE (project_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -67,7 +68,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grants WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_grants WHERE (grant_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",
@@ -95,7 +96,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -126,7 +127,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, state) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -157,7 +158,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -188,7 +189,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
+							expectedStmt: "UPDATE projections.project_grants SET (change_date, sequence, granted_role_keys) = ($1, $2, $3) WHERE (grant_id = $4) AND (project_id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -219,7 +220,7 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",

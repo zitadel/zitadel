@@ -42,7 +42,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-added",
@@ -73,7 +73,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-registered",
@@ -104,7 +104,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-added",
@@ -133,7 +133,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_names_users WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.login_names_users WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -162,7 +162,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								"changed",
 								"agg-id",
@@ -192,7 +192,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
+							expectedStmt: "UPDATE projections.login_names_users SET (user_name) = ($1) WHERE (id = $2)",
 							expectedArgs: []interface{}{
 								"claimed",
 								"agg-id",
@@ -222,7 +222,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								true,
 								false,
@@ -253,7 +253,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -301,7 +301,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_names_policies WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.login_names_policies WHERE (resource_owner = $1)",
 							expectedArgs: []interface{}{
 								"ro-id",
 							},
@@ -330,7 +330,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_domains (name, resource_owner) VALUES ($1, $2)",
+							expectedStmt: "INSERT INTO projections.login_names_domains (name, resource_owner) VALUES ($1, $2)",
 							expectedArgs: []interface{}{
 								"verified",
 								"ro-id",
@@ -360,7 +360,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_names_domains WHERE (name = $1) AND (resource_owner = $2)",
+							expectedStmt: "DELETE FROM projections.login_names_domains WHERE (name = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								"remove",
 								"ro-id",
@@ -390,7 +390,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_domains SET (is_primary) = ($1) WHERE (resource_owner = $2) AND (is_primary = $3)",
+							expectedStmt: "UPDATE projections.login_names_domains SET (is_primary) = ($1) WHERE (resource_owner = $2) AND (is_primary = $3)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",
@@ -398,7 +398,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_domains SET (is_primary) = ($1) WHERE (name = $2) AND (resource_owner = $3)",
+							expectedStmt: "UPDATE projections.login_names_domains SET (is_primary) = ($1) WHERE (name = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								true,
 								"primary",
@@ -429,7 +429,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								true,
 								true,
@@ -460,7 +460,7 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
+							expectedStmt: "UPDATE projections.login_names_policies SET (must_be_domain) = ($1) WHERE (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								false,
 								"ro-id",

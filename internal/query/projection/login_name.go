@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	LoginNameProjectionTable       = "projections.login_names2"
+	LoginNameProjectionTable       = "projections.login_names"
 	LoginNameUserProjectionTable   = LoginNameProjectionTable + "_" + loginNameUserSuffix
 	LoginNamePolicyProjectionTable = LoginNameProjectionTable + "_" + loginNamePolicySuffix
 	LoginNameDomainProjectionTable = LoginNameProjectionTable + "_" + loginNameDomainSuffix

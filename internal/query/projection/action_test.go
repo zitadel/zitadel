@@ -40,7 +40,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.actions (id, creation_date, change_date, resource_owner, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.actions (id, creation_date, change_date, resource_owner, sequence, name, script, timeout, allowed_to_fail, action_state) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
@@ -76,7 +76,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, name, script) = ($1, $2, $3, $4) WHERE (id = $5)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -107,7 +107,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -137,7 +137,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.actions SET (change_date, sequence, action_state) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -167,7 +167,7 @@ func TestActionProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.actions WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.actions WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

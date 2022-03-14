@@ -41,7 +41,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"token-id",
 								anyArg{},
@@ -78,7 +78,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"token-id",
 								anyArg{},
@@ -114,7 +114,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"",
 								anyArg{},
@@ -152,7 +152,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.user_auth_methods SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -189,7 +189,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.user_auth_methods SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -224,7 +224,7 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.user_auth_methods SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
+							expectedStmt: "UPDATE projections.user_auth_methods SET (change_date, sequence, name, state) = ($1, $2, $3, $4) WHERE (user_id = $5) AND (method_type = $6) AND (resource_owner = $7) AND (token_id = $8)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

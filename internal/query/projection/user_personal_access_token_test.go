@@ -41,7 +41,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.personal_access_tokens (id, creation_date, change_date, resource_owner, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.personal_access_tokens (id, creation_date, change_date, resource_owner, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"tokenID",
 								anyArg{},
@@ -75,7 +75,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.personal_access_tokens WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"tokenID",
 							},
@@ -102,7 +102,7 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.personal_access_tokens WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.personal_access_tokens WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
