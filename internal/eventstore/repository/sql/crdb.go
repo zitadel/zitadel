@@ -9,10 +9,11 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
-	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/cockroachdb/cockroach-go/v2/crdb"
 	"github.com/lib/pq"
+
+	caos_errs "github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore/repository"
 )
 
 const (
@@ -29,7 +30,7 @@ const (
 		" SELECT MAX(event_sequence) seq, 1 join_me" +
 		" FROM eventstore.events" +
 		" WHERE aggregate_type = $2" +
-		" AND tenant = $9" +
+		" AND (CASE WHEN $9::STRING IS NULL THEN tenant is null else tenant = $9::STRING END)" +
 		") AS agg_type " +
 		// combined with
 		"LEFT JOIN " +
@@ -37,7 +38,8 @@ const (
 		// max sequence and resource owner of aggregate root
 		" SELECT event_sequence seq, resource_owner ro, 1 join_me" +
 		" FROM eventstore.events" +
-		" WHERE aggregate_type = $2 AND aggregate_id = $3 AND tenant = $9" +
+		" WHERE aggregate_type = $2 AND aggregate_id = $3" +
+		" AND (CASE WHEN $9::STRING IS NULL THEN tenant is null else tenant = $9::STRING END)" +
 		" ORDER BY event_sequence DESC" +
 		" LIMIT 1" +
 		") AS agg USING(join_me)" +
@@ -53,6 +55,7 @@ const (
 		" editor_service," +
 		" resource_owner," +
 		" tenant," +
+		" event_sequence," +
 		" previous_aggregate_sequence," +
 		" previous_aggregate_type_sequence" +
 		") " +
@@ -66,8 +69,9 @@ const (
 		" $5::JSONB AS event_data," +
 		" $6::VARCHAR AS editor_user," +
 		" $7::VARCHAR AS editor_service," +
-		" IFNULL((resource_owner), $8::VARCHAR)  AS resource_owner," +
+		" IFNULL((resource_owner), $8::VARCHAR) AS resource_owner," +
 		" $9::VARCHAR AS tenant," +
+		" NEXTVAL(CONCAT('eventstore.', IFNULL($9, 'system'), '_seq'))," +
 		" aggregate_sequence AS previous_aggregate_sequence," +
 		" aggregate_type_sequence AS previous_aggregate_type_sequence " +
 		"FROM previous_data " +

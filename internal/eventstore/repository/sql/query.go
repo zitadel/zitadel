@@ -9,9 +9,10 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	z_errors "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/lib/pq"
 )
 
 type querier interface {
@@ -108,6 +109,7 @@ func eventsScanner(scanner scan, dest interface{}) (err error) {
 		&event.EditorService,
 		&event.EditorUser,
 		&event.ResourceOwner,
+		&event.Tenant,
 		&event.AggregateType,
 		&event.AggregateID,
 		&event.Version,

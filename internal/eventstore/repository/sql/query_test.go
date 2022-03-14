@@ -136,7 +136,7 @@ func Test_prepareColumns(t *testing.T) {
 				},
 			},
 			fields: fields{
-				dbRow: []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Sequence(0), Data(nil), "", "", sql.NullString{String: ""}, repository.AggregateType("user"), "hodor", repository.Version("")},
+				dbRow: []interface{}{time.Time{}, repository.EventType(""), uint64(5), Sequence(0), Sequence(0), Data(nil), "", "", sql.NullString{String: ""}, sql.NullString{String: ""}, repository.AggregateType("user"), "hodor", repository.Version("")},
 			},
 		},
 		{
