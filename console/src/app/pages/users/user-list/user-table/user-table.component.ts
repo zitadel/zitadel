@@ -259,4 +259,14 @@ export class UserTableComponent implements OnInit {
       });
     }
   }
+
+  public get multipleActivatePossible(): boolean {
+    const selected = this.selection.selected;
+    return selected ? selected.findIndex((user) => user.state !== UserState.USER_STATE_ACTIVE) > -1 : false;
+  }
+
+  public get multipleDeactivatePossible(): boolean {
+    const selected = this.selection.selected;
+    return selected ? selected.findIndex((user) => user.state !== UserState.USER_STATE_INACTIVE) > -1 : false;
+  }
 }

@@ -11,13 +11,14 @@
 
   <ng-template cnslHasRole [hasRole]="['user.write']" actions>
     <button (click)="deactivateSelectedUsers()" class="icon-button cnsl-action-button margin-right bg-state inactive"
-      mat-raised-button *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
+      mat-raised-button *ngIf="selection.hasValue() && multipleDeactivatePossible" [disabled]="disabled"
+      color="primary">
       <span class="">{{'USER.TABLE.DEACTIVATE' | translate}}</span>
       <cnsl-action-keys (actionTriggered)="deactivateSelectedUsers()" [type]="ActionKeysType.DEACTIVATE">
       </cnsl-action-keys>
     </button>
     <button (click)="reactivateSelectedUsers()" class="icon-button cnsl-action-button bg-state active" mat-raised-button
-      *ngIf="selection.hasValue()" [disabled]="disabled" color="primary">
+      *ngIf="selection.hasValue() && multipleActivatePossible" [disabled]="disabled" color="primary">
       <span class="">{{'USER.TABLE.ACTIVATE' | translate}}</span>
       <cnsl-action-keys (actionTriggered)="reactivateSelectedUsers()" [type]="ActionKeysType.REACTIVATE">
       </cnsl-action-keys>
