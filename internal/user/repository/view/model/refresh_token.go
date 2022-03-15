@@ -21,6 +21,7 @@ const (
 	RefreshTokenKeyUserAgentID   = "user_agent_id"
 	RefreshTokenKeyExpiration    = "expiration"
 	RefreshTokenKeyResourceOwner = "resource_owner"
+	RefreshTokenKeyTenant        = "tenant"
 )
 
 type RefreshTokenView struct {
@@ -39,6 +40,7 @@ type RefreshTokenView struct {
 	IdleExpiration        time.Time      `json:"-" gorm:"column:idle_expiration"`
 	Expiration            time.Time      `json:"-" gorm:"column:expiration"`
 	Sequence              uint64         `json:"-" gorm:"column:sequence"`
+	Tenant                string         `json:"tenant" gorm:"column:tenant"`
 }
 
 func RefreshTokenViewsToModel(tokens []*RefreshTokenView) []*usr_model.RefreshTokenView {
@@ -115,6 +117,7 @@ func (t *RefreshTokenView) AppendEvent(event *es_models.Event) error {
 func (t *RefreshTokenView) setRootData(event *es_models.Event) {
 	t.UserID = event.AggregateID
 	t.ResourceOwner = event.ResourceOwner
+	t.Tenant = event.Tenant
 }
 
 func (t *RefreshTokenView) appendAddedEvent(event *es_models.Event) error {

@@ -30,6 +30,7 @@ const (
 	UserGrantKeyOrgDomain     = "org_primary_domain"
 	UserGrantKeyProjectName   = "project_name"
 	UserGrantKeyDisplayName   = "display_name"
+	UserGrantKeyTenant        = "tenant"
 )
 
 type UserGrantView struct {

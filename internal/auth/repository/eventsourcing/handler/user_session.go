@@ -2,9 +2,10 @@ package handler
 
 import (
 	"github.com/caos/logging"
+
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -104,6 +105,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 				UserAgentID:   eventData.UserAgentID,
 				UserID:        event.AggregateID,
 				State:         int32(req_model.UserSessionStateActive),
+				Tenant:        event.Tenant,
 			}
 		}
 		return u.updateSession(session, event)

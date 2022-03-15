@@ -65,6 +65,8 @@ func (key TokenSearchKey) ToColumnName() string {
 		return TokenKeyExpiration
 	case model.TokenSearchKeyResourceOwner:
 		return TokenKeyResourceOwner
+	case model.TokenSearchKeyTenant:
+		return TokenKeyTenant
 	default:
 		return ""
 	}

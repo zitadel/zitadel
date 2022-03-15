@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/caos/zitadel/internal/domain"
-
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
 const (
@@ -40,8 +38,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, userAgentID, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, authReq.Tenant, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderPassword(w, r, authReq, err)
 		return

@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/caos/logging"
 
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
@@ -76,6 +76,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 	case model.ProjectAdded:
 		mapping.OrgID = event.ResourceOwner
 		mapping.ProjectID = event.AggregateID
+		mapping.Tenant = event.Tenant
 	case model.ProjectRemoved:
 		err := p.view.DeleteOrgProjectMappingsByProjectID(event.AggregateID)
 		if err == nil {
@@ -87,6 +88,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		mapping.OrgID = projectGrant.GrantedOrgID
 		mapping.ProjectID = event.AggregateID
 		mapping.ProjectGrantID = projectGrant.GrantID
+		mapping.Tenant = projectGrant.Tenant
 	case model.ProjectGrantRemoved:
 		projectGrant := new(view_model.ProjectGrant)
 		projectGrant.SetData(event)

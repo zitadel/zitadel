@@ -40,6 +40,11 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 				Method: domain.SearchMethodEquals,
 				Value:  ctxData.OrgID,
 			},
+			{
+				Key:    user_model.UserMembershipSearchKeyTenant,
+				Method: domain.SearchMethodEquals,
+				Value:  ctxData.TenantID,
+			},
 		},
 	})
 	if err != nil {
@@ -56,6 +61,11 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 				Key:    user_model.UserMembershipSearchKeyAggregateID,
 				Method: domain.SearchMethodEquals,
 				Value:  domain.IAMID,
+			},
+			{
+				Key:    user_model.UserMembershipSearchKeyTenant,
+				Method: domain.SearchMethodEquals,
+				Value:  ctxData.TenantID,
 			},
 		},
 	})

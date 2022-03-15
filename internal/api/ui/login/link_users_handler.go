@@ -13,7 +13,8 @@ const (
 
 func (l *Login) linkUsers(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.LinkExternalUsers(setContext(r.Context(), authReq.UserOrgID), authReq.ID, userAgentID, domain.BrowserInfoFromRequest(r))
+	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	err = l.authRepo.LinkExternalUsers(setContext(r.Context(), authReq.UserOrgID), authReq.ID, userAgentID, instanceID, domain.BrowserInfoFromRequest(r))
 	l.renderLinkUsersDone(w, r, authReq, err)
 }
 

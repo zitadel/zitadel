@@ -50,6 +50,7 @@ const (
 	UserMembershipSearchKeyAggregateID
 	UserMembershipSearchKeyObjectID
 	UserMembershipSearchKeyResourceOwner
+	UserMembershipSearchKeyTenant
 )
 
 type UserMembershipSearchQuery struct {

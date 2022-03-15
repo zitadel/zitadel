@@ -2,13 +2,15 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/project/model"
 	es_model "github.com/caos/zitadel/internal/project/repository/eventsourcing/model"
-	"github.com/lib/pq"
-	"time"
 )
 
 const (
@@ -39,6 +41,7 @@ type ProjectGrant struct {
 	GrantID      string   `json:"grantId"`
 	GrantedOrgID string   `json:"grantedOrgId"`
 	RoleKeys     []string `json:"roleKeys"`
+	Tenant       string   `json:"tenant"`
 }
 
 func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {

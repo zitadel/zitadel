@@ -81,6 +81,8 @@ func (key UserGrantSearchKey) ToColumnName() string {
 		return UserGrantKeyProjectName
 	case grant_model.UserGrantSearchKeyDisplayName:
 		return UserGrantKeyDisplayName
+	case grant_model.UserGrantSearchKeyTenant:
+		return UserGrantKeyTenant
 	default:
 		return ""
 	}

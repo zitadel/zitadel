@@ -94,7 +94,8 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID)
+	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID, instanceID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return

@@ -1,17 +1,21 @@
 package view
 
 import (
+	"github.com/jinzhu/gorm"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	"github.com/caos/zitadel/internal/usergrant/repository/view/model"
 	"github.com/caos/zitadel/internal/view/repository"
-	"github.com/jinzhu/gorm"
 )
 
 func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, error) {
 	grant := new(model.UserGrantView)
-	query := repository.PrepareGetByKey(table, model.UserGrantSearchKey(grant_model.UserGrantSearchKeyID), grantID)
+	query := repository.PrepareGetByQuery(table,
+		model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyID, Method: domain.SearchMethodNotEquals, Value: grantID},
+		model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyTenant, Method: domain.SearchMethodNotEquals, Value: grantID},
+	)
 	err := query(db, grant)
 	if caos_errs.IsNotFound(err) {
 		return nil, caos_errs.ThrowNotFound(nil, "VIEW-Nqwf1", "Errors.UserGrant.NotFound")

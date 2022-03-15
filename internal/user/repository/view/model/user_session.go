@@ -41,6 +41,7 @@ type UserSessionView struct {
 	MultiFactorVerification      time.Time `json:"-" gorm:"column:multi_factor_verification"`
 	MultiFactorVerificationType  int32     `json:"-" gorm:"column:multi_factor_verification_type"`
 	Sequence                     uint64    `json:"-" gorm:"column:sequence"`
+	Tenant                       string    `json:"tenant" gorm:"column:tenant"`
 }
 
 func UserSessionFromEvent(event *models.Event) (*UserSessionView, error) {

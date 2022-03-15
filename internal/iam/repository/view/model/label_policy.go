@@ -19,6 +19,7 @@ import (
 const (
 	LabelPolicyKeyAggregateID = "aggregate_id"
 	LabelPolicyKeyState       = "label_policy_state"
+	LabelPolicyKeyTenant      = "tenant"
 )
 
 type LabelPolicyView struct {
@@ -46,6 +47,7 @@ type LabelPolicyView struct {
 	Default             bool   `json:"-" gorm:"-"`
 
 	Sequence uint64 `json:"-" gorm:"column:sequence"`
+	Tenant   string `json:"tenant" gorm:"column:tenant"`
 }
 
 type AssetView struct {
@@ -189,6 +191,7 @@ func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 
 func (r *LabelPolicyView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
+	r.Tenant = event.Tenant
 }
 
 func (r *LabelPolicyView) SetData(event *models.Event) error {

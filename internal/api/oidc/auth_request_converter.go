@@ -10,6 +10,7 @@ import (
 	"github.com/caos/oidc/pkg/op"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	model2 "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
@@ -132,6 +133,7 @@ func CreateAuthRequestToBusiness(ctx context.Context, authReq *oidc.AuthRequest,
 		SelectedIDPConfigID: GetSelectedIDPIDFromScopes(authReq.Scopes),
 		MaxAuthAge:          MaxAgeToBusiness(authReq.MaxAge),
 		UserID:              userID,
+		Tenant:              authz.GetCtxData(ctx).TenantID,
 		Request: &domain.AuthRequestOIDC{
 			Scopes:        authReq.Scopes,
 			ResponseType:  ResponseTypeToBusiness(authReq.ResponseType),

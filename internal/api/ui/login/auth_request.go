@@ -19,7 +19,8 @@ func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 		return nil, nil
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID)
+	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID, instanceID)
 }
 
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {

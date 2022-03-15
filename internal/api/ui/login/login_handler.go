@@ -59,8 +59,9 @@ func (l *Login) handleLoginNameCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	instanceID := http_mw.InstanceIDFromCtx(r.Context())
 	loginName := data.LoginName
-	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID)
+	err = l.authRepo.CheckLoginName(r.Context(), authReq.ID, loginName, userAgentID, instanceID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return

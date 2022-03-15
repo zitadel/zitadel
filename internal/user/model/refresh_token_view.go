@@ -43,6 +43,7 @@ const (
 	RefreshTokenSearchKeyUserAgentID
 	RefreshTokenSearchKeyExpiration
 	RefreshTokenSearchKeyResourceOwner
+	RefreshTokenSearchKeyTenant
 )
 
 type RefreshTokenSearchQuery struct {

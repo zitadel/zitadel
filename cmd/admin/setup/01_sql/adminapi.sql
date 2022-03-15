@@ -48,6 +48,7 @@ CREATE TABLE adminapi.styling (
     err_msg_popup BOOL NULL,
     disable_watermark BOOL NULL,
     hide_login_name_suffix BOOL NULL,
+    tenant STRING NOT NULL,
 
     PRIMARY KEY (aggregate_id, label_policy_state)
 );

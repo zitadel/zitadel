@@ -2,12 +2,14 @@ package model
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
-	"time"
 )
 
 const (
@@ -27,6 +29,7 @@ type ExternalIDPView struct {
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner   string    `json:"-" gorm:"column:resource_owner"`
 	Sequence        uint64    `json:"-" gorm:"column:sequence"`
+	Tenant          string    `json:"tenant" gorm:"column:tenant"`
 }
 
 func ExternalIDPViewFromModel(externalIDP *model.ExternalIDPView) *ExternalIDPView {
@@ -80,6 +83,7 @@ func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {
 func (r *ExternalIDPView) setRootData(event *models.Event) {
 	r.UserID = event.AggregateID
 	r.ResourceOwner = event.ResourceOwner
+	r.Tenant = event.Tenant
 }
 
 func (r *ExternalIDPView) SetData(event *models.Event) error {

@@ -45,7 +45,8 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-D3g21", "no user agent id")
 	}
-	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID)
+	instanceID := middleware.InstanceIDFromCtx(ctx)
+	resp, err := o.repo.AuthRequestByIDCheckLoggedIn(ctx, id, userAgentID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +56,9 @@ func (o *OPStorage) AuthRequestByID(ctx context.Context, id string) (_ op.AuthRe
 func (o *OPStorage) AuthRequestByCode(ctx context.Context, code string) (_ op.AuthRequest, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	resp, err := o.repo.AuthRequestByCode(ctx, code)
+
+	instanceID := middleware.InstanceIDFromCtx(ctx)
+	resp, err := o.repo.AuthRequestByCode(ctx, code, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,13 +72,16 @@ func (o *OPStorage) SaveAuthCode(ctx context.Context, id, code string) (err erro
 	if !ok {
 		return errors.ThrowPreconditionFailed(nil, "OIDC-Dgus2", "no user agent id")
 	}
-	return o.repo.SaveAuthCode(ctx, id, code, userAgentID)
+	instanceID := middleware.InstanceIDFromCtx(ctx)
+	return o.repo.SaveAuthCode(ctx, id, code, userAgentID, instanceID)
 }
 
 func (o *OPStorage) DeleteAuthRequest(ctx context.Context, id string) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	return o.repo.DeleteAuthRequest(ctx, id)
+
+	instanceID := middleware.InstanceIDFromCtx(ctx)
+	return o.repo.DeleteAuthRequest(ctx, id, instanceID)
 }
 
 func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) (_ string, _ time.Time, err error) {

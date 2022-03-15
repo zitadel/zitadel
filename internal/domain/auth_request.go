@@ -23,6 +23,7 @@ type AuthRequest struct {
 	UiLocales     []string
 	LoginHint     string
 	MaxAuthAge    *time.Duration
+	Tenant        string
 	Request       Request
 
 	levelOfAssurance         LevelOfAssurance
