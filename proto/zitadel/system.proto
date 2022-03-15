@@ -148,21 +148,6 @@ service SystemService {
         };
     }
 
-    // Returns the region of an instance
-    rpc GetRegion(GetRegionRequest) returns (GetRegionResponse) {
-        option (google.api.http) = {
-            get: "/instances/{id}/region";
-        };
-    }
-
-    // Change the region of an instance
-    rpc ChangeRegion(ChangeRegionRequest) returns (ChangeRegionResponse) {
-        option (google.api.http) = {
-            put: "/instances/{id}/region";
-            body: "*"
-        };
-    }
-
     // Returns the domain of an instance
     rpc GetGeneratedDomain(GetGeneratedDomainRequest) returns (GetGeneratedDomainResponse) {
         option (google.api.http) = {
@@ -336,15 +321,14 @@ message GetInstanceResponse {
 message AddInstanceRequest {
     string instance_name = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     string first_org_name = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.instance.v1.Region region = 3;
-    string custom_domain = 4 [(validate.rules).string = {max_len: 200}];
-    string owner_first_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_last_name = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_email = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string owner_username = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    string password = 9 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    uint64 request_limit = 10;
-    uint64 action_mins_limit = 11;
+    string custom_domain = 3 [(validate.rules).string = {max_len: 200}];
+    string owner_first_name = 4 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string owner_last_name = 5 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string owner_email = 6 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string owner_username = 7 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string password = 8 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    uint64 request_limit = 9;
+    uint64 action_mins_limit = 10;
 }
 
 message AddInstanceResponse {
@@ -379,24 +363,6 @@ message GetMetricsResponse {
     uint64 user_count = 3;
     uint64 project_count = 4;
     uint64 application_count = 5;
-}
-
-message GetRegionRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message GetRegionResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    zitadel.instance.v1.Region region = 2;
-}
-
-message ChangeRegionRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-    zitadel.instance.v1.Region region = 4;
-}
-
-message ChangeRegionResponse {
-    zitadel.v1.ObjectDetails details = 1;
 }
 
 message GetGeneratedDomainRequest {

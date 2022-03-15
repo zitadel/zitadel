@@ -92,18 +92,6 @@ StateQuery is always equals
 
 
 
-### Region {#region}
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| REGION_UNSPECIFIED | 0 | - |
-| REGION_SWITZERLAND | 1 | - |
-| REGION_GDPR_COMPLIANT | 2 | - |
-
-
-
-
 ### State {#state}
 
 

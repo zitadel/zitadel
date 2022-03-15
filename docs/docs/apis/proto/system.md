@@ -94,30 +94,6 @@ Returns the metrics of an instance
     GET: /instances/{id}/metrics
 
 
-### GetRegion
-
-> **rpc** GetRegion([GetRegionRequest](#getregionrequest))
-[GetRegionResponse](#getregionresponse)
-
-Returns the region of an instance
-
-
-
-    GET: /instances/{id}/region
-
-
-### ChangeRegion
-
-> **rpc** ChangeRegion([ChangeRegionRequest](#changeregionrequest))
-[ChangeRegionResponse](#changeregionresponse)
-
-Change the region of an instance
-
-
-
-    PUT: /instances/{id}/region
-
-
 ### GetGeneratedDomain
 
 > **rpc** GetGeneratedDomain([GetGeneratedDomainRequest](#getgenerateddomainrequest))
@@ -252,7 +228,6 @@ failed event. You can find out if it worked on the `failure_count`
 | ----- | ---- | ----------- | ----------- |
 | instance_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | first_org_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| region |  zitadel.instance.v1.Region | - |  |
 | custom_domain |  string | - | string.max_len: 200<br />  |
 | owner_first_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
 | owner_last_name |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
@@ -272,29 +247,6 @@ failed event. You can find out if it worked on the `failure_count`
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | id |  string | - |  |
-
-
-
-
-### ChangeRegionRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-| region |  zitadel.instance.v1.Region | - |  |
-
-
-
-
-### ChangeRegionResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
 
 
 
@@ -447,29 +399,6 @@ This is an empty response
 | user_count |  uint64 | - |  |
 | project_count |  uint64 | - |  |
 | application_count |  uint64 | - |  |
-
-
-
-
-### GetRegionRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetRegionResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| region |  zitadel.instance.v1.Region | - |  |
 
 
 
