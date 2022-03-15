@@ -1,4 +1,5 @@
-<cnsl-refresh-table *ngIf="projectId" (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult ?? 0"
+<cnsl-refresh-table [showSelectionActionButton]="showSelectionActionButton" *ngIf="projectId"
+  (refreshed)="refreshPage()" [dataSize]="dataSource?.totalResult ?? 0"
   [emitRefreshOnPreviousRoutes]="['/projects/'+projectId+'/roles/create']" [selection]="selection"
   [loading]="dataSource?.loading$ | async" [timestamp]="dataSource?.viewTimestamp">
 

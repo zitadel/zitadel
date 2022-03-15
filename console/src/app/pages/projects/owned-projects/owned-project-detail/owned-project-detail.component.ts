@@ -105,7 +105,6 @@ export class OwnedProjectDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe((resp: PrivateLabelingSetting) => {
       if (resp !== undefined) {
         this.project.privateLabelingSetting = resp;
-        this.saveProject();
       }
     });
   }

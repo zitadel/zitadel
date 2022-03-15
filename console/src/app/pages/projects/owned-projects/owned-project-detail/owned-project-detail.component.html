@@ -77,19 +77,23 @@
             </div>
             <mat-checkbox [(ngModel)]="project.projectRoleAssertion"
               [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
-              (change)="saveProject()" color="primary">
+              color="primary">
               {{'PROJECT.ROLE.ASSERTION' | translate}}</mat-checkbox>
             <p class="desc cnsl-secondary-text">{{'PROJECT.ROLE.ASSERTION_DESCRIPTION' | translate}}</p>
             <mat-checkbox [(ngModel)]="project.projectRoleCheck"
               [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
-              (change)="saveProject()" color="primary">
+              color="primary">
               {{'PROJECT.ROLE.CHECK' | translate}}</mat-checkbox>
             <p class="desc cnsl-secondary-text">{{'PROJECT.ROLE.CHECK_DESCRIPTION' | translate}}</p>
             <mat-checkbox [(ngModel)]="project.hasProjectCheck"
               [disabled]="((['project.write$', 'project.write:'+ project.id]| hasRole | async)) === false"
-              (change)="saveProject()" color="primary">
+              color="primary">
               {{'PROJECT.HAS_PROJECT' | translate}}</mat-checkbox>
             <p class="desc cnsl-secondary-text">{{'PROJECT.HAS_PROJECT_DESCRIPTION' | translate}}</p>
+
+            <div class="project-detail-btn-container">
+              <button mat-raised-button color="primary" (click)="saveProject()">{{'ACTIONS.SAVE' | translate}}</button>
+            </div>
           </cnsl-card>
         </ng-template>
       </ng-container>

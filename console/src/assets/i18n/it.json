@@ -66,19 +66,7 @@
     "ACTIONS": "Azioni",
     "PRIVACY": "Informativa sulla privacy",
     "TOS": "Termini di servizio",
-    "TOOLTIP": {
-      "HOME": "Vai alla panoramica",
-      "PERSONAL": "Mostra il tuo account personale, i tuoi IDP, i metodi di accesso e le autorizzazioni.",
-      "IAMPOLICIES": "Gestisci le impostazioni globali di accesso e modifica i manager di ZITADEL",
-      "IAMEVENTSTORE": "Ripristina views ed eventi falliti di ZITADEL",
-      "ORG": "Mostra le impostazioni di accesso delle tue organizzazioni e gestisci i tuoi nomi di dominio",
-      "SELFPROJECTS": "Mostra i progetti della tua organizzazione",
-      "GRANTEDPROJECTS": "Mostra i progetti a cui la tua organizzazione ha accesso",
-      "HUMANUSERS": "Mostra tutti gli utenti umani registrati nella tua organizzazione",
-      "MACHINEUSERS": "Mostra tutti gli utenti di servizio della tua organizzazione",
-      "AUTHZ": "Mostra le autorizzazioni disponibili per gli utenti della tua organizzazione",
-      "ACTIONS": "Esegui processi su certi eventi."
-    }
+    "OPENSHORTCUTSTOOLTIP": "Premi ? per mostrare le scorciatoie da tastiera"
   },
   "ACTIONS": {
     "ACTIONS": "Azioni",

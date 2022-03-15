@@ -38,6 +38,11 @@
       }
     }
   }
+
+  .project-detail-btn-container {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 .desc {

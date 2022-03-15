@@ -66,19 +66,7 @@
     "ACTIONS": "Actions",
     "PRIVACY": "Privacy",
     "TOS": "Terms of Service",
-    "TOOLTIP": {
-      "HOME": "Go to your shortcuts",
-      "PERSONAL": "Show your Personal Account, your IDPs, Login methods, Factors and Authorisations",
-      "IAMPOLICIES": "Manage ZITADELs global Access policies und elect ZITADEL Managers",
-      "IAMEVENTSTORE": "Clear views and failed events",
-      "ORG": "Show your organizations access policies, and manage your domain names",
-      "SELFPROJECTS": "Show your organizations own projects",
-      "GRANTEDPROJECTS": "Show projects your organization was granted access",
-      "HUMANUSERS": "Show all registered human users on your organization",
-      "MACHINEUSERS": "Show service users of your organization",
-      "AUTHZ": "Show authorizations available to your organization users",
-      "ACTIONS": "Define scripts to execute on a certain event."
-    }
+    "OPENSHORTCUTSTOOLTIP": "Type ? to show keyboardshortcuts"
   },
   "ACTIONS": {
     "ACTIONS": "Actions",

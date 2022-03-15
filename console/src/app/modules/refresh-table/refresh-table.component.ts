@@ -35,6 +35,7 @@ export class RefreshTableComponent implements OnInit {
   @Output() public refreshed: EventEmitter<void> = new EventEmitter();
   @Input() public hideRefresh: boolean = false;
   @Input() public showBorder: boolean = false;
+  @Input() public showSelectionActionButton: boolean = true;
 
   public ActionKeysType: any = ActionKeysType;
   constructor(private refreshService: RefreshService) {}

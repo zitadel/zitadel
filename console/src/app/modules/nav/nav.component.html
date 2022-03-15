@@ -36,7 +36,7 @@
                 </a>
               </ng-template>
 
-
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
           </ng-container>
 
@@ -99,6 +99,8 @@
                   </a>
                 </ng-template>
               </ng-container>
+
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
           </ng-container>
 
@@ -146,6 +148,8 @@
                   </div>
                 </a>
               </ng-template>
+
+              <template [ngTemplateOutlet]="shortcutKeyRef"></template>
             </div>
           </ng-container>
         </div>
@@ -154,3 +158,11 @@
   </div>
 
 </ng-container>
+
+<ng-template #shortcutKeyRef>
+  <span class="fill-space"></span>
+  <div class="nav-shortcut-action-key" matTooltip="{{'MENU.OPENSHORTCUTSTOOLTIP' | translate}}">
+    <div class="nav-key-overlay"></div>
+    <span>?</span>
+  </div>
+</ng-template>

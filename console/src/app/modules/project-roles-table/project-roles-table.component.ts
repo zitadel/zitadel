@@ -24,6 +24,7 @@ export class ProjectRolesTableComponent implements OnInit {
   @Input() public disabled: boolean = false;
   @Input() public actionsVisible: boolean = false;
   @Input() public selectedKeys: string[] = [];
+  @Input() public showSelectionActionButton: boolean = true;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
   @ViewChild(MatTable) public table!: MatTable<Role.AsObject>;
   public dataSource!: ProjectRolesDataSource;

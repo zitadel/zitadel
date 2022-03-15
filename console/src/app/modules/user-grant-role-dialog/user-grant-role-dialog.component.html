@@ -2,7 +2,8 @@
 <div mat-dialog-content>
   <cnsl-project-roles-table class="role-table" *ngIf="projectId"
     [displayedColumns]="['select', 'key', 'displayname', 'group']" (changedSelection)="selectRoles($event)"
-    [projectId]="projectId" [grantId]="grantId" [selectedKeys]="selectedRoleKeysList">
+    [projectId]="projectId" [grantId]="grantId" [selectedKeys]="selectedRoleKeysList"
+    [showSelectionActionButton]="false">
   </cnsl-project-roles-table>
 </div>
 <div mat-dialog-actions class="action">
