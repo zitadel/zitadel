@@ -114,7 +114,7 @@ func Adapter(
 		}
 		current.Parsed = currentDB
 
-		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, "managed-db-password"))
+		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, "zitadel-passwords"))
 		currentDB.Current.PasswordSecretKey = "flyway"
 		currentDB.Current.PasswordSecret = pwSecretLabels
 		currentDB.Current.User = "flyway"
