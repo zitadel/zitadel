@@ -13,7 +13,7 @@
   $back: map-get($background, background);
   $border-color: if($is-dark-theme, rgba(#8795a1, 0.2), rgba(#8795a1, 0.2));
 
-  .filter-button-wrapper {
+  .cnsl-filter-button-wrapper {
     position: relative;
     padding-right: 0.5rem;
 
@@ -24,68 +24,72 @@
         margin-left: 0.5rem;
       }
     }
+  }
 
-    .filter-wrapper {
-      position: absolute;
-      right: 0.5rem;
-      top: 50px;
-      border-radius: 0.5rem;
-      z-index: 100;
-      background-color: $card-background-color;
-      transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-      border: 1px solid $border-color;
-      box-sizing: border-box;
-      outline: none;
+  .cnsl-filter-wrapper {
+    border-radius: 0.5rem;
+    background-color: $card-background-color;
+    transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    border: 1px solid $border-color;
+    box-sizing: border-box;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+    color: map-get($foreground, text);
+
+    @media only screen and (min-width: 500px) {
       width: 320px;
-      display: flex;
-      flex-direction: column;
-      padding: 0.5rem;
-      box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+    }
 
-      .filter-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid if($is-dark-theme, #ffffff15, #00000015);
+    .filter-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid if($is-dark-theme, #ffffff15, #00000015);
+
+      .filter-middle {
+        margin: 0 1rem;
+      }
+    }
+
+    .filter-row {
+      padding: 0.5rem 0;
+
+      .cb {
+        padding: 0.5rem 0;
+        font-size: 15px;
       }
 
-      .filter-row {
-        padding: 0.5rem 0;
+      .subquery {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 0.5rem;
+        background-color: if($is-dark-theme, #00000020, #ffffff20);
+        margin: 0 -0.5rem;
 
-        .cb {
-          padding: 0.5rem 0;
-          font-size: 15px;
+        .nomethod {
+          font-size: 14px;
         }
 
-        .subquery {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 0.5rem;
-          background-color: if($is-dark-theme, #00000020, #ffffff20);
-          margin: 0 -0.5rem;
+        .filter-select-method {
+          min-width: 100px;
+          margin-right: 0.5rem;
+        }
 
-          .nomethod {
-            font-size: 14px;
+        .filter-input-value {
+          input {
+            height: 36px;
+            font-size: 15px;
           }
+        }
 
-          .filter-select-method {
-            min-width: 100px;
-            margin-right: 0.5rem;
-          }
-
-          .filter-input-value {
-            input {
-              height: 36px;
-              font-size: 15px;
-            }
-          }
-
-          .filter-select-value {
-            min-width: 150px;
-          }
+        .filter-select-value {
+          min-width: 150px;
         }
       }
     }

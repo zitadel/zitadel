@@ -1,18 +1,22 @@
-<div class="filter-button-wrapper">
-  <button mat-stroked-button class="filter-toggle cnsl-action-button" (click)="toggleFilter()">
+<div class="cnsl-filter-button-wrapper">
+  <button mat-stroked-button class="filter-toggle cnsl-action-button" (click)="toggleFilter()" cdkOverlayOrigin
+    #trigger="cdkOverlayOrigin">
     <i class="las la-filter no-margin"></i>
     <span>{{ 'ACTIONS.FILTER' | translate }}</span>
     <span *ngIf="(filterCount$ | async)" class="filter-count">{{filterCount$ | async}}</span>
     <cnsl-action-keys [doNotUseContrast]="true" [type]="ActionKeysType.FILTER" (actionTriggered)="toggleFilter()">
     </cnsl-action-keys>
   </button>
-  <div *ngIf="showFilter" class="filter-wrapper">
-    <div class="filter-top">
-      <button mat-stroked-button (click)="resetted.emit()">{{'ACTIONS.RESET' |
-        translate}}</button>
-      <span>{{'FILTER.TITLE' | translate}}</span>
-      <button mat-raised-button color="primary" (click)="emitFilter()">{{'ACTIONS.FINISH' | translate}}</button>
+  <ng-template cdkConnectedOverlay [flexibleDimensions]="true" [lockPosition]="true" [offsetY]="10"
+    [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="showFilter" (detach)="showFilter = false">
+    <div class="cnsl-filter-wrapper" cdkTrapFocus>
+      <div class="filter-top">
+        <button mat-stroked-button (click)="resetted.emit()">{{'ACTIONS.RESET' |
+          translate}}</button>
+        <span class="filter-middle">{{'FILTER.TITLE' | translate}}</span>
+        <button mat-raised-button color="primary" (click)="emitFilter()">{{'ACTIONS.FINISH' | translate}}</button>
+      </div>
+      <ng-content></ng-content>
     </div>
-    <ng-content></ng-content>
-  </div>
+  </ng-template>
 </div>
