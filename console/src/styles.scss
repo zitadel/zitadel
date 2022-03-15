@@ -519,6 +519,11 @@ h2 {
   font-weight: 400;
 }
 
+.org-context-backdrop {
+  background: transparent !important;
+  opacity: 0;
+}
+
 .mat-paginator .mat-select {
   border: none;
 }

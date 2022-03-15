@@ -6,6 +6,7 @@
   .refresh-table-header-row {
     display: flex;
     align-items: center;
+    padding-bottom: 0.5rem;
 
     &.border-bottom {
       padding-bottom: 0.5rem;
@@ -15,6 +16,7 @@
 
     .refresh-table-row {
       display: flex;
+      align-items: center;
 
       .count {
         margin-right: 0.5rem;
@@ -27,12 +29,6 @@
       .count-slash {
         margin: 0 0.5rem;
         opacity: 0.8;
-      }
-
-      a {
-        cursor: pointer;
-        font-size: 14px;
-        margin-top: 2px;
       }
     }
 

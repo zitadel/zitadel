@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +9,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { OutsideClickModule } from 'src/app/directives/outside-click/outside-click.module';
 
 import { InputModule } from '../input/input.module';
 import { OrgContextComponent } from './org-context.component';
@@ -18,6 +18,7 @@ import { OrgContextComponent } from './org-context.component';
   imports: [
     CommonModule,
     FormsModule,
+    A11yModule,
     ReactiveFormsModule,
     MatIconModule,
     RouterModule,
@@ -25,7 +26,6 @@ import { OrgContextComponent } from './org-context.component';
     MatButtonModule,
     InputModule,
     MatTooltipModule,
-    OutsideClickModule,
     TranslateModule,
     MatButtonModule,
     HasRoleModule,

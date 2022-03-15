@@ -1,3 +1,13 @@
+.org-context-backdrop {
+  background: transparent !important;
+}
+
+.context_card {
+  border-radius: 0.5rem;
+  box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
+  border: 1px solid rgba(#8795a1, 0.2);
+}
+
 @mixin header-theme($theme) {
   $primary: map-get($theme, primary);
   $warn: map-get($theme, warn);
@@ -117,16 +127,6 @@
                 width: 1.25rem;
               }
             }
-          }
-
-          .context_card {
-            position: absolute;
-            top: 55px;
-            right: -3rem;
-            z-index: 300;
-            overflow: hidden;
-            border-radius: 0.5rem;
-            box-shadow: 0 0 15px 0 rgb(0 0 0 / 10%);
           }
         }
       }

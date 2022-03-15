@@ -69,7 +69,7 @@
         align-items: center;
         justify-content: space-between;
         padding: 0 0.5rem;
-        background-color: if($is-dark-theme, #00000020, #ffffff20);
+        background-color: if($is-dark-theme, #00000020, #00000008);
         margin: 0 -0.5rem;
 
         .nomethod {

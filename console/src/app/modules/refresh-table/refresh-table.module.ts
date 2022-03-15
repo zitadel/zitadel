@@ -10,6 +10,7 @@ import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
 
+import { ActionKeysModule } from '../action-keys/action-keys.module';
 import { RefreshTableComponent } from './refresh-table.component';
 
 @NgModule({
@@ -19,6 +20,7 @@ import { RefreshTableComponent } from './refresh-table.component';
     MatButtonModule,
     MatIconModule,
     TranslateModule,
+    ActionKeysModule,
     FormsModule,
     MatTooltipModule,
     MatProgressSpinnerModule,

@@ -9,6 +9,7 @@ export enum ActionKeysType {
   REACTIVATE,
   FILTER,
   ORGSWITCHER,
+  CLEAR,
 }
 
 @Component({
@@ -28,6 +29,12 @@ export class ActionKeysComponent implements AfterViewInit {
 
     if (exclude.indexOf(tagname.toLowerCase()) === -1) {
       switch (this.type) {
+        case ActionKeysType.CLEAR:
+          if (event.code === 'Escape') {
+            event.preventDefault();
+            this.actionTriggered.emit();
+          }
+          break;
         case ActionKeysType.ORGSWITCHER:
           if (event.key === '/') {
             this.actionTriggered.emit();

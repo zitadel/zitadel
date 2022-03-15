@@ -48,9 +48,10 @@
           <a *ngIf="org" matRipple [matRippleUnbounded]="false" class="org-link" id="orglink" [routerLink]="[ '/org']">
             {{org?.name ? org.name : 'NO NAME'}}</a>
 
-          <div class="org-context-wrapper" (clickOutside)="showOrgContext ? showOrgContext = false: null">
-            <button *ngIf="org" matRipple [matRippleUnbounded]="false" id="orgswitchbutton"
-              class="org-switch-button dontcloseonclick" (click)="showOrgContext = !showOrgContext">
+          <div class="org-context-wrapper" *ngIf="org">
+            <button cdkOverlayOrigin #trigger="cdkOverlayOrigin" matRipple [matRippleUnbounded]="false"
+              id="orgswitchbutton" class="org-switch-button dontcloseonclick"
+              (click)="showOrgContext = !showOrgContext">
               <span class="svgsapn dontcloseonclick">
                 <svg xmlns=" http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path fill-rule="evenodd"
@@ -61,9 +62,16 @@
               <cnsl-action-keys (actionTriggered)="showOrgContext = !showOrgContext"
                 [type]="ActionKeysType.ORGSWITCHER"></cnsl-action-keys>
             </button>
-            <cnsl-org-context class="context_card" *ngIf="org && showOrgContext" (closedCard)="showOrgContext = false"
-              [org]="org" (setOrg)="setActiveOrg($event)">
-            </cnsl-org-context>
+
+            <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [flexibleDimensions]="true"
+              [lockPosition]="true" [cdkConnectedOverlayOffsetY]="10" [cdkConnectedOverlayHasBackdrop]="true"
+              [cdkConnectedOverlayPositions]="positions" cdkConnectedOverlayBackdropClass="org-context-backdrop"
+              [cdkConnectedOverlayOpen]="showOrgContext" (backdropClick)="showOrgContext = false"
+              (detach)="showOrgContext = false">
+              <cnsl-org-context class="context_card" *ngIf="org && showOrgContext" (closedCard)="showOrgContext = false"
+                [org]="org" (setOrg)="setActiveOrg($event)">
+              </cnsl-org-context>
+            </ng-template>
           </div>
         </div>
       </ng-container>

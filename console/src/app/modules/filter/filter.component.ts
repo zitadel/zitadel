@@ -1,3 +1,4 @@
+import { ConnectedPosition, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { SearchQuery as MemberSearchQuery } from 'src/app/proto/generated/zitadel/member_pb';
@@ -31,6 +32,11 @@ export class FilterComponent implements OnDestroy {
     TextQueryMethod.TEXT_QUERY_METHOD_EQUALS_IGNORE_CASE,
   ];
   ActionKeysType: any = ActionKeysType;
+
+  public positions: ConnectedPosition[] = [
+    new ConnectionPositionPair({ originX: 'start', originY: 'bottom' }, { overlayX: 'start', overlayY: 'top' }, 0, 10),
+    new ConnectionPositionPair({ originX: 'end', originY: 'bottom' }, { overlayX: 'end', overlayY: 'top' }, 0, 10),
+  ];
 
   public toggleFilter(): void {
     this.showFilter = !this.showFilter;

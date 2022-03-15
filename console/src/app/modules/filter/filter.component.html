@@ -7,8 +7,9 @@
     <cnsl-action-keys [doNotUseContrast]="true" [type]="ActionKeysType.FILTER" (actionTriggered)="toggleFilter()">
     </cnsl-action-keys>
   </button>
-  <ng-template cdkConnectedOverlay [flexibleDimensions]="true" [lockPosition]="true" [offsetY]="10"
-    [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="showFilter" (detach)="showFilter = false">
+  <ng-template cdkConnectedOverlay [flexibleDimensions]="true" [lockPosition]="true" [cdkConnectedOverlayOffsetY]="10"
+    [cdkConnectedOverlayPositions]="positions" [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="showFilter" (detach)="showFilter = false">
     <div class="cnsl-filter-wrapper" cdkTrapFocus>
       <div class="filter-top">
         <button mat-stroked-button (click)="resetted.emit()">{{'ACTIONS.RESET' |

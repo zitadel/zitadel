@@ -4,6 +4,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { RefreshService } from 'src/app/services/refresh.service';
 
+import { ActionKeysType } from '../action-keys/action-keys.component';
+
 const rotate = animation([
   animate(
     '{{time}} cubic-bezier(0.785, 0.135, 0.15, 0.86)',
@@ -34,6 +36,7 @@ export class RefreshTableComponent implements OnInit {
   @Input() public hideRefresh: boolean = false;
   @Input() public showBorder: boolean = false;
 
+  public ActionKeysType: any = ActionKeysType;
   constructor(private refreshService: RefreshService) {}
 
   ngOnInit(): void {

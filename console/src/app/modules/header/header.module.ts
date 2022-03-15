@@ -1,3 +1,4 @@
+import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -9,7 +10,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { HasRoleModule } from 'src/app/directives/has-role/has-role.module';
-import { OutsideClickModule } from 'src/app/directives/outside-click/outside-click.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 
 import { AccountsCardModule } from '../accounts-card/accounts-card.module';
@@ -29,12 +29,12 @@ import { HeaderComponent } from './header.component';
     ActionKeysModule,
     MatRippleModule,
     MatIconModule,
+    OverlayModule,
     MatButtonModule,
     HasRoleModule,
     MatProgressSpinnerModule,
     TranslateModule,
     OrgContextModule,
-    OutsideClickModule,
     AvatarModule,
     AccountsCardModule,
     HasRolePipeModule,

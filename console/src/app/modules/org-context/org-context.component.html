@@ -1,4 +1,4 @@
-<div class="card" cnslOutsideClick (clickOutside)="closeCard($event)">
+<div class="org-context-card" cdkTrapFocus>
   <div class="spinner-w">
     <mat-spinner diameter="20" *ngIf="orgLoading$ | async" color="accent">
     </mat-spinner>

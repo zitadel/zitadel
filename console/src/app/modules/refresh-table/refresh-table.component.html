@@ -6,7 +6,11 @@
     </div>
 
     <span class="count-slash">|</span>
-    <a (click)="selection.clear()">{{'ORG_DETAIL.TABLE.CLEAR' | translate}}</a>
+    <a mat-stroked-button class="cnsl-action-button" (click)="selection.clear()">
+      <span>{{'ORG_DETAIL.TABLE.CLEAR' | translate}}</span>
+      <cnsl-action-keys [doNotUseContrast]="true" [type]="ActionKeysType.CLEAR" (actionTriggered)="selection.clear()">
+      </cnsl-action-keys>
+    </a>
   </div>
   <ng-template #leftActions>
     <ng-content select="[leftActions]"></ng-content>

@@ -1,86 +1,103 @@
-.card {
-  border-radius: 0.5rem;
-  z-index: 200;
-  border: 1px solid #ffffff30;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0;
-  min-width: 220px;
-  max-width: 240px;
-  padding-bottom: 0.5rem;
-  position: relative;
+@mixin org-context-theme($theme) {
+  $primary: map-get($theme, primary);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $accent: map-get($theme, accent);
+  $primary-color: mat.get-color-from-palette($primary, 500);
 
-  .filter-wrapper {
-    padding: 0.5rem;
-  }
+  $warn-color: mat.get-color-from-palette($warn, 500);
+  $accent-color: mat.get-color-from-palette($accent, 500);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $back: map-get($background, background);
 
-  .spinner-w {
-    top: 1rem;
-    left: 0;
-    right: 0;
-    position: absolute;
+  .org-context-card {
+    border-radius: 0.5rem;
+    z-index: 200;
+    border: 1px solid #ffffff30;
     display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .show-all {
-    width: 100%;
-  }
-
-  .org-wrapper {
-    max-height: 350px;
-    display: flex;
-    align-items: stretch;
     flex-direction: column;
-    overflow-y: auto;
-    width: 100%;
+    align-items: center;
+    padding: 0;
+    min-width: 220px;
+    max-width: 240px;
+    padding-bottom: 0.5rem;
+    position: relative;
+    color: map-get($foreground, text);
+    background: map-get($background, cards);
 
-    .org-button-with-pin {
-      min-height: 36px;
-      position: relative;
-      overflow: hidden;
+    .filter-wrapper {
+      padding: 0.5rem;
+    }
 
-      .org-flex-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .spinner-w {
+      top: 1rem;
+      left: 0;
+      right: 0;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .org-span {
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
+    .show-all {
+      width: 100%;
+    }
 
-        button {
-          height: 36px;
-          width: 36px;
-          font-size: 1.2rem;
-          line-height: 1rem;
-          margin-right: -0.5rem;
-          visibility: hidden;
-          opacity: 0.5;
+    .org-wrapper {
+      max-height: 350px;
+      display: flex;
+      align-items: stretch;
+      flex-direction: column;
+      overflow-y: auto;
+      width: 100%;
+      border-top: 1px solid rgba(#8795a1, 0.2);
 
-          &:hover {
-            opacity: 1;
-          }
+      .org-button-with-pin {
+        min-height: 36px;
+        position: relative;
+        overflow: hidden;
 
-          mat-icon {
-            font-size: 20px;
-            height: 20px;
-            width: 20px;
-          }
-        }
-      }
-
-      &.border-bottom {
-        border-bottom: 1px solid #66666630;
-      }
-
-      &:hover {
         .org-flex-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .org-span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
           button {
-            visibility: visible;
+            height: 36px;
+            width: 36px;
+            font-size: 1.2rem;
+            line-height: 1rem;
+            margin-right: -0.5rem;
+            visibility: hidden;
+            opacity: 0.5;
+
+            &:hover {
+              opacity: 1;
+            }
+
+            mat-icon {
+              font-size: 20px;
+              height: 20px;
+              width: 20px;
+            }
+          }
+        }
+
+        &.border-bottom {
+          border-bottom: 1px solid #66666630;
+        }
+
+        &:hover {
+          .org-flex-row {
+            button {
+              visibility: visible;
+            }
           }
         }
       }

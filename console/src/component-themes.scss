@@ -12,6 +12,7 @@
 @import 'src/app/modules/app-card/app-card.component';
 @import 'src/app/modules/contributors/contributors.component';
 @import 'src/app/modules/nav/nav.component';
+@import 'src/app/modules/org-context/org-context.component.scss';
 @import 'src/app/modules/action-keys/action-keys.component.scss';
 @import 'src/app/modules/header/header.component';
 @import 'src/app/modules/keyboard-shortcuts/keyboard-shortcuts.component';
@@ -86,6 +87,7 @@
   @include cnsl-label-theme($theme);
   @include cnsl-error-theme($theme);
   @include link-theme($theme);
+  @include org-context-theme($theme);
   @include auth-user-detail-theme($theme);
   @include edit-text-theme($theme);
   @include user-detail-theme($theme);
