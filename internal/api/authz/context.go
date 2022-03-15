@@ -20,6 +20,7 @@ const (
 type CtxData struct {
 	UserID            string
 	OrgID             string
+	TenantID          string //TODO: Set Tenant ID on some context
 	ProjectID         string
 	AgentID           string
 	PreferredLanguage string

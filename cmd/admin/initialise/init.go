@@ -5,12 +5,13 @@ import (
 	_ "embed"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/database"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	//sql import
 	_ "github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/database"
 )
 
 func New() *cobra.Command {
@@ -33,9 +34,9 @@ The user provided by flags needs priviledge to
 				return err
 			}
 			if err := initialise(config,
-				verifyUser(config.Database),
-				verifyDatabase(config.Database),
-				verifyGrant(config.Database),
+				VerifyUser(config.Database.User.Username, config.Database.User.Password),
+				VerifyDatabase(config.Database.Database),
+				VerifyGrant(config.Database.Database, config.Database.User.Username),
 			); err != nil {
 				return err
 			}
@@ -55,12 +56,18 @@ func initialise(config Config, steps ...func(*sql.DB) error) error {
 	if err != nil {
 		return err
 	}
+	err = Initialise(db, steps...)
+	if err != nil {
+		return err
+	}
+	return db.Close()
+}
 
+func Initialise(db *sql.DB, steps ...func(*sql.DB) error) error {
 	for _, step := range steps {
-		if err = step(db); err != nil {
+		if err := step(db); err != nil {
 			return err
 		}
 	}
-
-	return db.Close()
+	return nil
 }

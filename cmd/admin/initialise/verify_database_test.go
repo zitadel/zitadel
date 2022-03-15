@@ -4,14 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"testing"
-
-	"github.com/caos/zitadel/internal/database"
 )
 
 func Test_verifyDB(t *testing.T) {
 	type args struct {
-		db     db
-		config database.Config
+		db       db
+		database string
 	}
 	tests := []struct {
 		name      string
@@ -21,10 +19,8 @@ func Test_verifyDB(t *testing.T) {
 		{
 			name: "exists fails",
 			args: args{
-				db: prepareDB(t, expectQueryErr("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", sql.ErrConnDone, "zitadel")),
-				config: database.Config{
-					Database: "zitadel",
-				},
+				db:       prepareDB(t, expectQueryErr("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", sql.ErrConnDone, "zitadel")),
+				database: "zitadel",
 			},
 			targetErr: sql.ErrConnDone,
 		},
@@ -35,9 +31,7 @@ func Test_verifyDB(t *testing.T) {
 					expectExists("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", false, "zitadel"),
 					expectExec("CREATE DATABASE zitadel", sql.ErrTxDone),
 				),
-				config: database.Config{
-					Database: "zitadel",
-				},
+				database: "zitadel",
 			},
 			targetErr: sql.ErrTxDone,
 		},
@@ -48,9 +42,7 @@ func Test_verifyDB(t *testing.T) {
 					expectExists("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", false, "zitadel"),
 					expectExec("CREATE DATABASE zitadel", nil),
 				),
-				config: database.Config{
-					Database: "zitadel",
-				},
+				database: "zitadel",
 			},
 			targetErr: nil,
 		},
@@ -60,16 +52,14 @@ func Test_verifyDB(t *testing.T) {
 				db: prepareDB(t,
 					expectExists("SELECT EXISTS(SELECT database_name FROM [show databases] WHERE database_name = $1)", true, "zitadel"),
 				),
-				config: database.Config{
-					Database: "zitadel",
-				},
+				database: "zitadel",
 			},
 			targetErr: nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := verifyDatabase(tt.args.config)(tt.args.db.db); !errors.Is(err, tt.targetErr) {
+			if err := VerifyDatabase(tt.args.database)(tt.args.db.db); !errors.Is(err, tt.targetErr) {
 				t.Errorf("verifyDB() error = %v, want: %v", err, tt.targetErr)
 			}
 			if err := tt.args.db.mock.ExpectationsWereMet(); err != nil {

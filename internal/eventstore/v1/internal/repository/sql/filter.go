@@ -26,7 +26,7 @@ func filter(querier Querier, searchQuery *es_models.SearchQueryFactory) (events 
 
 	rows, err := querier.Query(query, values...)
 	if err != nil {
-		logging.Log("SQL-HP3Uk").WithError(err).Info("query failed")
+		logging.New().WithError(err).Info("query failed")
 		return nil, errors.ThrowInternal(err, "SQL-IJuyR", "unable to filter events")
 	}
 	defer rows.Close()
@@ -55,7 +55,7 @@ func (db *SQL) LatestSequence(ctx context.Context, queryFactory *es_models.Searc
 	sequence := new(Sequence)
 	err := rowScanner(row.Scan, sequence)
 	if err != nil {
-		logging.Log("SQL-WsxTg").WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("query failed")
+		logging.New().WithError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Info("query failed")
 		return 0, errors.ThrowInternal(err, "SQL-Yczyx", "unable to filter latest sequence")
 	}
 	return uint64(*sequence), nil

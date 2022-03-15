@@ -23,6 +23,7 @@ const (
 		", editor_service" +
 		", editor_user" +
 		", resource_owner" +
+		", tenant" +
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
@@ -32,7 +33,7 @@ const (
 func buildQuery(queryFactory *es_models.SearchQueryFactory) (query string, limit uint64, values []interface{}, rowScanner func(s scan, dest interface{}) error) {
 	searchQuery, err := queryFactory.Build()
 	if err != nil {
-		logging.Log("SQL-cshKu").WithError(err).Warn("search query factory invalid")
+		logging.New().WithError(err).Warn("search query factory invalid")
 		return "", 0, nil, nil
 	}
 	query, rowScanner = prepareColumns(searchQuery.Columns)
@@ -116,13 +117,14 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				&event.EditorService,
 				&event.EditorUser,
 				&event.ResourceOwner,
+				&event.Tenant,
 				&event.AggregateType,
 				&event.AggregateID,
 				&event.AggregateVersion,
 			)
 
 			if err != nil {
-				logging.Log("SQL-kn1Sw").WithError(err).Warn("unable to scan row")
+				logging.New().WithError(err).Warn("unable to scan row")
 				return z_errors.ThrowInternal(err, "SQL-J0hFS", "unable to scan row")
 			}
 
@@ -175,6 +177,8 @@ func getField(field es_models.Field) string {
 		return "event_sequence"
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
+	case es_models.Field_Tenant:
+		return "tenant"
 	case es_models.Field_EditorService:
 		return "editor_service"
 	case es_models.Field_EditorUser:

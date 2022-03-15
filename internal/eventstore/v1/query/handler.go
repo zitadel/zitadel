@@ -43,7 +43,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 	}()
 	currentSequence, err := handler.CurrentSequence()
 	if err != nil {
-		logging.Log("HANDL-BmpkC").WithError(err).Warn("unable to get current sequence")
+		logging.New().WithError(err).Warn("unable to get current sequence")
 		return
 	}
 
@@ -65,7 +65,7 @@ func ReduceEvent(handler Handler, event *models.Event) {
 			return
 		}
 		if unprocessedEvent.Sequence < currentSequence {
-			logging.LogWithFields("QUERY-DOYVN",
+			logging.WithFields(
 				"unprocessed", unprocessedEvent.Sequence,
 				"current", currentSequence,
 				"view", handler.ViewModel()).
