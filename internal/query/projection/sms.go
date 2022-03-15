@@ -22,9 +22,11 @@ const (
 	SMSColumnSequence      = "sequence"
 	SMSColumnState         = "state"
 	SMSColumnResourceOwner = "resource_owner"
+	SMSColumnInstanceID    = "instance_id"
 
 	smsTwilioTableSuffix              = "twilio"
 	SMSTwilioConfigColumnSMSID        = "sms_id"
+	SMSTwilioConfigColumnInstanceID   = "instance_id"
 	SMSTwilioConfigColumnSID          = "sid"
 	SMSTwilioConfigColumnSenderNumber = "sender_number"
 	SMSTwilioConfigColumnToken        = "token"
@@ -47,11 +49,13 @@ func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SMSColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(SMSColumnInstanceID, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(SMSColumnID),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText, crdb.Default(SMSColumnID)),
+			crdb.NewColumn(SMSTwilioConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnSID, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnSenderNumber, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSTwilioConfigColumnToken, crdb.ColumnTypeJSONB),
@@ -109,6 +113,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 				handler.NewCol(SMSColumnCreationDate, e.CreationDate()),
 				handler.NewCol(SMSColumnChangeDate, e.CreationDate()),
 				handler.NewCol(SMSColumnResourceOwner, e.Aggregate().ResourceOwner),
+				handler.NewCol(SMSColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSColumnState, domain.SMSConfigStateInactive),
 				handler.NewCol(SMSColumnSequence, e.Sequence()),
 			},
@@ -116,6 +121,7 @@ func (p *SMSConfigProjection) reduceSMSConfigTwilioAdded(event eventstore.Event)
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(SMSTwilioConfigColumnSMSID, e.ID),
+				handler.NewCol(SMSTwilioConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(SMSTwilioConfigColumnSID, e.SID),
 				handler.NewCol(SMSTwilioConfigColumnToken, e.Token),
 				handler.NewCol(SMSTwilioConfigColumnSenderNumber, e.SenderNumber),

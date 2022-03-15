@@ -17,6 +17,7 @@ const (
 	ActionCreationDateCol  = "creation_date"
 	ActionChangeDateCol    = "change_date"
 	ActionResourceOwnerCol = "resource_owner"
+	ActionInstanceIDCol    = "instance_id"
 	ActionStateCol         = "action_state"
 	ActionSequenceCol      = "sequence"
 	ActionNameCol          = "name"
@@ -39,6 +40,7 @@ func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 			crdb.NewColumn(ActionCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ActionChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ActionResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ActionInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(ActionStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ActionSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ActionNameCol, crdb.ColumnTypeText),
@@ -96,6 +98,7 @@ func (p *ActionProjection) reduceActionAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(ActionCreationDateCol, e.CreationDate()),
 			handler.NewCol(ActionChangeDateCol, e.CreationDate()),
 			handler.NewCol(ActionResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(ActionInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(ActionSequenceCol, e.Sequence()),
 			handler.NewCol(ActionNameCol, e.Name),
 			handler.NewCol(ActionScriptCol, e.Script),

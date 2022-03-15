@@ -40,7 +40,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -49,6 +49,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								domain.LabelPolicyStatePreview,
 								false,
 								"ro-id",
+								"instance-id",
 								"#5282c1",
 								"#141735",
 								"#ff3b5b",
@@ -521,7 +522,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+							expectedStmt: "INSERT INTO projections.label_policies (creation_date, change_date, sequence, id, state, is_default, resource_owner, instance_id, light_primary_color, light_background_color, light_warn_color, light_font_color, dark_primary_color, dark_background_color, dark_warn_color, dark_font_color, hide_login_name_suffix, should_error_popup, watermark_disabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -530,6 +531,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 								domain.LabelPolicyStatePreview,
 								true,
 								"ro-id",
+								"instance-id",
 								"#5282c1",
 								"#141735",
 								"#ff3b5b",

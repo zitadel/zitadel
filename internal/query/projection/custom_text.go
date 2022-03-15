@@ -16,6 +16,7 @@ const (
 	CustomTextTable = "projections.custom_texts"
 
 	CustomTextAggregateIDCol  = "aggregate_id"
+	CustomTextInstanceIDCol   = "instance_id"
 	CustomTextCreationDateCol = "creation_date"
 	CustomTextChangeDateCol   = "change_date"
 	CustomTextSequenceCol     = "sequence"
@@ -37,6 +38,7 @@ func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(CustomTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
@@ -109,6 +111,7 @@ func (p *CustomTextProjection) reduceSet(event eventstore.Event) (*handler.State
 		&customTextEvent,
 		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
+			handler.NewCol(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 			handler.NewCol(CustomTextCreationDateCol, customTextEvent.CreationDate()),
 			handler.NewCol(CustomTextChangeDateCol, customTextEvent.CreationDate()),
 			handler.NewCol(CustomTextSequenceCol, customTextEvent.Sequence()),

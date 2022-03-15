@@ -43,7 +43,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -54,6 +54,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 								"http://tos.link",
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -142,7 +143,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.privacy_policies (creation_date, change_date, sequence, id, state, privacy_link, tos_link, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -153,6 +154,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 								"http://tos.link",
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},

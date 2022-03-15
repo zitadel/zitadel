@@ -17,6 +17,7 @@ const (
 	FlowSequenceCol              = "sequence"
 	FlowTriggerTypeCol           = "trigger_type"
 	FlowResourceOwnerCol         = "resource_owner"
+	FlowInstanceIDCol            = "instance_id"
 	FlowActionTriggerSequenceCol = "trigger_sequence"
 	FlowActionIDCol              = "action_id"
 )
@@ -36,6 +37,7 @@ func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(FlowSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(FlowTriggerTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(FlowResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(FlowInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
 		},
@@ -80,6 +82,7 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 		stmts[i+1] = crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
+				handler.NewCol(FlowInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(FlowTypeCol, e.FlowType),
 				handler.NewCol(FlowChangeDateCol, e.CreationDate()),
 				handler.NewCol(FlowSequenceCol, e.Sequence()),

@@ -42,11 +42,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-added",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -73,11 +74,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"human-registered",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -104,11 +106,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_users (id, user_name, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"machine-added",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -222,11 +225,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -330,10 +334,11 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_domains (name, resource_owner) VALUES ($1, $2)",
+							expectedStmt: "INSERT INTO projections.login_names_domains (name, resource_owner, instance_id) VALUES ($1, $2, $3)",
 							expectedArgs: []interface{}{
 								"verified",
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -429,11 +434,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3)",
+							expectedStmt: "INSERT INTO projections.login_names_policies (must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},

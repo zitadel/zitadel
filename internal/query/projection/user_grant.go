@@ -24,6 +24,7 @@ const (
 	UserGrantSequence      = "sequence"
 	UserGrantState         = "state"
 	UserGrantResourceOwner = "resource_owner"
+	UserGrantInstanceID    = "instance_id"
 	UserGrantUserID        = "user_id"
 	UserGrantProjectID     = "project_id"
 	UserGrantGrantID       = "grant_id"
@@ -46,6 +47,7 @@ func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(UserGrantState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(UserGrantResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(UserGrantInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantUserID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
@@ -143,6 +145,7 @@ func (p *UserGrantProjection) reduceAdded(event eventstore.Event) (*handler.Stat
 		[]handler.Column{
 			handler.NewCol(UserGrantID, e.Aggregate().ID),
 			handler.NewCol(UserGrantResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(UserGrantInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(UserGrantCreationDate, e.CreationDate()),
 			handler.NewCol(UserGrantChangeDate, e.CreationDate()),
 			handler.NewCol(UserGrantSequence, e.Sequence()),

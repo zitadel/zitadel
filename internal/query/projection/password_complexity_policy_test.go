@@ -46,7 +46,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -59,6 +59,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 								false,
 							},
 						},
@@ -157,7 +158,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.password_complexity_policies (creation_date, change_date, sequence, id, state, min_length, has_lowercase, has_uppercase, has_symbol, has_number, resource_owner, instance_id, is_default) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -170,6 +171,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 								true,
 							},
 						},

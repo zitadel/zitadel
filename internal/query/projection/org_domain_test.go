@@ -39,13 +39,14 @@ func TestOrgDomainProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_domains (creation_date, change_date, sequence, domain, org_id, is_verified, is_primary, validation_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_domains (creation_date, change_date, sequence, domain, org_id, instance_id, is_verified, is_primary, validation_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"domain.new",
 								"agg-id",
+								"instance-id",
 								false,
 								false,
 								domain.OrgDomainValidationTypeUnspecified,

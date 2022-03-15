@@ -23,6 +23,7 @@ const (
 	PrivacyPolicyStateCol         = "state"
 	PrivacyPolicyIsDefaultCol     = "is_default"
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
+	PrivacyPolicyInstanceIDCol    = "instance_id"
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
 )
@@ -44,6 +45,7 @@ func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(PrivacyPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(PrivacyPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
 		},
@@ -114,6 +116,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 

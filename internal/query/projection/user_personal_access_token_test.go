@@ -41,12 +41,13 @@ func TestPersonalAccessTokenProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.personal_access_tokens (id, creation_date, change_date, resource_owner, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.personal_access_tokens (id, creation_date, change_date, resource_owner, instance_id, sequence, user_id, expiration, scopes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"tokenID",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								uint64(15),
 								"agg-id",
 								time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),

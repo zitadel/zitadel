@@ -23,6 +23,7 @@ const (
 	LabelPolicyStateCol               = "state"
 	LabelPolicyIsDefaultCol           = "is_default"
 	LabelPolicyResourceOwnerCol       = "resource_owner"
+	LabelPolicyInstanceIDCol          = "instance_id"
 	LabelPolicyHideLoginNameSuffixCol = "hide_login_name_suffix"
 	LabelPolicyWatermarkDisabledCol   = "watermark_disabled"
 	LabelPolicyShouldErrorPopupCol    = "should_error_popup"
@@ -60,6 +61,7 @@ func NewLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LabelPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LabelPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LabelPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LabelPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LabelPolicyHideLoginNameSuffixCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LabelPolicyWatermarkDisabledCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LabelPolicyShouldErrorPopupCol, crdb.ColumnTypeBool, crdb.Default(false)),
@@ -238,6 +240,7 @@ func (p *LabelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(LabelPolicyStateCol, domain.LabelPolicyStatePreview),
 			handler.NewCol(LabelPolicyIsDefaultCol, isDefault),
 			handler.NewCol(LabelPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(LabelPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 			handler.NewCol(LabelPolicyLightPrimaryColorCol, policyEvent.PrimaryColor),
 			handler.NewCol(LabelPolicyLightBackgroundColorCol, policyEvent.BackgroundColor),
 			handler.NewCol(LabelPolicyLightWarnColorCol, policyEvent.WarnColor),

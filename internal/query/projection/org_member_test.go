@@ -44,7 +44,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_members (user_id, roles, creation_date, change_date, sequence, resource_owner, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.org_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, org_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
 								pq.StringArray{"role"},
@@ -52,6 +52,7 @@ func TestOrgMemberProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								"agg-id",
 							},
 						},

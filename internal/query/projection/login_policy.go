@@ -16,6 +16,7 @@ const (
 	LoginPolicyTable = "projections.login_policies"
 
 	LoginPolicyIDCol                    = "aggregate_id"
+	LoginPolicyInstanceIDCol            = "instance_id"
 	LoginPolicyCreationDateCol          = "creation_date"
 	LoginPolicyChangeDateCol            = "change_date"
 	LoginPolicySequenceCol              = "sequence"
@@ -46,6 +47,7 @@ func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(LoginPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(LoginPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(LoginPolicySequenceCol, crdb.ColumnTypeInt64),
@@ -154,6 +156,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 
 	return crdb.NewCreateStatement(&policyEvent, []handler.Column{
 		handler.NewCol(LoginPolicyIDCol, policyEvent.Aggregate().ID),
+		handler.NewCol(LoginPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		handler.NewCol(LoginPolicyCreationDateCol, policyEvent.CreationDate()),
 		handler.NewCol(LoginPolicyChangeDateCol, policyEvent.CreationDate()),
 		handler.NewCol(LoginPolicySequenceCol, policyEvent.Sequence()),

@@ -20,6 +20,7 @@ const (
 	SecretGeneratorColumnChangeDate          = "change_date"
 	SecretGeneratorColumnSequence            = "sequence"
 	SecretGeneratorColumnResourceOwner       = "resource_owner"
+	SecretGeneratorColumnInstanceID          = "instance_id"
 	SecretGeneratorColumnLength              = "length"
 	SecretGeneratorColumnExpiry              = "expiry"
 	SecretGeneratorColumnIncludeLowerLetters = "include_lower_letters"
@@ -44,6 +45,7 @@ func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 			crdb.NewColumn(SecretGeneratorColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(SecretGeneratorColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecretGeneratorColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(SecretGeneratorColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(SecretGeneratorColumnLength, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecretGeneratorColumnExpiry, crdb.ColumnTypeInt64),
 			crdb.NewColumn(SecretGeneratorColumnIncludeLowerLetters, crdb.ColumnTypeBool),
@@ -93,6 +95,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 			handler.NewCol(SecretGeneratorColumnCreationDate, e.CreationDate()),
 			handler.NewCol(SecretGeneratorColumnChangeDate, e.CreationDate()),
 			handler.NewCol(SecretGeneratorColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(SecretGeneratorColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(SecretGeneratorColumnSequence, e.Sequence()),
 			handler.NewCol(SecretGeneratorColumnLength, e.Length),
 			handler.NewCol(SecretGeneratorColumnExpiry, e.Expiry),

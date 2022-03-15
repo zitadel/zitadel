@@ -17,6 +17,7 @@ const (
 	MemberChangeDate    = "change_date"
 	MemberSequence      = "sequence"
 	MemberResourceOwner = "resource_owner"
+	MemberInstanceID    = "instance_id"
 )
 
 var (
@@ -27,6 +28,7 @@ var (
 		crdb.NewColumn(MemberRolesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		crdb.NewColumn(MemberSequence, crdb.ColumnTypeInt64),
 		crdb.NewColumn(MemberResourceOwner, crdb.ColumnTypeText),
+		crdb.NewColumn(MemberInstanceID, crdb.ColumnTypeText),
 	}
 )
 
@@ -60,6 +62,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(MemberInstanceID, e.Aggregate().InstanceID),
 		}}
 
 	for _, opt := range opts {

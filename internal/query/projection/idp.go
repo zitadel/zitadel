@@ -28,6 +28,7 @@ const (
 	IDPChangeDateCol    = "change_date"
 	IDPSequenceCol      = "sequence"
 	IDPResourceOwnerCol = "resource_owner"
+	IDPInstanceIDCol    = "instance_id"
 	IDPStateCol         = "state"
 	IDPNameCol          = "name"
 	IDPStylingTypeCol   = "styling_type"
@@ -36,6 +37,7 @@ const (
 	IDPTypeCol          = "type"
 
 	OIDCConfigIDPIDCol                 = "idp_id"
+	OIDCConfigInstanceIDCol            = "instance_id"
 	OIDCConfigClientIDCol              = "client_id"
 	OIDCConfigClientSecretCol          = "client_secret"
 	OIDCConfigIssuerCol                = "issuer"
@@ -46,6 +48,7 @@ const (
 	OIDCConfigTokenEndpointCol         = "token_endpoint"
 
 	JWTConfigIDPIDCol        = "idp_id"
+	JWTConfigInstanceIDCol   = "instance_id"
 	JWTConfigIssuerCol       = "issuer"
 	JWTConfigKeysEndpointCol = "keys_endpoint"
 	JWTConfigHeaderNameCol   = "header_name"
@@ -67,6 +70,7 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(IDPSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(IDPResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(IDPInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(IDPNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPStylingTypeCol, crdb.ColumnTypeEnum),
@@ -79,6 +83,7 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+			crdb.NewColumn(OIDCConfigInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCConfigClientIDCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(OIDCConfigClientSecretCol, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(OIDCConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -93,6 +98,7 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(JWTConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),
+			crdb.NewColumn(JWTConfigInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(JWTConfigIssuerCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(JWTConfigKeysEndpointCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(JWTConfigHeaderNameCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -215,6 +221,7 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.Event) (*handler.Stateme
 			handler.NewCol(IDPChangeDateCol, idpEvent.CreationDate()),
 			handler.NewCol(IDPSequenceCol, idpEvent.Sequence()),
 			handler.NewCol(IDPResourceOwnerCol, idpEvent.Aggregate().ResourceOwner),
+			handler.NewCol(IDPInstanceIDCol, idpEvent.Aggregate().InstanceID),
 			handler.NewCol(IDPStateCol, domain.IDPConfigStateActive),
 			handler.NewCol(IDPNameCol, idpEvent.Name),
 			handler.NewCol(IDPStylingTypeCol, idpEvent.StylingType),
@@ -355,6 +362,7 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(OIDCConfigInstanceIDCol, event.Aggregate().InstanceID),
 				handler.NewCol(OIDCConfigClientIDCol, idpEvent.ClientID),
 				handler.NewCol(OIDCConfigClientSecretCol, idpEvent.ClientSecret),
 				handler.NewCol(OIDCConfigIssuerCol, idpEvent.Issuer),
@@ -457,6 +465,7 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(OIDCConfigIDPIDCol, idpEvent.IDPConfigID),
+				handler.NewCol(JWTConfigInstanceIDCol, event.Aggregate().InstanceID),
 				handler.NewCol(JWTConfigEndpointCol, idpEvent.JWTEndpoint),
 				handler.NewCol(JWTConfigIssuerCol, idpEvent.Issuer),
 				handler.NewCol(JWTConfigKeysEndpointCol, idpEvent.KeysEndpoint),

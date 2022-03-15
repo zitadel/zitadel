@@ -21,6 +21,7 @@ const (
 	DebugNotificationProviderChangeDateCol    = "change_date"
 	DebugNotificationProviderSequenceCol      = "sequence"
 	DebugNotificationProviderResourceOwnerCol = "resource_owner"
+	DebugNotificationProviderInstanceIDCol    = "instance_id"
 	DebugNotificationProviderStateCol         = "state"
 	DebugNotificationProviderTypeCol          = "provider_type"
 	DebugNotificationProviderCompactCol       = "compact"
@@ -41,6 +42,7 @@ func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 			crdb.NewColumn(DebugNotificationProviderChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(DebugNotificationProviderSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(DebugNotificationProviderResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DebugNotificationProviderInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(DebugNotificationProviderStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
@@ -106,6 +108,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		handler.NewCol(DebugNotificationProviderChangeDateCol, providerEvent.CreationDate()),
 		handler.NewCol(DebugNotificationProviderSequenceCol, providerEvent.Sequence()),
 		handler.NewCol(DebugNotificationProviderResourceOwnerCol, providerEvent.Aggregate().ResourceOwner),
+		handler.NewCol(DebugNotificationProviderInstanceIDCol, providerEvent.Aggregate().InstanceID),
 		handler.NewCol(DebugNotificationProviderStateCol, domain.NotificationProviderStateActive),
 		handler.NewCol(DebugNotificationProviderTypeCol, providerType),
 		handler.NewCol(DebugNotificationProviderCompactCol, providerEvent.Compact),

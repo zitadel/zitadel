@@ -104,13 +104,14 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.secret_generators (aggregate_id, generator_type, creation_date, change_date, resource_owner, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+							expectedStmt: "INSERT INTO projections.secret_generators (aggregate_id, generator_type, creation_date, change_date, resource_owner, instance_id, sequence, length, expiry, include_lower_letters, include_upper_letters, include_digits, include_symbols) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								domain.SecretGeneratorTypeInitCode,
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								uint64(15),
 								uint(4),
 								time.Millisecond * 10,

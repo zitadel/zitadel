@@ -17,6 +17,7 @@ const (
 	MessageTextTable = "projections.message_texts"
 
 	MessageTextAggregateIDCol  = "aggregate_id"
+	MessageTextInstanceIDCol   = "instance_id"
 	MessageTextCreationDateCol = "creation_date"
 	MessageTextChangeDateCol   = "change_date"
 	MessageTextSequenceCol     = "sequence"
@@ -43,6 +44,7 @@ func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(MessageTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MessageTextInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MessageTextCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(MessageTextChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(MessageTextSequenceCol, crdb.ColumnTypeInt64),
@@ -119,6 +121,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 
 	cols := []handler.Column{
 		handler.NewCol(MessageTextAggregateIDCol, templateEvent.Aggregate().ID),
+		handler.NewCol(MessageTextInstanceIDCol, templateEvent.Aggregate().InstanceID),
 		handler.NewCol(MessageTextCreationDateCol, templateEvent.CreationDate()),
 		handler.NewCol(MessageTextChangeDateCol, templateEvent.CreationDate()),
 		handler.NewCol(MessageTextSequenceCol, templateEvent.Sequence()),

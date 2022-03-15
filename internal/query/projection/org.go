@@ -18,6 +18,7 @@ const (
 	OrgColumnCreationDate  = "creation_date"
 	OrgColumnChangeDate    = "change_date"
 	OrgColumnResourceOwner = "resource_owner"
+	OrgColumnInstance      = "instance_id"
 	OrgColumnState         = "org_state"
 	OrgColumnSequence      = "sequence"
 	OrgColumnName          = "name"
@@ -38,6 +39,7 @@ func NewOrgProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(OrgColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OrgColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OrgColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgColumnInstance, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(OrgColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OrgColumnName, crdb.ColumnTypeText),
@@ -94,6 +96,7 @@ func (p *OrgProjection) reduceOrgAdded(event eventstore.Event) (*handler.Stateme
 			handler.NewCol(OrgColumnCreationDate, e.CreationDate()),
 			handler.NewCol(OrgColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OrgColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(OrgColumnInstance, e.Aggregate().InstanceID),
 			handler.NewCol(OrgColumnSequence, e.Sequence()),
 			handler.NewCol(OrgColumnName, e.Name),
 			handler.NewCol(OrgColumnState, domain.OrgStateActive),

@@ -41,12 +41,13 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"token-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								"agg-id",
 								uint64(15),
 								domain.MFAStateNotReady,
@@ -78,12 +79,13 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"token-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								"agg-id",
 								uint64(15),
 								domain.MFAStateNotReady,
@@ -114,12 +116,13 @@ func TestUserAuthMethodProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "UPSERT INTO projections.user_auth_methods (token_id, creation_date, change_date, resource_owner, instance_id, user_id, sequence, state, method_type, name) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								"agg-id",
 								uint64(15),
 								domain.MFAStateNotReady,

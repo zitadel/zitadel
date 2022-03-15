@@ -23,6 +23,7 @@ const (
 	LockoutPolicyStateCol               = "state"
 	LockoutPolicyIsDefaultCol           = "is_default"
 	LockoutPolicyResourceOwnerCol       = "resource_owner"
+	LockoutPolicyInstanceIDCol          = "instance_id"
 	LockoutPolicyMaxPasswordAttemptsCol = "max_password_attempts"
 	LockoutPolicyShowLockOutFailuresCol = "show_failure"
 )
@@ -44,6 +45,7 @@ func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(LockoutPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(LockoutPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(LockoutPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LockoutPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LockoutPolicyShowLockOutFailuresCol, crdb.ColumnTypeBool),
 		},
@@ -114,6 +116,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(LockoutPolicyShowLockOutFailuresCol, policyEvent.ShowLockOutFailures),
 			handler.NewCol(LockoutPolicyIsDefaultCol, isDefault),
 			handler.NewCol(LockoutPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(LockoutPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 

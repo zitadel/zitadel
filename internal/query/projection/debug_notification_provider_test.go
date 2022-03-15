@@ -41,13 +41,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.NotificationProviderStateActive,
 								domain.NotificationProviderTypeFile,
 								true,
@@ -138,13 +139,14 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.notification_providers (aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, state, provider_type, compact) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.NotificationProviderStateActive,
 								domain.NotificationProviderTypeLog,
 								true,

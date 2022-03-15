@@ -143,13 +143,14 @@ func TestProjectRoleProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_roles (role_key, project_id, creation_date, change_date, resource_owner, sequence, display_name, group_name, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.project_roles (role_key, project_id, creation_date, change_date, resource_owner, instance_id, sequence, display_name, group_name, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"key",
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								uint64(15),
 								"Key",
 								"Group",

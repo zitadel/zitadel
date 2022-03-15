@@ -42,7 +42,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -52,6 +52,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 								true,
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -137,7 +138,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -147,6 +148,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},

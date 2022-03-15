@@ -23,6 +23,7 @@ const (
 	ComplexityPolicyStateCol         = "state"
 	ComplexityPolicyIsDefaultCol     = "is_default"
 	ComplexityPolicyResourceOwnerCol = "resource_owner"
+	ComplexityPolicyInstanceIDCol    = "instance_id"
 	ComplexityPolicyMinLengthCol     = "min_length"
 	ComplexityPolicyHasLowercaseCol  = "has_lowercase"
 	ComplexityPolicyHasUppercaseCol  = "has_uppercase"
@@ -47,6 +48,7 @@ func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(ComplexityPolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ComplexityPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(ComplexityPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(ComplexityPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(ComplexityPolicyMinLengthCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ComplexityPolicyHasLowercaseCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(ComplexityPolicyHasUppercaseCol, crdb.ColumnTypeBool),
@@ -122,6 +124,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 			handler.NewCol(ComplexityPolicyHasSymbolCol, policyEvent.HasSymbol),
 			handler.NewCol(ComplexityPolicyHasNumberCol, policyEvent.HasNumber),
 			handler.NewCol(ComplexityPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(ComplexityPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 			handler.NewCol(ComplexityPolicyIsDefaultCol, isDefault),
 		}), nil
 }

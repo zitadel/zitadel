@@ -40,11 +40,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.authn_keys (id, creation_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								"agg-id",
 								uint64(15),
 								"appId",
@@ -76,11 +77,12 @@ func TestAuthNKeyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.authn_keys (id, creation_date, resource_owner, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.authn_keys (id, creation_date, resource_owner, instance_id, aggregate_id, sequence, object_id, expiration, identifier, public_key, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"keyId",
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								"agg-id",
 								uint64(15),
 								"agg-id",

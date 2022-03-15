@@ -18,6 +18,7 @@ const (
 	OIDCSettingsColumnCreationDate               = "creation_date"
 	OIDCSettingsColumnChangeDate                 = "change_date"
 	OIDCSettingsColumnResourceOwner              = "resource_owner"
+	OIDCSettingsColumnInstanceID                 = "instance_id"
 	OIDCSettingsColumnSequence                   = "sequence"
 	OIDCSettingsColumnAccessTokenLifetime        = "access_token_lifetime"
 	OIDCSettingsColumnIdTokenLifetime            = "id_token_lifetime"
@@ -39,6 +40,7 @@ func NewOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(OIDCSettingsColumnCreationDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OIDCSettingsColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OIDCSettingsColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(OIDCSettingsColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(OIDCSettingsColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnAccessTokenLifetime, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ExternalLoginCheckLifetimeCol, crdb.ColumnTypeInt64),
@@ -83,6 +85,7 @@ func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 			handler.NewCol(OIDCSettingsColumnCreationDate, e.CreationDate()),
 			handler.NewCol(OIDCSettingsColumnChangeDate, e.CreationDate()),
 			handler.NewCol(OIDCSettingsColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(OIDCSettingsColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(OIDCSettingsColumnSequence, e.Sequence()),
 			handler.NewCol(OIDCSettingsColumnAccessTokenLifetime, e.AccessTokenLifetime),
 			handler.NewCol(OIDCSettingsColumnIdTokenLifetime, e.IdTokenLifetime),

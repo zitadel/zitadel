@@ -48,13 +48,14 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idps (id, creation_date, change_date, sequence, resource_owner, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idps (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.IDPConfigStateActive,
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeUnspecified,
@@ -237,9 +238,10 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps_oidc_config (idp_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idps_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
+								"instance-id",
 								"client-id",
 								anyArg{},
 								"issuer",
@@ -364,9 +366,10 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps_jwt_config (idp_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idps_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
+								"instance-id",
 								"https://api.zitadel.ch/jwt",
 								"issuer",
 								"https://api.zitadel.ch/keys",
@@ -466,13 +469,14 @@ func TestIDPProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idps (id, creation_date, change_date, sequence, resource_owner, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.idps (id, creation_date, change_date, sequence, resource_owner, instance_id, state, name, styling_type, auto_register, owner_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.IDPConfigStateActive,
 								"custom-zitadel-instance",
 								domain.IDPConfigStylingTypeUnspecified,
@@ -655,9 +659,10 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps_oidc_config (idp_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.idps_oidc_config (idp_id, instance_id, client_id, client_secret, issuer, scopes, display_name_mapping, username_mapping, authorization_endpoint, token_endpoint) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
+								"instance-id",
 								"client-id",
 								anyArg{},
 								"issuer",
@@ -782,9 +787,10 @@ func TestIDPProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO projections.idps_jwt_config (idp_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.idps_jwt_config (idp_id, instance_id, endpoint, issuer, keys_endpoint, header_name) VALUES ($1, $2, $3, $4, $5, $6)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
+								"instance-id",
 								"https://api.zitadel.ch/jwt",
 								"issuer",
 								"https://api.zitadel.ch/keys",

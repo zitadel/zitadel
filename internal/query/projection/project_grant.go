@@ -22,6 +22,7 @@ const (
 	ProjectGrantColumnSequence      = "sequence"
 	ProjectGrantColumnState         = "state"
 	ProjectGrantColumnResourceOwner = "resource_owner"
+	ProjectGrantColumnInstanceID    = "instance_id"
 	ProjectGrantColumnProjectID     = "project_id"
 	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
 	ProjectGrantColumnRoleKeys      = "granted_role_keys"
@@ -44,6 +45,7 @@ func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
@@ -109,6 +111,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnCreationDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),

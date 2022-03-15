@@ -24,6 +24,7 @@ const (
 	OrgIAMPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
 	OrgIAMPolicyIsDefaultCol             = "is_default"
 	OrgIAMPolicyResourceOwnerCol         = "resource_owner"
+	OrgIAMPolicyInstanceCol              = "instance_id"
 )
 
 type OrgIAMPolicyProjection struct {
@@ -44,6 +45,7 @@ func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(OrgIAMPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(OrgIAMPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(OrgIAMPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgIAMPolicyInstanceCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(OrgIAMPolicyIDCol),
 		),
@@ -111,6 +113,7 @@ func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 			handler.NewCol(OrgIAMPolicyUserLoginMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
 			handler.NewCol(OrgIAMPolicyIsDefaultCol, isDefault),
 			handler.NewCol(OrgIAMPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(OrgIAMPolicyInstanceCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 

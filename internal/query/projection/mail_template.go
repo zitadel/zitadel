@@ -17,6 +17,7 @@ const (
 	MailTemplateTable = "projections.mail_templates"
 
 	MailTemplateAggregateIDCol  = "aggregate_id"
+	MailTemplateInstanceIDCol   = "instance_id"
 	MailTemplateCreationDateCol = "creation_date"
 	MailTemplateChangeDateCol   = "change_date"
 	MailTemplateSequenceCol     = "sequence"
@@ -36,6 +37,7 @@ func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandler
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(MailTemplateAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(MailTemplateInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MailTemplateCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(MailTemplateChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(MailTemplateSequenceCol, crdb.ColumnTypeInt64),
@@ -102,6 +104,7 @@ func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 		&templateEvent,
 		[]handler.Column{
 			handler.NewCol(MailTemplateAggregateIDCol, templateEvent.Aggregate().ID),
+			handler.NewCol(MailTemplateInstanceIDCol, templateEvent.Aggregate().InstanceID),
 			handler.NewCol(MailTemplateCreationDateCol, templateEvent.CreationDate()),
 			handler.NewCol(MailTemplateChangeDateCol, templateEvent.CreationDate()),
 			handler.NewCol(MailTemplateSequenceCol, templateEvent.Sequence()),

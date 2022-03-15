@@ -43,7 +43,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -51,6 +51,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.IdentityProviderTypeSystem,
 							},
 						},
@@ -141,7 +142,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.idp_login_policy_links (idp_id, aggregate_id, creation_date, change_date, sequence, resource_owner, instance_id, provider_type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"idp-config-id",
 								"agg-id",
@@ -149,6 +150,7 @@ func TestIDPLoginPolicyLinkProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								domain.IdentityProviderTypeOrg,
 							},
 						},

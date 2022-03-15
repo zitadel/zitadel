@@ -18,6 +18,7 @@ const (
 	UserMetadataColumnChangeDate    = "change_date"
 	UserMetadataColumnSequence      = "sequence"
 	UserMetadataColumnResourceOwner = "resource_owner"
+	UserMetadataColumnInstanceID    = "instance_id"
 	UserMetadataColumnKey           = "key"
 	UserMetadataColumnValue         = "value"
 )
@@ -37,6 +38,7 @@ func NewUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(UserMetadataColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(UserMetadataColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(UserMetadataColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
 		},
@@ -85,6 +87,7 @@ func (p *UserMetadataProjection) reduceMetadataSet(event eventstore.Event) (*han
 		[]handler.Column{
 			handler.NewCol(UserMetadataColumnUserID, e.Aggregate().ID),
 			handler.NewCol(UserMetadataColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(UserMetadataColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(UserMetadataColumnCreationDate, e.CreationDate()),
 			handler.NewCol(UserMetadataColumnChangeDate, e.CreationDate()),
 			handler.NewCol(UserMetadataColumnSequence, e.Sequence()),

@@ -220,13 +220,14 @@ func TestProjectGrantProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+							expectedStmt: "INSERT INTO projections.project_grants (grant_id, project_id, creation_date, change_date, resource_owner, instance_id, state, sequence, granted_org_id, granted_role_keys, creator_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								domain.ProjectGrantStateActive,
 								uint64(15),
 								"granted-org-id",

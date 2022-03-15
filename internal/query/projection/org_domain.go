@@ -15,6 +15,7 @@ const (
 	OrgDomainTable = "projections.org_domains"
 
 	OrgDomainOrgIDCol          = "org_id"
+	OrgDomainInstanceIDCol     = "instance_id"
 	OrgDomainCreationDateCol   = "creation_date"
 	OrgDomainChangeDateCol     = "change_date"
 	OrgDomainSequenceCol       = "sequence"
@@ -35,6 +36,7 @@ func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerCon
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
 			crdb.NewColumn(OrgDomainOrgIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(OrgDomainInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgDomainCreationDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OrgDomainChangeDateCol, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(OrgDomainSequenceCol, crdb.ColumnTypeInt64),
@@ -93,6 +95,7 @@ func (p *OrgDomainProjection) reduceDomainAdded(event eventstore.Event) (*handle
 			handler.NewCol(OrgDomainSequenceCol, e.Sequence()),
 			handler.NewCol(OrgDomainDomainCol, e.Domain),
 			handler.NewCol(OrgDomainOrgIDCol, e.Aggregate().ID),
+			handler.NewCol(OrgDomainInstanceIDCol, e.Aggregate().InstanceID),
 			handler.NewCol(OrgDomainIsVerifiedCol, false),
 			handler.NewCol(OrgDomainIsPrimaryCol, false),
 			handler.NewCol(OrgDomainValidationTypeCol, domain.OrgDomainValidationTypeUnspecified),

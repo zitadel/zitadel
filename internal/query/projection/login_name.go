@@ -26,16 +26,19 @@ const (
 	LoginNameUserIDCol            = "id"
 	LoginNameUserUserNameCol      = "user_name"
 	LoginNameUserResourceOwnerCol = "resource_owner"
+	LoginNameUserInstanceIDCol    = "instance_id"
 
 	loginNameDomainSuffix           = "domains"
 	LoginNameDomainNameCol          = "name"
 	LoginNameDomainIsPrimaryCol     = "is_primary"
 	LoginNameDomainResourceOwnerCol = "resource_owner"
+	LoginNameDomainInstanceIDCol    = "instance_id"
 
 	loginNamePolicySuffix             = "policies"
 	LoginNamePoliciesMustBeDomainCol  = "must_be_domain"
 	LoginNamePoliciesIsDefaultCol     = "is_default"
 	LoginNamePoliciesResourceOwnerCol = "resource_owner"
+	LoginNamePoliciesInstanceIDCol    = "instance_id"
 )
 
 var (
@@ -43,13 +46,14 @@ var (
 		" user_id"+
 		" , IF(%[1]s, CONCAT(%[2]s, '@', domain), %[2]s) AS login_name"+
 		" , IFNULL(%[3]s, true) AS %[3]s"+
+		" , %[4]s"+
 		" FROM ("+
 		" SELECT"+
 		" policy_users.user_id"+
 		" , policy_users.%[2]s"+
-		" , policy_users.%[4]s"+
+		" , policy_users.%[5]s"+
 		" , policy_users.%[1]s"+
-		" , domains.%[5]s AS domain"+
+		" , domains.%[6]s AS domain"+
 		" , domains.%[3]s"+
 		" FROM ("+
 		" SELECT"+
@@ -57,14 +61,15 @@ var (
 		" , users.%[2]s"+
 		" , users.%[4]s"+
 		" , IFNULL(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
-		" FROM %[6]s users"+
-		" LEFT JOIN %[7]s policy_custom on policy_custom.%[8]s = users.%[4]s"+
-		" LEFT JOIN %[7]s policy_default on policy_default.%[9]s = true) policy_users"+
-		" LEFT JOIN %[10]s domains ON policy_users.%[1]s AND policy_users.%[4]s = domains.%[11]s"+
+		" FROM %[7]s users"+
+		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s"+
+		" LEFT JOIN %[8]s policy_default on policy_default.%[10]s = true) policy_users"+
+		" LEFT JOIN %[11]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[12]s"+
 		");",
 		LoginNamePoliciesMustBeDomainCol,
 		LoginNameUserUserNameCol,
 		LoginNameDomainIsPrimaryCol,
+		LoginNameUserInstanceIDCol,
 		LoginNameUserResourceOwnerCol,
 		LoginNameDomainNameCol,
 		LoginNameUserProjectionTable,
@@ -90,6 +95,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(LoginNameUserIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameUserUserNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameUserResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameUserInstanceIDCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(LoginNameUserIDCol),
 			loginNameUserSuffix,
@@ -99,6 +105,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(LoginNameDomainIsPrimaryCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginNameDomainResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNameDomainInstanceIDCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(LoginNameDomainResourceOwnerCol, LoginNameDomainNameCol),
 			loginNameDomainSuffix,
@@ -107,6 +114,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(LoginNamePoliciesMustBeDomainCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginNamePoliciesIsDefaultCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(LoginNamePoliciesResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(LoginNamePoliciesInstanceIDCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
@@ -224,6 +232,7 @@ func (p *LoginNameProjection) reduceUserCreated(event eventstore.Event) (*handle
 			handler.NewCol(LoginNameUserIDCol, event.Aggregate().ID),
 			handler.NewCol(LoginNameUserUserNameCol, userName),
 			handler.NewCol(LoginNameUserResourceOwnerCol, event.Aggregate().ResourceOwner),
+			handler.NewCol(LoginNameUserInstanceIDCol, event.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameUserSuffix),
 	), nil
@@ -303,6 +312,7 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*
 			handler.NewCol(LoginNamePoliciesMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
 			handler.NewCol(LoginNamePoliciesIsDefaultCol, isDefault),
 			handler.NewCol(LoginNamePoliciesResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(LoginNamePoliciesInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNamePolicySuffix),
 	), nil
@@ -362,6 +372,7 @@ func (p *LoginNameProjection) reduceDomainVerified(event eventstore.Event) (*han
 		[]handler.Column{
 			handler.NewCol(LoginNameDomainNameCol, e.Domain),
 			handler.NewCol(LoginNameDomainResourceOwnerCol, e.Aggregate().ResourceOwner),
+			handler.NewCol(LoginNameDomainInstanceIDCol, e.Aggregate().InstanceID),
 		},
 		crdb.WithTableSuffix(loginNameDomainSuffix),
 	), nil

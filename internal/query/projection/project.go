@@ -20,6 +20,7 @@ const (
 	ProjectColumnSequence               = "sequence"
 	ProjectColumnState                  = "state"
 	ProjectColumnResourceOwner          = "resource_owner"
+	ProjectColumnInstanceID             = "instance_id"
 	ProjectColumnName                   = "name"
 	ProjectColumnProjectRoleAssertion   = "project_role_assertion"
 	ProjectColumnProjectRoleCheck       = "project_role_check"
@@ -44,6 +45,7 @@ func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ProjectColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ProjectColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectColumnName, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectColumnProjectRoleAssertion, crdb.ColumnTypeBool),
 			crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
@@ -101,6 +103,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 			handler.NewCol(ProjectColumnCreationDate, e.CreationDate()),
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(ProjectColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectColumnName, e.Name),
 			handler.NewCol(ProjectColumnProjectRoleAssertion, e.ProjectRoleAssertion),

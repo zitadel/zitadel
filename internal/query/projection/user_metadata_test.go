@@ -41,10 +41,11 @@ func TestUserMetadataProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.user_metadata (user_id, resource_owner, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "UPSERT INTO projections.user_metadata (user_id, resource_owner, instance_id, creation_date, change_date, sequence, key, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								"ro-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),

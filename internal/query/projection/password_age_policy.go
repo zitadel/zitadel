@@ -23,6 +23,7 @@ const (
 	AgePolicyStateCol          = "state"
 	AgePolicyIsDefaultCol      = "is_default"
 	AgePolicyResourceOwnerCol  = "resource_owner"
+	AgePolicyInstanceIDCol     = "instance_id"
 	AgePolicyExpireWarnDaysCol = "expire_warn_days"
 	AgePolicyMaxAgeDaysCol     = "max_age_days"
 )
@@ -44,6 +45,7 @@ func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AgePolicyStateCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AgePolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(AgePolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AgePolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(AgePolicyExpireWarnDaysCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(AgePolicyMaxAgeDaysCol, crdb.ColumnTypeInt64),
 		},
@@ -114,6 +116,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 			handler.NewCol(AgePolicyMaxAgeDaysCol, policyEvent.MaxAgeDays),
 			handler.NewCol(AgePolicyIsDefaultCol, isDefault),
 			handler.NewCol(AgePolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(AgePolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 

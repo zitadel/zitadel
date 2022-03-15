@@ -19,6 +19,7 @@ const (
 	ProjectRoleColumnChangeDate    = "change_date"
 	ProjectRoleColumnSequence      = "sequence"
 	ProjectRoleColumnResourceOwner = "resource_owner"
+	ProjectRoleColumnInstanceID    = "instance_id"
 	ProjectRoleColumnDisplayName   = "display_name"
 	ProjectRoleColumnGroupName     = "group_name"
 	ProjectRoleColumnCreator       = "creator_id" //TODO: necessary?
@@ -40,6 +41,7 @@ func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(ProjectRoleColumnChangeDate, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(ProjectRoleColumnSequence, crdb.ColumnTypeInt64),
 			crdb.NewColumn(ProjectRoleColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectRoleColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnDisplayName, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnCreator, crdb.ColumnTypeText),
@@ -90,6 +92,7 @@ func (p *ProjectRoleProjection) reduceProjectRoleAdded(event eventstore.Event) (
 			handler.NewCol(ProjectRoleColumnCreationDate, e.CreationDate()),
 			handler.NewCol(ProjectRoleColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectRoleColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectRoleColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(ProjectRoleColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectRoleColumnDisplayName, e.DisplayName),
 			handler.NewCol(ProjectRoleColumnGroupName, e.Group),
