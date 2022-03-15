@@ -74,6 +74,8 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
+				db.SetQueriedForDatabase(queried, current)
+
 				currentDB.Current.Host = desiredKind.Spec.Host
 				currentDB.Current.Cluster = desiredKind.Spec.Cluster
 				currentDB.Current.Port = strconv.Itoa(int(desiredKind.Spec.Port))
@@ -92,7 +94,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 
 					cert, err := pem.DecodeCertificate([]byte(certificate))
 					if err != nil {
-						return nil, fmt.Errorf("decoding pem certificate failed: %w", err)
+						return ensureErr(fmt.Errorf("decoding pem certificate failed: %w", err)), nil
 					}
 
 					certificateKey, err := read.GetSecretValue(k8sClient, desiredKind.Spec.CertificateKey, desiredKind.Spec.ExistingCertificateKey)
@@ -101,28 +103,28 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 					}
 
 					if certificateKey == "" {
-						return nil, errors.New("please provide a certificate key using zitadelctl writesecret")
+						return ensureErr(errors.New("please provide a certificate key using zitadelctl writesecret")), nil
 					}
 
 					certKey, err := pem.DecodeKey([]byte(certificateKey))
 					if err != nil {
-						return nil, fmt.Errorf("decoding pem certificate key failed: %w", err)
+						return ensureErr(fmt.Errorf("decoding pem certificate key failed: %w", err)), nil
 					}
 
 					certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
-						db.CACert: string(cert),
+						db.CACert: certificate,
 						db.CAKey:  certificateKey,
 					})
 					if err != nil {
 						return nil, err
 					}
 
-					currentDB.Current.CACert = []byte(certificate)
+					currentDB.Current.CACert = cert
 					currentDB.Current.CAKey = certKey
 
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
 				} else {
-					return nil, errors.New("please provide a ca certificate using zitadelctl writesecret")
+					return ensureErr(errors.New("please provide a ca certificate using zitadelctl writesecret")), nil
 				}
 
 				currentDB.Current.Secure = certificate != ""
@@ -144,7 +146,6 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(pwQuerier))
 				}
 
-				db.SetQueriedForDatabase(queried, current)
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			}, func(k8sClient kubernetes.ClientInt) error { return nil },
 			func(kubernetes.ClientInt, map[string]interface{}, bool) error { return nil },
@@ -153,4 +154,10 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 			false,
 			nil
 	}
+}
+
+// ensureErr can be used for errors that should not yet be returned in the query phase
+// for example for the writesecret command
+func ensureErr(err error) operator.EnsureFunc {
+	return func(_ kubernetes.ClientInt) error { return err }
 }

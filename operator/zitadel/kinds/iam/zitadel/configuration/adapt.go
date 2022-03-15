@@ -1,7 +1,6 @@
 package configuration
 
 import (
-	"fmt"
 	"github.com/caos/zitadel/pkg/databases/certs/client"
 	"time"
 
@@ -165,7 +164,7 @@ func AdaptFunc(
 				}
 
 				for user := range necessaryUsers {
-					queriers = append(queriers, queryCert(user, db.CertsSecret(user), fmt.Sprintf("client.%s.crt", user), fmt.Sprintf("client.%s.key", user)))
+					queriers = append(queriers, queryCert(user))
 				}
 
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)

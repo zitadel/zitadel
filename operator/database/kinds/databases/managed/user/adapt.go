@@ -30,7 +30,6 @@ func AdaptFunc(
 	dbPasswdExisting *secret.Existing,
 	pwSecretLabels *labels.Selectable,
 	pwSecretKey string,
-	rootCertsSecret string,
 	containerCertsDir string,
 	nodeSecret string,
 	dbConn db.Connection,
@@ -90,13 +89,13 @@ func AdaptFunc(
 
 	beforeCRqueriers := []operator.QueryFunc{
 		queryNode,
-		queryCert(rootUserName, rootCertsSecret, db.RootUserCert, db.RootUserKey),
-		queryCert(userName, db.CertsSecret(userName), db.UserCert, db.UserKey),
+		queryCert(rootUserName),
+		queryCert(userName),
 	}
 
 	beforeCRdestroyers := []operator.DestroyFunc{
 		destroyCert(db.CertsSecret(userName)),
-		destroyCert(rootCertsSecret),
+		destroyCert(db.CertsSecret(rootUserName)),
 		destroyNode,
 	}
 

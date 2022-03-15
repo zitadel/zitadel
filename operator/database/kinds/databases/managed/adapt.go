@@ -38,8 +38,7 @@ const (
 	cockroachHTTPPort  = int32(8080)
 	Clean              = "clean"
 	DBReady            = "dbready"
-	rootCertsSecret    = "root-certs"
-	nodeCertsSecret    = "node-certs"
+	nodeCertsSecret    = "cockroachdb.node"
 	zitadelCertsSecret = "zitadel-certs"
 	clientCertsPath    = "/cockroach/cockroach-client-certs"
 )
@@ -116,9 +115,9 @@ func Adapter(
 		current.Parsed = currentDB
 
 		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, "managed-db-password"))
-		currentDB.Current.PasswordSecretKey = "zitadel"
+		currentDB.Current.PasswordSecretKey = "flyway"
 		currentDB.Current.PasswordSecret = pwSecretLabels
-		currentDB.Current.User = "zitadel"
+		currentDB.Current.User = "flyway"
 
 		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := user.AdaptFunc(
 			internalMonitor,
@@ -131,7 +130,6 @@ func Adapter(
 			desiredKind.Spec.ZitadelUserPasswordExisting,
 			pwSecretLabels,
 			currentDB.Current.PasswordSecretKey,
-			rootCertsSecret,
 			clientCertsPath,
 			nodeCertsSecret,
 			currentDB,
@@ -167,7 +165,7 @@ func Adapter(
 			desiredKind.Spec.Cache,
 			desiredKind.Spec.MaxSQLMemory,
 			clientCertsPath,
-			rootCertsSecret,
+			db.CertsSecret("root"),
 			nodeCertsSecret,
 		)
 		if err != nil {

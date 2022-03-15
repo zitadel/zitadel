@@ -13,12 +13,8 @@ import (
 )
 
 const (
-	CACert       = "ca.crt"
-	CAKey        = "ca.key"
-	RootUserCert = "client.root.crt"
-	RootUserKey  = "client.root.key"
-	UserCert     = "client.zitadel.crt"
-	UserKey      = "client.zitadel.key"
+	CACert = "ca.crt"
+	CAKey  = "ca.key"
 )
 
 type Connection interface {
@@ -39,6 +35,14 @@ type SSL struct {
 
 func CertsSecret(user string) string {
 	return fmt.Sprintf("cockroachdb.client.%s", user)
+}
+
+func UserCert(user string) string {
+	return fmt.Sprintf("client.%s.crt", user)
+}
+
+func UserKey(user string) string {
+	return fmt.Sprintf("client.%s.key", user)
 }
 
 func InitChownCerts(

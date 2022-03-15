@@ -111,7 +111,7 @@ func AdaptFunc(
 							InitContainers: []corev1.Container{
 								chownCertsContainer,
 								getReadyPreContainer(dbConn, customImageRegistry),
-								// getFlywayUserPreContainer(dbConn, customImageRegistry, migrationUser, secretPasswordName, chownedVolumeMount), // TODO: delete?
+								//								getFlywayUserPreContainer(dbConn, customImageRegistry, migrationUser, secretPasswordName, chownedVolumeMount),
 							},
 							Containers: []corev1.Container{
 								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount, users, secretPasswordName),
@@ -179,6 +179,11 @@ func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserP
 					Key:                  migrationUserPasswordSecretKey,
 				},
 			},
+		})
+	} else {
+		envVars = append(envVars, corev1.EnvVar{
+			Name:  envMigrationPW,
+			Value: "",
 		})
 	}
 

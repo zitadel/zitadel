@@ -24,13 +24,13 @@ func AdaptFunc(
 	componentLabels *labels.Component,
 	dbConn db.Connection,
 ) (
-	func(client, secretName, userCrtFilename, userKeyFilename string) operator.QueryFunc,
+	func(client string) operator.QueryFunc,
 	func(secretName string) operator.DestroyFunc,
 	error,
 ) {
 
-	return func(client, secretName, userCrtFilename, userKeyFilename string) operator.QueryFunc {
-			nameLabels := labels.MustForName(componentLabels, secretName)
+	return func(client string) operator.QueryFunc {
+			nameLabels := labels.MustForName(componentLabels, db.CertsSecret(client))
 
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriers := make([]operator.QueryFunc, 0)
@@ -62,9 +62,9 @@ func AdaptFunc(
 				}
 
 				clientSecretData := map[string]string{
-					db.CACert:       string(pemCaCert),
-					userKeyFilename: string(pemClientPrivKey),
-					userCrtFilename: string(pemClientCert),
+					db.CACert:           string(pemCaCert),
+					db.UserKey(client):  string(pemClientPrivKey),
+					db.UserCert(client): string(pemClientCert),
 				}
 
 				queryClientSecret, err := secret.AdaptFuncToEnsure(namespace, labels.AsSelectable(nameLabels), clientSecretData)

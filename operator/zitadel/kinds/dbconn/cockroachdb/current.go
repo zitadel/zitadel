@@ -40,7 +40,7 @@ func (c *Current) PasswordSecret() (*labels.Selectable, string) {
 func (c *Current) SSL() *db.SSL {
 	return &db.SSL{
 		RootCert:       c.Current.Secure,
-		UserCertAndKey: false,
+		UserCertAndKey: true,
 	}
 }
 

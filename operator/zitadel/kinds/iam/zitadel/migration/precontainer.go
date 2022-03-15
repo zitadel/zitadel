@@ -98,7 +98,7 @@ func grantUserCommand(user, file string) string {
 
 func connectionURL(conn db.Connection, certsDir string) string {
 
-	url := fmt.Sprintf("jdbc:postgresql://%s:%s/defaultdb?%s", conn.Host(), conn.Port(), sslParams(conn.SSL(), certsDir))
+	url := fmt.Sprintf("jdbc:postgresql://%s:%s/defaultdb?%s", conn.Host(), conn.Port(), sslParams(conn.SSL(), conn.User(), certsDir))
 
 	options := conn.Options()
 	if options != "" {
@@ -109,7 +109,7 @@ func connectionURL(conn db.Connection, certsDir string) string {
 
 }
 
-func sslParams(ssl *db.SSL, certsDir string) string {
+func sslParams(ssl *db.SSL, user, certsDir string) string {
 
 	if ssl == nil {
 		return "sslmode=disable"
@@ -122,7 +122,7 @@ func sslParams(ssl *db.SSL, certsDir string) string {
 	}
 
 	if ssl.UserCertAndKey {
-		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s&sslfactory=org.postgresql.ssl.NonValidatingFactory", certsDir, db.UserCert, certsDir, db.UserKey)
+		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s&sslfactory=org.postgresql.ssl.NonValidatingFactory", certsDir, db.UserCert(user), certsDir, db.UserKey(user))
 	}
 
 	return params
