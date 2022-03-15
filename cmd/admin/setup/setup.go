@@ -8,6 +8,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
 	command "github.com/caos/zitadel/internal/command/v2"
+	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/migration"
@@ -38,7 +39,10 @@ Requirements:
 			logging.OnError(err).Fatal("unable to read setup steps")
 
 			steps := new(Steps)
-			err = v.Unmarshal(steps)
+			err = v.Unmarshal(steps,
+				viper.DecodeHook(hook.Base64ToBytesHookFunc()),
+				viper.DecodeHook(hook.TagToLanguageHookFunc()),
+			)
 			logging.OnError(err).Fatal("unable to read steps")
 
 			setup(config, steps)
@@ -55,8 +59,8 @@ func setup(config *Config, steps *Steps) {
 
 	cmd := command.New(eventstoreClient, "localhost")
 
-	steps.S1AdminOrg.cmd = cmd
+	steps.S1DefaultInstance.cmd = cmd
 
 	ctx := authz.WithTenant(context.Background(), "system")
-	migration.Migrate(ctx, eventstoreClient, steps.S1AdminOrg)
+	migration.Migrate(ctx, eventstoreClient, steps.S1DefaultInstance)
 }

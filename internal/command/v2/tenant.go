@@ -25,9 +25,9 @@ const (
 	consoleAppName     = "Console"
 )
 
-type TenantSetup struct {
+type InstanceSetup struct {
 	Org                      OrgSetup
-	Zitadel                  ZitadelSetup
+	Zitadel                  ZitadelConfig
 	PasswordComplexityPolicy struct {
 		MinLength    uint64
 		HasLowercase bool
@@ -36,24 +36,11 @@ type TenantSetup struct {
 		HasSymbol    bool
 	}
 	PasswordAgePolicy struct {
-		expireWarnDays uint64
-		maxAgeDays     uint64
+		ExpireWarnDays uint64
+		MaxAgeDays     uint64
 	}
 	OrgIAMPolicy struct {
 		UserLoginMustBeDomain bool
-	}
-	LabelPolicy struct {
-		PrimaryColor        string
-		BackgroundColor     string
-		WarnColor           string
-		FontColor           string
-		PrimaryColorDark    string
-		BackgroundColorDark string
-		WarnColorDark       string
-		FontColorDark       string
-		HideLoginNameSuffix bool
-		ErrorMsgPopup       bool
-		DisableWatermark    bool
 	}
 	LoginPolicy struct {
 		AllowUsernamePassword      bool
@@ -80,7 +67,21 @@ type TenantSetup struct {
 	MessageTexts  []*domain.CustomMessageText
 }
 
-func (s *TenantSetup) generateIDs() (err error) {
+type ZitadelConfig struct {
+	IsDevMode bool
+
+	projectID       string
+	mgmtID          string
+	mgmtClientID    string
+	adminID         string
+	adminClientID   string
+	authID          string
+	authClientID    string
+	consoleID       string
+	consoleClientID string
+}
+
+func (s *InstanceSetup) generateIDs() (err error) {
 	s.Zitadel.projectID, err = id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return err
@@ -124,20 +125,7 @@ func (s *TenantSetup) generateIDs() (err error) {
 	return nil
 }
 
-type ZitadelSetup struct {
-	projectID       string
-	mgmtID          string
-	mgmtClientID    string
-	adminID         string
-	adminClientID   string
-	authID          string
-	authClientID    string
-	consoleID       string
-	consoleClientID string
-	IsDevMode       bool
-}
-
-func (command *Command) SetUpTenant(ctx context.Context, tenant *TenantSetup) (*domain.ObjectDetails, error) {
+func (command *Command) SetUpTenant(ctx context.Context, tenant *InstanceSetup) (*domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -168,26 +156,12 @@ func (command *Command) SetUpTenant(ctx context.Context, tenant *TenantSetup) (*
 		),
 		iam.AddPasswordAgePolicy(
 			iamAgg,
-			tenant.PasswordAgePolicy.expireWarnDays,
-			tenant.PasswordAgePolicy.maxAgeDays,
+			tenant.PasswordAgePolicy.ExpireWarnDays,
+			tenant.PasswordAgePolicy.MaxAgeDays,
 		),
 		iam.AddOrgIAMPolicy(
 			iamAgg,
 			tenant.OrgIAMPolicy.UserLoginMustBeDomain,
-		),
-		iam.AddLabelPolicy(
-			iamAgg,
-			tenant.LabelPolicy.PrimaryColor,
-			tenant.LabelPolicy.BackgroundColor,
-			tenant.LabelPolicy.WarnColor,
-			tenant.LabelPolicy.FontColor,
-			tenant.LabelPolicy.PrimaryColorDark,
-			tenant.LabelPolicy.BackgroundColorDark,
-			tenant.LabelPolicy.WarnColorDark,
-			tenant.LabelPolicy.FontColorDark,
-			tenant.LabelPolicy.HideLoginNameSuffix,
-			tenant.LabelPolicy.ErrorMsgPopup,
-			tenant.LabelPolicy.DisableWatermark,
 		),
 		iam.AddLoginPolicy(
 			iamAgg,
@@ -223,7 +197,7 @@ func (command *Command) SetUpTenant(ctx context.Context, tenant *TenantSetup) (*
 		user.AddHumanCommand(userAgg, &tenant.Org.Human),
 		org.AddMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 
-		project.AddProject(projectAgg, zitadelProjectName, false, false, false, domain.PrivateLabelingSettingUnspecified),
+		project.AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
 		project.AddApp(
 			projectAgg,

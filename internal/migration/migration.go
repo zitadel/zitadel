@@ -50,6 +50,10 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		return false, err
 	}
 
+	if len(events) == 0 {
+		return true, nil
+	}
+
 	if events[len(events)-1].Type() == startedType {
 		return false, nil
 	}

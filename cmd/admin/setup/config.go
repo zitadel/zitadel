@@ -13,5 +13,5 @@ type Config struct {
 }
 
 type Steps struct {
-	S1AdminOrg *AdminOrg
+	S1DefaultInstance *DefaultInstance
 }

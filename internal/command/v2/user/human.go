@@ -35,7 +35,7 @@ type AddHuman struct {
 	Phone string
 	//Password is optional
 	//TODO: should we use the domain object?
-	Password *domain.Password
+	Password string
 }
 
 func AddHumanCommand(a *user.Aggregate, human *AddHuman) preparation.Validation {
@@ -76,8 +76,8 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman) preparation.Validation 
 			if phone := strings.TrimSpace(human.Phone); phone != "" {
 				cmd.AddPhoneData(phone)
 			}
-			if human.Password != nil {
-				cmd.AddPasswordData(human.Password.SecretCrypto, false) //TODO: when is it false when true?
+			if human.Password != "" {
+				// cmd.AddPasswordData(human.Password.SecretCrypto, false) //TODO: when is it false when true?
 			}
 
 			return []eventstore.Command{cmd}, nil
