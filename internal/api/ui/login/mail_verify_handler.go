@@ -51,7 +51,7 @@ func (l *Login) handleMailVerificationCheck(w http.ResponseWriter, r *http.Reque
 	if authReq != nil {
 		userOrg = authReq.UserOrgID
 	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.UserCodeAlg)
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 	if err != nil {
 		l.checkMailCode(w, r, authReq, data.UserID, data.Code)
 		return
@@ -66,7 +66,7 @@ func (l *Login) checkMailCode(w http.ResponseWriter, r *http.Request, authReq *d
 		userID = authReq.UserID
 		userOrg = authReq.UserOrgID
 	}
-	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.UserCodeAlg)
+	emailCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyEmailCode, l.userCodeAlg)
 	if err != nil {
 		l.renderMailVerification(w, r, authReq, userID, err)
 		return

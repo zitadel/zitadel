@@ -25,7 +25,7 @@ const (
 )
 
 func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserGrantProjection {
-	p := &UserGrantProjection{}
+	p := new(UserGrantProjection)
 	config.ProjectionName = UserGrantProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

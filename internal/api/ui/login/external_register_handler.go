@@ -58,7 +58,7 @@ func (l *Login) handleExternalRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if authReq == nil {
-		http.Redirect(w, r, l.zitadelURL, http.StatusFound)
+		http.Redirect(w, r, l.consolePath, http.StatusFound)
 		return
 	}
 	idpConfig, err := l.getIDPConfigByID(r, data.IDPConfigID)
@@ -145,12 +145,12 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 		memberRoles = nil
 		resourceOwner = authReq.RequestedOrgID
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.UserCodeAlg)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.UserCodeAlg)
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -226,12 +226,12 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.UserCodeAlg)
+	initCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeInitCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
-	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.UserCodeAlg)
+	phoneCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypeVerifyPhoneCode, l.userCodeAlg)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return

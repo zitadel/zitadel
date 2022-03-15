@@ -70,7 +70,7 @@ func (l *Login) checkPWCode(w http.ResponseWriter, r *http.Request, authReq *dom
 		userOrg = authReq.UserOrgID
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.UserCodeAlg)
+	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, data.UserID, "", err)
 		return
@@ -97,7 +97,7 @@ func (l *Login) resendPasswordSet(w http.ResponseWriter, r *http.Request, authRe
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return
 	}
-	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.UserCodeAlg)
+	passwordCodeGenerator, err := l.query.InitEncryptionGenerator(r.Context(), domain.SecretGeneratorTypePasswordResetCode, l.userCodeAlg)
 	if err != nil {
 		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
 		return

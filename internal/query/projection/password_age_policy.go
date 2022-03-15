@@ -23,7 +23,7 @@ const (
 )
 
 func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PasswordAgeProjection {
-	p := &PasswordAgeProjection{}
+	p := new(PasswordAgeProjection)
 	config.ProjectionName = PasswordAgeTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

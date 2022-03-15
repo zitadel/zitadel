@@ -23,7 +23,7 @@ const (
 )
 
 func NewIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPLoginPolicyLinkProjection {
-	p := &IDPLoginPolicyLinkProjection{}
+	p := new(IDPLoginPolicyLinkProjection)
 	config.ProjectionName = IDPLoginPolicyLinkTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

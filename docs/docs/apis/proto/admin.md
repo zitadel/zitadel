@@ -188,6 +188,54 @@ Update twilio sms provider token
     PUT: /sms/twilio/{id}/token
 
 
+### GetOIDCSettings
+
+> **rpc** GetOIDCSettings([GetOIDCSettingsRequest](#getoidcsettingsrequest))
+[GetOIDCSettingsResponse](#getoidcsettingsresponse)
+
+Get OIDC settings (e.g token lifetimes, etc.)
+
+
+
+    GET: /settings/oidc
+
+
+### UpdateOIDCSettings
+
+> **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
+[UpdateOIDCSettingsResponse](#updateoidcsettingsresponse)
+
+Update oidc settings (e.g token lifetimes, etc)
+
+
+
+    PUT: /settings/oidc
+
+
+### GetFileSystemNotificationProvider
+
+> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
+[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+
+Get file system notification provider
+
+
+
+    GET: /notification/provider/file
+
+
+### GetLogNotificationProvider
+
+> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
+[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+
+Get log notification provider
+
+
+
+    GET: /notification/provider/log
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1973,6 +2021,23 @@ This is an empty request
 
 
 
+### GetFileSystemNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetIDPByIDRequest
 
 
@@ -2029,6 +2094,23 @@ This is an empty request
 
 
 
+### GetLogNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetLogNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 This is an empty request
 
@@ -2042,6 +2124,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
+
+
+
+
+### GetOIDCSettingsRequest
+This is an empty request
+
+
+
+
+### GetOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| settings |  zitadel.settings.v1.OIDCSettings | - |  |
 
 
 
@@ -3603,6 +3702,31 @@ This is an empty request
 
 
 ### UpdateLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### UpdateOIDCSettingsResponse
 
 
 

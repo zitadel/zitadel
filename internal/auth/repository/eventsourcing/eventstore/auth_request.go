@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/crypto"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/view"
 	"github.com/caos/zitadel/internal/auth_request/model"
 	cache "github.com/caos/zitadel/internal/auth_request/repository"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
@@ -666,15 +666,20 @@ func queryLoginPolicyToDomain(policy *query.LoginPolicy) *domain.LoginPolicy {
 			CreationDate:  policy.CreationDate,
 			ChangeDate:    policy.ChangeDate,
 		},
-		Default:               policy.IsDefault,
-		AllowUsernamePassword: policy.AllowUsernamePassword,
-		AllowRegister:         policy.AllowRegister,
-		AllowExternalIDP:      policy.AllowExternalIDPs,
-		ForceMFA:              policy.ForceMFA,
-		SecondFactors:         policy.SecondFactors,
-		MultiFactors:          policy.MultiFactors,
-		PasswordlessType:      policy.PasswordlessType,
-		HidePasswordReset:     policy.HidePasswordReset,
+		Default:                    policy.IsDefault,
+		AllowUsernamePassword:      policy.AllowUsernamePassword,
+		AllowRegister:              policy.AllowRegister,
+		AllowExternalIDP:           policy.AllowExternalIDPs,
+		ForceMFA:                   policy.ForceMFA,
+		SecondFactors:              policy.SecondFactors,
+		MultiFactors:               policy.MultiFactors,
+		PasswordlessType:           policy.PasswordlessType,
+		HidePasswordReset:          policy.HidePasswordReset,
+		PasswordCheckLifetime:      policy.PasswordCheckLifetime,
+		ExternalLoginCheckLifetime: policy.ExternalLoginCheckLifetime,
+		MFAInitSkipLifetime:        policy.MFAInitSkipLifetime,
+		SecondFactorCheckLifetime:  policy.SecondFactorCheckLifetime,
+		MultiFactorCheckLifetime:   policy.MultiFactorCheckLifetime,
 	}
 }
 

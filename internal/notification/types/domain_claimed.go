@@ -7,6 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/fs"
+	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/templates"
 	"github.com/caos/zitadel/internal/query"
@@ -18,7 +20,7 @@ type DomainClaimedData struct {
 	URL string
 }
 
-func SendDomainClaimed(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), colors *query.LabelPolicy, assetsPrefix string) error {
+func SendDomainClaimed(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, username string, systemDefaults systemdefaults.SystemDefaults, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), colors *query.LabelPolicy, assetsPrefix string) error {
 	url, err := templates.ParseTemplateText(systemDefaults.Notifications.Endpoints.DomainClaimed, &UrlData{UserID: user.ID})
 	if err != nil {
 		return err
@@ -35,5 +37,5 @@ func SendDomainClaimed(ctx context.Context, mailhtml string, translator *i18n.Tr
 	if err != nil {
 		return err
 	}
-	return generateEmail(ctx, user, domainClaimedData.Subject, template, systemDefaults.Notifications, emailConfig, true)
+	return generateEmail(ctx, user, domainClaimedData.Subject, template, systemDefaults.Notifications, emailConfig, getFileSystemProvider, getLogProvider, true)
 }

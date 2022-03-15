@@ -29,6 +29,20 @@ Errors:
     ExceedsDefault: Limit überschreitet default Limit
   Language:
     NotParsed: Sprache konnte nicht gemapped werde
+  OIDCSettings:
+    NotFound: OIDC Konfiguration konnte nicht gefunden werden
+    AlreadyExists: OIDC Konfiguration existiert bereits
+  SecretGenerator:
+    AlreadyExists: Passwort Generator exisiter bereits
+    TypeMissing: Passwort Generator Typ fehlt
+    NotFound: Passwort Generator nicht gefunden
+  SMSConfig:
+    NotFound: SMS Konfiguration nicht gefunden
+    AlreadyActive: SMS Konfiguration ist bereits aktiviert
+    AlreadyDeactivated: SMS Konfiguration ist bereits deaktiviert
+  SMTPConfig:
+    NotFound: SMTP Konfiguration nicht gefunden
+    AlreadyExists: SMTP Konfiguration existiert bereits
   User:
     NotFound: Benutzer konnte nicht gefunden werden
     AlreadyExists: Benutzer existierts bereits
@@ -816,6 +830,35 @@ EventTypes:
           removed: Schrift von Label Richtlinie entfernt
         assets:
           removed: Bilder und Schrift von Label Richtlinie entfernt
+    default:
+      language:
+        set: Standard Sprache gesetzt
+    oidc:
+      settings:
+        added: OIDC Konfiguration hinzugefügt
+        changed: OIDC Konfiguration geändert
+        removed: OIDC Konfiguration gelöscht
+    secret:
+      generator:
+        added: Passwort Generator hinzugefügt
+        changed: Passwort Generator geändert
+        removed: Passwort Generator gelöscht
+    smtp:
+      config:
+        added: SMTP Konfiguration hinzugefügt
+        changed: SMTP Konfiguration geändert
+        password:
+          changed: SMTP Konfigurations Passwort geändert
+    sms:
+      config:
+        twilio:
+          added: Twilio SMS Provider hinzugefügt
+          changed: Twilio SMS Provider geändert
+          token:
+            changed: Twilio SMS Provider Token geändert
+          removed: Twilio SMS Provider entfernt
+          activated: Twilio SMS Provider aktiviert
+          deactivated: Twilio SMS Provider deaktiviert
   key_pair:
     added: Schlüsselpaar hinzugefügt
   action:

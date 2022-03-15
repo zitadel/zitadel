@@ -2,11 +2,11 @@ syntax = "proto3";
 
 import "zitadel/idp.proto";
 import "zitadel/user.proto";
-import "zitadel/settings.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
@@ -313,6 +313,50 @@ service AdminService {
         };
     }
 
+    // Get OIDC settings (e.g token lifetimes, etc.)
+    rpc GetOIDCSettings(GetOIDCSettingsRequest) returns (GetOIDCSettingsResponse) {
+        option (google.api.http) = {
+            get: "/settings/oidc";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Update oidc settings (e.g token lifetimes, etc)
+    rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
+        option (google.api.http) = {
+            put: "/settings/oidc";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get file system notification provider
+    rpc GetFileSystemNotificationProvider(GetFileSystemNotificationProviderRequest) returns (GetFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/file";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get log notification provider
+    rpc GetLogNotificationProvider(GetLogNotificationProviderRequest) returns (GetLogNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/log";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
 
     // Returns an organisation by id
     rpc GetOrgByID(GetOrgByIDRequest) returns (GetOrgByIDResponse) {
@@ -2536,6 +2580,38 @@ message UpdateSMSProviderTwilioTokenRequest {
 }
 
 message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetFileSystemNotificationProviderRequest {}
+
+message GetFileSystemNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
+}
+
+//This is an empty request
+message GetLogNotificationProviderRequest {}
+
+message GetLogNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
+}
+
+// This is an empty request
+message GetOIDCSettingsRequest {}
+
+message GetOIDCSettingsResponse {
+    zitadel.settings.v1.OIDCSettings settings = 1;
+}
+
+message UpdateOIDCSettingsRequest {
+    google.protobuf.Duration  access_token_lifetime   = 1;
+    google.protobuf.Duration  id_token_lifetime   = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
+    google.protobuf.Duration  refresh_token_expiration   = 4;
+}
+
+message UpdateOIDCSettingsResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

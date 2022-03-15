@@ -7,6 +7,8 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/i18n"
+	"github.com/caos/zitadel/internal/notification/channels/fs"
+	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
 	"github.com/caos/zitadel/internal/notification/templates"
 	"github.com/caos/zitadel/internal/query"
@@ -19,7 +21,7 @@ type EmailVerificationCodeData struct {
 	URL string
 }
 
-func SendEmailVerificationCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
+func SendEmailVerificationCode(ctx context.Context, mailhtml string, translator *i18n.Translator, user *view_model.NotifyUser, code *es_model.EmailCode, systemDefaults systemdefaults.SystemDefaults, smtpConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error), alg crypto.EncryptionAlgorithm, colors *query.LabelPolicy, assetsPrefix string) error {
 	codeString, err := crypto.DecryptString(code.Code, alg)
 	if err != nil {
 		return err
@@ -41,5 +43,5 @@ func SendEmailVerificationCode(ctx context.Context, mailhtml string, translator 
 	if err != nil {
 		return err
 	}
-	return generateEmail(ctx, user, emailCodeData.Subject, template, systemDefaults.Notifications, smtpConfig, true)
+	return generateEmail(ctx, user, emailCodeData.Subject, template, systemDefaults.Notifications, smtpConfig, getFileSystemProvider, getLogProvider, true)
 }

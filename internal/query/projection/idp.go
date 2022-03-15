@@ -26,7 +26,7 @@ const (
 )
 
 func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IDPProjection {
-	p := &IDPProjection{}
+	p := new(IDPProjection)
 	config.ProjectionName = IDPTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
