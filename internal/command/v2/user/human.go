@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -34,11 +34,12 @@ type AddHuman struct {
 	//TODO: can it also be verified?
 	Phone string
 	//Password is optional
-	//TODO: should we use the domain object?
 	Password string
+	//PasswordChangeRequired is used if the `Password`-field is set
+	PasswordChangeRequired bool
 }
 
-func AddHumanCommand(a *user.Aggregate, human *AddHuman) preparation.Validation {
+func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.HashAlgorithm) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if !domain.EmailRegex.MatchString(human.Email) {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument")
@@ -55,8 +56,17 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman) preparation.Validation 
 				return nil, errors.ThrowAlreadyExists(err, "COMMA-CxDKf", "Errors.User.AlreadyExists")
 			}
 
-			policy, err := orgIAMPolicy(ctx, filter)
+			orgIAMPolicy, err := orgIAMPolicyWriteModel(ctx, filter)
 			if err != nil {
+				return nil, err
+			}
+
+			passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
+			if err != nil {
+				return nil, err
+			}
+
+			if err = passwordComplexity.Validate(human.Password); err != nil {
 				return nil, err
 			}
 
@@ -71,13 +81,17 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman) preparation.Validation 
 				human.PreferredLang,
 				human.Gender,
 				human.Email,
-				policy.UserLoginMustBeDomain,
+				orgIAMPolicy.UserLoginMustBeDomain,
 			)
 			if phone := strings.TrimSpace(human.Phone); phone != "" {
 				cmd.AddPhoneData(phone)
 			}
 			if human.Password != "" {
-				// cmd.AddPasswordData(human.Password.SecretCrypto, false) //TODO: when is it false when true?
+				secret, err := crypto.Hash([]byte(human.Password), passwordAlg)
+				if err != nil {
+					return nil, err
+				}
+				cmd.AddPasswordData(secret, human.PasswordChangeRequired)
 			}
 
 			return []eventstore.Command{cmd}, nil
@@ -94,44 +108,4 @@ func existsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id
 	existing.AppendEvents(events...)
 	existing.Reduce()
 	return isUserStateExists(existing.UserState), nil
-}
-
-func orgIAMPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PolicyOrgIAMWriteModel, error) {
-	wm, err := customOrgIAMPolicy(ctx, filter)
-	if err != nil || wm != nil {
-		return wm, err
-	}
-	wm, err = defaultOrgIAMPolicy(ctx, filter)
-	if err != nil || wm != nil {
-		return wm, err
-	}
-	return nil, errors.ThrowInternal(nil, "USER-Ggk9n", "Errors.Internal")
-}
-
-func customOrgIAMPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PolicyOrgIAMWriteModel, error) {
-	policy := command.NewORGOrgIAMPolicyWriteModel(authz.GetCtxData(ctx).OrgID)
-	events, err := filter(ctx, policy.Query())
-	if err != nil {
-		return nil, err
-	}
-	if len(events) == 0 {
-		return nil, nil
-	}
-	policy.AppendEvents(events...)
-	err = policy.Reduce()
-	return &policy.PolicyOrgIAMWriteModel, err
-}
-
-func defaultOrgIAMPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PolicyOrgIAMWriteModel, error) {
-	policy := command.NewIAMOrgIAMPolicyWriteModel()
-	events, err := filter(ctx, policy.Query())
-	if err != nil {
-		return nil, err
-	}
-	if len(events) == 0 {
-		return nil, nil
-	}
-	policy.AppendEvents(events...)
-	err = policy.Reduce()
-	return &policy.PolicyOrgIAMWriteModel, err
 }

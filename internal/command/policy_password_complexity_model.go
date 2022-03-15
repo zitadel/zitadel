@@ -1,9 +1,19 @@
 package command
 
 import (
+	"regexp"
+
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/policy"
+)
+
+var (
+	hasStringLowerCase = regexp.MustCompile(`[a-z]`).MatchString
+	hasStringUpperCase = regexp.MustCompile(`[A-Z]`).MatchString
+	hasNumber          = regexp.MustCompile(`[0-9]`).MatchString
+	hasSymbol          = regexp.MustCompile(`[^A-Za-z0-9]`).MatchString
 )
 
 type PasswordComplexityPolicyWriteModel struct {
@@ -48,4 +58,27 @@ func (wm *PasswordComplexityPolicyWriteModel) Reduce() error {
 		}
 	}
 	return wm.WriteModel.Reduce()
+}
+
+func (wm *PasswordComplexityPolicyWriteModel) Validate(password string) error {
+	if wm.MinLength != 0 && uint64(len(password)) < wm.MinLength {
+		return errors.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength")
+	}
+
+	if wm.HasLowercase && !hasStringLowerCase(password) {
+		return errors.ThrowInvalidArgument(nil, "COMMA-co3Xw", "Errors.User.PasswordComplexityPolicy.HasLower")
+	}
+
+	if wm.HasUppercase && !hasStringUpperCase(password) {
+		return errors.ThrowInvalidArgument(nil, "COMMA-VoaRj", "Errors.User.PasswordComplexityPolicy.HasUpper")
+	}
+
+	if wm.HasNumber && !hasNumber(password) {
+		return errors.ThrowInvalidArgument(nil, "COMMA-ZBv4H", "Errors.User.PasswordComplexityPolicy.HasNumber")
+	}
+
+	if wm.HasSymbol && !hasSymbol(password) {
+		return errors.ThrowInvalidArgument(nil, "COMMA-ZDLwA", "Errors.User.PasswordComplexityPolicy.HasSymbol")
+	}
+	return nil
 }

@@ -57,7 +57,7 @@ func setup(config *Config, steps *Steps) {
 	eventstoreClient, err := eventstore.Start(dbClient)
 	logging.OnError(err).Fatal("unable to start eventstore")
 
-	cmd := command.New(eventstoreClient, "localhost")
+	cmd := command.New(eventstoreClient, "localhost", config.SystemDefaults)
 
 	steps.S1DefaultInstance.cmd = cmd
 

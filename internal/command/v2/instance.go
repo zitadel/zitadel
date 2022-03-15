@@ -140,6 +140,8 @@ func (command *Command) SetUpTenant(ctx context.Context, tenant *InstanceSetup) 
 		return nil, err
 	}
 
+	tenant.Org.Human.PasswordChangeRequired = true
+
 	iamAgg := iam_repo.NewAggregate()
 	orgAgg := org_repo.NewAggregate(orgID, orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
@@ -194,7 +196,7 @@ func (command *Command) SetUpTenant(ctx context.Context, tenant *InstanceSetup) 
 	validations = append(validations,
 		org.AddOrg(orgAgg, tenant.Org.Name, command.iamDomain),
 		org.AddDomain(orgAgg, tenant.Org.Domain),
-		user.AddHumanCommand(userAgg, &tenant.Org.Human),
+		user.AddHumanCommand(userAgg, &tenant.Org.Human, command.userPasswordAlg),
 		org.AddMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
 
 		project.AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
