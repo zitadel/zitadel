@@ -61,8 +61,8 @@ func (key UserMembershipSearchKey) ToColumnName() string {
 		return UserMembershipKeyAggregateID
 	case usr_model.UserMembershipSearchKeyObjectID:
 		return UserMembershipKeyObjectID
-	case usr_model.UserMembershipSearchKeyTenant:
-		return UserMembershipKeyTenant
+	case usr_model.UserMembershipSearchKeyInstanceID:
+		return UserMembershipKeyInstanceID
 
 	default:
 		return ""

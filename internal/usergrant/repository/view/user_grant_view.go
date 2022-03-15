@@ -14,7 +14,7 @@ func UserGrantByID(db *gorm.DB, table, grantID string) (*model.UserGrantView, er
 	grant := new(model.UserGrantView)
 	query := repository.PrepareGetByQuery(table,
 		model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyID, Method: domain.SearchMethodNotEquals, Value: grantID},
-		model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyTenant, Method: domain.SearchMethodNotEquals, Value: grantID},
+		model.UserGrantSearchQuery{Key: grant_model.UserGrantSearchKeyInstanceID, Method: domain.SearchMethodNotEquals, Value: grantID},
 	)
 	err := query(db, grant)
 	if caos_errs.IsNotFound(err) {

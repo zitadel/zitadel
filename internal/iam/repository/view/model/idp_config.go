@@ -24,7 +24,7 @@ const (
 	IDPConfigKeyAggregateID  = "aggregate_id"
 	IDPConfigKeyName         = "name"
 	IDPConfigKeyProviderType = "idp_provider_type"
-	IDPConfigKeyTenant       = "tenant"
+	IDPConfigKeyInstanceID   = "instance_id"
 )
 
 type IDPConfigView struct {
@@ -51,8 +51,8 @@ type IDPConfigView struct {
 	JWTKeysEndpoint            string              `json:"keysEndpoint" gorm:"jwt_keys_endpoint"`
 	JWTHeaderName              string              `json:"headerName" gorm:"jwt_header_name"`
 
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
-	Tenant   string `json:"tenant" gorm:"column:tenant"`
+	Sequence   uint64 `json:"-" gorm:"column:sequence"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func IDPConfigViewToModel(idp *IDPConfigView) *model.IDPConfigView {
@@ -122,7 +122,7 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 
 func (r *IDPConfigView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
-	r.Tenant = event.Tenant
+	r.InstanceID = event.InstanceID
 }
 
 func (r *IDPConfigView) SetData(event *models.Event) error {

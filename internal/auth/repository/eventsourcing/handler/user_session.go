@@ -105,7 +105,7 @@ func (u *UserSession) Reduce(event *models.Event) (err error) {
 				UserAgentID:   eventData.UserAgentID,
 				UserID:        event.AggregateID,
 				State:         int32(req_model.UserSessionStateActive),
-				Tenant:        event.Tenant,
+				InstanceID:    event.InstanceID,
 			}
 		}
 		return u.updateSession(session, event)

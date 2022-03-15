@@ -38,7 +38,7 @@ CREATE TABLE authz.user_memberships (
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
     sequence INT8 NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (user_id, member_type, aggregate_id, object_id)
 );

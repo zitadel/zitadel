@@ -41,7 +41,7 @@ type ProjectGrant struct {
 	GrantID      string   `json:"grantId"`
 	GrantedOrgID string   `json:"grantedOrgId"`
 	RoleKeys     []string `json:"roleKeys"`
-	Tenant       string   `json:"tenant"`
+	InstanceID   string   `json:"instanceID"`
 }
 
 func ProjectGrantFromModel(project *model.ProjectGrantView) *ProjectGrantView {

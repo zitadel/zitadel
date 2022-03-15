@@ -21,7 +21,7 @@ const (
 	UserMembershipKeyObjectID      = "object_id"
 	UserMembershipKeyResourceOwner = "resource_owner"
 	UserMembershipKeyMemberType    = "member_type"
-	UserMembershipKeyTenant        = "tenant"
+	UserMembershipKeyInstanceID    = "instance_id"
 )
 
 type UserMembershipView struct {
@@ -37,7 +37,7 @@ type UserMembershipView struct {
 	ResourceOwner     string         `json:"-" gorm:"column:resource_owner"`
 	ResourceOwnerName string         `json:"-" gorm:"column:resource_owner_name"`
 	Sequence          uint64         `json:"-" gorm:"column:sequence"`
-	Tenant            string         `json:"tenant" gorm:"column:tenant"`
+	InstanceID        string         `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func UserMembershipToModel(membership *UserMembershipView) *model.UserMembershipView {
@@ -107,7 +107,7 @@ func (u *UserMembershipView) setRootData(event *models.Event, memberType model.M
 	u.ObjectID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner
 	u.MemberType = int32(memberType)
-	u.Tenant = event.Tenant
+	u.InstanceID = event.InstanceID
 }
 
 func (u *UserMembershipView) setIamMemberData(event *models.Event) error {

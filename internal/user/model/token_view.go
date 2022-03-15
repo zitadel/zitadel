@@ -43,7 +43,7 @@ const (
 	TokenSearchKeyUserAgentID
 	TokenSearchKeyExpiration
 	TokenSearchKeyResourceOwner
-	TokenSearchKeyTenant
+	TokenSearchKeyInstanceID
 )
 
 type TokenSearchQuery struct {

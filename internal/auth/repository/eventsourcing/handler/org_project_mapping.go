@@ -76,7 +76,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 	case model.ProjectAdded:
 		mapping.OrgID = event.ResourceOwner
 		mapping.ProjectID = event.AggregateID
-		mapping.Tenant = event.Tenant
+		mapping.InstanceID = event.InstanceID
 	case model.ProjectRemoved:
 		err := p.view.DeleteOrgProjectMappingsByProjectID(event.AggregateID)
 		if err == nil {
@@ -88,7 +88,7 @@ func (p *OrgProjectMapping) Reduce(event *es_models.Event) (err error) {
 		mapping.OrgID = projectGrant.GrantedOrgID
 		mapping.ProjectID = event.AggregateID
 		mapping.ProjectGrantID = projectGrant.GrantID
-		mapping.Tenant = projectGrant.Tenant
+		mapping.InstanceID = projectGrant.InstanceID
 	case model.ProjectGrantRemoved:
 		projectGrant := new(view_model.ProjectGrant)
 		projectGrant.SetData(event)

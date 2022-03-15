@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 )
 
@@ -17,7 +18,7 @@ type SearchQueryFactory struct {
 	sequenceTo     uint64
 	eventTypes     []EventType
 	resourceOwner  string
-	tenant         string
+	instanceID     string
 	creationDate   time.Time
 }
 
@@ -63,8 +64,8 @@ func FactoryFromSearchQuery(query *SearchQuery) *SearchQueryFactory {
 			}
 		case Field_ResourceOwner:
 			factory = factory.ResourceOwner(filter.value.(string))
-		case Field_Tenant:
-			factory = factory.Tenant(filter.value.(string))
+		case Field_InstanceID:
+			factory = factory.InstanceID(filter.value.(string))
 		case Field_EventType:
 			factory = factory.EventTypes(filter.value.([]EventType)...)
 		case Field_EditorService, Field_EditorUser:
@@ -123,8 +124,8 @@ func (factory *SearchQueryFactory) ResourceOwner(resourceOwner string) *SearchQu
 	return factory
 }
 
-func (factory *SearchQueryFactory) Tenant(tenant string) *SearchQueryFactory {
-	factory.tenant = tenant
+func (factory *SearchQueryFactory) InstanceID(instanceID string) *SearchQueryFactory {
+	factory.instanceID = instanceID
 	return factory
 }
 
@@ -159,7 +160,7 @@ func (factory *SearchQueryFactory) Build() (*searchQuery, error) {
 		factory.sequenceToFilter,
 		factory.eventTypeFilter,
 		factory.resourceOwnerFilter,
-		factory.tenantFilter,
+		factory.instanceIDFilter,
 		factory.creationDateNewerFilter,
 	} {
 		if filter := f(); filter != nil {
@@ -231,11 +232,11 @@ func (factory *SearchQueryFactory) resourceOwnerFilter() *Filter {
 	return NewFilter(Field_ResourceOwner, factory.resourceOwner, Operation_Equals)
 }
 
-func (factory *SearchQueryFactory) tenantFilter() *Filter {
-	if factory.tenant == "" {
+func (factory *SearchQueryFactory) instanceIDFilter() *Filter {
+	if factory.instanceID == "" {
 		return nil
 	}
-	return NewFilter(Field_Tenant, factory.tenant, Operation_Equals)
+	return NewFilter(Field_InstanceID, factory.instanceID, Operation_Equals)
 }
 
 func (factory *SearchQueryFactory) creationDateNewerFilter() *Filter {

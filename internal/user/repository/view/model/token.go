@@ -23,7 +23,7 @@ const (
 	TokenKeyUserAgentID    = "user_agent_id"
 	TokenKeyExpiration     = "expiration"
 	TokenKeyResourceOwner  = "resource_owner"
-	TokenKeyTenant         = "tenant"
+	TokenKeyInstanceID     = "instance_id"
 )
 
 type TokenView struct {
@@ -42,7 +42,7 @@ type TokenView struct {
 	RefreshTokenID    string         `json:"refreshTokenID,omitempty" gorm:"refresh_token_id"`
 	IsPAT             bool           `json:"-" gorm:"is_pat"`
 	Deactivated       bool           `json:"-" gorm:"-"`
-	Tenant            string         `json:"tenant" gorm:"column:tenant"`
+	InstanceID        string         `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func TokenViewToModel(token *TokenView) *usr_model.TokenView {
@@ -127,7 +127,7 @@ func (t *TokenView) AppendEvent(event *es_models.Event) error {
 func (t *TokenView) setRootData(event *es_models.Event) {
 	t.UserID = event.AggregateID
 	t.ResourceOwner = event.ResourceOwner
-	t.Tenant = event.Tenant
+	t.InstanceID = event.InstanceID
 }
 
 func (t *TokenView) setData(event *es_models.Event) error {

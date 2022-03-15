@@ -38,7 +38,7 @@ func (l *Login) handlePasswordCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, authReq.Tenant, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.VerifyPassword(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Password, authReq.AgentID, authReq.InstanceID, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderPassword(w, r, authReq, err)
 		return

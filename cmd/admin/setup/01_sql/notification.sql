@@ -46,7 +46,7 @@ CREATE TABLE notification.notify_users (
     password_set BOOL NULL,
     login_names STRING NULL,
     preferred_login_name STRING NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (id)
 );

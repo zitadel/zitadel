@@ -57,8 +57,8 @@ func (key OrgProjectMappingSearchKey) ToColumnName() string {
 		return OrgProjectMappingKeyProjectID
 	case proj_model.OrgProjectMappingSearchKeyProjectGrantID:
 		return OrgProjectMappingKeyProjectGrantID
-	case proj_model.OrgProjectMappingSearchKeyTenant:
-		return OrgProjectMappingKeyTenant
+	case proj_model.OrgProjectMappingSearchKeyInstanceID:
+		return OrgProjectMappingKeyInstanceID
 	default:
 		return ""
 	}

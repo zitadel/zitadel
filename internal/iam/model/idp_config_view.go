@@ -51,7 +51,7 @@ const (
 	IDPConfigSearchKeyAggregateID
 	IDPConfigSearchKeyIdpConfigID
 	IDPConfigSearchKeyIdpProviderType
-	IDPConfigSearchKeyTenant
+	IDPConfigSearchKeyInstanceID
 )
 
 type IDPConfigSearchQuery struct {

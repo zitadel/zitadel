@@ -68,7 +68,7 @@ CREATE TABLE auth.users (
     avatar_key STRING NULL,
     passwordless_init_required BOOL NULL,
     password_init_required BOOL NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (id)
 );
@@ -93,7 +93,7 @@ CREATE TABLE auth.user_sessions (
     selected_idp_config_id STRING NULL,
     passwordless_verification TIMESTAMPTZ NULL,
     avatar_key STRING NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (user_agent_id, user_id)
 );
@@ -108,7 +108,7 @@ CREATE TABLE auth.user_external_idps (
     change_date TIMESTAMPTZ NULL,
     sequence INT8 NULL,
     resource_owner STRING NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (external_user_id, idp_config_id)
 );
@@ -127,7 +127,7 @@ CREATE TABLE auth.tokens (
     audience STRING[] NULL,
     preferred_language STRING NULL,
     refresh_token_id STRING NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (id),
     INDEX user_user_agent_idx (user_id, user_agent_id)
@@ -149,7 +149,7 @@ CREATE TABLE auth.refresh_tokens (
     scopes STRING[] NULL,
     audience STRING[] NULL,
     amr STRING[] NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (id),
     UNIQUE INDEX unique_client_user_index (client_id ASC, user_agent_id ASC, user_id ASC)
@@ -159,7 +159,7 @@ CREATE TABLE auth.org_project_mapping (
     org_id STRING NOT NULL,
     project_id STRING NOT NULL,
     project_grant_id STRING NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (org_id, project_id)
 );
@@ -175,7 +175,7 @@ CREATE TABLE auth.idp_providers (
     idp_provider_type INT2 NULL,
     idp_state INT2 NULL,
     styling_type INT2 NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (aggregate_id, idp_config_id)
 );
@@ -203,7 +203,7 @@ CREATE TABLE auth.idp_configs (
     jwt_endpoint STRING NULL,
     jwt_keys_endpoint STRING NULL,
     jwt_header_name STRING NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (idp_config_id)
 );
@@ -215,7 +215,7 @@ CREATE TABLE auth.auth_requests (
     request_type INT2 NULL,
     creation_date TIMESTAMPTZ NULL,
     change_date TIMESTAMPTZ NULL,
-    tenant STRING NULL,
+    instance_id STRING NULL,
 
     PRIMARY KEY (id),
     INDEX auth_code_idx (code)

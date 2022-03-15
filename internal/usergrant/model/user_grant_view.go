@@ -67,7 +67,7 @@ const (
 	UserGrantSearchKeyProjectName
 	UserGrantSearchKeyDisplayName
 	UserGrantSearchKeyWithGranted
-	UserGrantSearchKeyTenant
+	UserGrantSearchKeyInstanceID
 )
 
 type UserGrantSearchQuery struct {

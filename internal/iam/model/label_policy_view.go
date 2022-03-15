@@ -48,7 +48,7 @@ const (
 	LabelPolicySearchKeyUnspecified LabelPolicySearchKey = iota
 	LabelPolicySearchKeyAggregateID
 	LabelPolicySearchKeyState
-	LabelPolicySearchKeyTenant
+	LabelPolicySearchKeyInstanceID
 )
 
 type LabelPolicySearchQuery struct {

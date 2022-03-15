@@ -63,8 +63,8 @@ func (key RefreshTokenSearchKey) ToColumnName() string {
 		return RefreshTokenKeyExpiration
 	case model.RefreshTokenSearchKeyResourceOwner:
 		return RefreshTokenKeyResourceOwner
-	case model.RefreshTokenSearchKeyTenant:
-		return RefreshTokenKeyTenant
+	case model.RefreshTokenSearchKeyInstanceID:
+		return RefreshTokenKeyInstanceID
 	default:
 		return ""
 	}

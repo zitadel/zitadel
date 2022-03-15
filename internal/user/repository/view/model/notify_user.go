@@ -42,7 +42,7 @@ type NotifyUser struct {
 	PasswordSet        bool           `json:"-" gorm:"column:password_set"`
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	State              int32          `json:"-" gorm:"-"`
-	Tenant             string         `json:"tenant" gorm:"column:tenant"`
+	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func NotifyUserFromModel(user *model.NotifyUser) *NotifyUser {
@@ -159,7 +159,7 @@ func (u *NotifyUser) AppendEvent(event *models.Event) (err error) {
 func (u *NotifyUser) setRootData(event *models.Event) {
 	u.ID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner
-	u.Tenant = event.Tenant
+	u.InstanceID = event.InstanceID
 }
 
 func (u *NotifyUser) setData(event *models.Event) error {

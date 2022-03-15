@@ -224,7 +224,7 @@ func (l *Login) renderNextStep(w http.ResponseWriter, r *http.Request, authReq *
 		l.renderInternalError(w, r, nil, caos_errs.ThrowInvalidArgument(nil, "LOGIN-Df3f2", "Errors.AuthRequest.NotFound"))
 		return
 	}
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.Tenant)
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID)
 	if err != nil {
 		l.renderInternalError(w, r, authReq, err)
 		return

@@ -20,7 +20,7 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 	ctxData := authz.GetCtxData(ctx)
 	editorUser := ctxData.UserID
 	resourceOwner := ctxData.OrgID
-	tenant := ctxData.TenantID
+	instanceID := ctxData.InstanceID
 
 	aggregate := &Aggregate{
 		ID:               id,
@@ -31,7 +31,7 @@ func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ Aggr
 		editorService:    c.serviceName,
 		editorUser:       editorUser,
 		resourceOwner:    resourceOwner,
-		tenant:           tenant,
+		instanceID:       instanceID,
 	}
 
 	for _, opt := range opts {

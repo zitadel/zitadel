@@ -29,7 +29,7 @@ type ExternalIDPView struct {
 	ChangeDate      time.Time `json:"-" gorm:"column:change_date"`
 	ResourceOwner   string    `json:"-" gorm:"column:resource_owner"`
 	Sequence        uint64    `json:"-" gorm:"column:sequence"`
-	Tenant          string    `json:"tenant" gorm:"column:tenant"`
+	InstanceID      string    `json:"instanceID" gorm:"column:instance_id"`
 }
 
 func ExternalIDPViewFromModel(externalIDP *model.ExternalIDPView) *ExternalIDPView {
@@ -83,7 +83,7 @@ func (i *ExternalIDPView) AppendEvent(event *models.Event) (err error) {
 func (r *ExternalIDPView) setRootData(event *models.Event) {
 	r.UserID = event.AggregateID
 	r.ResourceOwner = event.ResourceOwner
-	r.Tenant = event.Tenant
+	r.InstanceID = event.InstanceID
 }
 
 func (r *ExternalIDPView) SetData(event *models.Event) error {
