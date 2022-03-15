@@ -12,6 +12,7 @@ type SearchQueryBuilder struct {
 	limit         uint64
 	desc          bool
 	resourceOwner string
+	tenant        string
 	queries       []*SearchQuery
 }
 
@@ -64,6 +65,12 @@ func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
 //ResourceOwner defines the resource owner (org) of the events
 func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
 	factory.resourceOwner = resourceOwner
+	return factory
+}
+
+//Tenant defines the tenant (system) of the events
+func (factory *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
+	factory.tenant = tenant
 	return factory
 }
 
@@ -138,12 +145,13 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
+func (builder *SearchQueryBuilder) build(tenantID string) (*repository.SearchQuery, error) {
 	if builder == nil ||
 		len(builder.queries) < 1 ||
 		builder.columns.Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
+	builder.tenant = tenantID
 	filters := make([][]*repository.Filter, len(builder.queries))
 
 	for i, query := range builder.queries {
@@ -155,6 +163,7 @@ func (builder *SearchQueryBuilder) build() (*repository.SearchQuery, error) {
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
 			query.builder.resourceOwnerFilter,
+			query.builder.tenantFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {
@@ -236,6 +245,13 @@ func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
 		return nil
 	}
 	return repository.NewFilter(repository.FieldResourceOwner, builder.resourceOwner, repository.OperationEquals)
+}
+
+func (builder *SearchQueryBuilder) tenantFilter() *repository.Filter {
+	if builder.tenant == "" {
+		return nil
+	}
+	return repository.NewFilter(repository.FieldTenant, builder.tenant, repository.OperationEquals)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {

@@ -162,7 +162,7 @@ func (h *ProjectionHandler) processEvent(
 ) error {
 	stmt, err := reduce(event)
 	if err != nil {
-		logging.Log("EVENT-PTr4j").WithError(err).Warn("unable to process event")
+		logging.New().WithError(err).Warn("unable to process event")
 		return err
 	}
 
@@ -314,5 +314,5 @@ func (h *ProjectionHandler) shutdown() {
 	if !h.shouldPush.Stop() {
 		<-h.shouldPush.C
 	}
-	logging.Log("EVENT-XG5Og").Info("stop processing")
+	logging.New().Info("stop processing")
 }

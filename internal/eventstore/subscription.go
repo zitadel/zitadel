@@ -122,6 +122,7 @@ func mapEventToV1Event(event Event) *models.Event {
 		AggregateType: models.AggregateType(event.Aggregate().Type),
 		AggregateID:   event.Aggregate().ID,
 		ResourceOwner: event.Aggregate().ResourceOwner,
+		Tenant:        event.Aggregate().Tenant,
 		EditorService: event.EditorService(),
 		EditorUser:    event.EditorUser(),
 		Data:          event.DataAsBytes(),

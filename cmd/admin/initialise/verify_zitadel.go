@@ -24,6 +24,7 @@ var (
 	searchSchema         = "SELECT schema_name FROM [SHOW SCHEMAS] WHERE schema_name = $1"
 	searchTable          = "SELECT table_name FROM [SHOW TABLES] WHERE table_name = $1"
 	searchSystemSequence = "SELECT sequence_name FROM [SHOW SEQUENCES] WHERE sequence_name = 'system_seq'"
+
 	//go:embed sql/04_eventstore.sql
 	createEventstoreStmt string
 	//go:embed sql/05_projections.sql
@@ -61,13 +62,7 @@ Prereqesits:
 	}
 }
 
-func verifyZitadel(config database.Config) error {
-	logging.WithFields("database", config.Database).Info("verify database")
-	db, err := database.Connect(config)
-	if err != nil {
-		return err
-	}
-
+func VerifyZitadel(db *sql.DB) error {
 	if err := verify(db, exists(searchSchema, systemSchema), exec(createSystemStmt)); err != nil {
 		return err
 	}
@@ -94,6 +89,18 @@ func verifyZitadel(config database.Config) error {
 
 	if err := verify(db, exists(searchTable, uniqueConstraintsTable), exec(createUniqueConstraints)); err != nil {
 		return err
+	}
+	return nil
+}
+
+func verifyZitadel(config database.Config) error {
+	logging.WithFields("database", config.Database).Info("verify database")
+	db, err := database.Connect(config)
+	if err != nil {
+		return err
+	}
+	if err := VerifyZitadel(db); err != nil {
+		return nil
 	}
 
 	return db.Close()
