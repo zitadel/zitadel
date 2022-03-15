@@ -6,6 +6,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -54,7 +56,10 @@ func NewOrgDomainVerifiedSearchQuery(verified bool) (SearchQuery, error) {
 
 func (q *Queries) SearchOrgDomains(ctx context.Context, queries *OrgDomainSearchQueries) (domains *Domains, err error) {
 	query, scan := prepareDomainsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			OrgDomainInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-ZRfj1", "Errors.Query.SQLStatement")
 	}
@@ -141,6 +146,10 @@ var (
 	}
 	OrgDomainOrgIDCol = Column{
 		name:  projection.OrgDomainOrgIDCol,
+		table: orgDomainsTable,
+	}
+	OrgDomainInstanceIDCol = Column{
+		name:  projection.OrgDomainInstanceIDCol,
 		table: orgDomainsTable,
 	}
 	OrgDomainIsVerifiedCol = Column{

@@ -7,6 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/query/projection"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -31,6 +34,10 @@ var (
 	}
 	UserAuthMethodColumnResourceOwner = Column{
 		name:  projection.UserAuthMethodResourceOwnerCol,
+		table: userAuthMethodTable,
+	}
+	UserAuthMethodColumnInstanceID = Column{
+		name:  projection.UserAuthMethodInstanceIDCol,
 		table: userAuthMethodTable,
 	}
 	UserAuthMethodColumnUserID = Column{
@@ -84,6 +91,7 @@ func (q *Queries) UserAuthMethodByIDs(ctx context.Context, userID, tokenID, reso
 		UserAuthMethodColumnTokenID.identifier():       tokenID,
 		UserAuthMethodColumnResourceOwner.identifier(): resourceOwner,
 		UserAuthMethodColumnMethodType.identifier():    methodType,
+		UserAuthMethodColumnInstanceID.identifier():    authz.GetCtxData(ctx).InstanceID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
@@ -95,7 +103,10 @@ func (q *Queries) UserAuthMethodByIDs(ctx context.Context, userID, tokenID, reso
 
 func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMethodSearchQueries) (userAuthMethods *AuthMethods, err error) {
 	query, scan := prepareUserAuthMethodsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			UserAuthMethodColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
 	}

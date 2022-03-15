@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/query/projection"
 
@@ -32,6 +34,10 @@ var (
 	}
 	SMTPConfigColumnResourceOwner = Column{
 		name:  projection.SMTPConfigColumnResourceOwner,
+		table: smtpConfigsTable,
+	}
+	SMTPConfigColumnInstanceID = Column{
+		name:  projection.SMTPConfigColumnInstanceID,
 		table: smtpConfigsTable,
 	}
 	SMTPConfigColumnSequence = Column{
@@ -88,6 +94,7 @@ func (q *Queries) SMTPConfigByAggregateID(ctx context.Context, aggregateID strin
 	stmt, scan := prepareSMTPConfigQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SMTPConfigColumnAggregateID.identifier(): aggregateID,
+		SMTPConfigColumnInstanceID.identifier():  authz.GetCtxData(ctx).InstanceID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3m9sl", "Errors.Query.SQLStatment")

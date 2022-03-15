@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -48,6 +50,10 @@ var (
 		name:  projection.DebugNotificationProviderResourceOwnerCol,
 		table: notificationProviderTable,
 	}
+	NotificationProviderColumnInstanceID = Column{
+		name:  projection.DebugNotificationProviderInstanceIDCol,
+		table: notificationProviderTable,
+	}
 	NotificationProviderColumnState = Column{
 		name:  projection.DebugNotificationProviderStateCol,
 		table: notificationProviderTable,
@@ -65,10 +71,15 @@ var (
 func (q *Queries) NotificationProviderByIDAndType(ctx context.Context, aggID string, providerType domain.NotificationProviderType) (*DebugNotificationProvider, error) {
 	query, scan := prepareDebugNotificationProviderQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				NotificationProviderColumnAggID.identifier(): aggID,
-				NotificationProviderColumnType.identifier():  providerType,
+				NotificationProviderColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			},
+			sq.Or{
+				sq.Eq{
+					NotificationProviderColumnAggID.identifier(): aggID,
+					NotificationProviderColumnType.identifier():  providerType,
+				},
 			},
 		}).
 		Limit(1).ToSql()

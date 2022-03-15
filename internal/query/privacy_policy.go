@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -50,6 +52,10 @@ var (
 		name:  projection.PrivacyPolicyResourceOwnerCol,
 		table: privacyTable,
 	}
+	PrivacyColInstanceID = Column{
+		name:  projection.PrivacyPolicyInstanceIDCol,
+		table: privacyTable,
+	}
 	PrivacyColPrivacyLink = Column{
 		name:  projection.PrivacyPolicyPrivacyLinkCol,
 		table: privacyTable,
@@ -71,12 +77,17 @@ var (
 func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				PrivacyColID.identifier(): orgID,
+				PrivacyColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				PrivacyColID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					PrivacyColID.identifier(): orgID,
+				},
+				sq.Eq{
+					PrivacyColID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(PrivacyColIsDefault.identifier()).
@@ -92,7 +103,8 @@ func (q *Queries) PrivacyPolicyByOrg(ctx context.Context, orgID string) (*Privac
 func (q *Queries) DefaultPrivacyPolicy(ctx context.Context) (*PrivacyPolicy, error) {
 	stmt, scan := preparePrivacyPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		PrivacyColID.identifier(): domain.IAMID,
+		PrivacyColID.identifier():         domain.IAMID,
+		PrivacyColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).
 		OrderBy(PrivacyColIsDefault.identifier()).
 		Limit(1).ToSql()

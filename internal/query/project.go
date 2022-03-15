@@ -7,6 +7,7 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/query/projection"
 
@@ -54,6 +55,10 @@ var (
 		name:  projection.ProjectColumnResourceOwner,
 		table: projectsTable,
 	}
+	ProjectColumnInstanceID = Column{
+		name:  projection.ProjectColumnInstanceID,
+		table: projectsTable,
+	}
 	ProjectColumnCreator = Column{
 		name:  projection.ProjectColumnCreator,
 		table: projectsTable,
@@ -96,7 +101,8 @@ type ProjectSearchQueries struct {
 func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) {
 	stmt, scan := prepareProjectQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		ProjectColumnID.identifier(): id,
+		ProjectColumnID.identifier():         id,
+		ProjectColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
@@ -113,7 +119,10 @@ func (q *Queries) ExistsProject(ctx context.Context, id string) (err error) {
 
 func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQueries) (projects *Projects, err error) {
 	query, scan := prepareProjectsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ProjectColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")
 	}

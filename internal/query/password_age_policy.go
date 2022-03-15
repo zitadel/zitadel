@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -50,6 +52,10 @@ var (
 		name:  projection.AgePolicyResourceOwnerCol,
 		table: passwordAgeTable,
 	}
+	PasswordAgeColInstanceID = Column{
+		name:  projection.AgePolicyInstanceIDCol,
+		table: passwordAgeTable,
+	}
 	PasswordAgeColWarnDays = Column{
 		name:  projection.AgePolicyExpireWarnDaysCol,
 		table: passwordAgeTable,
@@ -71,12 +77,17 @@ var (
 func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*PasswordAgePolicy, error) {
 	stmt, scan := preparePasswordAgePolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				PasswordAgeColID.identifier(): orgID,
+				PasswordAgeColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				PasswordAgeColID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					PasswordAgeColID.identifier(): orgID,
+				},
+				sq.Eq{
+					PasswordAgeColID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(PasswordAgeColIsDefault.identifier()).

@@ -9,6 +9,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -151,6 +153,10 @@ var (
 		name:  projection.UserGrantResourceOwner,
 		table: userGrantTable,
 	}
+	UserGrantInstanceID = Column{
+		name:  projection.UserGrantInstanceID,
+		table: userGrantTable,
+	}
 	UserGrantCreationDate = Column{
 		name:  projection.UserGrantCreationDate,
 		table: userGrantTable,
@@ -190,7 +196,10 @@ func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserG
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.ToSql()
+	stmt, args, err := query.
+		Where(sq.Eq{
+			UserGrantInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
 	}
@@ -201,7 +210,10 @@ func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserG
 
 func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries) (*UserGrants, error) {
 	query, scan := prepareUserGrantsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			UserGrantInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")
 	}

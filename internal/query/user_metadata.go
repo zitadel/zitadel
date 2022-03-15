@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -51,6 +53,10 @@ var (
 		name:  projection.UserMetadataColumnResourceOwner,
 		table: userMetadataTable,
 	}
+	UserMetadataInstanceIDCol = Column{
+		name:  projection.UserMetadataColumnInstanceID,
+		table: userMetadataTable,
+	}
 	UserMetadataSequenceCol = Column{
 		name:  projection.UserMetadataColumnSequence,
 		table: userMetadataTable,
@@ -72,8 +78,9 @@ func (q *Queries) GetUserMetadataByKey(ctx context.Context, userID, key string, 
 	}
 	stmt, args, err := query.Where(
 		sq.Eq{
-			UserMetadataUserIDCol.identifier(): userID,
-			UserMetadataKeyCol.identifier():    key,
+			UserMetadataUserIDCol.identifier():     userID,
+			UserMetadataKeyCol.identifier():        key,
+			UserMetadataInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-aDGG2", "Errors.Query.SQLStatment")
@@ -87,7 +94,8 @@ func (q *Queries) SearchUserMetadata(ctx context.Context, userID string, queries
 	query, scan := prepareUserMetadataListQuery()
 	stmt, args, err := queries.toQuery(query).Where(
 		sq.Eq{
-			UserMetadataUserIDCol.identifier(): userID,
+			UserMetadataUserIDCol.identifier():     userID,
+			UserMetadataInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
 		}).
 		ToSql()
 	if err != nil {

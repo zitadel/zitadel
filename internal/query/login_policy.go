@@ -7,10 +7,13 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type LoginPolicy struct {
@@ -50,6 +53,10 @@ var (
 	}
 	LoginPolicyColumnOrgID = Column{
 		name:  projection.LoginPolicyIDCol,
+		table: loginPolicyTable,
+	}
+	LoginPolicyColumnInstanceID = Column{
+		name:  projection.LoginPolicyInstanceIDCol,
 		table: loginPolicyTable,
 	}
 	LoginPolicyColumnCreationDate = Column{
@@ -125,12 +132,17 @@ var (
 func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPolicy, error) {
 	query, scan := prepareLoginPolicyQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): orgID,
+				LoginPolicyColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					LoginPolicyColumnOrgID.identifier(): orgID,
+				},
+				sq.Eq{
+					LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
@@ -146,7 +158,8 @@ func (q *Queries) LoginPolicyByID(ctx context.Context, orgID string) (*LoginPoli
 func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) {
 	query, scan := prepareLoginPolicyQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+		LoginPolicyColumnOrgID.identifier():      domain.IAMID,
+		LoginPolicyColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-t4TBK", "Errors.Query.SQLStatement")
@@ -159,12 +172,17 @@ func (q *Queries) DefaultLoginPolicy(ctx context.Context) (*LoginPolicy, error) 
 func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*SecondFactors, error) {
 	query, scan := prepareLoginPolicy2FAsQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): orgID,
+				LoginPolicyColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					LoginPolicyColumnOrgID.identifier(): orgID,
+				},
+				sq.Eq{
+					LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
@@ -185,7 +203,8 @@ func (q *Queries) SecondFactorsByOrg(ctx context.Context, orgID string) (*Second
 func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, error) {
 	query, scan := prepareLoginPolicy2FAsQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+		LoginPolicyColumnOrgID.identifier():      domain.IAMID,
+		LoginPolicyColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-CZ2Nv", "Errors.Query.SQLStatement")
@@ -203,12 +222,17 @@ func (q *Queries) DefaultSecondFactors(ctx context.Context) (*SecondFactors, err
 func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (*MultiFactors, error) {
 	query, scan := prepareLoginPolicyMFAsQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): orgID,
+				LoginPolicyColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					LoginPolicyColumnOrgID.identifier(): orgID,
+				},
+				sq.Eq{
+					LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(LoginPolicyColumnIsDefault.identifier()).
@@ -229,7 +253,8 @@ func (q *Queries) MultiFactorsByOrg(ctx context.Context, orgID string) (*MultiFa
 func (q *Queries) DefaultMultiFactors(ctx context.Context) (*MultiFactors, error) {
 	query, scan := prepareLoginPolicyMFAsQuery()
 	stmt, args, err := query.Where(sq.Eq{
-		LoginPolicyColumnOrgID.identifier(): domain.IAMID,
+		LoginPolicyColumnOrgID.identifier():      domain.IAMID,
+		LoginPolicyColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).OrderBy(LoginPolicyColumnIsDefault.identifier()).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-WxYjr", "Errors.Query.SQLStatement")

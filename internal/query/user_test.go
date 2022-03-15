@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"golang.org/x/text/language"
 
@@ -47,10 +48,11 @@ var (
 		` LEFT JOIN` +
 		` (SELECT login_names.user_id, ARRAY_AGG(login_names.login_name) as loginnames` +
 		` FROM projections.login_names as login_names` +
+		` WHERE login_names.instance_id = $1` +
 		` GROUP BY login_names.user_id) as login_names` +
 		` on login_names.user_id = projections.users.id` +
 		` LEFT JOIN` +
-		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.is_primary = $1) as preferred_login_name` +
+		` (SELECT preferred_login_name.user_id, preferred_login_name.login_name FROM projections.login_names as preferred_login_name WHERE preferred_login_name.instance_id = $2 AND preferred_login_name.is_primary = $3) as preferred_login_name` +
 		` on preferred_login_name.user_id = projections.users.id`
 	userCols = []string{
 		"id",
@@ -268,8 +270,10 @@ func Test_UserPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareUserQuery no result",
-			prepare: prepareUserQuery,
+			name: "prepareUserQuery no result",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+				return prepareUserQuery("instanceID")
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(userQuery),
@@ -286,8 +290,10 @@ func Test_UserPrepares(t *testing.T) {
 			object: (*User)(nil),
 		},
 		{
-			name:    "prepareUserQuery human found",
-			prepare: prepareUserQuery,
+			name: "prepareUserQuery human found",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+				return prepareUserQuery("instanceID")
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(userQuery),
@@ -350,8 +356,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUserQuery machine found",
-			prepare: prepareUserQuery,
+			name: "prepareUserQuery machine found",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+				return prepareUserQuery("instanceID")
+			},
 			want: want{
 				sqlExpectations: mockQuery(
 					regexp.QuoteMeta(userQuery),
@@ -405,8 +413,10 @@ func Test_UserPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareUserQuery sql err",
-			prepare: prepareUserQuery,
+			name: "prepareUserQuery sql err",
+			prepare: func() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+				return prepareUserQuery("instanceID")
+			},
 			want: want{
 				sqlExpectations: mockQueryErr(
 					regexp.QuoteMeta(userQuery),

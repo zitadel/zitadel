@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -25,6 +27,10 @@ var (
 	}
 	ProjectRoleColumnResourceOwner = Column{
 		name:  projection.ProjectRoleColumnResourceOwner,
+		table: projectRolesTable,
+	}
+	ProjectRoleColumnInstanceID = Column{
+		name:  projection.ProjectRoleColumnInstanceID,
 		table: projectRolesTable,
 	}
 	ProjectRoleColumnSequence = Column{
@@ -79,8 +85,9 @@ func (q *Queries) ProjectRoleByID(ctx context.Context, projectID, key string) (*
 	stmt, scan := prepareProjectRoleQuery()
 	query, args, err := stmt.
 		Where(sq.Eq{
-			ProjectRoleColumnProjectID.identifier(): projectID,
-			ProjectRoleColumnKey.identifier():       key,
+			ProjectRoleColumnProjectID.identifier():  projectID,
+			ProjectRoleColumnKey.identifier():        key,
+			ProjectRoleColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "Errors.Query.SQLStatment")
@@ -97,7 +104,10 @@ func (q *Queries) ExistsProjectRole(ctx context.Context, projectID, key string) 
 
 func (q *Queries) SearchProjectRoles(ctx context.Context, queries *ProjectRoleSearchQueries) (projects *ProjectRoles, err error) {
 	query, scan := prepareProjectRolesQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ProjectRoleColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}
@@ -124,7 +134,10 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 		return nil, err
 	}
 	query, scan := prepareProjectRolesQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ProjectRoleColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
 	}

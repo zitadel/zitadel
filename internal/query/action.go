@@ -8,6 +8,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -31,6 +33,10 @@ var (
 	}
 	ActionColumnResourceOwner = Column{
 		name:  projection.ActionResourceOwnerCol,
+		table: actionTable,
+	}
+	ActionColumnInstanceID = Column{
+		name:  projection.ActionInstanceIDCol,
 		table: actionTable,
 	}
 	ActionColumnSequence = Column{
@@ -93,7 +99,11 @@ func (q *ActionSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (q *Queries) SearchActions(ctx context.Context, queries *ActionSearchQueries) (actions *Actions, err error) {
 	query, scan := prepareActionsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			ActionColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).
+		ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-SDgwg", "Errors.Query.InvalidRequest")
 	}
@@ -116,6 +126,7 @@ func (q *Queries) GetActionByID(ctx context.Context, id string, orgID string) (*
 		sq.Eq{
 			ActionColumnID.identifier():            id,
 			ActionColumnResourceOwner.identifier(): orgID,
+			ActionColumnInstanceID.identifier():    authz.GetCtxData(ctx).InstanceID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgff3", "Errors.Query.SQLStatement")

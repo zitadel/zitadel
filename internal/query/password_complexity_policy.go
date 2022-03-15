@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -32,12 +34,17 @@ type PasswordComplexityPolicy struct {
 func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID string) (*PasswordComplexityPolicy, error) {
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				PasswordComplexityColID.identifier(): orgID,
+				PasswordComplexityColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				PasswordComplexityColID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					PasswordComplexityColID.identifier(): orgID,
+				},
+				sq.Eq{
+					PasswordComplexityColID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
@@ -53,7 +60,8 @@ func (q *Queries) PasswordComplexityPolicyByOrg(ctx context.Context, orgID strin
 func (q *Queries) DefaultPasswordComplexityPolicy(ctx context.Context) (*PasswordComplexityPolicy, error) {
 	stmt, scan := preparePasswordComplexityPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		PasswordComplexityColID.identifier(): domain.IAMID,
+		PasswordComplexityColID.identifier():         domain.IAMID,
+		PasswordComplexityColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).
 		OrderBy(PasswordComplexityColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -87,6 +95,10 @@ var (
 	}
 	PasswordComplexityColResourceOwner = Column{
 		name:  projection.ComplexityPolicyResourceOwnerCol,
+		table: passwordComplexityTable,
+	}
+	PasswordComplexityColInstanceID = Column{
+		name:  projection.ComplexityPolicyInstanceIDCol,
 		table: passwordComplexityTable,
 	}
 	PasswordComplexityColMinLength = Column{

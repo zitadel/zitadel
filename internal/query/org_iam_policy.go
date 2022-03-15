@@ -7,6 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -49,6 +52,10 @@ var (
 		name:  projection.OrgIAMPolicyResourceOwnerCol,
 		table: orgIAMTable,
 	}
+	OrgIAMColInstanceID = Column{
+		name:  projection.OrgIAMPolicyInstanceIDCol,
+		table: orgIAMTable,
+	}
 	OrgIAMColUserLoginMustBeDomain = Column{
 		name:  projection.OrgIAMPolicyUserLoginMustBeDomainCol,
 		table: orgIAMTable,
@@ -66,12 +73,17 @@ var (
 func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMPolicy, error) {
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				OrgIAMColID.identifier(): orgID,
+				OrgIAMColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 			},
-			sq.Eq{
-				OrgIAMColID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					OrgIAMColID.identifier(): orgID,
+				},
+				sq.Eq{
+					OrgIAMColID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(OrgIAMColIsDefault.identifier()).
@@ -87,7 +99,8 @@ func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMP
 func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error) {
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgIAMColID.identifier(): domain.IAMID,
+		OrgIAMColID.identifier():         domain.IAMID,
+		OrgIAMColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()

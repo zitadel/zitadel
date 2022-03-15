@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -70,6 +72,10 @@ var (
 		name:  projection.IDPUserLinkResourceOwnerCol,
 		table: idpUserLinkTable,
 	}
+	IDPUserLinkInstanceIDCol = Column{
+		name:  projection.IDPUserLinkInstanceIDCol,
+		table: idpUserLinkTable,
+	}
 	IDPUserLinkDisplayNameCol = Column{
 		name:  projection.IDPUserLinkDisplayNameCol,
 		table: idpUserLinkTable,
@@ -78,7 +84,10 @@ var (
 
 func (q *Queries) IDPUserLinks(ctx context.Context, queries *IDPUserLinksSearchQuery) (idps *IDPUserLinks, err error) {
 	query, scan := prepareIDPUserLinksQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			IDPUserLinkInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-4zzFK", "Errors.Query.InvalidRequest")
 	}

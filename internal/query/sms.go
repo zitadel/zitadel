@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -73,6 +75,10 @@ var (
 		name:  projection.SMSColumnResourceOwner,
 		table: smsConfigsTable,
 	}
+	SMSConfigColumnInstanceID = Column{
+		name:  projection.SMSColumnInstanceID,
+		table: smsConfigsTable,
+	}
 	SMSConfigColumnState = Column{
 		name:  projection.SMSColumnState,
 		table: smsConfigsTable,
@@ -109,7 +115,8 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSCon
 	stmt, scan := prepareSMSConfigQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			SMSConfigColumnID.identifier(): id,
+			SMSConfigColumnID.identifier():         id,
+			SMSConfigColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 		},
 	).ToSql()
 	if err != nil {
@@ -122,7 +129,10 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSCon
 
 func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearchQueries) (*SMSConfigs, error) {
 	query, scan := prepareSMSConfigsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			SMSConfigColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")
 	}

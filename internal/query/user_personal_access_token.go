@@ -9,6 +9,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/query/projection"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -46,6 +48,10 @@ var (
 		name:  projection.PersonalAccessTokenColumnResourceOwner,
 		table: personalAccessTokensTable,
 	}
+	PersonalAccessTokenColumnInstanceID = Column{
+		name:  projection.PersonalAccessTokenColumnInstanceID,
+		table: personalAccessTokensTable,
+	}
 	PersonalAccessTokenColumnSequence = Column{
 		name:  projection.PersonalAccessTokenColumnSequence,
 		table: personalAccessTokensTable,
@@ -80,7 +86,8 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, id string, querie
 		query = q.toQuery(query)
 	}
 	stmt, args, err := query.Where(sq.Eq{
-		PersonalAccessTokenColumnID.identifier(): id,
+		PersonalAccessTokenColumnID.identifier():         id,
+		PersonalAccessTokenColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgfb4", "Errors.Query.SQLStatment")
@@ -92,7 +99,10 @@ func (q *Queries) PersonalAccessTokenByID(ctx context.Context, id string, querie
 
 func (q *Queries) SearchPersonalAccessTokens(ctx context.Context, queries *PersonalAccessTokenSearchQueries) (personalAccessTokens *PersonalAccessTokens, err error) {
 	query, scan := preparePersonalAccessTokensQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			PersonalAccessTokenColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-Hjw2w", "Errors.Query.InvalidRequest")
 	}
