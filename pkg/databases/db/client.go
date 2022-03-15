@@ -1,6 +1,7 @@
 package db
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"github.com/caos/orbos/pkg/labels"
 	"strings"
@@ -13,6 +14,7 @@ import (
 
 const (
 	CACert       = "ca.crt"
+	CAKey        = "ca.key"
 	RootUserCert = "client.root.crt"
 	RootUserKey  = "client.root.key"
 	UserCert     = "client.zitadel.crt"
@@ -26,6 +28,8 @@ type Connection interface {
 	PasswordSecret() (*labels.Selectable, string)
 	SSL() *SSL
 	Options() string
+	CACert() []byte
+	CAKey() *rsa.PrivateKey
 }
 
 type SSL struct {
@@ -49,7 +53,7 @@ func InitChownCerts(
 
 	volumeMounts := make([]corev1.VolumeMount, len(users)+1)
 	volumeMounts[0] = to
-	volumes = make([]corev1.Volume, len(users), len(users)+1)
+	volumes = make([]corev1.Volume, len(users)+1)
 	volumes[0] = corev1.Volume{
 		Name: to.Name,
 		VolumeSource: corev1.VolumeSource{

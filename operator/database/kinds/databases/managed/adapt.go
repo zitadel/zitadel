@@ -134,6 +134,7 @@ func Adapter(
 			rootCertsSecret,
 			clientCertsPath,
 			nodeCertsSecret,
+			currentDB,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err

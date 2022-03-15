@@ -37,10 +37,16 @@ func getFlywayUserPreContainer(
 	certsVolumemount corev1.VolumeMount,
 ) corev1.Container {
 
+	migrationUserPasswordSecret, migrationUserPasswordSecretKey := dbConn.PasswordSecret()
+	var migrationUserPasswordSecretName string
+	if migrationUserPasswordSecret != nil {
+		migrationUserPasswordSecretName = migrationUserPasswordSecret.Name()
+	}
+
 	return corev1.Container{
 		Name:         "create-flyway-user",
 		Image:        common.CockroachImage.Reference(customImageRegistry),
-		Env:          baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, secretPasswordName),
+		Env:          baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserPasswordSecretName, migrationUserPasswordSecretKey),
 		VolumeMounts: []corev1.VolumeMount{certsVolumemount},
 		Command:      []string{"/bin/bash", "-c", "--"},
 		Args: []string{

@@ -4,16 +4,14 @@ import (
 	"errors"
 	"github.com/caos/zitadel/pkg/databases/db"
 
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
-
 	"github.com/caos/orbos/pkg/labels"
 	"github.com/caos/zitadel/operator"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/certificates"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/pem"
+	"github.com/caos/zitadel/pkg/databases/certs/certificates"
+	"github.com/caos/zitadel/pkg/databases/certs/pem"
 )
 
 const (
@@ -24,6 +22,7 @@ func AdaptFunc(
 	monitor mntr.Monitor,
 	namespace string,
 	componentLabels *labels.Component,
+	dbConn db.Connection,
 ) (
 	func(client, secretName, userCrtFilename, userKeyFilename string) operator.QueryFunc,
 	func(secretName string) operator.DestroyFunc,
@@ -36,15 +35,8 @@ func AdaptFunc(
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 				queriers := make([]operator.QueryFunc, 0)
 
-				currentDB, err := db.ParseQueriedForDatabase(queried)
-				if err != nil {
-					return nil, err
-				}
-
-				managedDB := currentDB.(*current.Current)
-
-				caCert := managedDB.GetCertificate()
-				caKey := managedDB.GetCertificateKey()
+				caCert := dbConn.CACert()
+				caKey := dbConn.CAKey()
 				if caKey == nil || caCert == nil || len(caCert) == 0 {
 					return nil, errors.New("no ca-certificate found")
 				}

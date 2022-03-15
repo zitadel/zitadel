@@ -7,9 +7,9 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/client"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/dbuser"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/node"
+	"github.com/caos/zitadel/pkg/databases/certs/client"
 	"github.com/caos/zitadel/pkg/databases/db"
 )
 
@@ -33,6 +33,7 @@ func AdaptFunc(
 	rootCertsSecret string,
 	containerCertsDir string,
 	nodeSecret string,
+	dbConn db.Connection,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -81,6 +82,7 @@ func AdaptFunc(
 		cMonitor,
 		namespace,
 		componentLabels,
+		dbConn,
 	)
 	if err != nil {
 		return nil, nil, nil, nil, err

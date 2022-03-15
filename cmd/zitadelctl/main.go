@@ -16,7 +16,6 @@ var (
 )
 
 func main() {
-	fmt.Println("here")
 	monitor := mntr.Monitor{
 		OnInfo:         mntr.LogMessage,
 		OnChange:       mntr.LogMessage,

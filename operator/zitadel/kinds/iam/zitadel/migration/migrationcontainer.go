@@ -19,6 +19,12 @@ func getMigrationContainer(
 	pwSecretName string,
 ) corev1.Container {
 
+	migrationUserPasswordSecret, migrationUserPasswordSecretKey := dbConn.PasswordSecret()
+	var migrationUserPasswordSecretName string
+	if migrationUserPasswordSecret != nil {
+		migrationUserPasswordSecretName = migrationUserPasswordSecret.Name()
+	}
+
 	return corev1.Container{
 		Name:  "db-migration",
 		Image: common.FlywayImage.Reference(customImageRegistry),
@@ -27,7 +33,8 @@ func getMigrationContainer(
 			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, users),
+
+		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, migrationUserPasswordSecretName, migrationUserPasswordSecretKey, users),
 		VolumeMounts: []corev1.VolumeMount{certsVolumeMount, {
 			Name:      migrationConfigmap,
 			MountPath: migrationsPath,
@@ -38,8 +45,8 @@ func getMigrationContainer(
 	}
 }
 
-func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string, users []string) []corev1.EnvVar {
-	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret)
+func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, migrationUserPasswordSecret, migrationUserPasswordSecretKey string, users []string) []corev1.EnvVar {
+	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserPasswordSecret, migrationUserPasswordSecretKey)
 
 	vars := make([]corev1.EnvVar, 0)
 	for _, v := range envVars {

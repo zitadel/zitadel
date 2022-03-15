@@ -1,6 +1,8 @@
 package configuration
 
 import (
+	"fmt"
+	"github.com/caos/zitadel/pkg/databases/certs/client"
 	"time"
 
 	"github.com/caos/zitadel/pkg/databases/db"
@@ -85,6 +87,16 @@ func AdaptFunc(
 		operator.ResourceDestroyToZitadelDestroy(destroySP),
 	}
 
+	queryCert, _, err := client.AdaptFunc(
+		internalMonitor,
+		namespace,
+		componentLabels,
+		dbConn,
+	)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
 	return func(
 			necessaryUsers map[string]string,
 		) operator.QueryFunc {
@@ -150,6 +162,10 @@ func AdaptFunc(
 					operator.ResourceQueryToZitadelQuery(querySV),
 					operator.ResourceQueryToZitadelQuery(querySP),
 					operator.ResourceQueryToZitadelQuery(queryCM),
+				}
+
+				for user := range necessaryUsers {
+					queriers = append(queriers, queryCert(user, db.CertsSecret(user), fmt.Sprintf("client.%s.crt", user), fmt.Sprintf("client.%s.key", user)))
 				}
 
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)

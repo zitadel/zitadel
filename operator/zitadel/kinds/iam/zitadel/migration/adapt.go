@@ -111,7 +111,7 @@ func AdaptFunc(
 							InitContainers: []corev1.Container{
 								chownCertsContainer,
 								getReadyPreContainer(dbConn, customImageRegistry),
-								getFlywayUserPreContainer(dbConn, customImageRegistry, migrationUser, secretPasswordName, chownedVolumeMount),
+								// getFlywayUserPreContainer(dbConn, customImageRegistry, migrationUser, secretPasswordName, chownedVolumeMount), // TODO: delete?
 							},
 							Containers: []corev1.Container{
 								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount, users, secretPasswordName),
@@ -163,20 +163,20 @@ func AdaptFunc(
 		nil
 }
 
-func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string) []corev1.EnvVar {
+func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserPasswordSecret, migrationUserPasswordSecretKey string) []corev1.EnvVar {
 
 	envVars := []corev1.EnvVar{{
 		Name:  envMigrationUser,
 		Value: migrationUser,
 	}}
 
-	if userPasswordsSecret != "" {
+	if migrationUserPasswordSecret != "" {
 		envVars = append(envVars, corev1.EnvVar{
 			Name: envMigrationPW,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-					Key:                  migrationUser,
+					LocalObjectReference: corev1.LocalObjectReference{Name: migrationUserPasswordSecret},
+					Key:                  migrationUserPasswordSecretKey,
 				},
 			},
 		})

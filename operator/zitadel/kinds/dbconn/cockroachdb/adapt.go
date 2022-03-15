@@ -1,7 +1,9 @@
 package cockroachdb
 
 import (
+	"errors"
 	"fmt"
+	"github.com/caos/zitadel/pkg/databases/certs/pem"
 	"strconv"
 
 	"github.com/caos/orbos/pkg/secret/read"
@@ -67,7 +69,7 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		if desiredKind.Spec.User != "" {
 			user = desiredKind.Spec.User
 		}
-		certLabels := labels.MustForName(componentLabels, user)
+		certLabels := labels.MustForName(componentLabels, "cockroachdb.client."+user)
 		pwLabels := labels.AsSelectable(labels.MustForName(componentLabels, "db-connection-password"))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
@@ -87,14 +89,42 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 
 				var queriers []operator.QueryFunc
 				if certificate != "" {
+
+					cert, err := pem.DecodeCertificate([]byte(certificate))
+					if err != nil {
+						return nil, fmt.Errorf("decoding pem certificate failed: %w", err)
+					}
+
+					certificateKey, err := read.GetSecretValue(k8sClient, desiredKind.Spec.CertificateKey, desiredKind.Spec.ExistingCertificateKey)
+					if err != nil {
+						return nil, err
+					}
+
+					if certificateKey == "" {
+						return nil, errors.New("please provide a certificate key using zitadelctl writesecret")
+					}
+
+					certKey, err := pem.DecodeKey([]byte(certificateKey))
+					if err != nil {
+						return nil, fmt.Errorf("decoding pem certificate key failed: %w", err)
+					}
+
 					certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
-						db.CACert: certificate,
+						db.CACert: string(cert),
+						db.CAKey:  certificateKey,
 					})
 					if err != nil {
 						return nil, err
 					}
+
+					currentDB.Current.CACert = []byte(certificate)
+					currentDB.Current.CAKey = certKey
+
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
+				} else {
+					return nil, errors.New("please provide a ca certificate using zitadelctl writesecret")
 				}
+
 				currentDB.Current.Secure = certificate != ""
 
 				password, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Password, desiredKind.Spec.ExistingPassword)

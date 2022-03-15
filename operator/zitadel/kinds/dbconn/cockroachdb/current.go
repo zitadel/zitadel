@@ -1,6 +1,7 @@
 package cockroachdb
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"github.com/caos/orbos/pkg/labels"
 	"strings"
@@ -21,12 +22,17 @@ type Current struct {
 		PasswordSecret    *labels.Selectable
 		PasswordSecretKey string
 		Secure            bool
+		CACert            []byte
+		CAKey             *rsa.PrivateKey
 	}
 }
 
-func (c *Current) Host() string { return c.Current.Host }
-func (c *Current) Port() string { return c.Current.Port }
-func (c *Current) User() string { return c.Current.User }
+func (c *Current) Host() string           { return c.Current.Host }
+func (c *Current) Port() string           { return c.Current.Port }
+func (c *Current) User() string           { return c.Current.User }
+func (c *Current) CACert() []byte         { return c.Current.CACert }
+func (c *Current) CAKey() *rsa.PrivateKey { return c.Current.CAKey }
+
 func (c *Current) PasswordSecret() (*labels.Selectable, string) {
 	return c.Current.PasswordSecret, c.Current.PasswordSecretKey
 }
