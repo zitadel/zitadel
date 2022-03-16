@@ -40,6 +40,7 @@ import { I18nInterceptor } from './services/interceptors/i18n.interceptor';
 import { OrgInterceptor } from './services/interceptors/org.interceptor';
 import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
+import { NavigationService } from './services/navigation.service';
 import { OverlayService } from './services/overlay/overlay.service';
 import { RefreshService } from './services/refresh.service';
 import { SeoService } from './services/seo.service';
@@ -176,6 +177,7 @@ const authConfig: AuthConfig = {
     SubscriptionService,
     KeyboardShortcutsService,
     AssetService,
+    NavigationService,
     { provide: 'windowObject', useValue: window },
   ],
   bootstrap: [AppComponent],

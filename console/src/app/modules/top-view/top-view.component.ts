@@ -13,8 +13,6 @@ export class TopViewComponent {
   @Input() public isInactive: boolean = false;
   @Input() public hasActions: boolean | null = false;
   @Input() public hasContributors: boolean | null = false;
-  @Input() public backRouterLink!: any[];
-  @Input() public backQueryParams!: any;
   @Input() public docLink: string = '';
   @Input() public hasBackButton: boolean | null = true;
   @Output() public backClicked: EventEmitter<void> = new EventEmitter();

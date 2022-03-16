@@ -1,4 +1,4 @@
-<cnsl-top-view title="{{'IDP.DETAIL.TITLE' | translate}}" [backRouterLink]="backroutes"
+<cnsl-top-view title="{{'IDP.DETAIL.TITLE' | translate}}"
   [sub]="idp?.oidcConfig ? ('IDP.OIDC.TITLE' | translate) : idp?.jwtConfig ? ('IDP.JWT.TITLE' | translate) : ''"
   [isActive]="idp?.state === IDPState.IDP_STATE_ACTIVE" [isInactive]="idp?.state === IDPState.IDP_STATE_INACTIVE"
   [hasContributors]="false" stateTooltip="{{'IDP.STATES.'+idp?.state | translate}}"

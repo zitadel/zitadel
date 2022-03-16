@@ -1,5 +1,4 @@
-<cnsl-detail-layout *ngIf="project"
-  [backRouterLink]="[ '/projects', (projectType === ProjectType.PROJECTTYPE_OWNED) ? $any(project)?.id : (projectType === ProjectType.PROJECTTYPE_GRANTED) ? $any(project)?.projectId: '']"
+<cnsl-detail-layout *ngIf="project" [hasBackButton]="true"
   title="{{projectName}} {{ 'PROJECT.MEMBER.TITLE' | translate }}">
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{ 'PROJECT.MEMBER.DESCRIPTION' | translate }}</span>

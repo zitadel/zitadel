@@ -1,5 +1,5 @@
-<cnsl-detail-layout [backRouterLink]="[ serviceType === PolicyComponentServiceType.ADMIN ? '/system' : '/org']"
-  [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate" [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
+<cnsl-detail-layout [hasBackButton]="true" [title]="'POLICY.LOGIN_TEXTS.TITLE' | translate"
+  [description]="'POLICY.LOGIN_TEXTS.DESCRIPTION' | translate">
 
   <p class="policy-applied-to" sub>{{'POLICY.APPLIEDTO' | translate}}:
     <strong *ngIf="orgName; else iam">{{orgName}}</strong>

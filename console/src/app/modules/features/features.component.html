@@ -1,5 +1,4 @@
-<cnsl-detail-layout [backRouterLink]="[ serviceType === FeatureServiceType.ADMIN ? '/system' : '/org']"
-  [title]="('FEATURES.TITLE' | translate)">
+<cnsl-detail-layout [hasBackButton]="true" [title]="('FEATURES.TITLE' | translate)">
   <p class="subinfo" sub>
     <span class="cnsl-secondary-text">{{'FEATURES.DESCRIPTION' | translate}}</span>
     <a mat-icon-button href="https://docs.zitadel.ch/docs/legal/introduction" target="_blank">

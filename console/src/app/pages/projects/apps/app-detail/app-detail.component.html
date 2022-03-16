@@ -1,9 +1,9 @@
-<cnsl-top-view title="{{app?.name}}" [backRouterLink]="[ '/users' ]"
+<cnsl-top-view title="{{app?.name}}"
   [hasActions]="isZitadel === false && (['project.app.write:'+projectId, 'project.app.write'] | hasRole | async)"
   docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
   [sub]="app?.oidcConfig ? ('APP.OIDC.APPTYPE.'+app?.oidcConfig?.appType | translate): 'API'"
   [isActive]="app?.state === AppState.APP_STATE_ACTIVE" [isInactive]="app?.state === AppState.APP_STATE_INACTIVE"
-  stateTooltip="{{('APP.PAGES.DETAIL.STATE.'+app?.state) | translate}}" [backRouterLink]="[ '/projects', projectId ]">
+  stateTooltip="{{('APP.PAGES.DETAIL.STATE.'+app?.state) | translate}}">
   <ng-template topActions cnslHasRole [hasRole]="['project.app.write:'+projectId, 'project.app.write']">
     <div class="regen-secret"
       *ngIf="isZitadel === false && this.app?.oidcConfig && (currentAuthMethod === 'CODE' || currentAuthMethod === 'POST')">
