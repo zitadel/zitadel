@@ -66,7 +66,7 @@ func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (*Me
 	query, scan := prepareOrgMembersQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			OrgMemberInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")

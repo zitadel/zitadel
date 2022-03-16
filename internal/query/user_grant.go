@@ -198,7 +198,7 @@ func (q *Queries) UserGrant(ctx context.Context, queries ...SearchQuery) (*UserG
 	}
 	stmt, args, err := query.
 		Where(sq.Eq{
-			UserGrantInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			UserGrantInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Fa1KW", "Errors.Query.SQLStatement")
@@ -212,7 +212,7 @@ func (q *Queries) UserGrants(ctx context.Context, queries *UserGrantsQueries) (*
 	query, scan := prepareUserGrantsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			UserGrantInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			UserGrantInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-wXnQR", "Errors.Query.SQLStatement")

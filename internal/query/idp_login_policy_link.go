@@ -75,7 +75,7 @@ func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string,
 	stmt, args, err := queries.toQuery(query).Where(
 		sq.Eq{
 			IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
-			IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetCtxData(ctx).InstanceID,
+			IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {

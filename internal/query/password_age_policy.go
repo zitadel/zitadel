@@ -79,7 +79,7 @@ func (q *Queries) PasswordAgePolicyByOrg(ctx context.Context, orgID string) (*Pa
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				PasswordAgeColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+				PasswordAgeColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Or{
 				sq.Eq{

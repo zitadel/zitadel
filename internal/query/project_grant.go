@@ -109,7 +109,7 @@ func (q *Queries) ProjectGrantByID(ctx context.Context, id string) (*ProjectGran
 	stmt, scan := prepareProjectGrantQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectGrantColumnGrantID.identifier():    id,
-		ProjectGrantColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Nf93d", "Errors.Query.SQLStatment")
@@ -124,7 +124,7 @@ func (q *Queries) ProjectGrantByIDAndGrantedOrg(ctx context.Context, id, granted
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectGrantColumnGrantID.identifier():      id,
 		ProjectGrantColumnGrantedOrgID.identifier(): grantedOrg,
-		ProjectGrantColumnInstanceID.identifier():   authz.GetCtxData(ctx).InstanceID,
+		ProjectGrantColumnInstanceID.identifier():   authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-MO9fs", "Errors.Query.SQLStatment")
@@ -143,7 +143,7 @@ func (q *Queries) SearchProjectGrants(ctx context.Context, queries *ProjectGrant
 	query, scan := prepareProjectGrantsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ProjectGrantColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			ProjectGrantColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-N9fsg", "Errors.Query.InvalidRequest")

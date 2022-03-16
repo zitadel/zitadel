@@ -5,6 +5,7 @@ import (
 
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -94,7 +95,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	err = l.authRepo.SelectUser(r.Context(), authRequest.ID, user.AggregateID, userAgentID, instanceID)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)

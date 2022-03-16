@@ -231,7 +231,7 @@ var (
 )
 
 func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...SearchQuery) (*User, error) {
-	instanceID := authz.GetCtxData(ctx).InstanceID
+	instanceID := authz.GetInstance(ctx).ID
 	query, scan := prepareUserQuery(instanceID)
 	for _, q := range queries {
 		query = q.toQuery(query)
@@ -249,7 +249,7 @@ func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...Sea
 }
 
 func (q *Queries) GetUser(ctx context.Context, queries ...SearchQuery) (*User, error) {
-	instanceID := authz.GetCtxData(ctx).InstanceID
+	instanceID := authz.GetInstance(ctx).ID
 	query, scan := prepareUserQuery(instanceID)
 	for _, q := range queries {
 		query = q.toQuery(query)
@@ -272,7 +272,7 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ..
 	}
 	stmt, args, err := query.Where(sq.Eq{
 		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
@@ -289,7 +289,7 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 	}
 	stmt, args, err := query.Where(sq.Eq{
 		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatment")
@@ -306,7 +306,7 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	}
 	stmt, args, err := query.Where(sq.Eq{
 		UserIDCol.identifier():         userID,
-		UserInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
@@ -320,7 +320,7 @@ func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (
 	query, scan := prepareUsersQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			UserInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+			UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
@@ -366,7 +366,7 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 		query = q.toQuery(query)
 	}
 	stmt, args, err := query.Where(sq.Eq{
-		UserInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")

@@ -28,6 +28,7 @@ func (repo *UserMembershipRepo) SearchMyMemberships(ctx context.Context) ([]*aut
 
 func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*user_view_model.UserMembershipView, error) {
 	ctxData := authz.GetCtxData(ctx)
+	instance := authz.GetInstance(ctx)
 	orgMemberships, orgCount, err := repo.View.SearchUserMemberships(&user_model.UserMembershipSearchRequest{
 		Queries: []*user_model.UserMembershipSearchQuery{
 			{
@@ -43,7 +44,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 			{
 				Key:    user_model.UserMembershipSearchKeyInstanceID,
 				Method: domain.SearchMethodEquals,
-				Value:  ctxData.InstanceID,
+				Value:  instance.ID,
 			},
 		},
 	})
@@ -65,7 +66,7 @@ func (repo *UserMembershipRepo) searchUserMemberships(ctx context.Context) ([]*u
 			{
 				Key:    user_model.UserMembershipSearchKeyInstanceID,
 				Method: domain.SearchMethodEquals,
-				Value:  ctxData.InstanceID,
+				Value:  instance.ID,
 			},
 		},
 	})

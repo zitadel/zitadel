@@ -86,7 +86,7 @@ func (q *Queries) CustomTextList(ctx context.Context, aggregateID, template, lan
 			CustomTextColAggregateID.identifier(): aggregateID,
 			CustomTextColTemplate.identifier():    template,
 			CustomTextColLanguage.identifier():    language,
-			CustomTextColInstanceID.identifier():  authz.GetCtxData(ctx).InstanceID,
+			CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {
@@ -111,7 +111,7 @@ func (q *Queries) CustomTextListByTemplate(ctx context.Context, aggregateID, tem
 		sq.Eq{
 			CustomTextColAggregateID.identifier(): aggregateID,
 			CustomTextColTemplate.identifier():    template,
-			CustomTextColInstanceID.identifier():  authz.GetCtxData(ctx).InstanceID,
+			CustomTextColInstanceID.identifier():  authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {

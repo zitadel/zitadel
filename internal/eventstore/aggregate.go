@@ -21,7 +21,7 @@ func NewAggregate(
 		ID:            id,
 		Type:          typ,
 		ResourceOwner: authz.GetCtxData(ctx).OrgID,
-		InstanceID:    authz.GetCtxData(ctx).InstanceID,
+		InstanceID:    authz.GetInstance(ctx).ID,
 		Version:       version,
 	}
 

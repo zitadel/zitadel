@@ -181,7 +181,7 @@ func (q *Queries) ActivePublicKeys(ctx context.Context, t time.Time) (*PublicKey
 	stmt, args, err := query.Where(
 		sq.And{
 			sq.Eq{
-				KeyColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+				KeyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Gt{
 				KeyPublicColExpiry.identifier(): t,
@@ -212,7 +212,7 @@ func (q *Queries) ActivePrivateSigningKey(ctx context.Context, t time.Time) (*Pr
 		sq.And{
 			sq.Eq{
 				KeyColUse.identifier():        domain.KeyUsageSigning,
-				KeyColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+				KeyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Gt{
 				KeyPrivateColExpiry.identifier(): t,

@@ -102,7 +102,7 @@ func (q *Queries) ProjectByID(ctx context.Context, id string) (*Project, error) 
 	stmt, scan := prepareProjectQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		ProjectColumnID.identifier():         id,
-		ProjectColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
@@ -121,7 +121,7 @@ func (q *Queries) SearchProjects(ctx context.Context, queries *ProjectSearchQuer
 	query, scan := prepareProjectsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ProjectColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			ProjectColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-fn9ew", "Errors.Query.InvalidRequest")

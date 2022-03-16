@@ -12,8 +12,8 @@ import (
 	"github.com/caos/oidc/pkg/client/rp"
 	"github.com/caos/oidc/pkg/oidc"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
-	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
@@ -45,7 +45,7 @@ func (l *Login) handleJWTRequest(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -209,7 +209,7 @@ func (l *Login) handleJWTCallback(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, nil, err)
 		return
 	}
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.AuthRequestID, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)

@@ -116,7 +116,7 @@ func (q *Queries) SMSProviderConfigByID(ctx context.Context, id string) (*SMSCon
 	query, args, err := stmt.Where(
 		sq.Eq{
 			SMSConfigColumnID.identifier():         id,
-			SMSConfigColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {
@@ -131,7 +131,7 @@ func (q *Queries) SearchSMSConfigs(ctx context.Context, queries *SMSConfigsSearc
 	query, scan := prepareSMSConfigsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			SMSConfigColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			SMSConfigColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9Jf", "Errors.Query.InvalidRequest")

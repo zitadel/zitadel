@@ -87,7 +87,7 @@ func (q *Queries) ProjectRoleByID(ctx context.Context, projectID, key string) (*
 		Where(sq.Eq{
 			ProjectRoleColumnProjectID.identifier():  projectID,
 			ProjectRoleColumnKey.identifier():        key,
-			ProjectRoleColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2N0fs", "Errors.Query.SQLStatment")
@@ -106,7 +106,7 @@ func (q *Queries) SearchProjectRoles(ctx context.Context, queries *ProjectRoleSe
 	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ProjectRoleColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")
@@ -136,7 +136,7 @@ func (q *Queries) SearchGrantedProjectRoles(ctx context.Context, grantID, grante
 	query, scan := prepareProjectRolesQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ProjectRoleColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			ProjectRoleColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-3N9ff", "Errors.Query.InvalidRequest")

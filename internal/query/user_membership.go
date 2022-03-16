@@ -94,7 +94,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	query, scan := prepareMembershipsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			membershipInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			membershipInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")

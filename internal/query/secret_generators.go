@@ -137,7 +137,7 @@ func (q *Queries) SecretGeneratorByType(ctx context.Context, generatorType domai
 	stmt, scan := prepareSecretGeneratorQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		SecretGeneratorColumnGeneratorType.identifier(): generatorType,
-		SecretGeneratorColumnInstanceID.identifier():    authz.GetCtxData(ctx).InstanceID,
+		SecretGeneratorColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-3k99f", "Errors.Query.SQLStatment")
@@ -151,7 +151,7 @@ func (q *Queries) SearchSecretGenerators(ctx context.Context, queries *SecretGen
 	query, scan := prepareSecretGeneratorsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			SecretGeneratorColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			SecretGeneratorColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-sn9lw", "Errors.Query.InvalidRequest")

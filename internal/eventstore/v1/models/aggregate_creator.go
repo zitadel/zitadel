@@ -18,9 +18,10 @@ type option func(*Aggregate)
 
 func (c *AggregateCreator) NewAggregate(ctx context.Context, id string, typ AggregateType, version Version, previousSequence uint64, opts ...option) (*Aggregate, error) {
 	ctxData := authz.GetCtxData(ctx)
+	instance := authz.GetInstance(ctx)
 	editorUser := ctxData.UserID
 	resourceOwner := ctxData.OrgID
-	instanceID := ctxData.InstanceID
+	instanceID := instance.ID
 
 	aggregate := &Aggregate{
 		ID:               id,

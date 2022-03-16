@@ -6,6 +6,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
@@ -29,7 +30,7 @@ func (l *Login) renderU2FVerification(w http.ResponseWriter, r *http.Request, au
 	var webAuthNLogin *domain.WebAuthNLogin
 	if err == nil {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		instanceID := http_mw.InstanceIDFromCtx(r.Context())
+		instanceID := authz.GetInstance(r.Context()).ID
 		webAuthNLogin, err = l.authRepo.BeginMFAU2FLogin(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, instanceID)
 	}
 	if err != nil {
@@ -71,7 +72,7 @@ func (l *Login) handleU2FVerification(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	err = l.authRepo.VerifyMFAU2F(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID, authReq.ID, userAgentID, instanceID, credData, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderU2FVerification(w, r, authReq, step.MFAProviders, err)

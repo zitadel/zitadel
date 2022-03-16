@@ -3,6 +3,7 @@ package login
 import (
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 )
@@ -13,7 +14,7 @@ const (
 
 func (l *Login) linkUsers(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, err error) {
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	err = l.authRepo.LinkExternalUsers(setContext(r.Context(), authReq.UserOrgID), authReq.ID, userAgentID, instanceID, domain.BrowserInfoFromRequest(r))
 	l.renderLinkUsersDone(w, r, authReq, err)
 }

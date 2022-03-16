@@ -67,7 +67,7 @@ func (q *Queries) ProjectMembers(ctx context.Context, queries *ProjectMembersQue
 	query, scan := prepareProjectMembersQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			ProjectMemberInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			ProjectMemberInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T8CuT", "Errors.Query.InvalidRequest")

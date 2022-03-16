@@ -608,6 +608,7 @@ func TestNewNoOpStatement(t *testing.T) {
 					aggregateType:    "agg",
 					sequence:         5,
 					previousSequence: 3,
+					instanceID:       "instanceID",
 				},
 			},
 			want: &handler.Statement{

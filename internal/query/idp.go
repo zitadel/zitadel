@@ -186,7 +186,7 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 		sq.And{
 			sq.Eq{
 				IDPIDCol.identifier():         id,
-				IDPInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+				IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Or{
 				sq.Eq{
@@ -211,7 +211,7 @@ func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *ID
 	query, scan := prepareIDPsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			IDPInstanceIDCol.identifier(): authz.GetCtxData(ctx).InstanceID,
+			IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")

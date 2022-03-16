@@ -75,7 +75,7 @@ func (q *Queries) OrgIAMPolicyByOrg(ctx context.Context, orgID string) (*OrgIAMP
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				OrgIAMColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+				OrgIAMColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Or{
 				sq.Eq{
@@ -100,7 +100,7 @@ func (q *Queries) DefaultOrgIAMPolicy(ctx context.Context) (*OrgIAMPolicy, error
 	stmt, scan := prepareOrgIAMPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OrgIAMColID.identifier():         domain.IAMID,
-		OrgIAMColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		OrgIAMColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(OrgIAMColIsDefault.identifier()).
 		Limit(1).ToSql()

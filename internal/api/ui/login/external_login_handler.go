@@ -11,6 +11,8 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"golang.org/x/oauth2"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -87,7 +89,7 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID, instanceID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
@@ -140,7 +142,7 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
@@ -200,7 +202,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, instanceID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -327,7 +329,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		return
 	} else if data.ResetLinking {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		instanceID := http_mw.InstanceIDFromCtx(r.Context())
+		instanceID := authz.GetInstance(r.Context()).ID
 		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID, instanceID)
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
@@ -366,7 +368,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	instanceID := http_mw.InstanceIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	if len(authReq.LinkingUsers) == 0 {
 		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return

@@ -28,6 +28,7 @@ type testEvent struct {
 	sequence         uint64
 	previousSequence uint64
 	aggregateType    eventstore.AggregateType
+	instanceID       string
 }
 
 func (e *testEvent) Sequence() uint64 {
@@ -36,7 +37,8 @@ func (e *testEvent) Sequence() uint64 {
 
 func (e *testEvent) Aggregate() eventstore.Aggregate {
 	return eventstore.Aggregate{
-		Type: e.aggregateType,
+		Type:       e.aggregateType,
+		InstanceID: e.instanceID,
 	}
 }
 
@@ -786,6 +788,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         5,
 							previousSequence: 0,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -798,6 +801,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         6,
 							previousSequence: 5,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -810,6 +814,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         7,
 							previousSequence: 6,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -830,8 +835,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreateErr("my_projection", []string{"col"}, []string{"$1"}, sql.ErrConnDone),
 					expectSavePointRollback(),
-					expectFailureCount("failed_events", "my_projection", 6, 3),
-					expectUpdateFailureCount("failed_events", "my_projection", 6, 4),
+					expectFailureCount("failed_events", "my_projection", "instanceID", 6, 3),
+					expectUpdateFailureCount("failed_events", "my_projection", "instanceID", 6, 4),
 				},
 				idx: 0,
 			},
@@ -850,6 +855,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         5,
 							previousSequence: 0,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -862,6 +868,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         6,
 							previousSequence: 5,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -874,6 +881,7 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 							aggregateType:    "agg",
 							sequence:         7,
 							previousSequence: 6,
+							instanceID:       "instanceID",
 						},
 						[]handler.Column{
 							{
@@ -894,8 +902,8 @@ func TestStatementHandler_executeStmts(t *testing.T) {
 					expectSavePoint(),
 					expectCreateErr("my_projection", []string{"col2"}, []string{"$1"}, sql.ErrConnDone),
 					expectSavePointRollback(),
-					expectFailureCount("failed_events", "my_projection", 6, 4),
-					expectUpdateFailureCount("failed_events", "my_projection", 6, 5),
+					expectFailureCount("failed_events", "my_projection", "instanceID", 6, 4),
+					expectUpdateFailureCount("failed_events", "my_projection", "instanceID", 6, 5),
 					expectSavePoint(),
 					expectCreate("my_projection", []string{"col3"}, []string{"$1"}),
 					expectSavePointRelease(),

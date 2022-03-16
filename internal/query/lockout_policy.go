@@ -80,7 +80,7 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*Lockou
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				LockoutColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+				LockoutColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Or{
 				sq.Eq{
@@ -105,7 +105,7 @@ func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, err
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		LockoutColID.identifier():         domain.IAMID,
-		LockoutColInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()

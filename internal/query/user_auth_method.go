@@ -91,7 +91,7 @@ func (q *Queries) UserAuthMethodByIDs(ctx context.Context, userID, tokenID, reso
 		UserAuthMethodColumnTokenID.identifier():       tokenID,
 		UserAuthMethodColumnResourceOwner.identifier(): resourceOwner,
 		UserAuthMethodColumnMethodType.identifier():    methodType,
-		UserAuthMethodColumnInstanceID.identifier():    authz.GetCtxData(ctx).InstanceID,
+		UserAuthMethodColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-2m00Q", "Errors.Query.SQLStatment")
@@ -105,7 +105,7 @@ func (q *Queries) SearchUserAuthMethods(ctx context.Context, queries *UserAuthMe
 	query, scan := prepareUserAuthMethodsQuery()
 	stmt, args, err := queries.toQuery(query).
 		Where(sq.Eq{
-			UserAuthMethodColumnInstanceID.identifier(): authz.GetCtxData(ctx).InstanceID,
+			UserAuthMethodColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-j9NJd", "Errors.Query.InvalidRequest")
