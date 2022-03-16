@@ -359,7 +359,7 @@
       "DESCRIPTION": "Si prega di fornirsi delle informazioni necessarie.",
       "NAMEANDEMAILSECTION": "Nome ed e-mail",
       "GENDERLANGSECTION": "Genere e linguaggio",
-      "PHONESECTION": "Phonenumbers",
+      "PHONESECTION": "Phone numbers",
       "PASSWORDSECTION": "Password iniziale",
       "ADDRESSANDPHONESECTION": "Numero di telefono",
       "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati."
@@ -478,6 +478,7 @@
         "VALID": "convalidato",
         "RESEND": "Reinvia il messaggio per la verifica",
         "EDITTITLE": "Cambia il numero di telefono",
+        "EDITVALUE": "Numero di telefono",
         "EDITDESC": "Inserisci il nuovo numero di telefono nel campo sottostante.",
         "DELETETITLE": "Rimuovi il numero di telefono",
         "DELETEDESC": "Vuoi davvero rimuovere il numero di telefono"

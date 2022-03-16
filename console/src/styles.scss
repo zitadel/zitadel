@@ -313,6 +313,7 @@ $caos-dark-theme-foreground: (
   warninfosection: #ffc1c1,
   successinfosection: #cbf4c9,
   toolbar-items: map-get(map-get($caos-dark-primary, contrast), 500),
+  slash: #ffffff6e,
 );
 
 $caos-light-theme-foreground: (
@@ -336,6 +337,7 @@ $caos-light-theme-foreground: (
   warninfosection: #620e0e,
   successinfosection: #0e6245,
   toolbar-items: map-get(map-get($caos-light-primary, contrast), 500),
+  slash: #0000006e,
 );
 
 $caos-dark-app-theme: (

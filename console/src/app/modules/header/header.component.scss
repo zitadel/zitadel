@@ -51,8 +51,8 @@
 
       .slash {
         flex-shrink: 0;
-        color: map-get($foreground, divider);
-        fill: map-get($foreground, divider);
+        color: map-get($foreground, slash);
+        fill: map-get($foreground, slash);
       }
 
       .org-context {
@@ -109,7 +109,7 @@
               background-color: if($is-dark-theme, #ffffff10, #00000010);
             }
 
-            .svgsapn {
+            .svgspan {
               margin-left: 0.75rem;
               position: absolute;
               top: 0;

@@ -478,6 +478,7 @@
         "VALID": "Validiert",
         "RESEND": "Verifikationsnachricht erneut senden",
         "EDITTITLE": "Nummer ändern",
+        "EDITVALUE": "Telefonnummer",
         "EDITDESC": "Geben Sie die neue Nummer in dem darunterliegenden Feld ein!",
         "DELETETITLE": "Telefonnummer löschen",
         "DELETEDESC": "Wollen Sie die Telefonnummer wirklich löschen?"

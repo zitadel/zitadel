@@ -2,24 +2,64 @@
 title: Overview
 ---
 
-import {ListElement, ListWrapper, ICONTYPE} from '../../src/components/list';
-import Column from '../../src/components/column';
+import { ListElement, ListWrapper, ICONTYPE } from "../../src/components/list";
+import Column from "../../src/components/column";
 
 In this section we provide manuals for different user profiles.
 
 <ListWrapper title="User">
   <Column>
     <div>
-      <ListElement link="/docs/manuals/user-register" type={ICONTYPE.HELP_REGISTER} title="Register" description="User and Org registration" />
-      <ListElement link="/docs/manuals/user-login" type={ICONTYPE.HELP_LOGIN} title="Login" description="Login methods, use of multifactors, passwordless" />
-      <ListElement link="/docs/manuals/user-passwordless" type={ICONTYPE.HELP_PASSWORDLESS} title="Passwordless" description="Authenticate with your fingerprint or security key." />
-      <ListElement link="/docs/manuals/user-password" type={ICONTYPE.HELP_PASSWORD} title="Password" description="Change your ZITADEL password" />
+      <ListElement
+        link="/docs/manuals/user-register"
+        type={ICONTYPE.HELP_REGISTER}
+        title="Register"
+        description="User and Org registration"
+      />
+      <ListElement
+        link="/docs/manuals/user-login"
+        type={ICONTYPE.HELP_LOGIN}
+        title="Login"
+        description="Login methods, use of multifactors, passwordless"
+      />
+      <ListElement
+        link="/docs/manuals/user-passwordless"
+        type={ICONTYPE.HELP_PASSWORDLESS}
+        title="Passwordless"
+        description="Authenticate with your fingerprint or security key."
+      />
+      <ListElement
+        link="/docs/manuals/user-password"
+        type={ICONTYPE.HELP_PASSWORD}
+        title="Password"
+        description="Change your ZITADEL password"
+      />
     </div>
     <div>
-      <ListElement link="/docs/manuals/user-factors" type={ICONTYPE.HELP_FACTORS} title="Factors" description="Enable multifactor authentication for more security" />
-      <ListElement link="/docs/manuals/user-email" type={ICONTYPE.HELP_EMAIL} title="Email" description="How to change your email" />
-      <ListElement link="/docs/manuals/user-phone" type={ICONTYPE.HELP_PHONE} title="Phone" description="How to change your phonenumber" />
-      <ListElement link="/docs/manuals/user-social-login" type={ICONTYPE.HELP_SOCIAL} title="Social Login" description="Link an external Identity Provider with your account" />   
+      <ListElement
+        link="/docs/manuals/user-factors"
+        type={ICONTYPE.HELP_FACTORS}
+        title="Factors"
+        description="Enable multifactor authentication for more security"
+      />
+      <ListElement
+        link="/docs/manuals/user-email"
+        type={ICONTYPE.HELP_EMAIL}
+        title="Email"
+        description="How to change your email"
+      />
+      <ListElement
+        link="/docs/manuals/user-phone"
+        type={ICONTYPE.HELP_PHONE}
+        title="Phone"
+        description="How to change your phone number"
+      />
+      <ListElement
+        link="/docs/manuals/user-social-login"
+        type={ICONTYPE.HELP_SOCIAL}
+        title="Social Login"
+        description="Link an external Identity Provider with your account"
+      />
     </div>
-  </Column> 
+  </Column>
 </ListWrapper>

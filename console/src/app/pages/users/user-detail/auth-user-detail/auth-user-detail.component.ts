@@ -265,7 +265,7 @@ export class AuthUserDetailComponent implements OnDestroy {
           data: {
             confirmKey: 'ACTIONS.SAVE',
             cancelKey: 'ACTIONS.CANCEL',
-            labelKey: 'ACTIONS.NEWVALUE',
+            labelKey: 'USER.LOGINMETHODS.PHONE.EDITVALUE',
             titleKey: 'USER.LOGINMETHODS.PHONE.EDITTITLE',
             descriptionKey: 'USER.LOGINMETHODS.PHONE.EDITDESC',
             value: this.user.human?.phone?.phone,

@@ -1,9 +1,9 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
-import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { GrantedProject } from 'src/app/proto/generated/zitadel/project_pb';
 import { ManagementService } from 'src/app/services/mgmt.service';
+import { ToastService } from 'src/app/services/toast.service';
 
 /**
  * Data source for the ProjectMembers view. This class should
@@ -17,7 +17,7 @@ export class ProjectGrantsDataSource extends DataSource<GrantedProject.AsObject>
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
 
-  constructor(private mgmtService: ManagementService) {
+  constructor(private mgmtService: ManagementService, private toast: ToastService) {
     super();
   }
 
@@ -25,25 +25,27 @@ export class ProjectGrantsDataSource extends DataSource<GrantedProject.AsObject>
     const offset = pageIndex * pageSize;
 
     this.loadingSubject.next(true);
-    from(this.mgmtService.listProjectGrants(projectId, pageSize, offset)).pipe(
-      map(resp => {
+    this.mgmtService
+      .listProjectGrants(projectId, pageSize, offset)
+      .then((resp) => {
         if (resp.details?.totalResult) {
           this.totalResult = resp.details.totalResult;
         } else {
           this.totalResult = 0;
         }
+
         if (resp.details?.viewTimestamp) {
           this.viewTimestamp = resp.details?.viewTimestamp;
         }
-        return resp.resultList;
-      }),
-      catchError(() => of([])),
-      finalize(() => this.loadingSubject.next(false)),
-    ).subscribe(grants => {
-      this.grantsSubject.next(grants);
-    });
-  }
 
+        this.grantsSubject.next(resp.resultList);
+        this.loadingSubject.next(false);
+      })
+      .catch((error) => {
+        this.toast.showError(error);
+        this.loadingSubject.next(false);
+      });
+  }
 
   /**
    * Connect this data source to the table. The table will only update when

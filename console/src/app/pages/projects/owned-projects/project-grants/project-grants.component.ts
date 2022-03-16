@@ -75,7 +75,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
   }
 
   public ngOnInit(): void {
-    this.dataSource = new ProjectGrantsDataSource(this.mgmtService);
+    this.dataSource = new ProjectGrantsDataSource(this.mgmtService, this.toast);
     this.dataSource.loadGrants(this.projectId, 0, 25, 'asc');
     this.getRoleOptions(this.projectId);
   }
