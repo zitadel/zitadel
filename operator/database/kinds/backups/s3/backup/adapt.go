@@ -24,10 +24,10 @@ const (
 	backupNameEnv             = "BACKUP_NAME"
 	cronJobNamePrefix         = "backup-"
 	internalSecretName        = "client-certs"
-	rootSecretName            = db.CertsSecret
 	timeout                   = 15 * time.Minute
 	Normal                    = "backup"
 	Instant                   = "instantbackup"
+	rootSecretName            = "cockroachdb.node"
 )
 
 func AdaptFunc(

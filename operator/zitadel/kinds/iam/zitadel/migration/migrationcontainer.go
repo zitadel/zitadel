@@ -15,13 +15,14 @@ func getMigrationContainer(
 	dbConn db.Connection,
 	customImageRegistry string,
 	certsVolumeMount corev1.VolumeMount,
+	users []string,
+	pwSecretName string,
 ) corev1.Container {
 
-	pwSecret, pwSecretKey := dbConn.PasswordSecret()
-
-	var pwSecretName string
-	if pwSecret != nil {
-		pwSecretName = pwSecret.Name()
+	migrationUserPasswordSecret, migrationUserPasswordSecretKey := dbConn.PasswordSecret()
+	var migrationUserPasswordSecretName string
+	if migrationUserPasswordSecret != nil {
+		migrationUserPasswordSecretName = migrationUserPasswordSecret.Name()
 	}
 
 	return corev1.Container{
@@ -32,7 +33,8 @@ func getMigrationContainer(
 			fmt.Sprintf("-locations=filesystem:%s", migrationsPath),
 			"migrate",
 		},
-		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, pwSecretKey),
+
+		Env: migrationEnvVars(envMigrationUser, envMigrationPW, dbConn.User(), pwSecretName, migrationUserPasswordSecretName, migrationUserPasswordSecretKey, users),
 		VolumeMounts: []corev1.VolumeMount{certsVolumeMount, {
 			Name:      migrationConfigmap,
 			MountPath: migrationsPath,
@@ -43,61 +45,25 @@ func getMigrationContainer(
 	}
 }
 
-func connectionURL(conn db.Connection, certsDir string) string {
-
-	url := fmt.Sprintf("jdbc:postgresql://%s:%s/defaultdb?%s", conn.Host(), conn.Port(), sslParams(conn.SSL(), certsDir))
-
-	options := conn.Options()
-	if options != "" {
-		url += "&options=" + options
-	}
-
-	return url
-
-}
-
-func sslParams(ssl *db.SSL, certsDir string) string {
-
-	if ssl == nil {
-		return "sslmode=disable"
-	}
-
-	params := "sslmode=verify-full&ssl=true"
-
-	if ssl.RootCert {
-		params += fmt.Sprintf("&sslrootcert=%s/%s", certsDir, db.CACert)
-	}
-
-	if ssl.UserCertAndKey {
-		params += fmt.Sprintf("&sslcert=%s/%s&sslkey=%s/%s&sslfactory=org.postgresql.ssl.NonValidatingFactory", certsDir, db.UserCert, certsDir, db.UserKey)
-	}
-
-	return params
-}
-
-func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string) []corev1.EnvVar {
-	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey)
+func migrationEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, migrationUserPasswordSecret, migrationUserPasswordSecretKey string, users []string) []corev1.EnvVar {
+	envVars := baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserPasswordSecret, migrationUserPasswordSecretKey)
 
 	vars := make([]corev1.EnvVar, 0)
 	for _, v := range envVars {
 		vars = append(vars, v)
 	}
 
-	deprecatedUsers := []string{
-		"management",
-		"adminapi",
-		"auth",
-		"authz",
-		"notification",
-		"eventstore",
-		"queries",
-	}
-	for _, user := range deprecatedUsers {
+	for _, user := range users {
 		vars = append(vars, corev1.EnvVar{
 			Name: "FLYWAY_PLACEHOLDERS_" + strings.ToUpper(user) + "PASSWORD",
-			// TODO: Drop users in a new migration
-			Value: "'to-be-deleted'",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
+					Key:                  user,
+				},
+			},
 		})
 	}
+
 	return vars
 }

@@ -7,9 +7,9 @@ import (
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/secret/read"
 	"github.com/caos/zitadel/operator"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/client"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/dbuser"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/node"
+	"github.com/caos/zitadel/pkg/databases/certs/client"
 	"github.com/caos/zitadel/pkg/databases/db"
 )
 
@@ -30,9 +30,9 @@ func AdaptFunc(
 	dbPasswdExisting *secret.Existing,
 	pwSecretLabels *labels.Selectable,
 	pwSecretKey string,
-	rootCertsSecret string,
 	containerCertsDir string,
 	nodeSecret string,
+	dbConn db.Connection,
 ) (
 	operator.QueryFunc,
 	operator.DestroyFunc,
@@ -81,6 +81,7 @@ func AdaptFunc(
 		cMonitor,
 		namespace,
 		componentLabels,
+		dbConn,
 	)
 	if err != nil {
 		return nil, nil, nil, nil, err
@@ -88,13 +89,13 @@ func AdaptFunc(
 
 	beforeCRqueriers := []operator.QueryFunc{
 		queryNode,
-		queryCert(rootUserName, rootCertsSecret, db.RootUserCert, db.RootUserKey),
-		queryCert(userName, db.CertsSecret, db.UserCert, db.UserKey),
+		queryCert(rootUserName),
+		queryCert(userName),
 	}
 
 	beforeCRdestroyers := []operator.DestroyFunc{
-		destroyCert(db.CertsSecret),
-		destroyCert(rootCertsSecret),
+		destroyCert(db.CertsSecret(userName)),
+		destroyCert(db.CertsSecret(rootUserName)),
 		destroyNode,
 	}
 
