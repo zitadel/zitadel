@@ -52,6 +52,7 @@ var (
 		" policy_users.user_id"+
 		" , policy_users.%[2]s"+
 		" , policy_users.%[5]s"+
+		" , policy_users.%[4]s"+
 		" , policy_users.%[1]s"+
 		" , domains.%[6]s AS domain"+
 		" , domains.%[3]s"+
@@ -60,11 +61,12 @@ var (
 		" users.id as user_id"+
 		" , users.%[2]s"+
 		" , users.%[4]s"+
+		" , users.%[5]s"+
 		" , IFNULL(policy_custom.%[1]s, policy_default.%[1]s) AS %[1]s"+
 		" FROM %[7]s users"+
-		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s"+
-		" LEFT JOIN %[8]s policy_default on policy_default.%[10]s = true) policy_users"+
-		" LEFT JOIN %[11]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[12]s"+
+		" LEFT JOIN %[8]s policy_custom on policy_custom.%[9]s = users.%[5]s AND policy_custom.%[10]s = users.%[4]s"+
+		" LEFT JOIN %[8]s policy_default on policy_default.%[11]s = true) policy_users"+
+		" LEFT JOIN %[12]s domains ON policy_users.%[1]s AND policy_users.%[5]s = domains.%[13]s AND policy_users.%[10]s = domains.%[14]s"+
 		");",
 		LoginNamePoliciesMustBeDomainCol,
 		LoginNameUserUserNameCol,
@@ -75,9 +77,11 @@ var (
 		LoginNameUserProjectionTable,
 		LoginNamePolicyProjectionTable,
 		LoginNamePoliciesResourceOwnerCol,
+		LoginNamePoliciesInstanceIDCol,
 		LoginNamePoliciesIsDefaultCol,
 		LoginNameDomainProjectionTable,
 		LoginNameDomainResourceOwnerCol,
+		LoginNameDomainInstanceIDCol,
 	)
 )
 

@@ -238,10 +238,9 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps_api_configs (app_id, instance_id, client_id, client_secret, auth_method) VALUES ($1, $2, $3, $4, $5)",
+							expectedStmt: "INSERT INTO projections.apps_api_configs (app_id, client_id, client_secret, auth_method) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"app-id",
-								"instance-id",
 								"client-id",
 								anyArg{},
 								domain.APIAuthMethodTypePrivateKeyJWT,
@@ -398,10 +397,9 @@ func TestAppProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.apps_oidc_configs (app_id, instance_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)",
+							expectedStmt: "INSERT INTO projections.apps_oidc_configs (app_id, version, client_id, client_secret, redirect_uris, response_types, grant_types, application_type, auth_method_type, post_logout_redirect_uris, is_dev_mode, access_token_type, access_token_role_assertion, id_token_role_assertion, id_token_userinfo_assertion, clock_skew, additional_origins) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
 							expectedArgs: []interface{}{
 								"app-id",
-								"instance-id",
 								domain.OIDCVersionV1,
 								"client-id",
 								anyArg{},

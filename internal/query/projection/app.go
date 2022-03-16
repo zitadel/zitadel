@@ -30,14 +30,12 @@ const (
 
 	appAPITableSuffix              = "api_configs"
 	AppAPIConfigColumnAppID        = "app_id"
-	AppAPIConfigColumnInstanceID   = "instance_id"
 	AppAPIConfigColumnClientID     = "client_id"
 	AppAPIConfigColumnClientSecret = "client_secret"
 	AppAPIConfigColumnAuthMethod   = "auth_method"
 
 	appOIDCTableSuffix                          = "oidc_configs"
 	AppOIDCConfigColumnAppID                    = "app_id"
-	AppOIDCConfigColumnInstanceID               = "instance_id"
 	AppOIDCConfigColumnVersion                  = "version"
 	AppOIDCConfigColumnClientID                 = "client_id"
 	AppOIDCConfigColumnClientSecret             = "client_secret"
@@ -81,7 +79,6 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
-			crdb.NewColumn(AppAPIConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
 			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
@@ -92,7 +89,6 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
-			crdb.NewColumn(AppOIDCConfigColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
@@ -291,7 +287,6 @@ func (p *AppProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppAPIConfigColumnAppID, e.AppID),
-				handler.NewCol(AppAPIConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppAPIConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppAPIConfigColumnClientSecret, e.ClientSecret),
 				handler.NewCol(AppAPIConfigColumnAuthMethod, e.AuthMethodType),
@@ -384,7 +379,6 @@ func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(AppOIDCConfigColumnAppID, e.AppID),
-				handler.NewCol(AppOIDCConfigColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(AppOIDCConfigColumnVersion, e.Version),
 				handler.NewCol(AppOIDCConfigColumnClientID, e.ClientID),
 				handler.NewCol(AppOIDCConfigColumnClientSecret, e.ClientSecret),

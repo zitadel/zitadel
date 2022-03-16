@@ -26,17 +26,15 @@ const (
 	KeyColumnAlgorithm     = "algorithm"
 	KeyColumnUse           = "use"
 
-	privateKeyTableSuffix      = "private"
-	KeyPrivateColumnID         = "id"
-	KeyPrivateColumnInstanceID = "instance_id"
-	KeyPrivateColumnExpiry     = "expiry"
-	KeyPrivateColumnKey        = "key"
+	privateKeyTableSuffix  = "private"
+	KeyPrivateColumnID     = "id"
+	KeyPrivateColumnExpiry = "expiry"
+	KeyPrivateColumnKey    = "key"
 
-	publicKeyTableSuffix      = "public"
-	KeyPublicColumnID         = "id"
-	KeyPublicColumnInstanceID = "instance_id"
-	KeyPublicColumnExpiry     = "expiry"
-	KeyPublicColumnKey        = "key"
+	publicKeyTableSuffix  = "public"
+	KeyPublicColumnID     = "id"
+	KeyPublicColumnExpiry = "expiry"
+	KeyPublicColumnKey    = "key"
 )
 
 type KeyProjection struct {
@@ -64,7 +62,6 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
-			crdb.NewColumn(KeyPrivateColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(KeyPrivateColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPrivateColumnKey, crdb.ColumnTypeJSONB),
 		},
@@ -73,7 +70,6 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPublicColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
-			crdb.NewColumn(KeyPublicColumnInstanceID, crdb.ColumnTypeText),
 			crdb.NewColumn(KeyPublicColumnExpiry, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(KeyPublicColumnKey, crdb.ColumnTypeBytes),
 		},
@@ -128,7 +124,6 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 		creates = append(creates, crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPrivateColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyPrivateColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(KeyPrivateColumnExpiry, e.PrivateKey.Expiry),
 				handler.NewCol(KeyPrivateColumnKey, e.PrivateKey.Key),
 			},
@@ -146,7 +141,6 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Sta
 		creates = append(creates, crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyPublicColumnID, e.Aggregate().ID),
-				handler.NewCol(KeyPublicColumnInstanceID, e.Aggregate().InstanceID),
 				handler.NewCol(KeyPublicColumnExpiry, e.PublicKey.Expiry),
 				handler.NewCol(KeyPublicColumnKey, publicKey),
 			},

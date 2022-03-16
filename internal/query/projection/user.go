@@ -31,9 +31,8 @@ const (
 	UserUsernameCol      = "username"
 	UserTypeCol          = "type"
 
-	UserHumanSuffix    = "humans"
-	HumanUserIDCol     = "user_id"
-	HumanInstanceIDCol = "instance_id"
+	UserHumanSuffix = "humans"
+	HumanUserIDCol  = "user_id"
 
 	// profile
 	HumanFirstNameCol         = "first_name"
@@ -55,7 +54,6 @@ const (
 	// machine
 	UserMachineSuffix     = "machines"
 	MachineUserIDCol      = "user_id"
-	MachineInstanceIDCol  = "instance_id"
 	MachineNameCol        = "name"
 	MachineDescriptionCol = "description"
 )
@@ -82,7 +80,6 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(HumanUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
-			crdb.NewColumn(HumanInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanFirstNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanLastNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(HumanNickNameCol, crdb.ColumnTypeText, crdb.Nullable()),
@@ -100,7 +97,6 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(MachineUserIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(UserIDCol)),
-			crdb.NewColumn(MachineInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineNameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(MachineDescriptionCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
@@ -265,7 +261,6 @@ func (p *UserProjection) reduceHumanAdded(event eventstore.Event) (*handler.Stat
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCol(HumanInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(HumanFirstNameCol, e.FirstName),
 				handler.NewCol(HumanLastNameCol, e.LastName),
 				handler.NewCol(HumanNickNameCol, &sql.NullString{String: e.NickName, Valid: e.NickName != ""}),
@@ -303,7 +298,6 @@ func (p *UserProjection) reduceHumanRegistered(event eventstore.Event) (*handler
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(HumanUserIDCol, e.Aggregate().ID),
-				handler.NewCol(HumanInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(HumanFirstNameCol, e.FirstName),
 				handler.NewCol(HumanLastNameCol, e.LastName),
 				handler.NewCol(HumanNickNameCol, &sql.NullString{String: e.NickName, Valid: e.NickName != ""}),
@@ -740,7 +734,6 @@ func (p *UserProjection) reduceMachineAdded(event eventstore.Event) (*handler.St
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(MachineUserIDCol, e.Aggregate().ID),
-				handler.NewCol(MachineInstanceIDCol, e.Aggregate().InstanceID),
 				handler.NewCol(MachineNameCol, e.Name),
 				handler.NewCol(MachineDescriptionCol, &sql.NullString{String: e.Description, Valid: e.Description != ""}),
 			},
