@@ -20,6 +20,7 @@ CREATE TABLE projections.failed_events (
     failed_sequence BIGINT,
     failure_count SMALLINT,
     error TEXT,
+    instance_id TEXT,
 
-    PRIMARY KEY (projection_name, failed_sequence)
+    PRIMARY KEY (projection_name, failed_sequence, instance_id)
 );

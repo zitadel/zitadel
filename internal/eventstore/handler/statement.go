@@ -27,6 +27,7 @@ type Statement struct {
 	AggregateType    eventstore.AggregateType
 	Sequence         uint64
 	PreviousSequence uint64
+	InstanceID       string
 
 	Execute func(ex Executer, projectionName string) error
 }

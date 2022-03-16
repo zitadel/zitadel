@@ -271,7 +271,7 @@ func (h *ProjectionHandler) fetchBulkStmts(
 
 	for _, event := range events {
 		if err = h.processEvent(ctx, event, reduce); err != nil {
-			logging.WithFields("projection", h.ProjectionName, "seq", event.Sequence()).WithError(err).Warn("unable to process event in bulk")
+			logging.WithFields("projection", h.ProjectionName, "sequence", event.Sequence(), "instanceID", event.Aggregate().InstanceID).WithError(err).Warn("unable to process event in bulk")
 			return false, err
 		}
 	}

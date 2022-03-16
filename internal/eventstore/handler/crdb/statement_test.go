@@ -615,6 +615,7 @@ func TestNewNoOpStatement(t *testing.T) {
 				Execute:          nil,
 				Sequence:         5,
 				PreviousSequence: 3,
+				InstanceID:       "instanceID",
 			},
 		},
 	}
