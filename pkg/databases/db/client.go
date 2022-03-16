@@ -4,6 +4,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"github.com/caos/orbos/pkg/labels"
+	"sort"
 	"strings"
 
 	"github.com/caos/zitadel/operator/common"
@@ -55,6 +56,7 @@ func InitChownCerts(
 	init corev1.Container,
 ) {
 
+	sort.Strings(users)
 	volumeMounts := make([]corev1.VolumeMount, len(users)+1)
 	volumeMounts[0] = to
 	volumes = make([]corev1.Volume, len(users)+1)
