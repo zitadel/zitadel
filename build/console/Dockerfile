@@ -52,7 +52,7 @@ FROM node:${NODE_VERSION} as npm-base
 WORKDIR /console
 
 COPY console/package.json console/package-lock.json ./
-RUN npm ci --loglevel verbose
+RUN npm install --loglevel verbose
 
 COPY console .
 COPY --from=base /proto /proto
@@ -93,6 +93,12 @@ RUN npm install -g @angular/cli
 FROM npm-base as prod-angular-build
 RUN npm run lint
 RUN npm run prodbuild
+
+#######################
+## enables running the container
+#######################
+FROM prod-angular-build as runnable-build
+
 RUN cp /console/dist/console/index.html /console/dist/console/404.html
 
 RUN npm install --global angular-http-server

@@ -259,7 +259,7 @@ services:
     build:
       context: ../..
       dockerfile: build/console/Dockerfile
-      target: prod-angular-build
+      target: runnable-build
     volumes:
       - ../../console/src/assets/environment.json:/console/dist/console/assets/environment.json
     command: [ "-p", "4200" ]
