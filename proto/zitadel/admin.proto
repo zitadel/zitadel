@@ -27,7 +27,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     info: {
         title: "Administration API aka Admin";
         version: "1.0";
-        description: "This API is intended to configure and manage the IAM itself.";
+        description: "This API is intended to configure and manage the IAM instance itself.";
         contact:{
             name: "CAOS developers of ZITADEL"
             url: "https://zitadel.ch"
@@ -494,7 +494,7 @@ service AdminService {
         };
     }
 
-    // Returns a identity provider configuration of the IAM
+    // Returns a identity provider configuration of the IAM instance
     rpc GetIDPByID(GetIDPByIDRequest) returns (GetIDPByIDResponse) {
         option (google.api.http) = {
             get: "/idps/{id}";
@@ -530,7 +530,7 @@ service AdminService {
         };
     }
 
-    // Returns all identity provider configurations of the IAM
+    // Returns all identity provider configurations of the IAM instance
     rpc ListIDPs(ListIDPsRequest) returns (ListIDPsResponse) {
         option (google.api.http) = {
             post: "/idps/_search";
@@ -567,7 +567,7 @@ service AdminService {
         };
     }
 
-    // Adds a new oidc identity provider configuration the IAM
+    // Adds a new oidc identity provider configuration the IAM instance
     rpc AddOIDCIDP(AddOIDCIDPRequest) returns (AddOIDCIDPResponse) {
         option (google.api.http) = {
             post: "/idps/oidc";
@@ -606,7 +606,7 @@ service AdminService {
         };
     }
 
-    // Adds a new jwt identity provider configuration the IAM
+    // Adds a new jwt identity provider configuration the IAM instance
     rpc AddJWTIDP(AddJWTIDPRequest) returns (AddJWTIDPResponse) {
         option (google.api.http) = {
             post: "/idps/jwt";
