@@ -43,7 +43,7 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 		userData: l.getUserData(r, authReq, "Login Successful", errID, errMessage),
 	}
 	if authReq != nil {
-		data.RedirectURI = l.oidcAuthCallbackURL("")
+		data.RedirectURI = l.oidcAuthCallbackURL("") //the id will be set via the html (maybe change this with the login refactoring)
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
 }
