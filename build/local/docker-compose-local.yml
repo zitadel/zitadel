@@ -105,7 +105,7 @@ services:
     env_file:
       - ./local.env
     environment:
-      - CR_HOST=db
+      - ZITADEL_EVENTSTORE_HOST=db
     command:
       [
         '-setup-files=cmd/zitadel/setup.yaml',
@@ -148,7 +148,7 @@ services:
     env_file:
       - ./local.env
     environment:
-      - CR_HOST=db
+      - ZITADEL_EVENTSTORE_HOST=db
     ports:
       - 50001:50001
       - 50002:50002

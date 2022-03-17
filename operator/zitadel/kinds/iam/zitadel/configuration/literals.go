@@ -47,13 +47,13 @@ func literalsConfigMap(
 		"SMTP_TLS":                       tls,
 		"CAOS_OIDC_DEV":                  "true",
 		"CR_SSL_MODE":                    sslMode, //"require",
-		"CR_HOST":                        dbConn.Host(),
-		"CR_PORT":                        dbConn.Port(),
-		"CR_USER":                        dbConn.User(),
-		"CR_OPTIONS":                     dbConn.Options(),
-		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.CACert),
-		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert(dbConn.User())),
-		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey(dbConn.User())),
+		//		"CR_HOST":                        dbConn.Host(),
+		//		"CR_PORT":                        dbConn.Port(),
+		//		"CR_USER":                        dbConn.User(),
+		"CR_OPTIONS":   dbConn.Options(),
+		"CR_ROOT_CERT": fmt.Sprintf("%s/%s", certPath, db.CACert),
+		"CR_USER_CERT": fmt.Sprintf("%s/%s", certPath, db.UserCert(dbConn.User())),
+		"CR_USER_KEY":  fmt.Sprintf("%s/%s", certPath, db.UserKey(dbConn.User())),
 	}
 
 	if desired != nil {
