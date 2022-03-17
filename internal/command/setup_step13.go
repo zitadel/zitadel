@@ -21,7 +21,7 @@ func (s *Step13) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep13(ctx context.Context, step *Step13) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
 		_, mailTemplateEvent, err := c.changeDefaultMailTemplate(ctx, &step.DefaultMailTemplate)
 		if err != nil {
 			return nil, err

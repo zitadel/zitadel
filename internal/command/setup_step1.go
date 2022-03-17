@@ -12,7 +12,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	iam_repo "github.com/caos/zitadel/internal/repository/instance"
 )
 
 const (
@@ -94,10 +94,10 @@ type API struct {
 
 func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 	var events []eventstore.Command
-	iamWriteModel := NewIAMWriteModel()
-	iamAgg := IAMAggregateFromWriteModel(&iamWriteModel.WriteModel)
+	iamWriteModel := NewInstanceWriteModel()
+	iamAgg := InstanceAggregateFromWriteModel(&iamWriteModel.WriteModel)
 	//create default login policy
-	loginPolicyEvent, err := c.addDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(),
+	loginPolicyEvent, err := c.addDefaultLoginPolicy(ctx, iamAgg, NewInstanceLoginPolicyWriteModel(),
 		&domain.LoginPolicy{
 			AllowUsernamePassword: step1.DefaultLoginPolicy.AllowUsernamePassword,
 			AllowRegister:         step1.DefaultLoginPolicy.AllowRegister,
@@ -175,7 +175,7 @@ func (c *Commands) SetupStep1(ctx context.Context, step1 *Step1) error {
 				}
 				events = append(events, iamProjectEvent)
 				logging.Log("SETUP-Bdfs1").Info("IAM project set")
-				iamEvent, err := c.addIAMMember(ctx, iamAgg, NewIAMMemberWriteModel(humanWriteModel.AggregateID), domain.NewMember(iamAgg.ID, humanWriteModel.AggregateID, domain.RoleIAMOwner))
+				iamEvent, err := c.addInstanceMember(ctx, iamAgg, NewInstanceMemberWriteModel(humanWriteModel.AggregateID), domain.NewMember(iamAgg.ID, humanWriteModel.AggregateID, domain.RoleIAMOwner))
 				if err != nil {
 					return err
 				}

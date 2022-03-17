@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -66,30 +66,30 @@ func (p *LoginPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.LoginPolicyAddedEventType,
+					Event:  instance.LoginPolicyAddedEventType,
 					Reduce: p.reduceLoginPolicyAdded,
 				},
 				{
-					Event:  iam.LoginPolicyChangedEventType,
+					Event:  instance.LoginPolicyChangedEventType,
 					Reduce: p.reduceLoginPolicyChanged,
 				},
 				{
-					Event:  iam.LoginPolicyMultiFactorAddedEventType,
+					Event:  instance.LoginPolicyMultiFactorAddedEventType,
 					Reduce: p.reduceMFAAdded,
 				},
 				{
-					Event:  iam.LoginPolicyMultiFactorRemovedEventType,
+					Event:  instance.LoginPolicyMultiFactorRemovedEventType,
 					Reduce: p.reduceMFARemoved,
 				},
 				{
-					Event:  iam.LoginPolicySecondFactorAddedEventType,
+					Event:  instance.LoginPolicySecondFactorAddedEventType,
 					Reduce: p.reduce2FAAdded,
 				},
 				{
-					Event:  iam.LoginPolicySecondFactorRemovedEventType,
+					Event:  instance.LoginPolicySecondFactorRemovedEventType,
 					Reduce: p.reduce2FARemoved,
 				},
 			},
@@ -122,14 +122,14 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 	var policyEvent policy.LoginPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
-	case *iam.LoginPolicyAddedEvent:
+	case *instance.LoginPolicyAddedEvent:
 		policyEvent = e.LoginPolicyAddedEvent
 		isDefault = true
 	case *org.LoginPolicyAddedEvent:
 		policyEvent = e.LoginPolicyAddedEvent
 		isDefault = false
 	default:
-		logging.LogWithFields("HANDL-IW6So", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-IW6So", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyAddedEventType, instance.LoginPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
 
@@ -156,12 +156,12 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.LoginPolicyChangedEvent
 	switch e := event.(type) {
-	case *iam.LoginPolicyChangedEvent:
+	case *instance.LoginPolicyChangedEvent:
 		policyEvent = e.LoginPolicyChangedEvent
 	case *org.LoginPolicyChangedEvent:
 		policyEvent = e.LoginPolicyChangedEvent
 	default:
-		logging.LogWithFields("HANDL-NIvFo", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyChangedEventType, iam.LoginPolicyChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-NIvFo", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyChangedEventType, instance.LoginPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-BpaO6", "reduce.wrong.event.type")
 	}
 
@@ -215,12 +215,12 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MultiFactorAddedEvent
 	switch e := event.(type) {
-	case *iam.LoginPolicyMultiFactorAddedEvent:
+	case *instance.LoginPolicyMultiFactorAddedEvent:
 		policyEvent = e.MultiFactorAddedEvent
 	case *org.LoginPolicyMultiFactorAddedEvent:
 		policyEvent = e.MultiFactorAddedEvent
 	default:
-		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, iam.LoginPolicyMultiFactorAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-fYAHO", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, instance.LoginPolicyMultiFactorAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-WMhAV", "reduce.wrong.event.type")
 	}
 
@@ -240,12 +240,12 @@ func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.MultiFactorRemovedEvent
 	switch e := event.(type) {
-	case *iam.LoginPolicyMultiFactorRemovedEvent:
+	case *instance.LoginPolicyMultiFactorRemovedEvent:
 		policyEvent = e.MultiFactorRemovedEvent
 	case *org.LoginPolicyMultiFactorRemovedEvent:
 		policyEvent = e.MultiFactorRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-vtC31", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, iam.LoginPolicyMultiFactorRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-vtC31", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, instance.LoginPolicyMultiFactorRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-czU7n", "reduce.wrong.event.type")
 	}
 
@@ -279,12 +279,12 @@ func (p *LoginPolicyProjection) reduceLoginPolicyRemoved(event eventstore.Event)
 func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorAddedEvent
 	switch e := event.(type) {
-	case *iam.LoginPolicySecondFactorAddedEvent:
+	case *instance.LoginPolicySecondFactorAddedEvent:
 		policyEvent = e.SecondFactorAddedEvent
 	case *org.LoginPolicySecondFactorAddedEvent:
 		policyEvent = e.SecondFactorAddedEvent
 	default:
-		logging.LogWithFields("HANDL-dwadQ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, iam.LoginPolicySecondFactorAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-dwadQ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, instance.LoginPolicySecondFactorAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-agB2E", "reduce.wrong.event.type")
 	}
 
@@ -304,12 +304,12 @@ func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.SecondFactorRemovedEvent
 	switch e := event.(type) {
-	case *iam.LoginPolicySecondFactorRemovedEvent:
+	case *instance.LoginPolicySecondFactorRemovedEvent:
 		policyEvent = e.SecondFactorRemovedEvent
 	case *org.LoginPolicySecondFactorRemovedEvent:
 		policyEvent = e.SecondFactorRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-2IE8Y", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, iam.LoginPolicySecondFactorRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-2IE8Y", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, instance.LoginPolicySecondFactorRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-KYJvA", "reduce.wrong.event.type")
 	}
 

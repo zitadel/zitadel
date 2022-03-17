@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
@@ -26,12 +26,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderFileAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DebugNotificationProviderFileAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"compact": true
 			}`),
-				), iam.DebugNotificationProviderFileAddedEventMapper),
+				), instance.DebugNotificationProviderFileAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -62,12 +62,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderFileChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DebugNotificationProviderFileChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 				"compact": true
 			}`),
-				), iam.DebugNotificationProviderFileChangedEventMapper),
+				), instance.DebugNotificationProviderFileChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -95,10 +95,10 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderFileRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DebugNotificationProviderFileRemovedEventType),
+					instance.AggregateType,
 					nil,
-				), iam.DebugNotificationProviderFileRemovedEventMapper),
+				), instance.DebugNotificationProviderFileRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -123,12 +123,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderLogAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DebugNotificationProviderLogAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"compact": true
 			}`),
-				), iam.DebugNotificationProviderLogAddedEventMapper),
+				), instance.DebugNotificationProviderLogAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -159,12 +159,12 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderLogChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DebugNotificationProviderLogChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 				"compact": true
 			}`),
-				), iam.DebugNotificationProviderLogChangedEventMapper),
+				), instance.DebugNotificationProviderLogChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -192,10 +192,10 @@ func TestDebugNotificationProviderProjection_reduces(t *testing.T) {
 			reduce: (&DebugNotificationProviderProjection{}).reduceDebugNotificationProviderRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DebugNotificationProviderLogRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DebugNotificationProviderLogRemovedEventType),
+					instance.AggregateType,
 					nil,
-				), iam.DebugNotificationProviderLogRemovedEventMapper),
+				), instance.DebugNotificationProviderLogRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

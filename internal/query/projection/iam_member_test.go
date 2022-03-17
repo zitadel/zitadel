@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/lib/pq"
 )
@@ -26,17 +26,17 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			name: "iam.MemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MemberAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MemberAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 					"userId": "user-id",
 					"roles": ["role"]
 				}`),
-				), iam.MemberAddedEventMapper),
+				), instance.MemberAddedEventMapper),
 			},
 			reduce: (&IAMMemberProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IAMMemberProjectionTable,
@@ -62,17 +62,17 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			name: "iam.MemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MemberChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MemberChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 					"userId": "user-id",
 					"roles": ["role", "changed"]
 				}`),
-				), iam.MemberChangedEventMapper),
+				), instance.MemberChangedEventMapper),
 			},
 			reduce: (&IAMMemberProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IAMMemberProjectionTable,
@@ -95,16 +95,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			name: "iam.MemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MemberCascadeRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MemberCascadeRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 					"userId": "user-id"
 				}`),
-				), iam.MemberCascadeRemovedEventMapper),
+				), instance.MemberCascadeRemovedEventMapper),
 			},
 			reduce: (&IAMMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IAMMemberProjectionTable,
@@ -124,16 +124,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			name: "iam.MemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MemberRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MemberRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 					"userId": "user-id"
 				}`),
-				), iam.MemberRemovedEventMapper),
+				), instance.MemberRemovedEventMapper),
 			},
 			reduce: (&IAMMemberProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IAMMemberProjectionTable,

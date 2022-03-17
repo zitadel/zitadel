@@ -24,7 +24,7 @@ func (s *Step4) execute(ctx context.Context, commandSide *Commands) error {
 //SetupStep4 is no op in favour of step 18.
 //Password lockout policy is replaced by lockout policy
 func (c *Commands) SetupStep4(ctx context.Context, step *Step4) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
 		return nil, nil
 	}
 	return c.setup(ctx, step, fn)

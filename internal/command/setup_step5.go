@@ -23,9 +23,9 @@ func (s *Step5) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep5(ctx context.Context, step *Step5) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := c.addDefaultOrgIAMPolicy(ctx, iamAgg, NewIAMOrgIAMPolicyWriteModel(), &domain.OrgIAMPolicy{
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		event, err := c.addDefaultOrgIAMPolicy(ctx, iamAgg, NewInstanceOrgIAMPolicyWriteModel(), &domain.OrgIAMPolicy{
 			UserLoginMustBeDomain: step.DefaultOrgIAMPolicy.UserLoginMustBeDomain,
 		})
 		if err != nil {

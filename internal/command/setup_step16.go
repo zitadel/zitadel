@@ -21,8 +21,8 @@ func (s *Step16) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep16(ctx context.Context, step *Step16) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
 		events := make([]eventstore.Command, 0)
 
 		for _, text := range step.DefaultMessageTexts {

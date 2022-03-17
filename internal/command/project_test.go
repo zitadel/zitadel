@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/id"
 	id_mock "github.com/caos/zitadel/internal/id/mock"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/project"
 )
@@ -62,8 +62,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewGlobalOrgSetEventEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewGlobalOrgSetEventEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"globalorg",
 							),
 						),
@@ -114,8 +114,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewGlobalOrgSetEventEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewGlobalOrgSetEventEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"globalorg",
 							),
 						),
@@ -176,8 +176,8 @@ func TestCommandSide_AddProject(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewGlobalOrgSetEventEvent(context.Background(),
-								&iam.NewAggregate().Aggregate,
+							instance.NewGlobalOrgSetEventEvent(context.Background(),
+								&instance.NewAggregate().Aggregate,
 								"globalorg",
 							),
 						),

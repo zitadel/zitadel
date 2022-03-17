@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -289,8 +289,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"allowUsernamePassword": true,
 						"allowRegister": true,
@@ -304,7 +304,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 						"secondFactorCheckLifetime": 10000000,
 						"multiFactorCheckLifetime": 10000000
 			}`),
-				), iam.LoginPolicyAddedEventMapper),
+				), instance.LoginPolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -343,8 +343,8 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"allowUsernamePassword": true,
 			"allowRegister": true,
@@ -353,7 +353,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			"hidePasswordReset": true,
 			"passwordlessType": 1
 			}`),
-				), iam.LoginPolicyChangedEventMapper),
+				), instance.LoginPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -385,12 +385,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&LoginPolicyProjection{}).reduceMFAAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyMultiFactorAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyMultiFactorAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 		"mfaType": 1
 		}`),
-				), iam.MultiFactorAddedEventMapper),
+				), instance.MultiFactorAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -417,12 +417,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&LoginPolicyProjection{}).reduceMFARemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicyMultiFactorRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicyMultiFactorRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 1
 			}`),
-				), iam.MultiFactorRemovedEventMapper),
+				), instance.MultiFactorRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -449,12 +449,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&LoginPolicyProjection{}).reduce2FAAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicySecondFactorAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicySecondFactorAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 2
 			}`),
-				), iam.SecondFactorAddedEventMapper),
+				), instance.SecondFactorAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -481,12 +481,12 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			reduce: (&LoginPolicyProjection{}).reduce2FARemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LoginPolicySecondFactorRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LoginPolicySecondFactorRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"mfaType": 2
 			}`),
-				), iam.SecondFactorRemovedEventMapper),
+				), instance.SecondFactorRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

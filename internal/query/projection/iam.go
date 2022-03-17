@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 type IAMProjection struct {
@@ -30,26 +30,26 @@ func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 func (p *IAMProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.GlobalOrgSetEventType,
+					Event:  instance.GlobalOrgSetEventType,
 					Reduce: p.reduceGlobalOrgSet,
 				},
 				{
-					Event:  iam.ProjectSetEventType,
+					Event:  instance.ProjectSetEventType,
 					Reduce: p.reduceIAMProjectSet,
 				},
 				{
-					Event:  iam.DefaultLanguageSetEventType,
+					Event:  instance.DefaultLanguageSetEventType,
 					Reduce: p.reduceDefaultLanguageSet,
 				},
 				{
-					Event:  iam.SetupStartedEventType,
+					Event:  instance.SetupStartedEventType,
 					Reduce: p.reduceSetupEvent,
 				},
 				{
-					Event:  iam.SetupDoneEventType,
+					Event:  instance.SetupDoneEventType,
 					Reduce: p.reduceSetupEvent,
 				},
 			},
@@ -71,9 +71,9 @@ const (
 )
 
 func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.GlobalOrgSetEvent)
+	e, ok := event.(*instance.GlobalOrgSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-3n89fs", "seq", event.Sequence(), "expectedType", iam.GlobalOrgSetEventType).Error("wrong event type")
+		logging.LogWithFields("HANDL-3n89fs", "seq", event.Sequence(), "expectedType", instance.GlobalOrgSetEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-2n9f2", "reduce.wrong.event.type")
 	}
 	return crdb.NewUpsertStatement(
@@ -88,9 +88,9 @@ func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Sta
 }
 
 func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.ProjectSetEvent)
+	e, ok := event.(*instance.ProjectSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-2j9fw", "seq", event.Sequence(), "expectedType", iam.ProjectSetEventType).Error("wrong event type")
+		logging.LogWithFields("HANDL-2j9fw", "seq", event.Sequence(), "expectedType", instance.ProjectSetEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-30o0e", "reduce.wrong.event.type")
 	}
 	return crdb.NewUpsertStatement(
@@ -105,9 +105,9 @@ func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.St
 }
 
 func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.DefaultLanguageSetEvent)
+	e, ok := event.(*instance.DefaultLanguageSetEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-3n9le", "seq", event.Sequence(), "expectedType", iam.DefaultLanguageSetEventType).Error("wrong event type")
+		logging.LogWithFields("HANDL-3n9le", "seq", event.Sequence(), "expectedType", instance.DefaultLanguageSetEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-30o0e", "reduce.wrong.event.type")
 	}
 	return crdb.NewUpsertStatement(
@@ -122,9 +122,9 @@ func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handl
 }
 
 func (p *IAMProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SetupStepEvent)
+	e, ok := event.(*instance.SetupStepEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-39fjw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.SetupDoneEventType, iam.SetupStartedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-39fjw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{instance.SetupDoneEventType, instance.SetupStartedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-d9nfw", "reduce.wrong.event.type")
 	}
 	columns := []handler.Column{
@@ -132,7 +132,7 @@ func (p *IAMProjection) reduceSetupEvent(event eventstore.Event) (*handler.State
 		handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 		handler.NewCol(IAMColumnSequence, e.Sequence()),
 	}
-	if e.EventType == iam.SetupStartedEventType {
+	if e.EventType == instance.SetupStartedEventType {
 		columns = append(columns, handler.NewCol(IAMColumnSetUpStarted, e.Step))
 	} else {
 		columns = append(columns, handler.NewCol(IAMColumnSetUpDone, e.Step))

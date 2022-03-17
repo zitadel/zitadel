@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -138,8 +138,8 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			reduce: (&PasswordComplexityProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordComplexityPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordComplexityPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"minLength": 10,
 			"hasLowercase": true,
@@ -147,7 +147,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			"HasNumber": true,
 			"HasSymbol": true
 					}`),
-				), iam.PasswordComplexityPolicyAddedEventMapper),
+				), instance.PasswordComplexityPolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -182,8 +182,8 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			reduce: (&PasswordComplexityProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordComplexityPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordComplexityPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 			"minLength": 10,
 			"hasLowercase": true,
@@ -191,7 +191,7 @@ func TestPasswordComplexityProjection_reduces(t *testing.T) {
 			"HasNumber": true,
 			"HasSymbol": true
 					}`),
-				), iam.PasswordComplexityPolicyChangedEventMapper),
+				), instance.PasswordComplexityPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

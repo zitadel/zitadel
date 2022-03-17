@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -585,15 +585,15 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			reduce: (&MessageTextProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.CustomTextSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.CustomTextSetEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"key": "Title",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), iam.CustomTextSetEventMapper),
+				), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -623,14 +623,14 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			name: "iam.reduceRemoved.Title",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.CustomTextRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.CustomTextRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"key": "Title",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), iam.CustomTextRemovedEventMapper),
+				), instance.CustomTextRemovedEventMapper),
 			},
 			reduce: (&MessageTextProjection{}).reduceRemoved,
 			want: wantReduce{

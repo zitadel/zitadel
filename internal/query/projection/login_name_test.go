@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -413,12 +413,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "iam.OrgIAMPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyAddedEventType),
+					repository.EventType(instance.OrgIAMPolicyAddedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), iam.OrgIAMPolicyAddedEventMapper),
+				), instance.OrgIAMPolicyAddedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -444,12 +444,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "iam.OrgIAMPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyChangedEventType),
+					repository.EventType(instance.OrgIAMPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), iam.OrgIAMPolicyChangedEventMapper),
+				), instance.OrgIAMPolicyChangedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyChanged,
 			want: wantReduce{
@@ -474,10 +474,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "iam.OrgIAMPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyChangedEventType),
+					repository.EventType(instance.OrgIAMPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), iam.OrgIAMPolicyChangedEventMapper),
+				), instance.OrgIAMPolicyChangedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyChanged,
 			want: wantReduce{

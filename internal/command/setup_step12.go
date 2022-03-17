@@ -31,8 +31,8 @@ func (s *Step12) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep12(ctx context.Context, step *Step12) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		featuresWriteModel := NewIAMFeaturesWriteModel()
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		featuresWriteModel := NewInstanceFeaturesWriteModel()
 		featuresEvent, err := c.setDefaultFeatures(ctx, featuresWriteModel, &domain.Features{
 			TierName:                 step.TierName,
 			TierDescription:          step.TierDescription,

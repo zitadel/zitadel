@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -58,14 +58,14 @@ func (p *MailTemplateProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.MailTemplateAddedEventType,
+					Event:  instance.MailTemplateAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.MailTemplateChangedEventType,
+					Event:  instance.MailTemplateChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -80,11 +80,11 @@ func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 	case *org.MailTemplateAddedEvent:
 		templateEvent = e.MailTemplateAddedEvent
 		isDefault = false
-	case *iam.MailTemplateAddedEvent:
+	case *instance.MailTemplateAddedEvent:
 		templateEvent = e.MailTemplateAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-94jfG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateAddedEventType, iam.MailTemplateAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-94jfG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateAddedEventType, instance.MailTemplateAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-0pJ3f", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -105,10 +105,10 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 	switch e := event.(type) {
 	case *org.MailTemplateChangedEvent:
 		policyEvent = e.MailTemplateChangedEvent
-	case *iam.MailTemplateChangedEvent:
+	case *instance.MailTemplateChangedEvent:
 		policyEvent = e.MailTemplateChangedEvent
 	default:
-		logging.LogWithFields("PROJE-02J9f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateChangedEventType, iam.MailTemplateChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-02J9f", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.MailTemplateChangedEventType, instance.MailTemplateChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-gJ03f", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{

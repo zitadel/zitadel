@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -233,8 +233,8 @@ func TestFeatureProjection_reduces(t *testing.T) {
 			reduce: (&FeatureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.FeaturesSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.FeaturesSetEventType),
+					instance.AggregateType,
 					[]byte(`{
 				"tierName": "TierName",
 				"tierDescription": "TierDescription",
@@ -258,7 +258,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				"lockoutPolicy": true,
 				"actions": true
 			}`),
-				), iam.FeaturesSetEventMapper),
+				), instance.FeaturesSetEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -306,8 +306,8 @@ func TestFeatureProjection_reduces(t *testing.T) {
 			reduce: (&FeatureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.FeaturesSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.FeaturesSetEventType),
+					instance.AggregateType,
 					[]byte(`{
 				"tierName": "TierName",
 				"tierDescription": "TierDescription",
@@ -332,7 +332,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				"actionsAllowed": 1,
 				"maxActions": 10
 			}`),
-				), iam.FeaturesSetEventMapper),
+				), instance.FeaturesSetEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

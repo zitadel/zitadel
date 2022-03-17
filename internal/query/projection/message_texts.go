@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -66,18 +66,18 @@ func (p *MessageTextProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.CustomTextSetEventType,
+					Event:  instance.CustomTextSetEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.CustomTextRemovedEventType,
+					Event:  instance.CustomTextRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 				{
-					Event:  iam.CustomTextTemplateRemovedEventType,
+					Event:  instance.CustomTextTemplateRemovedEventType,
 					Reduce: p.reduceTemplateRemoved,
 				},
 			},
@@ -90,10 +90,10 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	switch e := event.(type) {
 	case *org.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
-	case *iam.CustomTextSetEvent:
+	case *instance.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
 	default:
-		logging.LogWithFields("PROJE-2N9fg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-2N9fg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-2n90r", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
@@ -140,10 +140,10 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
-	case *iam.CustomTextRemovedEvent:
+	case *instance.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-3m022", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-3m022", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-fm0ge", "reduce.wrong.event.type")
 	}
 	if !isMessageTemplate(templateEvent.Template) {
@@ -190,7 +190,7 @@ func (p *MessageTextProjection) reduceTemplateRemoved(event eventstore.Event) (*
 	switch e := event.(type) {
 	case *org.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
-	case *iam.CustomTextTemplateRemovedEvent:
+	case *instance.CustomTextTemplateRemovedEvent:
 		templateEvent = e.CustomTextTemplateRemovedEvent
 	default:
 		logging.LogWithFields("PROJE-m03ng", "seq", event.Sequence(), "expectedType", org.CustomTextTemplateRemovedEventType).Error("wrong event type")

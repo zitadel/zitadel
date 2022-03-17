@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/lib/pq"
 )
@@ -27,8 +27,8 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"name": "custom-zitadel-instance",
@@ -36,7 +36,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 	"stylingType": 0,
 	"autoRegister": true
 }`),
-				), iam.IDPConfigAddedEventMapper),
+				), instance.IDPConfigAddedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPAdded,
 			want: wantReduce{
@@ -69,15 +69,15 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"name": "custom-zitadel-instance",
 	"stylingType": 1,
 	"autoRegister": true
 }`),
-				), iam.IDPConfigChangedEventMapper),
+				), instance.IDPConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPChanged,
 			want: wantReduce{
@@ -106,12 +106,12 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceIDPDeactivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigDeactivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigDeactivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id"
 }`),
-				), iam.IDPConfigDeactivatedEventMapper),
+				), instance.IDPConfigDeactivatedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPDeactivated,
 			want: wantReduce{
@@ -138,12 +138,12 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceIDPReactivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigReactivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigReactivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id"
 }`),
-				), iam.IDPConfigReactivatedEventMapper),
+				), instance.IDPConfigReactivatedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPReactivated,
 			want: wantReduce{
@@ -170,12 +170,12 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceIDPRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id"
 }`),
-				), iam.IDPConfigRemovedEventMapper),
+				), instance.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceIDPRemoved,
 			want: wantReduce{
@@ -199,8 +199,8 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPOIDCConfigAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPOIDCConfigAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"clientId": "client-id",
@@ -216,7 +216,7 @@ func TestIDPProjection_reduces(t *testing.T) {
     "idpDisplayNameMapping": 0,
     "usernameMapping": 1
 }`),
-				), iam.IDPOIDCConfigAddedEventMapper),
+				), instance.IDPOIDCConfigAddedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
@@ -257,8 +257,8 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPOIDCConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPOIDCConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"clientId": "client-id",
@@ -274,7 +274,7 @@ func TestIDPProjection_reduces(t *testing.T) {
     "idpDisplayNameMapping": 0,
     "usernameMapping": 1
 }`),
-				), iam.IDPOIDCConfigChangedEventMapper),
+				), instance.IDPOIDCConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
@@ -314,10 +314,10 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceOIDCConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPOIDCConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPOIDCConfigChangedEventType),
+					instance.AggregateType,
 					[]byte("{}"),
-				), iam.IDPOIDCConfigChangedEventMapper),
+				), instance.IDPOIDCConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
@@ -334,8 +334,8 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceJWTConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPJWTConfigAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPJWTConfigAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"jwtEndpoint": "https://api.zitadel.ch/jwt",
@@ -343,7 +343,7 @@ func TestIDPProjection_reduces(t *testing.T) {
     "keysEndpoint": "https://api.zitadel.ch/keys",
     "headerName": "hodor"
 }`),
-				), iam.IDPJWTConfigAddedEventMapper),
+				), instance.IDPJWTConfigAddedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigAdded,
 			want: wantReduce{
@@ -380,8 +380,8 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceJWTConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPJWTConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPJWTConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 	"idpConfigId": "idp-config-id",
 	"jwtEndpoint": "https://api.zitadel.ch/jwt",
@@ -389,7 +389,7 @@ func TestIDPProjection_reduces(t *testing.T) {
     "keysEndpoint": "https://api.zitadel.ch/keys",
     "headerName": "hodor"
 }`),
-				), iam.IDPJWTConfigChangedEventMapper),
+				), instance.IDPJWTConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
@@ -425,10 +425,10 @@ func TestIDPProjection_reduces(t *testing.T) {
 			name: "iam.reduceJWTConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPJWTConfigChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPJWTConfigChangedEventType),
+					instance.AggregateType,
 					[]byte(`{}`),
-				), iam.IDPJWTConfigChangedEventMapper),
+				), instance.IDPJWTConfigChangedEventMapper),
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{

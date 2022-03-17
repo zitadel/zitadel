@@ -14,7 +14,7 @@ import (
 func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *command.Commands) error {
 	logging.Log("SETUP-JAK2q").Info("starting setup")
 
-	iam, err := commands.GetIAM(ctx)
+	iam, err := commands.GetInstance(ctx)
 	if err != nil && !caos_errs.IsNotFound(err) {
 		return err
 	}
@@ -24,7 +24,7 @@ func Execute(ctx context.Context, setUpConfig IAMSetUp, iamID string, commands *
 	}
 
 	if iam == nil {
-		iam = &domain.IAM{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
+		iam = &domain.Instance{ObjectRoot: models.ObjectRoot{AggregateID: iamID}}
 	}
 
 	steps, err := setUpConfig.Steps(iam.SetUpDone)

@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -59,14 +59,14 @@ func (p *OrgIAMPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.OrgIAMPolicyAddedEventType,
+					Event:  instance.OrgIAMPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.OrgIAMPolicyChangedEventType,
+					Event:  instance.OrgIAMPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -81,11 +81,11 @@ func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 	case *org.OrgIAMPolicyAddedEvent:
 		policyEvent = e.OrgIAMPolicyAddedEvent
 		isDefault = false
-	case *iam.OrgIAMPolicyAddedEvent:
+	case *instance.OrgIAMPolicyAddedEvent:
 		policyEvent = e.OrgIAMPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-XakxJ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-XakxJ", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, instance.OrgIAMPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-CSE7A", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -107,10 +107,10 @@ func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	switch e := event.(type) {
 	case *org.OrgIAMPolicyChangedEvent:
 		policyEvent = e.OrgIAMPolicyChangedEvent
-	case *iam.OrgIAMPolicyChangedEvent:
+	case *instance.OrgIAMPolicyChangedEvent:
 		policyEvent = e.OrgIAMPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-SvTK0", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-SvTK0", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, instance.OrgIAMPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-qgVug", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{

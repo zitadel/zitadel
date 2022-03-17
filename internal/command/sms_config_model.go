@@ -6,7 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 type IAMSMSConfigWriteModel struct {
@@ -36,7 +36,7 @@ func NewIAMSMSConfigWriteModel(id string) *IAMSMSConfigWriteModel {
 func (wm *IAMSMSConfigWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *iam.SMSConfigTwilioAddedEvent:
+		case *instance.SMSConfigTwilioAddedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
@@ -46,7 +46,7 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 				SenderNumber: e.SenderNumber,
 			}
 			wm.State = domain.SMSConfigStateInactive
-		case *iam.SMSConfigTwilioChangedEvent:
+		case *instance.SMSConfigTwilioChangedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
@@ -56,22 +56,22 @@ func (wm *IAMSMSConfigWriteModel) Reduce() error {
 			if e.SenderNumber != nil {
 				wm.Twilio.SenderNumber = *e.SenderNumber
 			}
-		case *iam.SMSConfigTwilioTokenChangedEvent:
+		case *instance.SMSConfigTwilioTokenChangedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.Twilio.Token = e.Token
-		case *iam.SMSConfigActivatedEvent:
+		case *instance.SMSConfigActivatedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.State = domain.SMSConfigStateActive
-		case *iam.SMSConfigDeactivatedEvent:
+		case *instance.SMSConfigDeactivatedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
 			wm.State = domain.SMSConfigStateInactive
-		case *iam.SMSConfigRemovedEvent:
+		case *instance.SMSConfigRemovedEvent:
 			if wm.ID != e.ID {
 				continue
 			}
@@ -85,33 +85,33 @@ func (wm *IAMSMSConfigWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
-		AggregateTypes(iam.AggregateType).
+		AggregateTypes(instance.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
-			iam.SMSConfigTwilioAddedEventType,
-			iam.SMSConfigTwilioChangedEventType,
-			iam.SMSConfigTwilioTokenChangedEventType,
-			iam.SMSConfigActivatedEventType,
-			iam.SMSConfigDeactivatedEventType,
-			iam.SMSConfigRemovedEventType).
+			instance.SMSConfigTwilioAddedEventType,
+			instance.SMSConfigTwilioChangedEventType,
+			instance.SMSConfigTwilioTokenChangedEventType,
+			instance.SMSConfigActivatedEventType,
+			instance.SMSConfigDeactivatedEventType,
+			instance.SMSConfigRemovedEventType).
 		Builder()
 }
 
-func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, senderNumber string) (*iam.SMSConfigTwilioChangedEvent, bool, error) {
-	changes := make([]iam.SMSConfigTwilioChanges, 0)
+func (wm *IAMSMSConfigWriteModel) NewChangedEvent(ctx context.Context, aggregate *eventstore.Aggregate, id, sid, senderNumber string) (*instance.SMSConfigTwilioChangedEvent, bool, error) {
+	changes := make([]instance.SMSConfigTwilioChanges, 0)
 	var err error
 
 	if wm.Twilio.SID != sid {
-		changes = append(changes, iam.ChangeSMSConfigTwilioSID(sid))
+		changes = append(changes, instance.ChangeSMSConfigTwilioSID(sid))
 	}
 	if wm.Twilio.SenderNumber != senderNumber {
-		changes = append(changes, iam.ChangeSMSConfigTwilioSenderNumber(senderNumber))
+		changes = append(changes, instance.ChangeSMSConfigTwilioSenderNumber(senderNumber))
 	}
 
 	if len(changes) == 0 {
 		return nil, false, nil
 	}
-	changeEvent, err := iam.NewSMSConfigTwilioChangedEvent(ctx, aggregate, id, changes)
+	changeEvent, err := instance.NewSMSConfigTwilioChangedEvent(ctx, aggregate, id, changes)
 	if err != nil {
 		return nil, false, err
 	}

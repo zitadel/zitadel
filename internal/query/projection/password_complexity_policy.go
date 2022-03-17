@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -50,14 +50,14 @@ func (p *PasswordComplexityProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.PasswordComplexityPolicyAddedEventType,
+					Event:  instance.PasswordComplexityPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.PasswordComplexityPolicyChangedEventType,
+					Event:  instance.PasswordComplexityPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -72,11 +72,11 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 	case *org.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
 		isDefault = false
-	case *iam.PasswordComplexityPolicyAddedEvent:
+	case *instance.PasswordComplexityPolicyAddedEvent:
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-mP8AR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-mP8AR", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, instance.PasswordComplexityPolicyAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KTHmJ", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -102,10 +102,10 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 	switch e := event.(type) {
 	case *org.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
-	case *iam.PasswordComplexityPolicyChangedEvent:
+	case *instance.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-L4UHn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, iam.PasswordComplexityPolicyChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("PROJE-L4UHn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, instance.PasswordComplexityPolicyChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "PROJE-cf3Xb", "reduce.wrong.event.type")
 	}
 	cols := []handler.Column{

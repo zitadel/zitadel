@@ -23,7 +23,7 @@ func (s *Step19) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep19(ctx context.Context, step *Step19) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
 		events := make([]eventstore.Command, 0)
 		orgs := newOrgsWithUsernameNotDomain()
 		if err := c.eventstore.FilterToQueryReducer(ctx, orgs); err != nil {

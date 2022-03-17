@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -507,10 +507,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b"}`),
-				), iam.LabelPolicyAddedEventMapper),
+				), instance.LabelPolicyAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
@@ -551,10 +551,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{"backgroundColor": "#141735", "fontColor": "#ffffff", "primaryColor": "#5282c1", "warnColor": "#ff3b5b", "primaryColorDark": "#ffffff","backgroundColorDark": "#ffffff", "warnColorDark": "#ffffff", "fontColorDark": "#ffffff", "hideLoginNameSuffix": true, "errorMsgPopup": true, "disableWatermark": true}`),
-				), iam.LabelPolicyChangedEventMapper),
+				), instance.LabelPolicyChangedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
@@ -592,10 +592,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceActivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyActivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyActivatedEventType),
+					instance.AggregateType,
 					nil,
-				), iam.LabelPolicyActivatedEventMapper),
+				), instance.LabelPolicyActivatedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
@@ -623,10 +623,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceLogoAdded light",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyLogoAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyLogoAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), iam.LabelPolicyLogoAddedEventMapper),
+				), instance.LabelPolicyLogoAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
@@ -654,10 +654,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceLogoAdded dark",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyLogoDarkAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyLogoDarkAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), iam.LabelPolicyLogoDarkAddedEventMapper),
+				), instance.LabelPolicyLogoDarkAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
@@ -685,10 +685,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceIconAdded light",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyIconAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyIconAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), iam.LabelPolicyIconAddedEventMapper),
+				), instance.LabelPolicyIconAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
@@ -716,10 +716,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceIconAdded dark",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyIconDarkAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyIconDarkAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), iam.LabelPolicyIconDarkAddedEventMapper),
+				), instance.LabelPolicyIconDarkAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
@@ -747,10 +747,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceLogoRemoved light",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyLogoRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyLogoRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), iam.LabelPolicyLogoRemovedEventMapper),
+				), instance.LabelPolicyLogoRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
@@ -778,10 +778,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceLogoRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyLogoDarkRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyLogoDarkRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/logo.png"}`),
-				), iam.LabelPolicyLogoDarkRemovedEventMapper),
+				), instance.LabelPolicyLogoDarkRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
@@ -809,10 +809,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceIconRemoved light",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyIconRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyIconRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), iam.LabelPolicyIconRemovedEventMapper),
+				), instance.LabelPolicyIconRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
@@ -840,10 +840,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceIconRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyIconDarkRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyIconDarkRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/icon.png"}`),
-				), iam.LabelPolicyIconDarkRemovedEventMapper),
+				), instance.LabelPolicyIconDarkRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
@@ -871,10 +871,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceFontAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyFontAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyFontAddedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
-				), iam.LabelPolicyFontAddedEventMapper),
+				), instance.LabelPolicyFontAddedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
@@ -902,10 +902,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceFontRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyFontRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyFontRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{"storeKey": "/path/to/font.ttf"}`),
-				), iam.LabelPolicyFontRemovedEventMapper),
+				), instance.LabelPolicyFontRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
@@ -933,10 +933,10 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			name: "iam.reduceAssetsRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.LabelPolicyAssetsRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.LabelPolicyAssetsRemovedEventType),
+					instance.AggregateType,
 					nil,
-				), iam.LabelPolicyAssetsRemovedEventMapper),
+				), instance.LabelPolicyAssetsRemovedEventMapper),
 			},
 			reduce: (&LabelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{

@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func TestIAMProjection_reduces(t *testing.T) {
@@ -25,10 +25,10 @@ func TestIAMProjection_reduces(t *testing.T) {
 			name: "reduceGlobalOrgSet",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.GlobalOrgSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.GlobalOrgSetEventType),
+					instance.AggregateType,
 					[]byte(`{"globalOrgId": "orgid"}`),
-				), iam.GlobalOrgSetMapper),
+				), instance.GlobalOrgSetMapper),
 			},
 			reduce: (&IAMProjection{}).reduceGlobalOrgSet,
 			want: wantReduce{
@@ -55,10 +55,10 @@ func TestIAMProjection_reduces(t *testing.T) {
 			name: "reduceProjectIDSet",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.ProjectSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.ProjectSetEventType),
+					instance.AggregateType,
 					[]byte(`{"iamProjectId": "project-id"}`),
-				), iam.ProjectSetMapper),
+				), instance.ProjectSetMapper),
 			},
 			reduce: (&IAMProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
@@ -85,10 +85,10 @@ func TestIAMProjection_reduces(t *testing.T) {
 			name: "reduceDefaultLanguageSet",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.DefaultLanguageSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.DefaultLanguageSetEventType),
+					instance.AggregateType,
 					[]byte(`{"language": "en"}`),
-				), iam.DefaultLanguageSetMapper),
+				), instance.DefaultLanguageSetMapper),
 			},
 			reduce: (&IAMProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
@@ -115,10 +115,10 @@ func TestIAMProjection_reduces(t *testing.T) {
 			name: "reduceSetupStarted",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SetupStartedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SetupStartedEventType),
+					instance.AggregateType,
 					[]byte(`{"Step": 1}`),
-				), iam.SetupStepMapper),
+				), instance.SetupStepMapper),
 			},
 			reduce: (&IAMProjection{}).reduceSetupEvent,
 			want: wantReduce{
@@ -145,10 +145,10 @@ func TestIAMProjection_reduces(t *testing.T) {
 			name: "reduceSetupDone",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SetupDoneEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SetupDoneEventType),
+					instance.AggregateType,
 					[]byte(`{"Step": 1}`),
-				), iam.SetupStepMapper),
+				), instance.SetupStepMapper),
 			},
 			reduce: (&IAMProjection{}).reduceSetupEvent,
 			want: wantReduce{

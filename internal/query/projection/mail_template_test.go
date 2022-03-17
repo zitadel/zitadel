@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -121,12 +121,12 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			reduce: (&MailTemplateProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MailTemplateAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MailTemplateAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"template": "PHRhYmxlPjwvdGFibGU+"
 					}`),
-				), iam.MailTemplateAddedEventMapper),
+				), instance.MailTemplateAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -156,12 +156,12 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			reduce: (&MailTemplateProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.MailTemplateChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.MailTemplateChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"template": "PHRhYmxlPjwvdGFibGU+"
 					}`),
-				), iam.MailTemplateChangedEventMapper),
+				), instance.MailTemplateChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

@@ -9,8 +9,8 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/idpconfig"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/lib/pq"
 )
@@ -36,42 +36,42 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 func (p *IDPProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.IDPConfigAddedEventType,
+					Event:  instance.IDPConfigAddedEventType,
 					Reduce: p.reduceIDPAdded,
 				},
 				{
-					Event:  iam.IDPConfigChangedEventType,
+					Event:  instance.IDPConfigChangedEventType,
 					Reduce: p.reduceIDPChanged,
 				},
 				{
-					Event:  iam.IDPConfigDeactivatedEventType,
+					Event:  instance.IDPConfigDeactivatedEventType,
 					Reduce: p.reduceIDPDeactivated,
 				},
 				{
-					Event:  iam.IDPConfigReactivatedEventType,
+					Event:  instance.IDPConfigReactivatedEventType,
 					Reduce: p.reduceIDPReactivated,
 				},
 				{
-					Event:  iam.IDPConfigRemovedEventType,
+					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPRemoved,
 				},
 				{
-					Event:  iam.IDPOIDCConfigAddedEventType,
+					Event:  instance.IDPOIDCConfigAddedEventType,
 					Reduce: p.reduceOIDCConfigAdded,
 				},
 				{
-					Event:  iam.IDPOIDCConfigChangedEventType,
+					Event:  instance.IDPOIDCConfigChangedEventType,
 					Reduce: p.reduceOIDCConfigChanged,
 				},
 				{
-					Event:  iam.IDPJWTConfigAddedEventType,
+					Event:  instance.IDPJWTConfigAddedEventType,
 					Reduce: p.reduceJWTConfigAdded,
 				},
 				{
-					Event:  iam.IDPJWTConfigChangedEventType,
+					Event:  instance.IDPJWTConfigChangedEventType,
 					Reduce: p.reduceJWTConfigChanged,
 				},
 			},
@@ -160,11 +160,11 @@ func (p *IDPProjection) reduceIDPAdded(event eventstore.Event) (*handler.Stateme
 	case *org.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeOrg
-	case *iam.IDPConfigAddedEvent:
+	case *instance.IDPConfigAddedEvent:
 		idpEvent = e.IDPConfigAddedEvent
 		idpOwnerType = domain.IdentityProviderTypeSystem
 	default:
-		logging.LogWithFields("HANDL-hBriG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigAddedEventType, iam.IDPConfigAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-hBriG", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigAddedEventType, instance.IDPConfigAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fcUdQ", "reduce.wrong.event.type")
 	}
 
@@ -190,10 +190,10 @@ func (p *IDPProjection) reduceIDPChanged(event eventstore.Event) (*handler.State
 	switch e := event.(type) {
 	case *org.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
-	case *iam.IDPConfigChangedEvent:
+	case *instance.IDPConfigChangedEvent:
 		idpEvent = e.IDPConfigChangedEvent
 	default:
-		logging.LogWithFields("HANDL-FFrph", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigChangedEventType, iam.IDPConfigChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-FFrph", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigChangedEventType, instance.IDPConfigChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-NVvJD", "reduce.wrong.event.type")
 	}
 
@@ -230,10 +230,10 @@ func (p *IDPProjection) reduceIDPDeactivated(event eventstore.Event) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
-	case *iam.IDPConfigDeactivatedEvent:
+	case *instance.IDPConfigDeactivatedEvent:
 		idpEvent = e.IDPConfigDeactivatedEvent
 	default:
-		logging.LogWithFields("HANDL-1s33a", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigDeactivatedEventType, iam.IDPConfigDeactivatedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-1s33a", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigDeactivatedEventType, instance.IDPConfigDeactivatedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-94O5l", "reduce.wrong.event.type")
 	}
 
@@ -255,10 +255,10 @@ func (p *IDPProjection) reduceIDPReactivated(event eventstore.Event) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
-	case *iam.IDPConfigReactivatedEvent:
+	case *instance.IDPConfigReactivatedEvent:
 		idpEvent = e.IDPConfigReactivatedEvent
 	default:
-		logging.LogWithFields("HANDL-Zgzpt", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigReactivatedEventType, iam.IDPConfigReactivatedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-Zgzpt", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigReactivatedEventType, instance.IDPConfigReactivatedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-I8QyS", "reduce.wrong.event.type")
 	}
 
@@ -280,10 +280,10 @@ func (p *IDPProjection) reduceIDPRemoved(event eventstore.Event) (*handler.State
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
-	case *iam.IDPConfigRemovedEvent:
+	case *instance.IDPConfigRemovedEvent:
 		idpEvent = e.IDPConfigRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-JJasT", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-JJasT", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-B4zy8", "reduce.wrong.event.type")
 	}
 
@@ -300,10 +300,10 @@ func (p *IDPProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
-	case *iam.IDPOIDCConfigAddedEvent:
+	case *instance.IDPOIDCConfigAddedEvent:
 		idpEvent = e.OIDCConfigAddedEvent
 	default:
-		logging.LogWithFields("HANDL-DCmeB", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, iam.IDPOIDCConfigAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-DCmeB", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPOIDCConfigAddedEventType, instance.IDPOIDCConfigAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-2FuAA", "reduce.wrong.event.type")
 	}
 
@@ -340,10 +340,10 @@ func (p *IDPProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
-	case *iam.IDPOIDCConfigChangedEvent:
+	case *instance.IDPOIDCConfigChangedEvent:
 		idpEvent = e.OIDCConfigChangedEvent
 	default:
-		logging.LogWithFields("HANDL-VyBm2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, iam.IDPOIDCConfigChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-VyBm2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPOIDCConfigChangedEventType, instance.IDPOIDCConfigChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-x2IVI", "reduce.wrong.event.type")
 	}
 
@@ -403,10 +403,10 @@ func (p *IDPProjection) reduceJWTConfigAdded(event eventstore.Event) (*handler.S
 	switch e := event.(type) {
 	case *org.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
-	case *iam.IDPJWTConfigAddedEvent:
+	case *instance.IDPJWTConfigAddedEvent:
 		idpEvent = e.JWTConfigAddedEvent
 	default:
-		logging.LogWithFields("HANDL-228q7", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPJWTConfigAddedEventType, iam.IDPJWTConfigAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-228q7", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPJWTConfigAddedEventType, instance.IDPJWTConfigAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-qvPdb", "reduce.wrong.event.type")
 	}
 
@@ -440,10 +440,10 @@ func (p *IDPProjection) reduceJWTConfigChanged(event eventstore.Event) (*handler
 	switch e := event.(type) {
 	case *org.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
-	case *iam.IDPJWTConfigChangedEvent:
+	case *instance.IDPJWTConfigChangedEvent:
 		idpEvent = e.JWTConfigChangedEvent
 	default:
-		logging.LogWithFields("HANDL-VyBm2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPJWTConfigChangedEventType, iam.IDPJWTConfigChangedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-VyBm2", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPJWTConfigChangedEventType, instance.IDPJWTConfigChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-x2IVI", "reduce.wrong.event.type")
 	}
 

@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
@@ -34,11 +34,11 @@ func (p *OIDCSettingsProjection) reducers() []handler.AggregateReducer {
 			Aggregate: project.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.OIDCSettingsAddedEventType,
+					Event:  instance.OIDCSettingsAddedEventType,
 					Reduce: p.reduceOIDCSettingsAdded,
 				},
 				{
-					Event:  iam.OIDCSettingsChangedEventType,
+					Event:  instance.OIDCSettingsChangedEventType,
 					Reduce: p.reduceOIDCSettingsChanged,
 				},
 			},
@@ -59,9 +59,9 @@ const (
 )
 
 func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.OIDCSettingsAddedEvent)
+	e, ok := event.(*instance.OIDCSettingsAddedEvent)
 	if !ok {
-		logging.WithFields("seq", event.Sequence(), "expectedType", iam.OIDCSettingsAddedEventType).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedType", instance.OIDCSettingsAddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-f9nwf", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -81,9 +81,9 @@ func (p *OIDCSettingsProjection) reduceOIDCSettingsAdded(event eventstore.Event)
 }
 
 func (p *OIDCSettingsProjection) reduceOIDCSettingsChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.OIDCSettingsChangedEvent)
+	e, ok := event.(*instance.OIDCSettingsChangedEvent)
 	if !ok {
-		logging.WithFields("seq", event.Sequence(), "expected", iam.OIDCSettingsChangedEventType).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expected", instance.OIDCSettingsChangedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-8JJ2d", "reduce.wrong.event.type")
 	}
 

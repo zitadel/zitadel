@@ -9,7 +9,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -58,22 +58,22 @@ func (p *IDPLoginPolicyLinkProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.LoginPolicyIDPProviderAddedEventType,
+					Event:  instance.LoginPolicyIDPProviderAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.LoginPolicyIDPProviderCascadeRemovedEventType,
+					Event:  instance.LoginPolicyIDPProviderCascadeRemovedEventType,
 					Reduce: p.reduceCascadeRemoved,
 				},
 				{
-					Event:  iam.LoginPolicyIDPProviderRemovedEventType,
+					Event:  instance.LoginPolicyIDPProviderRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 				{
-					Event:  iam.IDPConfigRemovedEventType,
+					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
 			},
@@ -101,11 +101,11 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*han
 	case *org.IdentityProviderAddedEvent:
 		idp = e.IdentityProviderAddedEvent
 		providerType = domain.IdentityProviderTypeOrg
-	case *iam.IdentityProviderAddedEvent:
+	case *instance.IdentityProviderAddedEvent:
 		idp = e.IdentityProviderAddedEvent
 		providerType = domain.IdentityProviderTypeSystem
 	default:
-		logging.LogWithFields("HANDL-oce92", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, iam.LoginPolicyIDPProviderAddedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-oce92", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, instance.LoginPolicyIDPProviderAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Nlp55", "reduce.wrong.event.type")
 	}
 
@@ -128,10 +128,10 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*h
 	switch e := event.(type) {
 	case *org.IdentityProviderRemovedEvent:
 		idp = e.IdentityProviderRemovedEvent
-	case *iam.IdentityProviderRemovedEvent:
+	case *instance.IdentityProviderRemovedEvent:
 		idp = e.IdentityProviderRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-vAH3I", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, iam.LoginPolicyIDPProviderRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-vAH3I", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, instance.LoginPolicyIDPProviderRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-tUMYY", "reduce.wrong.event.type")
 	}
 
@@ -149,10 +149,10 @@ func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 	switch e := event.(type) {
 	case *org.IdentityProviderCascadeRemovedEvent:
 		idp = e.IdentityProviderCascadeRemovedEvent
-	case *iam.IdentityProviderCascadeRemovedEvent:
+	case *instance.IdentityProviderCascadeRemovedEvent:
 		idp = e.IdentityProviderCascadeRemovedEvent
 	default:
-		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, iam.LoginPolicyIDPProviderCascadeRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-7lZaf", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, instance.LoginPolicyIDPProviderCascadeRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-iCKSj", "reduce.wrong.event.type")
 	}
 
@@ -170,10 +170,10 @@ func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
-	case *iam.IDPConfigRemovedEvent:
+	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		logging.LogWithFields("HANDL-aJvob", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType}).Error("wrong event type")
+		logging.LogWithFields("HANDL-aJvob", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-u6tze", "reduce.wrong.event.type")
 	}
 

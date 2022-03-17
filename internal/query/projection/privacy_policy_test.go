@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -126,13 +126,13 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			reduce: (&PrivacyPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PrivacyPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PrivacyPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"tosLink": "http://tos.link",
 						"privacyLink": "http://privacy.link"
 					}`),
-				), iam.PrivacyPolicyAddedEventMapper),
+				), instance.PrivacyPolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -164,13 +164,13 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			reduce: (&PrivacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PrivacyPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PrivacyPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"tosLink": "http://tos.link",
 						"privacyLink": "http://privacy.link"
 					}`),
-				), iam.PrivacyPolicyChangedEventMapper),
+				), instance.PrivacyPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

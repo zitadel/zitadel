@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 type DebugNotificationProviderProjection struct {
@@ -33,30 +33,30 @@ func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 func (p *DebugNotificationProviderProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.DebugNotificationProviderFileAddedEventType,
+					Event:  instance.DebugNotificationProviderFileAddedEventType,
 					Reduce: p.reduceDebugNotificationProviderAdded,
 				},
 				{
-					Event:  iam.DebugNotificationProviderFileChangedEventType,
+					Event:  instance.DebugNotificationProviderFileChangedEventType,
 					Reduce: p.reduceDebugNotificationProviderChanged,
 				},
 				{
-					Event:  iam.DebugNotificationProviderFileRemovedEventType,
+					Event:  instance.DebugNotificationProviderFileRemovedEventType,
 					Reduce: p.reduceDebugNotificationProviderRemoved,
 				},
 				{
-					Event:  iam.DebugNotificationProviderLogAddedEventType,
+					Event:  instance.DebugNotificationProviderLogAddedEventType,
 					Reduce: p.reduceDebugNotificationProviderAdded,
 				},
 				{
-					Event:  iam.DebugNotificationProviderLogChangedEventType,
+					Event:  instance.DebugNotificationProviderLogChangedEventType,
 					Reduce: p.reduceDebugNotificationProviderChanged,
 				},
 				{
-					Event:  iam.DebugNotificationProviderLogRemovedEventType,
+					Event:  instance.DebugNotificationProviderLogRemovedEventType,
 					Reduce: p.reduceDebugNotificationProviderRemoved,
 				},
 			},
@@ -79,14 +79,14 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 	var providerEvent settings.DebugNotificationProviderAddedEvent
 	var providerType domain.NotificationProviderType
 	switch e := event.(type) {
-	case *iam.DebugNotificationProviderFileAddedEvent:
+	case *instance.DebugNotificationProviderFileAddedEvent:
 		providerEvent = e.DebugNotificationProviderAddedEvent
 		providerType = domain.NotificationProviderTypeFile
-	case *iam.DebugNotificationProviderLogAddedEvent:
+	case *instance.DebugNotificationProviderLogAddedEvent:
 		providerEvent = e.DebugNotificationProviderAddedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileAddedEventType, iam.DebugNotificationProviderLogAddedEventType}).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{instance.DebugNotificationProviderFileAddedEventType, instance.DebugNotificationProviderLogAddedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
 
@@ -106,14 +106,14 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 	var providerEvent settings.DebugNotificationProviderChangedEvent
 	var providerType domain.NotificationProviderType
 	switch e := event.(type) {
-	case *iam.DebugNotificationProviderFileChangedEvent:
+	case *instance.DebugNotificationProviderFileChangedEvent:
 		providerEvent = e.DebugNotificationProviderChangedEvent
 		providerType = domain.NotificationProviderTypeFile
-	case *iam.DebugNotificationProviderLogChangedEvent:
+	case *instance.DebugNotificationProviderLogChangedEvent:
 		providerEvent = e.DebugNotificationProviderChangedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileChangedEventType, iam.DebugNotificationProviderLogChangedEventType}).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{instance.DebugNotificationProviderFileChangedEventType, instance.DebugNotificationProviderLogChangedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-pYPxS", "reduce.wrong.event.type")
 	}
 
@@ -139,14 +139,14 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderRem
 	var providerEvent settings.DebugNotificationProviderRemovedEvent
 	var providerType domain.NotificationProviderType
 	switch e := event.(type) {
-	case *iam.DebugNotificationProviderFileRemovedEvent:
+	case *instance.DebugNotificationProviderFileRemovedEvent:
 		providerEvent = e.DebugNotificationProviderRemovedEvent
 		providerType = domain.NotificationProviderTypeFile
-	case *iam.DebugNotificationProviderLogRemovedEvent:
+	case *instance.DebugNotificationProviderLogRemovedEvent:
 		providerEvent = e.DebugNotificationProviderRemovedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{iam.DebugNotificationProviderFileRemovedEventType, iam.DebugNotificationProviderLogRemovedEventType}).Error("wrong event type")
+		logging.WithFields("seq", event.Sequence(), "expectedTypes", []eventstore.EventType{instance.DebugNotificationProviderFileRemovedEventType, instance.DebugNotificationProviderLogRemovedEventType}).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-dow9f", "reduce.wrong.event.type")
 	}
 

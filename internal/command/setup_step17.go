@@ -21,9 +21,9 @@ func (s *Step17) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep17(ctx context.Context, step *Step17) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		addedPolicy := NewIAMPrivacyPolicyWriteModel()
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		addedPolicy := NewInstancePrivacyPolicyWriteModel()
 		events, err := c.addDefaultPrivacyPolicy(ctx, iamAgg, addedPolicy, &step.PrivacyPolicy)
 		if err != nil {
 			return nil, err

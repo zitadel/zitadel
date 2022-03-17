@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -122,12 +122,12 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			reduce: (&OrgIAMPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.OrgIAMPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
 					}`),
-				), iam.OrgIAMPolicyAddedEventMapper),
+				), instance.OrgIAMPolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -158,12 +158,12 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			reduce: (&OrgIAMPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.OrgIAMPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
 					}`),
-				), iam.OrgIAMPolicyChangedEventMapper),
+				), instance.OrgIAMPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),

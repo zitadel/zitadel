@@ -12,7 +12,7 @@ import (
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	iam_view_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 type OrgRepository struct {
@@ -53,5 +53,5 @@ func (repo *OrgRepository) GetLoginText(ctx context.Context, orgID string) ([]*d
 }
 
 func (p *OrgRepository) getIAMEvents(ctx context.Context, sequence uint64) ([]*models.Event, error) {
-	return p.Eventstore.FilterEvents(ctx, models.NewSearchQuery().AggregateIDFilter(domain.IAMID).AggregateTypeFilter(iam.AggregateType))
+	return p.Eventstore.FilterEvents(ctx, models.NewSearchQuery().AggregateIDFilter(domain.IAMID).AggregateTypeFilter(instance.AggregateType))
 }

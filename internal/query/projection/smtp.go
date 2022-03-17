@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
@@ -34,15 +34,15 @@ func (p *SMTPConfigProjection) reducers() []handler.AggregateReducer {
 			Aggregate: project.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.SMTPConfigAddedEventType,
+					Event:  instance.SMTPConfigAddedEventType,
 					Reduce: p.reduceSMTPConfigAdded,
 				},
 				{
-					Event:  iam.SMTPConfigChangedEventType,
+					Event:  instance.SMTPConfigChangedEventType,
 					Reduce: p.reduceSMTPConfigChanged,
 				},
 				{
-					Event:  iam.SMTPConfigPasswordChangedEventType,
+					Event:  instance.SMTPConfigPasswordChangedEventType,
 					Reduce: p.reduceSMTPConfigPasswordChanged,
 				},
 			},
@@ -65,9 +65,9 @@ const (
 )
 
 func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SMTPConfigAddedEvent)
+	e, ok := event.(*instance.SMTPConfigAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-wkofs", "seq", event.Sequence(), "expectedType", iam.SMTPConfigAddedEventType).Error("wrong event type")
+		logging.LogWithFields("HANDL-wkofs", "seq", event.Sequence(), "expectedType", instance.SMTPConfigAddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-sk99F", "reduce.wrong.event.type")
 	}
 	return crdb.NewCreateStatement(
@@ -89,9 +89,9 @@ func (p *SMTPConfigProjection) reduceSMTPConfigAdded(event eventstore.Event) (*h
 }
 
 func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SMTPConfigChangedEvent)
+	e, ok := event.(*instance.SMTPConfigChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-wo00f", "seq", event.Sequence(), "expected", iam.SMTPConfigChangedEventType).Error("wrong event type")
+		logging.LogWithFields("HANDL-wo00f", "seq", event.Sequence(), "expected", instance.SMTPConfigChangedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-wl0wd", "reduce.wrong.event.type")
 	}
 
@@ -123,9 +123,9 @@ func (p *SMTPConfigProjection) reduceSMTPConfigChanged(event eventstore.Event) (
 }
 
 func (p *SMTPConfigProjection) reduceSMTPConfigPasswordChanged(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*iam.SMTPConfigPasswordChangedEvent)
+	e, ok := event.(*instance.SMTPConfigPasswordChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-f92sf", "seq", event.Sequence(), "expected", iam.SMTPConfigChangedEventType).Error("wrong event type")
+		logging.LogWithFields("HANDL-f92sf", "seq", event.Sequence(), "expected", instance.SMTPConfigChangedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-fk02f", "reduce.wrong.event.type")
 	}
 

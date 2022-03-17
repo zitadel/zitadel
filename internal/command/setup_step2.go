@@ -23,9 +23,9 @@ func (s *Step2) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep2(ctx context.Context, step *Step2) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := c.addDefaultPasswordComplexityPolicy(ctx, iamAgg, NewIAMPasswordComplexityPolicyWriteModel(), &domain.PasswordComplexityPolicy{
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		event, err := c.addDefaultPasswordComplexityPolicy(ctx, iamAgg, NewInstancePasswordComplexityPolicyWriteModel(), &domain.PasswordComplexityPolicy{
 			MinLength:    step.DefaultPasswordComplexityPolicy.MinLength,
 			HasLowercase: step.DefaultPasswordComplexityPolicy.HasLowercase,
 			HasUppercase: step.DefaultPasswordComplexityPolicy.HasUppercase,

@@ -22,9 +22,9 @@ func (s *Step9) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep9(ctx context.Context, step *Step9) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		multiFactorModel := NewIAMMultiFactorWriteModel(domain.MultiFactorTypeU2FWithPIN)
-		iamAgg := IAMAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		multiFactorModel := NewInstanceMultiFactorWriteModel(domain.MultiFactorTypeU2FWithPIN)
+		iamAgg := InstanceAggregateFromWriteModel(&multiFactorModel.MultiFactorWriteModel.WriteModel)
 		if !step.Passwordless {
 			return []eventstore.Command{}, nil
 		}
@@ -49,5 +49,5 @@ func setPasswordlessAllowedInPolicy(ctx context.Context, c *Commands, iamAgg *ev
 		return nil, err
 	}
 	policy.PasswordlessType = domain.PasswordlessTypeAllowed
-	return c.changeDefaultLoginPolicy(ctx, iamAgg, NewIAMLoginPolicyWriteModel(), policy)
+	return c.changeDefaultLoginPolicy(ctx, iamAgg, NewInstanceLoginPolicyWriteModel(), policy)
 }

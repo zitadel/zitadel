@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -126,13 +126,13 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			reduce: (&PasswordAgeProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordAgePolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordAgePolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 					}`),
-				), iam.PasswordAgePolicyAddedEventMapper),
+				), instance.PasswordAgePolicyAddedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
@@ -164,13 +164,13 @@ func TestPasswordAgeProjection_reduces(t *testing.T) {
 			reduce: (&PasswordAgeProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.PasswordAgePolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.PasswordAgePolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"expireWarnDays": 10,
 						"maxAgeDays": 13
 					}`),
-				), iam.PasswordAgePolicyChangedEventMapper),
+				), instance.PasswordAgePolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("iam"),
