@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	PasswordAgePolicyAddedEventType   = iamEventTypePrefix + policy.PasswordAgePolicyAddedEventType
-	PasswordAgePolicyChangedEventType = iamEventTypePrefix + policy.PasswordAgePolicyChangedEventType
+	PasswordAgePolicyAddedEventType   = instanceEventTypePrefix + policy.PasswordAgePolicyAddedEventType
+	PasswordAgePolicyChangedEventType = instanceEventTypePrefix + policy.PasswordAgePolicyChangedEventType
 )
 
 type PasswordAgePolicyAddedEvent struct {

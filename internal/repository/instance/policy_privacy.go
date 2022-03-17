@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	PrivacyPolicyAddedEventType   = iamEventTypePrefix + policy.PrivacyPolicyAddedEventType
-	PrivacyPolicyChangedEventType = iamEventTypePrefix + policy.PrivacyPolicyChangedEventType
+	PrivacyPolicyAddedEventType   = instanceEventTypePrefix + policy.PrivacyPolicyAddedEventType
+	PrivacyPolicyChangedEventType = instanceEventTypePrefix + policy.PrivacyPolicyChangedEventType
 )
 
 type PrivacyPolicyAddedEvent struct {

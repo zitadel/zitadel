@@ -10,23 +10,23 @@ import (
 )
 
 var (
-	LabelPolicyAddedEventType     = iamEventTypePrefix + policy.LabelPolicyAddedEventType
-	LabelPolicyChangedEventType   = iamEventTypePrefix + policy.LabelPolicyChangedEventType
-	LabelPolicyActivatedEventType = iamEventTypePrefix + policy.LabelPolicyActivatedEventType
+	LabelPolicyAddedEventType     = instanceEventTypePrefix + policy.LabelPolicyAddedEventType
+	LabelPolicyChangedEventType   = instanceEventTypePrefix + policy.LabelPolicyChangedEventType
+	LabelPolicyActivatedEventType = instanceEventTypePrefix + policy.LabelPolicyActivatedEventType
 
-	LabelPolicyLogoAddedEventType       = iamEventTypePrefix + policy.LabelPolicyLogoAddedEventType
-	LabelPolicyLogoRemovedEventType     = iamEventTypePrefix + policy.LabelPolicyLogoRemovedEventType
-	LabelPolicyIconAddedEventType       = iamEventTypePrefix + policy.LabelPolicyIconAddedEventType
-	LabelPolicyIconRemovedEventType     = iamEventTypePrefix + policy.LabelPolicyIconRemovedEventType
-	LabelPolicyLogoDarkAddedEventType   = iamEventTypePrefix + policy.LabelPolicyLogoDarkAddedEventType
-	LabelPolicyLogoDarkRemovedEventType = iamEventTypePrefix + policy.LabelPolicyLogoDarkRemovedEventType
-	LabelPolicyIconDarkAddedEventType   = iamEventTypePrefix + policy.LabelPolicyIconDarkAddedEventType
-	LabelPolicyIconDarkRemovedEventType = iamEventTypePrefix + policy.LabelPolicyIconDarkRemovedEventType
+	LabelPolicyLogoAddedEventType       = instanceEventTypePrefix + policy.LabelPolicyLogoAddedEventType
+	LabelPolicyLogoRemovedEventType     = instanceEventTypePrefix + policy.LabelPolicyLogoRemovedEventType
+	LabelPolicyIconAddedEventType       = instanceEventTypePrefix + policy.LabelPolicyIconAddedEventType
+	LabelPolicyIconRemovedEventType     = instanceEventTypePrefix + policy.LabelPolicyIconRemovedEventType
+	LabelPolicyLogoDarkAddedEventType   = instanceEventTypePrefix + policy.LabelPolicyLogoDarkAddedEventType
+	LabelPolicyLogoDarkRemovedEventType = instanceEventTypePrefix + policy.LabelPolicyLogoDarkRemovedEventType
+	LabelPolicyIconDarkAddedEventType   = instanceEventTypePrefix + policy.LabelPolicyIconDarkAddedEventType
+	LabelPolicyIconDarkRemovedEventType = instanceEventTypePrefix + policy.LabelPolicyIconDarkRemovedEventType
 
-	LabelPolicyFontAddedEventType   = iamEventTypePrefix + policy.LabelPolicyFontAddedEventType
-	LabelPolicyFontRemovedEventType = iamEventTypePrefix + policy.LabelPolicyFontRemovedEventType
+	LabelPolicyFontAddedEventType   = instanceEventTypePrefix + policy.LabelPolicyFontAddedEventType
+	LabelPolicyFontRemovedEventType = instanceEventTypePrefix + policy.LabelPolicyFontRemovedEventType
 
-	LabelPolicyAssetsRemovedEventType = iamEventTypePrefix + policy.LabelPolicyAssetsRemovedEventType
+	LabelPolicyAssetsRemovedEventType = instanceEventTypePrefix + policy.LabelPolicyAssetsRemovedEventType
 )
 
 type LabelPolicyAddedEvent struct {

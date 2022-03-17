@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	FeaturesSetEventType = iamEventTypePrefix + features.FeaturesSetEventType
+	FeaturesSetEventType = instanceEventTypePrefix + features.FeaturesSetEventType
 )
 
 type FeaturesSetEvent struct {

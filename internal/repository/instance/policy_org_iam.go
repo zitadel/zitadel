@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	OrgIAMPolicyAddedEventType   = iamEventTypePrefix + policy.OrgIAMPolicyAddedEventType
-	OrgIAMPolicyChangedEventType = iamEventTypePrefix + policy.OrgIAMPolicyChangedEventType
+	OrgIAMPolicyAddedEventType   = instanceEventTypePrefix + policy.OrgIAMPolicyAddedEventType
+	OrgIAMPolicyChangedEventType = instanceEventTypePrefix + policy.OrgIAMPolicyChangedEventType
 )
 
 type OrgIAMPolicyAddedEvent struct {

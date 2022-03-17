@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	iamEventTypePrefix = eventstore.EventType("iam.")
+	instanceEventTypePrefix = eventstore.EventType("instance.")
 )
 
 const (
-	AggregateType    = "iam"
+	AggregateType    = "instance"
 	AggregateVersion = "v1"
 )
 

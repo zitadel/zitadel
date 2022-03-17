@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	CustomTextSetEventType             = iamEventTypePrefix + policy.CustomTextSetEventType
-	CustomTextRemovedEventType         = iamEventTypePrefix + policy.CustomTextRemovedEventType
-	CustomTextTemplateRemovedEventType = iamEventTypePrefix + policy.CustomTextTemplateRemovedEventType
+	CustomTextSetEventType             = instanceEventTypePrefix + policy.CustomTextSetEventType
+	CustomTextRemovedEventType         = instanceEventTypePrefix + policy.CustomTextRemovedEventType
+	CustomTextTemplateRemovedEventType = instanceEventTypePrefix + policy.CustomTextTemplateRemovedEventType
 )
 
 type CustomTextSetEvent struct {

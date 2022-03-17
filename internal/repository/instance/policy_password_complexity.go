@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	PasswordComplexityPolicyAddedEventType   = iamEventTypePrefix + policy.PasswordComplexityPolicyAddedEventType
-	PasswordComplexityPolicyChangedEventType = iamEventTypePrefix + policy.PasswordComplexityPolicyChangedEventType
+	PasswordComplexityPolicyAddedEventType   = instanceEventTypePrefix + policy.PasswordComplexityPolicyAddedEventType
+	PasswordComplexityPolicyChangedEventType = instanceEventTypePrefix + policy.PasswordComplexityPolicyChangedEventType
 )
 
 type PasswordComplexityPolicyAddedEvent struct {

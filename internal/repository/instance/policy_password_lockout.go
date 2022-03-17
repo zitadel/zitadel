@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	LockoutPolicyAddedEventType   = iamEventTypePrefix + policy.LockoutPolicyAddedEventType
-	LockoutPolicyChangedEventType = iamEventTypePrefix + policy.LockoutPolicyChangedEventType
+	LockoutPolicyAddedEventType   = instanceEventTypePrefix + policy.LockoutPolicyAddedEventType
+	LockoutPolicyChangedEventType = instanceEventTypePrefix + policy.LockoutPolicyChangedEventType
 )
 
 type LockoutPolicyAddedEvent struct {

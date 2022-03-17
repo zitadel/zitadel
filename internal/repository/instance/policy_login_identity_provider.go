@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	LoginPolicyIDPProviderAddedEventType          = iamEventTypePrefix + policy.LoginPolicyIDPProviderAddedType
-	LoginPolicyIDPProviderRemovedEventType        = iamEventTypePrefix + policy.LoginPolicyIDPProviderRemovedType
-	LoginPolicyIDPProviderCascadeRemovedEventType = iamEventTypePrefix + policy.LoginPolicyIDPProviderCascadeRemovedType
+	LoginPolicyIDPProviderAddedEventType          = instanceEventTypePrefix + policy.LoginPolicyIDPProviderAddedType
+	LoginPolicyIDPProviderRemovedEventType        = instanceEventTypePrefix + policy.LoginPolicyIDPProviderRemovedType
+	LoginPolicyIDPProviderCascadeRemovedEventType = instanceEventTypePrefix + policy.LoginPolicyIDPProviderCascadeRemovedType
 )
 
 type IdentityProviderAddedEvent struct {

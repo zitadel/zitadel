@@ -13,12 +13,12 @@ import (
 const (
 	smsConfigPrefix                      = "sms.config"
 	smsConfigTwilioPrefix                = "twilio."
-	SMSConfigTwilioAddedEventType        = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "added"
-	SMSConfigTwilioChangedEventType      = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "changed"
-	SMSConfigTwilioTokenChangedEventType = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "token.changed"
-	SMSConfigActivatedEventType          = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "activated"
-	SMSConfigDeactivatedEventType        = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "deactivated"
-	SMSConfigRemovedEventType            = iamEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "removed"
+	SMSConfigTwilioAddedEventType        = instanceEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "added"
+	SMSConfigTwilioChangedEventType      = instanceEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "changed"
+	SMSConfigTwilioTokenChangedEventType = instanceEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "token.changed"
+	SMSConfigActivatedEventType          = instanceEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "activated"
+	SMSConfigDeactivatedEventType        = instanceEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "deactivated"
+	SMSConfigRemovedEventType            = instanceEventTypePrefix + smsConfigPrefix + smsConfigTwilioPrefix + "removed"
 )
 
 type SMSConfigTwilioAddedEvent struct {

@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	MailTextAddedEventType   = iamEventTypePrefix + policy.MailTextPolicyAddedEventType
-	MailTextChangedEventType = iamEventTypePrefix + policy.MailTextPolicyChangedEventType
+	MailTextAddedEventType   = instanceEventTypePrefix + policy.MailTextPolicyAddedEventType
+	MailTextChangedEventType = instanceEventTypePrefix + policy.MailTextPolicyChangedEventType
 )
 
 type MailTextAddedEvent struct {

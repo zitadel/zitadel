@@ -12,9 +12,9 @@ import (
 
 const (
 	smtpConfigPrefix                   = "smtp.config"
-	SMTPConfigAddedEventType           = iamEventTypePrefix + smtpConfigPrefix + "added"
-	SMTPConfigChangedEventType         = iamEventTypePrefix + smtpConfigPrefix + "changed"
-	SMTPConfigPasswordChangedEventType = iamEventTypePrefix + smtpConfigPrefix + "password.changed"
+	SMTPConfigAddedEventType           = instanceEventTypePrefix + smtpConfigPrefix + "added"
+	SMTPConfigChangedEventType         = instanceEventTypePrefix + smtpConfigPrefix + "changed"
+	SMTPConfigPasswordChangedEventType = instanceEventTypePrefix + smtpConfigPrefix + "password.changed"
 )
 
 type SMTPConfigAddedEvent struct {

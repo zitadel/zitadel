@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	LoginPolicySecondFactorAddedEventType   = iamEventTypePrefix + policy.LoginPolicySecondFactorAddedEventType
-	LoginPolicySecondFactorRemovedEventType = iamEventTypePrefix + policy.LoginPolicySecondFactorRemovedEventType
+	LoginPolicySecondFactorAddedEventType   = instanceEventTypePrefix + policy.LoginPolicySecondFactorAddedEventType
+	LoginPolicySecondFactorRemovedEventType = instanceEventTypePrefix + policy.LoginPolicySecondFactorRemovedEventType
 
-	LoginPolicyMultiFactorAddedEventType   = iamEventTypePrefix + policy.LoginPolicyMultiFactorAddedEventType
-	LoginPolicyMultiFactorRemovedEventType = iamEventTypePrefix + policy.LoginPolicyMultiFactorRemovedEventType
+	LoginPolicyMultiFactorAddedEventType   = instanceEventTypePrefix + policy.LoginPolicyMultiFactorAddedEventType
+	LoginPolicyMultiFactorRemovedEventType = instanceEventTypePrefix + policy.LoginPolicyMultiFactorRemovedEventType
 )
 
 type LoginPolicySecondFactorAddedEvent struct {

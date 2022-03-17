@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	MemberAddedEventType          = iamEventTypePrefix + member.AddedEventType
-	MemberChangedEventType        = iamEventTypePrefix + member.ChangedEventType
-	MemberRemovedEventType        = iamEventTypePrefix + member.RemovedEventType
-	MemberCascadeRemovedEventType = iamEventTypePrefix + member.CascadeRemovedEventType
+	MemberAddedEventType          = instanceEventTypePrefix + member.AddedEventType
+	MemberChangedEventType        = instanceEventTypePrefix + member.ChangedEventType
+	MemberRemovedEventType        = instanceEventTypePrefix + member.RemovedEventType
+	MemberCascadeRemovedEventType = instanceEventTypePrefix + member.CascadeRemovedEventType
 )
 
 type MemberAddedEvent struct {

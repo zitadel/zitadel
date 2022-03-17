@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	LoginPolicyAddedEventType   = iamEventTypePrefix + policy.LoginPolicyAddedEventType
-	LoginPolicyChangedEventType = iamEventTypePrefix + policy.LoginPolicyChangedEventType
+	LoginPolicyAddedEventType   = instanceEventTypePrefix + policy.LoginPolicyAddedEventType
+	LoginPolicyChangedEventType = instanceEventTypePrefix + policy.LoginPolicyChangedEventType
 )
 
 type LoginPolicyAddedEvent struct {

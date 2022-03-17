@@ -14,9 +14,9 @@ const (
 )
 
 var (
-	DebugNotificationProviderFileAddedEventType   = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderAdded
-	DebugNotificationProviderFileChangedEventType = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderChanged
-	DebugNotificationProviderFileRemovedEventType = iamEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderRemoved
+	DebugNotificationProviderFileAddedEventType   = instanceEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderAdded
+	DebugNotificationProviderFileChangedEventType = instanceEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderChanged
+	DebugNotificationProviderFileRemovedEventType = instanceEventTypePrefix + settings.DebugNotificationPrefix + fileType + settings.DebugNotificationProviderRemoved
 )
 
 type DebugNotificationProviderFileAddedEvent struct {

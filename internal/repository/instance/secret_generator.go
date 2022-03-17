@@ -14,9 +14,9 @@ import (
 const (
 	UniqueSecretGeneratorType       = "secret_generator"
 	secretGeneratorPrefix           = "secret.generator."
-	SecretGeneratorAddedEventType   = iamEventTypePrefix + secretGeneratorPrefix + "added"
-	SecretGeneratorChangedEventType = iamEventTypePrefix + secretGeneratorPrefix + "changed"
-	SecretGeneratorRemovedEventType = iamEventTypePrefix + secretGeneratorPrefix + "removed"
+	SecretGeneratorAddedEventType   = instanceEventTypePrefix + secretGeneratorPrefix + "added"
+	SecretGeneratorChangedEventType = instanceEventTypePrefix + secretGeneratorPrefix + "changed"
+	SecretGeneratorRemovedEventType = instanceEventTypePrefix + secretGeneratorPrefix + "removed"
 )
 
 func NewAddSecretGeneratorTypeUniqueConstraint(generatorType domain.SecretGeneratorType) *eventstore.EventUniqueConstraint {

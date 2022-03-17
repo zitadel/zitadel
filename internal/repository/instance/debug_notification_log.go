@@ -14,11 +14,11 @@ const (
 )
 
 var (
-	DebugNotificationProviderLogAddedEventType    = iamEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderAdded
-	DebugNotificationProviderLogChangedEventType  = iamEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderChanged
-	DebugNotificationProviderLogEnabledEventType  = iamEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderEnabled
-	DebugNotificationProviderLogDisabledEventType = iamEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderDisabled
-	DebugNotificationProviderLogRemovedEventType  = iamEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderRemoved
+	DebugNotificationProviderLogAddedEventType    = instanceEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderAdded
+	DebugNotificationProviderLogChangedEventType  = instanceEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderChanged
+	DebugNotificationProviderLogEnabledEventType  = instanceEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderEnabled
+	DebugNotificationProviderLogDisabledEventType = instanceEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderDisabled
+	DebugNotificationProviderLogRemovedEventType  = instanceEventTypePrefix + settings.DebugNotificationPrefix + logType + settings.DebugNotificationProviderRemoved
 )
 
 type DebugNotificationProviderLogAddedEvent struct {
