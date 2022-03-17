@@ -76,33 +76,4 @@
     margin-right: 8px;
     box-shadow: 0 0 3px #0000001a;
   }
-
-  .cnsl-table-action-wrapper {
-    display: flex;
-    justify-content: flex-end;
-
-    .cnsl-table-action {
-      display: flex;
-      background-color: $card-background-color;
-      transition: background-color 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-      border: 1px solid $border-color;
-      box-sizing: border-box;
-      border-radius: 0.5rem;
-      outline: none;
-      box-shadow: 0 0 3px #0000001a;
-    }
-  }
-
-  tr {
-    .cnsl-table-action {
-      visibility: hidden;
-      transition: color 0.2s ease;
-    }
-
-    &:hover {
-      .cnsl-table-action {
-        visibility: visible;
-      }
-    }
-  }
 }

@@ -1,0 +1,12 @@
+<div class="cnsl-table-action-wrapper">
+  <div class="cnsl-table-action">
+    <ng-content select="[hoverActions]"></ng-content>
+    <button mat-icon-button [matMenuTriggerFor]="actions">
+      <mat-icon>more_horiz</mat-icon>
+    </button>
+
+    <mat-menu #actions="matMenu" xPosition="before">
+      <ng-content select="[actions]"></ng-content>
+    </mat-menu>
+  </div>
+</div>

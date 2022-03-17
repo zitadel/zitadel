@@ -35,14 +35,28 @@
     }
   }
 
-  td {
-    .cnsl-form-field-wrapper {
-      padding-bottom: 0;
-    }
-  }
-
   .pointer {
     cursor: pointer;
+  }
+
+  tr {
+    .cnsl-table-action {
+      visibility: hidden;
+      transition: color 0.2s ease;
+
+      &:active,
+      &:hover,
+      &:focus,
+      &:focus-within {
+        visibility: visible;
+      }
+    }
+
+    &:hover {
+      .cnsl-table-action {
+        visibility: visible;
+      }
+    }
   }
 
   tr {
@@ -73,7 +87,6 @@
 
   .no-content-row {
     background-color: if($is-dark-theme, #00000030, #f4f4f470);
-    // color: $primary-color;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     display: flex;

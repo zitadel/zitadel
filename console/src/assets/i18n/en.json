@@ -115,7 +115,8 @@
     "GOTOFEATURES": "Go to features",
     "OF": "of",
     "PREVIOUS": "Previous",
-    "NEXT": "Next"
+    "NEXT": "Next",
+    "MORE": "more"
   },
   "OVERLAYS": {
     "ORGSWITCHER": {

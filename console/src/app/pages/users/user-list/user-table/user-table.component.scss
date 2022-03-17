@@ -38,50 +38,8 @@
   }
 }
 
-th {
-  .search-button {
-    visibility: hidden;
-    width: 30px;
-
-    .icon {
-      font-size: 1.2rem;
-    }
-  }
-
-  &:hover,
-  &.search-active {
-    .search-button {
-      visibility: visible;
-    }
-  }
-}
-
 .user-tr-actions {
-  width: 50px;
-}
-
-.filtername {
-  flex: 1;
-  margin-right: 1rem;
-
-  .filterinput {
-    height: 36px;
-    transform: translateY(1px);
-  }
-
-  .cnsl-form-field-wrapper {
-    margin: 0 !important;
-  }
-}
-
-.sa-icon {
-  display: block;
-  width: 32px;
-  margin: 0 0.5rem;
-
-  i {
-    margin: auto;
-  }
+  width: 42px;
 }
 
 td {

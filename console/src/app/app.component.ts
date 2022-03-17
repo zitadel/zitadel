@@ -17,6 +17,7 @@ import { AuthenticationService } from './services/authentication.service';
 import { GrpcAuthService } from './services/grpc-auth.service';
 import { KeyboardShortcutsService } from './services/keyboard-shortcuts/keyboard-shortcuts.service';
 import { ManagementService } from './services/mgmt.service';
+import { NavigationService } from './services/navigation.service';
 import { OverlayWorkflowService } from './services/overlay/overlay-workflow.service';
 import { IntroWorkflowOverlays } from './services/overlay/workflows';
 import { StorageLocation, StorageService } from './services/storage.service';
@@ -72,6 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private workflowService: OverlayWorkflowService,
     private storageService: StorageService,
+    private navigationService: NavigationService,
     @Inject(DOCUMENT) private document: Document,
   ) {
     console.log(
