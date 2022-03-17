@@ -34,6 +34,11 @@ const (
 	envMigrationUser   = "FLYWAY_USER"
 	envMigrationPW     = "FLYWAY_PASSWORD"
 	jobNamePrefix      = "cockroachdb-cluster-migration-"
+	rootUserInternal   = "root"
+	rootUserPath       = "/certificates"
+	createFile         = "create.sql"
+	grantFile          = "grant.sql"
+	deleteFile         = "delete.sql"
 )
 
 func AdaptFunc(
@@ -43,6 +48,8 @@ func AdaptFunc(
 	namespace string,
 	reason string,
 	secretPasswordName string,
+	migrationUser string,
+	users []string,
 	nodeselector map[string]string,
 	tolerations []corev1.Toleration,
 	customImageRegistry string,
@@ -78,10 +85,7 @@ func AdaptFunc(
 				MountPath: "/chownedcerts",
 			}
 
-			srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, "101:101", corev1.VolumeMount{
-				Name:      "certs",
-				MountPath: "certificates",
-			}, chownedVolumeMount)
+			certVolumes, chownCertsContainer := db.InitChownCerts(customImageRegistry, "101:101", []string{dbConn.User()}, chownedVolumeMount)
 
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
@@ -102,31 +106,35 @@ func AdaptFunc(
 							},
 						},
 						Spec: corev1.PodSpec{
-							NodeSelector:   nodeselector,
-							Tolerations:    tolerations,
-							InitContainers: append(getPreContainer(dbConn, customImageRegistry), chownCertsContainer),
+							NodeSelector: nodeselector,
+							Tolerations:  tolerations,
+							InitContainers: []corev1.Container{
+								chownCertsContainer,
+								getReadyPreContainer(dbConn, customImageRegistry),
+								//								getFlywayUserPreContainer(dbConn, customImageRegistry, migrationUser, secretPasswordName, chownedVolumeMount),
+							},
 							Containers: []corev1.Container{
-								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount),
+								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount, users, secretPasswordName),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
 							TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-							Volumes: []corev1.Volume{srcVolume, destVolume, {
+							Volumes: append(certVolumes, corev1.Volume{
 								Name: migrationConfigmap,
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
 									},
 								},
-							}, {
+							}, corev1.Volume{
 								Name: secretPasswordName,
 								VolumeSource: corev1.VolumeSource{
 									Secret: &corev1.SecretVolumeSource{
 										SecretName: secretPasswordName,
 									},
 								},
-							}},
+							}),
 						},
 					},
 				},
@@ -155,26 +163,30 @@ func AdaptFunc(
 		nil
 }
 
-func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret, userPasswordKey string) []corev1.EnvVar {
+func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserPasswordSecret, migrationUserPasswordSecretKey string) []corev1.EnvVar {
 
-	envVars := []corev1.EnvVar{
-		{
-			Name:  envMigrationUser,
-			Value: migrationUser,
-		},
-	}
+	envVars := []corev1.EnvVar{{
+		Name:  envMigrationUser,
+		Value: migrationUser,
+	}}
 
-	if userPasswordsSecret != "" {
+	if migrationUserPasswordSecret != "" {
 		envVars = append(envVars, corev1.EnvVar{
 			Name: envMigrationPW,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-					Key:                  userPasswordKey,
+					LocalObjectReference: corev1.LocalObjectReference{Name: migrationUserPasswordSecret},
+					Key:                  migrationUserPasswordSecretKey,
 				},
 			},
 		})
+	} else {
+		envVars = append(envVars, corev1.EnvVar{
+			Name:  envMigrationPW,
+			Value: "",
+		})
 	}
+
 	return envVars
 }
 

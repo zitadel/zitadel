@@ -2,7 +2,8 @@ package deployment
 
 import (
 	"github.com/caos/zitadel/operator/common"
-	"github.com/caos/zitadel/pkg/databases/db"
+	"sort"
+	"strings"
 
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	corev1 "k8s.io/api/core/v1"
@@ -23,7 +24,8 @@ func GetContainer(
 	dbcerts corev1.VolumeMount,
 	command string,
 	customImageRegistry string,
-	dbConn db.Connection,
+	secretPasswordsName string,
+	users []string,
 ) corev1.Container {
 
 	envVars := []corev1.EnvVar{{
@@ -98,14 +100,14 @@ func GetContainer(
 		}},
 	}
 
-	crpwSecret, crpwKey := dbConn.PasswordSecret()
-	if crpwSecret != nil {
+	sort.Strings(users)
+	for _, user := range users {
 		envVars = append(envVars, corev1.EnvVar{
-			Name: "CR_PASSWORD",
+			Name: "CR_" + strings.ToUpper(user) + "_PASSWORD",
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: crpwSecret.Name()},
-					Key:                  crpwKey,
+					LocalObjectReference: corev1.LocalObjectReference{Name: secretPasswordsName},
+					Key:                  user,
 				},
 			},
 		})

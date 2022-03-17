@@ -52,8 +52,8 @@ func literalsConfigMap(
 		"CR_USER":                        dbConn.User(),
 		"CR_OPTIONS":                     dbConn.Options(),
 		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.CACert),
-		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert),
-		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey),
+		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert(dbConn.User())),
+		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey(dbConn.User())),
 	}
 
 	if desired != nil {
@@ -125,6 +125,9 @@ func literalsConfigMap(
 	sentryEnv, _, doIngest := mntr.Environment()
 	literalsConfigMap["SENTRY_ENVIRONMENT"] = sentryEnv
 	literalsConfigMap["SENTRY_USAGE"] = strconv.FormatBool(doIngest)
+
+	literalsConfigMap["ZITADEL_EVENTSTORE_HOST"] = dbConn.Host()
+	literalsConfigMap["ZITADEL_EVENTSTORE_PORT"] = dbConn.Port()
 
 	return literalsConfigMap
 }

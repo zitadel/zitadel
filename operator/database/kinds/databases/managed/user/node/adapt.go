@@ -3,6 +3,7 @@ package node
 import (
 	"crypto/rsa"
 	"errors"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 	"reflect"
 
 	"github.com/caos/zitadel/operator"
@@ -13,9 +14,8 @@ import (
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/certificates"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user/pem"
+	"github.com/caos/zitadel/pkg/databases/certs/certificates"
+	"github.com/caos/zitadel/pkg/databases/certs/pem"
 )
 
 const (
@@ -49,8 +49,6 @@ func AdaptFunc(
 				return nil, err
 			}
 
-			managedDB := currentDB.(*current.Current)
-
 			allNodeSecrets, err := k8sClient.ListSecrets(namespace, nodeSecretSelector)
 			if err != nil {
 				return nil, err
@@ -64,11 +62,11 @@ func AdaptFunc(
 
 				emptyCert := true
 				emptyKey := true
-				if currentCaCert := managedDB.GetCertificate(); currentCaCert != nil && len(currentCaCert) != 0 {
+				if currentCaCert := currentDB.CACert(); currentCaCert != nil && len(currentCaCert) != 0 {
 					emptyCert = false
 					caCert = currentCaCert
 				}
-				if currentCaCertKey := managedDB.GetCertificateKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
+				if currentCaCertKey := currentDB.CAKey(); currentCaCertKey != nil && !reflect.DeepEqual(currentCaCertKey, &rsa.PrivateKey{}) {
 					emptyKey = false
 					caPrivKey = currentCaCertKey
 				}
@@ -131,6 +129,7 @@ func AdaptFunc(
 				caCert = cert
 			}
 
+			managedDB := currentDB.(*current.Current)
 			managedDB.SetCertificate(caCert)
 			managedDB.SetCertificateKey(caPrivKey)
 

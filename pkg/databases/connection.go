@@ -90,6 +90,7 @@ func connection(
 	if err != nil && !noCurrentState {
 		return nil, err
 	}
+	err = nil
 
 	if noCurrentState {
 		databaseTree, err := desiredDatabase()

@@ -1,7 +1,9 @@
 package cockroachdb
 
 import (
+	"errors"
 	"fmt"
+	"github.com/caos/zitadel/pkg/databases/certs/pem"
 	"strconv"
 
 	"github.com/caos/orbos/pkg/secret/read"
@@ -63,21 +65,23 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 		current.Parsed = currentDB
 
 		componentLabels := labels.MustForComponent(apiLabels, component)
-		certLabels := labels.MustForName(componentLabels, db.CertsSecret)
+		user := "root"
+		if desiredKind.Spec.User != "" {
+			user = desiredKind.Spec.User
+		}
+		certLabels := labels.MustForName(componentLabels, "cockroachdb.client."+user)
 		pwLabels := labels.AsSelectable(labels.MustForName(componentLabels, "db-connection-password"))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
+				db.SetQueriedForDatabase(queried, current)
+
 				currentDB.Current.Host = desiredKind.Spec.Host
 				currentDB.Current.Cluster = desiredKind.Spec.Cluster
 				currentDB.Current.Port = strconv.Itoa(int(desiredKind.Spec.Port))
+				currentDB.Current.User = user
 				if currentDB.Current.Port == "" {
 					currentDB.Current.Port = "26257"
-				}
-
-				currentDB.Current.User = desiredKind.Spec.User
-				if currentDB.Current.User == "" {
-					currentDB.Current.User = "root"
 				}
 
 				certificate, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Certificate, desiredKind.Spec.ExistingCertificate)
@@ -87,14 +91,42 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 
 				var queriers []operator.QueryFunc
 				if certificate != "" {
+
+					cert, err := pem.DecodeCertificate([]byte(certificate))
+					if err != nil {
+						return ensureErr(fmt.Errorf("decoding pem certificate failed: %w", err)), nil
+					}
+
+					certificateKey, err := read.GetSecretValue(k8sClient, desiredKind.Spec.CertificateKey, desiredKind.Spec.ExistingCertificateKey)
+					if err != nil {
+						return nil, err
+					}
+
+					if certificateKey == "" {
+						return ensureErr(errors.New("please provide a certificate key using zitadelctl writesecret")), nil
+					}
+
+					certKey, err := pem.DecodeKey([]byte(certificateKey))
+					if err != nil {
+						return ensureErr(fmt.Errorf("decoding pem certificate key failed: %w", err)), nil
+					}
+
 					certQuerier, err := k8sSecret.AdaptFuncToEnsure(namespace, labels.AsSelectable(certLabels), map[string]string{
 						db.CACert: certificate,
+						db.CAKey:  certificateKey,
 					})
 					if err != nil {
 						return nil, err
 					}
+
+					currentDB.Current.CACert = cert
+					currentDB.Current.CAKey = certKey
+
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(certQuerier))
+				} else {
+					return ensureErr(errors.New("please provide a ca certificate using zitadelctl writesecret")), nil
 				}
+
 				currentDB.Current.Secure = certificate != ""
 
 				password, err := read.GetSecretValue(k8sClient, desiredKind.Spec.Password, desiredKind.Spec.ExistingPassword)
@@ -114,7 +146,6 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 					queriers = append(queriers, operator.ResourceQueryToZitadelQuery(pwQuerier))
 				}
 
-				db.SetQueriedForDatabase(queried, current)
 				return operator.QueriersToEnsureFunc(internalMonitor, false, queriers, k8sClient, queried)
 			}, func(k8sClient kubernetes.ClientInt) error { return nil },
 			func(kubernetes.ClientInt, map[string]interface{}, bool) error { return nil },
@@ -123,4 +154,10 @@ func Adapter(apiLabels *labels.API) operator.AdaptFunc {
 			false,
 			nil
 	}
+}
+
+// ensureErr can be used for errors that should not yet be returned in the query phase
+// for example for the writesecret command
+func ensureErr(err error) operator.EnsureFunc {
+	return func(_ kubernetes.ClientInt) error { return err }
 }

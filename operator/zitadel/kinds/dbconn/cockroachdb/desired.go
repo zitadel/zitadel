@@ -16,15 +16,17 @@ type DesiredV0 struct {
 }
 
 type Spec struct {
-	Verbose             bool
-	Host                string
-	Port                uint16
-	Cluster             string
-	User                string
-	Certificate         *secret.Secret   `yaml:"certificate,omitempty"`
-	ExistingCertificate *secret.Existing `yaml:"existingCertificate,omitempty"`
-	Password            *secret.Secret   `yaml:"password,omitempty"`
-	ExistingPassword    *secret.Existing `yaml:"existingPassword,omitempty"`
+	Verbose                bool
+	Host                   string
+	Port                   uint16
+	Cluster                string
+	User                   string
+	Certificate            *secret.Secret   `yaml:"certificate,omitempty"`
+	ExistingCertificate    *secret.Existing `yaml:"existingCertificate,omitempty"`
+	CertificateKey         *secret.Secret   `yaml:"certificateKey,omitempty"`
+	ExistingCertificateKey *secret.Existing `yaml:"existingCertificateKey,omitempty"`
+	Password               *secret.Secret   `yaml:"password,omitempty"`
+	ExistingPassword       *secret.Existing `yaml:"existingPassword,omitempty"`
 }
 
 func parseDesiredV0(desiredTree *tree.Tree) (*DesiredV0, error) {
