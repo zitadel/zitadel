@@ -28,7 +28,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.reduceSMSTwilioAdded",
+			name: "instance.reduceSMSTwilioAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigTwilioAddedEventType),
@@ -47,7 +47,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -79,7 +79,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigTwilioChanged",
+			name: "instance.reduceSMSConfigTwilioChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigTwilioChangedEventType),
@@ -93,7 +93,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -120,7 +120,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigActivated",
+			name: "instance.reduceSMSConfigActivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigActivatedEventType),
@@ -132,7 +132,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigActivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -152,7 +152,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigDeactivated",
+			name: "instance.reduceSMSConfigDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigDeactivatedEventType),
@@ -164,7 +164,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -184,7 +184,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigRemoved",
+			name: "instance.reduceSMSConfigRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.SMSConfigRemovedEventType),
@@ -196,7 +196,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,

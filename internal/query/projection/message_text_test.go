@@ -581,7 +581,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&MessageTextProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -596,7 +596,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 				), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       MessageTextTable,
@@ -620,7 +620,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceRemoved.Title",
+			name: "instance.reduceRemoved.Title",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.CustomTextRemovedEventType),
@@ -634,7 +634,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 			},
 			reduce: (&MessageTextProjection{}).reduceRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       MessageTextTable,

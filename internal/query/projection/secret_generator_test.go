@@ -34,7 +34,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorRemoved,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -62,7 +62,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorChanged,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -98,7 +98,7 @@ func TestSecretGeneratorProjection_reduces(t *testing.T) {
 			reduce: (&SecretGeneratorProjection{}).reduceSecretGeneratorAdded,
 			want: wantReduce{
 				projection:       SecretGeneratorProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{

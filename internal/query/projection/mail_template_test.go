@@ -117,7 +117,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&MailTemplateProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -129,7 +129,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				), instance.MailTemplateAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       MailTemplateTable,
@@ -152,7 +152,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&MailTemplateProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -164,7 +164,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				), instance.MailTemplateChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       MailTemplateTable,

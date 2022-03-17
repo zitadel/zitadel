@@ -285,7 +285,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceLoginPolicyAdded",
+			name:   "instance.reduceLoginPolicyAdded",
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -307,7 +307,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.LoginPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
@@ -339,7 +339,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceLoginPolicyChanged",
+			name:   "instance.reduceLoginPolicyChanged",
 			reduce: (&LoginPolicyProjection{}).reduceLoginPolicyChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -356,7 +356,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.LoginPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
@@ -381,7 +381,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceMFAAdded",
+			name:   "instance.reduceMFAAdded",
 			reduce: (&LoginPolicyProjection{}).reduceMFAAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -393,7 +393,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.MultiFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
@@ -413,7 +413,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceMFARemoved",
+			name:   "instance.reduceMFARemoved",
 			reduce: (&LoginPolicyProjection{}).reduceMFARemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -425,7 +425,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.MultiFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
@@ -445,7 +445,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduce2FAAdded",
+			name:   "instance.reduce2FAAdded",
 			reduce: (&LoginPolicyProjection{}).reduce2FAAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -457,7 +457,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.SecondFactorAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,
@@ -477,7 +477,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduce2FARemoved",
+			name:   "instance.reduce2FARemoved",
 			reduce: (&LoginPolicyProjection{}).reduce2FARemoved,
 			args: args{
 				event: getEvent(testEvent(
@@ -489,7 +489,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				), instance.SecondFactorRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LoginPolicyTable,

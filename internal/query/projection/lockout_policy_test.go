@@ -122,7 +122,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&LockoutPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -135,7 +135,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				), instance.LockoutPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LockoutPolicyTable,
@@ -160,7 +160,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&LockoutPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -173,7 +173,7 @@ func TestLockoutPolicyProjection_reduces(t *testing.T) {
 				), instance.LockoutPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LockoutPolicyTable,

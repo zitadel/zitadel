@@ -122,7 +122,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&PrivacyPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -135,7 +135,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				), instance.PrivacyPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PrivacyPolicyTable,
@@ -160,7 +160,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&PrivacyPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -173,7 +173,7 @@ func TestPrivacyPolicyProjection_reduces(t *testing.T) {
 				), instance.PrivacyPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       PrivacyPolicyTable,

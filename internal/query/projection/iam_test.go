@@ -33,7 +33,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 			reduce: (&IAMProjection{}).reduceGlobalOrgSet,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -63,7 +63,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 			reduce: (&IAMProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -93,7 +93,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 			reduce: (&IAMProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -123,7 +123,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 			reduce: (&IAMProjection{}).reduceSetupEvent,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -153,7 +153,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 			reduce: (&IAMProjection{}).reduceSetupEvent,
 			want: wantReduce{
 				projection:       IAMProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{

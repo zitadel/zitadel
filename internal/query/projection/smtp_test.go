@@ -39,7 +39,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			reduce: (&SMTPConfigProjection{}).reduceSMTPConfigChanged,
 			want: wantReduce{
 				projection:       SMTPConfigProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -84,7 +84,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			reduce: (&SMTPConfigProjection{}).reduceSMTPConfigAdded,
 			want: wantReduce{
 				projection:       SMTPConfigProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
@@ -127,7 +127,7 @@ func TestSMTPConfigProjection_reduces(t *testing.T) {
 			reduce: (&SMTPConfigProjection{}).reduceSMTPConfigPasswordChanged,
 			want: wantReduce{
 				projection:       SMTPConfigProjectionTable,
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{

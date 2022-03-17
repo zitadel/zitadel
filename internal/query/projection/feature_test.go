@@ -229,7 +229,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceFeatureSet old",
+			name:   "instance.reduceFeatureSet old",
 			reduce: (&FeatureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
@@ -261,7 +261,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				), instance.FeaturesSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       FeatureTable,
@@ -302,7 +302,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceFeatureSet new",
+			name:   "instance.reduceFeatureSet new",
 			reduce: (&FeatureProjection{}).reduceFeatureSet,
 			args: args{
 				event: getEvent(testEvent(
@@ -335,7 +335,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				), instance.FeaturesSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       FeatureTable,

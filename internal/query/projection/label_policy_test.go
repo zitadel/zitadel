@@ -504,7 +504,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceAdded",
+			name: "instance.reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyAddedEventType),
@@ -514,7 +514,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -548,7 +548,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceChanged",
+			name: "instance.reduceChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyChangedEventType),
@@ -558,7 +558,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -589,7 +589,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceActivated",
+			name: "instance.reduceActivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyActivatedEventType),
@@ -599,7 +599,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceActivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -620,7 +620,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceLogoAdded light",
+			name: "instance.reduceLogoAdded light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoAddedEventType),
@@ -630,7 +630,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -651,7 +651,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceLogoAdded dark",
+			name: "instance.reduceLogoAdded dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoDarkAddedEventType),
@@ -661,7 +661,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -682,7 +682,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIconAdded light",
+			name: "instance.reduceIconAdded light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconAddedEventType),
@@ -692,7 +692,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -713,7 +713,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIconAdded dark",
+			name: "instance.reduceIconAdded dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconDarkAddedEventType),
@@ -723,7 +723,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -744,7 +744,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceLogoRemoved light",
+			name: "instance.reduceLogoRemoved light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoRemovedEventType),
@@ -754,7 +754,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -775,7 +775,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceLogoRemoved dark",
+			name: "instance.reduceLogoRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyLogoDarkRemovedEventType),
@@ -785,7 +785,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceLogoRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -806,7 +806,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIconRemoved light",
+			name: "instance.reduceIconRemoved light",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconRemovedEventType),
@@ -816,7 +816,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -837,7 +837,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIconRemoved dark",
+			name: "instance.reduceIconRemoved dark",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyIconDarkRemovedEventType),
@@ -847,7 +847,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceIconRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -868,7 +868,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceFontAdded",
+			name: "instance.reduceFontAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyFontAddedEventType),
@@ -878,7 +878,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceFontAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -899,7 +899,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceFontRemoved",
+			name: "instance.reduceFontRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyFontRemovedEventType),
@@ -909,7 +909,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceFontRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,
@@ -930,7 +930,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceAssetsRemoved",
+			name: "instance.reduceAssetsRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.LabelPolicyAssetsRemovedEventType),
@@ -940,7 +940,7 @@ func TestLabelPolicyProjection_reduces(t *testing.T) {
 			},
 			reduce: (&LabelPolicyProjection{}).reduceAssetsRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       LabelPolicyTable,

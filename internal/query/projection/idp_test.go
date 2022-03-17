@@ -24,7 +24,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.reduceIDPAdded",
+			name: "instance.reduceIDPAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigAddedEventType),
@@ -40,7 +40,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceIDPAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -66,7 +66,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPChanged",
+			name: "instance.reduceIDPChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigChangedEventType),
@@ -81,7 +81,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceIDPChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -103,7 +103,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPDeactivated",
+			name: "instance.reduceIDPDeactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigDeactivatedEventType),
@@ -115,7 +115,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceIDPDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -135,7 +135,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPReactivated",
+			name: "instance.reduceIDPReactivated",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigReactivatedEventType),
@@ -147,7 +147,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceIDPReactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -167,7 +167,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceIDPRemoved",
+			name: "instance.reduceIDPRemoved",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPConfigRemovedEventType),
@@ -179,7 +179,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceIDPRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -196,7 +196,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceOIDCConfigAdded",
+			name: "instance.reduceOIDCConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPOIDCConfigAddedEventType),
@@ -220,7 +220,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -254,7 +254,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceOIDCConfigChanged",
+			name: "instance.reduceOIDCConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPOIDCConfigChangedEventType),
@@ -278,7 +278,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -311,7 +311,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceOIDCConfigChanged: no op",
+			name: "instance.reduceOIDCConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPOIDCConfigChangedEventType),
@@ -321,7 +321,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceOIDCConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -331,7 +331,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceJWTConfigAdded",
+			name: "instance.reduceJWTConfigAdded",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPJWTConfigAddedEventType),
@@ -347,7 +347,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -377,7 +377,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceJWTConfigChanged",
+			name: "instance.reduceJWTConfigChanged",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPJWTConfigChangedEventType),
@@ -393,7 +393,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,
@@ -422,7 +422,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceJWTConfigChanged: no op",
+			name: "instance.reduceJWTConfigChanged: no op",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.IDPJWTConfigChangedEventType),
@@ -432,7 +432,7 @@ func TestIDPProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IDPProjection{}).reduceJWTConfigChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPTable,

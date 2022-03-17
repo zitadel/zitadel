@@ -144,7 +144,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       CustomTextTable,
@@ -183,7 +183,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				), instance.CustomTextRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       CustomTextTable,
@@ -217,7 +217,7 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 				), instance.CustomTextTemplateRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       CustomTextTable,

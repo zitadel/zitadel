@@ -118,7 +118,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
+			name:   "instance.reduceAdded",
 			reduce: (&OrgIAMPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
@@ -130,7 +130,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				), instance.OrgIAMPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       OrgIAMPolicyTable,
@@ -154,7 +154,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
+			name:   "instance.reduceChanged",
 			reduce: (&OrgIAMPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
@@ -166,7 +166,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				), instance.OrgIAMPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       OrgIAMPolicyTable,
