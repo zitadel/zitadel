@@ -22,6 +22,7 @@ import { FilterUserGrantsModule } from '../filter-user-grants/filter-user-grants
 import { PaginatorModule } from '../paginator/paginator.module';
 import { ProjectRoleChipModule } from '../project-role-chip/project-role-chip.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
+import { TableActionsModule } from '../table-actions/table-actions.module';
 import { UserGrantRoleDialogModule } from '../user-grant-role-dialog/user-grant-role-dialog.module';
 import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { UserGrantsComponent } from './user-grants.component';
@@ -42,6 +43,7 @@ import { UserGrantsComponent } from './user-grants.component';
     MatProgressSpinnerModule,
     MatCheckboxModule,
     MatTooltipModule,
+    TableActionsModule,
     UserGrantRoleDialogModule,
     MatSelectModule,
     TranslateModule,

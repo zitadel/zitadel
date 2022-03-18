@@ -116,7 +116,10 @@
     "OF": "von",
     "PREVIOUS": "Zurück",
     "NEXT": "Weiter",
-    "MORE": "mehr"
+    "MORE": "mehr",
+    "TABLE": {
+      "SHOWUSER": "Zeige Benutzer {{value}}"
+    }
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -650,7 +653,8 @@
       },
       "DELETEACTION": {
         "TITLE": "Aktion löschen?",
-        "DESCRIPTION": "Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?"
+        "DESCRIPTION": "Sie sind im Begriff eine Aktion zu löschen. Dieser Vorgang kann nicht zurückgesetzt werden. Sind Sie sicher?",
+        "DELETE_SUCCESS": "Aktion erfolgreich gelöscht."
       },
       "CLEAR": {
         "TITLE": "Flow zurücksetzen?",

@@ -11,6 +11,6 @@ import { TableActionsComponent } from './table-actions.component';
 @NgModule({
   declarations: [TableActionsComponent],
   imports: [CommonModule, MatIconModule, MatButtonModule, MatMenuModule, MatTooltipModule, TranslateModule],
-  exports: [TableActionsComponent],
+  exports: [TableActionsComponent, MatMenuModule],
 })
 export class TableActionsModule {}

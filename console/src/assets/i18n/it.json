@@ -116,7 +116,10 @@
     "OF": "di",
     "PREVIOUS": "Precedente",
     "NEXT": "Avanti",
-    "MORE": "azioni"
+    "MORE": "azioni",
+    "TABLE": {
+      "SHOWUSER": "Mostra utente {{value}}"
+    }
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -650,7 +653,8 @@
       },
       "DELETEACTION": {
         "TITLE": "Elimina azione?",
-        "DESCRIPTION": ""
+        "DESCRIPTION": "",
+        "DELETE_SUCCESS": "Azione rimossa con successo."
       },
       "CLEAR": {
         "TITLE": "Flow zurücksetzen?",

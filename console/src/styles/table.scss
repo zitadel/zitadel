@@ -40,6 +40,20 @@
   }
 
   tr {
+    &.mat-header-row {
+      height: 40px;
+      padding-bottom: 4px;
+    }
+
+    &.highlight {
+      &:hover {
+        td {
+          transition: background 0.1s ease;
+          background: map-get($background, hover);
+        }
+      }
+    }
+
     .cnsl-table-action {
       visibility: hidden;
       transition: color 0.2s ease;
@@ -55,22 +69,6 @@
     &:hover {
       .cnsl-table-action {
         visibility: visible;
-      }
-    }
-  }
-
-  tr {
-    &.mat-header-row {
-      height: 40px;
-      padding-bottom: 4px;
-    }
-
-    &.highlight {
-      &:hover {
-        td {
-          transition: background 0.1s ease;
-          background: map-get($background, hover);
-        }
       }
     }
   }

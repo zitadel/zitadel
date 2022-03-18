@@ -116,7 +116,10 @@
     "OF": "of",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
-    "MORE": "more"
+    "MORE": "more",
+    "TABLE": {
+      "SHOWUSER": "Show user {{value}}"
+    }
   },
   "OVERLAYS": {
     "ORGSWITCHER": {
@@ -650,7 +653,8 @@
       },
       "DELETEACTION": {
         "TITLE": "Delete Action?",
-        "DESCRIPTION": "You are about to delete an action. This cannot be reverted. Are you sure?"
+        "DESCRIPTION": "You are about to delete an action. This cannot be reverted. Are you sure?",
+        "DELETE_SUCCESS": "Action deleted successfully."
       },
       "CLEAR": {
         "TITLE": "Clear flow?",

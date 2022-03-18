@@ -1,12 +1,14 @@
 <div class="cnsl-table-action-wrapper">
   <div class="cnsl-table-action">
     <ng-content select="[hoverActions]"></ng-content>
-    <button mat-icon-button [matMenuTriggerFor]="actions">
+    <ng-content select="[actions]"></ng-content>
+    <button (click)="$event.stopPropagation()" *ngIf="hasActions" class="table-actions-trigger" mat-icon-button
+      [matMenuTriggerFor]="actions">
       <mat-icon>more_horiz</mat-icon>
     </button>
 
-    <mat-menu #actions="matMenu" xPosition="before">
-      <ng-content select="[actions]"></ng-content>
+    <mat-menu #actions="matMenu" xPosition="before" class="table-actions-menu">
+      <ng-content select="[menuActions]"></ng-content>
     </mat-menu>
   </div>
 </div>

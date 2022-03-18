@@ -7,6 +7,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.component';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Action, ActionState } from 'src/app/proto/generated/zitadel/action_pb';
 import {
   CreateActionRequest,
@@ -30,7 +31,7 @@ export class ActionTableComponent implements OnInit {
   public actionsResult!: ListActionsResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumns: string[] = ['select', 'name', 'state', 'timeout', 'allowedToFail'];
+  @Input() public displayedColumns: string[] = ['select', 'name', 'state', 'timeout', 'allowedToFail', 'actions'];
 
   @Output() public changedSelection: EventEmitter<Array<Action.AsObject>> = new EventEmitter();
 
@@ -66,17 +67,30 @@ export class ActionTableComponent implements OnInit {
     this.getData(event.pageSize, event.pageIndex * event.pageSize);
   }
 
-  public deleteKey(action: Action.AsObject): void {
-    this.mgmtService
-      .deleteAction(action.id)
-      .then(() => {
-        this.selection.clear();
-        this.toast.showInfo('FLOWS.TOAST.SELECTEDKEYSDELETED', true);
-        this.getData(10, 0);
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public deleteAction(action: Action.AsObject): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'FLOWS.DIALOG.DELETEACTION.TITLE',
+        descriptionKey: 'FLOWS.DIALOG.DELETEACTION.DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.mgmtService
+          .deleteAction(action.id)
+          .then(() => {
+            this.toast.showInfo('FLOWS.DIALOG.DELETEACTION.DELETE_SUCCESS', true);
+            this.getData(10, 0);
+          })
+          .catch((error: any) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 
   public openAddAction(): void {
