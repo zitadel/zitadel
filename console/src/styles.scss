@@ -401,6 +401,8 @@ $custom-typography: mat.define-typography-config(
     }
   }
 }
+@include component-themes($caos-dark-app-theme);
+@include mat.all-component-themes($caos-dark-app-theme);
 
 .light-theme {
   @include component-themes($caos-light-app-theme);
@@ -449,12 +451,8 @@ $custom-typography: mat.define-typography-config(
 }
 
 .dark-theme {
-  @include component-themes($caos-dark-app-theme);
-  @include mat.all-component-themes($caos-dark-app-theme);
-
   $background: map-get($caos-dark-app-theme, background);
   $foreground: map-get($caos-dark-app-theme, foreground);
-
   --color-main: var(--theme-dark-primary-500);
   --warn: #ff3b5b;
   --success: #10b981;
