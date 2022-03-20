@@ -33,19 +33,14 @@ type EsRepository struct {
 	eventstore.OrgRepository
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig, assetsPrefix string, userCrypto *crypto.AESCrypto) (*EsRepository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Commands, queries *query.Queries, dbClient *sql.DB, assetsPrefix string, oidcEncryption crypto.EncryptionAlgorithm, userEncryption crypto.EncryptionAlgorithm) (*EsRepository, error) {
 	es, err := v1.Start(dbClient)
-	if err != nil {
-		return nil, err
-	}
-
-	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
 	if err != nil {
 		return nil, err
 	}
 	idGenerator := id.SonyFlakeGenerator
 
-	view, err := auth_view.StartView(dbClient, keyAlgorithm, queries, idGenerator, assetsPrefix)
+	view, err := auth_view.StartView(dbClient, oidcEncryption, queries, idGenerator, assetsPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -72,31 +67,26 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 		es,
 		userRepo,
 		eventstore.AuthRequestRepo{
-			PrivacyPolicyProvider:      queries,
-			LabelPolicyProvider:        queries,
-			Command:                    command,
-			Query:                      queries,
-			OrgViewProvider:            queries,
-			AuthRequests:               authReq,
-			View:                       view,
-			Eventstore:                 es,
-			UserCodeAlg:                userCrypto,
-			UserSessionViewProvider:    view,
-			UserViewProvider:           view,
-			UserCommandProvider:        command,
-			UserEventProvider:          &userRepo,
-			IDPProviderViewProvider:    view,
-			LockoutPolicyViewProvider:  queries,
-			LoginPolicyViewProvider:    queries,
-			UserGrantProvider:          queryView,
-			ProjectProvider:            queryView,
-			ApplicationProvider:        queries,
-			IdGenerator:                idGenerator,
-			PasswordCheckLifeTime:      systemDefaults.VerificationLifetimes.PasswordCheck,
-			ExternalLoginCheckLifeTime: systemDefaults.VerificationLifetimes.PasswordCheck,
-			MFAInitSkippedLifeTime:     systemDefaults.VerificationLifetimes.MFAInitSkip,
-			SecondFactorCheckLifeTime:  systemDefaults.VerificationLifetimes.SecondFactorCheck,
-			MultiFactorCheckLifeTime:   systemDefaults.VerificationLifetimes.MultiFactorCheck,
+			PrivacyPolicyProvider:     queries,
+			LabelPolicyProvider:       queries,
+			Command:                   command,
+			Query:                     queries,
+			OrgViewProvider:           queries,
+			AuthRequests:              authReq,
+			View:                      view,
+			Eventstore:                es,
+			UserCodeAlg:               userEncryption,
+			UserSessionViewProvider:   view,
+			UserViewProvider:          view,
+			UserCommandProvider:       command,
+			UserEventProvider:         &userRepo,
+			IDPProviderViewProvider:   view,
+			LockoutPolicyViewProvider: queries,
+			LoginPolicyViewProvider:   queries,
+			UserGrantProvider:         queryView,
+			ProjectProvider:           queryView,
+			ApplicationProvider:       queries,
+			IdGenerator:               idGenerator,
 		},
 		eventstore.TokenRepo{
 			View:       view,
@@ -106,7 +96,7 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, command *command.Comma
 			View:         view,
 			Eventstore:   es,
 			SearchLimit:  conf.SearchLimit,
-			KeyAlgorithm: keyAlgorithm,
+			KeyAlgorithm: oidcEncryption,
 		},
 		eventstore.UserSessionRepo{
 			View: view,

@@ -4,8 +4,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/crypto"
@@ -34,10 +32,20 @@ func (h *handler) Eventstore() v1.Eventstore {
 	return h.es
 }
 
-func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, command *command.Commands, queries *query.Queries, systemDefaults sd.SystemDefaults, dir http.FileSystem, assetsPrefix string, smtpPasswordEncAlg crypto.EncryptionAlgorithm) []queryv1.Handler {
-	aesCrypto, err := crypto.NewAESCrypto(systemDefaults.UserVerificationKey)
-	logging.OnError(err).Fatal("error create new aes crypto")
-
+func Register(configs Configs,
+	bulkLimit,
+	errorCount uint64,
+	view *view.View,
+	es v1.Eventstore,
+	command *command.Commands,
+	queries *query.Queries,
+	systemDefaults sd.SystemDefaults,
+	dir http.FileSystem,
+	assetsPrefix string,
+	userEncryption crypto.EncryptionAlgorithm,
+	smtpEncryption crypto.EncryptionAlgorithm,
+	smsEncryption crypto.EncryptionAlgorithm,
+) []queryv1.Handler {
 	return []queryv1.Handler{
 		newNotifyUser(
 			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
@@ -48,10 +56,11 @@ func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es
 			command,
 			queries,
 			systemDefaults,
-			aesCrypto,
 			dir,
 			assetsPrefix,
-			smtpPasswordEncAlg,
+			userEncryption,
+			smtpEncryption,
+			smsEncryption,
 		),
 	}
 }

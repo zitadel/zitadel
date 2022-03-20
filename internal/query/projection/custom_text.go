@@ -33,7 +33,7 @@ const (
 )
 
 func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *CustomTextProjection {
-	p := &CustomTextProjection{}
+	p := new(CustomTextProjection)
 	config.ProjectionName = CustomTextTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

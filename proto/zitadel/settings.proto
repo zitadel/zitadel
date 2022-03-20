@@ -20,7 +20,6 @@ message SecretGenerator {
   bool include_symbols = 8;
 }
 
-
 message SecretGeneratorQuery {
   oneof query {
     option (validate.required) = true;
@@ -50,4 +49,38 @@ message SMTPConfig {
   bool tls = 4;
   string host = 5;
   string user = 6;
+}
+
+message SMSProvider {
+  zitadel.v1.ObjectDetails details = 1;
+  string id = 2;
+  SMSProviderConfigState state = 3;
+
+  oneof config {
+    TwilioConfig twilio = 4;
+  }
+}
+
+message TwilioConfig {
+  string sid = 1;
+  string sender_number = 2;
+}
+
+enum SMSProviderConfigState {
+  SMS_PROVIDER_CONFIG_STATE_UNSPECIFIED = 0;
+  SMS_PROVIDER_CONFIG_ACTIVE = 1;
+  SMS_PROVIDER_CONFIG_INACTIVE = 2;
+}
+
+message DebugNotificationProvider {
+    zitadel.v1.ObjectDetails details = 1;
+    bool compact = 2;
+}
+
+message OIDCSettings {
+  zitadel.v1.ObjectDetails details = 1;
+  google.protobuf.Duration  access_token_lifetime = 2;
+  google.protobuf.Duration  id_token_lifetime = 3;
+  google.protobuf.Duration  refresh_token_idle_expiration = 4;
+  google.protobuf.Duration  refresh_token_expiration = 5;
 }

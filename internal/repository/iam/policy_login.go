@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+	"time"
 
 	"github.com/caos/zitadel/internal/eventstore"
 
@@ -28,6 +29,11 @@ func NewLoginPolicyAddedEvent(
 	forceMFA,
 	hidePasswordReset bool,
 	passwordlessType domain.PasswordlessType,
+	passwordCheckLifetime,
+	externalLoginCheckLifetime,
+	mfaInitSkipLifetime,
+	secondFactorCheckLifetime,
+	multiFactorCheckLifetime time.Duration,
 ) *LoginPolicyAddedEvent {
 	return &LoginPolicyAddedEvent{
 		LoginPolicyAddedEvent: *policy.NewLoginPolicyAddedEvent(
@@ -40,7 +46,12 @@ func NewLoginPolicyAddedEvent(
 			allowExternalIDP,
 			forceMFA,
 			hidePasswordReset,
-			passwordlessType),
+			passwordlessType,
+			passwordCheckLifetime,
+			externalLoginCheckLifetime,
+			mfaInitSkipLifetime,
+			secondFactorCheckLifetime,
+			multiFactorCheckLifetime),
 	}
 }
 

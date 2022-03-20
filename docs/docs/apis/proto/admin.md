@@ -128,6 +128,114 @@ Update system smtp configuration password for host
     PUT: /smtp/password
 
 
+### ListSMSProviders
+
+> **rpc** ListSMSProviders([ListSMSProvidersRequest](#listsmsprovidersrequest))
+[ListSMSProvidersResponse](#listsmsprovidersresponse)
+
+list sms provider configurations
+
+
+
+    POST: /sms/_search
+
+
+### GetSMSProvider
+
+> **rpc** GetSMSProvider([GetSMSProviderRequest](#getsmsproviderrequest))
+[GetSMSProviderResponse](#getsmsproviderresponse)
+
+Get sms provider
+
+
+
+    GET: /sms/{id}
+
+
+### AddSMSProviderTwilio
+
+> **rpc** AddSMSProviderTwilio([AddSMSProviderTwilioRequest](#addsmsprovidertwiliorequest))
+[AddSMSProviderTwilioResponse](#addsmsprovidertwilioresponse)
+
+Add twilio sms provider
+
+
+
+    POST: /sms/twilio
+
+
+### UpdateSMSProviderTwilio
+
+> **rpc** UpdateSMSProviderTwilio([UpdateSMSProviderTwilioRequest](#updatesmsprovidertwiliorequest))
+[UpdateSMSProviderTwilioResponse](#updatesmsprovidertwilioresponse)
+
+Update twilio sms provider
+
+
+
+    PUT: /sms/twilio/{id}
+
+
+### UpdateSMSProviderTwilioToken
+
+> **rpc** UpdateSMSProviderTwilioToken([UpdateSMSProviderTwilioTokenRequest](#updatesmsprovidertwiliotokenrequest))
+[UpdateSMSProviderTwilioTokenResponse](#updatesmsprovidertwiliotokenresponse)
+
+Update twilio sms provider token
+
+
+
+    PUT: /sms/twilio/{id}/token
+
+
+### GetOIDCSettings
+
+> **rpc** GetOIDCSettings([GetOIDCSettingsRequest](#getoidcsettingsrequest))
+[GetOIDCSettingsResponse](#getoidcsettingsresponse)
+
+Get OIDC settings (e.g token lifetimes, etc.)
+
+
+
+    GET: /settings/oidc
+
+
+### UpdateOIDCSettings
+
+> **rpc** UpdateOIDCSettings([UpdateOIDCSettingsRequest](#updateoidcsettingsrequest))
+[UpdateOIDCSettingsResponse](#updateoidcsettingsresponse)
+
+Update oidc settings (e.g token lifetimes, etc)
+
+
+
+    PUT: /settings/oidc
+
+
+### GetFileSystemNotificationProvider
+
+> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
+[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+
+Get file system notification provider
+
+
+
+    GET: /notification/provider/file
+
+
+### GetLogNotificationProvider
+
+> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
+[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+
+Get log notification provider
+
+
+
+    GET: /notification/provider/log
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1446,6 +1554,31 @@ This is an empty request
 
 
 
+### AddSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### AddSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| id |  string | - |  |
+
+
+
+
 ### AddSecondFactorToLoginPolicyRequest
 
 
@@ -1888,6 +2021,23 @@ This is an empty request
 
 
 
+### GetFileSystemNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetIDPByIDRequest
 
 
@@ -1944,6 +2094,23 @@ This is an empty request
 
 
 
+### GetLogNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetLogNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetLoginPolicyRequest
 This is an empty request
 
@@ -1957,6 +2124,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LoginPolicy | - |  |
+
+
+
+
+### GetOIDCSettingsRequest
+This is an empty request
+
+
+
+
+### GetOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| settings |  zitadel.settings.v1.OIDCSettings | - |  |
 
 
 
@@ -2086,6 +2270,28 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.PrivacyPolicy | - |  |
+
+
+
+
+### GetSMSProviderRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 100<br />  |
+
+
+
+
+### GetSMSProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| config |  zitadel.settings.v1.SMSProvider | - |  |
 
 
 
@@ -2359,6 +2565,29 @@ This is an empty request
 | details |  zitadel.v1.ListDetails | - |  |
 | sorting_column |  zitadel.org.v1.OrgFieldName | - |  |
 | result | repeated zitadel.org.v1.Org | - |  |
+
+
+
+
+### ListSMSProvidersRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| query |  zitadel.v1.ListQuery | list limitations and ordering |  |
+
+
+
+
+### ListSMSProvidersResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ListDetails | - |  |
+| result | repeated zitadel.settings.v1.SMSProvider | - |  |
 
 
 
@@ -3463,11 +3692,41 @@ This is an empty request
 | force_mfa |  bool | - |  |
 | passwordless_type |  zitadel.policy.v1.PasswordlessType | - | enum.defined_only: true<br />  |
 | hide_password_reset |  bool | - |  |
+| password_check_lifetime |  google.protobuf.Duration | - |  |
+| external_login_check_lifetime |  google.protobuf.Duration | - |  |
+| mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
+| second_factor_check_lifetime |  google.protobuf.Duration | - |  |
+| multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
 
 
 
 
 ### UpdateLoginPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOIDCSettingsRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| access_token_lifetime |  google.protobuf.Duration | - |  |
+| id_token_lifetime |  google.protobuf.Duration | - |  |
+| refresh_token_idle_expiration |  google.protobuf.Duration | - |  |
+| refresh_token_expiration |  google.protobuf.Duration | - |  |
+
+
+
+
+### UpdateOIDCSettingsResponse
 
 
 
@@ -3562,6 +3821,53 @@ This is an empty request
 
 
 ### UpdatePrivacyPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sid |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| sender_number |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| token |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### UpdateSMSProviderTwilioTokenResponse
 
 
 

@@ -2,11 +2,11 @@ syntax = "proto3";
 
 import "zitadel/idp.proto";
 import "zitadel/user.proto";
-import "zitadel/settings.proto";
 import "zitadel/object.proto";
 import "zitadel/options.proto";
 import "zitadel/org.proto";
 import "zitadel/policy.proto";
+import "zitadel/settings.proto";
 import "zitadel/text.proto";
 import "zitadel/member.proto";
 import "zitadel/features.proto";
@@ -251,6 +251,110 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.write";
+        };
+    }
+
+    // list sms provider configurations
+    rpc ListSMSProviders(ListSMSProvidersRequest) returns (ListSMSProvidersResponse) {
+        option (google.api.http) = {
+            post: "/sms/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get sms provider
+    rpc GetSMSProvider(GetSMSProviderRequest) returns (GetSMSProviderResponse) {
+        option (google.api.http) = {
+            get: "/sms/{id}";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Add twilio sms provider
+    rpc AddSMSProviderTwilio(AddSMSProviderTwilioRequest) returns (AddSMSProviderTwilioResponse) {
+        option (google.api.http) = {
+            post: "/sms/twilio";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update twilio sms provider
+    rpc UpdateSMSProviderTwilio(UpdateSMSProviderTwilioRequest) returns (UpdateSMSProviderTwilioResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Update twilio sms provider token
+    rpc UpdateSMSProviderTwilioToken(UpdateSMSProviderTwilioTokenRequest) returns (UpdateSMSProviderTwilioTokenResponse) {
+        option (google.api.http) = {
+            put: "/sms/twilio/{id}/token";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get OIDC settings (e.g token lifetimes, etc.)
+    rpc GetOIDCSettings(GetOIDCSettingsRequest) returns (GetOIDCSettingsResponse) {
+        option (google.api.http) = {
+            get: "/settings/oidc";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Update oidc settings (e.g token lifetimes, etc)
+    rpc UpdateOIDCSettings(UpdateOIDCSettingsRequest) returns (UpdateOIDCSettingsResponse) {
+        option (google.api.http) = {
+            put: "/settings/oidc";
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.write";
+        };
+    }
+
+    // Get file system notification provider
+    rpc GetFileSystemNotificationProvider(GetFileSystemNotificationProviderRequest) returns (GetFileSystemNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/file";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
+        };
+    }
+
+    // Get log notification provider
+    rpc GetLogNotificationProvider(GetLogNotificationProviderRequest) returns (GetLogNotificationProviderResponse) {
+        option (google.api.http) = {
+            get: "/notification/provider/log";
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.read";
         };
     }
 
@@ -2431,6 +2535,86 @@ message UpdateSMTPConfigPasswordResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ListSMSProvidersRequest {
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 1;
+}
+
+message ListSMSProvidersResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.settings.v1.SMSProvider result = 3;
+}
+
+message GetSMSProviderRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 100}];
+}
+
+message GetSMSProviderResponse {
+    zitadel.settings.v1.SMSProvider config = 1;
+}
+
+message AddSMSProviderTwilioRequest {
+    string sid = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message AddSMSProviderTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+    string id = 2;
+}
+
+message UpdateSMSProviderTwilioRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sid = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string sender_number = 3 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderTwilioResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message UpdateSMSProviderTwilioTokenRequest {
+    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message UpdateSMSProviderTwilioTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+//This is an empty request
+message GetFileSystemNotificationProviderRequest {}
+
+message GetFileSystemNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
+}
+
+//This is an empty request
+message GetLogNotificationProviderRequest {}
+
+message GetLogNotificationProviderResponse {
+    zitadel.settings.v1.DebugNotificationProvider provider = 1;
+}
+
+// This is an empty request
+message GetOIDCSettingsRequest {}
+
+message GetOIDCSettingsResponse {
+    zitadel.settings.v1.OIDCSettings settings = 1;
+}
+
+message UpdateOIDCSettingsRequest {
+    google.protobuf.Duration  access_token_lifetime   = 1;
+    google.protobuf.Duration  id_token_lifetime   = 2;
+    google.protobuf.Duration  refresh_token_idle_expiration   = 3;
+    google.protobuf.Duration  refresh_token_expiration   = 4;
+}
+
+message UpdateOIDCSettingsResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 // if name or domain is already in use, org is not unique
 message IsOrgUniqueRequest {
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
@@ -3351,6 +3535,11 @@ message UpdateLoginPolicyRequest {
             description: "defines if password reset link should be shown in the login screen"
         }
     ];
+    google.protobuf.Duration password_check_lifetime = 7;
+    google.protobuf.Duration external_login_check_lifetime = 8;
+    google.protobuf.Duration mfa_init_skip_lifetime = 9;
+    google.protobuf.Duration second_factor_check_lifetime = 10;
+    google.protobuf.Duration multi_factor_check_lifetime = 11;
 }
 
 message UpdateLoginPolicyResponse {

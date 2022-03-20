@@ -21,7 +21,7 @@ const (
 )
 
 func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandlerConfig) *UserAuthMethodProjection {
-	p := &UserAuthMethodProjection{}
+	p := new(UserAuthMethodProjection)
 	config.ProjectionName = UserAuthMethodTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -23,7 +23,7 @@ const (
 )
 
 func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LoginPolicyProjection {
-	p := &LoginPolicyProjection{}
+	p := new(LoginPolicyProjection)
 	config.ProjectionName = LoginPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
@@ -111,6 +111,11 @@ const (
 	LoginPolicyPasswordlessTypeCol      = "passwordless_type"
 	LoginPolicyIsDefaultCol             = "is_default"
 	LoginPolicyHidePWResetCol           = "hide_password_reset"
+	PasswordCheckLifetimeCol            = "password_check_lifetime"
+	ExternalLoginCheckLifetimeCol       = "external_login_check_lifetime"
+	MFAInitSkipLifetimeCol              = "mfa_init_skip_lifetime"
+	SecondFactorCheckLifetimeCol        = "second_factor_check_lifetime"
+	MultiFactorCheckLifetimeCol         = "multi_factor_check_lifetime"
 )
 
 func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
@@ -140,6 +145,11 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		handler.NewCol(LoginPolicyPasswordlessTypeCol, policyEvent.PasswordlessType),
 		handler.NewCol(LoginPolicyIsDefaultCol, isDefault),
 		handler.NewCol(LoginPolicyHidePWResetCol, policyEvent.HidePasswordReset),
+		handler.NewCol(PasswordCheckLifetimeCol, policyEvent.PasswordCheckLifetime),
+		handler.NewCol(ExternalLoginCheckLifetimeCol, policyEvent.ExternalLoginCheckLifetime),
+		handler.NewCol(MFAInitSkipLifetimeCol, policyEvent.MFAInitSkipLifetime),
+		handler.NewCol(SecondFactorCheckLifetimeCol, policyEvent.SecondFactorCheckLifetime),
+		handler.NewCol(MultiFactorCheckLifetimeCol, policyEvent.MultiFactorCheckLifetime),
 	}), nil
 }
 
@@ -177,6 +187,22 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	if policyEvent.HidePasswordReset != nil {
 		cols = append(cols, handler.NewCol(LoginPolicyHidePWResetCol, *policyEvent.HidePasswordReset))
 	}
+	if policyEvent.PasswordCheckLifetime != nil {
+		cols = append(cols, handler.NewCol(PasswordCheckLifetimeCol, *policyEvent.PasswordCheckLifetime))
+	}
+	if policyEvent.ExternalLoginCheckLifetime != nil {
+		cols = append(cols, handler.NewCol(ExternalLoginCheckLifetimeCol, *policyEvent.ExternalLoginCheckLifetime))
+	}
+	if policyEvent.MFAInitSkipLifetime != nil {
+		cols = append(cols, handler.NewCol(MFAInitSkipLifetimeCol, *policyEvent.MFAInitSkipLifetime))
+	}
+	if policyEvent.SecondFactorCheckLifetime != nil {
+		cols = append(cols, handler.NewCol(SecondFactorCheckLifetimeCol, *policyEvent.SecondFactorCheckLifetime))
+	}
+	if policyEvent.MultiFactorCheckLifetime != nil {
+		cols = append(cols, handler.NewCol(MultiFactorCheckLifetimeCol, *policyEvent.MultiFactorCheckLifetime))
+	}
+
 	return crdb.NewUpdateStatement(
 		&policyEvent,
 		cols,

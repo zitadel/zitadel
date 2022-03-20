@@ -24,12 +24,15 @@ type Email struct {
 
 func InitSMTPChannel(ctx context.Context, getSMTPConfig func(ctx context.Context) (*EmailConfig, error)) (*Email, error) {
 	smtpConfig, err := getSMTPConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
 	client, err := smtpConfig.SMTP.connectToSMTP(smtpConfig.Tls)
 	if err != nil {
 		return nil, err
 	}
 
-	logging.Log("NOTIF-4n4Ih").Debug("successfully initialized smtp email channel")
+	logging.New().Debug("successfully initialized smtp email channel")
 
 	return &Email{
 		smtpClient: client,

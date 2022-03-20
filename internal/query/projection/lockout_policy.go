@@ -33,7 +33,7 @@ const (
 )
 
 func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *LockoutPolicyProjection {
-	p := &LockoutPolicyProjection{}
+	p := new(LockoutPolicyProjection)
 	config.ProjectionName = LockoutPolicyTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

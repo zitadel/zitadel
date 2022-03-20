@@ -22,7 +22,7 @@ const (
 )
 
 func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PersonalAccessTokenProjection {
-	p := &PersonalAccessTokenProjection{}
+	p := new(PersonalAccessTokenProjection)
 	config.ProjectionName = PersonalAccessTokenProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
