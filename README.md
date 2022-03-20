@@ -39,6 +39,7 @@ The modern software stack consisting of [**Golang**](https://golang.org/), [**An
 - Multifactor authentication with OTP, U2F
 - [Identity Brokering](https://docs.zitadel.ch/docs/guides/authentication/identity-brokering)
 - [Machine-to-machine (JWT profile)](https://docs.zitadel.ch/docs/guides/authentication/serviceusers)
+- Personal Access Tokens (PAT)
 
 ### Access Management possibilities
 
