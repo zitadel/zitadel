@@ -107,9 +107,14 @@ zitadel start-with-init
 
 ### Quick starts
 
-To start developing your app as fast as possible check out our [quick start guides](https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples in many languages.
+To start developing your app as fast as possible check out our [quick start guides](https://docs.zitadel.ch/docs/quickstarts/introduction) where we describe basic examples for many use cases.
 
-If your preferred language is missing please let us know [here](https://github.com/caos/zitadel/discussions/1717)
+- **Login using ZITADEL**: [Angular](https://docs.zitadel.ch/docs/quickstarts/login/angular), [React](https://docs.zitadel.ch/docs/quickstarts/login/react), [Flutter](https://docs.zitadel.ch/docs/quickstarts/login/flutter), [Next.js](https://docs.zitadel.ch/docs/quickstarts/login/nextjs)
+- **Secure your API**: [Go](https://docs.zitadel.ch/docs/quickstarts/secure-api/go), [.Net](https://docs.zitadel.ch/docs/quickstarts/secure-api/dot-net)
+- **Use the ZITADEL API**: [Go](https://docs.zitadel.ch/docs/quickstarts/call-zitadel-api/go), [.Net](https://docs.zitadel.ch/docs/quickstarts/call-zitadel-api/dot-net)
+- **Use ZITADEL as identity proxy**: using [oauth2-proxy](https://docs.zitadel.ch/docs/quickstarts/identity-proxy/oauth2-proxy)
+
+If your use case is missing please let us know [here](https://github.com/caos/zitadel/discussions/1717)
 
 ## Help and Documentation
 
