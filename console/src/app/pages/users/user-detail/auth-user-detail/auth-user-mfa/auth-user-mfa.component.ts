@@ -56,12 +56,8 @@ export class AuthUserMfaComponent implements OnInit, OnDestroy {
       },
     });
 
-    dialogRef.afterClosed().subscribe((code) => {
-      if (code) {
-        this.service.verifyMyMultiFactorOTP(code).then(() => {
-          this.getMFAs();
-        });
-      }
+    dialogRef.afterClosed().subscribe(() => {
+      this.getMFAs();
     });
   }
 

@@ -31,6 +31,7 @@ import { PersonalAccessTokensModule } from 'src/app/modules/personal-access-toke
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { ShowTokenDialogModule } from 'src/app/modules/show-token-dialog/show-token-dialog.module';
 import { SidenavModule } from 'src/app/modules/sidenav/sidenav.module';
+import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 import { TopViewModule } from 'src/app/modules/top-view/top-view.module';
 import { UserGrantsModule } from 'src/app/modules/user-grants/user-grants.module';
 import { WarnDialogModule } from 'src/app/modules/warn-dialog/warn-dialog.module';
@@ -119,6 +120,7 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     RefreshTableModule,
     CopyToClipboardModule,
     DetailLayoutModule,
+    TableActionsModule,
     PasswordComplexityViewModule,
     MemberCreateDialogModule,
     TimestampToDatePipeModule,
