@@ -230,14 +230,14 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 	return u.UserName + "@" + domain
 }
 
-func (u *UserView) SetLoginNames(policy *query.OrgIAMPolicy, domains []*org_model.OrgDomain) {
+func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
 			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		loginNames = append(loginNames, u.UserName)
 	}
 	u.LoginNames = loginNames
