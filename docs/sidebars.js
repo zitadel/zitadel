@@ -189,6 +189,7 @@ module.exports = {
           collapsed: true,
           items: ["apis/assets/assets"],
         },
+          "apis/actions"
       ],
     },
     {
@@ -239,6 +240,12 @@ module.exports = {
       label: "Use Cases",
       collapsed: false,
       items: ["concepts/usecases/saas"],
+    },
+    {
+      type: "category",
+      label: "Features",
+      collapsed: false,
+      items: ["concepts/features/actions"],
     },
   ],
   manuals: [
