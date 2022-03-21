@@ -4,8 +4,9 @@ import (
 	"context"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
@@ -175,19 +176,12 @@ func (u *User) ProcessUser(event *es_models.Event) (err error) {
 }
 
 func (u *User) fillLoginNames(user *view_model.UserView) (err error) {
-	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
-	}
-	user.SetLoginNames(policy, org.Domains)
-	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	user.SetLoginNames(userLoginMustBeDomain, domains)
+	user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	return nil
 }
 
@@ -207,40 +201,26 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 }
 
 func (u *User) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
-	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
 	}
 	users, err := u.view.UsersByOrgID(event.AggregateID)
 	if err != nil {
 		return err
 	}
 	for _, user := range users {
-		user.SetLoginNames(policy, org.Domains)
+		user.SetLoginNames(userLoginMustBeDomain, domains)
 	}
 	return u.view.PutUsers(users, event)
 }
 
 func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
-	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		return nil
 	}
 	users, err := u.view.UsersByOrgID(event.AggregateID)
@@ -248,7 +228,7 @@ func (u *User) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
 		return err
 	}
 	for _, user := range users {
-		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	}
 	return u.view.PutUsers(users, event)
 }
@@ -284,6 +264,17 @@ func (u *User) getOrgByID(ctx context.Context, orgID string) (*org_model.Org, er
 	return org_es_model.OrgToModel(esOrg), nil
 }
 
-func (u *User) getDefaultOrgIAMPolicy(ctx context.Context) (*query2.OrgIAMPolicy, error) {
-	return u.queries.DefaultOrgIAMPolicy(ctx)
+func (u *User) loginNameInformation(ctx context.Context, orgID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
+	org, err := u.getOrgByID(ctx, orgID)
+	if err != nil {
+		return false, "", nil, err
+	}
+	if org.OrgIamPolicy == nil {
+		policy, err := u.queries.DefaultOrgIAMPolicy(ctx)
+		if err != nil {
+			return false, "", nil, err
+		}
+		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	}
+	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }
