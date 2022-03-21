@@ -1253,6 +1253,10 @@
         "PROJECTGRANTMEMBERREMOVED": "Grant manager removed.",
         "PROJECTGRANTUPDATED": "Project Grant updated"
       },
+      "DIALOG": {
+        "DELETE_TITLE": "Delete project grant",
+        "DELETE_DESCRIPTION": "You are about to delete a project grant. Are you sure?"
+      },
       "ROLES": "Project Roles"
     },
     "APP": {
@@ -1282,7 +1286,11 @@
       "ASSERTION": "Assert Roles on Authentication",
       "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
       "CHECK": "Check authorization on Authentication",
-      "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
+      "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account.",
+      "DIALOG": {
+        "DELETE_TITLE": "Delete role",
+        "DELETE_DESCRIPTION": "You are about to delete a project role. Are you sure?"
+      }
     },
     "HAS_PROJECT": "Check for Project on Authentication",
     "HAS_PROJECT_DESCRIPTION": "It is checked whether the user's organization has this project. If not, the user cannot be authenticated.",

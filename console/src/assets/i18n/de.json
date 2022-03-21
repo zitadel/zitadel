@@ -1253,6 +1253,10 @@
         "PROJECTGRANTMEMBERREMOVED": "Berechtigungsmanager entfernt.",
         "PROJECTGRANTUPDATED": "Projectberechtigung geändert."
       },
+      "DIALOG": {
+        "DELETE_TITLE": "Projektberechtigung löschen",
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Projectberechtigung zu entfernen. Wollen Sie fortfahren?"
+      },
       "ROLES": "Projektrollen"
     },
     "APP": {
@@ -1282,7 +1286,11 @@
       "ASSERTION": "Rollen bei Authentisierung mitschicken",
       "ASSERTION_DESCRIPTION": "Rolleninformationen werden auf dem UserInfo Endpoint oder je nach Applikationseinstellungen in Tokens oder anderen Methoden bereitgestellt.",
       "CHECK": "Berechtigung bei Authentisierung prüfen",
-      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden."
+      "CHECK_DESCRIPTION": "Ist das Attribut gesetzt, kann ein Benutzer nur mit einer entsprechenden Rolle authentifiziert werden.",
+      "DIALOG": {
+        "DELETE_TITLE": "Rolle löschen",
+        "DELETE_DESCRIPTION": "Sie sind im Begriff eine Rolle zu entfernen. Wollen Sie fortfahren?"
+      }
     },
     "HAS_PROJECT": "Projektbesitz bei Authentisierung prüfen",
     "HAS_PROJECT_DESCRIPTION": "Es wird überprüft, ob die Organisation des Benutzers über dieses Projekt verfügt. Wenn nicht, kann der Benutzer nicht authentifiziert werden.",

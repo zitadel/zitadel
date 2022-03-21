@@ -146,7 +146,5 @@ export class SearchProjectAutocompleteComponent implements OnDestroy {
       project: p,
       type: type,
     });
-
-    console.log(p, type);
   }
 }

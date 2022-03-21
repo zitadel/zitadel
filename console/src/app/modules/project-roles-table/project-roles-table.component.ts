@@ -11,6 +11,7 @@ import {
   ProjectRoleDetailComponent,
 } from '../../pages/projects/owned-projects/project-roles/project-role-detail/project-role-detail.component';
 import { PaginatorComponent } from '../paginator/paginator.component';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 import { ProjectRolesDataSource } from './project-roles-table-datasource';
 
 @Component({
@@ -84,15 +85,29 @@ export class ProjectRolesTableComponent implements OnInit {
       : this.dataSource.rolesSubject.value.forEach((row: Role.AsObject) => this.selection.select(row));
   }
 
-  public deleteRole(role: Role.AsObject): Promise<any> {
-    const index = this.dataSource.rolesSubject.value.findIndex((iter) => iter.key === role.key);
+  public deleteRole(role: Role.AsObject): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'PROJECT.ROLE.DIALOG.DELETE_TITLE',
+        descriptionKey: 'PROJECT.ROLE.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
 
-    return this.mgmtService.removeProjectRole(this.projectId, role.key).then(() => {
-      this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        const index = this.dataSource.rolesSubject.value.findIndex((iter) => iter.key === role.key);
 
-      if (index > -1) {
-        this.dataSource.rolesSubject.value.splice(index, 1);
-        this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
+        this.mgmtService.removeProjectRole(this.projectId, role.key).then(() => {
+          this.toast.showInfo('PROJECT.TOAST.ROLEREMOVED', true);
+
+          if (index > -1) {
+            this.dataSource.rolesSubject.value.splice(index, 1);
+            this.dataSource.rolesSubject.next(this.dataSource.rolesSubject.value);
+          }
+        });
       }
     });
   }

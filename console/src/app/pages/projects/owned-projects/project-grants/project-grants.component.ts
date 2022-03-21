@@ -1,11 +1,13 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { MatTable } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
+import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { GrantedProject, ProjectGrantState, Role } from 'src/app/proto/generated/zitadel/project_pb';
 import { Breadcrumb, BreadcrumbService, BreadcrumbType } from 'src/app/services/breadcrumb.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
@@ -42,6 +44,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     private mgmtService: ManagementService,
     private toast: ToastService,
     private route: ActivatedRoute,
+    private dialog: MatDialog,
     private breadcrumbService: BreadcrumbService,
     private router: Router,
   ) {
@@ -106,7 +109,7 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  updateRoles(grant: GrantedProject.AsObject, selectionChange: MatSelectChange): void {
+  public updateRoles(grant: GrantedProject.AsObject, selectionChange: MatSelectChange): void {
     this.mgmtService
       .updateProjectGrant(grant.grantId, grant.projectId, selectionChange.value)
       .then(() => {
@@ -117,23 +120,37 @@ export class ProjectGrantsComponent implements OnInit, AfterViewInit {
       });
   }
 
-  public deleteGrant(grant: GrantedProject.AsObject): Promise<void> {
-    return this.mgmtService
-      .removeProjectGrant(grant.grantId, grant.projectId)
-      .then(() => {
-        this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
-        const data = this.dataSource.grantsSubject.getValue();
-        this.selection.selected.forEach((item) => {
-          const index = data.findIndex((i) => i.grantId === item.grantId);
-          if (index > -1) {
-            data.splice(index, 1);
-            this.dataSource.grantsSubject.next(data);
-          }
-        });
-        this.selection.clear();
-      })
-      .catch((error) => {
-        this.toast.showError(error);
-      });
+  public deleteGrant(grant: GrantedProject.AsObject): void {
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'PROJECT.GRANT.DIALOG.DELETE_TITLE',
+        descriptionKey: 'PROJECT.GRANT.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.mgmtService
+          .removeProjectGrant(grant.grantId, grant.projectId)
+          .then(() => {
+            this.toast.showInfo('GRANTS.TOAST.REMOVED', true);
+            const data = this.dataSource.grantsSubject.getValue();
+            this.selection.selected.forEach((item) => {
+              const index = data.findIndex((i) => i.grantId === item.grantId);
+              if (index > -1) {
+                data.splice(index, 1);
+                this.dataSource.grantsSubject.next(data);
+              }
+            });
+            this.selection.clear();
+          })
+          .catch((error) => {
+            this.toast.showError(error);
+          });
+      }
+    });
   }
 }

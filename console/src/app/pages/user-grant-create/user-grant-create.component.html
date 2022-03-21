@@ -39,7 +39,7 @@
 
         <cnsl-card>
           <cnsl-project-roles-table
-            [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
+            [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'changeDate']"
             (changedSelection)="selectRoles($event)"
             [projectId]="project?.id ? project.id : grantedProject?.projectId ? grantedProject.projectId : ''"
             [grantId]="$any(project)?.grantId ? $any(project)?.grantId : ''">

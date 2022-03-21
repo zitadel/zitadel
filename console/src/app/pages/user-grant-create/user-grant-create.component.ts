@@ -193,7 +193,6 @@ export class UserGrantCreateComponent implements OnDestroy {
   }
 
   public selectProject(project: Project.AsObject | GrantedProject.AsObject, type: ProjectType): void {
-    console.log(project, type);
     if (type === ProjectType.PROJECTTYPE_OWNED) {
       this.project = project as Project.AsObject;
     } else if (type === ProjectType.PROJECTTYPE_GRANTED) {

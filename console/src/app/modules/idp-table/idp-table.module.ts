@@ -17,6 +17,7 @@ import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/
 import { TruncatePipeModule } from 'src/app/pipes/truncate-pipe/truncate-pipe.module';
 
 import { PaginatorModule } from '../paginator/paginator.module';
+import { TableActionsModule } from '../table-actions/table-actions.module';
 import { IdpTableComponent } from './idp-table.component';
 
 @NgModule({
@@ -26,6 +27,7 @@ import { IdpTableComponent } from './idp-table.component';
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
+    TableActionsModule,
     MatCheckboxModule,
     MatIconModule,
     MatTooltipModule,

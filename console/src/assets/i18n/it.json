@@ -1253,6 +1253,10 @@
         "PROJECTGRANTMEMBERREMOVED": "Grant manager rimosso.",
         "PROJECTGRANTUPDATED": "Project Grant cambiato."
       },
+      "DIALOG": {
+        "DELETE_TITLE": "Rimuovere progetto delegato",
+        "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un progetto delegato. La organizzazione ammissibile non potrà più usare il tuo progetto. Vuoi davvero continuare?"
+      },
       "ROLES": "Ruoli del progetto"
     },
     "APP": {
@@ -1282,7 +1286,11 @@
       "ASSERTION": "Includi ruoli con autenticazione",
       "ASSERTION_DESCRIPTION": "Le informazioni sui ruoli sono inviate dall'endpoint Userinfo e a seconda delle impostazioni dell'applicazione in token.",
       "CHECK": "Verifica l'autorizzazione durante l'autenticazione",
-      "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account."
+      "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account.",
+      "DIALOG": {
+        "DELETE_TITLE": "Elima ruolo",
+        "DELETE_DESCRIPTION": "Stai per eliminare un ruolo del progetto. Vuoi davvero continuare?"
+      }
     },
     "HAS_PROJECT": "Controlla project grant con l'autenticazione",
     "HAS_PROJECT_DESCRIPTION": "Questa impostazione verifica il project grant dell'organizzazione. In caso di mancanza, l'utente non può essere autenticato.",

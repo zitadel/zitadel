@@ -35,7 +35,7 @@
 
       <cnsl-card *ngIf="projectId">
         <cnsl-project-roles-table
-          [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'actions']"
+          [displayedColumns]="['select', 'key', 'displayname', 'group', 'creationDate', 'changeDate']"
           (changedSelection)="selectRoles($event)" [projectId]="projectId">
         </cnsl-project-roles-table>
       </cnsl-card>

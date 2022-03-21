@@ -98,29 +98,23 @@
       <ng-container matColumnDef="actions" stickyEnd>
         <th class="idp-table-actions" mat-header-cell *matHeaderCellDef></th>
         <td class="idp-table-actions" mat-cell *matCellDef="let idp">
-          <div class="cnsl-table-action-wrapper">
-            <div class="cnsl-table-action">
-              <button *ngIf="!isEnabled(idp)"
-                [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))"
-                mat-icon-button matTooltip="{{'IDP.SETAVAILABLE' | translate}}" (click)="addIdp(idp)">
-                <i class="las la-check-circle"></i>
-              </button>
-              <button *ngIf="isEnabled(idp)"
-                [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))"
-                mat-icon-button matTooltip="{{'IDP.SETUNAVAILABLE' | translate}}" (click)="removeIdp(idp)">
-                <i class="las la-times-circle"></i>
-              </button>
-              <a *ngIf="!disabled" [routerLink]="routerLinkForRow(idp)" mat-icon-button
-                matTooltip="{{'ACTIONS.EDIT' | translate}}">
-                <i class="las la-pen"></i>
-              </a>
-              <button
-                [disabled]="serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG"
-                mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" (click)="deleteIdp(idp)">
-                <i class="las la-trash"></i>
-              </button>
-            </div>
-          </div>
+          <cnsl-table-actions>
+            <button actions *ngIf="!isEnabled(idp)"
+              [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))"
+              mat-icon-button matTooltip="{{'IDP.SETAVAILABLE' | translate}}" (click)="addIdp(idp)">
+              <i class="las la-check-circle"></i>
+            </button>
+            <button actions *ngIf="isEnabled(idp)"
+              [disabled]="([serviceType === PolicyComponentServiceType.ADMIN ? 'iam.idp.write' : serviceType === PolicyComponentServiceType.MGMT ? 'org.idp.write' : ''] | hasRole | async) === false || ((serviceType === PolicyComponentServiceType.MGMT && (['login_policy.idp'] | hasFeature | async) === false))"
+              mat-icon-button matTooltip="{{'IDP.SETUNAVAILABLE' | translate}}" (click)="removeIdp(idp)">
+              <i class="las la-times-circle"></i>
+            </button>
+            <button actions
+              [disabled]="serviceType === PolicyComponentServiceType.MGMT && idp?.providerType === IDPOwnerType.IDP_OWNER_TYPE_ORG"
+              mat-icon-button color="warn" matTooltip="{{'ACTIONS.REMOVE' | translate}}" (click)="deleteIdp(idp)">
+              <i class="las la-trash"></i>
+            </button>
+          </cnsl-table-actions>
         </td>
       </ng-container>
 

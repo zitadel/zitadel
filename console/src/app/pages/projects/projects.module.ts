@@ -18,6 +18,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
 import { TimestampToDatePipeModule } from 'src/app/pipes/timestamp-to-date-pipe/timestamp-to-date-pipe.module';
@@ -47,6 +48,7 @@ import { ProjectsComponent } from './projects.component';
     MatTooltipModule,
     FilterProjectModule,
     ActionKeysModule,
+    TableActionsModule,
     MatSortModule,
     HasRolePipeModule,
     TimestampToDatePipeModule,
