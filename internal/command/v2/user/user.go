@@ -1,16 +1,40 @@
 package user
 
-import "github.com/caos/zitadel/internal/domain"
+import (
+	"context"
 
-func isUserStateExists(state domain.UserState) bool {
-	return !hasUserState(state, domain.UserStateDeleted, domain.UserStateUnspecified)
-}
+	"github.com/caos/zitadel/internal/command/v2/preparation"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/repository/user"
+)
 
-func hasUserState(check domain.UserState, states ...domain.UserState) bool {
-	for _, state := range states {
-		if check == state {
-			return true
+func ExistsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(resourceOwner).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(user.AggregateType).
+		AggregateIDs(id).
+		EventTypes(
+			user.HumanRegisteredType,
+			user.UserV1RegisteredType,
+			user.HumanAddedType,
+			user.UserV1AddedType,
+			user.MachineAddedEventType,
+			user.UserRemovedType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch event.(type) {
+		case *user.HumanRegisteredEvent, *user.HumanAddedEvent, *user.MachineAddedEvent:
+			exists = true
+		case *user.UserRemovedEvent:
+			exists = false
 		}
 	}
-	return false
+
+	return exists, nil
 }

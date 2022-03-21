@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -52,7 +51,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 		}
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := existsUser(ctx, filter, a.ID, a.ResourceOwner); exists || err != nil {
+			if exists, err := ExistsUser(ctx, filter, a.ID, a.ResourceOwner); exists || err != nil {
 				return nil, errors.ThrowAlreadyExists(err, "COMMA-CxDKf", "Errors.User.AlreadyExists")
 			}
 
@@ -97,15 +96,4 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 			return []eventstore.Command{cmd}, nil
 		}, nil
 	}
-}
-
-func existsUser(ctx context.Context, filter preparation.FilterToQueryReducer, id, resourceOwner string) (bool, error) {
-	existing := command.NewHumanWriteModel(id, resourceOwner)
-	events, err := filter(ctx, existing.Query())
-	if err != nil {
-		return false, err
-	}
-	existing.AppendEvents(events...)
-	existing.Reduce()
-	return isUserStateExists(existing.UserState), nil
 }
