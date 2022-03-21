@@ -50,7 +50,7 @@ func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	}
 }
 
-func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) bool {
+func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matches bool) {
 	if builder.limit > 0 && uint64(existingLen) >= builder.limit {
 		return false
 	}
@@ -60,12 +60,16 @@ func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) bool {
 	if builder.tenant != "" && event.Aggregate().Tenant != builder.tenant {
 		return false
 	}
+
+	if len(builder.queries) == 0 {
+		return true
+	}
 	for _, query := range builder.queries {
-		if !query.matches(event) {
-			return false
+		if query.matches(event) {
+			return true
 		}
 	}
-	return true
+	return false
 }
 
 //Columns defines which fields are set
