@@ -68,9 +68,12 @@ func transactionFilter(filter FilterToQueryReducer, commands []eventstore.Comman
 		if err != nil {
 			return nil, err
 		}
-		//TODO: filter commands analog to query builder
 		for _, command := range commands {
-			events = append(events, command.(eventstore.Event))
+			event := command.(eventstore.Event)
+			if !query.Matches(event, len(events)) {
+				continue
+			}
+			events = append(events, event)
 		}
 		return events, nil
 	}

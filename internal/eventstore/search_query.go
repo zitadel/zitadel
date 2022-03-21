@@ -50,50 +50,68 @@ func NewSearchQueryBuilder(columns Columns) *SearchQueryBuilder {
 	}
 }
 
+func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) bool {
+	if builder.limit > 0 && uint64(existingLen) >= builder.limit {
+		return false
+	}
+	if builder.resourceOwner != "" && event.Aggregate().ResourceOwner != builder.resourceOwner {
+		return false
+	}
+	if builder.tenant != "" && event.Aggregate().Tenant != builder.tenant {
+		return false
+	}
+	for _, query := range builder.queries {
+		if !query.matches(event) {
+			return false
+		}
+	}
+	return true
+}
+
 //Columns defines which fields are set
-func (factory *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
-	factory.columns = repository.Columns(columns)
-	return factory
+func (builder *SearchQueryBuilder) Columns(columns Columns) *SearchQueryBuilder {
+	builder.columns = repository.Columns(columns)
+	return builder
 }
 
 //Limit defines how many events are returned maximally.
-func (factory *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
-	factory.limit = limit
-	return factory
+func (builder *SearchQueryBuilder) Limit(limit uint64) *SearchQueryBuilder {
+	builder.limit = limit
+	return builder
 }
 
 //ResourceOwner defines the resource owner (org) of the events
-func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
-	factory.resourceOwner = resourceOwner
-	return factory
+func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQueryBuilder {
+	builder.resourceOwner = resourceOwner
+	return builder
 }
 
 //Tenant defines the tenant (system) of the events
-func (factory *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
-	factory.tenant = tenant
-	return factory
+func (builder *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
+	builder.tenant = tenant
+	return builder
 }
 
 //OrderDesc changes the sorting order of the returned events to descending
-func (factory *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
-	factory.desc = true
-	return factory
+func (builder *SearchQueryBuilder) OrderDesc() *SearchQueryBuilder {
+	builder.desc = true
+	return builder
 }
 
 //OrderAsc changes the sorting order of the returned events to ascending
-func (factory *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
-	factory.desc = false
-	return factory
+func (builder *SearchQueryBuilder) OrderAsc() *SearchQueryBuilder {
+	builder.desc = false
+	return builder
 }
 
 //AddQuery creates a new sub query.
 //All fields in the sub query are AND-connected in the storage request.
 //Multiple sub queries are OR-connected in the storage request.
-func (factory *SearchQueryBuilder) AddQuery() *SearchQuery {
+func (builder *SearchQueryBuilder) AddQuery() *SearchQuery {
 	query := &SearchQuery{
-		builder: factory,
+		builder: builder,
 	}
-	factory.queries = append(factory.queries, query)
+	builder.queries = append(builder.queries, query)
 
 	return query
 }
@@ -143,6 +161,25 @@ func (query *SearchQuery) EventData(data map[string]interface{}) *SearchQuery {
 //Builder returns the SearchQueryBuilder of the sub query
 func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
+}
+
+func (query *SearchQuery) matches(event Event) bool {
+	if query.eventSequenceLess > 0 && event.Sequence() >= query.eventSequenceLess {
+		return false
+	}
+	if query.eventSequenceGreater > 0 && event.Sequence() <= query.eventSequenceGreater {
+		return false
+	}
+	if ok := isAggreagteTypes(event.Aggregate(), query.aggregateTypes...); len(query.aggregateTypes) > 0 && !ok {
+		return false
+	}
+	if ok := isAggregateIDs(event.Aggregate(), query.aggregateIDs...); len(query.aggregateIDs) > 0 && !ok {
+		return false
+	}
+	if ok := isEventTypes(event, query.eventTypes...); len(query.eventTypes) > 0 && !ok {
+		return false
+	}
+	return true
 }
 
 func (builder *SearchQueryBuilder) build(tenantID string) (*repository.SearchQuery, error) {

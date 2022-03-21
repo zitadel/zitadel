@@ -68,3 +68,21 @@ type Aggregate struct {
 	//Version is the semver this aggregate represents
 	Version Version `json:"-"`
 }
+
+func isAggreagteTypes(a Aggregate, types ...AggregateType) bool {
+	for _, typ := range types {
+		if a.Type == typ {
+			return true
+		}
+	}
+	return false
+}
+
+func isAggregateIDs(a Aggregate, ids ...string) bool {
+	for _, id := range ids {
+		if a.ID == id {
+			return true
+		}
+	}
+	return false
+}

@@ -45,3 +45,12 @@ type Event interface {
 	//DataAsBytes returns the payload of the event. It represent the changed fields by the event
 	DataAsBytes() []byte
 }
+
+func isEventTypes(event Event, types ...EventType) bool {
+	for _, typ := range types {
+		if event.Type() == typ {
+			return true
+		}
+	}
+	return false
+}
