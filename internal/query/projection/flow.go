@@ -62,6 +62,7 @@ func (p *FlowProjection) reduceTriggerActionsSetEventType(event eventstore.Event
 		[]handler.Condition{
 			handler.NewCond(FlowTypeCol, e.FlowType),
 			handler.NewCond(FlowTriggerTypeCol, e.TriggerType),
+			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
 		},
 	)
 	for i, id := range e.ActionIDs {
@@ -88,6 +89,7 @@ func (p *FlowProjection) reduceFlowClearedEventType(event eventstore.Event) (*ha
 		e,
 		[]handler.Condition{
 			handler.NewCond(FlowTypeCol, e.FlowType),
+			handler.NewCond(FlowResourceOwnerCol, e.Aggregate().ResourceOwner),
 		},
 	), nil
 }
