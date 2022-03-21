@@ -39,10 +39,11 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (trigger_type = $2)",
+							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (trigger_type = $2) AND (resource_owner = $3)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
 								domain.TriggerTypePostAuthentication,
+								"ro-id",
 							},
 						},
 						{
@@ -93,9 +94,10 @@ func TestFlowProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1)",
+							expectedStmt: "DELETE FROM projections.flows_triggers WHERE (flow_type = $1) AND (resource_owner = $2)",
 							expectedArgs: []interface{}{
 								domain.FlowTypeExternalAuthentication,
+								"ro-id",
 							},
 						},
 					},
