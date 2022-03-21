@@ -90,7 +90,11 @@ module.exports = {
       type: "category",
       label: "Customization",
       collapsed: false,
-      items: ["guides/customization/branding", "guides/customization/texts"],
+      items: [
+          "guides/customization/branding",
+          "guides/customization/texts",
+          "guides/customization/behavior"
+      ],
     },
 
     {
