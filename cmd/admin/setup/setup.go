@@ -60,6 +60,7 @@ func setup(config *Config, steps *Steps) {
 	cmd := command.New(eventstoreClient, "localhost", config.SystemDefaults)
 
 	steps.S1DefaultInstance.cmd = cmd
+	steps.S1DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
 
 	ctx := authz.WithTenant(context.Background(), "system")
 	migration.Migrate(ctx, eventstoreClient, steps.S1DefaultInstance)

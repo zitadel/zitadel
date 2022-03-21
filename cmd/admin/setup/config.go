@@ -10,6 +10,7 @@ type Config struct {
 	Database       database.Config
 	SystemDefaults systemdefaults.SystemDefaults
 	InternalAuthZ  authz.Config
+	ExternalSecure bool
 }
 
 type Steps struct {

@@ -14,9 +14,6 @@ S1DefaultInstance:
         Gender:
         Phone:
         Password: Password1!
-    # TODO: defined by variables from other config
-    Zitadel:
-      IsDevMode: true
     PasswordComplexityPolicy: 
       MinLength: 8
       HasLowercase: true 
