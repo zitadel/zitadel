@@ -2,6 +2,7 @@ package project
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 	"time"
 
@@ -22,6 +23,9 @@ func AddApp(a *project.Aggregate, id, name string) preparation.Validation {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-P7gKR", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			if exists, err := ExistsProject(ctx, filter, a.ID, a.ResourceOwner); !exists || err != nil {
+				return nil, errors.ThrowAlreadyExists(err, "PROJE-5LQ0U", "Errors.Project.NotFound")
+			}
 			return []eventstore.Command{
 				project.NewApplicationAddedEvent(
 					ctx,
@@ -62,7 +66,9 @@ func AddOIDCConfig(
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-ghTsJ", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			// TODO: exists app?
+			if exists, err := ExistsApp(ctx, filter, a.ID, appID, a.ResourceOwner); err != nil || !exists {
+				return nil, errors.ThrowNotFound(err, "PROJE-EpG1p", "Errors.Project.Application.NotFound")
+			}
 			return []eventstore.Command{
 				project.NewOIDCConfigAddedEvent(
 					ctx,
@@ -98,7 +104,6 @@ func AddAPIConfig(
 	authMethodType domain.APIAuthMethodType,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
-		// TODO: exists app?
 		if appID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument")
 		}
@@ -106,6 +111,9 @@ func AddAPIConfig(
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XXED5", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			if exists, err := ExistsApp(ctx, filter, a.ID, appID, a.ResourceOwner); err != nil || !exists {
+				return nil, errors.ThrowNotFound(err, "PROJE-EpG1p", "Errors.Project.Application.NotFound")
+			}
 			return []eventstore.Command{
 				project.NewAPIConfigAddedEvent(
 					ctx,
@@ -118,4 +126,46 @@ func AddAPIConfig(
 			}, nil
 		}, nil
 	}
+}
+
+func ExistsApp(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, appID, resourceOwner string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(resourceOwner).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(projectID).
+		EventTypes(
+			project.ApplicationAddedType,
+			project.ApplicationRemovedType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		id := struct {
+			ID string `json:"appId"`
+		}{}
+		switch event.(type) {
+		case *project.ApplicationAddedEvent:
+			err = json.Unmarshal(event.DataAsBytes(), &id)
+			if err != nil {
+				return false, errors.ThrowInternal(err, "PROJE-Oh9Yt", "Errors.Internal")
+			}
+			if id.ID == appID {
+				exists = true
+			}
+		case *project.ApplicationRemovedEvent:
+			err = json.Unmarshal(event.DataAsBytes(), &id)
+			if err != nil {
+				return false, errors.ThrowInternal(err, "PROJE-HuIBt", "Errors.Internal")
+			}
+			if id.ID == appID {
+				exists = false
+			}
+		}
+	}
+
+	return exists, nil
 }

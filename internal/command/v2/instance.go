@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/zitadel/internal/command/v2/iam"
+	iam "github.com/caos/zitadel/internal/command/v2/instance"
 	"github.com/caos/zitadel/internal/command/v2/org"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/command/v2/project"

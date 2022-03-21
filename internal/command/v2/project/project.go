@@ -27,10 +27,10 @@ func AddProject(
 		if !privateLabelingSetting.Valid() {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument")
 		}
+		if owner == "" {
+			return nil, errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument")
+		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if owner == "" {
-				return nil, errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument")
-			}
 			return []eventstore.Command{
 				project.NewProjectAddedEvent(ctx, &a.Aggregate,
 					name,
@@ -45,4 +45,31 @@ func AddProject(
 			}, nil
 		}, nil
 	}
+}
+
+func ExistsProject(ctx context.Context, filter preparation.FilterToQueryReducer, projectID, resourceOwner string) (exists bool, err error) {
+	events, err := filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
+		ResourceOwner(resourceOwner).
+		OrderAsc().
+		AddQuery().
+		AggregateTypes(project.AggregateType).
+		AggregateIDs(projectID).
+		EventTypes(
+			project.ProjectAddedType,
+			project.ProjectRemovedType,
+		).Builder())
+	if err != nil {
+		return false, err
+	}
+
+	for _, event := range events {
+		switch event.(type) {
+		case *project.ApplicationAddedEvent:
+			exists = true
+		case *project.ApplicationRemovedEvent:
+			exists = false
+		}
+	}
+
+	return exists, nil
 }

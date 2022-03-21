@@ -49,12 +49,9 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 		if human.LastName = strings.TrimSpace(human.LastName); human.LastName == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument")
 		}
+		human.Phone = strings.TrimSpace(human.Phone)
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := ExistsUser(ctx, filter, a.ID, a.ResourceOwner); exists || err != nil {
-				return nil, errors.ThrowAlreadyExists(err, "COMMA-CxDKf", "Errors.User.AlreadyExists")
-			}
-
 			orgIAMPolicy, err := orgIAMPolicyWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
@@ -82,8 +79,8 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				human.Email,
 				orgIAMPolicy.UserLoginMustBeDomain,
 			)
-			if phone := strings.TrimSpace(human.Phone); phone != "" {
-				cmd.AddPhoneData(phone)
+			if human.Phone != "" {
+				cmd.AddPhoneData(human.Phone)
 			}
 			if human.Password != "" {
 				secret, err := crypto.Hash([]byte(human.Password), passwordAlg)

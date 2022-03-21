@@ -16,6 +16,7 @@ func AddMemberCommand(a *org.Aggregate, userID string, roles ...string) preparat
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
 		}
+		// TODO: check roles
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 				if exists, err := user.ExistsUser(ctx, filter, userID, a.ID); err != nil || !exists {
 					return nil, errors.ThrowNotFound(err, "ORG-GoXOn", "Errors.User.NotFound")
@@ -61,7 +62,7 @@ func IsMember(ctx context.Context, filter preparation.FilterToQueryReducer, orgI
 		case *org.MemberRemovedEvent, *org.MemberCascadeRemovedEvent:
 			err = json.Unmarshal(event.DataAsBytes(), &id)
 			if err != nil {
-				return false, errors.ThrowInternal(err, "ORG-WcoNL", "Errors.Internal")
+				return false, errors.ThrowInternal(err, "ORG-hJkpr", "Errors.Internal")
 			}
 			if id.ID == userID {
 				isMember = false
