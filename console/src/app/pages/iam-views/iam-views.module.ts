@@ -14,6 +14,7 @@ import { InputModule } from 'src/app/modules/input/input.module';
 import { PaginatorModule } from 'src/app/modules/paginator/paginator.module';
 import { RefreshTableModule } from 'src/app/modules/refresh-table/refresh-table.module';
 import { SharedModule } from 'src/app/modules/shared/shared.module';
+import { TableActionsModule } from 'src/app/modules/table-actions/table-actions.module';
 import { HasFeaturePipeModule } from 'src/app/pipes/has-feature-pipe/has-feature-pipe.module';
 import { HasRolePipeModule } from 'src/app/pipes/has-role-pipe/has-role-pipe.module';
 import { LocalizedDatePipeModule } from 'src/app/pipes/localized-date-pipe/localized-date-pipe.module';
@@ -28,6 +29,7 @@ import { IamViewsComponent } from './iam-views.component';
     IamViewsRoutingModule,
     SharedModule,
     CommonModule,
+    TableActionsModule,
     MatIconModule,
     CardModule,
     HasFeaturePipeModule,

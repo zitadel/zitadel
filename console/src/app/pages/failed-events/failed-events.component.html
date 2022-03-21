@@ -41,10 +41,12 @@
         <ng-container matColumnDef="actions" stickyEnd>
           <th mat-header-cell *matHeaderCellDef></th>
           <td class="back" mat-cell *matCellDef="let event">
-            <button color="warn" mat-icon-button matTooltip="{{'IAM.FAILEDEVENTS.DELETE' | translate}}"
-              (click)="cancelEvent(event.viewName, event.database, event.failedSequence)">
-              <i class="las la-minus-circle"></i>
-            </button>
+            <cnsl-table-actions>
+              <button actions color="warn" mat-icon-button matTooltip="{{'IAM.FAILEDEVENTS.DELETE' | translate}}"
+                (click)="cancelEvent(event.viewName, event.database, event.failedSequence)">
+                <i class="las la-minus-circle"></i>
+              </button>
+            </cnsl-table-actions>
           </td>
         </ng-container>
 

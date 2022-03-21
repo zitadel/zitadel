@@ -288,7 +288,7 @@ $caos-light-theme-background: (
   successinfosection: #cbf4c9,
   toolbar: rgba(map_get($caos-light-background, 500), 0.9),
   moz-toolbar: map_get($caos-light-background, 500),
-  footer: map_get($caos-light-background, 400),
+  footer: #00000010,
   metadata-section: #605f5f08,
 );
 

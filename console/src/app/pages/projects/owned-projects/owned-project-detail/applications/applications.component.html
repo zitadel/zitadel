@@ -39,6 +39,32 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="state">
+        <th mat-header-cell *matHeaderCellDef> {{ 'USER.DATA.STATE' | translate }} </th>
+        <td class="pointer" mat-cell *matCellDef="let app" [routerLink]="['/projects', projectId, 'apps', app.id ]">
+          <span class="state"
+            [ngClass]="{'active': app.state === AppState.APP_STATE_ACTIVE, 'inactive': app.state === AppState.APP_STATE_INACTIVE}">
+            {{('APP.PAGES.DETAIL.STATE.'+app?.state) | translate}}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="creationDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CREATIONDATE' | translate }} </th>
+        <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell *matCellDef="let app">
+          <span *ngIf="app?.details?.creationDate">{{app.details.creationDate | timestampToDate |
+            localizedDate: 'dd. MMM, HH:mm' }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="changeDate">
+        <th mat-header-cell *matHeaderCellDef> {{ 'PROJECT.ROLE.CHANGEDATE' | translate }} </th>
+        <td class="pointer" [routerLink]="['/projects', projectId, 'apps', app.id ]" mat-cell *matCellDef="let app">
+          <span *ngIf="app?.details?.changeDate">{{app.details.changeDate | timestampToDate |
+            localizedDate: 'dd. MMM, HH:mm' }}</span>
+        </td>
+      </ng-container>
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr class="highlight" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
