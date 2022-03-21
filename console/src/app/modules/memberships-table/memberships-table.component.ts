@@ -37,7 +37,7 @@ export class MembershipsTableComponent implements OnInit, OnDestroy {
   private destroyed: Subject<void> = new Subject();
   public membershipRoleOptions: string[] = [];
 
-  public displayedColumns: string[] = ['select', 'displayName', 'type', 'rolesList'];
+  public displayedColumns: string[] = ['displayName', 'type', 'rolesList'];
   public membershipToEdit: string = '';
   public loadingRoles: boolean = false;
 

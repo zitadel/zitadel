@@ -1,4 +1,4 @@
-<cnsl-top-view title="{{user?.human ? user.human?.profile?.displayName :
+<cnsl-top-view *ngIf="user" title="{{user?.human ? user.human?.profile?.displayName :
   user?.machine?.name}}" docLink="https://docs.zitadel.ch/docs/guides/basics/projects"
   sub="{{user?.preferredLoginName}}" [isActive]="user?.state === UserState.USER_STATE_ACTIVE"
   [isInactive]="user?.state === UserState.USER_STATE_INACTIVE" stateTooltip="{{'USER.STATE.'+user?.state | translate}}"
@@ -18,9 +18,10 @@
     </ng-template>
   </ng-template>
   <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
-  <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
   <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
 </cnsl-top-view>
+
+<p class="no-user-error" *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</p>
 
 <div class="max-width-container" *ngIf="user && (['user.write$','user.write:' + user.id] | hasRole) as canWrite$">
   <cnsl-meta-layout>

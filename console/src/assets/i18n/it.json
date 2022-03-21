@@ -1696,7 +1696,11 @@
       "4": "Progetto"
     },
     "EDITROLE": "Modifica ruoli",
-    "EDITFOR": "Modifica i ruoli per l'utente: {{value}}"
+    "EDITFOR": "Modifica i ruoli per l'utente: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Rimuovi manager",
+      "DELETE_DESCRIPTION": "Stai per rimuovere un manager. Vuoi davvero continuare?"
+    }
   },
   "ROLESLABEL": "Ruoli",
   "GRANTS": {

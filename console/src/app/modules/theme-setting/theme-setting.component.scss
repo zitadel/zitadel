@@ -7,6 +7,6 @@
   $back: map-get($background, background);
 
   .theme-setting-button {
-    background-color: if($is-dark-theme, #ffffff10, #ffffff) !important;
+    background-color: if($is-dark-theme, #ffffff10, #fff) !important;
   }
 }

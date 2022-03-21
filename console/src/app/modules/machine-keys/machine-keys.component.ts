@@ -30,7 +30,7 @@ export class MachineKeysComponent implements OnInit {
   public keyResult!: ListMachineKeysResponse.AsObject;
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumns: string[] = ['select', 'id', 'type', 'creationDate', 'expirationDate', 'actions'];
+  @Input() public displayedColumns: string[] = ['id', 'type', 'creationDate', 'expirationDate', 'actions'];
 
   @Output() public changedSelection: EventEmitter<Array<Key.AsObject>> = new EventEmitter();
 

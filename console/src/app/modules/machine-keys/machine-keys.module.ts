@@ -21,6 +21,7 @@ import { InputModule } from '../input/input.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
 import { ShowKeyDialogModule } from '../show-key-dialog/show-key-dialog.module';
+import { TableActionsModule } from '../table-actions/table-actions.module';
 import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { MachineKeysComponent } from './machine-keys.component';
 
@@ -39,6 +40,7 @@ import { MachineKeysComponent } from './machine-keys.component';
     MatIconModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
+    TableActionsModule,
     WarnDialogModule,
     MatTooltipModule,
     HasRolePipeModule,

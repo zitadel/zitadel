@@ -18,6 +18,8 @@ import { AddMemberRolesDialogModule } from '../add-member-roles-dialog/add-membe
 import { AvatarModule } from '../avatar/avatar.module';
 import { PaginatorModule } from '../paginator/paginator.module';
 import { RefreshTableModule } from '../refresh-table/refresh-table.module';
+import { TableActionsModule } from '../table-actions/table-actions.module';
+import { WarnDialogModule } from '../warn-dialog/warn-dialog.module';
 import { MembersTableComponent } from './members-table.component';
 
 @NgModule({
@@ -37,7 +39,9 @@ import { MembersTableComponent } from './members-table.component';
     MatTooltipModule,
     FormsModule,
     TranslateModule,
+    WarnDialogModule,
     RefreshTableModule,
+    TableActionsModule,
     RouterModule,
     AvatarModule,
     MatButtonModule,

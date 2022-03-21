@@ -207,7 +207,7 @@
       "MY": "My Informations",
       "LOGINNAMES": "Loginnames",
       "LOGINNAMESDESC": "These are your login names:",
-      "NOUSER": "No associated users.",
+      "NOUSER": "No associated user.",
       "REACTIVATE": "Reactivate",
       "DEACTIVATE": "Deactivate",
       "FILTER": "Filter",
@@ -1696,7 +1696,11 @@
       "4": "Project"
     },
     "EDITROLE": "Edit roles",
-    "EDITFOR": "Edit the roles for the user: {{value}}"
+    "EDITFOR": "Edit the roles for the user: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Remove Manager",
+      "DELETE_DESCRIPTION": "You are about to remove a manager. Are you sure?"
+    }
   },
   "ROLESLABEL": "Roles",
   "GRANTS": {

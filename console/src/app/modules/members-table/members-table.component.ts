@@ -15,6 +15,7 @@ import { getMembershipColor } from 'src/app/utils/color';
 import { AddMemberRolesDialogComponent } from '../add-member-roles-dialog/add-member-roles-dialog.component';
 import { PageEvent, PaginatorComponent } from '../paginator/paginator.component';
 import { ProjectMembersDataSource } from '../project-members/project-members-datasource';
+import { WarnDialogComponent } from '../warn-dialog/warn-dialog.component';
 
 type MemberDatasource =
   | OrgMembersDataSource
@@ -70,13 +71,27 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   }
 
   public removeRole(member: Member.AsObject, role: string) {
-    const newRoles = Object.assign([], member.rolesList);
-    const index = newRoles.findIndex((r) => r === role);
-    if (index > -1) {
-      newRoles.splice(index);
-      member.rolesList = newRoles;
-      this.updateRoles.emit({ member: member, change: newRoles });
-    }
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'GRANTS.DIALOG.DELETE_TITLE',
+        descriptionKey: 'GRANTS.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        const newRoles = Object.assign([], member.rolesList);
+        const index = newRoles.findIndex((r) => r === role);
+        if (index > -1) {
+          newRoles.splice(index);
+          member.rolesList = newRoles;
+          this.updateRoles.emit({ member: member, change: newRoles });
+        }
+      }
+    });
   }
 
   public addRole(member: Member.AsObject) {
@@ -115,6 +130,20 @@ export class MembersTableComponent implements OnInit, OnDestroy {
   }
 
   public triggerDeleteMember(member: any): void {
-    this.deleteMember.emit(member);
+    const dialogRef = this.dialog.open(WarnDialogComponent, {
+      data: {
+        confirmKey: 'ACTIONS.DELETE',
+        cancelKey: 'ACTIONS.CANCEL',
+        titleKey: 'MEMBER.DIALOG.DELETE_TITLE',
+        descriptionKey: 'MEMBER.DIALOG.DELETE_DESCRIPTION',
+      },
+      width: '400px',
+    });
+
+    dialogRef.afterClosed().subscribe((resp) => {
+      if (resp) {
+        this.deleteMember.emit(member);
+      }
+    });
   }
 }

@@ -1696,7 +1696,11 @@
       "4": "Projekt"
     },
     "EDITROLE": "Rollen editieren",
-    "EDITFOR": "Bearbeiten Sie die Rollen für den Benutzer: {{value}}"
+    "EDITFOR": "Bearbeiten Sie die Rollen für den Benutzer: {{value}}",
+    "DIALOG": {
+      "DELETE_TITLE": "Manager entfernen",
+      "DELETE_DESCRIPTION": "Sie sind im Begriff einen Manager zu entfernen. Wollen Sie fortfahren?"
+    }
   },
   "ROLESLABEL": "Rollen",
   "GRANTS": {
