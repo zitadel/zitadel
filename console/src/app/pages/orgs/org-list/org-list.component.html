@@ -67,7 +67,7 @@
             {{ 'ORG.PAGES.CREATIONDATE' | translate }}
           </th>
           <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
-            {{org.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+            {{org.details?.creationDate | timestampToDate | localizedDate: 'fromNow'}}
           </td>
         </ng-container>
 
@@ -76,7 +76,7 @@
             {{ 'ORG.PAGES.DATECHANGED' | translate }}
           </th>
           <td mat-cell *matCellDef="let org" (click)="setAndNavigateToOrg(org)">
-            {{org.details?.changeDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+            {{org.details?.changeDate | timestampToDate | localizedDate: 'fromNow'}}
           </td>
         </ng-container>
 

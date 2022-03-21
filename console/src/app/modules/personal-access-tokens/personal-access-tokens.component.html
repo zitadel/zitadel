@@ -31,7 +31,7 @@
       <ng-container matColumnDef="creationDate">
         <th mat-header-cell *matHeaderCellDef> {{ 'USER.MACHINE.CREATIONDATE' | translate }} </th>
         <td mat-cell *matCellDef="let key">
-          {{key.details?.creationDate | timestampToDate | localizedDate: 'EEE dd. MMM YYYY, HH:mm'}}
+          {{key.details?.creationDate | timestampToDate | localizedDate: 'fromNow'}}
         </td>
       </ng-container>
 
