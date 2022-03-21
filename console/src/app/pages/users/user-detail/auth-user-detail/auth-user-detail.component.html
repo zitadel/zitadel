@@ -3,10 +3,13 @@
   [isInactive]="user?.state === UserState.USER_STATE_INACTIVE" stateTooltip="{{'USER.STATE.'+user?.state | translate}}"
   [hasBackButton]="(['org.read'] | hasRole | async)" (backRouterLink)="['/']">
 
-  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
   <span *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</span>
   <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
 </cnsl-top-view>
+
+<div *ngIf="loading" class="max-width-container">
+  <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+</div>
 
 <div class="max-width-container">
   <cnsl-meta-layout>

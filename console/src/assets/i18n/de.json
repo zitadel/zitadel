@@ -241,6 +241,8 @@
     "TABLE": {
       "DEACTIVATE": "Deaktivieren",
       "ACTIVATE": "Aktivieren",
+      "CHANGEDATE": "Letzte Änderung",
+      "CREATIONDATE": "Erstelldatum",
       "TYPES": {
         "HUMAN": "Benutzer",
         "MACHINE": "Service Users"

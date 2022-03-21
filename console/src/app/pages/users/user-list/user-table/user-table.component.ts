@@ -45,8 +45,25 @@ export class UserTableComponent implements OnInit {
   public selection: SelectionModel<User.AsObject> = new SelectionModel<User.AsObject>(true, []);
   private loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
-  @Input() public displayedColumnsHuman: string[] = ['select', 'displayName', 'username', 'email', 'state', 'actions'];
-  @Input() public displayedColumnsMachine: string[] = ['select', 'displayName', 'username', 'state', 'actions'];
+  @Input() public displayedColumnsHuman: string[] = [
+    'select',
+    'displayName',
+    'username',
+    'email',
+    'state',
+    'creationDate',
+    'changeDate',
+    'actions',
+  ];
+  @Input() public displayedColumnsMachine: string[] = [
+    'select',
+    'displayName',
+    'username',
+    'creationDate',
+    'changeDate',
+    'state',
+    'actions',
+  ];
 
   @Output() public changedSelection: EventEmitter<Array<User.AsObject>> = new EventEmitter();
 

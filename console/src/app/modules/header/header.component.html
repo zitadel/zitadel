@@ -64,7 +64,7 @@
 
             <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [flexibleDimensions]="true"
               [lockPosition]="true" [cdkConnectedOverlayOffsetY]="10" [cdkConnectedOverlayHasBackdrop]="true"
-              [cdkConnectedOverlayPositions]="positions" cdkConnectedOverlayBackdropClass="org-context-backdrop"
+              [cdkConnectedOverlayPositions]="positions" cdkConnectedOverlayBackdropClass="transparent-backdrop"
               [cdkConnectedOverlayOpen]="showOrgContext" (backdropClick)="showOrgContext = false"
               (detach)="showOrgContext = false">
               <cnsl-org-context class="context_card" *ngIf="org && showOrgContext" (closedCard)="showOrgContext = false"

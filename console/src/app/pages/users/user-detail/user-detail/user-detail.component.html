@@ -17,9 +17,12 @@
           [style.color]="'var(--warn)'">{{'USER.PAGES.DELETE' | translate}}</span></button>
     </ng-template>
   </ng-template>
-  <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
   <cnsl-info-row topContent *ngIf="user" [user]="user"></cnsl-info-row>
 </cnsl-top-view>
+
+<div *ngIf="loading" class="max-width-container">
+  <mat-progress-spinner diameter="25" color="primary" mode="indeterminate"></mat-progress-spinner>
+</div>
 
 <p class="no-user-error" *ngIf="!loading && !user">{{ 'USER.PAGES.NOUSER' | translate }}</p>
 
@@ -31,8 +34,6 @@
       </div>
 
       <div class="max-width-container">
-        <mat-progress-bar *ngIf="loading" color="primary" mode="indeterminate"></mat-progress-bar>
-
         <cnsl-info-section class="locked" *ngIf="user?.state === UserState.USER_STATE_LOCKED"
           [type]="InfoSectionType.WARN">
           {{'USER.PAGES.LOCKEDDESCRIPTION' | translate}}</cnsl-info-section>

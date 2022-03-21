@@ -241,6 +241,8 @@
     "TABLE": {
       "DEACTIVATE": "Disattiva",
       "ACTIVATE": "Attiva",
+      "CHANGEDATE": "Ultima modifica",
+      "CREATIONDATE": "creato",
       "TYPES": {
         "HUMAN": "Utenti",
         "MACHINE": "Utenti di servizio"

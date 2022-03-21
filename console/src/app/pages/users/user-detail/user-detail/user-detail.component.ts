@@ -42,7 +42,7 @@ export class UserDetailComponent implements OnInit {
   public languages: string[] = ['de', 'en'];
 
   public ChangeType: any = ChangeType;
-  public loading: boolean = false;
+  public loading: boolean = true;
 
   public UserState: any = UserState;
   public copied: string = '';
@@ -101,10 +101,12 @@ export class UserDetailComponent implements OnInit {
   refreshUser(): void {
     this.refreshChanges$.emit();
     this.route.params.pipe(take(1)).subscribe((params) => {
+      this.loading = true;
       const { id } = params;
       this.mgmtUserService
         .getUserByID(id)
         .then((resp) => {
+          this.loading = false;
           if (resp.user) {
             this.user = resp.user;
 
@@ -117,6 +119,7 @@ export class UserDetailComponent implements OnInit {
         })
         .catch((err) => {
           this.error = err.message ?? '';
+          this.loading = false;
           this.toast.showError(err);
         });
 

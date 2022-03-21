@@ -6,7 +6,6 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -107,7 +106,6 @@ import { UserMfaComponent } from './user-detail/user-mfa/user-mfa.component';
     MatIconModule,
     CardModule,
     MatProgressSpinnerModule,
-    MatProgressBarModule,
     HasFeatureModule,
     MatTooltipModule,
     HasRoleModule,
