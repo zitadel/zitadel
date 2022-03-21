@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -131,12 +129,12 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 		featureEvent = e.FeaturesSetEvent
 		isDefault = false
 	default:
-		logging.LogWithFields("HANDL-M9ets", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.FeaturesSetEventType, iam.FeaturesSetEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-K0erf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-K0erf", "reduce.wrong.event.type %v", []eventstore.EventType{org.FeaturesSetEventType, iam.FeaturesSetEventType})
 	}
 
 	cols := []handler.Column{
 		handler.NewCol(FeatureAggregateIDCol, featureEvent.Aggregate().ID),
+		handler.NewCol(FeatureInstanceIDCol, featureEvent.Aggregate().InstanceID),
 		handler.NewCol(FeatureChangeDateCol, featureEvent.CreationDate()),
 		handler.NewCol(FeatureSequenceCol, featureEvent.Sequence()),
 		handler.NewCol(FeatureIsDefaultCol, isDefault),
@@ -228,8 +226,7 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 func (p *FeatureProjection) reduceFeatureRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*org.FeaturesRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-fN903", "seq", event.Sequence(), "expectedType", org.FeaturesRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-0p4rf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0p4rf", "reduce.wrong.event.type %s", org.FeaturesRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
