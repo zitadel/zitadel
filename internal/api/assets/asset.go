@@ -12,8 +12,8 @@ import (
 
 	"github.com/caos/logging"
 	sentryhttp "github.com/getsentry/sentry-go/http"
-	"github.com/go-oss/image/imageutil"
 	"github.com/gorilla/mux"
+	"github.com/superseriousbusiness/exifremove/pkg/exifremove"
 
 	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
@@ -208,16 +208,17 @@ func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int6
 	if !isAllowedContentType(contentType) {
 		return file, size, nil
 	}
-	file, err := imageutil.RemoveExif(file)
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(file)
 	if err != nil {
 		return file, 0, err
 	}
-	data := new(bytes.Buffer)
-	_, err = data.ReadFrom(file)
+	data := buf.Bytes()
+	data, err = exifremove.Remove(data)
 	if err != nil {
 		return file, 0, err
 	}
-	return bytes.NewReader(data.Bytes()), int64(data.Len()), nil
+	return bytes.NewReader(data), int64(len(data)), nil
 }
 
 func isAllowedContentType(contentType string) bool {
