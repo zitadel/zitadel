@@ -60,7 +60,7 @@ In this exercise, we will add a new Google identity provider to federate identit
 
 Google Example:
 
-1. Go to the Google Gloud Platform and choose youre project: <https://console.cloud.google.com/apis/credentials>
+1. Go to the Google Cloud Platform and choose your project: <https://console.cloud.google.com/apis/credentials>
 2. Select **+ CREATE CREDENTIALS**. Choose **OAuth client ID**.
 3. Choose **Web application** as the Application type and give it a name.
 4. Add the redirect URIs from above.
