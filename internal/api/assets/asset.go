@@ -213,10 +213,9 @@ func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int6
 	if err != nil {
 		return file, 0, err
 	}
-	data := buf.Bytes()
-	data, err = exifremove.Remove(data)
+	data, err := exifremove.Remove(buf.Bytes())
 	if err != nil {
-		return file, 0, err
+		return nil, 0, err
 	}
 	return bytes.NewReader(data), int64(len(data)), nil
 }
