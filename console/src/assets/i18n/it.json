@@ -1199,7 +1199,7 @@
     },
     "GRANT": {
       "EMPTY": "Nessun organizzazione ammissibile.",
-      "TITLE": "Projetto delegato",
+      "TITLE": "Organizzazioni ammissibili",
       "DESCRIPTION": "Permetti a un'altra organizzazione di usare il tuo progetto.",
       "EDITTITLE": "Configura ruoli",
       "CREATE": {
@@ -1218,7 +1218,7 @@
         "FOR_ORG": "Org grant \u00e8 creato per:"
       },
       "DETAIL": {
-        "TITLE": "Progetto delegato",
+        "TITLE": "Organizzazione ammissibile",
         "DESC": "Puoi definire quali ruoli possono essere usati e gestire i manager",
         "MEMBERTITLE": "Manager",
         "MEMBERDESC": "Questi sono i manager dell'org grant. Aggiungi qui gli utenti che devono ottenere l'accesso per modificare i dati del progetto.",
