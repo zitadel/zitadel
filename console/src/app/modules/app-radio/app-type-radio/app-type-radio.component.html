@@ -1,4 +1,4 @@
-<div class="radio-button-wrapper">
+<div class="app-type-radio-button-wrapper">
   <ng-container *ngFor="let type of types">
     <input class="app" type="radio" (change)="emitChange()" [value]="type" [(ngModel)]="selected" [id]="type.prefix" />
     <label class="cnsl-type-radio-button" [for]="type.prefix">

@@ -1,11 +1,11 @@
 @use '@angular/material' as mat;
 
-.radio-button-wrapper {
+.app-type-radio-button-wrapper {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   margin: 0 -0.5rem;
   box-sizing: border-box;
+  overflow-x: auto;
 }
 
 @mixin app-type-radio-theme($theme) {
@@ -46,6 +46,7 @@
     background-color: map-get($background, cards);
     flex: 0 1 230px;
     min-height: 300px;
+    min-width: 150px;
     cursor: pointer;
     position: relative;
     padding-bottom: 1rem;

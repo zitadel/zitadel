@@ -160,9 +160,11 @@
 </ng-container>
 
 <ng-template #shortcutKeyRef>
-  <span class="fill-space"></span>
-  <div class="nav-shortcut-action-key" matTooltip="{{'MENU.OPENSHORTCUTSTOOLTIP' | translate}}">
-    <div class="nav-key-overlay"></div>
-    <span>?</span>
-  </div>
+  <ng-container *ngIf="(isHandset$ | async) === false">
+    <span class="fill-space"></span>
+    <div class="nav-shortcut-action-key" matTooltip="{{'MENU.OPENSHORTCUTSTOOLTIP' | translate}}">
+      <div class="nav-key-overlay"></div>
+      <span>?</span>
+    </div>
+  </ng-container>
 </ng-template>

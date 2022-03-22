@@ -130,6 +130,8 @@
       .breadcrumb-context {
         display: flex;
         align-items: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         .breadcrumb-link {
           font-size: 14px;

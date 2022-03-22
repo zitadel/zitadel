@@ -1,8 +1,9 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject } from 'rxjs';
 import { Org } from 'src/app/proto/generated/zitadel/org_pb';
 import { LabelPolicy } from 'src/app/proto/generated/zitadel/policy_pb';
 import { User } from 'src/app/proto/generated/zitadel/user_pb';
@@ -71,6 +72,11 @@ export class NavComponent implements OnDestroy {
   @Input() public isDarkTheme: boolean = true;
   @Input() public user!: User.AsObject;
   @Input() public labelpolicy!: LabelPolicy.AsObject;
+  public isHandset$: Observable<boolean> = this.breakpointObserver.observe('(max-width: 599px)').pipe(
+    map((result) => {
+      return result.matches;
+    }),
+  );
 
   @Input() public org!: Org.AsObject;
   public filterControl: FormControl = new FormControl('');
@@ -86,6 +92,7 @@ export class NavComponent implements OnDestroy {
     public breadcrumbService: BreadcrumbService,
     public mgmtService: ManagementService,
     private router: Router,
+    private breakpointObserver: BreakpointObserver,
   ) {
     this.hideAdminWarn = localStorage.getItem('hideAdministratorWarning') === 'true' ? true : false;
   }

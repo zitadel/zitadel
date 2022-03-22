@@ -1,4 +1,4 @@
-<div class="radio-button-wrapper">
+<div class="auth-method-radio-button-wrapper">
   <ng-container *ngFor="let method of authMethods; index as i">
     <input type="radio" [disabled]="method.disabled" (change)="emitChange()" [value]="method.key" [id]="method.key"
       [(ngModel)]="selected" />
