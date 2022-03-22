@@ -24,7 +24,7 @@ The [B2B scenarios topic](./b2b) focuses on planning considerations when you hav
 Everything in the following sections assumes you've created an organization.
 An organization is the outermost layer of ZITADEL.
 It is the vessel for projects, roles, applications and users.
-You can create an organization from the [ZITADEL Console](https://console.zitadel.ch/org/create).
+You can create an organization from the [ZITADEL console](https://console.zitadel.ch/org/create).
 You can either choose your current account for the organization owner, or create a new one.
 
 Depending on your Software Development Life Cycle (SDLC), you can create multiple organizations or projects, keeping your application environments separated.
@@ -55,11 +55,11 @@ Requests to the management API are rate limited. Read our [Rate limit Policy](..
 
 ### User Authentication
 
-There are multiple ways to perform User Authentication.
-The default method in ZITADEL is with a username and password with MFA enabled.
-To enhance user security, ZITADEL lets you to configure Multifactor and Passwordless Authentication.
+There are multiple ways to perform _User Authentication_.
+The default method in ZITADEL is with a username and password with _Mulitifactor Authentication (MFA)_ enabled.
+To provide good user security, ZITADEL lets you to configure _MFA_ and _Passwordless Authentication_.
 All authentication methods are available from the FREE Tier.
-To set up your organization's login policy, go to your organization's detail in [Console](https://console.zitadel.ch/org).
+To set up your organization's login policy, go to your organization's detail in the ZITADEL [console](https://console.zitadel.ch/org).
 
 When planning your application, consider the following questions about User Authentication:
 
@@ -71,7 +71,7 @@ When planning your application, consider the following questions about User Auth
 - Do you offer Login via an Identity Provider?
 - Which languages do you have to provide?
 
-Considering these questions, you might admit that building an Identity Management System is more complex than you initially thought.
+Considering these questions, you might admit that building an identity management system is more complex than you initially thought.
 Implementing it yourself might be too much work, especially if you want to focus on building your applications.
 
 ### Federation
@@ -122,7 +122,7 @@ When setting up your applications, consult our [guide about Authentication Flows
 ### Access Control
 
 Having authenticated a user, you need to ensure users and services have access to your application and APIs.
-This process is called _Access Control_ and comprises User Authentication, Authorization, and Policy Enforcement.
+This process is called _Access Control_ and comprises _User Authentication_, Authorization, and Policy Enforcement.
 When implementing access control, consider these questions:
 
 - Does your application call your own APIs?

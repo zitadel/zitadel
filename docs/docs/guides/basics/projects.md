@@ -31,42 +31,38 @@ So, let’s create a straightforward example project.
 
 Let’s make this more interesting by adding some basic roles and authorizations to your project, then confirm the scope of the roles and authorizations.
 
-4. Jump to the section **ROLES**. Create two new roles with the following values
+4. Jump to the section **ROLES**. Create a new roles with the following values
 
 * Key: reader
 * Display Name: Reader
 * Group: user
 
-and
-
-* Key: editor
-* Display Name: Editor
-* Group: user
-
 ![Add New Roles](/img/console_projects_add_new_roles.gif)
 
-Now, you can add roles to your own user, or you can create a new user.
-To create a new user:
+Now, create a new user `coyote`.
 
 1. Go to **Users** and select **New**.
-2. Enter the required contact details and select **Create**.
+2. Use some random values for the required fields, then select **Create**.
 
 ![Create new user](/img/console_users_create_new_user.gif)
 
+Now, grant `coyote` the role `reader`
 To grant users certain roles, you need to create authorizations.
-Go back to the project, and jump to the section **AUTHORIZATIONS**.
+1. Go back to the project, and jump to the section **AUTHORIZATIONS**.
+2. Search and select the user `coyote`, then select **CONTINUE**.
+3. Check the role `reader`, then select `Save`.
 
 ![Verify your authorization](/img/console_projects_create_authorization.gif)
 
-To verify the role granted to the user:
+Now, verify that the user `coyote` has the role `reader`:
 
 1. Select **Users** from the navigation menu.
-2. Select the user `Coyote`.
-3. Scroll down to the section **AUTHORIZATION**. There you should be able to verify that the user has the role `reader` for your project `My first project`.
+2. Select the user `coyote`.
+3. Scroll down to the section **AUTHORIZATION**. You see, `coyote` has the role `reader` in the project `My first project`.
 
 ![Organization grant](/img/console_projects_authorization_created.png)
 
-4. Now create another project (eg. “My second project”).
+4. Now create another project (eg. `My second project`).
 5. Verify that there are no roles or authorizations on your second project.
 
 ## What is a granted project?
@@ -77,11 +73,11 @@ import GrantedProjectDescription from '../../concepts/structure/_granted_project
 
 ## Exercise - Grant a project
 
-1. Visit the project that you created before. In the section GRANTED ORGANIZATIONS, select 
+1. Visit the project that you created before. In the section **GRANTED ORGANIZATIONS**, select 
 **New**.
 2. Enter the domain `acme.caos.ch`. Search the organization and continue to the next step.
-3. Select some roles that you would like to grant to the organization ACME. Confirm the change.
-4. You should now see ACME-CAOS in the section GRANTED ORGANIZATIONS
+3. Select some roles that you would like to grant to the organization `ACME`. Confirm the change.
+4. You should now see `ACME` in the section **GRANTED ORGANIZATIONS**
 
 ![Grant a project](/img/projects_create_org_grant_caos2acme.gif)
 

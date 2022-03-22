@@ -13,7 +13,7 @@ If you need to distinguish different environments, we recommend using multiple p
 To initialize the user authentication, create an authorization request to `/authorize`, using the HTTP GET method in the user agent (browser).
 The request needs at least the following parameters:
 
-- `client_id`: how the authorization server knows which application it is. Copy from Console.
+- `client_id`: how the authorization server knows which application it is. Copy from the console.
 - `redirect_uri`: where the authorization code is sent to after user authentication. Must be one of the registered URIs in the previous step.
 - `response_type`: whether you want to have a code (authorization code flow) or a token (implicit flow). Whenever possible, use `code`
 - `scope`: what scope you want to grant to the access_token / id_token, minimum is `openid`. If you're unsure what you need, you might start with `openid profile email`

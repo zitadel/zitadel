@@ -53,8 +53,8 @@ In this exercise, we will add a new Google identity provider to federate identit
 
 1. Register an OIDC Client in your preferred provider.
 2. Make sure you add the ZITADEL callback redirect URIs.
-   https://accounts.zitadel.ch/register/externalidp/callback
-   https://accounts.zitadel.ch/login/externalidp/callback
+   - https://accounts.zitadel.ch/register/externalidp/callback  
+   - https://accounts.zitadel.ch/login/externalidp/callback
 
 > **Information:** Make sure the provider is OIDC 1.0 compliant with a proper Discovery Endpoint
 
@@ -66,7 +66,7 @@ Google Example:
 4. Add the redirect URIs from above.
 5. Save **Your Client ID** and **Your Client Secret**.
 
-![Add new oAuth credentials in Google Console](/img/google_add_credentials.gif)
+![Add new OAuth credentials in the Google console](/img/google_add_credentials.gif)
 
 ### 2. Add custom login policy on your organization
 
@@ -80,7 +80,7 @@ Google Example:
 
 1. Go to the identity providers section. Select **New**.
 2. Fill out the form:
-   - Use the issuer, `clientid` and client secret provided by your provider
+   - Use the issuer, `clientid` and `client secret` you get from your identity provider
    - The scopes will be prefilled with `openid`, `profile` and `email`, because this information is relevant for ZITADEL.
    - Choose what fields you like to map as the display name and username. The fields you can choose are `preferred_username` and `email`
      (Example: For Google, you should choose `email` for both fields)
@@ -128,7 +128,7 @@ Your user now can choose Google to login instead of username/password or mfa.
 * The issuer for your identity provider is <https://issuer.zitadel.ch>
     - [ ] yes
     - [ ] no
-* The identity provider has to be oAuth 2.0 compliant
+* The identity provider has to be OAuth 2.0 compliant
     - [ ] yes
     - [ ] no
 
@@ -140,7 +140,7 @@ Your user now can choose Google to login instead of username/password or mfa.
 * The issuer for your identity provider is https://issuer.zitadel.ch
     - [ ] yes
     - [x] no (The issuer is provided by your chosen identity provider. In the case of Google, it's https://accounts.google.com)
-* The identity provider has to be oAuth 2.0 compliant
+* The identity provider has to be OAuth 2.0 compliant
     - [x] yes
     - [ ] no
 

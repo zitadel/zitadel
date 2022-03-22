@@ -28,7 +28,7 @@ When describing multiple-organization scenarios, this topic sometimes also refer
 
 ### Portal Application
 
-Octagon has a *Portal application*, where its employees can access their account and list all applications they are allowed to use.
+Octagon has a portal application, where its employees can access their account and list all applications they are allowed to use.
 
 Employees work for a department within Octagon, or for Octagon itself. 
 Some users supervise teams.
@@ -40,7 +40,7 @@ Target groups of the application can be split into:
 
 ### Planning considerations
 
-To define the Portal Application's needs, the application's builders need to consider how the organization is made:
+To define the portal application's needs, the application's builders need to consider how the organization is made:
 
 - Login and Access: Does a user have a preset organization to log in?
   Does the application show the default login page, or does each organization use its own branding?
@@ -56,7 +56,7 @@ You can decide whether an organization is preselected for the login, or redirect
 To set the behavior of the login, go to your projects detail page.
 To send the user to a specific organization, define the organization in a custom scope (primary domain).
 
-To change the branding or the login options of the organization, head to the organization section in [Console](https://console.zitadel.ch/org). 
+To change the branding or the login options of the organization, head to the organization section in the [console](https://console.zitadel.ch/org). 
 You can choose the branding of the selected organization, the user resource owner, or the project's resource owner.
 
 ### Organizations
@@ -69,7 +69,7 @@ If you don't want this feature, create a separate user for each organization.
 To add a user from a different organization to a project's audience, you can add a new user authorization (user grant).
 A user grant combines a user from any organization with a project and 0-N roles.
 
-Our sample organization has these users:
+Our sample organizations have these users:
 
 - Dimitri: a team leader who is employed by Pentagon, an Octagon department.
   Dimitri uses his Microsoft Account in combination with his one-time password to access the portal.
@@ -77,13 +77,18 @@ Our sample organization has these users:
   Pentagon also requires its users to secure their accounts with additional factors.
 - Michael: a trainee of Pentagon using the portal only to access his workspace apps.
   Michael uses his Google Account in combination with his laptop's fingerprint.
-- Bill: an employee of Octagon, working as Administrator of the Portal Application.
+- Bill: an employee of Octagon, working as Administrator of the portal application.
   Bill also uses a Microsoft Account in combination with a Security Key to secure his account.
 
-After you understand the constellation of the organizations and its users, use the
-[Console](https://console.zitadel.ch/org) to set up all the necessary data (Portal project with roles and app, users, login requirements, identity providers, branding).
+After you understand the constellation of the organizations and its users, use the ZITADEL
+[console](https://console.zitadel.ch/org) to set up all the necessary data:
+- portal project with roles and app
+- users
+- login requirements
+- identity providers
+- branding
 
-A sample B2B application for NextJS can be found in our [Example Repo](https://github.com/caos/zitadel-examples).
+A sample B2B application for NextJS can be found in our [example repository](https://github.com/caos/zitadel-examples).
 
 To allow another organization to use a project, create a project grant. Upon creation, you can limit roles for a grant to a subset of the total project roles.
 
@@ -97,7 +102,7 @@ The `admin` role is reserved for the Octagon organization itself.
 
 In this scenario, Dimitri and Michael both belong to the organization Pentagon.
 Bill belongs to Octagon.
-Octagon is owner of the Portal project with its Web App, where Bill is configured as user grant with `admin` role.
+Octagon is owner of the portal project with its Web App, where Bill is configured as user grant with `admin` role.
 Dimitri owns the `writer` role, whereas Michael is only a `reader`.
 
 > Note: Roles are meant for internal business logic and therefore need to be validated separately. None of the users described are allowed to create user grants, at least if they do not own a ZITADEL manager role.
@@ -109,7 +114,7 @@ To create a meaningful audit log, do not use a machine user's token.
 ### Noteworthy
 
 Because ZITADEL includes unlimited users, projects, and applications, and because it comes with all security features in the FREE tier, ZITADEL is a great alternative to other SaaS IAM systems such as Auth0 or Okta.
-In cases of high potential scalability, where user counts can grow explosively, ZITADEL does not become the bottleneck.
+In cases of potentially high scalability demands, where user counts can grow explosively, ZITADEL does not become the bottleneck.
 [Read more about ZITADELs benefits and pricing](https://zitadel.ch/pricing).
 
 ### Learn more

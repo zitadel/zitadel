@@ -13,7 +13,7 @@ title: Service Users
             In this module you will:
             <ul>
                 <li>Learn about Service Users</li>
-                <li>Create a Service User in ZITADEL Console</li>
+                <li>Create a Service User in the ZITADEL console</li>
                 <li>Authorize a Service User with JWT signed with your private key</li>
             </ul>
         </td>

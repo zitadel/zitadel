@@ -7,7 +7,7 @@ This integration guide shows you how.
 
 ## Setup your ZITADEL application
 
-Before you embed an authenticated chart in your application, you need to provide some information about your app in the ZITADEL Console.
+Before you embed an authenticated chart in your application, you need to provide some information about your app in the ZITADEL console.
 We recommend creating a new app to start from scratch.
 
 1. Navigate to your [Project](https://console.zitadel.ch/projects)
