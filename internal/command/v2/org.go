@@ -36,7 +36,7 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 		org.AddOrg(orgAgg, o.Name, command.iamDomain),
 		org.AddDomain(orgAgg, o.Domain),
 		user.AddHumanCommand(userAgg, &o.Human, command.userPasswordAlg),
-		org.AddMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+		org.AddMember(orgAgg, userID, domain.RoleOrgOwner),
 	)
 	if err != nil {
 		return nil, err

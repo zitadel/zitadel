@@ -57,15 +57,6 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				return nil, err
 			}
 
-			passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
-			if err != nil {
-				return nil, err
-			}
-
-			if err = passwordComplexity.Validate(human.Password); err != nil {
-				return nil, err
-			}
-
 			cmd := user.NewHumanAddedEvent(
 				ctx,
 				&a.Aggregate,
@@ -83,6 +74,15 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				cmd.AddPhoneData(human.Phone)
 			}
 			if human.Password != "" {
+				passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
+				if err != nil {
+					return nil, err
+				}
+
+				if err = passwordComplexity.Validate(human.Password); err != nil {
+					return nil, err
+				}
+
 				secret, err := crypto.Hash([]byte(human.Password), passwordAlg)
 				if err != nil {
 					return nil, err

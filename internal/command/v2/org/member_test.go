@@ -8,7 +8,130 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/user"
 )
+
+func TestAddMember(t *testing.T) {
+	type args struct {
+		a      *org.Aggregate
+		userID string
+		roles  []string
+		filter preparation.FilterToQueryReducer
+	}
+
+	ctx := context.Background()
+	agg := org.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want preparation.Want
+	}{
+		{
+			name: "no user id",
+			args: args{
+				a:      agg,
+				userID: "",
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
+			},
+		},
+		// {
+		// 	name: "TODO: invalid roles",
+		// 	args: args{
+		// 		a:      agg,
+		// 		userID: "",
+		// 		roles:  []string{""},
+		// 	},
+		// 	want: preparation.Want{
+		// 		ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
+		// 	},
+		// },
+		{
+			name: "user not exists",
+			args: args{
+				a:      agg,
+				userID: "userID",
+				filter: preparation.NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return nil, nil
+					}).
+					Filter(),
+			},
+			want: preparation.Want{
+				CreateErr: errors.ThrowNotFound(nil, "ORG-GoXOn", "Errors.User.NotFound"),
+			},
+		},
+		{
+			name: "already member",
+			args: args{
+				a:      agg,
+				userID: "userID",
+				filter: preparation.NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							user.NewMachineAddedEvent(
+								ctx,
+								&user.NewAggregate("id", "ro").Aggregate,
+								"userName",
+								"name",
+								"description",
+								true,
+							),
+						}, nil
+					}).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							org.NewMemberAddedEvent(
+								ctx,
+								&org.NewAggregate("id", "ro").Aggregate,
+								"userID",
+							),
+						}, nil
+					}).
+					Filter(),
+			},
+			want: preparation.Want{
+				CreateErr: errors.ThrowAlreadyExists(nil, "ORG-poWwe", "Errors.Org.Member.AlreadyExists"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:      agg,
+				userID: "userID",
+				filter: preparation.NewMultiFilter().
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return []eventstore.Event{
+							user.NewMachineAddedEvent(
+								ctx,
+								&user.NewAggregate("id", "ro").Aggregate,
+								"userName",
+								"name",
+								"description",
+								true,
+							),
+						}, nil
+					}).
+					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+						return nil, nil
+					}).
+					Filter(),
+			},
+			want: preparation.Want{
+				Commands: []eventstore.Command{
+					org.NewMemberAddedEvent(ctx, &agg.Aggregate, "userID"),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			preparation.AssertValidation(t, AddMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+		})
+	}
+}
 
 func TestIsMember(t *testing.T) {
 	type args struct {

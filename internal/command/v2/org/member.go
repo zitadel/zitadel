@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func AddMemberCommand(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
+func AddMember(a *org.Aggregate, userID string, roles ...string) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		if userID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument")
@@ -21,7 +21,7 @@ func AddMemberCommand(a *org.Aggregate, userID string, roles ...string) preparat
 					return nil, errors.ThrowNotFound(err, "ORG-GoXOn", "Errors.User.NotFound")
 				}
 				if isMember, err := IsMember(ctx, filter, a.ID, userID); err != nil || isMember {
-					return nil, errors.ThrowNotFound(err, "ORG-poWwe", "Errors.Org.Member.AlreadyExists")
+					return nil, errors.ThrowAlreadyExists(err, "ORG-poWwe", "Errors.Org.Member.AlreadyExists")
 				}
 				return []eventstore.Command{org.NewMemberAddedEvent(ctx, &a.Aggregate, userID, roles...)}, nil
 			},

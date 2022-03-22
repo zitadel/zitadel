@@ -18,7 +18,7 @@ type Want struct {
 }
 
 //AssertValidation checks if the validation works as inteded
-func AssertValidation(t *testing.T, validation Validation, want Want) {
+func AssertValidation(t *testing.T, validation Validation, filter FilterToQueryReducer, want Want) {
 	t.Helper()
 
 	creates, err := validation()
@@ -29,7 +29,7 @@ func AssertValidation(t *testing.T, validation Validation, want Want) {
 	if err != nil {
 		return
 	}
-	cmds, err := creates(context.Background(), nil)
+	cmds, err := creates(context.Background(), filter)
 	if !errors.Is(err, want.CreateErr) {
 		t.Errorf("wrong create err = %v, want %v", err, want.CreateErr)
 		return

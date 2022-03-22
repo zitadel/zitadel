@@ -11,6 +11,89 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+func TestAddProject(t *testing.T) {
+	type args struct {
+		a                      *project.Aggregate
+		name                   string
+		owner                  string
+		privateLabelingSetting domain.PrivateLabelingSetting
+	}
+
+	ctx := context.Background()
+	agg := project.NewAggregate("test", "test")
+
+	tests := []struct {
+		name string
+		args args
+		want preparation.Want
+	}{
+		{
+			name: "invalid name",
+			args: args{
+				a:                      agg,
+				name:                   "",
+				owner:                  "owner",
+				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-C01yo", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid private labeling setting",
+			args: args{
+				a:                      agg,
+				name:                   "name",
+				owner:                  "owner",
+				privateLabelingSetting: -1,
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "invalid owner",
+			args: args{
+				a:                      agg,
+				name:                   "name",
+				owner:                  "",
+				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument"),
+			},
+		},
+		{
+			name: "correct",
+			args: args{
+				a:                      agg,
+				name:                   "ZITADEL",
+				owner:                  "CAOS AG",
+				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+			},
+			want: preparation.Want{
+				Commands: []eventstore.Command{
+					project.NewProjectAddedEvent(ctx, &agg.Aggregate,
+						"ZITADEL",
+						false,
+						false,
+						false,
+						domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
+					),
+					project.NewProjectMemberAddedEvent(ctx, &agg.Aggregate,
+						"CAOS AG",
+						domain.RoleProjectOwner),
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			preparation.AssertValidation(t, AddProject(tt.args.a, tt.args.name, tt.args.owner, false, false, false, tt.args.privateLabelingSetting), nil, tt.want)
+		})
+	}
+}
+
 func TestExistsProject(t *testing.T) {
 	type args struct {
 		filter        preparation.FilterToQueryReducer

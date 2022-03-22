@@ -201,7 +201,7 @@ func (command *Command) SetUpTenant(ctx context.Context, instance *InstanceSetup
 		org.AddOrg(orgAgg, instance.Org.Name, command.iamDomain),
 		org.AddDomain(orgAgg, instance.Org.Domain),
 		user.AddHumanCommand(userAgg, &instance.Org.Human, command.userPasswordAlg),
-		org.AddMemberCommand(orgAgg, userID, domain.RoleOrgOwner),
+		org.AddMember(orgAgg, userID, domain.RoleOrgOwner),
 
 		project.AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
