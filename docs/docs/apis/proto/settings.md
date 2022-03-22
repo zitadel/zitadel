@@ -9,6 +9,18 @@ title: zitadel/settings.proto
 ## Messages
 
 
+### DebugNotificationProvider
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| compact |  bool | - |  |
+
+
+
+
 ### OIDCSettings
 
 
