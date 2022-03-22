@@ -57,3 +57,24 @@ func eventTypes(cmds []eventstore.Command) []eventstore.EventType {
 	}
 	return types
 }
+
+type MultiFilter struct {
+	count   int
+	filters []FilterToQueryReducer
+}
+
+func NewMultiFilter() *MultiFilter {
+	return new(MultiFilter)
+}
+
+func (mf *MultiFilter) Append(filter FilterToQueryReducer) *MultiFilter {
+	mf.filters = append(mf.filters, filter)
+	return mf
+}
+
+func (mf *MultiFilter) Filter() FilterToQueryReducer {
+	return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
+		mf.count++
+		return mf.filters[mf.count-1](ctx, queryFactory)
+	}
+}
