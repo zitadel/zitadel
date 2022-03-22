@@ -148,7 +148,7 @@ Your user now can choose Google to login instead of username/password or mfa.
 
 ## Summary
 
-* You can federate identities of all oAuth 2.0 compliant external identity providers.
+* You can federate identities of all OAuth 2.0 compliant external identity providers.
 * Configure the provider in your custom login policy.
 
 Where to go from here:
