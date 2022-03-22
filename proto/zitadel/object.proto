@@ -85,3 +85,8 @@ enum TextQueryMethod {
     TEXT_QUERY_METHOD_ENDS_WITH = 6;
     TEXT_QUERY_METHOD_ENDS_WITH_IGNORE_CASE = 7;
 }
+
+
+enum ListQueryMethod {
+    LIST_QUERY_METHOD_IN = 0;
+}
