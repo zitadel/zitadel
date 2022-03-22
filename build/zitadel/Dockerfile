@@ -60,9 +60,9 @@ RUN apt install openssl tzdata tar
 
 # cockroach binary used to backup database
 RUN mkdir /usr/local/lib/cockroach
-RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v21.2.5.linux-amd64.tgz \
-    | tar  xvz && cp -i cockroach-v21.2.5.linux-amd64/cockroach /usr/local/bin/
-RUN rm -r cockroach-v21.2.5.linux-amd64
+RUN wget -qO- https://binaries.cockroachdb.com/cockroach-v21.2.7.linux-amd64.tgz \
+    | tar  xvz && cp -i cockroach-v21.2.7.linux-amd64/cockroach /usr/local/bin/
+RUN rm -r cockroach-v21.2.7.linux-amd64
 
 #######################
 ## generates static files
