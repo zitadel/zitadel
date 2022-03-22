@@ -82,18 +82,6 @@ Returns the usage metrics of an instance
     GET: /instances/{id}/usage
 
 
-### GetInstanceMetrics
-
-> **rpc** GetInstanceMetrics([GetMetricsRequest](#getmetricsrequest))
-[GetMetricsResponse](#getmetricsresponse)
-
-Returns the metrics of an instance
-
-
-
-    GET: /instances/{id}/metrics
-
-
 ### GetGeneratedDomain
 
 > **rpc** GetGeneratedDomain([GetGeneratedDomainRequest](#getgenerateddomainrequest))
@@ -373,32 +361,6 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | instance |  zitadel.instance.v1.Instance | - |  |
-
-
-
-
-### GetMetricsRequest
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
-
-
-
-
-### GetMetricsResponse
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| org_count |  uint64 | - |  |
-| user_count |  uint64 | - |  |
-| project_count |  uint64 | - |  |
-| application_count |  uint64 | - |  |
 
 
 
