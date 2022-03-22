@@ -52,7 +52,7 @@ func (db *CRDB) Step20(ctx context.Context, latestSequence uint64) error {
 		if err = tx.Commit(); err != nil {
 			return err
 		}
-		logging.LogWithFields("SQL-bXVwS", "currentSeq", currentSequence, "events", len(events)).Info("events updated")
+		logging.WithFields("currentSeq", currentSequence, "events", len(events)).Info("events updated")
 	}
 	return nil
 }

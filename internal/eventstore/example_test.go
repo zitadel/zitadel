@@ -3,7 +3,6 @@ package eventstore_test
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
 
@@ -18,7 +17,7 @@ import (
 // ------------------------------------------------------------
 func NewUserAggregate(id string) *eventstore.Aggregate {
 	return eventstore.NewAggregate(
-		authz.NewMockContext("caos", "adlerhurst"),
+		authz.NewMockContext("zitadel", "caos", "adlerhurst"),
 		id,
 		"test.user",
 		"v1",
@@ -308,7 +307,7 @@ func TestUserReadModel(t *testing.T) {
 
 	events = append(events, nil)
 
-	fmt.Printf("%+v\n", events)
+	t.Logf("%+v\n", events)
 
 	users := UsersReadModel{}
 
@@ -316,5 +315,5 @@ func TestUserReadModel(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error on filter to reducer: %v", err)
 	}
-	fmt.Printf("%+v", users)
+	t.Logf("%+v", users)
 }

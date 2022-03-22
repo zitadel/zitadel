@@ -195,7 +195,7 @@ func (c *Commands) addOrgDomain(ctx context.Context, orgAgg *eventstore.Aggregat
 		for _, userID := range claimedUserIDs {
 			userEvents, _, err := c.userDomainClaimed(ctx, userID)
 			if err != nil {
-				logging.LogWithFields("COMMAND-nn8Jf", "userid", userID).WithError(err).Warn("could not claim user")
+				logging.WithFields("userid", userID).WithError(err).Warn("could not claim user")
 				continue
 			}
 			events = append(events, userEvents...)

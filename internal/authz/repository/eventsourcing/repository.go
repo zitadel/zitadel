@@ -26,7 +26,7 @@ type EsRepository struct {
 	eventstore.TokenVerifierRepo
 }
 
-func Start(conf Config, systemDefaults sd.SystemDefaults, queries *query.Queries, dbClient *sql.DB, keyConfig *crypto.KeyConfig) (repository.Repository, error) {
+func Start(conf Config, systemDefaults sd.SystemDefaults, queries *query.Queries, dbClient *sql.DB, keyEncryptionAlgorithm crypto.EncryptionAlgorithm) (repository.Repository, error) {
 	es, err := v1.Start(dbClient)
 	if err != nil {
 		return nil, err
@@ -40,18 +40,13 @@ func Start(conf Config, systemDefaults sd.SystemDefaults, queries *query.Queries
 
 	spool := spooler.StartSpooler(conf.Spooler, es, view, dbClient, systemDefaults)
 
-	keyAlgorithm, err := crypto.NewAESCrypto(keyConfig)
-	if err != nil {
-		return nil, err
-	}
-
 	return &EsRepository{
 		spool,
 		eventstore.UserMembershipRepo{
 			View: view,
 		},
 		eventstore.TokenVerifierRepo{
-			TokenVerificationKey: keyAlgorithm,
+			TokenVerificationKey: keyEncryptionAlgorithm,
 			Eventstore:           es,
 			View:                 view,
 			Query:                queries,

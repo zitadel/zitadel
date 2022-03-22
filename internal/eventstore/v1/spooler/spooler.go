@@ -2,15 +2,14 @@ package spooler
 
 import (
 	"context"
-
-	"github.com/getsentry/sentry-go"
-
-	"github.com/caos/zitadel/internal/eventstore/v1"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/caos/logging"
+	"github.com/getsentry/sentry-go"
+
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
@@ -38,7 +37,7 @@ type spooledHandler struct {
 }
 
 func (s *Spooler) Start() {
-	defer logging.LogWithFields("SPOOL-N0V1g", "lockerID", s.lockID, "workers", s.workers).Info("spooler started")
+	defer logging.WithFields("lockerID", s.lockID, "workers", s.workers).Info("spooler started")
 	if s.workers < 1 {
 		return
 	}
@@ -116,7 +115,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 	for i, event := range events {
 		select {
 		case <-ctx.Done():
-			logging.LogWithFields("SPOOL-FTKwH", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
+			logging.WithFields("view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).Debug("context canceled")
 			return nil
 		default:
 			if err := s.Reduce(event); err != nil {
@@ -130,7 +129,7 @@ func (s *spooledHandler) process(ctx context.Context, events []*models.Event, wo
 		}
 	}
 	err := s.OnSuccess()
-	logging.LogWithFields("SPOOL-49ods", "view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
+	logging.WithFields("view", s.ViewModel(), "worker", workerID, "traceID", tracing.TraceIDFromCtx(ctx)).OnError(err).Warn("could not process on success func")
 	return err
 }
 
@@ -141,7 +140,7 @@ func (s *spooledHandler) query(ctx context.Context) ([]*models.Event, error) {
 	}
 	factory := models.FactoryFromSearchQuery(query)
 	sequence, err := s.eventstore.LatestSequence(ctx, factory)
-	logging.Log("SPOOL-7SciK").OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
+	logging.OnError(err).WithField("traceID", tracing.TraceIDFromCtx(ctx)).Debug("unable to query latest sequence")
 	var processedSequence uint64
 	for _, filter := range query.Filters {
 		if filter.GetField() == models.Field_LatestSequence {

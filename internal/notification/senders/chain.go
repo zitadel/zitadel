@@ -22,3 +22,7 @@ func (c *Chain) HandleMessage(message channels.Message) error {
 	}
 	return nil
 }
+
+func (c *Chain) Len() int {
+	return len(c.channels)
+}

@@ -3,25 +3,21 @@ package senders
 import (
 	"context"
 
+	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/notification/channels"
+	"github.com/caos/zitadel/internal/notification/channels/fs"
+	"github.com/caos/zitadel/internal/notification/channels/log"
 	"github.com/caos/zitadel/internal/notification/channels/smtp"
 )
 
-func EmailChannels(ctx context.Context, config systemdefaults.Notifications, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error)) (channels.NotificationChannel, error) {
-
-	debug, err := debugChannels(config)
+func EmailChannels(ctx context.Context, config systemdefaults.Notifications, emailConfig func(ctx context.Context) (*smtp.EmailConfig, error), getFileSystemProvider func(ctx context.Context) (*fs.FSConfig, error), getLogProvider func(ctx context.Context) (*log.LogConfig, error)) (chain *Chain, err error) {
+	p, err := smtp.InitSMTPChannel(ctx, emailConfig)
+	if err == nil {
+		chain.channels = append(chain.channels, p)
+	}
+	chain, err = debugChannels(ctx, config, getFileSystemProvider, getLogProvider)
 	if err != nil {
-		return nil, err
+		logging.New().Info("Error in creating debug channels")
 	}
-
-	if !config.DebugMode {
-		p, err := smtp.InitSMTPChannel(ctx, emailConfig)
-		if err != nil {
-			return nil, err
-		}
-		return chainChannels(debug, p), nil
-	}
-
-	return debug, nil
+	return chain, nil
 }

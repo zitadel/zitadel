@@ -212,6 +212,30 @@ Update oidc settings (e.g token lifetimes, etc)
     PUT: /settings/oidc
 
 
+### GetFileSystemNotificationProvider
+
+> **rpc** GetFileSystemNotificationProvider([GetFileSystemNotificationProviderRequest](#getfilesystemnotificationproviderrequest))
+[GetFileSystemNotificationProviderResponse](#getfilesystemnotificationproviderresponse)
+
+Get file system notification provider
+
+
+
+    GET: /notification/provider/file
+
+
+### GetLogNotificationProvider
+
+> **rpc** GetLogNotificationProvider([GetLogNotificationProviderRequest](#getlognotificationproviderrequest))
+[GetLogNotificationProviderResponse](#getlognotificationproviderresponse)
+
+Get log notification provider
+
+
+
+    GET: /notification/provider/log
+
+
 ### GetOrgByID
 
 > **rpc** GetOrgByID([GetOrgByIDRequest](#getorgbyidrequest))
@@ -1997,6 +2021,23 @@ This is an empty request
 
 
 
+### GetFileSystemNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetFileSystemNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
+
+
+
+
 ### GetIDPByIDRequest
 
 
@@ -2049,6 +2090,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | policy |  zitadel.policy.v1.LockoutPolicy | - |  |
+
+
+
+
+### GetLogNotificationProviderRequest
+This is an empty request
+
+
+
+
+### GetLogNotificationProviderResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| provider |  zitadel.settings.v1.DebugNotificationProvider | - |  |
 
 
 

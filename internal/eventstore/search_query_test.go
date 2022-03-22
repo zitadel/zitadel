@@ -226,6 +226,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 	type args struct {
 		columns Columns
 		setters []func(*SearchQueryBuilder) *SearchQueryBuilder
+		tenant  string
 	}
 	type res struct {
 		isErr func(err error) bool
@@ -621,6 +622,32 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 			},
 		},
 		{
+			name: "filter aggregate type and tenant",
+			args: args{
+				columns: ColumnsEvent,
+				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
+					testAddQuery(
+						testSetAggregateTypes("user"),
+					),
+				},
+				tenant: "tenant",
+			},
+			res: res{
+				isErr: nil,
+				query: &repository.SearchQuery{
+					Columns: repository.ColumnsEvent,
+					Desc:    false,
+					Limit:   0,
+					Filters: [][]*repository.Filter{
+						{
+							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
+							repository.NewFilter(repository.FieldTenant, "tenant", repository.OperationEquals),
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "column invalid",
 			args: args{
 				columns: Columns(-1),
@@ -641,7 +668,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 			for _, f := range tt.args.setters {
 				builder = f(builder)
 			}
-			query, err := builder.build()
+			query, err := builder.build(tt.args.tenant)
 			if tt.res.isErr != nil && !tt.res.isErr(err) {
 				t.Errorf("wrong error(%T): %v", err, err)
 				return
