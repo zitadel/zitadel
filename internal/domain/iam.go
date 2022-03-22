@@ -28,7 +28,8 @@ type IAM struct {
 type InstanceDomain struct {
 	models.ObjectRoot
 
-	Domain string
+	Domain    string
+	Generated bool
 }
 
 func (i *InstanceDomain) IsValid() bool {

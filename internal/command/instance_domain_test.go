@@ -57,6 +57,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 							iam.NewDomainAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"domain.ch",
+								false,
 							),
 						),
 					),
@@ -83,6 +84,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 							eventFromEventPusher(iam.NewDomainAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"domain.ch",
+								false,
 							)),
 						},
 						uniqueConstraintsFromEventConstraint(iam.NewAddInstanceDomainUniqueConstraint("domain.ch")),
@@ -186,6 +188,7 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 							iam.NewDomainAddedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate,
 								"domain.ch",
+								false,
 							),
 						),
 					),
@@ -214,6 +217,36 @@ func TestCommandSide_RemoveInstanceDomain(t *testing.T) {
 				want: &domain.ObjectDetails{
 					ResourceOwner: "IAM",
 				},
+			},
+		},
+		{
+			name: "remove generated domain, precondition failed",
+			fields: fields{
+				eventstore: eventstoreExpect(
+					t,
+					expectFilter(
+						eventFromEventPusher(
+							iam.NewDomainAddedEvent(context.Background(),
+								&iam.NewAggregate().Aggregate,
+								"domain.ch",
+								true,
+							),
+						),
+					),
+				),
+			},
+			args: args{
+				ctx: context.Background(),
+				domain: &domain.InstanceDomain{
+					ObjectRoot: models.ObjectRoot{
+						AggregateID:   "IAM",
+						ResourceOwner: "IAM",
+					},
+					Domain: "domain.ch",
+				},
+			},
+			res: res{
+				err: caos_errs.IsPreconditionFailed,
 			},
 		},
 	}

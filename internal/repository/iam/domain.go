@@ -33,7 +33,8 @@ func NewRemoveInstanceDomainUniqueConstraint(orgDomain string) *eventstore.Event
 type DomainAddedEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	Domain string `json:"domain,omitempty"`
+	Domain    string `json:"domain,omitempty"`
+	Generated bool   `json:"generated,omitempty"`
 }
 
 func (e *DomainAddedEvent) Data() interface{} {
@@ -44,14 +45,15 @@ func (e *DomainAddedEvent) UniqueConstraints() []*eventstore.EventUniqueConstrai
 	return []*eventstore.EventUniqueConstraint{NewAddInstanceDomainUniqueConstraint(e.Domain)}
 }
 
-func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string) *DomainAddedEvent {
+func NewDomainAddedEvent(ctx context.Context, aggregate *eventstore.Aggregate, domain string, generated bool) *DomainAddedEvent {
 	return &DomainAddedEvent{
 		BaseEvent: *eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
 			InstanceDomainAddedEventType,
 		),
-		Domain: domain,
+		Domain:    domain,
+		Generated: generated,
 	}
 }
 

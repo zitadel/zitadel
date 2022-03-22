@@ -9,8 +9,9 @@ import (
 type InstanceDomainWriteModel struct {
 	eventstore.WriteModel
 
-	Domain string
-	State  domain.InstanceDomainState
+	Domain    string
+	Generated bool
+	State     domain.InstanceDomainState
 }
 
 func NewInstanceDomainWriteModel(instanceDomain string) *InstanceDomainWriteModel {
@@ -45,6 +46,7 @@ func (wm *InstanceDomainWriteModel) Reduce() error {
 		switch e := event.(type) {
 		case *iam.DomainAddedEvent:
 			wm.Domain = e.Domain
+			wm.Generated = e.Generated
 			wm.State = domain.InstanceDomainStateActive
 		case *iam.DomainRemovedEvent:
 			wm.State = domain.InstanceDomainStateRemoved

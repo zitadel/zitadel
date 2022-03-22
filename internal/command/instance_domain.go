@@ -42,6 +42,9 @@ func (c *Commands) RemoveInstanceDomain(ctx context.Context, instanceDomain *dom
 	if domainWriteModel.State != domain.InstanceDomainStateActive {
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-8ls9f", "Errors.Instance.Domain.NotFound")
 	}
+	if domainWriteModel.Generated {
+		return nil, caos_errs.ThrowPreconditionFailed(nil, "INSTANCE-9hn3n", "Errors.Instance.Domain.GeneratedNotRemovable")
+	}
 	instanceAgg := IAMAggregateFromWriteModel(&domainWriteModel.WriteModel)
 	pushedEvents, err := c.eventstore.Push(ctx, iam.NewDomainRemovedEvent(ctx, instanceAgg, instanceDomain.Domain))
 	if err != nil {
@@ -63,7 +66,7 @@ func (c *Commands) addInstanceDomain(ctx context.Context, instanceAgg *eventstor
 		return nil, caos_errs.ThrowAlreadyExists(nil, "COMMA-nfske", "Errors.Instance.Domain.AlreadyExists")
 	}
 
-	return iam.NewDomainAddedEvent(ctx, instanceAgg, instanceDomain.Domain), nil
+	return iam.NewDomainAddedEvent(ctx, instanceAgg, instanceDomain.Domain, instanceDomain.Generated), nil
 }
 
 func (c *Commands) getInstanceDomainWriteModel(ctx context.Context, domain string) (*InstanceDomainWriteModel, error) {
