@@ -24,3 +24,25 @@ type IAM struct {
 	DefaultPasswordAgePolicy        *PasswordAgePolicy
 	DefaultPasswordLockoutPolicy    *LockoutPolicy
 }
+
+type InstanceDomain struct {
+	Domain string
+}
+
+func (i *InstanceDomain) IsValid() bool {
+	return i.Domain != ""
+}
+
+type InstanceDomainState int32
+
+const (
+	InstanceDomainStateUnspecified InstanceDomainState = iota
+	InstanceDomainStateActive
+	InstanceDomainStateRemoved
+
+	instanceDomainStateCount
+)
+
+func (f InstanceDomainState) Valid() bool {
+	return f >= 0 && f < instanceDomainStateCount
+}
