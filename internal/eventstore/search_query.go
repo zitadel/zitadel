@@ -91,9 +91,9 @@ func (builder *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQu
 }
 
 //Tenant defines the tenant (system) of the events
-func (builder *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
-	builder.tenant = tenant
-	return builder
+func (factory *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
+	factory.tenant = tenant
+	return factory
 }
 
 //OrderDesc changes the sorting order of the returned events to descending

@@ -32,6 +32,7 @@ The user provided by flags needs priviledge to
 			config := Config{}
 			err := viper.Unmarshal(&config)
 			logging.OnError(err).Fatal("unable to read config")
+
 			err = initialise(config,
 				VerifyUser(config.Database.User.Username, config.Database.User.Password),
 				VerifyDatabase(config.Database.Database),
