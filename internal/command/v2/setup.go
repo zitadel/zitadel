@@ -1,15 +1,9 @@
 package command
 
-import "context"
-
 type SetupDefaults struct {
 	Org         Org
 	Admin       User
 	LoginPolicy LoginPolicy
-}
-
-func (c *Command) SetupTenant(ctx context.Context, defaults *SetupDefaults) error {
-	return nil
 }
 
 type LoginPolicy struct {
