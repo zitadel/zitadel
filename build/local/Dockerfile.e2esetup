@@ -1,7 +1,7 @@
 FROM golang:1.17
 
-RUN curl https://binaries.cockroachdb.com/cockroach-v21.2.5.linux-amd64.tgz | tar -xz
-RUN cp -i cockroach-v21.2.5.linux-amd64/cockroach /usr/local/bin/ 
+RUN curl https://binaries.cockroachdb.com/cockroach-v21.2.7.linux-amd64.tgz | tar -xz
+RUN cp -i cockroach-v21.2.7.linux-amd64/cockroach /usr/local/bin/ 
 
 WORKDIR /go/src/github.com/caos/zitadel
 
