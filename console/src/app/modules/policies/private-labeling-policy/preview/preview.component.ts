@@ -34,6 +34,16 @@ export class PreviewComponent implements OnInit, OnDestroy {
 
   public get contrastTextColor(): string {
     const c = tinycolor(this.theme === Theme.DARK ? this.policy.primaryColorDark : this.policy.primaryColor);
-    return c.isLight() ? '#000000' : '#ffffff';
+    return this.getContrast(c.toHexString());
+  }
+
+  public getContrast(color: string): string {
+    const onBlack = tinycolor.readability('#000', color);
+    const onWhite = tinycolor.readability('#fff', color);
+    if (onBlack > onWhite) {
+      return '#000000';
+    } else {
+      return '#ffffff';
+    }
   }
 }

@@ -7,7 +7,7 @@ export interface Color {
   name: string;
   hex: string;
   rgb: string;
-  darkContrast: boolean;
+  contrastColor: string;
 }
 
 @Injectable()
@@ -37,10 +37,7 @@ export class ThemeService {
   public updateTheme(colors: Color[], type: string, theme: string): void {
     colors.forEach((color) => {
       document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
-      document.documentElement.style.setProperty(
-        `--theme-${theme}-${type}-contrast-${color.name}`,
-        color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff',
-      );
+      document.documentElement.style.setProperty(`--theme-${theme}-${type}-contrast-${color.name}`, color.contrastColor);
     });
   }
 
@@ -90,7 +87,7 @@ export class ThemeService {
       name: name,
       hex: c.toHexString(),
       rgb: c.toRgbString(),
-      darkContrast: c.isLight(),
+      contrastColor: this.getContrast(c.toHexString()),
     };
   }
 
@@ -102,5 +99,15 @@ export class ThemeService {
   public isDark(hex: string): boolean {
     const color = tinycolor(hex);
     return color.isDark();
+  }
+
+  public getContrast(color: string): string {
+    const onBlack = tinycolor.readability('#000', color);
+    const onWhite = tinycolor.readability('#fff', color);
+    if (onBlack > onWhite) {
+      return 'hsla(0, 0%, 0%, 0.87)';
+    } else {
+      return '#ffffff';
+    }
   }
 }
