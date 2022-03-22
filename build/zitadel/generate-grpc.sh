@@ -39,6 +39,20 @@ protoc \
   --grpc-gateway_opt logtostderr=true \
   --openapiv2_out ${OPENAPI_PATH} \
   --openapiv2_opt logtostderr=true \
+  --authoption_out ${GRPC_PATH}/system \
+  --validate_out=lang=go:${GOPATH}/src \
+  ${PROTO_PATH}/system.proto
+
+# authoptions are generated into the wrong folder
+mv ${ZITADEL_PATH}/pkg/grpc/system/zitadel/* ${ZITADEL_PATH}/pkg/grpc/system
+rm -r ${ZITADEL_PATH}/pkg/grpc/system/zitadel
+
+protoc \
+  -I=/proto/include \
+  --grpc-gateway_out ${GOPATH}/src \
+  --grpc-gateway_opt logtostderr=true \
+  --openapiv2_out ${OPENAPI_PATH} \
+  --openapiv2_opt logtostderr=true \
   --authoption_out ${GRPC_PATH}/admin \
   --validate_out=lang=go:${GOPATH}/src \
   ${PROTO_PATH}/admin.proto
@@ -82,6 +96,10 @@ rm -r ${ZITADEL_PATH}/pkg/grpc/auth/zitadel
 ## generate docs
 protoc \
   -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,system.md \
+  ${PROTO_PATH}/system.proto
+protoc \
+  -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,auth.md \
   ${PROTO_PATH}/auth.proto
 protoc \
@@ -114,6 +132,10 @@ protoc \
   ${PROTO_PATH}/idp.proto
 protoc \
   -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,instance.md \
+  ${PROTO_PATH}/instance.proto
+protoc \
+  -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,member.md \
   ${PROTO_PATH}/member.proto
 protoc \
@@ -144,7 +166,11 @@ protoc \
   -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,project.md \
   ${PROTO_PATH}/project.proto
-  protoc \
+protoc \
+  -I=/proto/include \
+  --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,settings.md \
+  ${PROTO_PATH}/settings.proto
+protoc \
   -I=/proto/include \
   --doc_out=${DOCS_PATH} --doc_opt=${PROTO_PATH}/docs/zitadel-md.tmpl,text.md \
   ${PROTO_PATH}/text.proto
