@@ -215,6 +215,7 @@ module.exports = {
     "concepts/principles",
     "concepts/eventstore",
     "concepts/architecture",
+    "concepts/billing",
     {
       type: "category",
       label: "Structure",

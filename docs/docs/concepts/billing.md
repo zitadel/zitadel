@@ -4,11 +4,13 @@ title: Billing
 
 ## Where can I find my invoice?
 
-The invvoices are visible in the payment module of stripe.
+The invoices are visible in the payment module of stripe.
 
 Way to them:
 
-- Switch to the organization view.
+- Log in to the console https://console.zitadel.ch/
+
+- Go to the organization view.
 
 - Let the "View Featureset" show you.
 
