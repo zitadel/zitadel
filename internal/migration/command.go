@@ -7,6 +7,7 @@ type SetupStep struct {
 	typ       eventstore.EventType
 	migration Migration
 	Name      string `json:"name"`
+	Error     error  `json:"error,omitempty"`
 	done      bool
 }
 
@@ -27,6 +28,7 @@ func setupDoneCmd(migration Migration, err error) eventstore.Command {
 
 	if err != nil {
 		s.typ = failedType
+		s.Error = err
 	}
 
 	return s
