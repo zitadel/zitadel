@@ -115,7 +115,7 @@ With this token, you can access the [ZITADEL APIs](../../apis/introduction) .
 * Managers are used for all users to get authorizations for all projects.
     - [ ] yes
     - [x] no (Managers are used only to grant users for ZITADEL)
-* You need the ZITADEL Project Id in your audience and can access this with a custom scope?
+* You need the ZITADEL Project Id in your audience and can access this with a custom scope.
     - [x] yes
     - [ ] no
 
