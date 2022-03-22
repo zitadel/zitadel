@@ -224,6 +224,5 @@ func removeExif(file io.Reader, size int64, contentType string) (io.Reader, int6
 func isAllowedContentType(contentType string) bool {
 	return strings.HasSuffix(contentType, "png") ||
 		strings.HasSuffix(contentType, "jpg") ||
-		strings.HasSuffix(contentType, "jpeg") ||
-		strings.HasSuffix(contentType, "tiff")
+		strings.HasSuffix(contentType, "jpeg")
 }
