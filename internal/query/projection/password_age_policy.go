@@ -49,7 +49,7 @@ func NewPasswordAgeProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(AgePolicyExpireWarnDaysCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(AgePolicyMaxAgeDaysCol, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(AgePolicyIDCol),
+			crdb.NewPrimaryKey(AgePolicyInstanceIDCol, AgePolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

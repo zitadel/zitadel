@@ -66,7 +66,7 @@ func NewLoginPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(SecondFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(MultiFactorCheckLifetimeCol, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(LoginPolicyIDCol),
+			crdb.NewPrimaryKey(LoginPolicyInstanceIDCol, LoginPolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

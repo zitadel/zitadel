@@ -46,7 +46,7 @@ func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.Statement
 			crdb.NewColumn(PersonalAccessTokenColumnExpiration, crdb.ColumnTypeTimestamp),
 			crdb.NewColumn(PersonalAccessTokenColumnScopes, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(PersonalAccessTokenColumnID),
+			crdb.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
 			crdb.NewIndex("user_idx", []string{PersonalAccessTokenColumnUserID}),
 			crdb.NewIndex("ro_idx", []string{PersonalAccessTokenColumnResourceOwner}),
 		),

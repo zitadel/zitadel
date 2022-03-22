@@ -53,7 +53,7 @@ func NewSecretGeneratorProjection(ctx context.Context, config crdb.StatementHand
 			crdb.NewColumn(SecretGeneratorColumnIncludeDigits, crdb.ColumnTypeBool),
 			crdb.NewColumn(SecretGeneratorColumnIncludeSymbols, crdb.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
+			crdb.NewPrimaryKey(SecretGeneratorColumnInstanceID, SecretGeneratorColumnGeneratorType, SecretGeneratorColumnAggregateID),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

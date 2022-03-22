@@ -27,7 +27,7 @@ func NewOrgMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable(
 			append(memberColumns, crdb.NewColumn(OrgMemberOrgIDCol, crdb.ColumnTypeText)),
-			crdb.NewPrimaryKey(OrgMemberOrgIDCol, MemberUserIDCol),
+			crdb.NewPrimaryKey(MemberInstanceID, OrgMemberOrgIDCol, MemberUserIDCol),
 			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
 	)

@@ -76,7 +76,7 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPAutoRegisterCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(IDPIDCol),
+			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
 			crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol}),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{

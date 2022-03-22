@@ -53,7 +53,7 @@ func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
 			crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(ProjectColumnID),
+			crdb.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
 			crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner}),
 		),
 	)

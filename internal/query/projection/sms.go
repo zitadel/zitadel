@@ -50,7 +50,7 @@ func NewSMSConfigProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(SMSColumnResourceOwner, crdb.ColumnTypeText),
 			crdb.NewColumn(SMSColumnInstanceID, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(SMSColumnID),
+			crdb.NewPrimaryKey(SMSColumnInstanceID, SMSColumnID),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(SMSTwilioConfigColumnSMSID, crdb.ColumnTypeText, crdb.Default(SMSColumnID)),

@@ -48,7 +48,7 @@ func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
 			crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
+			crdb.NewPrimaryKey(CustomTextInstanceIDCol, CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

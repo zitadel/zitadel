@@ -47,7 +47,7 @@ func NewDebugNotificationProviderProjection(ctx context.Context, config crdb.Sta
 			crdb.NewColumn(DebugNotificationProviderTypeCol, crdb.ColumnTypeEnum),
 			crdb.NewColumn(DebugNotificationProviderCompactCol, crdb.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
+			crdb.NewPrimaryKey(DebugNotificationProviderInstanceIDCol, DebugNotificationProviderAggIDCol, DebugNotificationProviderTypeCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

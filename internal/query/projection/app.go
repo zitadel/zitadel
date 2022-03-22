@@ -74,7 +74,7 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(ActionIDCol),
+			crdb.NewPrimaryKey(AppColumnInstanceID, ActionIDCol),
 			crdb.NewIndex("project_id_idx", []string{AppColumnProjectID}),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{

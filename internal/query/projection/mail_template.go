@@ -45,7 +45,7 @@ func NewMailTemplateProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(MailTemplateIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
 			crdb.NewColumn(MailTemplateTemplateCol, crdb.ColumnTypeBytes),
 		},
-			crdb.NewPrimaryKey(MailTemplateAggregateIDCol),
+			crdb.NewPrimaryKey(MailTemplateInstanceIDCol, MailTemplateAggregateIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

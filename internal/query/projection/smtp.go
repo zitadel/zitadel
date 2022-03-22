@@ -51,7 +51,7 @@ func NewSMTPConfigProjection(ctx context.Context, config crdb.StatementHandlerCo
 			crdb.NewColumn(SMTPConfigColumnSMTPUser, crdb.ColumnTypeText),
 			crdb.NewColumn(SMTPConfigColumnSMTPPassword, crdb.ColumnTypeJSONB, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(SMTPConfigColumnAggregateID),
+			crdb.NewPrimaryKey(SMTPConfigColumnInstanceID, SMTPConfigColumnAggregateID),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

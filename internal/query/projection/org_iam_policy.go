@@ -47,7 +47,7 @@ func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(OrgIAMPolicyResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(OrgIAMPolicyInstanceIDCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(OrgIAMPolicyIDCol),
+			crdb.NewPrimaryKey(OrgIAMPolicyInstanceIDCol, OrgIAMPolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

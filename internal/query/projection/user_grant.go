@@ -53,7 +53,7 @@ func NewUserGrantProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(UserGrantGrantID, crdb.ColumnTypeText),
 			crdb.NewColumn(UserGrantRoles, crdb.ColumnTypeTextArray, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(UserGrantID),
+			crdb.NewPrimaryKey(UserGrantInstanceID, UserGrantID),
 			crdb.NewIndex("user_idx", []string{UserGrantUserID}),
 			crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner}),
 		),

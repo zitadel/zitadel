@@ -45,7 +45,7 @@ func NewOrgDomainProjection(ctx context.Context, config crdb.StatementHandlerCon
 			crdb.NewColumn(OrgDomainIsPrimaryCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(OrgDomainValidationTypeCol, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(OrgDomainOrgIDCol),
+			crdb.NewPrimaryKey(OrgDomainInstanceIDCol, OrgDomainOrgIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

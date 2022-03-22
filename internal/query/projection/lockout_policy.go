@@ -49,7 +49,7 @@ func NewLockoutPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(LockoutPolicyMaxPasswordAttemptsCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(LockoutPolicyShowLockOutFailuresCol, crdb.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(LockoutPolicyIDCol),
+			crdb.NewPrimaryKey(LockoutPolicyInstanceIDCol, LockoutPolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

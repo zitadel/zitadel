@@ -48,7 +48,7 @@ func NewOIDCSettingsProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(OIDCSettingsColumnRefreshTokenIdleExpiration, crdb.ColumnTypeInt64),
 			crdb.NewColumn(OIDCSettingsColumnRefreshTokenExpiration, crdb.ColumnTypeInt64),
 		},
-			crdb.NewPrimaryKey(OIDCSettingsColumnAggregateID),
+			crdb.NewPrimaryKey(OIDCSettingsColumnInstanceID, OIDCSettingsColumnAggregateID),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -74,7 +74,7 @@ func NewUserProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(UserUsernameCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserTypeCol, crdb.ColumnTypeEnum),
 		},
-			crdb.NewPrimaryKey(UserIDCol),
+			crdb.NewPrimaryKey(UserInstanceIDCol, UserIDCol),
 			crdb.NewIndex("username_idx", []string{UserUsernameCol}),
 			crdb.NewIndex("ro_idx", []string{UserResourceOwnerCol}),
 		),

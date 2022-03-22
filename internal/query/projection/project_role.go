@@ -46,7 +46,7 @@ func NewProjectRoleProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(ProjectRoleColumnGroupName, crdb.ColumnTypeText),
 			crdb.NewColumn(ProjectRoleColumnCreator, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(ProjectRoleColumnProjectID, ProjectRoleColumnKey),
+			crdb.NewPrimaryKey(ProjectRoleColumnInstanceID, ProjectRoleColumnProjectID, ProjectRoleColumnKey),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -47,7 +47,7 @@ func NewUserAuthMethodProjection(ctx context.Context, config crdb.StatementHandl
 			crdb.NewColumn(UserAuthMethodInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(UserAuthMethodNameCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
+			crdb.NewPrimaryKey(UserAuthMethodInstanceIDCol, UserAuthMethodUserIDCol, UserAuthMethodTypeCol, UserAuthMethodTokenIDCol),
 			crdb.NewIndex("ro_idx", []string{UserAuthMethodResourceOwnerCol}),
 		),
 	)

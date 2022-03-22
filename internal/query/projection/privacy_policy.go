@@ -49,7 +49,7 @@ func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(PrivacyPolicyIDCol),
+			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

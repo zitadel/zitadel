@@ -51,7 +51,7 @@ func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
 			crdb.NewColumn(ProjectGrantColumnCreator, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(ProjectGrantColumnGrantID),
+			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
 			crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner}),
 			crdb.NewIndex("granted_org_idx", []string{ProjectGrantColumnGrantedOrgID}),
 		),

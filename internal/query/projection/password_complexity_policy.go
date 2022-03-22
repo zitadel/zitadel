@@ -55,7 +55,7 @@ func NewPasswordComplexityProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(ComplexityPolicyHasSymbolCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(ComplexityPolicyHasNumberCol, crdb.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(ComplexityPolicyIDCol),
+			crdb.NewPrimaryKey(ComplexityPolicyInstanceIDCol, ComplexityPolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

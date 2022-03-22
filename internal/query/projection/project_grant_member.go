@@ -33,7 +33,7 @@ func NewProjectGrantMemberProjection(ctx context.Context, config crdb.StatementH
 				crdb.NewColumn(ProjectGrantMemberProjectIDCol, crdb.ColumnTypeText),
 				crdb.NewColumn(ProjectGrantMemberGrantIDCol, crdb.ColumnTypeText),
 			),
-			crdb.NewPrimaryKey(ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
+			crdb.NewPrimaryKey(MemberInstanceID, ProjectGrantMemberProjectIDCol, ProjectGrantMemberGrantIDCol, MemberUserIDCol),
 			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
 	)

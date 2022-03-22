@@ -44,7 +44,7 @@ func NewIDPLoginPolicyLinkProjection(ctx context.Context, config crdb.StatementH
 			crdb.NewColumn(IDPLoginPolicyLinkResourceOwnerCol, crdb.ColumnTypeText),
 			crdb.NewColumn(IDPLoginPolicyLinkInstanceIDCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
+			crdb.NewPrimaryKey(IDPLoginPolicyLinkInstanceIDCol, IDPLoginPolicyLinkAggregateIDCol, IDPLoginPolicyLinkIDPIDCol),
 			crdb.NewIndex("ro_idx", []string{IDPLoginPolicyLinkResourceOwnerCol}),
 		),
 	)

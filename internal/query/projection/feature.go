@@ -84,7 +84,7 @@ func NewFeatureProjection(ctx context.Context, config crdb.StatementHandlerConfi
 			crdb.NewColumn(FeatureActionsAllowedCol, crdb.ColumnTypeEnum, crdb.Default(0)),
 			crdb.NewColumn(FeatureMaxActionsCol, crdb.ColumnTypeInt64, crdb.Default(0)),
 		},
-			crdb.NewPrimaryKey(FeatureAggregateIDCol),
+			crdb.NewPrimaryKey(FeatureInstanceIDCol, FeatureAggregateIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -42,7 +42,7 @@ func NewUserMetadataProjection(ctx context.Context, config crdb.StatementHandler
 			crdb.NewColumn(UserMetadataColumnKey, crdb.ColumnTypeText),
 			crdb.NewColumn(UserMetadataColumnValue, crdb.ColumnTypeBytes, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(UserMetadataColumnUserID),
+			crdb.NewPrimaryKey(UserMetadataColumnInstanceID, UserMetadataColumnUserID),
 			crdb.NewIndex("ro_idx", []string{UserGrantResourceOwner}),
 		),
 	)

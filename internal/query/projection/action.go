@@ -48,7 +48,7 @@ func NewActionProjection(ctx context.Context, config crdb.StatementHandlerConfig
 			crdb.NewColumn(ActionTimeoutCol, crdb.ColumnTypeInt64, crdb.Default(0)),
 			crdb.NewColumn(ActionAllowedToFailCol, crdb.ColumnTypeBool, crdb.Default(false)),
 		},
-			crdb.NewPrimaryKey(ActionIDCol),
+			crdb.NewPrimaryKey(ActionInstanceIDCol, ActionIDCol),
 			crdb.NewIndex("ro_idx", []string{ActionResourceOwnerCol}),
 		),
 	)

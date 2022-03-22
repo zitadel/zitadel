@@ -31,7 +31,7 @@ func NewProjectMemberProjection(ctx context.Context, config crdb.StatementHandle
 			append(memberColumns,
 				crdb.NewColumn(ProjectMemberProjectIDCol, crdb.ColumnTypeText),
 			),
-			crdb.NewPrimaryKey(ProjectMemberProjectIDCol, MemberUserIDCol),
+			crdb.NewPrimaryKey(MemberInstanceID, ProjectMemberProjectIDCol, MemberUserIDCol),
 			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
 	)

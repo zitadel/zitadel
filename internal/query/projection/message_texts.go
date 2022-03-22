@@ -59,7 +59,7 @@ func NewMessageTextProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(MessageTextButtonTextCol, crdb.ColumnTypeBool),
 			crdb.NewColumn(MessageTextFooterCol, crdb.ColumnTypeBool),
 		},
-			crdb.NewPrimaryKey(MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
+			crdb.NewPrimaryKey(MessageTextInstanceIDCol, MessageTextAggregateIDCol, MessageTextTypeCol, MessageTextLanguageCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

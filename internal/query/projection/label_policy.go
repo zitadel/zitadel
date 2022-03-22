@@ -79,7 +79,7 @@ func NewLabelPolicyProjection(ctx context.Context, config crdb.StatementHandlerC
 			crdb.NewColumn(LabelPolicyDarkLogoURLCol, crdb.ColumnTypeText, crdb.Nullable()),
 			crdb.NewColumn(LabelPolicyDarkIconURLCol, crdb.ColumnTypeText, crdb.Nullable()),
 		},
-			crdb.NewPrimaryKey(LabelPolicyIDCol, LabelPolicyStateCol),
+			crdb.NewPrimaryKey(LabelPolicyInstanceIDCol, LabelPolicyIDCol, LabelPolicyStateCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

@@ -41,7 +41,7 @@ func NewFlowProjection(ctx context.Context, config crdb.StatementHandlerConfig) 
 			crdb.NewColumn(FlowActionTriggerSequenceCol, crdb.ColumnTypeInt64),
 			crdb.NewColumn(FlowActionIDCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
+			crdb.NewPrimaryKey(FlowInstanceIDCol, FlowTypeCol, FlowTriggerTypeCol, FlowResourceOwnerCol, FlowActionIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
