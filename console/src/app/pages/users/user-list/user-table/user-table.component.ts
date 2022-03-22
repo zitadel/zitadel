@@ -1,6 +1,8 @@
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,7 +13,7 @@ import { ActionKeysType } from 'src/app/modules/action-keys/action-keys.componen
 import { PageEvent, PaginatorComponent } from 'src/app/modules/paginator/paginator.component';
 import { WarnDialogComponent } from 'src/app/modules/warn-dialog/warn-dialog.component';
 import { Timestamp } from 'src/app/proto/generated/google/protobuf/timestamp_pb';
-import { SearchQuery, Type, TypeQuery, User, UserState } from 'src/app/proto/generated/zitadel/user_pb';
+import { SearchQuery, Type, TypeQuery, User, UserFieldName, UserState } from 'src/app/proto/generated/zitadel/user_pb';
 import { GrpcAuthService } from 'src/app/services/grpc-auth.service';
 import { ManagementService } from 'src/app/services/mgmt.service';
 import { ToastService } from 'src/app/services/toast.service';
@@ -37,7 +39,8 @@ export class UserTableComponent implements OnInit {
   @Input() refreshOnPreviousRoutes: string[] = [];
   @Input() disabled: boolean = false;
   @ViewChild(PaginatorComponent) public paginator!: PaginatorComponent;
-  @ViewChild('input') public filter!: Input;
+  @ViewChild(MatSort) public sort!: MatSort;
+  public INITIAL_PAGE_SIZE: number = 20;
 
   public viewTimestamp!: Timestamp.AsObject;
   public totalResult: number = 0;
@@ -81,6 +84,7 @@ export class UserTableComponent implements OnInit {
     private toast: ToastService,
     private dialog: MatDialog,
     private route: ActivatedRoute,
+    private _liveAnnouncer: LiveAnnouncer,
   ) {
     this.selection.changed.subscribe(() => {
       this.changedSelection.emit(this.selection.selected);
@@ -89,7 +93,7 @@ export class UserTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.pipe(take(1)).subscribe((params) => {
-      this.getData(10, 0, this.type);
+      this.getData(this.INITIAL_PAGE_SIZE, 0, this.type);
       if (params.deferredReload) {
         setTimeout(() => {
           this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
@@ -178,8 +182,30 @@ export class UserTableComponent implements OnInit {
     typeQuery.setType(type);
     queryT.setTypeQuery(typeQuery);
 
+    let sortingField: UserFieldName | undefined = undefined;
+    if (this.sort?.active && this.sort?.direction)
+      switch (this.sort.active) {
+        case 'displayName':
+          sortingField = UserFieldName.USER_FIELD_NAME_DISPLAY_NAME;
+          break;
+        case 'username':
+          sortingField = UserFieldName.USER_FIELD_NAME_USER_NAME;
+          break;
+        case 'email':
+          sortingField = UserFieldName.USER_FIELD_NAME_EMAIL;
+          break;
+        case 'state':
+          sortingField = UserFieldName.USER_FIELD_NAME_STATE;
+          break;
+      }
     this.userService
-      .listUsers(limit, offset, searchQueries?.length ? [queryT, ...searchQueries] : [queryT])
+      .listUsers(
+        limit,
+        offset,
+        searchQueries?.length ? [queryT, ...searchQueries] : [queryT],
+        sortingField,
+        this.sort?.direction,
+      )
       .then((resp) => {
         if (resp.details?.totalResult) {
           this.totalResult = resp.details?.totalResult;
@@ -202,24 +228,20 @@ export class UserTableComponent implements OnInit {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type);
   }
 
+  public sortChange(sortState: Sort) {
+    console.log(sortState.active, sortState.direction);
+
+    if (sortState.direction && sortState.active) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+      this.refreshPage();
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
+  }
+
   public applySearchQuery(searchQueries: SearchQuery[]): void {
     this.selection.clear();
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize, this.type, searchQueries);
-  }
-
-  public setFilter(key: UserListSearchKey): void {
-    setTimeout(() => {
-      if (this.filter) {
-        (this.filter as any).nativeElement.focus();
-      }
-    }, 100);
-
-    if (this.userSearchKey !== key) {
-      this.userSearchKey = key;
-    } else {
-      this.userSearchKey = undefined;
-      this.refreshPage();
-    }
   }
 
   public deleteUser(user: User.AsObject): void {

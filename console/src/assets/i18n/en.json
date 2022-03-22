@@ -1159,7 +1159,8 @@
         },
         "DELETE": {
           "TITLE": "Delete Project",
-          "DESCRIPTION": "Do you really want to delete your project?"
+          "DESCRIPTION": "Do you really want to delete your project?",
+          "TYPENAME": "Type the name of the project to delete it permanently."
         }
       }
     },

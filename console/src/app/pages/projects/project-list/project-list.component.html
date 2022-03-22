@@ -84,7 +84,7 @@
           <td mat-cell *matCellDef="let project">
             <cnsl-table-actions>
               <button actions *ngIf="project.id !== zitadelProjectId" color="warn" mat-icon-button
-                matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteProject(project.id)">
+                matTooltip="{{'ACTIONS.DELETE' | translate}}" (click)="deleteProject(project.id, project.name)">
                 <i class="las la-trash"></i>
               </button>
             </cnsl-table-actions>

@@ -7,6 +7,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
@@ -52,6 +53,7 @@ import { UserTableComponent } from './user-table/user-table.component';
     TableActionsModule,
     ActionKeysModule,
     MatMenuModule,
+    MatSortModule,
     InputModule,
     PaginatorModule,
   ],

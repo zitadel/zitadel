@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { SortDirection } from '@angular/material/sort';
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
 import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
 import { BehaviorSubject } from 'rxjs';
@@ -1638,6 +1639,7 @@ export class ManagementService {
     offset: number,
     queriesList?: UserSearchQuery[],
     sortingColumn?: UserFieldName,
+    sortingDirection?: SortDirection,
   ): Promise<ListUsersResponse.AsObject> {
     const req = new ListUsersRequest();
     const query = new ListQuery();
@@ -1647,10 +1649,14 @@ export class ManagementService {
     if (offset) {
       query.setOffset(offset);
     }
+    if (sortingDirection) {
+      query.setAsc(sortingDirection === 'asc');
+    }
     req.setQuery(query);
     if (sortingColumn) {
       req.setSortingColumn(sortingColumn);
     }
+
     if (queriesList) {
       req.setQueriesList(queriesList);
     }

@@ -1159,7 +1159,8 @@
         },
         "DELETE": {
           "TITLE": "Rimuovere il progetto",
-          "DESCRIPTION": "Vuoi davvero rimuovere il tuo progetto?"
+          "DESCRIPTION": "Vuoi davvero rimuovere il tuo progetto?",
+          "TYPENAME": "Ripeti il nome del progetto per eliminarlo."
         }
       }
     },
@@ -1326,7 +1327,7 @@
       "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
-      "DELETED": "Progetto rimosso con successo."
+      "DELETED": "Progetto eliminato con successo."
     }
   },
   "NEXTSTEPS": {
@@ -1592,7 +1593,7 @@
       "TOKENTYPE0": "Bearer Token",
       "TOKENTYPE1": "JWT",
       "UNSECUREREDIRECT": "Speriamo proprio che tu sappia cosa stai facendo.",
-      "OVERVIEWSECTION": "Panoramica",
+      "OVERVIEWSECTION": "Sommario",
       "OVERVIEWTITLE": "Configurazione finita. Rivedi le tue impostazioni.",
       "ACCESSTOKENROLEASSERTION": "Aggiungere ruoli utente al Access Token",
       "ACCESSTOKENROLEASSERTION_DESCRIPTION": "Se selezionato, i ruoli richiesti dall'utente autenticato sono aggiunti all'Access Token",

@@ -258,6 +258,8 @@ export class ProjectGridComponent implements OnInit, OnDestroy {
         cancelKey: 'ACTIONS.CANCEL',
         titleKey: 'PROJECT.PAGES.DIALOG.DELETE.TITLE',
         descriptionKey: 'PROJECT.PAGES.DIALOG.DELETE.DESCRIPTION',
+        confirmationKey: 'PROJECT.PAGES.DIALOG.DELETE.TYPENAME',
+        confirmation: item.name,
       },
       width: '400px',
     });

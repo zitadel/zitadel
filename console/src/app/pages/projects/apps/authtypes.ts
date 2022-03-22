@@ -22,7 +22,7 @@ export interface RadioItemAppType {
   background: string;
 }
 
-export const WEB_TYPE = {
+export const WEB_TYPE: RadioItemAppType = {
   // key: AppType.WEB,
   titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.TITLE',
   descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.WEB.DESCRIPTION',
@@ -32,7 +32,7 @@ export const WEB_TYPE = {
   background: 'linear-gradient(40deg, #059669 30%, #047857)',
 };
 
-export const USER_AGENT_TYPE = {
+export const USER_AGENT_TYPE: RadioItemAppType = {
   // key: AppType.USER_AGENT,
   titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.TITLE',
   descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.USERAGENT.DESCRIPTION',
@@ -42,7 +42,7 @@ export const USER_AGENT_TYPE = {
   background: 'linear-gradient(40deg, #dc2626 30%, #db2777)',
 };
 
-export const NATIVE_TYPE = {
+export const NATIVE_TYPE: RadioItemAppType = {
   // key: AppType.NATIVE,
   titleI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.TITLE',
   descI18nKey: 'APP.OIDC.SELECTION.APPTYPE.NATIVE.DESCRIPTION',
@@ -52,7 +52,7 @@ export const NATIVE_TYPE = {
   background: 'linear-gradient(40deg, #306ccc 30%, #4f46e5)',
 };
 
-export const API_TYPE = {
+export const API_TYPE: RadioItemAppType = {
   // key: AppType.API,
   titleI18nKey: 'APP.API.SELECTION.TITLE',
   descI18nKey: 'APP.API.SELECTION.DESCRIPTION',

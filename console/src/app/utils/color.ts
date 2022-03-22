@@ -27,6 +27,18 @@ export const COLORS = [
   { 500: '#f43f5e', 200: '#fecdd3', 300: '#fda4af', 600: '#e11d48', 700: '#be123c', 900: '#881337' },
 ];
 
+export const WEB_APP_COLOR: Color = COLORS[6];
+export const USER_AGENT_APP_COLOR: Color = COLORS[10];
+export const NATIVE_APP_COLOR: Color = COLORS[16];
+export const API_APP_COLOR: Color = {
+  500: '#737373',
+  200: '#e5e5e5',
+  300: '#d4d4d4',
+  600: '#525252',
+  700: '#404040',
+  900: '#171717',
+};
+
 export function hashCode(str: string, seed: number = 0): number {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;

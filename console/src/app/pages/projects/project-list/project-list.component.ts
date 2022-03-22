@@ -201,13 +201,15 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.getData(type, this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
 
-  public deleteProject(id: string): void {
+  public deleteProject(id: string, name: string): void {
     const dialogRef = this.dialog.open(WarnDialogComponent, {
       data: {
         confirmKey: 'ACTIONS.DELETE',
         cancelKey: 'ACTIONS.CANCEL',
         titleKey: 'PROJECT.PAGES.DIALOG.DELETE.TITLE',
         descriptionKey: 'PROJECT.PAGES.DIALOG.DELETE.DESCRIPTION',
+        confirmationKey: 'PROJECT.PAGES.DIALOG.DELETE.TYPENAME',
+        confirmation: name,
       },
       width: '400px',
     });

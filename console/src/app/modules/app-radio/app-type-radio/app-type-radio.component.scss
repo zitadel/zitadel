@@ -5,6 +5,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   margin: 0 -0.5rem;
+  box-sizing: border-box;
 }
 
 @mixin app-type-radio-theme($theme) {
@@ -28,6 +29,7 @@
   input.app:checked + label {
     border-color: $primary-color;
     border-width: 2px;
+    box-sizing: border-box;
     box-shadow: 0 0 6px rgb(0 0 0 / 10%);
 
     .cnsl-type-radio-header span {
@@ -41,13 +43,12 @@
     border: 1px solid $border-color;
     display: flex;
     flex-direction: column;
-    background-color: map-get($background, card);
+    background-color: map-get($background, cards);
     flex: 0 1 230px;
     min-height: 300px;
     cursor: pointer;
     position: relative;
     padding-bottom: 1rem;
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 
     .cnsl-type-radio-header {
       display: flex;
@@ -55,8 +56,9 @@
       justify-content: center;
       background: rgb(80, 110, 110);
       margin-bottom: 1rem;
-      border-top-left-radius: 7px;
-      border-top-right-radius: 7px;
+      box-sizing: border-box;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
 
       span {
         margin: 2rem;

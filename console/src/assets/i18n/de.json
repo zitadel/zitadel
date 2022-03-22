@@ -286,7 +286,7 @@
         "3": "Gelöscht"
       },
       "DIALOG": {
-        "DELETE_TITLE": "Passwortlos entfernen",
+        "DELETE_TITLE": "Passwortlose Authentifizierung entfernen",
         "DELETE_DESCRIPTION": "Sie sind im Begriff eine Passwortlose Authentifizierungsmethode zu entfernen. Sind sie sicher?",
         "ADD_TITLE": "Passwortlose Authentifizierung",
         "ADD_DESCRIPTION": "Wählen Sie eine der verfügbaren Optionen für das Erstellen einer passwortlosen Authentifizierungsmethode.",
@@ -1159,7 +1159,8 @@
         },
         "DELETE": {
           "TITLE": "Projekt löschen",
-          "DESCRIPTION": "Willst Du das Projekt wirklich löschen?"
+          "DESCRIPTION": "Willst Du das Projekt wirklich löschen?",
+          "TYPENAME": "Wiederholen Sie den Namen des Projektes um es zu löschen."
         }
       }
     },
