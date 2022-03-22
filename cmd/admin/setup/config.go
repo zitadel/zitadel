@@ -10,6 +10,8 @@ type Config struct {
 	Database       database.Config
 	SystemDefaults systemdefaults.SystemDefaults
 	InternalAuthZ  authz.Config
+	ExternalPort   uint16
+	ExternalDomain string
 	ExternalSecure bool
 }
 
