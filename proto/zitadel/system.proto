@@ -141,13 +141,6 @@ service SystemService {
         };
     }
 
-    // Returns the metrics of an instance
-    rpc GetInstanceMetrics(GetMetricsRequest) returns (GetMetricsResponse) {
-        option (google.api.http) = {
-            get: "/instances/{id}/metrics";
-        };
-    }
-
     // Returns the domain of an instance
     rpc GetGeneratedDomain(GetGeneratedDomainRequest) returns (GetGeneratedDomainResponse) {
         option (google.api.http) = {
@@ -351,18 +344,6 @@ message GetUsageResponse {
     zitadel.v1.ObjectDetails details = 1;
     uint64 executed_requests = 2;
     uint64 executed_action_mins = 3;
-}
-
-message GetMetricsRequest {
-    string id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
-}
-
-message GetMetricsResponse {
-    zitadel.v1.ObjectDetails details = 1;
-    uint64 org_count = 2;
-    uint64 user_count = 3;
-    uint64 project_count = 4;
-    uint64 application_count = 5;
 }
 
 message GetGeneratedDomainRequest {
