@@ -58,12 +58,18 @@ func (s *SetupStep) Data() interface{} {
 }
 
 func (s *SetupStep) UniqueConstraints() []*eventstore.EventUniqueConstraint {
-	if s.typ == startedType {
+	switch s.typ {
+	case startedType:
 		return []*eventstore.EventUniqueConstraint{
 			eventstore.NewAddEventUniqueConstraint("migration_started", s.migration.String(), "Errors.Step.Started.AlreadyExists"),
 		}
-	}
-	return []*eventstore.EventUniqueConstraint{
-		eventstore.NewAddEventUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
+	case failedType:
+		return []*eventstore.EventUniqueConstraint{
+			eventstore.NewRemoveEventUniqueConstraint("migration_started", s.migration.String()),
+		}
+	default:
+		return []*eventstore.EventUniqueConstraint{
+			eventstore.NewAddEventUniqueConstraint("migration_done", s.migration.String(), "Errors.Step.Done.AlreadyExists"),
+		}
 	}
 }
