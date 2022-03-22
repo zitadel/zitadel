@@ -26,6 +26,8 @@ type IAM struct {
 }
 
 type InstanceDomain struct {
+	models.ObjectRoot
+
 	Domain string
 }
 

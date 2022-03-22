@@ -13,7 +13,7 @@ type InstanceDomainWriteModel struct {
 	State  domain.InstanceDomainState
 }
 
-func NewInstanceDomainWriteModel(instanceID string, instanceDomain string) *InstanceDomainWriteModel {
+func NewInstanceDomainWriteModel(instanceDomain string) *InstanceDomainWriteModel {
 	return &InstanceDomainWriteModel{
 		WriteModel: eventstore.WriteModel{
 			AggregateID:   domain.IAMID,
@@ -55,60 +55,10 @@ func (wm *InstanceDomainWriteModel) Reduce() error {
 
 func (wm *InstanceDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
+		ResourceOwner(domain.IAMID).
 		AddQuery().
 		AggregateTypes(iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
-		EventTypes(
-			iam.InstanceDomainAddedEventType,
-			iam.InstanceDomainRemovedEventType).
-		Builder()
-}
-
-type InstanceDomainsWriteModel struct {
-	eventstore.WriteModel
-
-	Domains []*InstanceDomain
-}
-
-type InstanceDomain struct {
-	Domain string
-	State  domain.InstanceDomainState
-}
-
-func NewInstanceDomainsWriteModel(orgID string) *InstanceDomainsWriteModel {
-	return &InstanceDomainsWriteModel{
-		WriteModel: eventstore.WriteModel{
-			AggregateID:   orgID,
-			ResourceOwner: orgID,
-		},
-		Domains: make([]*InstanceDomain, 0),
-	}
-}
-
-func (wm *InstanceDomainsWriteModel) Reduce() error {
-	for _, event := range wm.Events {
-		switch e := event.(type) {
-		case *iam.DomainAddedEvent:
-			wm.Domains = append(wm.Domains, &InstanceDomain{Domain: e.Domain, State: domain.InstanceDomainStateActive})
-		case *iam.DomainRemovedEvent:
-			for _, d := range wm.Domains {
-				if d.Domain == e.Domain {
-					d.State = domain.InstanceDomainStateRemoved
-					continue
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (wm *InstanceDomainsWriteModel) Query() *eventstore.SearchQueryBuilder {
-	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(wm.ResourceOwner).
-		AddQuery().
-		AggregateTypes(iam.AggregateType).
-		AggregateIDs(wm.AggregateID).
+		AggregateIDs(domain.IAMID).
 		EventTypes(
 			iam.InstanceDomainAddedEventType,
 			iam.InstanceDomainRemovedEventType).
