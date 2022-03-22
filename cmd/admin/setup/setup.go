@@ -7,6 +7,7 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/api/authz"
+	http_util "github.com/caos/zitadel/internal/api/http"
 	command "github.com/caos/zitadel/internal/command/v2"
 	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/caos/zitadel/internal/database"
@@ -61,6 +62,7 @@ func setup(config *Config, steps *Steps) {
 
 	steps.S1DefaultInstance.cmd = cmd
 	steps.S1DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
+	steps.S1DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
 	ctx := authz.WithTenant(context.Background(), "system")
 	migration.Migrate(ctx, eventstoreClient, steps.S1DefaultInstance)

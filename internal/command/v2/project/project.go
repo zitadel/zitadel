@@ -64,9 +64,9 @@ func ExistsProject(ctx context.Context, filter preparation.FilterToQueryReducer,
 
 	for _, event := range events {
 		switch event.(type) {
-		case *project.ApplicationAddedEvent:
+		case *project.ProjectAddedEvent:
 			exists = true
-		case *project.ApplicationRemovedEvent:
+		case *project.ProjectRemovedEvent:
 			exists = false
 		}
 	}

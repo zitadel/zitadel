@@ -2,7 +2,6 @@ package project
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 	"time"
 
@@ -67,7 +66,7 @@ func AddOIDCConfig(
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			if exists, err := ExistsApp(ctx, filter, a.ID, appID, a.ResourceOwner); err != nil || !exists {
-				return nil, errors.ThrowNotFound(err, "PROJE-EpG1p", "Errors.Project.Application.NotFound")
+				return nil, errors.ThrowNotFound(err, "PROJE-sLDbG", "Errors.Project.Application.NotFound")
 			}
 			return []eventstore.Command{
 				project.NewOIDCConfigAddedEvent(
@@ -144,24 +143,13 @@ func ExistsApp(ctx context.Context, filter preparation.FilterToQueryReducer, pro
 	}
 
 	for _, event := range events {
-		id := struct {
-			ID string `json:"appId"`
-		}{}
-		switch event.(type) {
+		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:
-			err = json.Unmarshal(event.DataAsBytes(), &id)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "PROJE-Oh9Yt", "Errors.Internal")
-			}
-			if id.ID == appID {
+			if e.AppID == appID {
 				exists = true
 			}
 		case *project.ApplicationRemovedEvent:
-			err = json.Unmarshal(event.DataAsBytes(), &id)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "PROJE-HuIBt", "Errors.Internal")
-			}
-			if id.ID == appID {
+			if e.AppID == appID {
 				exists = false
 			}
 		}

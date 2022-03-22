@@ -2,7 +2,6 @@ package org
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/command/v2/user"
@@ -47,24 +46,17 @@ func IsMember(ctx context.Context, filter preparation.FilterToQueryReducer, orgI
 	}
 
 	for _, event := range events {
-		id := struct {
-			ID string `json:"userId"`
-		}{}
-		switch event.(type) {
+		switch e := event.(type) {
 		case *org.MemberAddedEvent:
-			err = json.Unmarshal(event.DataAsBytes(), &id)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "ORG-WcoNL", "Errors.Internal")
-			}
-			if id.ID == userID {
+			if e.UserID == userID {
 				isMember = true
 			}
-		case *org.MemberRemovedEvent, *org.MemberCascadeRemovedEvent:
-			err = json.Unmarshal(event.DataAsBytes(), &id)
-			if err != nil {
-				return false, errors.ThrowInternal(err, "ORG-hJkpr", "Errors.Internal")
+		case *org.MemberRemovedEvent:
+			if e.UserID == userID {
+				isMember = false
 			}
-			if id.ID == userID {
+		case *org.MemberCascadeRemovedEvent:
+			if e.UserID == userID {
 				isMember = false
 			}
 		}
