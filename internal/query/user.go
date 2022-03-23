@@ -10,6 +10,8 @@ import (
 	"github.com/lib/pq"
 	"golang.org/x/text/language"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -115,6 +117,10 @@ var (
 		name:  projection.UserResourceOwnerCol,
 		table: userTable,
 	}
+	UserInstanceIDCol = Column{
+		name:  projection.UserInstanceIDCol,
+		table: userTable,
+	}
 	UserStateCol = Column{
 		name:  projection.UserStateCol,
 		table: userTable,
@@ -132,17 +138,19 @@ var (
 		table: userTable,
 	}
 
-	userLoginNamesTable     = loginNameTable.setAlias("login_names")
-	userLoginNamesUserIDCol = LoginNameUserIDCol.setTable(userLoginNamesTable)
-	userLoginNamesNameCol   = LoginNameNameCol.setTable(userLoginNamesTable)
-	userLoginNamesListCol   = Column{
+	userLoginNamesTable         = loginNameTable.setAlias("login_names")
+	userLoginNamesUserIDCol     = LoginNameUserIDCol.setTable(userLoginNamesTable)
+	userLoginNamesNameCol       = LoginNameNameCol.setTable(userLoginNamesTable)
+	userLoginNamesInstanceIDCol = LoginNameInstanceIDCol.setTable(userLoginNamesTable)
+	userLoginNamesListCol       = Column{
 		name:  "loginnames",
 		table: userLoginNamesTable,
 	}
-	userPreferredLoginNameTable        = loginNameTable.setAlias("preferred_login_name")
-	userPreferredLoginNameUserIDCol    = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameCol          = LoginNameNameCol.setTable(userPreferredLoginNameTable)
-	userPreferredLoginNameIsPrimaryCol = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameTable         = loginNameTable.setAlias("preferred_login_name")
+	userPreferredLoginNameUserIDCol     = LoginNameUserIDCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameCol           = LoginNameNameCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameIsPrimaryCol  = LoginNameIsPrimaryCol.setTable(userPreferredLoginNameTable)
+	userPreferredLoginNameInstanceIDCol = LoginNameInstanceIDCol.setTable(userPreferredLoginNameTable)
 )
 
 var (
@@ -223,14 +231,15 @@ var (
 )
 
 func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...SearchQuery) (*User, error) {
-	query, scan := prepareUserQuery()
+	instanceID := authz.GetInstance(ctx).ID
+	query, scan := prepareUserQuery(instanceID)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			UserIDCol.identifier(): userID,
-		}).ToSql()
+	stmt, args, err := query.Where(sq.Eq{
+		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): instanceID,
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-FBg21", "Errors.Query.SQLStatment")
 	}
@@ -240,11 +249,14 @@ func (q *Queries) GetUserByID(ctx context.Context, userID string, queries ...Sea
 }
 
 func (q *Queries) GetUser(ctx context.Context, queries ...SearchQuery) (*User, error) {
-	query, scan := prepareUserQuery()
+	instanceID := authz.GetInstance(ctx).ID
+	query, scan := prepareUserQuery(instanceID)
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.ToSql()
+	stmt, args, err := query.Where(sq.Eq{
+		UserInstanceIDCol.identifier(): instanceID,
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dnhr2", "Errors.Query.SQLStatment")
 	}
@@ -258,10 +270,10 @@ func (q *Queries) GetHumanProfile(ctx context.Context, userID string, queries ..
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			UserIDCol.identifier(): userID,
-		}).ToSql()
+	stmt, args, err := query.Where(sq.Eq{
+		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -275,10 +287,10 @@ func (q *Queries) GetHumanEmail(ctx context.Context, userID string, queries ...S
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			UserIDCol.identifier(): userID,
-		}).ToSql()
+	stmt, args, err := query.Where(sq.Eq{
+		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-BHhj3", "Errors.Query.SQLStatment")
 	}
@@ -292,10 +304,10 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.Where(
-		sq.Eq{
-			UserIDCol.identifier(): userID,
-		}).ToSql()
+	stmt, args, err := query.Where(sq.Eq{
+		UserIDCol.identifier():         userID,
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
 	}
@@ -306,7 +318,10 @@ func (q *Queries) GetHumanPhone(ctx context.Context, userID string, queries ...S
 
 func (q *Queries) SearchUsers(ctx context.Context, queries *UserSearchQueries) (*Users, error) {
 	query, scan := prepareUsersQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-Dgbg2", "Errors.Query.SQLStatment")
 	}
@@ -350,7 +365,9 @@ func (q *Queries) IsUserUnique(ctx context.Context, username, email, resourceOwn
 	for _, q := range queries {
 		query = q.toQuery(query)
 	}
-	stmt, args, err := query.ToSql()
+	stmt, args, err := query.Where(sq.Eq{
+		UserInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+	}).ToSql()
 	if err != nil {
 		return false, errors.ThrowInternal(err, "QUERY-Dg43g", "Errors.Query.SQLStatment")
 	}
@@ -419,13 +436,15 @@ func NewUserLoginNamesSearchQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(userLoginNamesListCol, value, TextListContains)
 }
 
-func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
+func prepareUserQuery(instanceID string) (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 	loginNamesQuery, _, err := sq.Select(
 		userLoginNamesUserIDCol.identifier(),
 		"ARRAY_AGG("+userLoginNamesNameCol.identifier()+") as "+userLoginNamesListCol.name).
 		From(userLoginNamesTable.identifier()).
 		GroupBy(userLoginNamesUserIDCol.identifier()).
-		ToSql()
+		Where(sq.Eq{
+			userLoginNamesInstanceIDCol.identifier(): instanceID,
+		}).ToSql()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}
@@ -433,10 +452,10 @@ func prepareUserQuery() (sq.SelectBuilder, func(*sql.Row) (*User, error)) {
 		userPreferredLoginNameUserIDCol.identifier(),
 		userPreferredLoginNameCol.identifier()).
 		From(userPreferredLoginNameTable.identifier()).
-		Where(
-			sq.Eq{
-				userPreferredLoginNameIsPrimaryCol.identifier(): true,
-			}).ToSql()
+		Where(sq.Eq{
+			userPreferredLoginNameIsPrimaryCol.identifier():  true,
+			userPreferredLoginNameInstanceIDCol.identifier(): instanceID,
+		}).ToSql()
 	if err != nil {
 		return sq.SelectBuilder{}, nil
 	}

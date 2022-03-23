@@ -10,7 +10,7 @@ type WriteModel struct {
 	ProcessedSequence uint64    `json:"-"`
 	Events            []Event   `json:"-"`
 	ResourceOwner     string    `json:"-"`
-	Tenant            string    `json:"-"`
+	InstanceID        string    `json:"-"`
 	ChangeDate        time.Time `json:"-"`
 }
 
@@ -33,8 +33,8 @@ func (wm *WriteModel) Reduce() error {
 	if wm.ResourceOwner == "" {
 		wm.ResourceOwner = wm.Events[0].Aggregate().ResourceOwner
 	}
-	if wm.Tenant == "" {
-		wm.Tenant = wm.Events[0].Aggregate().Tenant
+	if wm.InstanceID == "" {
+		wm.InstanceID = wm.Events[0].Aggregate().InstanceID
 	}
 
 	wm.ProcessedSequence = wm.Events[len(wm.Events)-1].Sequence()

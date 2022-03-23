@@ -28,19 +28,19 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.password_complexity_policies.id,`+
-						` zitadel.projections.password_complexity_policies.sequence,`+
-						` zitadel.projections.password_complexity_policies.creation_date,`+
-						` zitadel.projections.password_complexity_policies.change_date,`+
-						` zitadel.projections.password_complexity_policies.resource_owner,`+
-						` zitadel.projections.password_complexity_policies.min_length,`+
-						` zitadel.projections.password_complexity_policies.has_lowercase,`+
-						` zitadel.projections.password_complexity_policies.has_uppercase,`+
-						` zitadel.projections.password_complexity_policies.has_number,`+
-						` zitadel.projections.password_complexity_policies.has_symbol,`+
-						` zitadel.projections.password_complexity_policies.is_default,`+
-						` zitadel.projections.password_complexity_policies.state`+
-						` FROM zitadel.projections.password_complexity_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_complexity_policies.id,`+
+						` projections.password_complexity_policies.sequence,`+
+						` projections.password_complexity_policies.creation_date,`+
+						` projections.password_complexity_policies.change_date,`+
+						` projections.password_complexity_policies.resource_owner,`+
+						` projections.password_complexity_policies.min_length,`+
+						` projections.password_complexity_policies.has_lowercase,`+
+						` projections.password_complexity_policies.has_uppercase,`+
+						` projections.password_complexity_policies.has_number,`+
+						` projections.password_complexity_policies.has_symbol,`+
+						` projections.password_complexity_policies.is_default,`+
+						` projections.password_complexity_policies.state`+
+						` FROM projections.password_complexity_policies`),
 					nil,
 					nil,
 				),
@@ -58,19 +58,19 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.password_complexity_policies.id,`+
-						` zitadel.projections.password_complexity_policies.sequence,`+
-						` zitadel.projections.password_complexity_policies.creation_date,`+
-						` zitadel.projections.password_complexity_policies.change_date,`+
-						` zitadel.projections.password_complexity_policies.resource_owner,`+
-						` zitadel.projections.password_complexity_policies.min_length,`+
-						` zitadel.projections.password_complexity_policies.has_lowercase,`+
-						` zitadel.projections.password_complexity_policies.has_uppercase,`+
-						` zitadel.projections.password_complexity_policies.has_number,`+
-						` zitadel.projections.password_complexity_policies.has_symbol,`+
-						` zitadel.projections.password_complexity_policies.is_default,`+
-						` zitadel.projections.password_complexity_policies.state`+
-						` FROM zitadel.projections.password_complexity_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_complexity_policies.id,`+
+						` projections.password_complexity_policies.sequence,`+
+						` projections.password_complexity_policies.creation_date,`+
+						` projections.password_complexity_policies.change_date,`+
+						` projections.password_complexity_policies.resource_owner,`+
+						` projections.password_complexity_policies.min_length,`+
+						` projections.password_complexity_policies.has_lowercase,`+
+						` projections.password_complexity_policies.has_uppercase,`+
+						` projections.password_complexity_policies.has_number,`+
+						` projections.password_complexity_policies.has_symbol,`+
+						` projections.password_complexity_policies.is_default,`+
+						` projections.password_complexity_policies.state`+
+						` FROM projections.password_complexity_policies`),
 					[]string{
 						"id",
 						"sequence",
@@ -121,19 +121,19 @@ func Test_PasswordComplexityPolicyPrepares(t *testing.T) {
 			prepare: preparePasswordComplexityPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.password_complexity_policies.id,`+
-						` zitadel.projections.password_complexity_policies.sequence,`+
-						` zitadel.projections.password_complexity_policies.creation_date,`+
-						` zitadel.projections.password_complexity_policies.change_date,`+
-						` zitadel.projections.password_complexity_policies.resource_owner,`+
-						` zitadel.projections.password_complexity_policies.min_length,`+
-						` zitadel.projections.password_complexity_policies.has_lowercase,`+
-						` zitadel.projections.password_complexity_policies.has_uppercase,`+
-						` zitadel.projections.password_complexity_policies.has_number,`+
-						` zitadel.projections.password_complexity_policies.has_symbol,`+
-						` zitadel.projections.password_complexity_policies.is_default,`+
-						` zitadel.projections.password_complexity_policies.state`+
-						` FROM zitadel.projections.password_complexity_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_complexity_policies.id,`+
+						` projections.password_complexity_policies.sequence,`+
+						` projections.password_complexity_policies.creation_date,`+
+						` projections.password_complexity_policies.change_date,`+
+						` projections.password_complexity_policies.resource_owner,`+
+						` projections.password_complexity_policies.min_length,`+
+						` projections.password_complexity_policies.has_lowercase,`+
+						` projections.password_complexity_policies.has_uppercase,`+
+						` projections.password_complexity_policies.has_number,`+
+						` projections.password_complexity_policies.has_symbol,`+
+						` projections.password_complexity_policies.is_default,`+
+						` projections.password_complexity_policies.state`+
+						` FROM projections.password_complexity_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

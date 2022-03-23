@@ -11,6 +11,8 @@ import (
 	"github.com/caos/oidc/pkg/oidc"
 	"golang.org/x/oauth2"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
@@ -87,7 +89,8 @@ func (l *Login) handleIDP(w http.ResponseWriter, r *http.Request, authReq *domai
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	err = l.authRepo.SelectExternalIDP(r.Context(), authReq.ID, idpConfig.IDPConfigID, userAgentID, instanceID)
 	if err != nil {
 		l.renderLogin(w, r, authReq, err)
 		return
@@ -139,7 +142,8 @@ func (l *Login) handleExternalLoginCallback(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	authReq, err := l.authRepo.AuthRequestByID(r.Context(), data.State, userAgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return
@@ -198,12 +202,13 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, externalUser, domain.BrowserInfoFromRequest(r))
+	instanceID := authz.GetInstance(r.Context()).ID
+	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, instanceID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil
 		}
-		iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+		iam, err := l.query.IAM(r.Context())
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 			return
@@ -226,7 +231,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 			l.renderExternalNotFoundOption(w, r, authReq, iam, orgIAMPolicy, human, idpLinking, err)
 			return
 		}
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID, instanceID)
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, iam, orgIAMPolicy, human, idpLinking, err)
 			return
@@ -235,7 +240,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 		return
 	}
 	if len(externalUser.Metadatas) > 0 {
-		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID)
+		authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, userAgentID, instanceID)
 		if err != nil {
 			return
 		}
@@ -254,7 +259,7 @@ func (l *Login) renderExternalNotFoundOption(w http.ResponseWriter, r *http.Requ
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
 	if orgIAMPolicy == nil {
-		iam, err = l.query.IAMByID(r.Context(), domain.IAMID)
+		iam, err = l.query.IAM(r.Context())
 		if err != nil {
 			l.renderError(w, r, authReq, err)
 			return
@@ -324,7 +329,8 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 		return
 	} else if data.ResetLinking {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID)
+		instanceID := authz.GetInstance(r.Context()).ID
+		err = l.authRepo.ResetLinkingUsers(r.Context(), authReq.ID, userAgentID, instanceID)
 		if err != nil {
 			l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		}
@@ -335,7 +341,7 @@ func (l *Login) handleExternalNotFoundOptionCheck(w http.ResponseWriter, r *http
 }
 
 func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+	iam, err := l.query.IAM(r.Context())
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, nil, nil, nil, nil, err)
 		return
@@ -362,6 +368,7 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 	}
 
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
+	instanceID := authz.GetInstance(r.Context()).ID
 	if len(authReq.LinkingUsers) == 0 {
 		l.renderError(w, r, authReq, caos_errors.ThrowPreconditionFailed(nil, "LOGIN-asfg3", "Errors.ExternalIDP.NoExternalUserData"))
 		return
@@ -373,12 +380,12 @@ func (l *Login) handleAutoRegister(w http.ResponseWriter, r *http.Request, authR
 		l.renderExternalNotFoundOption(w, r, authReq, iam, orgIamPolicy, nil, nil, err)
 		return
 	}
-	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, metadata, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.AutoRegisterExternalUser(setContext(r.Context(), resourceOwner), user, externalIDP, memberRoles, authReq.ID, userAgentID, resourceOwner, instanceID, metadata, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.renderExternalNotFoundOption(w, r, authReq, iam, orgIamPolicy, user, externalIDP, err)
 		return
 	}
-	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID)
+	authReq, err = l.authRepo.AuthRequestByID(r.Context(), authReq.ID, authReq.AgentID, instanceID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -58,6 +60,10 @@ var (
 		name:  projection.IDPLoginPolicyLinkResourceOwnerCol,
 		table: idpLoginPolicyLinkTable,
 	}
+	IDPLoginPolicyLinkInstanceIDCol = Column{
+		name:  projection.IDPLoginPolicyLinkInstanceIDCol,
+		table: idpLoginPolicyLinkTable,
+	}
 	IDPLoginPolicyLinkProviderTypeCol = Column{
 		name:  projection.IDPLoginPolicyLinkProviderTypeCol,
 		table: idpLoginPolicyLinkTable,
@@ -67,7 +73,10 @@ var (
 func (q *Queries) IDPLoginPolicyLinks(ctx context.Context, resourceOwner string, queries *IDPLoginPolicyLinksSearchQuery) (idps *IDPLoginPolicyLinks, err error) {
 	query, scan := prepareIDPLoginPolicyLinksQuery()
 	stmt, args, err := queries.toQuery(query).Where(
-		sq.Eq{IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner},
+		sq.Eq{
+			IDPLoginPolicyLinkResourceOwnerCol.identifier(): resourceOwner,
+			IDPLoginPolicyLinkInstanceIDCol.identifier():    authz.GetInstance(ctx).ID,
+		},
 	).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-FDbKW", "Errors.Query.InvalidRequest")

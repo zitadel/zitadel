@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -16,10 +14,11 @@ import (
 )
 
 const (
-	AuthNKeyTable            = "zitadel.projections.authn_keys"
+	AuthNKeyTable            = "projections.authn_keys"
 	AuthNKeyIDCol            = "id"
 	AuthNKeyCreationDateCol  = "creation_date"
 	AuthNKeyResourceOwnerCol = "resource_owner"
+	AuthNKeyInstanceIDCol    = "instance_id"
 	AuthNKeyAggregateIDCol   = "aggregate_id"
 	AuthNKeySequenceCol      = "sequence"
 	AuthNKeyObjectIDCol      = "object_id"
@@ -38,6 +37,26 @@ func NewAuthNKeyProjection(ctx context.Context, config crdb.StatementHandlerConf
 	p := new(AuthNKeyProjection)
 	config.ProjectionName = AuthNKeyTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(AuthNKeyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AuthNKeyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(AuthNKeyObjectIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyExpirationCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AuthNKeyIdentifierCol, crdb.ColumnTypeText),
+			crdb.NewColumn(AuthNKeyPublicKeyCol, crdb.ColumnTypeBytes),
+			crdb.NewColumn(AuthNKeyEnabledCol, crdb.ColumnTypeBool, crdb.Default(true)),
+			crdb.NewColumn(AuthNKeyTypeCol, crdb.ColumnTypeEnum, crdb.Default(0)),
+		},
+			crdb.NewPrimaryKey(AuthNKeyInstanceIDCol, AuthNKeyIDCol),
+			crdb.NewIndex("enabled_idx", []string{AuthNKeyEnabledCol}),
+			crdb.NewIndex("identifier_idx", []string{AuthNKeyIdentifierCol}),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -121,8 +140,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 		authNKeyEvent.publicKey = e.PublicKey
 		authNKeyEvent.keyType = e.KeyType
 	default:
-		logging.LogWithFields("PROJE-Dbr3g", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dgb32", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dgb32", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyAddedEventType, user.MachineKeyAddedEventType})
 	}
 	return crdb.NewMultiStatement(
 		&authNKeyEvent,
@@ -131,6 +149,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyAdded(event eventstore.Event) (*handl
 				handler.NewCol(AuthNKeyIDCol, authNKeyEvent.keyID),
 				handler.NewCol(AuthNKeyCreationDateCol, authNKeyEvent.CreationDate()),
 				handler.NewCol(AuthNKeyResourceOwnerCol, authNKeyEvent.Aggregate().ResourceOwner),
+				handler.NewCol(AuthNKeyInstanceIDCol, authNKeyEvent.Aggregate().InstanceID),
 				handler.NewCol(AuthNKeyAggregateIDCol, authNKeyEvent.Aggregate().ID),
 				handler.NewCol(AuthNKeySequenceCol, authNKeyEvent.Sequence()),
 				handler.NewCol(AuthNKeyObjectIDCol, authNKeyEvent.objectID),
@@ -160,8 +179,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyEnabledChanged(event eventstore.Event
 		appID = e.AppID
 		enabled = *e.AuthMethodType == domain.OIDCAuthMethodTypePrivateKeyJWT
 	default:
-		logging.LogWithFields("PROJE-Db5u3", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-Dbrt1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-Dbrt1", "reduce.wrong.event.type %v", []eventstore.EventType{project.APIConfigChangedType, project.OIDCConfigChangedType})
 	}
 	return crdb.NewUpdateStatement(
 		event,
@@ -184,9 +202,7 @@ func (p *AuthNKeyProjection) reduceAuthNKeyRemoved(event eventstore.Event) (*han
 	case *user.UserRemovedEvent:
 		condition = handler.NewCond(AuthNKeyAggregateIDCol, e.Aggregate().ID)
 	default:
-		logging.LogWithFields("PROJE-Sfdg3", "seq", event.Sequence(), "expectedTypes",
-			[]eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-BGge42", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-BGge42", "reduce.wrong.event.type %v", []eventstore.EventType{project.ApplicationKeyRemovedEventType, project.ApplicationRemovedType, project.ProjectRemovedType, user.MachineKeyRemovedEventType, user.UserRemovedType})
 	}
 	return crdb.NewDeleteStatement(
 		event,

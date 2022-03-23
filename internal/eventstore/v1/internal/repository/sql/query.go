@@ -8,9 +8,10 @@ import (
 	"strings"
 
 	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	z_errors "github.com/caos/zitadel/internal/errors"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/lib/pq"
 )
 
 const (
@@ -23,7 +24,7 @@ const (
 		", editor_service" +
 		", editor_user" +
 		", resource_owner" +
-		", tenant" +
+		", instance_id" +
 		", aggregate_type" +
 		", aggregate_id" +
 		", aggregate_version" +
@@ -117,7 +118,7 @@ func prepareColumns(columns es_models.Columns) (string, func(s scan, dest interf
 				&event.EditorService,
 				&event.EditorUser,
 				&event.ResourceOwner,
-				&event.Tenant,
+				&event.InstanceID,
 				&event.AggregateType,
 				&event.AggregateID,
 				&event.AggregateVersion,
@@ -177,8 +178,8 @@ func getField(field es_models.Field) string {
 		return "event_sequence"
 	case es_models.Field_ResourceOwner:
 		return "resource_owner"
-	case es_models.Field_Tenant:
-		return "tenant"
+	case es_models.Field_InstanceID:
+		return "instance_id"
 	case es_models.Field_EditorService:
 		return "editor_service"
 	case es_models.Field_EditorUser:

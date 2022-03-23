@@ -16,32 +16,32 @@ import (
 
 var (
 	userGrantStmt = regexp.QuoteMeta(
-		"SELECT zitadel.projections.user_grants.id" +
-			", zitadel.projections.user_grants.creation_date" +
-			", zitadel.projections.user_grants.change_date" +
-			", zitadel.projections.user_grants.sequence" +
-			", zitadel.projections.user_grants.grant_id" +
-			", zitadel.projections.user_grants.roles" +
-			", zitadel.projections.user_grants.state" +
-			", zitadel.projections.user_grants.user_id" +
-			", zitadel.projections.users.username" +
-			", zitadel.projections.users.type" +
-			", zitadel.projections.users.resource_owner" +
-			", zitadel.projections.users_humans.first_name" +
-			", zitadel.projections.users_humans.last_name" +
-			", zitadel.projections.users_humans.email" +
-			", zitadel.projections.users_humans.display_name" +
-			", zitadel.projections.users_humans.avatar_key" +
-			", zitadel.projections.user_grants.resource_owner" +
-			", zitadel.projections.orgs.name" +
-			", zitadel.projections.orgs.primary_domain" +
-			", zitadel.projections.user_grants.project_id" +
-			", zitadel.projections.projects.name" +
-			" FROM zitadel.projections.user_grants" +
-			" LEFT JOIN zitadel.projections.users ON zitadel.projections.user_grants.user_id = zitadel.projections.users.id" +
-			" LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.user_grants.user_id = zitadel.projections.users_humans.user_id" +
-			" LEFT JOIN zitadel.projections.orgs ON zitadel.projections.user_grants.resource_owner = zitadel.projections.orgs.id" +
-			" LEFT JOIN zitadel.projections.projects ON zitadel.projections.user_grants.project_id = zitadel.projections.projects.id")
+		"SELECT projections.user_grants.id" +
+			", projections.user_grants.creation_date" +
+			", projections.user_grants.change_date" +
+			", projections.user_grants.sequence" +
+			", projections.user_grants.grant_id" +
+			", projections.user_grants.roles" +
+			", projections.user_grants.state" +
+			", projections.user_grants.user_id" +
+			", projections.users.username" +
+			", projections.users.type" +
+			", projections.users.resource_owner" +
+			", projections.users_humans.first_name" +
+			", projections.users_humans.last_name" +
+			", projections.users_humans.email" +
+			", projections.users_humans.display_name" +
+			", projections.users_humans.avatar_key" +
+			", projections.user_grants.resource_owner" +
+			", projections.orgs.name" +
+			", projections.orgs.primary_domain" +
+			", projections.user_grants.project_id" +
+			", projections.projects.name" +
+			" FROM projections.user_grants" +
+			" LEFT JOIN projections.users ON projections.user_grants.user_id = projections.users.id" +
+			" LEFT JOIN projections.users_humans ON projections.user_grants.user_id = projections.users_humans.user_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
+			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id")
 	userGrantCols = []string{
 		"id",
 		"creation_date",
@@ -66,33 +66,33 @@ var (
 		"name", //project name
 	}
 	userGrantsStmt = regexp.QuoteMeta(
-		"SELECT zitadel.projections.user_grants.id" +
-			", zitadel.projections.user_grants.creation_date" +
-			", zitadel.projections.user_grants.change_date" +
-			", zitadel.projections.user_grants.sequence" +
-			", zitadel.projections.user_grants.grant_id" +
-			", zitadel.projections.user_grants.roles" +
-			", zitadel.projections.user_grants.state" +
-			", zitadel.projections.user_grants.user_id" +
-			", zitadel.projections.users.username" +
-			", zitadel.projections.users.type" +
-			", zitadel.projections.users.resource_owner" +
-			", zitadel.projections.users_humans.first_name" +
-			", zitadel.projections.users_humans.last_name" +
-			", zitadel.projections.users_humans.email" +
-			", zitadel.projections.users_humans.display_name" +
-			", zitadel.projections.users_humans.avatar_key" +
-			", zitadel.projections.user_grants.resource_owner" +
-			", zitadel.projections.orgs.name" +
-			", zitadel.projections.orgs.primary_domain" +
-			", zitadel.projections.user_grants.project_id" +
-			", zitadel.projections.projects.name" +
+		"SELECT projections.user_grants.id" +
+			", projections.user_grants.creation_date" +
+			", projections.user_grants.change_date" +
+			", projections.user_grants.sequence" +
+			", projections.user_grants.grant_id" +
+			", projections.user_grants.roles" +
+			", projections.user_grants.state" +
+			", projections.user_grants.user_id" +
+			", projections.users.username" +
+			", projections.users.type" +
+			", projections.users.resource_owner" +
+			", projections.users_humans.first_name" +
+			", projections.users_humans.last_name" +
+			", projections.users_humans.email" +
+			", projections.users_humans.display_name" +
+			", projections.users_humans.avatar_key" +
+			", projections.user_grants.resource_owner" +
+			", projections.orgs.name" +
+			", projections.orgs.primary_domain" +
+			", projections.user_grants.project_id" +
+			", projections.projects.name" +
 			", COUNT(*) OVER ()" +
-			" FROM zitadel.projections.user_grants" +
-			" LEFT JOIN zitadel.projections.users ON zitadel.projections.user_grants.user_id = zitadel.projections.users.id" +
-			" LEFT JOIN zitadel.projections.users_humans ON zitadel.projections.user_grants.user_id = zitadel.projections.users_humans.user_id" +
-			" LEFT JOIN zitadel.projections.orgs ON zitadel.projections.user_grants.resource_owner = zitadel.projections.orgs.id" +
-			" LEFT JOIN zitadel.projections.projects ON zitadel.projections.user_grants.project_id = zitadel.projections.projects.id")
+			" FROM projections.user_grants" +
+			" LEFT JOIN projections.users ON projections.user_grants.user_id = projections.users.id" +
+			" LEFT JOIN projections.users_humans ON projections.user_grants.user_id = projections.users_humans.user_id" +
+			" LEFT JOIN projections.orgs ON projections.user_grants.resource_owner = projections.orgs.id" +
+			" LEFT JOIN projections.projects ON projections.user_grants.project_id = projections.projects.id")
 	userGrantsCols = append(
 		userGrantCols,
 		"count",

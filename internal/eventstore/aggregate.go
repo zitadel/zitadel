@@ -21,7 +21,7 @@ func NewAggregate(
 		ID:            id,
 		Type:          typ,
 		ResourceOwner: authz.GetCtxData(ctx).OrgID,
-		Tenant:        authz.GetCtxData(ctx).TenantID,
+		InstanceID:    authz.GetInstance(ctx).ID,
 		Version:       version,
 	}
 
@@ -50,7 +50,7 @@ func AggregateFromWriteModel(
 		ID:            wm.AggregateID,
 		Type:          typ,
 		ResourceOwner: wm.ResourceOwner,
-		Tenant:        wm.Tenant,
+		InstanceID:    wm.InstanceID,
 		Version:       version,
 	}
 }
@@ -63,8 +63,8 @@ type Aggregate struct {
 	Type AggregateType `json:"-"`
 	//ResourceOwner is the org this aggregates belongs to
 	ResourceOwner string `json:"-"`
-	//Tenant is the system this aggregate belongs to
-	Tenant string `json:"-"`
+	//InstanceID is the instance this aggregate belongs to
+	InstanceID string `json:"-"`
 	//Version is the semver this aggregate represents
 	Version Version `json:"-"`
 }

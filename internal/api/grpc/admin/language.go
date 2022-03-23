@@ -3,12 +3,12 @@ package admin
 import (
 	"context"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/api/grpc/text"
-	"github.com/caos/zitadel/internal/domain"
 	caos_errors "github.com/caos/zitadel/internal/errors"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
-	"golang.org/x/text/language"
 )
 
 func (s *Server) GetSupportedLanguages(ctx context.Context, req *admin_pb.GetSupportedLanguagesRequest) (*admin_pb.GetSupportedLanguagesResponse, error) {
@@ -34,9 +34,5 @@ func (s *Server) SetDefaultLanguage(ctx context.Context, req *admin_pb.SetDefaul
 }
 
 func (s *Server) GetDefaultLanguage(ctx context.Context, req *admin_pb.GetDefaultLanguageRequest) (*admin_pb.GetDefaultLanguageResponse, error) {
-	iam, err := s.query.IAMByID(ctx, domain.IAMID)
-	if err != nil {
-		return nil, err
-	}
-	return &admin_pb.GetDefaultLanguageResponse{Language: iam.DefaultLanguage.String()}, nil
+	return &admin_pb.GetDefaultLanguageResponse{Language: s.query.GetDefaultLanguage(ctx).String()}, nil
 }

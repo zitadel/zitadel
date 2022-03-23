@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -12,18 +11,52 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	ProjectProjectionTable = "projections.projects"
+
+	ProjectColumnID                     = "id"
+	ProjectColumnCreationDate           = "creation_date"
+	ProjectColumnChangeDate             = "change_date"
+	ProjectColumnSequence               = "sequence"
+	ProjectColumnState                  = "state"
+	ProjectColumnResourceOwner          = "resource_owner"
+	ProjectColumnInstanceID             = "instance_id"
+	ProjectColumnName                   = "name"
+	ProjectColumnProjectRoleAssertion   = "project_role_assertion"
+	ProjectColumnProjectRoleCheck       = "project_role_check"
+	ProjectColumnHasProjectCheck        = "has_project_check"
+	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
+	ProjectColumnCreator                = "creator_id" //TODO: necessary?
+)
+
 type ProjectProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	ProjectProjectionTable = "zitadel.projections.projects"
-)
 
 func NewProjectProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectProjection {
 	p := new(ProjectProjection)
 	config.ProjectionName = ProjectProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ProjectColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ProjectColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectColumnProjectRoleAssertion, crdb.ColumnTypeBool),
+			crdb.NewColumn(ProjectColumnProjectRoleCheck, crdb.ColumnTypeBool),
+			crdb.NewColumn(ProjectColumnHasProjectCheck, crdb.ColumnTypeBool),
+			crdb.NewColumn(ProjectColumnPrivateLabelingSetting, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectColumnCreator, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(ProjectColumnInstanceID, ProjectColumnID),
+			crdb.NewIndex("ro_idx", []string{ProjectColumnResourceOwner}),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -58,26 +91,10 @@ func (p *ProjectProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	ProjectColumnID                     = "id"
-	ProjectColumnName                   = "name"
-	ProjectColumnProjectRoleAssertion   = "project_role_assertion"
-	ProjectColumnProjectRoleCheck       = "project_role_check"
-	ProjectColumnHasProjectCheck        = "has_project_check"
-	ProjectColumnPrivateLabelingSetting = "private_labeling_setting"
-	ProjectColumnCreationDate           = "creation_date"
-	ProjectColumnChangeDate             = "change_date"
-	ProjectColumnResourceOwner          = "resource_owner"
-	ProjectColumnCreator                = "creator_id"
-	ProjectColumnState                  = "state"
-	ProjectColumnSequence               = "sequence"
-)
-
 func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-MFOsd", "seq", event.Sequence(), "expectedType", project.ProjectAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-l000S", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-l000S", "reduce.wrong.event.type %s", project.ProjectAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -86,6 +103,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 			handler.NewCol(ProjectColumnCreationDate, e.CreationDate()),
 			handler.NewCol(ProjectColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(ProjectColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectColumnName, e.Name),
 			handler.NewCol(ProjectColumnProjectRoleAssertion, e.ProjectRoleAssertion),
@@ -101,8 +119,7 @@ func (p *ProjectProjection) reduceProjectAdded(event eventstore.Event) (*handler
 func (p *ProjectProjection) reduceProjectChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectChangeEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-dk2iF", "seq", event.Sequence(), "expected", project.ProjectChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-s00Fs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", project.ProjectChangedType)
 	}
 	if e.Name == nil && e.HasProjectCheck == nil && e.ProjectRoleAssertion == nil && e.ProjectRoleCheck == nil && e.PrivateLabelingSetting == nil {
 		return crdb.NewNoOpStatement(e), nil
@@ -138,8 +155,7 @@ func (p *ProjectProjection) reduceProjectChanged(event eventstore.Event) (*handl
 func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectDeactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-8Nf2s", "seq", event.Sequence(), "expectedType", project.ProjectDeactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-LLp0f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-LLp0f", "reduce.wrong.event.type %s", project.ProjectDeactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -157,8 +173,7 @@ func (p *ProjectProjection) reduceProjectDeactivated(event eventstore.Event) (*h
 func (p *ProjectProjection) reduceProjectReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectReactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-sm99f", "seq", event.Sequence(), "expectedType", project.ProjectReactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-9J98f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-9J98f", "reduce.wrong.event.type %s", project.ProjectReactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -176,8 +191,7 @@ func (p *ProjectProjection) reduceProjectReactivated(event eventstore.Event) (*h
 func (p *ProjectProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-mL0sf", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-5N9fs", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5N9fs", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

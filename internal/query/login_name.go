@@ -18,4 +18,8 @@ var (
 		name:  projection.LoginNameDomainIsPrimaryCol,
 		table: loginNameTable,
 	}
+	LoginNameInstanceIDCol = Column{
+		name:  projection.LoginNameUserInstanceIDCol,
+		table: loginNameTable,
+	}
 )

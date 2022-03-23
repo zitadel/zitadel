@@ -29,20 +29,20 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols,`+
+					regexp.QuoteMeta(`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.secret_generators`),
+						` FROM projections.secret_generators`),
 					nil,
 					nil,
 				),
@@ -54,20 +54,20 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols,`+
+					regexp.QuoteMeta(`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.secret_generators`),
+						` FROM projections.secret_generators`),
 					[]string{
 						"aggregate_id",
 						"generator_type",
@@ -128,20 +128,20 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols,`+
+					regexp.QuoteMeta(`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.secret_generators`),
+						` FROM projections.secret_generators`),
 					[]string{
 						"aggregate_id",
 						"generator_type",
@@ -230,20 +230,20 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols,`+
+					regexp.QuoteMeta(`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.secret_generators`),
+						` FROM projections.secret_generators`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -260,19 +260,19 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols`+
-						` FROM zitadel.projections.secret_generators`,
+					`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols`+
+						` FROM projections.secret_generators`,
 					nil,
 					nil,
 				),
@@ -290,19 +290,19 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols`+
-						` FROM zitadel.projections.secret_generators`),
+					regexp.QuoteMeta(`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols`+
+						` FROM projections.secret_generators`),
 					[]string{
 						"aggregate_id",
 						"generator_type",
@@ -353,19 +353,19 @@ func Test_SecretGeneratorsPrepares(t *testing.T) {
 			prepare: prepareSecretGeneratorQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.secret_generators.aggregate_id,`+
-						` zitadel.projections.secret_generators.generator_type,`+
-						` zitadel.projections.secret_generators.creation_date,`+
-						` zitadel.projections.secret_generators.change_date,`+
-						` zitadel.projections.secret_generators.resource_owner,`+
-						` zitadel.projections.secret_generators.sequence,`+
-						` zitadel.projections.secret_generators.length,`+
-						` zitadel.projections.secret_generators.expiry,`+
-						` zitadel.projections.secret_generators.include_lower_letters,`+
-						` zitadel.projections.secret_generators.include_upper_letters,`+
-						` zitadel.projections.secret_generators.include_digits,`+
-						` zitadel.projections.secret_generators.include_symbols`+
-						` FROM zitadel.projections.secret_generators`),
+					regexp.QuoteMeta(`SELECT projections.secret_generators.aggregate_id,`+
+						` projections.secret_generators.generator_type,`+
+						` projections.secret_generators.creation_date,`+
+						` projections.secret_generators.change_date,`+
+						` projections.secret_generators.resource_owner,`+
+						` projections.secret_generators.sequence,`+
+						` projections.secret_generators.length,`+
+						` projections.secret_generators.expiry,`+
+						` projections.secret_generators.include_lower_letters,`+
+						` projections.secret_generators.include_upper_letters,`+
+						` projections.secret_generators.include_digits,`+
+						` projections.secret_generators.include_symbols`+
+						` FROM projections.secret_generators`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

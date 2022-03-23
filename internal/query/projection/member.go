@@ -1,11 +1,12 @@
 package projection
 
 import (
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/member"
-	"github.com/lib/pq"
 )
 
 const (
@@ -16,6 +17,19 @@ const (
 	MemberChangeDate    = "change_date"
 	MemberSequence      = "sequence"
 	MemberResourceOwner = "resource_owner"
+	MemberInstanceID    = "instance_id"
+)
+
+var (
+	memberColumns = []*crdb.Column{
+		crdb.NewColumn(MemberCreationDate, crdb.ColumnTypeTimestamp),
+		crdb.NewColumn(MemberChangeDate, crdb.ColumnTypeTimestamp),
+		crdb.NewColumn(MemberUserIDCol, crdb.ColumnTypeText),
+		crdb.NewColumn(MemberRolesCol, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		crdb.NewColumn(MemberSequence, crdb.ColumnTypeInt64),
+		crdb.NewColumn(MemberResourceOwner, crdb.ColumnTypeText),
+		crdb.NewColumn(MemberInstanceID, crdb.ColumnTypeText),
+	}
 )
 
 type reduceMemberConfig struct {
@@ -48,6 +62,7 @@ func reduceMemberAdded(e member.MemberAddedEvent, opts ...reduceMemberOpt) (*han
 			handler.NewCol(MemberChangeDate, e.CreationDate()),
 			handler.NewCol(MemberSequence, e.Sequence()),
 			handler.NewCol(MemberResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(MemberInstanceID, e.Aggregate().InstanceID),
 		}}
 
 	for _, opt := range opts {

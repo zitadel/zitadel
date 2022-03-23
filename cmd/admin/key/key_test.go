@@ -155,7 +155,7 @@ func Test_keysFromYAML(t *testing.T) {
 			if tt.res.err != nil && !tt.res.err(err) {
 				t.Errorf("got wrong err: %v ", err)
 			}
-			assert.EqualValues(t, got, tt.res.keys)
+			assert.ElementsMatch(t, got, tt.res.keys)
 		})
 	}
 }

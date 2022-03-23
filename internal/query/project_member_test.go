@@ -19,22 +19,22 @@ var (
 		", members.resource_owner" +
 		", members.user_id" +
 		", members.roles" +
-		", zitadel.projections.login_names.login_name" +
-		", zitadel.projections.users_humans.email" +
-		", zitadel.projections.users_humans.first_name" +
-		", zitadel.projections.users_humans.last_name" +
-		", zitadel.projections.users_humans.display_name" +
-		", zitadel.projections.users_machines.name" +
-		", zitadel.projections.users_humans.avatar_key" +
+		", projections.login_names.login_name" +
+		", projections.users_humans.email" +
+		", projections.users_humans.first_name" +
+		", projections.users_humans.last_name" +
+		", projections.users_humans.display_name" +
+		", projections.users_machines.name" +
+		", projections.users_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM zitadel.projections.project_members as members " +
-		"LEFT JOIN zitadel.projections.users_humans " +
-		"ON members.user_id = zitadel.projections.users_humans.user_id " +
-		"LEFT JOIN zitadel.projections.users_machines " +
-		"ON members.user_id = zitadel.projections.users_machines.user_id " +
-		"LEFT JOIN zitadel.projections.login_names " +
-		"ON members.user_id = zitadel.projections.login_names.user_id " +
-		"WHERE zitadel.projections.login_names.is_primary = $1")
+		"FROM projections.project_members as members " +
+		"LEFT JOIN projections.users_humans " +
+		"ON members.user_id = projections.users_humans.user_id " +
+		"LEFT JOIN projections.users_machines " +
+		"ON members.user_id = projections.users_machines.user_id " +
+		"LEFT JOIN projections.login_names " +
+		"ON members.user_id = projections.login_names.user_id " +
+		"WHERE projections.login_names.is_primary = $1")
 	projectMembersColumns = []string{
 		"creation_date",
 		"change_date",

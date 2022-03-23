@@ -28,16 +28,16 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.privacy_policies.id,`+
-						` zitadel.projections.privacy_policies.sequence,`+
-						` zitadel.projections.privacy_policies.creation_date,`+
-						` zitadel.projections.privacy_policies.change_date,`+
-						` zitadel.projections.privacy_policies.resource_owner,`+
-						` zitadel.projections.privacy_policies.privacy_link,`+
-						` zitadel.projections.privacy_policies.tos_link,`+
-						` zitadel.projections.privacy_policies.is_default,`+
-						` zitadel.projections.privacy_policies.state`+
-						` FROM zitadel.projections.privacy_policies`),
+					regexp.QuoteMeta(`SELECT projections.privacy_policies.id,`+
+						` projections.privacy_policies.sequence,`+
+						` projections.privacy_policies.creation_date,`+
+						` projections.privacy_policies.change_date,`+
+						` projections.privacy_policies.resource_owner,`+
+						` projections.privacy_policies.privacy_link,`+
+						` projections.privacy_policies.tos_link,`+
+						` projections.privacy_policies.is_default,`+
+						` projections.privacy_policies.state`+
+						` FROM projections.privacy_policies`),
 					nil,
 					nil,
 				),
@@ -55,16 +55,16 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.privacy_policies.id,`+
-						` zitadel.projections.privacy_policies.sequence,`+
-						` zitadel.projections.privacy_policies.creation_date,`+
-						` zitadel.projections.privacy_policies.change_date,`+
-						` zitadel.projections.privacy_policies.resource_owner,`+
-						` zitadel.projections.privacy_policies.privacy_link,`+
-						` zitadel.projections.privacy_policies.tos_link,`+
-						` zitadel.projections.privacy_policies.is_default,`+
-						` zitadel.projections.privacy_policies.state`+
-						` FROM zitadel.projections.privacy_policies`),
+					regexp.QuoteMeta(`SELECT projections.privacy_policies.id,`+
+						` projections.privacy_policies.sequence,`+
+						` projections.privacy_policies.creation_date,`+
+						` projections.privacy_policies.change_date,`+
+						` projections.privacy_policies.resource_owner,`+
+						` projections.privacy_policies.privacy_link,`+
+						` projections.privacy_policies.tos_link,`+
+						` projections.privacy_policies.is_default,`+
+						` projections.privacy_policies.state`+
+						` FROM projections.privacy_policies`),
 					[]string{
 						"id",
 						"sequence",
@@ -106,16 +106,16 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 			prepare: preparePrivacyPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.privacy_policies.id,`+
-						` zitadel.projections.privacy_policies.sequence,`+
-						` zitadel.projections.privacy_policies.creation_date,`+
-						` zitadel.projections.privacy_policies.change_date,`+
-						` zitadel.projections.privacy_policies.resource_owner,`+
-						` zitadel.projections.privacy_policies.privacy_link,`+
-						` zitadel.projections.privacy_policies.tos_link,`+
-						` zitadel.projections.privacy_policies.is_default,`+
-						` zitadel.projections.privacy_policies.state`+
-						` FROM zitadel.projections.privacy_policies`),
+					regexp.QuoteMeta(`SELECT projections.privacy_policies.id,`+
+						` projections.privacy_policies.sequence,`+
+						` projections.privacy_policies.creation_date,`+
+						` projections.privacy_policies.change_date,`+
+						` projections.privacy_policies.resource_owner,`+
+						` projections.privacy_policies.privacy_link,`+
+						` projections.privacy_policies.tos_link,`+
+						` projections.privacy_policies.is_default,`+
+						` projections.privacy_policies.state`+
+						` FROM projections.privacy_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

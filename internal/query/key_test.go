@@ -31,18 +31,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePublicKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
-						` zitadel.projections.keys.creation_date,`+
-						` zitadel.projections.keys.change_date,`+
-						` zitadel.projections.keys.sequence,`+
-						` zitadel.projections.keys.resource_owner,`+
-						` zitadel.projections.keys.algorithm,`+
-						` zitadel.projections.keys.use,`+
-						` zitadel.projections.keys_public.expiry,`+
-						` zitadel.projections.keys_public.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys.id,`+
+						` projections.keys.creation_date,`+
+						` projections.keys.change_date,`+
+						` projections.keys.sequence,`+
+						` projections.keys.resource_owner,`+
+						` projections.keys.algorithm,`+
+						` projections.keys.use,`+
+						` projections.keys_public.expiry,`+
+						` projections.keys_public.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.keys`+
-						` LEFT JOIN zitadel.projections.keys_public ON zitadel.projections.keys.id = zitadel.projections.keys_public.id`),
+						` FROM projections.keys`+
+						` LEFT JOIN projections.keys_public ON projections.keys.id = projections.keys_public.id`),
 					nil,
 					nil,
 				),
@@ -60,18 +60,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePublicKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
-						` zitadel.projections.keys.creation_date,`+
-						` zitadel.projections.keys.change_date,`+
-						` zitadel.projections.keys.sequence,`+
-						` zitadel.projections.keys.resource_owner,`+
-						` zitadel.projections.keys.algorithm,`+
-						` zitadel.projections.keys.use,`+
-						` zitadel.projections.keys_public.expiry,`+
-						` zitadel.projections.keys_public.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys.id,`+
+						` projections.keys.creation_date,`+
+						` projections.keys.change_date,`+
+						` projections.keys.sequence,`+
+						` projections.keys.resource_owner,`+
+						` projections.keys.algorithm,`+
+						` projections.keys.use,`+
+						` projections.keys_public.expiry,`+
+						` projections.keys_public.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.keys`+
-						` LEFT JOIN zitadel.projections.keys_public ON zitadel.projections.keys.id = zitadel.projections.keys_public.id`),
+						` FROM projections.keys`+
+						` LEFT JOIN projections.keys_public ON projections.keys.id = projections.keys_public.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -128,18 +128,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePublicKeysQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
-						` zitadel.projections.keys.creation_date,`+
-						` zitadel.projections.keys.change_date,`+
-						` zitadel.projections.keys.sequence,`+
-						` zitadel.projections.keys.resource_owner,`+
-						` zitadel.projections.keys.algorithm,`+
-						` zitadel.projections.keys.use,`+
-						` zitadel.projections.keys_public.expiry,`+
-						` zitadel.projections.keys_public.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys.id,`+
+						` projections.keys.creation_date,`+
+						` projections.keys.change_date,`+
+						` projections.keys.sequence,`+
+						` projections.keys.resource_owner,`+
+						` projections.keys.algorithm,`+
+						` projections.keys.use,`+
+						` projections.keys_public.expiry,`+
+						` projections.keys_public.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.keys`+
-						` LEFT JOIN zitadel.projections.keys_public ON zitadel.projections.keys.id = zitadel.projections.keys_public.id`),
+						` FROM projections.keys`+
+						` LEFT JOIN projections.keys_public ON projections.keys.id = projections.keys_public.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -156,18 +156,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePrivateKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
-						` zitadel.projections.keys.creation_date,`+
-						` zitadel.projections.keys.change_date,`+
-						` zitadel.projections.keys.sequence,`+
-						` zitadel.projections.keys.resource_owner,`+
-						` zitadel.projections.keys.algorithm,`+
-						` zitadel.projections.keys.use,`+
-						` zitadel.projections.keys_private.expiry,`+
-						` zitadel.projections.keys_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys.id,`+
+						` projections.keys.creation_date,`+
+						` projections.keys.change_date,`+
+						` projections.keys.sequence,`+
+						` projections.keys.resource_owner,`+
+						` projections.keys.algorithm,`+
+						` projections.keys.use,`+
+						` projections.keys_private.expiry,`+
+						` projections.keys_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.keys`+
-						` LEFT JOIN zitadel.projections.keys_private ON zitadel.projections.keys.id = zitadel.projections.keys_private.id`),
+						` FROM projections.keys`+
+						` LEFT JOIN projections.keys_private ON projections.keys.id = projections.keys_private.id`),
 					nil,
 					nil,
 				),
@@ -185,18 +185,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePrivateKeysQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
-						` zitadel.projections.keys.creation_date,`+
-						` zitadel.projections.keys.change_date,`+
-						` zitadel.projections.keys.sequence,`+
-						` zitadel.projections.keys.resource_owner,`+
-						` zitadel.projections.keys.algorithm,`+
-						` zitadel.projections.keys.use,`+
-						` zitadel.projections.keys_private.expiry,`+
-						` zitadel.projections.keys_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys.id,`+
+						` projections.keys.creation_date,`+
+						` projections.keys.change_date,`+
+						` projections.keys.sequence,`+
+						` projections.keys.resource_owner,`+
+						` projections.keys.algorithm,`+
+						` projections.keys.use,`+
+						` projections.keys_private.expiry,`+
+						` projections.keys_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.keys`+
-						` LEFT JOIN zitadel.projections.keys_private ON zitadel.projections.keys.id = zitadel.projections.keys_private.id`),
+						` FROM projections.keys`+
+						` LEFT JOIN projections.keys_private ON projections.keys.id = projections.keys_private.id`),
 					[]string{
 						"id",
 						"creation_date",
@@ -255,18 +255,18 @@ func Test_KeyPrepares(t *testing.T) {
 			prepare: preparePrivateKeysQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.keys.id,`+
-						` zitadel.projections.keys.creation_date,`+
-						` zitadel.projections.keys.change_date,`+
-						` zitadel.projections.keys.sequence,`+
-						` zitadel.projections.keys.resource_owner,`+
-						` zitadel.projections.keys.algorithm,`+
-						` zitadel.projections.keys.use,`+
-						` zitadel.projections.keys_private.expiry,`+
-						` zitadel.projections.keys_private.key,`+
+					regexp.QuoteMeta(`SELECT projections.keys.id,`+
+						` projections.keys.creation_date,`+
+						` projections.keys.change_date,`+
+						` projections.keys.sequence,`+
+						` projections.keys.resource_owner,`+
+						` projections.keys.algorithm,`+
+						` projections.keys.use,`+
+						` projections.keys_private.expiry,`+
+						` projections.keys_private.key,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.keys`+
-						` LEFT JOIN zitadel.projections.keys_private ON zitadel.projections.keys.id = zitadel.projections.keys_private.id`),
+						` FROM projections.keys`+
+						` LEFT JOIN projections.keys_private ON projections.keys.id = projections.keys_private.id`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
