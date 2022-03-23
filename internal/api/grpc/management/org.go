@@ -206,8 +206,8 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 	}, nil
 }
 
-func (s *Server) ListOrgMemberRoles(ctx context.Context, req *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	iam, err := s.query.IAMByID(ctx, domain.IAMID)
+func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
+	iam, err := s.query.IAM(ctx)
 	if err != nil {
 		return nil, err
 	}

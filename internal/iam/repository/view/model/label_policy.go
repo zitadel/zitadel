@@ -19,6 +19,7 @@ import (
 const (
 	LabelPolicyKeyAggregateID = "aggregate_id"
 	LabelPolicyKeyState       = "label_policy_state"
+	LabelPolicyKeyInstanceID  = "instance_id"
 )
 
 type LabelPolicyView struct {
@@ -45,7 +46,8 @@ type LabelPolicyView struct {
 	DisableWatermark    bool   `json:"disableWatermark" gorm:"column:disable_watermark"`
 	Default             bool   `json:"-" gorm:"-"`
 
-	Sequence uint64 `json:"-" gorm:"column:sequence"`
+	Sequence   uint64 `json:"-" gorm:"column:sequence"`
+	InstanceID string `json:"instanceID" gorm:"column:instance_id"`
 }
 
 type AssetView struct {
@@ -189,6 +191,7 @@ func (i *LabelPolicyView) AppendEvent(event *models.Event) (err error) {
 
 func (r *LabelPolicyView) setRootData(event *models.Event) {
 	r.AggregateID = event.AggregateID
+	r.InstanceID = event.InstanceID
 }
 
 func (r *LabelPolicyView) SetData(event *models.Event) error {

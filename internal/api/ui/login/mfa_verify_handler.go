@@ -3,6 +3,7 @@ package login
 import (
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
 )
@@ -35,7 +36,8 @@ func (l *Login) handleMFAVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	if data.MFAType == domain.MFATypeOTP {
 		userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, domain.BrowserInfoFromRequest(r))
+		instanceID := authz.GetInstance(r.Context()).ID
+		err = l.authRepo.VerifyMFAOTP(setContext(r.Context(), authReq.UserOrgID), authReq.ID, authReq.UserID, authReq.UserOrgID, data.Code, userAgentID, instanceID, domain.BrowserInfoFromRequest(r))
 		if err != nil {
 			l.renderMFAVerifySelected(w, r, authReq, step, domain.MFATypeOTP, err)
 			return

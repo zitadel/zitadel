@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -30,6 +32,10 @@ var (
 	}
 	OrgColumnResourceOwner = Column{
 		name:  projection.OrgColumnResourceOwner,
+		table: orgsTable,
+	}
+	OrgColumnInstanceID = Column{
+		name:  projection.OrgColumnInstanceID,
 		table: orgsTable,
 	}
 	OrgColumnState = Column{
@@ -83,7 +89,8 @@ func (q *OrgSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnID.identifier(): id,
+		OrgColumnID.identifier():         id,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-AWx52", "Errors.Query.SQLStatement")
@@ -96,7 +103,8 @@ func (q *Queries) OrgByID(ctx context.Context, id string) (*Org, error) {
 func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, error) {
 	stmt, scan := prepareOrgQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		OrgColumnDomain.identifier(): domain,
+		OrgColumnDomain.identifier():     domain,
+		OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-TYUCE", "Errors.Query.SQLStatement")
@@ -109,12 +117,17 @@ func (q *Queries) OrgByDomainGlobal(ctx context.Context, domain string) (*Org, e
 func (q *Queries) IsOrgUnique(ctx context.Context, name, domain string) (isUnique bool, err error) {
 	query, scan := prepareOrgUniqueQuery()
 	stmt, args, err := query.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				OrgColumnDomain.identifier(): domain,
+				OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
-			sq.Eq{
-				OrgColumnName.identifier(): name,
+			sq.Or{
+				sq.Eq{
+					OrgColumnDomain.identifier(): domain,
+				},
+				sq.Eq{
+					OrgColumnName.identifier(): name,
+				},
 			},
 		}).ToSql()
 	if err != nil {
@@ -132,7 +145,10 @@ func (q *Queries) ExistsOrg(ctx context.Context, id string) (err error) {
 
 func (q *Queries) SearchOrgs(ctx context.Context, queries *OrgSearchQueries) (orgs *Orgs, err error) {
 	query, scan := prepareOrgsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			OrgColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-wQ3by", "Errors.Query.InvalidRequest")
 	}

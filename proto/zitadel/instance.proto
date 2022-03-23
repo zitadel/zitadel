@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+import "zitadel/object.proto";
+import "validate/validate.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+package zitadel.instance.v1;
+
+option go_package ="github.com/caos/zitadel/pkg/grpc/instance";
+
+message Instance {
+    string id = 1 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"69629023906488334\""
+        }
+    ];
+    zitadel.v1.ObjectDetails details = 2;
+    State state = 3 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the instance";
+        }
+    ];
+    string generated_domain = 4 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"organization.zitadel.com\"";
+        }
+    ];
+    repeated string custom_domains = 5 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "[\"zitadel.com\", \"zitadel.cloud\", \"zitadel.ch\"]";
+        }
+    ];
+    string name = 6 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"ZITADEL\"";
+        }
+    ];
+    string version = 7 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"v1.0.0\"";
+        }
+    ];
+}
+
+enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_CREATING = 1;
+    STATE_RUNNING = 2;
+    STATE_STOPPING = 3;
+    STATE_STOPPED = 4;
+}
+
+message Query {
+    oneof query {
+        option (validate.required) = true;
+
+        IdQuery id_query = 1;
+        DomainsQuery domains_query = 2;
+        StateQuery state_query = 3;
+    }
+}
+
+//IdQuery is always equals
+message IdQuery {
+    string id = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "4820840938402429";
+        }
+    ];
+}
+
+message DomainsQuery {
+    repeated string domains = 1 [
+        (validate.rules).string = {max_len: 200},
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"caos.ch\"";
+        }
+    ];
+    zitadel.v1.ListQueryMethod method = 2 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "defines which list equality method is used";
+        }
+    ];
+}
+
+//StateQuery is always equals
+message StateQuery {
+    State state = 1 [
+        (validate.rules).enum.defined_only = true,
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            description: "current state of the instance";
+        }
+    ];
+}
+
+enum FieldName {
+    FIELD_NAME_UNSPECIFIED = 0;
+    FIELD_NAME_ID = 1;
+    FIELD_NAME_GENERATED_DOMAIN = 2;
+    FIELD_NAME_NAME = 3;
+    FIELD_NAME_CREATION_DATE = 4;
+}

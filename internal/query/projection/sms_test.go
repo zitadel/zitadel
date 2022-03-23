@@ -54,19 +54,20 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.sms_configs (id, aggregate_id, creation_date, change_date, resource_owner, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.sms_configs (id, aggregate_id, creation_date, change_date, resource_owner, instance_id, state, sequence) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"id",
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
+								"instance-id",
 								domain.SMSConfigStateInactive,
 								uint64(15),
 							},
 						},
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "INSERT INTO projections.sms_configs_twilio (sms_id, sid, token, sender_number) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"id",
 								"sid",
@@ -100,7 +101,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs_twilio SET (sid, sender_number) = ($1, $2) WHERE (sms_id = $3)",
 							expectedArgs: []interface{}{
 								&sid,
 								&senderNumber,
@@ -108,7 +109,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
+							expectedStmt: "UPDATE projections.sms_configs SET (change_date, sequence) = ($1, $2) WHERE (id = $3)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -139,7 +140,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateActive,
 								anyArg{},
@@ -171,7 +172,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.sms_configs SET (state, change_date, sequence) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								domain.SMSConfigStateInactive,
 								anyArg{},
@@ -203,7 +204,7 @@ func TestSMSProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.sms_configs WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.sms_configs WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"id",
 							},

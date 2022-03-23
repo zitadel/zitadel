@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -14,14 +12,11 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type CustomTextProjection struct {
-	crdb.StatementHandler
-}
-
 const (
-	CustomTextTable = "zitadel.projections.custom_texts"
+	CustomTextTable = "projections.custom_texts"
 
 	CustomTextAggregateIDCol  = "aggregate_id"
+	CustomTextInstanceIDCol   = "instance_id"
 	CustomTextCreationDateCol = "creation_date"
 	CustomTextChangeDateCol   = "change_date"
 	CustomTextSequenceCol     = "sequence"
@@ -32,10 +27,30 @@ const (
 	CustomTextTextCol         = "text"
 )
 
+type CustomTextProjection struct {
+	crdb.StatementHandler
+}
+
 func NewCustomTextProjection(ctx context.Context, config crdb.StatementHandlerConfig) *CustomTextProjection {
 	p := new(CustomTextProjection)
 	config.ProjectionName = CustomTextTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(CustomTextAggregateIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(CustomTextChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(CustomTextSequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(CustomTextIsDefaultCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(CustomTextTemplateCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextLanguageCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextKeyCol, crdb.ColumnTypeText),
+			crdb.NewColumn(CustomTextTextCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(CustomTextInstanceIDCol, CustomTextAggregateIDCol, CustomTextTemplateCol, CustomTextKeyCol, CustomTextLanguageCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -90,13 +105,13 @@ func (p *CustomTextProjection) reduceSet(event eventstore.Event) (*handler.State
 		customTextEvent = e.CustomTextSetEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-g0Jfs", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-KKfw4", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KKfw4", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType})
 	}
 	return crdb.NewUpsertStatement(
 		&customTextEvent,
 		[]handler.Column{
 			handler.NewCol(CustomTextAggregateIDCol, customTextEvent.Aggregate().ID),
+			handler.NewCol(CustomTextInstanceIDCol, customTextEvent.Aggregate().InstanceID),
 			handler.NewCol(CustomTextCreationDateCol, customTextEvent.CreationDate()),
 			handler.NewCol(CustomTextChangeDateCol, customTextEvent.CreationDate()),
 			handler.NewCol(CustomTextSequenceCol, customTextEvent.Sequence()),
@@ -116,8 +131,7 @@ func (p *CustomTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	case *instance.CustomTextRemovedEvent:
 		customTextEvent = e.CustomTextRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-2Nigw", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-n9wJg", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-n9wJg", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType})
 	}
 	return crdb.NewDeleteStatement(
 		&customTextEvent,
@@ -137,8 +151,7 @@ func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 	case *instance.CustomTextTemplateRemovedEvent:
 		customTextEvent = e.CustomTextTemplateRemovedEvent
 	default:
-		logging.LogWithFields("PROJE-J9wfg", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, instance.CustomTextTemplateRemovedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-29iPf", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-29iPf", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, iam.CustomTextTemplateRemovedEventType})
 	}
 	return crdb.NewDeleteStatement(
 		&customTextEvent,

@@ -7,10 +7,12 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"golang.org/x/text/language"
 )
 
 var (
@@ -76,10 +78,10 @@ func (q *IAMSearchQueries) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 	return query
 }
 
-func (q *Queries) IAMByID(ctx context.Context, id string) (*IAM, error) {
+func (q *Queries) IAM(ctx context.Context) (*IAM, error) {
 	stmt, scan := prepareIAMQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		IAMColumnID.identifier(): id,
+		IAMColumnID.identifier(): authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-d9ngs", "Errors.Query.SQLStatement")
@@ -90,7 +92,7 @@ func (q *Queries) IAMByID(ctx context.Context, id string) (*IAM, error) {
 }
 
 func (q *Queries) GetDefaultLanguage(ctx context.Context) language.Tag {
-	iam, err := q.IAMByID(ctx, domain.IAMID)
+	iam, err := q.IAM(ctx)
 	if err != nil {
 		return language.Und
 	}

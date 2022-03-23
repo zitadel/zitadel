@@ -8,9 +8,10 @@ import (
 	"regexp"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/domain"
 	errs "github.com/caos/zitadel/internal/errors"
-	"golang.org/x/text/language"
 )
 
 func Test_IAMPrepares(t *testing.T) {
@@ -29,15 +30,15 @@ func Test_IAMPrepares(t *testing.T) {
 			prepare: prepareIAMQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.iam.id,`+
-						` zitadel.projections.iam.change_date,`+
-						` zitadel.projections.iam.sequence,`+
-						` zitadel.projections.iam.global_org_id,`+
-						` zitadel.projections.iam.iam_project_id,`+
-						` zitadel.projections.iam.setup_started,`+
-						` zitadel.projections.iam.setup_done,`+
-						` zitadel.projections.iam.default_language`+
-						` FROM zitadel.projections.iam`),
+					regexp.QuoteMeta(`SELECT projections.iam.id,`+
+						` projections.iam.change_date,`+
+						` projections.iam.sequence,`+
+						` projections.iam.global_org_id,`+
+						` projections.iam.iam_project_id,`+
+						` projections.iam.setup_started,`+
+						` projections.iam.setup_done,`+
+						` projections.iam.default_language`+
+						` FROM projections.iam`),
 					nil,
 					nil,
 				),
@@ -55,15 +56,15 @@ func Test_IAMPrepares(t *testing.T) {
 			prepare: prepareIAMQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.iam.id,`+
-						` zitadel.projections.iam.change_date,`+
-						` zitadel.projections.iam.sequence,`+
-						` zitadel.projections.iam.global_org_id,`+
-						` zitadel.projections.iam.iam_project_id,`+
-						` zitadel.projections.iam.setup_started,`+
-						` zitadel.projections.iam.setup_done,`+
-						` zitadel.projections.iam.default_language`+
-						` FROM zitadel.projections.iam`),
+					regexp.QuoteMeta(`SELECT projections.iam.id,`+
+						` projections.iam.change_date,`+
+						` projections.iam.sequence,`+
+						` projections.iam.global_org_id,`+
+						` projections.iam.iam_project_id,`+
+						` projections.iam.setup_started,`+
+						` projections.iam.setup_done,`+
+						` projections.iam.default_language`+
+						` FROM projections.iam`),
 					[]string{
 						"id",
 						"change_date",
@@ -102,15 +103,15 @@ func Test_IAMPrepares(t *testing.T) {
 			prepare: prepareIAMQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.iam.id,`+
-						` zitadel.projections.iam.change_date,`+
-						` zitadel.projections.iam.sequence,`+
-						` zitadel.projections.iam.global_org_id,`+
-						` zitadel.projections.iam.iam_project_id,`+
-						` zitadel.projections.iam.setup_started,`+
-						` zitadel.projections.iam.setup_done,`+
-						` zitadel.projections.iam.default_language`+
-						` FROM zitadel.projections.iam`),
+					regexp.QuoteMeta(`SELECT projections.iam.id,`+
+						` projections.iam.change_date,`+
+						` projections.iam.sequence,`+
+						` projections.iam.global_org_id,`+
+						` projections.iam.iam_project_id,`+
+						` projections.iam.setup_started,`+
+						` projections.iam.setup_done,`+
+						` projections.iam.default_language`+
+						` FROM projections.iam`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

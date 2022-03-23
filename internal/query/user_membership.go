@@ -6,9 +6,11 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
-	"github.com/lib/pq"
 )
 
 type Memberships struct {
@@ -90,7 +92,10 @@ func (q *MembershipSearchQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder
 
 func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuery) (*Memberships, error) {
 	query, scan := prepareMembershipsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			membershipInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
@@ -138,6 +143,10 @@ var (
 	}
 	membershipResourceOwner = Column{
 		name:  projection.MemberResourceOwner,
+		table: membershipAlias,
+	}
+	membershipInstanceID = Column{
+		name:  projection.MemberInstanceID,
 		table: membershipAlias,
 	}
 	membershipOrgID = Column{

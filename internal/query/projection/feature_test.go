@@ -64,9 +64,10 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed, max_actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)",
+							expectedStmt: "UPSERT INTO projections.features (aggregate_id, instance_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed, max_actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								false,
@@ -138,9 +139,10 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedStmt: "UPSERT INTO projections.features (aggregate_id, instance_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								false,
@@ -189,9 +191,10 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.features (aggregate_id, instance_id, change_date, sequence, is_default) VALUES ($1, $2, $3, $4, $5)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								false,
@@ -219,7 +222,7 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.features WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.features WHERE (aggregate_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -268,9 +271,10 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25)",
+							expectedStmt: "UPSERT INTO projections.features (aggregate_id, instance_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								true,
@@ -342,9 +346,10 @@ func TestFeatureProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO zitadel.projections.features (aggregate_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed, max_actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)",
+							expectedStmt: "UPSERT INTO projections.features (aggregate_id, instance_id, change_date, sequence, is_default, tier_name, tier_description, state, state_description, audit_log_retention, login_policy_factors, login_policy_idp, login_policy_passwordless, login_policy_registration, login_policy_username_login, login_policy_password_reset, password_complexity_policy, label_policy_private_label, label_policy_watermark, custom_domain, privacy_policy, metadata_user, custom_text_message, custom_text_login, lockout_policy, actions_allowed, max_actions) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								true,

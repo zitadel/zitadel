@@ -7,6 +7,9 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -32,6 +35,10 @@ var (
 	}
 	LockoutColID = Column{
 		name:  projection.LockoutPolicyIDCol,
+		table: lockoutTable,
+	}
+	LockoutColInstanceID = Column{
+		name:  projection.LockoutPolicyInstanceIDCol,
 		table: lockoutTable,
 	}
 	LockoutColSequence = Column{
@@ -71,12 +78,17 @@ var (
 func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*LockoutPolicy, error) {
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				LockoutColID.identifier(): orgID,
+				LockoutColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
-			sq.Eq{
-				LockoutColID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					LockoutColID.identifier(): orgID,
+				},
+				sq.Eq{
+					LockoutColID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(LockoutColIsDefault.identifier()).
@@ -92,7 +104,8 @@ func (q *Queries) LockoutPolicyByOrg(ctx context.Context, orgID string) (*Lockou
 func (q *Queries) DefaultLockoutPolicy(ctx context.Context) (*LockoutPolicy, error) {
 	stmt, scan := prepareLockoutPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LockoutColID.identifier(): domain.IAMID,
+		LockoutColID.identifier():         domain.IAMID,
+		LockoutColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(LockoutColIsDefault.identifier()).
 		Limit(1).ToSql()

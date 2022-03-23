@@ -3,6 +3,8 @@ package projection
 import (
 	"testing"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -10,7 +12,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
 	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/lib/pq"
 )
 
 func TestProjectGrantMemberProjection_reduces(t *testing.T) {
@@ -45,7 +46,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.project_grant_members (user_id, roles, creation_date, change_date, sequence, resource_owner, project_id, grant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.project_grant_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, project_id, grant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								"user-id",
 								pq.StringArray{"role"},
@@ -53,6 +54,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 								anyArg{},
 								uint64(15),
 								"ro-id",
+								"instance-id",
 								"agg-id",
 								"grant-id",
 							},
@@ -83,7 +85,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.project_grant_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5) AND (grant_id = $6)",
+							expectedStmt: "UPDATE projections.project_grant_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4) AND (project_id = $5) AND (grant_id = $6)",
 							expectedArgs: []interface{}{
 								pq.StringArray{"role", "changed"},
 								anyArg{},
@@ -118,7 +120,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
+							expectedStmt: "DELETE FROM projections.project_grant_members WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"agg-id",
@@ -150,7 +152,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
+							expectedStmt: "DELETE FROM projections.project_grant_members WHERE (user_id = $1) AND (project_id = $2) AND (grant_id = $3)",
 							expectedArgs: []interface{}{
 								"user-id",
 								"agg-id",
@@ -179,7 +181,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grant_members WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -206,7 +208,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (resource_owner = $1)",
+							expectedStmt: "DELETE FROM projections.project_grant_members WHERE (resource_owner = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -233,7 +235,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (project_id = $1)",
+							expectedStmt: "DELETE FROM projections.project_grant_members WHERE (project_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -260,7 +262,7 @@ func TestProjectGrantMemberProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.project_grant_members WHERE (grant_id = $1) AND (project_id = $2)",
+							expectedStmt: "DELETE FROM projections.project_grant_members WHERE (grant_id = $1) AND (project_id = $2)",
 							expectedArgs: []interface{}{
 								"grant-id",
 								"agg-id",

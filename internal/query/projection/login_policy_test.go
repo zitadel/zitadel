@@ -53,9 +53,10 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -107,7 +108,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE (aggregate_id = $14)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -149,7 +150,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -181,7 +182,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -211,7 +212,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.login_policies WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.login_policies WHERE (aggregate_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -240,7 +241,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -272,7 +273,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -314,9 +315,10 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.login_policies (aggregate_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)",
+							expectedStmt: "INSERT INTO projections.login_policies (aggregate_id, instance_id, creation_date, change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, is_default, hide_password_reset, password_check_lifetime, external_login_check_lifetime, mfa_init_skip_lifetime, second_factor_check_lifetime, multi_factor_check_lifetime) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -363,7 +365,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, allow_register, allow_username_password, allow_external_idps, force_mfa, passwordless_type, hide_password_reset) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE (aggregate_id = $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -400,7 +402,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_append(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -432,7 +434,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, multi_factors) = ($1, $2, array_remove(multi_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -464,7 +466,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_append(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -496,7 +498,7 @@ func TestLoginPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.login_policies SET (change_date, sequence, second_factors) = ($1, $2, array_remove(second_factors, $3)) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

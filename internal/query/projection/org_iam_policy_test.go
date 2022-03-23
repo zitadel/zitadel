@@ -42,7 +42,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -52,6 +52,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 								true,
 								false,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -78,7 +79,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.org_iam_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.org_iam_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -108,7 +109,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.org_iam_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.org_iam_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -137,7 +138,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -147,6 +148,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 								true,
 								true,
 								"ro-id",
+								"instance-id",
 							},
 						},
 					},
@@ -173,7 +175,7 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.org_iam_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.org_iam_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

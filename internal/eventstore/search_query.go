@@ -12,7 +12,7 @@ type SearchQueryBuilder struct {
 	limit         uint64
 	desc          bool
 	resourceOwner string
-	tenant        string
+	instanceID    string
 	queries       []*SearchQuery
 }
 
@@ -68,9 +68,9 @@ func (factory *SearchQueryBuilder) ResourceOwner(resourceOwner string) *SearchQu
 	return factory
 }
 
-//Tenant defines the tenant (system) of the events
-func (factory *SearchQueryBuilder) Tenant(tenant string) *SearchQueryBuilder {
-	factory.tenant = tenant
+//InstanceID defines the instanceID (system) of the events
+func (factory *SearchQueryBuilder) InstanceID(instanceID string) *SearchQueryBuilder {
+	factory.instanceID = instanceID
 	return factory
 }
 
@@ -145,13 +145,13 @@ func (query *SearchQuery) Builder() *SearchQueryBuilder {
 	return query.builder
 }
 
-func (builder *SearchQueryBuilder) build(tenantID string) (*repository.SearchQuery, error) {
+func (builder *SearchQueryBuilder) build(instanceID string) (*repository.SearchQuery, error) {
 	if builder == nil ||
 		len(builder.queries) < 1 ||
 		builder.columns.Validate() != nil {
 		return nil, errors.ThrowPreconditionFailed(nil, "MODEL-4m9gs", "builder invalid")
 	}
-	builder.tenant = tenantID
+	builder.instanceID = instanceID
 	filters := make([][]*repository.Filter, len(builder.queries))
 
 	for i, query := range builder.queries {
@@ -163,7 +163,7 @@ func (builder *SearchQueryBuilder) build(tenantID string) (*repository.SearchQue
 			query.eventSequenceGreaterFilter,
 			query.eventSequenceLessFilter,
 			query.builder.resourceOwnerFilter,
-			query.builder.tenantFilter,
+			query.builder.instanceIDFilter,
 		} {
 			if filter := f(); filter != nil {
 				if err := filter.Validate(); err != nil {
@@ -247,11 +247,11 @@ func (builder *SearchQueryBuilder) resourceOwnerFilter() *repository.Filter {
 	return repository.NewFilter(repository.FieldResourceOwner, builder.resourceOwner, repository.OperationEquals)
 }
 
-func (builder *SearchQueryBuilder) tenantFilter() *repository.Filter {
-	if builder.tenant == "" {
+func (builder *SearchQueryBuilder) instanceIDFilter() *repository.Filter {
+	if builder.instanceID == "" {
 		return nil
 	}
-	return repository.NewFilter(repository.FieldTenant, builder.tenant, repository.OperationEquals)
+	return repository.NewFilter(repository.FieldInstanceID, builder.instanceID, repository.OperationEquals)
 }
 
 func (query *SearchQuery) eventDataFilter() *repository.Filter {
