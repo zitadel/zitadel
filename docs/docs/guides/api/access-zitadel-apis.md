@@ -47,7 +47,7 @@ Make sure you have a Service User with a Key. (For more detailed informations ab
 1. Navigate to Organization Detail
 2. Click the **+** button in the right part of console, in the managers part of details
 3. Search the user and select it
-4. Choose the role ORG_OWNER
+4. Select the role **ORG_OWNER**
 
 ![Add Org Manager](/img/console_org_manager_add.gif)
 

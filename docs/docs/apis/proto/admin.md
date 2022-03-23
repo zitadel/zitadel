@@ -75,7 +75,7 @@ all queries need to match (AND)
 [SetUpOrgResponse](#setuporgresponse)
 
 Creates a new org and user 
-and adds the user to the orgs members as ORG_OWNER
+and adds the user to the orgs members as *ORG_OWNER*
 
 
 

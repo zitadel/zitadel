@@ -2,7 +2,7 @@
 title: OAuth 2.0 Proxy
 ---
 
-The [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) project lets services delegate the authentication flow to an IDP like **ZITADEL**
+The [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) project lets services delegate the authentication flow to an IDP like ZITADEL
 
 ## Configure ZITADEL
 

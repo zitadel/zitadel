@@ -13,15 +13,15 @@ For detailed information about the SDK, refer to the [.NET SDK documentation](ht
 
 The client [SDK](https://github.com/caos/zitadel-net) handles all necessary OAuth 2.0 requests and sends the required headers to the ZITADEL API.
 
-You'll need a service account assigned with the Org-owner role
+You'll need a service account assigned with the *ORG_OWNER* role
 (or another role, depending on the needed API requests).
-You'll also need the account's service key in a JSON file.
+You'll also need the service account's JSON key in a file.
 
-For background information, we recommend reading the guide on [how to access the ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of :
+For background information, we recommend reading the guide on [how to access the ZITADEL API](../../guides/api/access-zitadel-apis) and the associated guides for a basic knowledge of:
  - [Recommended Authorization Flows](../../guides/authorization/oauth-recommended-flows)
  - [Service Users](../../guides/authentication/serviceusers)
 
-> Be sure that you have a valid JSON key and that its service account is either `ORG_OWNER` or at least `ORG_OWNER_VIEWER`.
+> Be sure that you have a valid JSON key and that its service account is either *ORG_OWNER* or at least *ORG_OWNER_VIEWER*.
 
 ## .NET Setup
 
@@ -47,7 +47,7 @@ Change the `program.cs` file to the content below.
 This creates a client for the management API and calls its `GetMyOrg` function.
 
 To make sure you can access the API,
-the SDK retrieves a Bearer Token using a JWT Profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
+the SDK retrieves a *Bearer Token* using a JWT profile with the provided scopes (`openid` and `urn:zitadel:iam:org:project:id:69234237810729019:aud`).
 
 ```csharp
 using System;
@@ -55,7 +55,6 @@ using Zitadel.Api;
 using Zitadel.Authentication;
 using Zitadel.Authentication.Credentials;
 
-// no.. this key is not activated anymore ;-)
 var sa = await ServiceAccount.LoadFromJsonFileAsync("./service-account.json");
 var api = Clients.ManagementService(
     new()
@@ -116,7 +115,7 @@ You have successfully used the ZITADEL .NET SDK to call the management API!
 
 If you encountered an error (e.g. `code = PermissionDenied desc = No matching permissions found`), 
 make sure your service user has the required permissions:
-either the `ORG_OWNER` or `ORG_OWNER_VIEWER` roles.
+either the *ORG_OWNER* or *ORG_OWNER_VIEWER* roles.
 
 For more help, check the [guides](#prerequisites) mentioned at the beginning.
 

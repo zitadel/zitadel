@@ -4,11 +4,11 @@ title: Architecture
 
 ## Software Architecture
 
-**ZITADEL** is built with two essential patterns. Eventsourcing and CQRS. Due to the nature of eventsourcing **ZITADEL** provides the unique capability to generate a strong audit trail of ALL the things that happen to its resources, without compromising on storage cost or audit trail length.
+ZITADEL is built with two essential patterns. Eventsourcing and CQRS. Due to the nature of eventsourcing ZITADEL provides the unique capability to generate a strong audit trail of ALL the things that happen to its resources, without compromising on storage cost or audit trail length.
 
-The combination with CQRS makes **ZITADEL** eventual consistent which, from our perspective is a great benefit. It allows us to build a SOR (Source of Records) which is the one single point of truth for all computed states. The SOR needs to be transaction safe to make sure all operations are in order.
+The combination with CQRS makes ZITADEL eventual consistent which, from our perspective is a great benefit. It allows us to build a SOR (Source of Records) which is the one single point of truth for all computed states. The SOR needs to be transaction safe to make sure all operations are in order.
 
-Each **ZITADEL** contains all components of the IAM, from serving as API, rendering / serving GUI's, background processing of events and task or being a GITOPS style operator. This AiO (All in One) approach makes scaling from a single machine to a multi region (multi cluster) seamless.
+Each ZITADEL contains all components of the IAM, from serving as API, rendering / serving GUI's, background processing of events and task or being a GITOPS style operator. This AiO (All in One) approach makes scaling from a single machine to a multi region (multi cluster) seamless.
 
 ![Software Architecture](/img/zitadel_software_architecture.png)
 
@@ -54,7 +54,7 @@ A **ZITADEL Cluster** is a highly available IAM system with each component criti
 As our storage (CockroachDB) relies on Raft it is also necessary to always utilizes odd numbers to address for "split brain" scenarios.
 Hence our reference design is to have three application nodes and three Storage Nodes.
 
-If you deploy **ZITADEL** with our GITOPS Tooling [**ORBOS**](https://github.com/caos/orbos) we create 7 seven nodes. One management, three application and three storage nodes.
+If you deploy ZITADEL with our GITOPS Tooling [**ORBOS**](https://github.com/caos/orbos) we create 7 seven nodes. One management, three application and three storage nodes.
 
 > You can horizontaly scale zitadel, but we recommend to use multiple cluster instead to reduce the blast radius from impacts to a single cluster
 
@@ -62,7 +62,7 @@ If you deploy **ZITADEL** with our GITOPS Tooling [**ORBOS**](https://github.com
 
 ## Multi Cluster Architecture
 
-To scale **ZITADEL** is recommend to create smaller clusters, see cluster architecture and then create a fabric which interconnects the database.
+To scale ZITADEL is recommend to create smaller clusters, see cluster architecture and then create a fabric which interconnects the database.
 In our reference design we recommend to create a cluster per cloud provider or availability zone and to group them into regions.
 
 For example, you can run three cluster for the region switzerland. On with GCE, one with cloudscale and one with inventx.

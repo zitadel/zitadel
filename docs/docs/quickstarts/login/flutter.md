@@ -2,7 +2,7 @@
 title: Flutter
 ---
 
-This guide shows you how to integrate **ZITADEL** as an identity provider for a Flutter app.
+This guide shows you how to integrate ZITADEL as an identity provider for a Flutter app.
 
 At the end of the guide, you will have a mobile application on Android and iOS that can authenticate users via ZITADEL.
 
