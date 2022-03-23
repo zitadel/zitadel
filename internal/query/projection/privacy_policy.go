@@ -102,7 +102,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, instance.PrivacyPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -128,7 +128,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	case *instance.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, instance.PrivacyPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(PrivacyPolicyChangeDateCol, policyEvent.CreationDate()),

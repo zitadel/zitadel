@@ -105,7 +105,7 @@ func (p *CustomTextProjection) reduceSet(event eventstore.Event) (*handler.State
 		customTextEvent = e.CustomTextSetEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KKfw4", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KKfw4", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
 	return crdb.NewUpsertStatement(
 		&customTextEvent,
@@ -131,7 +131,7 @@ func (p *CustomTextProjection) reduceRemoved(event eventstore.Event) (*handler.S
 	case *instance.CustomTextRemovedEvent:
 		customTextEvent = e.CustomTextRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-n9wJg", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-n9wJg", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
 	return crdb.NewDeleteStatement(
 		&customTextEvent,
@@ -151,7 +151,7 @@ func (p *CustomTextProjection) reduceTemplateRemoved(event eventstore.Event) (*h
 	case *instance.CustomTextTemplateRemovedEvent:
 		customTextEvent = e.CustomTextTemplateRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-29iPf", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, iam.CustomTextTemplateRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-29iPf", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextTemplateRemovedEventType, instance.CustomTextTemplateRemovedEventType})
 	}
 	return crdb.NewDeleteStatement(
 		&customTextEvent,

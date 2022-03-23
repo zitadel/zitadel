@@ -102,7 +102,7 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		policyEvent = e.LockoutPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, iam.LockoutPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, instance.LockoutPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -128,7 +128,7 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	case *instance.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, iam.LockoutPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, instance.LockoutPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(LockoutPolicyChangeDateCol, policyEvent.CreationDate()),

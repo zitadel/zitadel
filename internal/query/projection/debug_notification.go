@@ -99,7 +99,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderAdd
 		providerEvent = e.DebugNotificationProviderAddedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{iam.DebugNotificationProviderFileAddedEventType, iam.DebugNotificationProviderLogAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileAddedEventType, instance.DebugNotificationProviderLogAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(&providerEvent, []handler.Column{
@@ -126,7 +126,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderCha
 		providerEvent = e.DebugNotificationProviderChangedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{iam.DebugNotificationProviderFileChangedEventType, iam.DebugNotificationProviderLogChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileChangedEventType, instance.DebugNotificationProviderLogChangedEventType})
 	}
 
 	cols := []handler.Column{
@@ -158,7 +158,7 @@ func (p *DebugNotificationProviderProjection) reduceDebugNotificationProviderRem
 		providerEvent = e.DebugNotificationProviderRemovedEvent
 		providerType = domain.NotificationProviderTypeLog
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dow9f", "reduce.wrong.event.type %v", []eventstore.EventType{iam.DebugNotificationProviderFileRemovedEventType, iam.DebugNotificationProviderLogRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-dow9f", "reduce.wrong.event.type %v", []eventstore.EventType{instance.DebugNotificationProviderFileRemovedEventType, instance.DebugNotificationProviderLogRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(

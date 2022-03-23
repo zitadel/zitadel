@@ -107,10 +107,10 @@ func (p *FeatureProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.FeaturesSetEventType,
+					Event:  instance.FeaturesSetEventType,
 					Reduce: p.reduceFeatureSet,
 				},
 			},
@@ -129,7 +129,7 @@ func (p *FeatureProjection) reduceFeatureSet(event eventstore.Event) (*handler.S
 		featureEvent = e.FeaturesSetEvent
 		isDefault = false
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-K0erf", "reduce.wrong.event.type %v", []eventstore.EventType{org.FeaturesSetEventType, iam.FeaturesSetEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-K0erf", "reduce.wrong.event.type %v", []eventstore.EventType{org.FeaturesSetEventType, instance.FeaturesSetEventType})
 	}
 
 	cols := []handler.Column{

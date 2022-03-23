@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
-func TestIAMMemberProjection_reduces(t *testing.T) {
+func TestInstanceMemberProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -24,7 +24,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.MemberAddedType",
+			name: "instance.MemberAddedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberAddedEventType),
@@ -35,16 +35,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), instance.MemberAddedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceAdded,
+			reduce: (&InstanceMemberProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IAMMemberProjectionTable,
+				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.iam_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, iam_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+							expectedStmt: "INSERT INTO projections.instance_members (user_id, roles, creation_date, change_date, sequence, resource_owner, instance_id, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"user-id",
 								pq.StringArray{"role"},
@@ -61,7 +61,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.MemberChangedType",
+			name: "instance.MemberChangedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberChangedEventType),
@@ -72,16 +72,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), instance.MemberChangedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceChanged,
+			reduce: (&InstanceMemberProjection{}).reduceChanged,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IAMMemberProjectionTable,
+				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.iam_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4)",
+							expectedStmt: "UPDATE projections.instance_members SET (roles, change_date, sequence) = ($1, $2, $3) WHERE (user_id = $4)",
 							expectedArgs: []interface{}{
 								pq.StringArray{"role", "changed"},
 								anyArg{},
@@ -94,7 +94,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.MemberCascadeRemovedType",
+			name: "instance.MemberCascadeRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberCascadeRemovedEventType),
@@ -104,16 +104,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), instance.MemberCascadeRemovedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceCascadeRemoved,
+			reduce: (&InstanceMemberProjection{}).reduceCascadeRemoved,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IAMMemberProjectionTable,
+				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.iam_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"user-id",
 							},
@@ -123,7 +123,7 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.MemberRemovedType",
+			name: "instance.MemberRemovedType",
 			args: args{
 				event: getEvent(testEvent(
 					repository.EventType(instance.MemberRemovedEventType),
@@ -133,16 +133,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 				}`),
 				), instance.MemberRemovedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceRemoved,
+			reduce: (&InstanceMemberProjection{}).reduceRemoved,
 			want: wantReduce{
 				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IAMMemberProjectionTable,
+				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.iam_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"user-id",
 							},
@@ -160,16 +160,16 @@ func TestIAMMemberProjection_reduces(t *testing.T) {
 					[]byte(`{}`),
 				), user.UserRemovedEventMapper),
 			},
-			reduce: (&IAMMemberProjection{}).reduceUserRemoved,
+			reduce: (&InstanceMemberProjection{}).reduceUserRemoved,
 			want: wantReduce{
 				aggregateType:    user.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
-				projection:       IAMMemberProjectionTable,
+				projection:       InstanceMemberProjectionTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.iam_members WHERE (user_id = $1)",
+							expectedStmt: "DELETE FROM projections.instance_members WHERE (user_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},

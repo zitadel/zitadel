@@ -9,6 +9,19 @@ title: zitadel/policy.proto
 ## Messages
 
 
+### DomainPolicy
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| user_login_must_be_domain |  bool | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### LabelPolicy
 
 
@@ -68,19 +81,6 @@ title: zitadel/policy.proto
 | mfa_init_skip_lifetime |  google.protobuf.Duration | - |  |
 | second_factor_check_lifetime |  google.protobuf.Duration | - |  |
 | multi_factor_check_lifetime |  google.protobuf.Duration | - |  |
-
-
-
-
-### OrgIAMPolicy
-
-
-
-| Field | Type | Description | Validation |
-| ----- | ---- | ----------- | ----------- |
-| details |  zitadel.v1.ObjectDetails | - |  |
-| user_login_must_be_domain |  bool | - |  |
-| is_default |  bool | - |  |
 
 
 

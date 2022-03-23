@@ -6,8 +6,8 @@ import (
 	policy_pb "github.com/caos/zitadel/pkg/grpc/policy"
 )
 
-func OrgIAMPolicyToPb(policy *query.OrgIAMPolicy) *policy_pb.OrgIAMPolicy {
-	return &policy_pb.OrgIAMPolicy{
+func DomainPolicyToPb(policy *query.DomainPolicy) *policy_pb.DomainPolicy {
+	return &policy_pb.DomainPolicy{
 		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
 		IsDefault:             policy.IsDefault,
 		Details: object.ToViewDetailsPb(

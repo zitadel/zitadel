@@ -36,12 +36,12 @@ func (c *Commands) ChangeUsername(ctx context.Context, orgID, userID, userName s
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6m9gs", "Errors.User.UsernameNotChanged")
 	}
 
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.OrgIAM.NotExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-38fnu", "Errors.Org.DomainPolicy.NotExisting")
 	}
 
-	if err := CheckOrgIAMPolicyForUserName(userName, orgIAMPolicy); err != nil {
+	if err := CheckDomainPolicyForUserName(userName, orgIAMPolicy); err != nil {
 		return nil, err
 	}
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)
@@ -186,7 +186,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-m9od", "Errors.User.NotFound")
 	}
 
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	orgIAMPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAM.NotExisting")
 	}
@@ -320,7 +320,7 @@ func (c *Commands) userDomainClaimed(ctx context.Context, userID string) (events
 	changedUserGrant := NewUserWriteModel(userID, existingUser.ResourceOwner)
 	userAgg := UserAggregateFromWriteModel(&changedUserGrant.WriteModel)
 
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, existingUser.ResourceOwner)
+	orgIAMPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
 		return nil, nil, err
 	}

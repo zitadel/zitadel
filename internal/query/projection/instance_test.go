@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func TestIAMProjection_reduces(t *testing.T) {
+func TestInstanceProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -32,14 +32,14 @@ func TestIAMProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IAMProjection{}).reduceGlobalOrgSet,
 			want: wantReduce{
-				projection:       IAMProjectionTable,
+				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.instance (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								anyArg{},
@@ -62,14 +62,14 @@ func TestIAMProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IAMProjection{}).reduceIAMProjectSet,
 			want: wantReduce{
-				projection:       IAMProjectionTable,
+				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.instance (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								anyArg{},
@@ -92,14 +92,14 @@ func TestIAMProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IAMProjection{}).reduceDefaultLanguageSet,
 			want: wantReduce{
-				projection:       IAMProjectionTable,
+				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.instance (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								anyArg{},
@@ -122,14 +122,14 @@ func TestIAMProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IAMProjection{}).reduceSetupEvent,
 			want: wantReduce{
-				projection:       IAMProjectionTable,
+				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, setup_started) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.instance (id, change_date, sequence, setup_started) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								anyArg{},
@@ -152,14 +152,14 @@ func TestIAMProjection_reduces(t *testing.T) {
 			},
 			reduce: (&IAMProjection{}).reduceSetupEvent,
 			want: wantReduce{
-				projection:       IAMProjectionTable,
+				projection:       InstanceProjectionTable,
 				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, setup_done) VALUES ($1, $2, $3, $4)",
+							expectedStmt: "UPSERT INTO projections.instance (id, change_date, sequence, setup_done) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
 								"instance-id",
 								anyArg{},

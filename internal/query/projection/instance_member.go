@@ -12,23 +12,23 @@ import (
 )
 
 const (
-	IAMMemberProjectionTable = "projections.iam_members"
+	InstanceMemberProjectionTable = "projections.instance_members"
 
-	IAMMemberIAMIDCol = "iam_id"
+	InstanceMemberIAMIDCol = "instance_id"
 )
 
-type IAMMemberProjection struct {
+type InstanceMemberProjection struct {
 	crdb.StatementHandler
 }
 
-func NewIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMMemberProjection {
-	p := new(IAMMemberProjection)
-	config.ProjectionName = IAMMemberProjectionTable
+func NewInstanceMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *InstanceMemberProjection {
+	p := new(InstanceMemberProjection)
+	config.ProjectionName = InstanceMemberProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable(
-			append(memberColumns, crdb.NewColumn(IAMColumnID, crdb.ColumnTypeText)),
-			crdb.NewPrimaryKey(MemberInstanceID, IAMColumnID, MemberUserIDCol),
+			append(memberColumns, crdb.NewColumn(InstanceColumnID, crdb.ColumnTypeText)),
+			crdb.NewPrimaryKey(MemberInstanceID, InstanceColumnID, MemberUserIDCol),
 			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
 		),
 	)
@@ -37,7 +37,7 @@ func NewIAMMemberProjection(ctx context.Context, config crdb.StatementHandlerCon
 	return p
 }
 
-func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
+func (p *InstanceMemberProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -72,39 +72,39 @@ func (p *IAMMemberProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *IAMMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", iam.MemberAddedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pGNCu", "reduce.wrong.event.type %s", instance.MemberAddedEventType)
 	}
-	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(IAMMemberIAMIDCol, e.Aggregate().ID))
+	return reduceMemberAdded(e.MemberAddedEvent, withMemberCol(InstanceMemberIAMIDCol, e.Aggregate().ID))
 }
 
-func (p *IAMMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5WQcZ", "reduce.wrong.event.type %s", iam.MemberChangedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-5WQcZ", "reduce.wrong.event.type %s", instance.MemberChangedEventType)
 	}
 	return reduceMemberChanged(e.MemberChangedEvent)
 }
 
-func (p *IAMMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberCascadeRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dmdf2", "reduce.wrong.event.type %s", iam.MemberCascadeRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dmdf2", "reduce.wrong.event.type %s", instance.MemberCascadeRemovedEventType)
 	}
 	return reduceMemberCascadeRemoved(e.MemberCascadeRemovedEvent)
 }
 
-func (p *IAMMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.MemberRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-exVqy", "reduce.wrong.event.type %s", iam.MemberRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-exVqy", "reduce.wrong.event.type %s", instance.MemberRemovedEventType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.UserID))
 }
 
-func (p *IAMMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-mkDHF", "reduce.wrong.event.type %s", user.UserRemovedType)

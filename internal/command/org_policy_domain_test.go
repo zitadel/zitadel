@@ -15,17 +15,17 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
+func TestCommandSide_AddDomainPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
 		orgID  string
-		policy *domain.OrgIAMPolicy
+		policy *domain.DomainPolicy
 	}
 	type res struct {
-		want *domain.OrgIAMPolicy
+		want *domain.DomainPolicy
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -43,7 +43,7 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -58,7 +58,7 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -69,7 +69,7 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -86,7 +86,7 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgIAMPolicyAddedEvent(context.Background(),
+								org.NewOrgDomainPolicyAddedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate,
 									true,
 								),
@@ -98,12 +98,12 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
 			res: res{
-				want: &domain.OrgIAMPolicy{
+				want: &domain.DomainPolicy{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
@@ -118,7 +118,7 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOrgIAMPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
+			got, err := r.AddOrgDomainPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -132,17 +132,17 @@ func TestCommandSide_AddOrgIAMPolicy(t *testing.T) {
 	}
 }
 
-func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
+func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
 		ctx    context.Context
 		orgID  string
-		policy *domain.OrgIAMPolicy
+		policy *domain.DomainPolicy
 	}
 	type res struct {
-		want *domain.OrgIAMPolicy
+		want *domain.DomainPolicy
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -160,7 +160,7 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx: context.Background(),
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -179,7 +179,7 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -194,7 +194,7 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -205,7 +205,7 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
 			},
@@ -220,7 +220,7 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -238,12 +238,12 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 			args: args{
 				ctx:   context.Background(),
 				orgID: "org1",
-				policy: &domain.OrgIAMPolicy{
+				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: false,
 				},
 			},
 			res: res{
-				want: &domain.OrgIAMPolicy{
+				want: &domain.DomainPolicy{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID:   "org1",
 						ResourceOwner: "org1",
@@ -258,7 +258,7 @@ func TestCommandSide_ChangeOrgIAMPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeOrgIAMPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
+			got, err := r.ChangeOrgDomainPolicy(tt.args.ctx, tt.args.orgID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -327,7 +327,7 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -336,7 +336,7 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgIAMPolicyRemovedEvent(context.Background(),
+								org.NewOrgDomainPolicyRemovedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate),
 							),
 						},
@@ -359,7 +359,7 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			err := r.RemoveOrgIAMPolicy(tt.args.ctx, tt.args.orgID)
+			err := r.RemoveOrgDomainPolicy(tt.args.ctx, tt.args.orgID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -370,10 +370,10 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 	}
 }
 
-func newOrgIAMPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain bool) *org.OrgIAMPolicyChangedEvent {
-	event, _ := org.NewOrgIAMPolicyChangedEvent(ctx,
+func newOrgIAMPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain bool) *org.OrgDomainPolicyChangedEvent {
+	event, _ := org.NewOrgDomainPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
-		[]policy.OrgIAMPolicyChanges{
+		[]policy.OrgPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
 		},
 	)

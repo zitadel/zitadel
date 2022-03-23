@@ -10,16 +10,8 @@ type Org struct {
 	State OrgState
 	Name  string
 
-	PrimaryDomain            string
-	Domains                  []*OrgDomain
-	Members                  []*Member
-	OrgIamPolicy             *OrgIAMPolicy
-	LoginPolicy              *LoginPolicy
-	LabelPolicy              *LabelPolicy
-	PasswordComplexityPolicy *PasswordComplexityPolicy
-	PasswordAgePolicy        *PasswordAgePolicy
-	PasswordLockoutPolicy    *LockoutPolicy
-	IDPs                     []*IDPConfig
+	PrimaryDomain string
+	Domains       []*OrgDomain
 }
 
 func (o *Org) IsValid() bool {

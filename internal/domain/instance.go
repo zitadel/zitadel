@@ -19,7 +19,7 @@ type Instance struct {
 	IDPs                            []*IDPConfig
 	DefaultLoginPolicy              *LoginPolicy
 	DefaultLabelPolicy              *LabelPolicy
-	DefaultOrgIAMPolicy             *OrgIAMPolicy
+	DefaultDomainPolicy             *DomainPolicy
 	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy
 	DefaultPasswordAgePolicy        *PasswordAgePolicy
 	DefaultPasswordLockoutPolicy    *LockoutPolicy

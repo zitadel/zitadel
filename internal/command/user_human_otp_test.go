@@ -176,7 +176,7 @@ func TestCommandSide_AddHumanOTP(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),

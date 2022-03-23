@@ -85,7 +85,7 @@ func (p *SecretGeneratorProjection) reducers() []handler.AggregateReducer {
 func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorAddedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", iam.SecretGeneratorAddedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-sk99F", "reduce.wrong.event.type %s", instance.SecretGeneratorAddedEventType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -110,7 +110,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorAdded(event eventstore.
 func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorChangedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", iam.SecretGeneratorChangedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-s00Fs", "reduce.wrong.event.type %s", instance.SecretGeneratorChangedEventType)
 	}
 
 	columns := make([]handler.Column, 0, 7)
@@ -147,7 +147,7 @@ func (p *SecretGeneratorProjection) reduceSecretGeneratorChanged(event eventstor
 func (p *SecretGeneratorProjection) reduceSecretGeneratorRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SecretGeneratorRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", iam.SecretGeneratorRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-fmiIf", "reduce.wrong.event.type %s", instance.SecretGeneratorRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

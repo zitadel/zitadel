@@ -83,7 +83,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								false,
 							),
@@ -110,7 +110,7 @@ func TestCommandSide_AddMachine(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),

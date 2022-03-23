@@ -175,16 +175,16 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  org.OrgIAMPolicyAddedEventType,
+					Event:  org.OrgDomainPolicyAddedEventType,
 					Reduce: p.reduceOrgIAMPolicyAdded,
 				},
 				{
-					Event:  org.OrgIAMPolicyChangedEventType,
-					Reduce: p.reduceOrgIAMPolicyChanged,
+					Event:  org.OrgDomainPolicyChangedEventType,
+					Reduce: p.reduceDomainPolicyChanged,
 				},
 				{
-					Event:  org.OrgIAMPolicyRemovedEventType,
-					Reduce: p.reduceOrgIAMPolicyRemoved,
+					Event:  org.OrgDomainPolicyRemovedEventType,
+					Reduce: p.reduceDomainPolicyRemoved,
 				},
 				{
 					Event:  org.OrgDomainPrimarySetEventType,
@@ -204,12 +204,12 @@ func (p *LoginNameProjection) reducers() []handler.AggregateReducer {
 			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  instance.OrgIAMPolicyAddedEventType,
+					Event:  instance.InstanceDomainPolicyAddedEventType,
 					Reduce: p.reduceOrgIAMPolicyAdded,
 				},
 				{
-					Event:  instance.OrgIAMPolicyChangedEventType,
-					Reduce: p.reduceOrgIAMPolicyChanged,
+					Event:  instance.InstanceDomainPolicyChangedEventType,
+					Reduce: p.reduceDomainPolicyChanged,
 				},
 			},
 		},
@@ -295,19 +295,19 @@ func (p *LoginNameProjection) reduceUserDomainClaimed(event eventstore.Event) (*
 
 func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*handler.Statement, error) {
 	var (
-		policyEvent *policy.OrgIAMPolicyAddedEvent
+		policyEvent *policy.DomainPolicyAddedEvent
 		isDefault   bool
 	)
 
 	switch e := event.(type) {
-	case *org.OrgIAMPolicyAddedEvent:
-		policyEvent = &e.OrgIAMPolicyAddedEvent
+	case *org.OrgDomainPolicyAddedEvent:
+		policyEvent = &e.DomainPolicyAddedEvent
 		isDefault = false
-	case *instance.OrgIAMPolicyAddedEvent:
-		policyEvent = &e.OrgIAMPolicyAddedEvent
+	case *instance.InstanceDomainPolicyAddedEvent:
+		policyEvent = &e.DomainPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-yCV6S", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-yCV6S", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgDomainPolicyAddedEventType, instance.InstanceDomainPolicyAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(
@@ -322,16 +322,16 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyAdded(event eventstore.Event) (*
 	), nil
 }
 
-func (p *LoginNameProjection) reduceOrgIAMPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
-	var policyEvent *policy.OrgIAMPolicyChangedEvent
+func (p *LoginNameProjection) reduceDomainPolicyChanged(event eventstore.Event) (*handler.Statement, error) {
+	var policyEvent *policy.DomainPolicyChangedEvent
 
 	switch e := event.(type) {
-	case *org.OrgIAMPolicyChangedEvent:
-		policyEvent = &e.OrgIAMPolicyChangedEvent
-	case *instance.OrgIAMPolicyChangedEvent:
-		policyEvent = &e.OrgIAMPolicyChangedEvent
+	case *org.OrgDomainPolicyChangedEvent:
+		policyEvent = &e.DomainPolicyChangedEvent
+	case *instance.InstanceDomainPolicyChangedEvent:
+		policyEvent = &e.DomainPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ArFDd", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ArFDd", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgDomainPolicyChangedEventType, instance.InstanceDomainPolicyChangedEventType})
 	}
 
 	if policyEvent.UserLoginMustBeDomain == nil {
@@ -350,10 +350,10 @@ func (p *LoginNameProjection) reduceOrgIAMPolicyChanged(event eventstore.Event) 
 	), nil
 }
 
-func (p *LoginNameProjection) reduceOrgIAMPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
-	e, ok := event.(*org.OrgIAMPolicyRemovedEvent)
+func (p *LoginNameProjection) reduceDomainPolicyRemoved(event eventstore.Event) (*handler.Statement, error) {
+	e, ok := event.(*org.OrgDomainPolicyRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ysEeB", "reduce.wrong.event.type %s", org.OrgIAMPolicyRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ysEeB", "reduce.wrong.event.type %s", org.OrgDomainPolicyRemovedEventType)
 	}
 
 	return crdb.NewDeleteStatement(

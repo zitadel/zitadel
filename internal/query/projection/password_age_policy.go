@@ -102,7 +102,7 @@ func (p *PasswordAgeProjection) reduceAdded(event eventstore.Event) (*handler.St
 		policyEvent = e.PasswordAgePolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, iam.PasswordAgePolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CJqF0", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyAddedEventType, instance.PasswordAgePolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -128,7 +128,7 @@ func (p *PasswordAgeProjection) reduceChanged(event eventstore.Event) (*handler.
 	case *instance.PasswordAgePolicyChangedEvent:
 		policyEvent = e.PasswordAgePolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, iam.PasswordAgePolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-i7FZt", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordAgePolicyChangedEventType, instance.PasswordAgePolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(AgePolicyChangeDateCol, policyEvent.CreationDate()),

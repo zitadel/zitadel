@@ -74,9 +74,9 @@ func writeModelToMailTemplate(wm *MailTemplateWriteModel) *domain.MailTemplate {
 	}
 }
 
-func writeModelToOrgIAMPolicy(wm *InstanceOrgIAMPolicyWriteModel) *domain.OrgIAMPolicy {
-	return &domain.OrgIAMPolicy{
-		ObjectRoot:            writeModelToObjectRoot(wm.PolicyOrgIAMWriteModel.WriteModel),
+func writeModelToDomainPolicy(wm *InstanceDomainPolicyWriteModel) *domain.DomainPolicy {
+	return &domain.DomainPolicy{
+		ObjectRoot:            writeModelToObjectRoot(wm.PolicyDomainWriteModel.WriteModel),
 		UserLoginMustBeDomain: wm.UserLoginMustBeDomain,
 	}
 }

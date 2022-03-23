@@ -98,7 +98,7 @@ func (p *MailTemplateProjection) reduceAdded(event eventstore.Event) (*handler.S
 		templateEvent = e.MailTemplateAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-0pJ3f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateAddedEventType, iam.MailTemplateAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-0pJ3f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateAddedEventType, instance.MailTemplateAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&templateEvent,
@@ -122,7 +122,7 @@ func (p *MailTemplateProjection) reduceChanged(event eventstore.Event) (*handler
 	case *instance.MailTemplateChangedEvent:
 		policyEvent = e.MailTemplateChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gJ03f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateChangedEventType, iam.MailTemplateChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gJ03f", "reduce.wrong.event.type, %v", []eventstore.EventType{org.MailTemplateChangedEventType, instance.MailTemplateChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(MailTemplateChangeDateCol, policyEvent.CreationDate()),

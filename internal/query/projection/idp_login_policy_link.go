@@ -117,7 +117,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceAdded(event eventstore.Event) (*han
 		idp = e.IdentityProviderAddedEvent
 		providerType = domain.IdentityProviderTypeSystem
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Nlp55", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, iam.LoginPolicyIDPProviderAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Nlp55", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderAddedEventType, instance.LoginPolicyIDPProviderAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(&idp,
@@ -143,7 +143,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceRemoved(event eventstore.Event) (*h
 	case *instance.IdentityProviderRemovedEvent:
 		idp = e.IdentityProviderRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-tUMYY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, iam.LoginPolicyIDPProviderRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-tUMYY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderRemovedEventType, instance.LoginPolicyIDPProviderRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(&idp,
@@ -163,7 +163,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceCascadeRemoved(event eventstore.Eve
 	case *instance.IdentityProviderCascadeRemovedEvent:
 		idp = e.IdentityProviderCascadeRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, iam.LoginPolicyIDPProviderCascadeRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyIDPProviderCascadeRemovedEventType, instance.LoginPolicyIDPProviderCascadeRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(&idp,
@@ -183,7 +183,7 @@ func (p *IDPLoginPolicyLinkProjection) reduceIDPConfigRemoved(event eventstore.E
 	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-u6tze", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-u6tze", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,

@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) GetIAM(ctx context.Context, _ *mgmt_pb.GetIAMRequest) (*mgmt_pb.GetIAMResponse, error) {
-	iam, err := s.query.IAM(ctx)
+	iam, err := s.query.Instance(ctx)
 	if err != nil {
 		return nil, err
 	}

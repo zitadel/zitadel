@@ -187,7 +187,7 @@ func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,

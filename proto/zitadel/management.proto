@@ -1750,10 +1750,10 @@ service ManagementService {
         };
     }
 
-    // Returns the org iam policy (this policy is managed by the iam administrator)
-    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+    // Returns the domain policy (this policy is managed by the iam administrator)
+    rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
         option (google.api.http) = {
-            get: "/policies/orgiam"
+            get: "/policies/domain"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -4370,10 +4370,10 @@ message GetFeaturesResponse {
     zitadel.features.v1.Features features = 1;
 }
 
-message GetOrgIAMPolicyRequest {}
+message GetDomainPolicyRequest {}
 
-message GetOrgIAMPolicyResponse {
-    zitadel.policy.v1.OrgIAMPolicy policy = 1;
+message GetDomainPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
 }
 
 message GetLoginPolicyRequest {}

@@ -113,7 +113,7 @@ func (p *MessageTextProjection) reduceAdded(event eventstore.Event) (*handler.St
 	case *instance.CustomTextSetEvent:
 		templateEvent = e.CustomTextSetEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, iam.CustomTextSetEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-2n90r", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextSetEventType, instance.CustomTextSetEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil
@@ -163,7 +163,7 @@ func (p *MessageTextProjection) reduceRemoved(event eventstore.Event) (*handler.
 	case *instance.CustomTextRemovedEvent:
 		templateEvent = e.CustomTextRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, iam.CustomTextRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-fm0ge", "reduce.wrong.event.type %v", []eventstore.EventType{org.CustomTextRemovedEventType, instance.CustomTextRemovedEventType})
 	}
 	if !isMessageTemplate(templateEvent.Template) {
 		return crdb.NewNoOpStatement(event), nil

@@ -10,13 +10,13 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+func (c *Commands) AddOrgDomainPolicy(ctx context.Context, resourceOwner string, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-4Jfsf", "Errors.ResourceOwnerMissing")
 	}
-	addedPolicy := NewORGOrgIAMPolicyWriteModel(resourceOwner)
-	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	event, err := c.addOrgIAMPolicy(ctx, orgAgg, addedPolicy, policy)
+	addedPolicy := NewOrgDomainPolicyWriteModel(resourceOwner)
+	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.PolicyDomainWriteModel.WriteModel)
+	event, err := c.addOrgDomainPolicy(ctx, orgAgg, addedPolicy, policy)
 	if err != nil {
 		return nil, err
 	}
@@ -28,33 +28,33 @@ func (c *Commands) AddOrgIAMPolicy(ctx context.Context, resourceOwner string, po
 	if err != nil {
 		return nil, err
 	}
-	return orgWriteModelToOrgIAMPolicy(addedPolicy), nil
+	return orgWriteModelToDomainPolicy(addedPolicy), nil
 }
 
-func (c *Commands) addOrgIAMPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *ORGOrgIAMPolicyWriteModel, policy *domain.OrgIAMPolicy) (eventstore.Command, error) {
+func (c *Commands) addOrgDomainPolicy(ctx context.Context, orgAgg *eventstore.Aggregate, addedPolicy *OrgDomainPolicyWriteModel, policy *domain.DomainPolicy) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
 	}
 	if addedPolicy.State == domain.PolicyStateActive {
-		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.OrgIAMPolicy.AlreadyExists")
+		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.DomainPolicy.AlreadyExists")
 	}
-	return org.NewOrgIAMPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain), nil
+	return org.NewOrgDomainPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain), nil
 }
 
-func (c *Commands) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string, policy *domain.OrgIAMPolicy) (*domain.OrgIAMPolicy, error) {
+func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner string, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-5H8fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy, err := c.orgIAMPolicyWriteModelByID(ctx, resourceOwner)
+	existingPolicy, err := c.orgDomainPolicyWriteModelByID(ctx, resourceOwner)
 	if err != nil {
 		return nil, err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return nil, caos_errs.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowNotFound(nil, "ORG-2N9sd", "Errors.Org.DomainPolicy.NotFound")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
 	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "ORG-3M9ds", "Errors.Org.LabelPolicy.NotChanged")
@@ -68,14 +68,14 @@ func (c *Commands) ChangeOrgIAMPolicy(ctx context.Context, resourceOwner string,
 	if err != nil {
 		return nil, err
 	}
-	return orgWriteModelToOrgIAMPolicy(existingPolicy), nil
+	return orgWriteModelToDomainPolicy(existingPolicy), nil
 }
 
-func (c *Commands) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
+func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) error {
 	if orgID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "Org-3H8fs", "Errors.ResourceOwnerMissing")
 	}
-	existingPolicy, err := c.orgIAMPolicyWriteModelByID(ctx, orgID)
+	existingPolicy, err := c.orgDomainPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return err
 	}
@@ -83,27 +83,27 @@ func (c *Commands) RemoveOrgIAMPolicy(ctx context.Context, orgID string) error {
 		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.OrgIAM.NotFound")
 	}
 
-	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyOrgIAMWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, org.NewOrgIAMPolicyRemovedEvent(ctx, orgAgg))
+	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
+	_, err = c.eventstore.Push(ctx, org.NewOrgDomainPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }
 
-func (c *Commands) getOrgIAMPolicy(ctx context.Context, orgID string) (*domain.OrgIAMPolicy, error) {
-	policy, err := c.orgIAMPolicyWriteModelByID(ctx, orgID)
+func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error) {
+	policy, err := c.orgDomainPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
 	if policy.State == domain.PolicyStateActive {
-		return orgWriteModelToOrgIAMPolicy(policy), nil
+		return orgWriteModelToDomainPolicy(policy), nil
 	}
-	return c.getDefaultOrgIAMPolicy(ctx)
+	return c.getDefaultDomainPolicy(ctx)
 }
 
-func (c *Commands) orgIAMPolicyWriteModelByID(ctx context.Context, orgID string) (policy *ORGOrgIAMPolicyWriteModel, err error) {
+func (c *Commands) orgDomainPolicyWriteModelByID(ctx context.Context, orgID string) (policy *OrgDomainPolicyWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewORGOrgIAMPolicyWriteModel(orgID)
+	writeModel := NewOrgDomainPolicyWriteModel(orgID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

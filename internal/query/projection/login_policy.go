@@ -151,7 +151,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyAdded(event eventstore.Event) (
 		policyEvent = e.LoginPolicyAddedEvent
 		isDefault = false
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyAddedEventType, iam.LoginPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-pYPxS", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyAddedEventType, instance.LoginPolicyAddedEventType})
 	}
 
 	return crdb.NewCreateStatement(&policyEvent, []handler.Column{
@@ -183,7 +183,7 @@ func (p *LoginPolicyProjection) reduceLoginPolicyChanged(event eventstore.Event)
 	case *org.LoginPolicyChangedEvent:
 		policyEvent = e.LoginPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BpaO6", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyChangedEventType, iam.LoginPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-BpaO6", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyChangedEventType, instance.LoginPolicyChangedEventType})
 	}
 
 	cols := []handler.Column{
@@ -241,7 +241,7 @@ func (p *LoginPolicyProjection) reduceMFAAdded(event eventstore.Event) (*handler
 	case *org.LoginPolicyMultiFactorAddedEvent:
 		policyEvent = e.MultiFactorAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WMhAV", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, iam.LoginPolicyMultiFactorAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-WMhAV", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorAddedEventType, instance.LoginPolicyMultiFactorAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -265,7 +265,7 @@ func (p *LoginPolicyProjection) reduceMFARemoved(event eventstore.Event) (*handl
 	case *org.LoginPolicyMultiFactorRemovedEvent:
 		policyEvent = e.MultiFactorRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-czU7n", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, iam.LoginPolicyMultiFactorRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-czU7n", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicyMultiFactorRemovedEventType, instance.LoginPolicyMultiFactorRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -302,7 +302,7 @@ func (p *LoginPolicyProjection) reduce2FAAdded(event eventstore.Event) (*handler
 	case *org.LoginPolicySecondFactorAddedEvent:
 		policyEvent = e.SecondFactorAddedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-agB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, iam.LoginPolicySecondFactorAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-agB2E", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorAddedEventType, instance.LoginPolicySecondFactorAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -326,7 +326,7 @@ func (p *LoginPolicyProjection) reduce2FARemoved(event eventstore.Event) (*handl
 	case *org.LoginPolicySecondFactorRemovedEvent:
 		policyEvent = e.SecondFactorRemovedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-KYJvA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, iam.LoginPolicySecondFactorRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-KYJvA", "reduce.wrong.event.type %v", []eventstore.EventType{org.LoginPolicySecondFactorRemovedEventType, instance.LoginPolicySecondFactorRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(

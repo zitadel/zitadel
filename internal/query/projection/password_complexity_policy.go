@@ -108,7 +108,7 @@ func (p *PasswordComplexityProjection) reduceAdded(event eventstore.Event) (*han
 		policyEvent = e.PasswordComplexityPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KTHmJ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, iam.PasswordComplexityPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-KTHmJ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyAddedEventType, instance.PasswordComplexityPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -137,7 +137,7 @@ func (p *PasswordComplexityProjection) reduceChanged(event eventstore.Event) (*h
 	case *instance.PasswordComplexityPolicyChangedEvent:
 		policyEvent = e.PasswordComplexityPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-cf3Xb", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, iam.PasswordComplexityPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-cf3Xb", "reduce.wrong.event.type %v", []eventstore.EventType{org.PasswordComplexityPolicyChangedEventType, instance.PasswordComplexityPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(ComplexityPolicyChangeDateCol, policyEvent.CreationDate()),
