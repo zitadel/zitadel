@@ -75,6 +75,8 @@ func (key UserSearchKey) ToColumnName() string {
 		return UserKeyPreferredLoginName
 	case usr_model.UserSearchKeyType:
 		return UserKeyType
+	case usr_model.UserSearchKeyInstanceID:
+		return UserKeyInstanceID
 	default:
 		return ""
 	}

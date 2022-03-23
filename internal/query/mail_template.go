@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -29,6 +31,10 @@ var (
 	}
 	MailTemplateColAggregateID = Column{
 		name:  projection.MailTemplateAggregateIDCol,
+		table: mailTemplateTable,
+	}
+	MailTemplateColInstanceID = Column{
+		name:  projection.MailTemplateInstanceIDCol,
 		table: mailTemplateTable,
 	}
 	MailTemplateColSequence = Column{
@@ -60,12 +66,17 @@ var (
 func (q *Queries) MailTemplateByOrg(ctx context.Context, orgID string) (*MailTemplate, error) {
 	stmt, scan := prepareMailTemplateQuery()
 	query, args, err := stmt.Where(
-		sq.Or{
+		sq.And{
 			sq.Eq{
-				MailTemplateColAggregateID.identifier(): orgID,
+				MailTemplateColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
-			sq.Eq{
-				MailTemplateColAggregateID.identifier(): domain.IAMID,
+			sq.Or{
+				sq.Eq{
+					MailTemplateColAggregateID.identifier(): orgID,
+				},
+				sq.Eq{
+					MailTemplateColAggregateID.identifier(): domain.IAMID,
+				},
 			},
 		}).
 		OrderBy(MailTemplateColIsDefault.identifier()).
@@ -82,6 +93,7 @@ func (q *Queries) DefaultMailTemplate(ctx context.Context) (*MailTemplate, error
 	stmt, scan := prepareMailTemplateQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		MailTemplateColAggregateID.identifier(): domain.IAMID,
+		MailTemplateColInstanceID.identifier():  authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(MailTemplateColIsDefault.identifier()).
 		Limit(1).ToSql()

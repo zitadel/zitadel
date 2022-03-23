@@ -3,8 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
-
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -15,18 +13,29 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+const (
+	ProjectMemberProjectionTable = "projections.project_members"
+	ProjectMemberProjectIDCol    = "project_id"
+)
+
 type ProjectMemberProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	ProjectMemberProjectionTable = "zitadel.projections.project_members"
-)
 
 func NewProjectMemberProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectMemberProjection {
 	p := new(ProjectMemberProjection)
 	config.ProjectionName = ProjectMemberProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable(
+			append(memberColumns,
+				crdb.NewColumn(ProjectMemberProjectIDCol, crdb.ColumnTypeText),
+			),
+			crdb.NewPrimaryKey(MemberInstanceID, ProjectMemberProjectIDCol, MemberUserIDCol),
+			crdb.NewIndex("user_idx", []string{MemberUserIDCol}),
+		),
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -79,17 +88,10 @@ func (p *ProjectMemberProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-type ProjectMemberColumn string
-
-const (
-	ProjectMemberProjectIDCol = "project_id"
-)
-
 func (p *ProjectMemberProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-3FRys", "seq", event.Sequence(), "expectedType", project.MemberAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-bgx5Q", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-bgx5Q", "reduce.wrong.event.type %s", project.MemberAddedType)
 	}
 	return reduceMemberAdded(
 		*member.NewMemberAddedEvent(&e.BaseEvent, e.UserID, e.Roles...),
@@ -100,8 +102,7 @@ func (p *ProjectMemberProjection) reduceAdded(event eventstore.Event) (*handler.
 func (p *ProjectMemberProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-9hgMR", "seq", event.Sequence(), "expectedType", project.MemberChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-90WJ1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-90WJ1", "reduce.wrong.event.type %s", project.MemberChangedType)
 	}
 	return reduceMemberChanged(
 		*member.NewMemberChangedEvent(&e.BaseEvent, e.UserID, e.Roles...),
@@ -112,8 +113,7 @@ func (p *ProjectMemberProjection) reduceChanged(event eventstore.Event) (*handle
 func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberCascadeRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-2kyYa", "seq", event.Sequence(), "expectedType", project.MemberCascadeRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-aGd43", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-aGd43", "reduce.wrong.event.type %s", project.MemberCascadeRemovedType)
 	}
 	return reduceMemberCascadeRemoved(
 		*member.NewCascadeRemovedEvent(&e.BaseEvent, e.UserID),
@@ -124,8 +124,7 @@ func (p *ProjectMemberProjection) reduceCascadeRemoved(event eventstore.Event) (
 func (p *ProjectMemberProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.MemberRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-X0yvM", "seq", event.Sequence(), "expectedType", project.MemberRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-eJZPh", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-eJZPh", "reduce.wrong.event.type %s", project.MemberRemovedType)
 	}
 	return reduceMemberRemoved(e,
 		withMemberCond(MemberUserIDCol, e.UserID),
@@ -136,8 +135,7 @@ func (p *ProjectMemberProjection) reduceRemoved(event eventstore.Event) (*handle
 func (p *ProjectMemberProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-g8eWd", "seq", event.Sequence(), "expected", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-aYA60", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-aYA60", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberUserIDCol, e.Aggregate().ID))
 }
@@ -149,8 +147,7 @@ func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*han
 	// if org A is deleted, the membership wouldn't be deleted
 	e, ok := event.(*org.OrgRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-q7H8D", "seq", event.Sequence(), "expected", org.OrgRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-NGUEL", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-NGUEL", "reduce.wrong.event.type %s", org.OrgRemovedEventType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(MemberResourceOwner, e.Aggregate().ID))
 }
@@ -158,8 +155,7 @@ func (p *ProjectMemberProjection) reduceOrgRemoved(event eventstore.Event) (*han
 func (p *ProjectMemberProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-q7H8D", "seq", event.Sequence(), "expected", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-NGUEL", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-NGUEL", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return reduceMemberRemoved(e, withMemberCond(ProjectMemberProjectIDCol, e.Aggregate().ID))
 }

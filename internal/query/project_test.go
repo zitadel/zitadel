@@ -44,19 +44,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.projects`),
+						` FROM projections.projects`),
 					nil,
 					nil,
 				),
@@ -68,19 +68,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.projects`),
+						` FROM projections.projects`),
 					[]string{
 						"id",
 						"creation_date",
@@ -138,19 +138,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.projects`),
+						` FROM projections.projects`),
 					[]string{
 						"id",
 						"creation_date",
@@ -234,19 +234,19 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting,`+
+					regexp.QuoteMeta(`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.projects`),
+						` FROM projections.projects`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {
@@ -263,18 +263,18 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting`+
-						` FROM zitadel.projections.projects`,
+					`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting`+
+						` FROM projections.projects`,
 					nil,
 					nil,
 				),
@@ -292,18 +292,18 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting`+
-						` FROM zitadel.projections.projects`),
+					regexp.QuoteMeta(`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting`+
+						` FROM projections.projects`),
 					[]string{
 						"id",
 						"creation_date",
@@ -351,18 +351,18 @@ func Test_ProjectPrepares(t *testing.T) {
 			prepare: prepareProjectQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.projects.id,`+
-						` zitadel.projections.projects.creation_date,`+
-						` zitadel.projections.projects.change_date,`+
-						` zitadel.projections.projects.resource_owner,`+
-						` zitadel.projections.projects.state,`+
-						` zitadel.projections.projects.sequence,`+
-						` zitadel.projections.projects.name,`+
-						` zitadel.projections.projects.project_role_assertion,`+
-						` zitadel.projections.projects.project_role_check,`+
-						` zitadel.projections.projects.has_project_check,`+
-						` zitadel.projections.projects.private_labeling_setting`+
-						` FROM zitadel.projections.projects`),
+					regexp.QuoteMeta(`SELECT projections.projects.id,`+
+						` projections.projects.creation_date,`+
+						` projections.projects.change_date,`+
+						` projections.projects.resource_owner,`+
+						` projections.projects.state,`+
+						` projections.projects.sequence,`+
+						` projections.projects.name,`+
+						` projections.projects.project_role_assertion,`+
+						` projections.projects.project_role_check,`+
+						` projections.projects.has_project_check,`+
+						` projections.projects.private_labeling_setting`+
+						` FROM projections.projects`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

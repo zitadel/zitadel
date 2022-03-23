@@ -12,12 +12,12 @@ import (
 )
 
 var (
-	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT zitadel.projections.idp_login_policy_links.idp_id,` +
-		` zitadel.projections.idps.name,` +
-		` zitadel.projections.idps.type,` +
+	loginPolicyIDPLinksQuery = regexp.QuoteMeta(`SELECT projections.idp_login_policy_links.idp_id,` +
+		` projections.idps.name,` +
+		` projections.idps.type,` +
 		` COUNT(*) OVER ()` +
-		` FROM zitadel.projections.idp_login_policy_links` +
-		` LEFT JOIN zitadel.projections.idps ON zitadel.projections.idp_login_policy_links.idp_id = zitadel.projections.idps.id`)
+		` FROM projections.idp_login_policy_links` +
+		` LEFT JOIN projections.idps ON projections.idp_login_policy_links.idp_id = projections.idps.id`)
 	loginPolicyIDPLinksCols = []string{
 		"idp_id",
 		"name",

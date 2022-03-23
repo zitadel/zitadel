@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"github.com/caos/zitadel/internal/query"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/query"
 
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
@@ -32,6 +33,7 @@ const (
 	UserKeyLoginNames         = "login_names"
 	UserKeyPreferredLoginName = "preferred_login_name"
 	UserKeyType               = "user_type"
+	UserKeyInstanceID         = "instance_id"
 )
 
 type userType string
@@ -53,6 +55,7 @@ type UserView struct {
 	Sequence           uint64         `json:"-" gorm:"column:sequence"`
 	Type               userType       `json:"-" gorm:"column:user_type"`
 	UserName           string         `json:"userName" gorm:"column:user_name"`
+	InstanceID         string         `json:"instanceID" gorm:"column:instance_id"`
 	*MachineView
 	*HumanView
 }
@@ -363,6 +366,7 @@ func (u *UserView) AppendEvent(event *models.Event) (err error) {
 func (u *UserView) setRootData(event *models.Event) {
 	u.ID = event.AggregateID
 	u.ResourceOwner = event.ResourceOwner
+	u.InstanceID = event.InstanceID
 }
 
 func (u *UserView) setData(event *models.Event) error {

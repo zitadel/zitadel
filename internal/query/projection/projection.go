@@ -3,6 +3,7 @@ package projection
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -34,6 +35,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		BulkLimit:         config.BulkLimit,
 	}
 
+	now := time.Now()
 	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
 	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
@@ -46,7 +48,6 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewLabelPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["label_policy"]))
 	NewProjectGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grants"]))
 	NewProjectRoleProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_roles"]))
-	// owner.NewOrgOwnerProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_owners"]))
 	NewOrgDomainProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["org_domains"]))
 	NewLoginPolicyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["login_policies"]))
 	NewIDPProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["idps"]))
@@ -75,6 +76,7 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewOIDCSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["oidc_settings"]))
 	NewDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, keyChan)
+	fmt.Println(time.Now().Sub(now))
 	return nil
 }
 

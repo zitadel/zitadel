@@ -37,7 +37,7 @@ func NewLocker(client *sql.DB, lockTable, projectionName string) Locker {
 	workerName, err := os.Hostname()
 	if err != nil || workerName == "" {
 		workerName, err = id.SonyFlakeGenerator.Next()
-		logging.Log("CRDB-bdO56").OnError(err).Panic("unable to generate lockID")
+		logging.OnError(err).Panic("unable to generate lockID")
 	}
 	return &locker{
 		client:         client,

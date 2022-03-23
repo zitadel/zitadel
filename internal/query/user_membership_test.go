@@ -23,8 +23,8 @@ var (
 			", memberships.iam_id" +
 			", memberships.project_id" +
 			", memberships.grant_id" +
-			", zitadel.projections.projects.name" +
-			", zitadel.projections.orgs.name" +
+			", projections.projects.name" +
+			", projections.orgs.name" +
 			", COUNT(*) OVER ()" +
 			" FROM (" +
 			"SELECT members.user_id" +
@@ -37,7 +37,7 @@ var (
 			", NULL::STRING AS iam_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.org_members as members" +
+			" FROM projections.org_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -49,7 +49,7 @@ var (
 			", members.iam_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.iam_members as members" +
+			" FROM projections.iam_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -61,7 +61,7 @@ var (
 			", NULL::STRING AS iam_id" +
 			", members.project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM zitadel.projections.project_members as members" +
+			" FROM projections.project_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -73,10 +73,10 @@ var (
 			", NULL::STRING AS iam_id" +
 			", members.project_id" +
 			", members.grant_id" +
-			" FROM zitadel.projections.project_grant_members as members" +
+			" FROM projections.project_grant_members as members" +
 			") AS memberships" +
-			" LEFT JOIN zitadel.projections.projects ON memberships.project_id = zitadel.projections.projects.id" +
-			" LEFT JOIN zitadel.projections.orgs ON memberships.org_id = zitadel.projections.orgs.id")
+			" LEFT JOIN projections.projects ON memberships.project_id = projections.projects.id" +
+			" LEFT JOIN projections.orgs ON memberships.org_id = projections.orgs.id")
 	membershipCols = []string{
 		"user_id",
 		"roles",

@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -51,7 +53,8 @@ func (q *Queries) ActiveLabelPolicyByOrg(ctx context.Context, orgID string) (*La
 				},
 			},
 			sq.Eq{
-				LabelPolicyColState.identifier(): domain.LabelPolicyStateActive,
+				LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
+				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
@@ -77,7 +80,8 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 				},
 			},
 			sq.Eq{
-				LabelPolicyColState.identifier(): domain.LabelPolicyStatePreview,
+				LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
+				LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 			},
 		}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
@@ -93,8 +97,9 @@ func (q *Queries) PreviewLabelPolicyByOrg(ctx context.Context, orgID string) (*L
 func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LabelPolicyColID.identifier():    domain.IAMID,
-		LabelPolicyColState.identifier(): domain.LabelPolicyStateActive,
+		LabelPolicyColID.identifier():         domain.IAMID,
+		LabelPolicyColState.identifier():      domain.LabelPolicyStateActive,
+		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -109,8 +114,9 @@ func (q *Queries) DefaultActiveLabelPolicy(ctx context.Context) (*LabelPolicy, e
 func (q *Queries) DefaultPreviewLabelPolicy(ctx context.Context) (*LabelPolicy, error) {
 	stmt, scan := prepareLabelPolicyQuery()
 	query, args, err := stmt.Where(sq.Eq{
-		LabelPolicyColID.identifier():    domain.IAMID,
-		LabelPolicyColState.identifier(): domain.LabelPolicyStatePreview,
+		LabelPolicyColID.identifier():         domain.IAMID,
+		LabelPolicyColState.identifier():      domain.LabelPolicyStatePreview,
+		LabelPolicyColInstanceID.identifier(): authz.GetInstance(ctx).ID,
 	}).
 		OrderBy(LabelPolicyColIsDefault.identifier()).
 		Limit(1).ToSql()
@@ -146,6 +152,9 @@ var (
 	}
 	LabelPolicyColResourceOwner = Column{
 		name: projection.LabelPolicyResourceOwnerCol,
+	}
+	LabelPolicyColInstanceID = Column{
+		name: projection.LabelPolicyInstanceIDCol,
 	}
 	LabelPolicyColHideLoginNameSuffix = Column{
 		name: projection.LabelPolicyHideLoginNameSuffixCol,

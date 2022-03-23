@@ -9,6 +9,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
@@ -77,6 +79,10 @@ var (
 	}
 	IDPResourceOwnerCol = Column{
 		name:  projection.IDPResourceOwnerCol,
+		table: idpTable,
+	}
+	IDPInstanceIDCol = Column{
+		name:  projection.IDPInstanceIDCol,
 		table: idpTable,
 	}
 	IDPStateCol = Column{
@@ -179,7 +185,8 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 	query, args, err := stmt.Where(
 		sq.And{
 			sq.Eq{
-				IDPIDCol.identifier(): id,
+				IDPIDCol.identifier():         id,
+				IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
 			},
 			sq.Or{
 				sq.Eq{
@@ -202,7 +209,10 @@ func (q *Queries) IDPByIDAndResourceOwner(ctx context.Context, id, resourceOwner
 //IDPs searches idps matching the query
 func (q *Queries) IDPs(ctx context.Context, queries *IDPSearchQueries) (idps *IDPs, err error) {
 	query, scan := prepareIDPsQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			IDPInstanceIDCol.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-X6X7y", "Errors.Query.InvalidRequest")
 	}

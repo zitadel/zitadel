@@ -8,8 +8,9 @@ import (
 	"regexp"
 	"testing"
 
-	errs "github.com/caos/zitadel/internal/errors"
 	"golang.org/x/text/language"
+
+	errs "github.com/caos/zitadel/internal/errors"
 )
 
 func Test_CustomTextPrepares(t *testing.T) {
@@ -28,16 +29,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.custom_texts.aggregate_id,`+
-						` zitadel.projections.custom_texts.sequence,`+
-						` zitadel.projections.custom_texts.creation_date,`+
-						` zitadel.projections.custom_texts.change_date,`+
-						` zitadel.projections.custom_texts.language,`+
-						` zitadel.projections.custom_texts.template,`+
-						` zitadel.projections.custom_texts.key,`+
-						` zitadel.projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
+						` projections.custom_texts.sequence,`+
+						` projections.custom_texts.creation_date,`+
+						` projections.custom_texts.change_date,`+
+						` projections.custom_texts.language,`+
+						` projections.custom_texts.template,`+
+						` projections.custom_texts.key,`+
+						` projections.custom_texts.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.custom_texts`),
+						` FROM projections.custom_texts`),
 					nil,
 					nil,
 				),
@@ -55,16 +56,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.custom_texts.aggregate_id,`+
-						` zitadel.projections.custom_texts.sequence,`+
-						` zitadel.projections.custom_texts.creation_date,`+
-						` zitadel.projections.custom_texts.change_date,`+
-						` zitadel.projections.custom_texts.language,`+
-						` zitadel.projections.custom_texts.template,`+
-						` zitadel.projections.custom_texts.key,`+
-						` zitadel.projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
+						` projections.custom_texts.sequence,`+
+						` projections.custom_texts.creation_date,`+
+						` projections.custom_texts.change_date,`+
+						` projections.custom_texts.language,`+
+						` projections.custom_texts.template,`+
+						` projections.custom_texts.key,`+
+						` projections.custom_texts.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.custom_texts`),
+						` FROM projections.custom_texts`),
 					[]string{
 						"aggregate_id",
 						"sequence",
@@ -113,16 +114,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.custom_texts.aggregate_id,`+
-						` zitadel.projections.custom_texts.sequence,`+
-						` zitadel.projections.custom_texts.creation_date,`+
-						` zitadel.projections.custom_texts.change_date,`+
-						` zitadel.projections.custom_texts.language,`+
-						` zitadel.projections.custom_texts.template,`+
-						` zitadel.projections.custom_texts.key,`+
-						` zitadel.projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
+						` projections.custom_texts.sequence,`+
+						` projections.custom_texts.creation_date,`+
+						` projections.custom_texts.change_date,`+
+						` projections.custom_texts.language,`+
+						` projections.custom_texts.template,`+
+						` projections.custom_texts.key,`+
+						` projections.custom_texts.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.custom_texts`),
+						` FROM projections.custom_texts`),
 					[]string{
 						"aggregate_id",
 						"sequence",
@@ -191,16 +192,16 @@ func Test_CustomTextPrepares(t *testing.T) {
 			prepare: prepareCustomTextsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.custom_texts.aggregate_id,`+
-						` zitadel.projections.custom_texts.sequence,`+
-						` zitadel.projections.custom_texts.creation_date,`+
-						` zitadel.projections.custom_texts.change_date,`+
-						` zitadel.projections.custom_texts.language,`+
-						` zitadel.projections.custom_texts.template,`+
-						` zitadel.projections.custom_texts.key,`+
-						` zitadel.projections.custom_texts.text,`+
+					regexp.QuoteMeta(`SELECT projections.custom_texts.aggregate_id,`+
+						` projections.custom_texts.sequence,`+
+						` projections.custom_texts.creation_date,`+
+						` projections.custom_texts.change_date,`+
+						` projections.custom_texts.language,`+
+						` projections.custom_texts.template,`+
+						` projections.custom_texts.key,`+
+						` projections.custom_texts.text,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.custom_texts`),
+						` FROM projections.custom_texts`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

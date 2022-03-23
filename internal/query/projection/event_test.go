@@ -26,6 +26,7 @@ func testEvent(
 		Version:                       "v1",
 		AggregateID:                   "agg-id",
 		ResourceOwner:                 sql.NullString{String: "ro-id", Valid: true},
+		InstanceID:                    sql.NullString{String: "instance-id", Valid: true},
 		ID:                            "event-id",
 		EditorService:                 "editor-svc",
 		EditorUser:                    "editor-user",
