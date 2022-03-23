@@ -3,11 +3,34 @@ title: Projects
 
 ---
 
-|                   |                                                                                                                                                                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Description       | Learn the basics about applications, roles and authorizations, then learn how projects allow you to group these together.                                                                                                       |
-| Learning Outcomes | In this module you will: <ul><li>Learn about projects and granted projects</li><li>Create a new project</li><li>Creating simple roles and authorizations</li><li>Create an organization grant for your project</li></ul> |
-| Prerequisites     | <ul><li>ZITADEL organizations</li><li>Role Based Access Management (RBAC)</li></ul>                                                                                                                                      |
+
+<table class="table-wrapper">
+    <tr>
+        <td>Description</td>
+        <td>Learn the basics about applications, roles and authorizations, then learn how projects allow you to group these.</td>
+    </tr>
+    <tr>
+        <td>Learning Outcomes</td>
+        <td>
+            In this module you will:
+            <ul>
+              <li>Learn about projects and granted projects</li>
+              <li>Create a new project</li>
+              <li>Create a simple role and an authorization</li>
+              <li>Create an organization grant for your project</li>
+            </ul>
+        </td>
+    </tr>
+     <tr>
+        <td>Prerequisites</td>
+        <td>
+            <ul>
+                <li>ZITADEL organizations</li>
+                <li>Role Based Access Management (RBAC)</li>
+            </ul>
+        </td>
+    </tr>
+</table>
 
 ## What is a project?
 

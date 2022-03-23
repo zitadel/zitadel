@@ -12,7 +12,7 @@ title: Identity Brokering
         <td>
             In this module you will:
             <ul>
-                <li>Learn about Identity Providers</li>
+                <li>Learn about identity providers</li>
                 <li>Add a new identity provider</li>
                 <li>See an example with Google Login</li>
             </ul>

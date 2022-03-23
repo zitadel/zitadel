@@ -33,7 +33,7 @@ In general there might be the following possibilities:
 - FaceRecognition (e.g. FaceID)
 - Hardware Tokens (e.g. YubiKey, Solokeys)
 
-Hardware Tokens are basically a piece of hardware such as a USB key that gets linked to your Identity and authorizes as second factor when a button on the device is pressed.
+Hardware Tokens are basically a piece of hardware such as a USB key that gets linked to your identity and authorizes as second factor when a button on the device is pressed.
 
 :::info
 Some example Keys are [Solokeys](https://solokeys.com) or [Yubikey](https://www.yubico.com/) You can choose the one you like the most.

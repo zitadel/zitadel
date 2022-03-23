@@ -27,7 +27,7 @@ It is the vessel for projects, roles, applications and users.
 You can create an organization from the [ZITADEL console](https://console.zitadel.ch/org/create).
 You can either choose your current account for the organization owner, or create a new one.
 
-Depending on your Software Development Life Cycle (SDLC), you can create multiple organizations or projects, keeping your application environments separated.
+Depending on your *Software Development Life Cycle (SDLC)*, you can create multiple organizations or projects, keeping your application environments separated.
 
 ### Custom domains
 
@@ -57,7 +57,7 @@ Requests to the management API are rate limited. Read our [Rate limit Policy](..
 
 There are multiple ways to perform _User Authentication_.
 The default method in ZITADEL is with a username and password with _Mulitifactor Authentication (MFA)_ enabled.
-To provide good user security, ZITADEL lets you to configure _MFA_ and _Passwordless Authentication_.
+To provide good user security, ZITADEL lets you to configure _MFA_ and passwordless authentication.
 All authentication methods are available from the FREE Tier.
 To set up your organization's login policy, go to your organization's detail in the ZITADEL [console](https://console.zitadel.ch/org).
 
@@ -67,8 +67,8 @@ When planning your application, consider the following questions about User Auth
 - Where will your users enter their credentials?
 - Do you offer password authentication?
 - What do you do to keep user credentials safe?
-- Do you offer Multifactor Authentication?
-- Do you offer Login via an Identity Provider?
+- Do you offer *Multifactor Authentication*?
+- Do you offer Login via an identity provider?
 - Which languages do you have to provide?
 
 Considering these questions, you might admit that building an identity management system is more complex than you initially thought.
@@ -76,7 +76,7 @@ Implementing it yourself might be too much work, especially if you want to focus
 
 ### Federation
 
-ZITADEL supports signup with OIDC Identity providers, as well as JWT Identity Providers.
+ZITADEL supports signup with *OIDC* identity providers, as well as *JWT* identity providers.
 On signup, ZITADEL imports user information to their own profile.
 
 <!---TODO extend this passage---->
@@ -84,7 +84,7 @@ On signup, ZITADEL imports user information to their own profile.
 ### Hosted Login
 
 ZITADEL's approach is _secure by default_.
-It comes with a _Hosted Login_, a fixed endpoint for your users to authenticate.
+It comes with a *Hosted Login*, a fixed endpoint for your users to authenticate.
 It's safe and secure and comes with Multifactor, Federated Login and Passwordless capabilities.
 *OpenID Connect (OIDC)* opens the doors for *Single Sign On (SSO)*.
 Especially if you have more than one application, you may want a central and familiar authentication experience.
@@ -114,26 +114,26 @@ We'd appreciate anyone who contributes to our repo with translations of their la
 
 ### Projects and applications
 
-As our Hosted Login is a separate authentication screen, you have to determine how you direct your users from your applications.
-ZITADEL's Applications live under ZITADEL's Projects.
-You may add multiple applications for your different client-types (Native, Web, User Agent, or API).
-When setting up your applications, consult our [guide about Authentication Flows](../authentication/login-users).
+As our hosted login is a separate authentication screen, you have to determine how you direct your users from your applications.
+ZITADEL's applications live under ZITADEL's projects.
+You may add multiple applications for your different client-types (*Native*, *Web*, *User Agent*, or *API*).
+When setting up your applications, consult our [guide about authentication flows](../authentication/login-users).
 
 ### Access Control
 
 Having authenticated a user, you need to ensure users and services have access to your application and APIs.
-This process is called _Access Control_ and comprises _User Authentication_, Authorization, and Policy Enforcement.
+This process is called access control and comprises user authentication, authorization, and policy enforcement.
 When implementing access control, consider these questions:
 
 - Does your application call your own APIs?
 - Does your application need to call third-party APIs?
-- Do *you* offer an API for third-party applications?
+- Do you offer an API for third-party applications?
 
 The data required to check whether a user has access to a certain API is stored within a user grant.
 This information typically is stored within roles or custom claims.
-You can access it with an `access` or OIDC `id` token.
+You can access it with an `access` or *OIDC* `id` token.
 
-[Read more about Authorization](../authorization/oauth-recommended-flows).
+[Read more about authorization](../authorization/oauth-recommended-flows).
 
 ## Learn more
 
