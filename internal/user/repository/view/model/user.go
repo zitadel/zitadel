@@ -8,8 +8,6 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/query"
-
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
