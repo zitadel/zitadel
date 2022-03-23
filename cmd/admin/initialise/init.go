@@ -8,9 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	//sql import
-	_ "github.com/lib/pq"
-
 	"github.com/caos/zitadel/internal/database"
 )
 
@@ -29,19 +26,9 @@ The user provided by flags needs priviledge to
 - grant all rights of the ZITADEL database to the user created if not yet set
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := Config{}
-			err := viper.Unmarshal(&config)
-			logging.OnError(err).Fatal("unable to read config")
+			config := MustNewConfig(viper.New())
 
-			err = initialise(config,
-				VerifyUser(config.Database.User.Username, config.Database.User.Password),
-				VerifyDatabase(config.Database.Database),
-				VerifyGrant(config.Database.Database, config.Database.User.Username),
-			)
-			logging.OnError(err).Fatal("unable to initialize the database")
-
-			err = verifyZitadel(config.Database)
-			logging.OnError(err).Fatal("unable to initialize ZITADEL")
+			InitAll(config)
 		},
 	}
 
@@ -49,7 +36,19 @@ The user provided by flags needs priviledge to
 	return cmd
 }
 
-func initialise(config Config, steps ...func(*sql.DB) error) error {
+func InitAll(config *Config) {
+	err := initialise(config,
+		VerifyUser(config.Database.Username, config.Database.Password),
+		VerifyDatabase(config.Database.Database),
+		VerifyGrant(config.Database.Database, config.Database.Username),
+	)
+	logging.OnError(err).Fatal("unable to initialize the database")
+
+	err = verifyZitadel(config.Database)
+	logging.OnError(err).Fatal("unable to initialize ZITADEL")
+}
+
+func initialise(config *Config, steps ...func(*sql.DB) error) error {
 	logging.Info("initialization started")
 
 	db, err := database.Connect(adminConfig(config))

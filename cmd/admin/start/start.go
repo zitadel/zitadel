@@ -15,7 +15,6 @@ import (
 
 	"github.com/caos/logging"
 	"github.com/gorilla/mux"
-	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/net/http2"
@@ -37,8 +36,6 @@ import (
 	"github.com/caos/zitadel/internal/authz"
 	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/command"
-	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/crypto"
 	cryptoDB "github.com/caos/zitadel/internal/crypto/database"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/domain"
@@ -46,9 +43,7 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/notification"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/query/projection"
 	"github.com/caos/zitadel/internal/static"
-	static_config "github.com/caos/zitadel/internal/static/config"
 	"github.com/caos/zitadel/internal/webauthn"
 	"github.com/caos/zitadel/openapi"
 )
@@ -65,79 +60,16 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := new(Config)
-			err := viper.Unmarshal(config, viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
-				mapstructure.StringToTimeDurationHookFunc(),
-				mapstructure.StringToSliceHookFunc(":"),
-			)))
-			if err != nil {
-				return err
-			}
-			err = config.Log.SetLogger()
-			if err != nil {
-				return err
-			}
-			masterKey, _ := cmd.Flags().GetString("masterkey")
+			config := MustNewConfig(viper.New())
+			masterKey, _ := cmd.Flags().GetString(flagMasterKey)
+
 			return startZitadel(config, masterKey)
 		},
 	}
-	bindUint16Flag(start, "port", "port to run ZITADEL on")
-	bindStringFlag(start, "externalDomain", "domain ZITADEL will be exposed on")
-	bindStringFlag(start, "externalPort", "port ZITADEL will be exposed on")
-	bindBoolFlag(start, "externalSecure", "if ZITADEL will be served on HTTPS")
 
-	start.PersistentFlags().String(flagMasterKey, "", "masterkey for en/decryption keys")
+	startFlags(start)
 
 	return start
-}
-
-func bindStringFlag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().String(name, viper.GetString(name), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
-}
-
-func bindUint16Flag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().Uint16(name, uint16(viper.GetUint(name)), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
-}
-
-func bindBoolFlag(cmd *cobra.Command, name, description string) {
-	cmd.PersistentFlags().Bool(name, viper.GetBool(name), description)
-	viper.BindPFlag(name, cmd.PersistentFlags().Lookup(name))
-}
-
-type Config struct {
-	Log             *logging.Config
-	Port            uint16
-	ExternalPort    uint16
-	ExternalDomain  string
-	ExternalSecure  bool
-	Database        database.Config
-	Projections     projection.Config
-	AuthZ           authz.Config
-	Auth            auth_es.Config
-	Admin           admin_es.Config
-	UserAgentCookie *middleware.UserAgentCookieConfig
-	OIDC            oidc.Config
-	Login           login.Config
-	Console         console.Config
-	Notification    notification.Config
-	AssetStorage    static_config.AssetStorageConfig
-	InternalAuthZ   internal_authz.Config
-	SystemDefaults  systemdefaults.SystemDefaults
-	EncryptionKeys  *encryptionKeyConfig
-}
-
-type encryptionKeyConfig struct {
-	DomainVerification   *crypto.KeyConfig
-	IDPConfig            *crypto.KeyConfig
-	OIDC                 *crypto.KeyConfig
-	OTP                  *crypto.KeyConfig
-	SMS                  *crypto.KeyConfig
-	SMTP                 *crypto.KeyConfig
-	User                 *crypto.KeyConfig
-	CSRFCookieKeyID      string
-	UserAgentCookieKeyID string
 }
 
 func startZitadel(config *Config, masterKey string) error {

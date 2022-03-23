@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	//sql import
+	_ "github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/errors"
 )
