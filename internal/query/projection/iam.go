@@ -87,7 +87,7 @@ func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Sta
 	return crdb.NewUpsertStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(IAMColumnID, e.Aggregate().ID),
+			handler.NewCol(IAMColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 			handler.NewCol(IAMColumnSequence, e.Sequence()),
 			handler.NewCol(IAMColumnGlobalOrgID, e.OrgID),
@@ -103,7 +103,7 @@ func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.St
 	return crdb.NewUpsertStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(IAMColumnID, e.Aggregate().ID),
+			handler.NewCol(IAMColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 			handler.NewCol(IAMColumnSequence, e.Sequence()),
 			handler.NewCol(IAMColumnProjectID, e.ProjectID),
@@ -119,7 +119,7 @@ func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handl
 	return crdb.NewUpsertStatement(
 		e,
 		[]handler.Column{
-			handler.NewCol(IAMColumnID, e.Aggregate().ID),
+			handler.NewCol(IAMColumnID, e.Aggregate().InstanceID),
 			handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 			handler.NewCol(IAMColumnSequence, e.Sequence()),
 			handler.NewCol(IAMColumnDefaultLanguage, e.Language.String()),
@@ -133,7 +133,7 @@ func (p *IAMProjection) reduceSetupEvent(event eventstore.Event) (*handler.State
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-d9nfw", "reduce.wrong.event.type %v", []eventstore.EventType{iam.SetupDoneEventType, iam.SetupStartedEventType})
 	}
 	columns := []handler.Column{
-		handler.NewCol(IAMColumnID, e.Aggregate().ID),
+		handler.NewCol(IAMColumnID, e.Aggregate().InstanceID),
 		handler.NewCol(IAMColumnChangeDate, e.CreationDate()),
 		handler.NewCol(IAMColumnSequence, e.Sequence()),
 	}

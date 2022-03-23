@@ -41,7 +41,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, global_org_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								"orgid",
@@ -71,7 +71,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, iam_project_id) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								"project-id",
@@ -101,7 +101,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, default_language) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								"en",
@@ -131,7 +131,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, setup_started) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								domain.Step1,
@@ -161,7 +161,7 @@ func TestIAMProjection_reduces(t *testing.T) {
 						{
 							expectedStmt: "UPSERT INTO projections.iam (id, change_date, sequence, setup_done) VALUES ($1, $2, $3, $4)",
 							expectedArgs: []interface{}{
-								"agg-id",
+								"instance-id",
 								anyArg{},
 								uint64(15),
 								domain.Step1,

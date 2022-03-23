@@ -114,7 +114,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+	iam, err := l.query.IAM(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -207,7 +207,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
+	iam, err := l.query.IAM(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
