@@ -4,26 +4,26 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/user/model"
+	"github.com/caos/zitadel/internal/query"
 	usr_grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	user_pb "github.com/caos/zitadel/pkg/grpc/user"
 )
 
-func UsersToPb(users []*model.UserView) []*user_pb.User {
+func UsersToPb(users []*query.User, assetPrefix string) []*user_pb.User {
 	u := make([]*user_pb.User, len(users))
 	for i, user := range users {
-		u[i] = UserToPb(user)
+		u[i] = UserToPb(user, assetPrefix)
 	}
 	return u
 }
-func UserToPb(user *model.UserView) *user_pb.User {
+func UserToPb(user *query.User, assetPrefix string) *user_pb.User {
 	return &user_pb.User{
 		Id:                 user.ID,
-		State:              ModelUserStateToPb(user.State),
-		UserName:           user.UserName,
+		State:              UserStateToPb(user.State),
+		UserName:           user.Username,
 		LoginNames:         user.LoginNames,
 		PreferredLoginName: user.PreferredLoginName,
-		Type:               UserTypeToPb(user),
+		Type:               UserTypeToPb(user, assetPrefix),
 		Details: object.ToViewDetailsPb(
 			user.Sequence,
 			user.CreationDate,
@@ -33,30 +33,30 @@ func UserToPb(user *model.UserView) *user_pb.User {
 	}
 }
 
-func UserTypeToPb(user *model.UserView) user_pb.UserType {
-	if user.HumanView != nil {
+func UserTypeToPb(user *query.User, assetPrefix string) user_pb.UserType {
+	if user.Human != nil {
 		return &user_pb.User_Human{
-			Human: HumanToPb(user.HumanView),
+			Human: HumanToPb(user.Human, assetPrefix, user.ResourceOwner),
 		}
 	}
-	if user.MachineView != nil {
+	if user.Machine != nil {
 		return &user_pb.User_Machine{
-			Machine: MachineToPb(user.MachineView),
+			Machine: MachineToPb(user.Machine),
 		}
 	}
 	return nil
 }
 
-func HumanToPb(view *model.HumanView) *user_pb.Human {
+func HumanToPb(view *query.Human, assetPrefix, owner string) *user_pb.Human {
 	return &user_pb.Human{
 		Profile: &user_pb.Profile{
 			FirstName:         view.FirstName,
 			LastName:          view.LastName,
 			NickName:          view.NickName,
 			DisplayName:       view.DisplayName,
-			PreferredLanguage: view.PreferredLanguage,
+			PreferredLanguage: view.PreferredLanguage.String(),
 			Gender:            GenderToPb(view.Gender),
-			AvatarUrl:         view.AvatarURL,
+			AvatarUrl:         domain.AvatarURL(assetPrefix, owner, view.AvatarKey),
 		},
 		Email: &user_pb.Email{
 			Email:           view.Email,
@@ -69,14 +69,14 @@ func HumanToPb(view *model.HumanView) *user_pb.Human {
 	}
 }
 
-func MachineToPb(view *model.MachineView) *user_pb.Machine {
+func MachineToPb(view *query.Machine) *user_pb.Machine {
 	return &user_pb.Machine{
 		Name:        view.Name,
 		Description: view.Description,
 	}
 }
 
-func ProfileToPb(profile *model.Profile) *user_pb.Profile {
+func ProfileToPb(profile *query.Profile, assetPrefix string) *user_pb.Profile {
 	return &user_pb.Profile{
 		FirstName:         profile.FirstName,
 		LastName:          profile.LastName,
@@ -84,35 +84,35 @@ func ProfileToPb(profile *model.Profile) *user_pb.Profile {
 		DisplayName:       profile.DisplayName,
 		PreferredLanguage: profile.PreferredLanguage.String(),
 		Gender:            GenderToPb(profile.Gender),
-		AvatarUrl:         profile.AvatarURL,
+		AvatarUrl:         domain.AvatarURL(assetPrefix, profile.ResourceOwner, profile.AvatarKey),
 	}
 }
 
-func EmailToPb(email *model.Email) *user_pb.Email {
+func EmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.EmailAddress,
-		IsEmailVerified: email.IsEmailVerified,
+		Email:           email.Email,
+		IsEmailVerified: email.IsVerified,
 	}
 }
 
-func PhoneToPb(phone *model.Phone) *user_pb.Phone {
+func PhoneToPb(phone *query.Phone) *user_pb.Phone {
 	return &user_pb.Phone{
-		Phone:           phone.PhoneNumber,
-		IsPhoneVerified: phone.IsPhoneVerified,
+		Phone:           phone.Phone,
+		IsPhoneVerified: phone.IsVerified,
 	}
 }
 
-func ModelEmailToPb(email *model.Email) *user_pb.Email {
+func ModelEmailToPb(email *query.Email) *user_pb.Email {
 	return &user_pb.Email{
-		Email:           email.EmailAddress,
-		IsEmailVerified: email.IsEmailVerified,
+		Email:           email.Email,
+		IsEmailVerified: email.IsVerified,
 	}
 }
 
-func ModelPhoneToPb(phone *model.Phone) *user_pb.Phone {
+func ModelPhoneToPb(phone *query.Phone) *user_pb.Phone {
 	return &user_pb.Phone{
-		Phone:           phone.PhoneNumber,
-		IsPhoneVerified: phone.IsPhoneVerified,
+		Phone:           phone.Phone,
+		IsPhoneVerified: phone.IsVerified,
 	}
 }
 
@@ -129,19 +129,19 @@ func GenderToDomain(gender user_pb.Gender) domain.Gender {
 	}
 }
 
-func ModelUserStateToPb(state model.UserState) user_pb.UserState {
+func UserStateToPb(state domain.UserState) user_pb.UserState {
 	switch state {
-	case model.UserStateActive:
+	case domain.UserStateActive:
 		return user_pb.UserState_USER_STATE_ACTIVE
-	case model.UserStateInactive:
+	case domain.UserStateInactive:
 		return user_pb.UserState_USER_STATE_INACTIVE
-	case model.UserStateDeleted:
+	case domain.UserStateDeleted:
 		return user_pb.UserState_USER_STATE_DELETED
-	case model.UserStateInitial:
+	case domain.UserStateInitial:
 		return user_pb.UserState_USER_STATE_INITIAL
-	case model.UserStateLocked:
+	case domain.UserStateLocked:
 		return user_pb.UserState_USER_STATE_LOCKED
-	case model.UserStateSuspend:
+	case domain.UserStateSuspend:
 		return user_pb.UserState_USER_STATE_SUSPEND
 	default:
 		return user_pb.UserState_USER_STATE_UNSPECIFIED
@@ -159,67 +159,67 @@ func ModelUserGrantStateToPb(state usr_grant_model.UserGrantState) user_pb.UserG
 	}
 }
 
-func GenderToPb(gender model.Gender) user_pb.Gender {
+func GenderToPb(gender domain.Gender) user_pb.Gender {
 	switch gender {
-	case model.GenderDiverse:
+	case domain.GenderDiverse:
 		return user_pb.Gender_GENDER_DIVERSE
-	case model.GenderFemale:
+	case domain.GenderFemale:
 		return user_pb.Gender_GENDER_FEMALE
-	case model.GenderMale:
+	case domain.GenderMale:
 		return user_pb.Gender_GENDER_MALE
 	default:
 		return user_pb.Gender_GENDER_UNSPECIFIED
 	}
 }
 
-func AuthFactorsToPb(mfas []*model.MultiFactor) []*user_pb.AuthFactor {
-	factors := make([]*user_pb.AuthFactor, len(mfas))
-	for i, mfa := range mfas {
-		factors[i] = AuthFactorToPb(mfa)
+func AuthMethodsToPb(mfas *query.AuthMethods) []*user_pb.AuthFactor {
+	factors := make([]*user_pb.AuthFactor, len(mfas.AuthMethods))
+	for i, mfa := range mfas.AuthMethods {
+		factors[i] = AuthMethodToPb(mfa)
 	}
 	return factors
 }
 
-func AuthFactorToPb(mfa *model.MultiFactor) *user_pb.AuthFactor {
+func AuthMethodToPb(mfa *query.AuthMethod) *user_pb.AuthFactor {
 	factor := &user_pb.AuthFactor{
 		State: MFAStateToPb(mfa.State),
 	}
 	switch mfa.Type {
-	case model.MFATypeOTP:
+	case domain.UserAuthMethodTypeOTP:
 		factor.Type = &user_pb.AuthFactor_Otp{
 			Otp: &user_pb.AuthFactorOTP{},
 		}
-	case model.MFATypeU2F:
+	case domain.UserAuthMethodTypeU2F:
 		factor.Type = &user_pb.AuthFactor_U2F{
 			U2F: &user_pb.AuthFactorU2F{
-				Id:   mfa.ID,
-				Name: mfa.Attribute,
+				Id:   mfa.TokenID,
+				Name: mfa.Name,
 			},
 		}
 	}
 	return factor
 }
 
-func MFAStateToPb(state model.MFAState) user_pb.AuthFactorState {
+func MFAStateToPb(state domain.MFAState) user_pb.AuthFactorState {
 	switch state {
-	case model.MFAStateNotReady:
+	case domain.MFAStateNotReady:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_NOT_READY
-	case model.MFAStateReady:
+	case domain.MFAStateReady:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_READY
 	default:
 		return user_pb.AuthFactorState_AUTH_FACTOR_STATE_UNSPECIFIED
 	}
 }
 
-func WebAuthNTokensViewToPb(tokens []*model.WebAuthNView) []*user_pb.WebAuthNToken {
-	t := make([]*user_pb.WebAuthNToken, len(tokens))
-	for i, token := range tokens {
-		t[i] = WebAuthNTokenViewToPb(token)
+func UserAuthMethodsToWebAuthNTokenPb(methods *query.AuthMethods) []*user_pb.WebAuthNToken {
+	t := make([]*user_pb.WebAuthNToken, len(methods.AuthMethods))
+	for i, token := range methods.AuthMethods {
+		t[i] = UserAuthMethodToWebAuthNTokenPb(token)
 	}
 	return t
 }
 
-func WebAuthNTokenViewToPb(token *model.WebAuthNView) *user_pb.WebAuthNToken {
+func UserAuthMethodToWebAuthNTokenPb(token *query.AuthMethod) *user_pb.WebAuthNToken {
 	return &user_pb.WebAuthNToken{
 		Id:    token.TokenID,
 		State: MFAStateToPb(token.State),
@@ -227,13 +227,7 @@ func WebAuthNTokenViewToPb(token *model.WebAuthNView) *user_pb.WebAuthNToken {
 	}
 }
 
-func WebAuthNTokenToWebAuthNKeyPb(token *domain.WebAuthNToken) *user_pb.WebAuthNKey {
-	return &user_pb.WebAuthNKey{
-		PublicKey: token.PublicKey,
-	}
-}
-
-func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*domain.UserIDPLink {
+func ExternalIDPViewsToExternalIDPs(externalIDPs []*query.IDPUserLink) []*domain.UserIDPLink {
 	idps := make([]*domain.UserIDPLink, len(externalIDPs))
 	for i, idp := range externalIDPs {
 		idps[i] = &domain.UserIDPLink{
@@ -241,9 +235,9 @@ func ExternalIDPViewsToExternalIDPs(externalIDPs []*model.ExternalIDPView) []*do
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,
 			},
-			IDPConfigID:    idp.IDPConfigID,
-			ExternalUserID: idp.ExternalUserID,
-			DisplayName:    idp.UserDisplayName,
+			IDPConfigID:    idp.IDPID,
+			ExternalUserID: idp.ProvidedUserID,
+			DisplayName:    idp.ProvidedUsername,
 		}
 	}
 	return idps

@@ -24,7 +24,7 @@ func NewIAMLabelPolicyWriteModel() *IAMLabelPolicyWriteModel {
 	}
 }
 
-func (wm *IAMLabelPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMLabelPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.LabelPolicyAddedEvent:

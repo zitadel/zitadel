@@ -194,8 +194,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Elimina utente",
+      "DELETE_SELF_TITLE": "Elimina Account",
       "DELETE_DESCRIPTION": "Stai per eliminare definitivamente un utente. Sei sicuro?",
+      "DELETE_SELF_DESCRIPTION": "Stai per eliminare definitivamente il tuo account. Questo ti disconnetterà ed eliminerà il tuo utente. Questa azione non può essere annullata!",
       "DELETE_AUTH_DESCRIPTION": "Stai per eleminare il tuo account personale in modo permanente. Vuoi continuare?",
+      "TYPEUSERNAME": "Ripeti '{{value}}' per confermare ed eliminare l'utente.",
       "DELETE_BTN": "Elimina"
     },
     "SENDEMAILDIALOG": {
@@ -325,7 +328,8 @@
       "GENDERLANGSECTION": "Genere e linguaggio",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Password iniziale",
-      "ADDRESSANDPHONESECTION": "Numero di telefono"
+      "ADDRESSANDPHONESECTION": "Numero di telefono",
+      "INITMAILDESCRIPTION": "Se vengono selezionate entrambe le opzioni, non verrà inviata alcuna e-mail per l'inizializzazione. Se solo una delle opzioni viene selezionata, verrà inviata una mail per fornire/verificare i dati."
     },
     "CODEDIALOG": {
       "TITLE": "Verificare il numero di telefono",
@@ -374,6 +378,8 @@
       "DESCRIPTION": "Descrizione",
       "KEYSTITLE": "Chiavi",
       "KEYSDESC": "Definisci le tue chiavi e aggiungi una data di scadenza opzionale.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Questi Token d'accesso personali funzionano come i Access Token per OAuth.",
       "ID": "ID chiave",
       "TYPE": "Tipo",
       "EXPIRATIONDATE": "Data di scadenza",
@@ -399,6 +405,8 @@
       "OLD": "Password attuale",
       "NEW": "Nuova password",
       "CONFIRM": "Conferma la nuova password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Conferma password",
       "RESET": "Ripristina la password attuale",
       "SET": "Imposta nuova password",
       "RESENDNOTIFICATION": "Reinvia il link per la reimpostazione della password",
@@ -419,6 +427,8 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "convalidato",
+        "ISVERIFIED": "Email Verificato",
+        "ISVERIFIEDDESC": "Se l'email viene indicata come verificata, non verrà inviata alcuna email di verificazione.",
         "RESEND": "Invia di nuovo l'e-mail di verifica",
         "EDITTITLE": "Cambiare l'e-mail",
         "EDITDESC": "Inserisci la nuova email nel campo sottostante."
@@ -525,6 +535,25 @@
         "PROJECT": "Progetto",
         "GRANTEDPROJECT": "Progetto concesso"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Genera un nuovo token",
+        "DESCRIPTION": "Definisci la data di scadenza del token",
+        "CHOOSEEXPIRY": "Seleziona una data di scadenza",
+        "CHOOSEDATEAFTER": "Inserisci una scadenza valida"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Copia il tuo token di accesso. Non sarà possibile recuperarlo in seguito."
+      },
+      "DELETE": {
+        "TITLE": "Elimina Token",
+        "DESCRIPTION": "Stai per eliminare il token di accesso. Sei sicuro di voler continuare?"
+      },
+      "DELETED": "Token eliminato con successo."
     }
   },
   "FLOWS": {
@@ -556,6 +585,7 @@
     "FLOWTYPE": "Tipo processo",
     "TRIGGERTYPE": "Tipo trigger",
     "ACTIONS": "Azioni",
+    "ACTIONSMAX": "In base al tuo tier, hai a disposizione un numero limitato di azioni ({{value}}). Assicurati di disattivare quelli di cui non hai bisogno o considera di fare un upgrade.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Crea azione"
@@ -573,7 +603,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Azioni salvate!"
+      "ACTIONSSET": "Azioni salvate!",
+      "ACTIONREACTIVATED": "Azioni riattivati con successo",
+      "ACTIONDEACTIVATED": "Azioni disattivati con successo"
     }
   },
   "IAM": {
@@ -639,6 +671,7 @@
       "LISTDESCRIPTION": "Scegli un'organizzazione.",
       "ACTIVE": "Attivo",
       "CREATE": "Creare un'organizzazione",
+      "USERSELFACCOUNT": "Usa il tuo account personale come proprietario dell'organizzazione",
       "ORGDETAIL_TITLE": "Inserisci il nome e il dominio della tua nuova organizzazione.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Inserisci il nome della tua nuova organizzazione.",
       "ORGDETAILUSER_TITLE": "Configurare il proprietario dell'organizzazione",
@@ -662,7 +695,8 @@
       "SELECTORGTOOLTIP": "Seleziona questa organizzazione.",
       "PRIMARYDOMAIN": "Dominio primario",
       "STATE": "Stato",
-      "USEPASSWORD": "Imposta la password iniziale"
+      "USEPASSWORD": "Imposta la password iniziale",
+      "USEPASSWORDDESC": "L'utente non deve impostare la password durante l'inizializzazione."
     },
     "DOMAINS": {
       "NEW": "Aggiungi dominio",
@@ -746,7 +780,16 @@
       "CUSTOMTEXTMESSAGE": "Testi email personalizzati",
       "PRIVACYPOLICY": "Link personalizzati all'informativa sulla privacy e ai TOS",
       "METADATAUSER": "Metadati utente",
-      "FLOWS": "Azioni e processi"
+      "FLOWS": "Azioni e processi",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Non abilitato",
+          "1": "Numero limitato",
+          "2": "Illimitato"
+        },
+        "COUNT": "Anzahl",
+        "TYPE": "Tipo di utilizzo"
+      }
     },
     "TIERSTATES": {
       "0": "Attivo",
@@ -830,6 +873,7 @@
       "DESCRIPTION": "Imposta i tuoi link all'informativa sulla privacy e ai termini di servizio",
       "TOSLINK": "Link ai termini di servizio",
       "POLICYLINK": "Link all'informativa sulla privacy",
+      "HELPLINK": "link per l'aiuto",
       "SAVED": "Salvato con successo!",
       "RESET_TITLE": "Ripristina i valori predefiniti",
       "RESET_DESCRIPTION": "Stai per ripristinare i link predefiniti per i TOS e l'informativa sulla privacy. Vuoi davvero continuare?"
@@ -1162,7 +1206,7 @@
       "OPTIONS": "Opzioni",
       "ASSERTION": "Includi ruoli con autenticazione",
       "ASSERTION_DESCRIPTION": "Le informazioni sui ruoli sono inviate dall'endpoint Userinfo e a seconda delle impostazioni dell'applicazione in token.",
-      "CHECK": "Verifica i ruoli con l'autenticazione",
+      "CHECK": "Verifica l'autorizzazione durante l'autenticazione",
       "CHECK_DESCRIPTION": "Se impostato, gli utenti possono autenticarsi solo se un qualsiasi ruolo \u00e8 assegnato al loro account."
     },
     "HAS_PROJECT": "Controlla project grant con l'autenticazione",
@@ -1189,10 +1233,12 @@
       "MEMBERSADDED": "Manager aggiunto con successo.",
       "MEMBERADDED": "Manager aggiunto con successo.",
       "MEMBERCHANGED": "Manager cambiato con successo.",
+      "ROLESCREATED": "Ruoli creati con successo.",
       "ROLEREMOVED": "Ruolo rimosso con successo.",
       "ROLECHANGED": "Ruolo cambiato con successo.",
       "REACTIVATED": "Riattivato con successo.",
       "DEACTIVATED": "Disattivato con successo.",
+      "CREATED": "Progetto creato con successo.",
       "UPDATED": "Progetto cambiato con successo.",
       "GRANTUPDATED": "Grant cambiato con successo.",
       "DELETED": "Progetto rimosso con successo."
@@ -1529,6 +1575,7 @@
       "OIDCUPDATED": "Configurazione OIDC aggiornata.",
       "APIUPDATED": "Configurazione API aggiornata",
       "UPDATED": "App aggiornata.",
+      "CREATED": "App creata.",
       "CLIENTSECRETREGENERATED": "Client secret generato.",
       "DELETED": "App rimossa con successo.",
       "CONFIGCHANGED": "Modifiche alla configurazione rilevate"

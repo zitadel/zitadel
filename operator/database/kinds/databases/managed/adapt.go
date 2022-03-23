@@ -2,8 +2,11 @@ package managed
 
 import (
 	"fmt"
+	"github.com/caos/zitadel/operator/database/kinds/databases/managed/user"
 	"strconv"
 	"strings"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -18,11 +21,11 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/database/kinds/backups"
-	"github.com/caos/zitadel/operator/database/kinds/databases/core"
-	"github.com/caos/zitadel/operator/database/kinds/databases/managed/certificate"
+	managedCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/current"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/rbac"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/services"
 	"github.com/caos/zitadel/operator/database/kinds/databases/managed/statefulset"
+	certCurr "github.com/caos/zitadel/operator/database/kinds/databases/managed/user/current"
 )
 
 const (
@@ -35,6 +38,9 @@ const (
 	cockroachHTTPPort  = int32(8080)
 	Clean              = "clean"
 	DBReady            = "dbready"
+	nodeCertsSecret    = "cockroachdb.node"
+	zitadelCertsSecret = "zitadel-certs"
+	clientCertsPath    = "/cockroach/cockroach-client-certs"
 )
 
 func Adapter(
@@ -68,11 +74,7 @@ func Adapter(
 			}
 		}()
 
-		var (
-			internalMonitor = monitor.WithField("kind", "cockroachdb")
-			allSecrets      = make(map[string]*secret.Secret)
-			allExisting     = make(map[string]*secret.Existing)
-		)
+		internalMonitor := monitor.WithField("kind", "cockroachdb")
 
 		desiredKind, err := parseDesiredV0(desired)
 		if err != nil {
@@ -89,6 +91,8 @@ func Adapter(
 			internalMonitor.Verbose()
 		}
 
+		allSecrets, allExisting := getSecretsMap(desiredKind)
+
 		var (
 			isFeatureDatabase bool
 			isFeatureClean    bool
@@ -102,25 +106,47 @@ func Adapter(
 			}
 		}
 
-		queryCert, destroyCert, addUser, deleteUser, listUsers, err := certificate.AdaptFunc(internalMonitor, namespace, componentLabels, desiredKind.Spec.ClusterDns, isFeatureDatabase)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
+		currentDB := &managedCurr.Current{
+			Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
+			Current: &managedCurr.CurrentDB{
+				CA: &certCurr.Current{},
+			},
 		}
-		addRoot, err := addUser("root")
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-		destroyRoot, err := deleteUser("root")
+		current.Parsed = currentDB
+
+		pwSecretLabels := labels.AsSelectable(labels.MustForName(componentLabels, "zitadel-passwords"))
+		currentDB.Current.PasswordSecretKey = "flyway"
+		currentDB.Current.PasswordSecret = pwSecretLabels
+		currentDB.Current.User = "flyway"
+
+		queryDBSetupBeforeCR, destroyDBSetupBeforeCR, queryDBSetupAfterCR, destroyDBSetupAfterCR, err := user.AdaptFunc(
+			internalMonitor,
+			namespace,
+			componentLabels,
+			desiredKind.Spec.ClusterDns,
+			isFeatureDatabase,
+			currentDB.Current.User,
+			desiredKind.Spec.ZitadelUserPassword,
+			desiredKind.Spec.ZitadelUserPasswordExisting,
+			pwSecretLabels,
+			currentDB.Current.PasswordSecretKey,
+			clientCertsPath,
+			nodeCertsSecret,
+			currentDB,
+		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
 		}
 
 		queryRBAC, destroyRBAC, err := rbac.AdaptFunc(internalMonitor, namespace, labels.MustForName(componentLabels, serviceAccountName))
+		if err != nil {
+			return nil, nil, nil, nil, nil, false, err
+		}
 
 		cockroachNameLabels := labels.MustForName(componentLabels, SfsName)
 		cockroachSelector := labels.DeriveNameSelector(cockroachNameLabels, false)
 		cockroachSelectabel := labels.AsSelectable(cockroachNameLabels)
-		querySFS, destroySFS, ensureInit, checkDBReady, listDatabases, err := statefulset.AdaptFunc(
+		querySFS, destroySFS, ensureInit, checkDBReady, err := statefulset.AdaptFunc(
 			internalMonitor,
 			cockroachSelectabel,
 			cockroachSelector,
@@ -138,6 +164,9 @@ func Adapter(
 			desiredKind.Spec.Resources,
 			desiredKind.Spec.Cache,
 			desiredKind.Spec.MaxSQLMemory,
+			clientCertsPath,
+			db.CertsSecret("root"),
+			nodeCertsSecret,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -158,14 +187,6 @@ func Adapter(
 			return nil, nil, nil, nil, nil, false, err
 		}
 
-		currentDB := &Current{
-			Common: tree.NewCommon("databases.caos.ch/CockroachDB", "v0", false),
-			Current: &CurrentDB{
-				CA: &certificate.Current{},
-			},
-		}
-		current.Parsed = currentDB
-
 		var (
 			queriers    = make([]operator.QueryFunc, 0)
 			destroyers  = make([]operator.DestroyFunc, 0)
@@ -174,22 +195,21 @@ func Adapter(
 		if isFeatureDatabase {
 			queriers = append(queriers,
 				queryRBAC,
-				queryCert,
-				addRoot,
+				queryDBSetupBeforeCR,
 				operator.ResourceQueryToZitadelQuery(querySFS),
-				operator.ResourceQueryToZitadelQuery(queryPDB),
 				queryS,
 				operator.EnsureFuncToQueryFunc(ensureInit),
+				queryDBSetupAfterCR,
+				operator.ResourceQueryToZitadelQuery(queryPDB),
 			)
 			destroyers = append(destroyers,
 				destroyS,
+				destroyDBSetupAfterCR,
 				operator.ResourceDestroyToZitadelDestroy(destroySFS),
+				destroyDBSetupBeforeCR,
 				destroyRBAC,
-				destroyCert,
-				destroyRoot,
 			)
 		}
-
 		if isFeatureClean {
 			queriers = append(queriers,
 				operator.ResourceQueryToZitadelQuery(
@@ -202,6 +222,7 @@ func Adapter(
 				),
 				operator.EnsureFuncToQueryFunc(ensureInit),
 				operator.EnsureFuncToQueryFunc(checkDBReady),
+				queryDBSetupAfterCR,
 			)
 		}
 
@@ -229,8 +250,7 @@ func Adapter(
 						nodeselector,
 						tolerations,
 						version,
-						PublicServiceName,
-						cockroachPort,
+						currentDB,
 						features,
 						customImageRegistry,
 					)
@@ -249,18 +269,12 @@ func Adapter(
 		}
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-				queriedCurrentDB, err := core.ParseQueriedForDatabase(queried)
+				queriedCurrentDB, err := db.ParseQueriedForDatabase(queried)
 				if err != nil || queriedCurrentDB == nil {
 					// TODO: query system state
 					currentDB.Current.Port = strconv.Itoa(int(cockroachPort))
 					currentDB.Current.URL = PublicServiceName
-					currentDB.Current.ReadyFunc = checkDBReady
-					currentDB.Current.AddUserFunc = addUser
-					currentDB.Current.DeleteUserFunc = deleteUser
-					currentDB.Current.ListUsersFunc = listUsers
-					currentDB.Current.ListDatabasesFunc = listDatabases
-
-					core.SetQueriedForDatabase(queried, current)
+					db.SetQueriedForDatabase(queried, current)
 					internalMonitor.Info("set current state of managed database")
 				}
 

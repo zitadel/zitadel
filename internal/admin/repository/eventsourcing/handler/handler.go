@@ -32,27 +32,7 @@ func (h *handler) Eventstore() v1.Eventstore {
 }
 
 func Register(configs Configs, bulkLimit, errorCount uint64, view *view.View, es v1.Eventstore, defaults systemdefaults.SystemDefaults, command *command.Commands, static static.Storage, localDevMode bool) []query.Handler {
-	handlers := []query.Handler{
-		newIAMMember(
-			handler{view, bulkLimit, configs.cycleDuration("IamMember"), errorCount, es}),
-		newIDPConfig(
-			handler{view, bulkLimit, configs.cycleDuration("IDPConfig"), errorCount, es}),
-		newIDPProvider(
-			handler{view, bulkLimit, configs.cycleDuration("IDPProvider"), errorCount, es},
-			defaults),
-		newUser(
-			handler{view, bulkLimit, configs.cycleDuration("User"), errorCount, es},
-			defaults),
-		newExternalIDP(
-			handler{view, bulkLimit, configs.cycleDuration("ExternalIDP"), errorCount, es},
-			defaults),
-		newMailTemplate(
-			handler{view, bulkLimit, configs.cycleDuration("MailTemplate"), errorCount, es}),
-		newMessageText(
-			handler{view, bulkLimit, configs.cycleDuration("MessageText"), errorCount, es}),
-		newCustomText(
-			handler{view, bulkLimit, configs.cycleDuration("CustomTexts"), errorCount, es}),
-	}
+	handlers := []query.Handler{}
 	if static != nil {
 		handlers = append(handlers, newStyling(
 			handler{view, bulkLimit, configs.cycleDuration("Styling"), errorCount, es},

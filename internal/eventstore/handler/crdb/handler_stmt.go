@@ -4,13 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
-	"github.com/caos/zitadel/internal/id"
 )
 
 var (
@@ -32,6 +31,7 @@ type StatementHandlerConfig struct {
 
 type StatementHandler struct {
 	*handler.ProjectionHandler
+	Locker
 
 	client                  *sql.DB
 	sequenceTable           string
@@ -40,25 +40,17 @@ type StatementHandler struct {
 	maxFailureCount         uint
 	failureCountStmt        string
 	setFailureCountStmt     string
-	lockStmt                string
 
 	aggregates []eventstore.AggregateType
 	reduces    map[eventstore.EventType]handler.Reduce
 
-	workerName string
-	bulkLimit  uint64
+	bulkLimit uint64
 }
 
 func NewStatementHandler(
 	ctx context.Context,
 	config StatementHandlerConfig,
 ) StatementHandler {
-	workerName, err := os.Hostname()
-	if err != nil || workerName == "" {
-		workerName, err = id.SonyFlakeGenerator.Next()
-		logging.Log("SPOOL-bdO56").OnError(err).Panic("unable to generate lockID")
-	}
-
 	aggregateTypes := make([]eventstore.AggregateType, 0, len(config.Reducers))
 	reduces := make(map[eventstore.EventType]handler.Reduce, len(config.Reducers))
 	for _, aggReducer := range config.Reducers {
@@ -77,11 +69,10 @@ func NewStatementHandler(
 		updateSequencesBaseStmt: fmt.Sprintf(updateCurrentSequencesStmtFormat, config.SequenceTable),
 		failureCountStmt:        fmt.Sprintf(failureCountStmtFormat, config.FailedEventsTable),
 		setFailureCountStmt:     fmt.Sprintf(setFailureCountStmtFormat, config.FailedEventsTable),
-		lockStmt:                fmt.Sprintf(lockStmtFormat, config.LockTable),
 		aggregates:              aggregateTypes,
 		reduces:                 reduces,
-		workerName:              workerName,
 		bulkLimit:               config.BulkLimit,
+		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
 	}
 
 	go h.ProjectionHandler.Process(
@@ -196,7 +187,7 @@ func (h *StatementHandler) fetchPreviousStmts(
 		return nil, nil
 	}
 
-	events, err := h.Eventstore.FilterEvents(ctx, query)
+	events, err := h.Eventstore.Filter(ctx, query)
 	if err != nil {
 		return nil, err
 	}

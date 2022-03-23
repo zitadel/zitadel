@@ -4,6 +4,9 @@ Errors:
   OriginNotAllowed: Dieser "Origin" ist nicht freigeschaltet
   IDMissing: ID fehlt
   ResourceOwnerMissing: Organisation fehlt
+  RemoveFailed: Konnte nicht gelöscht werden
+  ProjectionName:
+    Invalid: Ungültiger Projektionsname
   Assets:
     EmptyKey: Asset Key ist leer
     Store:
@@ -36,6 +39,7 @@ Errors:
     DomainNotAllowedAsUsername: Domäne ist bereits reserviert und kann nicht verwendet werden
     AlreadyInactive: Benutzer ist bereits deaktiviert
     NotInactive: Benutzer ist nicht inaktiv
+    CantDeactivateInitial: Benutzer mit dem Status initial kann nur gelöscht und nicht deaktiviert werden
     ShouldBeActiveOrInitial: Benutzer ist nicht aktiv oder initialisiert
     AlreadyInitialised: Benutzer ist bereits initialisiert
     NotInitialised: Benutzer ist noch nicht initialisiert
@@ -62,8 +66,11 @@ Errors:
     Machine:
       Key:
         NotFound: Maschinen Key nicht gefunden
+    PAT:
+      NotFound: Persönliches Access Token nicht gefunden
     NotHuman: Der Benutzer muss eine Person sein
     NotMachine: Der Benutzer muss technisch sein
+    WrongType: Für diesen Benutzertyp nicht erlaubt
     NotAllowedToLink: Der Benutzer darf nicht mit einem externen Login Provider verlinkt werden
     Username:
       AlreadyExists: Benutzername ist bereits vergeben
@@ -170,22 +177,22 @@ Errors:
       NotChanged: Default Message Text wurde nicht verändert
       AlreadyExists: Default Message Text existiert bereits
       Invalid: Default Message Text ist ungültig
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Password Komplexitäts Policy konnte nicht gefunden werden
       Empty: Passwort Komplexitäts Policy ist leer
       NotExisting: Passwort Komplexitäts Policy existiert nicht
       AlreadyExists: Passwort Komplexitäts Policy existiert bereits
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Password Lockout Policy konnte nicht gefunden werden
       Empty: Passwort Lockout Policy ist leer
       NotExisting: Passwort Lockout Policy existiert nicht
       AlreadyExists: Passwort Lockout Policy existiert bereits
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Password Age Policy konnte nicht gefunden werden
       Empty: Passwort Age Policy ist leer
       NotExisting: Passwort Age Policy existiert nicht
       AlreadyExists: Passwort Age Policy existiert bereits
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Org IAM Policy ist leer
       NotExisting: Org IAM Policy existiert nicht
       AlreadyExists: Org IAM Policy existiert bereits
@@ -337,6 +344,7 @@ Errors:
     NotExisting: Identitäts Provider Konfiguration existiert nicht
   Changes:
     NotFound: Es konnte kein Änderungsverlauf gefunden werden
+    AuditRetention: Änderungsverlauf ist ausserhalb der Audit Log Retention
   Token:
     NotFound: Token konnte nicht gefunden werden
   UserSession:
@@ -372,6 +380,7 @@ Errors:
     NotFound: Action wurde nicht gefunden
     NotActive: Action ist nicht aktiv
     NotInactive: Action ist nicht inaktiv
+    MaxAllowed: Keine weitern aktiven Actions mehr erlaubt
   Flow:
     FlowTypeMissing: FlowType fehlt
     Empty: Flow ist bereits leer
@@ -564,6 +573,10 @@ EventTypes:
       cascade:
         removed: Berechtigung entfernt
         changed: Berechtigung geändert
+      metadata:
+        set: Benutzer Metadaten gesetzt
+        removed: Benutzer Metadaten gelöscht
+        removed.all: Alle Benutzer Metadaten gelöscht
   org:
     added: Organisation hinzugefügt
     changed: Organisation geändert

@@ -20,7 +20,7 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (c *Commands) SetOrgLoginText(ctx context.Context, resourceOwner string, lo
 	return writeModelToObjectDetails(&existingLoginText.WriteModel), nil
 }
 
-func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggregate, loginText *domain.CustomLoginText) ([]eventstore.EventPusher, *OrgCustomLoginTextReadModel, error) {
+func (c *Commands) setOrgLoginText(ctx context.Context, orgAgg *eventstore.Aggregate, loginText *domain.CustomLoginText) ([]eventstore.Command, *OrgCustomLoginTextReadModel, error) {
 	if !loginText.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "ORG-PPo2w", "Errors.CustomText.Invalid")
 	}
@@ -59,7 +59,7 @@ func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string
 		return nil, caos_errs.ThrowNotFound(nil, "Org-9ru44", "Errors.CustomText.NotFound")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&customText.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, domain.LoginCustomText, lang))
 	err = AppendAndReduce(customText, pushedEvents...)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (c *Commands) RemoveOrgLoginTexts(ctx context.Context, resourceOwner string
 	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
-func (c *Commands) removeOrgLoginTextsIfExists(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+func (c *Commands) removeOrgLoginTextsIfExists(ctx context.Context, orgID string) ([]eventstore.Command, error) {
 	msgTemplates := NewOrgCustomLoginTextsReadModel(orgID)
 	err := c.eventstore.FilterToQueryReducer(ctx, msgTemplates)
 	if err != nil {
@@ -75,7 +75,7 @@ func (c *Commands) removeOrgLoginTextsIfExists(ctx context.Context, orgID string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&msgTemplates.WriteModel)
-	events := make([]eventstore.EventPusher, 0, len(msgTemplates.CustomLoginTexts))
+	events := make([]eventstore.Command, 0, len(msgTemplates.CustomLoginTexts))
 	for _, tmpl := range msgTemplates.CustomLoginTexts {
 		events = append(events, org.NewCustomTextTemplateRemovedEvent(ctx, orgAgg, tmpl.Template, tmpl.Language))
 	}

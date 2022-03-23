@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"gopkg.in/yaml.v3"
 	core "k8s.io/api/core/v1"
 
@@ -19,7 +21,6 @@ import (
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/ambassador"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/configuration"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/deployment"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/migration"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/services"
@@ -30,7 +31,7 @@ func AdaptFunc(
 	apiLabels *labels.API,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	dbClient database.Client,
+	dbConn db.Connection,
 	namespace string,
 	action string,
 	version *string,
@@ -85,6 +86,7 @@ func AdaptFunc(
 		secretName := "zitadel-secret"
 		consoleCMName := "console-config"
 		secretVarsName := "zitadel-secrets-vars"
+
 		secretPasswordName := "zitadel-passwords"
 		//paths which are used in the configuration and also are used for mounting the used files
 		certPath := "/home/zitadel/dbsecrets-zitadel"
@@ -128,16 +130,8 @@ func AdaptFunc(
 			consoleCMName,
 			secretVarsName,
 			secretPasswordName,
-			dbClient,
 			services.GetClientIDFunc(namespace, httpServiceName, httpPort),
-		)
-		if err != nil {
-			return nil, nil, nil, nil, nil, false, err
-		}
-
-		queryDB, err := database.AdaptFunc(
-			monitor,
-			dbClient,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -146,6 +140,7 @@ func AdaptFunc(
 		queryM, destroyM, err := migration.AdaptFunc(
 			internalMonitor,
 			labels.MustForComponent(apiLabels, "database"),
+			dbConn,
 			namespace,
 			action,
 			secretPasswordName,
@@ -176,6 +171,7 @@ func AdaptFunc(
 			secretVarsName,
 			secretPasswordName,
 			customImageRegistry,
+			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -259,7 +255,6 @@ func AdaptFunc(
 				return nil, err
 			}
 			return concatQueriers(
-				queryDB,
 				getQueryC(users),
 				operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(
 					monitor,
@@ -276,6 +271,7 @@ func AdaptFunc(
 		queryReadyD := operator.EnsureFuncToQueryFunc(deployment.GetReadyFunc(monitor, namespace, zitadelDeploymentName))
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+
 				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
 				if err != nil {
 					return nil, err

@@ -24,53 +24,19 @@ const (
 
 type IAM struct {
 	es_models.ObjectRoot
-	SetUpStarted                    Step                      `json:"-"`
-	SetUpDone                       Step                      `json:"-"`
-	GlobalOrgID                     string                    `json:"globalOrgId,omitempty"`
-	IAMProjectID                    string                    `json:"iamProjectId,omitempty"`
-	Members                         []*IAMMember              `json:"-"`
-	IDPs                            []*IDPConfig              `json:"-"`
-	DefaultLoginPolicy              *LoginPolicy              `json:"-"`
-	DefaultLabelPolicy              *LabelPolicy              `json:"-"`
-	DefaultMailTemplate             *MailTemplate             `json:"-"`
-	DefaultOrgIAMPolicy             *OrgIAMPolicy             `json:"-"`
-	DefaultPasswordComplexityPolicy *PasswordComplexityPolicy `json:"-"`
-	DefaultPasswordAgePolicy        *PasswordAgePolicy        `json:"-"`
-	DefaultLockoutPolicy            *LockoutPolicy            `json:"-"`
+	SetUpStarted Step   `json:"-"`
+	SetUpDone    Step   `json:"-"`
+	GlobalOrgID  string `json:"globalOrgId,omitempty"`
+	IAMProjectID string `json:"iamProjectId,omitempty"`
 }
 
 func IAMToModel(iam *IAM) *model.IAM {
-	members := IAMMembersToModel(iam.Members)
-	idps := IDPConfigsToModel(iam.IDPs)
 	converted := &model.IAM{
 		ObjectRoot:   iam.ObjectRoot,
 		SetUpStarted: domain.Step(iam.SetUpStarted),
 		SetUpDone:    domain.Step(iam.SetUpDone),
 		GlobalOrgID:  iam.GlobalOrgID,
 		IAMProjectID: iam.IAMProjectID,
-		Members:      members,
-		IDPs:         idps,
-	}
-	if iam.DefaultLoginPolicy != nil {
-		converted.DefaultLoginPolicy = LoginPolicyToModel(iam.DefaultLoginPolicy)
-	}
-	if iam.DefaultLabelPolicy != nil {
-		converted.DefaultLabelPolicy = LabelPolicyToModel(iam.DefaultLabelPolicy)
-	}
-	if iam.DefaultMailTemplate != nil {
-		converted.DefaultMailTemplate = MailTemplateToModel(iam.DefaultMailTemplate)
-	}
-	if iam.DefaultPasswordComplexityPolicy != nil {
-		converted.DefaultPasswordComplexityPolicy = PasswordComplexityPolicyToModel(iam.DefaultPasswordComplexityPolicy)
-	}
-	if iam.DefaultPasswordAgePolicy != nil {
-		converted.DefaultPasswordAgePolicy = PasswordAgePolicyToModel(iam.DefaultPasswordAgePolicy)
-	}
-	if iam.DefaultLockoutPolicy != nil {
-		converted.DefaultLockoutPolicy = LockoutPolicyToModel(iam.DefaultLockoutPolicy)
-	}
-	if iam.DefaultOrgIAMPolicy != nil {
-		converted.DefaultOrgIAMPolicy = OrgIAMPolicyToModel(iam.DefaultOrgIAMPolicy)
 	}
 	return converted
 }
@@ -112,68 +78,6 @@ func (i *IAM) AppendEvent(event *es_models.Event) (err error) {
 	case IAMProjectSet,
 		GlobalOrgSet:
 		err = i.SetData(event)
-	case IAMMemberAdded:
-		err = i.appendAddMemberEvent(event)
-	case IAMMemberChanged:
-		err = i.appendChangeMemberEvent(event)
-	case IAMMemberRemoved:
-		err = i.appendRemoveMemberEvent(event)
-	case IAMMemberCascadeRemoved:
-		err = i.appendRemoveMemberEvent(event)
-	case IDPConfigAdded:
-		return i.appendAddIDPConfigEvent(event)
-	case IDPConfigChanged:
-		return i.appendChangeIDPConfigEvent(event)
-	case IDPConfigRemoved:
-		return i.appendRemoveIDPConfigEvent(event)
-	case IDPConfigDeactivated:
-		return i.appendIDPConfigStateEvent(event, model.IDPConfigStateInactive)
-	case IDPConfigReactivated:
-		return i.appendIDPConfigStateEvent(event, model.IDPConfigStateActive)
-	case OIDCIDPConfigAdded:
-		return i.appendAddOIDCIDPConfigEvent(event)
-	case OIDCIDPConfigChanged:
-		return i.appendChangeOIDCIDPConfigEvent(event)
-	case LoginPolicyAdded:
-		return i.appendAddLoginPolicyEvent(event)
-	case LoginPolicyChanged:
-		return i.appendChangeLoginPolicyEvent(event)
-	case LoginPolicyIDPProviderAdded:
-		return i.appendAddIDPProviderToLoginPolicyEvent(event)
-	case LoginPolicyIDPProviderRemoved:
-		return i.appendRemoveIDPProviderFromLoginPolicyEvent(event)
-	case LoginPolicySecondFactorAdded:
-		return i.appendAddSecondFactorToLoginPolicyEvent(event)
-	case LoginPolicySecondFactorRemoved:
-		return i.appendRemoveSecondFactorFromLoginPolicyEvent(event)
-	case LoginPolicyMultiFactorAdded:
-		return i.appendAddMultiFactorToLoginPolicyEvent(event)
-	case LoginPolicyMultiFactorRemoved:
-		return i.appendRemoveMultiFactorFromLoginPolicyEvent(event)
-	case LabelPolicyAdded:
-		return i.appendAddLabelPolicyEvent(event)
-	case LabelPolicyChanged:
-		return i.appendChangeLabelPolicyEvent(event)
-	case MailTemplateAdded:
-		return i.appendAddMailTemplateEvent(event)
-	case MailTemplateChanged:
-		return i.appendChangeMailTemplateEvent(event)
-	case PasswordComplexityPolicyAdded:
-		return i.appendAddPasswordComplexityPolicyEvent(event)
-	case PasswordComplexityPolicyChanged:
-		return i.appendChangePasswordComplexityPolicyEvent(event)
-	case PasswordAgePolicyAdded:
-		return i.appendAddPasswordAgePolicyEvent(event)
-	case PasswordAgePolicyChanged:
-		return i.appendChangePasswordAgePolicyEvent(event)
-	case LockoutPolicyAdded:
-		return i.appendAddLockoutPolicyEvent(event)
-	case LockoutPolicyChanged:
-		return i.appendChangeLockoutPolicyEvent(event)
-	case OrgIAMPolicyAdded:
-		return i.appendAddOrgIAMPolicyEvent(event)
-	case OrgIAMPolicyChanged:
-		return i.appendChangeOrgIAMPolicyEvent(event)
 	}
 
 	return err

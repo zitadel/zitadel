@@ -93,7 +93,6 @@ title: zitadel/text.proto
 | tos |  string | - | string.max_len: 200<br />  |
 | privacy_policy |  string | - | string.max_len: 200<br />  |
 | help |  string | - | string.max_len: 200<br />  |
-| help_link |  string | - | string.max_len: 500<br />  |
 
 
 
@@ -278,6 +277,7 @@ title: zitadel/text.proto
 | passwordless_registration_text |  PasswordlessRegistrationScreenText | - |  |
 | passwordless_registration_done_text |  PasswordlessRegistrationDoneScreenText | - |  |
 | external_registration_user_overview_text |  ExternalRegistrationUserOverviewScreenText | - |  |
+| is_default |  bool | - |  |
 
 
 
@@ -343,6 +343,7 @@ title: zitadel/text.proto
 | text |  string | - |  |
 | button_text |  string | - |  |
 | footer_text |  string | - |  |
+| is_default |  bool | - |  |
 
 
 

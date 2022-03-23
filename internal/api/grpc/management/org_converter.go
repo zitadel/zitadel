@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/authz"
+	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	org_grpc "github.com/caos/zitadel/internal/api/grpc/org"
 	"github.com/caos/zitadel/internal/domain"
@@ -71,4 +72,30 @@ func AddOrgMemberRequestToDomain(ctx context.Context, req *mgmt_pb.AddOrgMemberR
 
 func UpdateOrgMemberRequestToDomain(ctx context.Context, req *mgmt_pb.UpdateOrgMemberRequest) *domain.Member {
 	return domain.NewMember(authz.GetCtxData(ctx).OrgID, req.UserId, req.Roles...)
+}
+
+func ListOrgMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*query.OrgMembersQuery, error) {
+	ctxData := authz.GetCtxData(ctx)
+	offset, limit, asc := object.ListQueryToModel(req.Query)
+	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
+	}
+	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(ctxData.OrgID)
+	if err != nil {
+		return nil, err
+	}
+	queries = append(queries, ownerQuery)
+	return &query.OrgMembersQuery{
+		MembersQuery: query.MembersQuery{
+			SearchRequest: query.SearchRequest{
+				Offset: offset,
+				Limit:  limit,
+				Asc:    asc,
+				//SortingColumn: //TODO: sorting
+			},
+			Queries: queries,
+		},
+		OrgID: ctxData.OrgID,
+	}, nil
 }

@@ -16,6 +16,7 @@ type UserWriteModel struct {
 	UserName  string
 	IDPLinks  []*domain.UserIDPLink
 	UserState domain.UserState
+	UserType  domain.UserType
 }
 
 func NewUserWriteModel(userID, resourceOwner string) *UserWriteModel {
@@ -34,9 +35,11 @@ func (wm *UserWriteModel) Reduce() error {
 		case *user.HumanAddedEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
+			wm.UserType = domain.UserTypeHuman
 		case *user.HumanRegisteredEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
+			wm.UserType = domain.UserTypeHuman
 		case *user.HumanInitialCodeAddedEvent:
 			wm.UserState = domain.UserStateInitial
 		case *user.HumanInitializedCheckSucceededEvent:
@@ -62,6 +65,7 @@ func (wm *UserWriteModel) Reduce() error {
 		case *user.MachineAddedEvent:
 			wm.UserName = e.UserName
 			wm.UserState = domain.UserStateActive
+			wm.UserType = domain.UserTypeMachine
 		case *user.UsernameChangedEvent:
 			wm.UserName = e.UserName
 		case *user.UserLockedEvent:
@@ -138,6 +142,10 @@ func isUserStateExists(state domain.UserState) bool {
 
 func isUserStateInactive(state domain.UserState) bool {
 	return hasUserState(state, domain.UserStateInactive)
+}
+
+func isUserStateInitial(state domain.UserState) bool {
+	return hasUserState(state, domain.UserStateInitial)
 }
 
 func hasUserState(check domain.UserState, states ...domain.UserState) bool {

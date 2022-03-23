@@ -246,53 +246,8 @@ Admin:
     BulkLimit: 10000
     FailureCountUntilSkip: 5
 
-Mgmt:
-  SearchLimit: 1000
-  Domain: $ZITADEL_DEFAULT_DOMAIN
-  APIDomain: $ZITADEL_API_DOMAIN
-  Eventstore:
-    ServiceName: 'ManagementAPI'
-    Repository:
-      SQL:
-        Host: $ZITADEL_EVENTSTORE_HOST
-        Port: $ZITADEL_EVENTSTORE_PORT
-        User: 'management'
-        Database: 'eventstore'
-        Password: $CR_MANAGEMENT_PASSWORD
-        MaxOpenConns: 3
-        MaxConnLifetime: 30m
-        MaxConnIdleTime: 30m
-        Options: $CR_OPTIONS
-        SSL:
-          Mode: $CR_SSL_MODE
-          RootCert: $CR_ROOT_CERT
-          Cert: $CR_MANAGEMENT_CERT
-          Key: $CR_MANAGEMENT_KEY
-    Cache:
-      Type: 'fastcache'
-      Config:
-        MaxCacheSizeInByte: 10485760 #10mb
-  View:
-    Host: $ZITADEL_EVENTSTORE_HOST
-    Port: $ZITADEL_EVENTSTORE_PORT
-    User: 'management'
-    Options: $CR_OPTIONS
-    Database: 'management'
-    Password: $CR_MANAGEMENT_PASSWORD
-    MaxOpenConns: 3
-    MaxConnLifetime: 30m
-    MaxConnIdleTime: 30m
-    SSL:
-      Mode: $CR_SSL_MODE
-      RootCert: $CR_ROOT_CERT
-      Cert: $CR_MANAGEMENT_CERT
-      Key: $CR_MANAGEMENT_KEY
-  Spooler:
-    ConcurrentWorkers: 1
-    BulkLimit: 10000
-    FailureCountUntilSkip: 5
-
 API:
+  Domain: $ZITADEL_API_DOMAIN
   GRPC:
     ServerPort: 50001
     GatewayPort: 50002

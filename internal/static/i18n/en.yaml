@@ -4,6 +4,9 @@ Errors:
   OriginNotAllowed: This "Origin" is not allowed
   IDMissing: ID missing
   ResourceOwnerMissing: Resource Owner Organisation missing
+  RemoveFailed: Could not be removed
+  ProjectionName:
+    Invalid: Invalid projection name
   Assets:
     EmptyKey: Asset key is empty
     Store:
@@ -36,6 +39,7 @@ Errors:
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
     AlreadyInactive: User already inactive
     NotInactive: User is not inactive
+    CantDeactivateInitial: User with state initial can only be deleted not deactivated
     ShouldBeActiveOrInitial: User is not active or inital
     AlreadyInitialised: User is already initialised
     NotInitialised: User is not yet initialised
@@ -62,8 +66,11 @@ Errors:
     Machine:
       Key:
         NotFound: Machine key not found
+    PAT:
+      NotFound: Personal Access Token not found
     NotHuman: The User must be personal
     NotMachine: The User must be technical
+    WrongType: Not allowed for this user type
     NotAllowedToLink: User is not allowed to link with external login provider
     Username:
       AlreadyExists:  Username already taken
@@ -170,22 +177,22 @@ Errors:
       NotChanged: Default Message Text has not been changed
       AlreadyExists: Default Message Text already exists
       Invalid: Default Message Text is invalid
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Password Complexity Policy not found
       Empty: Password Complexity Policy is empty
       NotExisting: Password Complexity Policy doesn't exist
       AlreadyExists: Password Complexity Policy already exists
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Password Lockout Policy not found
       Empty: Password Lockout Policy is empty
       NotExisting: Password Lockout Policy doesn't exist
       AlreadyExists: Password Lockout Policy already exists
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Password Age Policy not found
       Empty: Password Age Policy is empty
       NotExisting: Password Age Policy doesn't exist
       AlreadyExists: Password Age Policy already exists
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy doesn't exist
       AlreadyExists: Org IAM Policy already exists
@@ -337,6 +344,7 @@ Errors:
     NotExisting: Identity Provider Configuration doesn't exist
   Changes:
     NotFound: No history found
+    AuditRetention: History is outside of the Audit Log Retention
   Token:
     NotFound: Token not found
   UserSession:
@@ -372,6 +380,7 @@ Errors:
     NotFound: Action not found
     NotActive: Action is not active
     NotInactive: Action is not inactive
+    MaxAllowed: No additional active Actions allowed
   Flow:
     FlowTypeMissing: FlowType missing
     Empty: Flow is already empty
@@ -564,6 +573,10 @@ EventTypes:
       cascade:
         removed: Authorization removed
         changed: Authorization changed
+    metadata:
+      set: User metadata set
+      removed: User metadata removed
+      removed.all: All user metadata removed
   org:
     added: Organization added
     changed: Organization changed

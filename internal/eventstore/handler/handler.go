@@ -10,13 +10,13 @@ type HandlerConfig struct {
 type Handler struct {
 	Eventstore *eventstore.Eventstore
 	Sub        *eventstore.Subscription
-	EventQueue chan eventstore.EventReader
+	EventQueue chan eventstore.Event
 }
 
 func NewHandler(config HandlerConfig) Handler {
 	return Handler{
 		Eventstore: config.Eventstore,
-		EventQueue: make(chan eventstore.EventReader, 100),
+		EventQueue: make(chan eventstore.Event, 100),
 	}
 }
 

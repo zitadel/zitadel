@@ -137,4 +137,40 @@ export class ActionTableComponent implements OnInit {
   public refreshPage(): void {
     this.getData(this.paginator.pageSize, this.paginator.pageIndex * this.paginator.pageSize);
   }
+
+  public deactivateSelection(): Promise<void> {
+    const prom = this.selection.selected.map((action) => {
+      return this.mgmtService.deactivateAction(action.id);
+    });
+
+    return Promise.all(prom)
+      .then(() => {
+        this.selection.clear();
+        this.toast.showInfo('FLOWS.TOAST.ACTIONDEACTIVATED', true);
+        this.getData(10, 0);
+      })
+      .catch((error) => {
+        this.selection.clear();
+        this.toast.showError(error);
+        this.getData(10, 0);
+      });
+  }
+
+  public activateSelection(): Promise<void> {
+    const prom = this.selection.selected.map((action) => {
+      return this.mgmtService.reactivateAction(action.id);
+    });
+
+    return Promise.all(prom)
+      .then(() => {
+        this.selection.clear();
+        this.toast.showInfo('FLOWS.TOAST.ACTIONREACTIVATED', true);
+        this.getData(10, 0);
+      })
+      .catch((error) => {
+        this.selection.clear();
+        this.toast.showError(error);
+        this.getData(10, 0);
+      });
+  }
 }

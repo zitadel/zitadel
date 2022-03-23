@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/api/grpc/user"
+	"github.com/caos/zitadel/internal/query"
 
 	"github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/object"
@@ -60,11 +61,12 @@ func (s *Server) AddIDPToLoginPolicy(ctx context.Context, req *admin_pb.AddIDPTo
 }
 
 func (s *Server) RemoveIDPFromLoginPolicy(ctx context.Context, req *admin_pb.RemoveIDPFromLoginPolicyRequest) (*admin_pb.RemoveIDPFromLoginPolicyResponse, error) {
-	externalIDPs, err := s.iam.ExternalIDPsByIDPConfigID(ctx, req.IdpId)
-	if err != nil {
-		return nil, err
-	}
-	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(externalIDPs)...)
+	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
+	idps, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
+		Queries: []query.SearchQuery{idpQuery},
+	})
+
+	objectDetails, err := s.command.RemoveIDPProviderFromDefaultLoginPolicy(ctx, &domain.IDPProvider{IDPConfigID: req.IdpId}, user.ExternalIDPViewsToExternalIDPs(idps.Links)...)
 	if err != nil {
 		return nil, err
 	}

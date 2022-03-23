@@ -3,19 +3,19 @@ package oidc
 import (
 	"context"
 	"fmt"
-	key_model "github.com/caos/zitadel/internal/key/model"
 	"strings"
 	"time"
 
 	"github.com/caos/logging"
 	"github.com/caos/oidc/pkg/oidc"
 	"github.com/caos/oidc/pkg/op"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	"github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"github.com/caos/zitadel/internal/user/model"
 	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 )
 
@@ -26,17 +26,9 @@ func (o *OPStorage) CreateAuthRequest(ctx context.Context, req *oidc.AuthRequest
 	if !ok {
 		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-sd436", "no user agent id")
 	}
-	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, req.ClientID)
+	req.Scopes, err = o.assertProjectRoleScopes(ctx, req.ClientID, req.Scopes)
 	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
-	}
-	project, err := o.query.ProjectByID(ctx, projectID)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
-	}
-	req.Scopes, err = o.assertProjectRoleScopes(project, req.Scopes)
-	if err != nil {
-		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-Gqrfg", "Errors.Internal")
+		return nil, errors.ThrowPreconditionFailed(err, "OIDC-Gqrfg", "Errors.Internal")
 	}
 	authRequest := CreateAuthRequestToBusiness(ctx, req, userAgentID, userID)
 	//TODO: ensure splitting of command and query side durring auth request and login refactoring
@@ -97,7 +89,7 @@ func (o *OPStorage) CreateAccessToken(ctx context.Context, req op.TokenRequest) 
 		applicationID = authReq.ApplicationID
 		userOrgID = authReq.UserOrgID
 	}
-	resp, err := o.command.AddUserToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
+	resp, err := o.command.AddUserToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(), req.GetAudience(), req.GetScopes(), o.defaultAccessTokenLifetime) //PLANNED: lifetime from client
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -118,8 +110,15 @@ func (o *OPStorage) CreateAccessAndRefreshTokens(ctx context.Context, req op.Tok
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 	userAgentID, applicationID, userOrgID, authTime, authMethodsReferences := getInfoFromRequest(req)
-	resp, token, err := o.command.AddAccessAndRefreshToken(ctx, userOrgID, userAgentID, applicationID, req.GetSubject(),
-		refreshToken, req.GetAudience(), req.GetScopes(), authMethodsReferences, o.defaultAccessTokenLifetime,
+	scopes, err := o.assertProjectRoleScopes(ctx, applicationID, req.GetScopes())
+	if err != nil {
+		return "", "", time.Time{}, errors.ThrowPreconditionFailed(err, "OIDC-Df2fq", "Errors.Internal")
+	}
+	if request, ok := req.(op.RefreshTokenRequest); ok {
+		request.SetCurrentScopes(scopes)
+	}
+	resp, token, err := o.command.AddAccessAndRefreshToken(setContextUserSystem(ctx), userOrgID, userAgentID, applicationID, req.GetSubject(),
+		refreshToken, req.GetAudience(), scopes, authMethodsReferences, o.defaultAccessTokenLifetime,
 		o.defaultRefreshTokenIdleExpiration, o.defaultRefreshTokenExpiration, authTime) //PLANNED: lifetime from client
 	if err != nil {
 		if errors.IsErrorInvalidArgument(err) {
@@ -166,7 +165,10 @@ func (o *OPStorage) TerminateSession(ctx context.Context, userID, clientID strin
 	if len(userIDs) == 0 {
 		return nil
 	}
-	err = o.command.HumansSignOut(ctx, userAgentID, userIDs)
+	data := authz.CtxData{
+		UserID: userID,
+	}
+	err = o.command.HumansSignOut(authz.SetCtxData(ctx, data), userAgentID, userIDs)
 	logging.Log("OIDC-Dggt2").OnError(err).Error("error signing out")
 	return err
 }
@@ -200,24 +202,22 @@ func (o *OPStorage) RevokeToken(ctx context.Context, token, userID, clientID str
 	return oidc.ErrServerError().WithParent(err)
 }
 
-func (o *OPStorage) GetSigningKey(ctx context.Context, keyCh chan<- jose.SigningKey) {
-	o.repo.GetSigningKey(ctx, keyCh, o.signingKeyAlgorithm, key_model.KeyUsageSigning)
-}
-
-func (o *OPStorage) GetKeySet(ctx context.Context) (_ *jose.JSONWebKeySet, err error) {
-	ctx, span := tracing.NewSpan(ctx)
-	defer func() { span.EndWithError(err) }()
-	return o.repo.GetKeySet(ctx, key_model.KeyUsageSigning)
-}
-
-func (o *OPStorage) assertProjectRoleScopes(project *query.Project, scopes []string) ([]string, error) {
-	if !project.ProjectRoleAssertion {
-		return scopes, nil
-	}
+func (o *OPStorage) assertProjectRoleScopes(ctx context.Context, clientID string, scopes []string) ([]string, error) {
 	for _, scope := range scopes {
 		if strings.HasPrefix(scope, ScopeProjectRolePrefix) {
 			return scopes, nil
 		}
+	}
+	projectID, err := o.query.ProjectIDFromOIDCClientID(ctx, clientID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	project, err := o.query.ProjectByID(ctx, projectID)
+	if err != nil {
+		return nil, errors.ThrowPreconditionFailed(nil, "OIDC-w4wIn", "Errors.Internal")
+	}
+	if !project.ProjectRoleAssertion {
+		return scopes, nil
 	}
 	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(project.ID)
 	if err != nil {
@@ -231,4 +231,31 @@ func (o *OPStorage) assertProjectRoleScopes(project *query.Project, scopes []str
 		scopes = append(scopes, ScopeProjectRolePrefix+role.Key)
 	}
 	return scopes, nil
+}
+
+func (o *OPStorage) assertClientScopesForPAT(ctx context.Context, token *model.TokenView, clientID string) error {
+	token.Audience = append(token.Audience, clientID)
+	projectID, err := o.query.ProjectIDFromClientID(ctx, clientID)
+	if err != nil {
+		return errors.ThrowPreconditionFailed(nil, "OIDC-AEG4d", "Errors.Internal")
+	}
+	projectIDQuery, err := query.NewProjectRoleProjectIDSearchQuery(projectID)
+	if err != nil {
+		return errors.ThrowInternal(err, "OIDC-Cyc78", "Errors.Internal")
+	}
+	roles, err := o.query.SearchProjectRoles(context.TODO(), &query.ProjectRoleSearchQueries{Queries: []query.SearchQuery{projectIDQuery}})
+	if err != nil {
+		return err
+	}
+	for _, role := range roles.ProjectRoles {
+		token.Scopes = append(token.Scopes, ScopeProjectRolePrefix+role.Key)
+	}
+	return nil
+}
+
+func setContextUserSystem(ctx context.Context) context.Context {
+	data := authz.CtxData{
+		UserID: "SYSTEM",
+	}
+	return authz.SetCtxData(ctx, data)
 }

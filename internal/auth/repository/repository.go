@@ -9,11 +9,7 @@ type Repository interface {
 	UserRepository
 	AuthRequestRepository
 	TokenRepository
-	ApplicationRepository
-	KeyRepository
 	UserSessionRepository
-	UserGrantRepository
 	OrgRepository
-	IAMRepository
 	RefreshTokenRepository
 }

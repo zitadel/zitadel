@@ -6,6 +6,12 @@ export const ICONTYPE = {
   START: <div className="rounded rounded-start">
     <i className={`las la-play-circle`}></i>
   </div>,
+  TASKS: <div className="rounded rounded-start">
+  <i className={`las la-tasks`}></i>
+</div>,
+  ARCHITECTURE: <div className="rounded rounded-architecture">
+  <i className={`las la-sitemap`}></i>
+</div>,
   LOGIN: <div className="rounded rounded-login">
     <i className={`las la-sign-in-alt`}></i>
   </div>,
@@ -20,6 +26,15 @@ export const ICONTYPE = {
   </div>,
   SERVICE: <div className="rounded rounded-service">
   <i className={`las la-concierge-bell`}></i>
+  </div>,
+  STORAGE: <div className="rounded rounded-storage">
+  <i className={`las la-database`}></i>
+  </div>,
+  FOLDER: <div className="rounded rounded-storage">
+  <i className={`las la-folder`}></i>
+  </div>,
+  FILE: <div className="rounded rounded-storage">
+  <i className={`las la-file-alt`}></i>
   </div>,
   SYSTEM: <div className="rounded rounded-system">
     <i className={`las la-server`}></i>
@@ -58,11 +73,13 @@ export const ICONTYPE = {
   </div>,
 };
 
-export function ListElement({ link, iconClasses, type, title, description}) {
+export function ListElement({ link, iconClasses,roundClasses, label, type, title, description}) {
   return (
     <a className={styles.listelement} href={link}>
       {type ? type : 
-        iconClasses && <div><i className={`${styles.icon} ${iconClasses}`}></i></div>
+        iconClasses && <div className={roundClasses}>
+          { label ? <span className={styles.listlabel}>{label}</span>: <i className={`${iconClasses}`}></i> }
+        </div>
       }
       <div>
         <h3>{title}</h3>
@@ -75,8 +92,19 @@ export function ListElement({ link, iconClasses, type, title, description}) {
 export function ListWrapper({children, title, columns}) {
   return (
     <div className={styles.listWrapper}>
-      <span className={styles.listWrapperTitle}>{title}</span>
+      {title && <span className={styles.listWrapperTitle}>{title}</span>}
       {children}
+    </div>
+  )
+}
+
+export function HomeListWrapper({children, image}) {
+  return (
+    <div className={styles.homerow}>
+      {image}
+      <div className={styles.homecontent}>
+        {children}
+      </div>
     </div>
   )
 }

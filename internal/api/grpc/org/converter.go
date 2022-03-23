@@ -5,7 +5,6 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query"
-	grant_model "github.com/caos/zitadel/internal/usergrant/model"
 	org_pb "github.com/caos/zitadel/pkg/grpc/org"
 )
 
@@ -31,10 +30,10 @@ func OrgQueryToModel(apiQuery *org_pb.OrgQuery) (query.SearchQuery, error) {
 	}
 }
 
-func OrgQueriesToUserGrantModel(queries []*org_pb.OrgQuery) (_ []*grant_model.UserGrantSearchQuery, err error) {
-	q := make([]*grant_model.UserGrantSearchQuery, len(queries))
+func OrgQueriesToQuery(queries []*org_pb.OrgQuery) (_ []query.SearchQuery, err error) {
+	q := make([]query.SearchQuery, len(queries))
 	for i, query := range queries {
-		q[i], err = OrgQueryToUserGrantQueryModel(query)
+		q[i], err = OrgQueryToQuery(query)
 		if err != nil {
 			return nil, err
 		}
@@ -42,20 +41,12 @@ func OrgQueriesToUserGrantModel(queries []*org_pb.OrgQuery) (_ []*grant_model.Us
 	return q, nil
 }
 
-func OrgQueryToUserGrantQueryModel(query *org_pb.OrgQuery) (*grant_model.UserGrantSearchQuery, error) {
-	switch q := query.Query.(type) {
+func OrgQueryToQuery(search *org_pb.OrgQuery) (query.SearchQuery, error) {
+	switch q := search.Query.(type) {
 	case *org_pb.OrgQuery_DomainQuery:
-		return &grant_model.UserGrantSearchQuery{
-			Key:    grant_model.UserGrantSearchKeyOrgDomain,
-			Method: object.TextMethodToModel(q.DomainQuery.Method),
-			Value:  q.DomainQuery.Domain,
-		}, nil
+		return query.NewOrgDomainSearchQuery(object.TextMethodToQuery(q.DomainQuery.Method), q.DomainQuery.Domain)
 	case *org_pb.OrgQuery_NameQuery:
-		return &grant_model.UserGrantSearchQuery{
-			Key:    grant_model.UserGrantSearchKeyOrgName,
-			Method: object.TextMethodToModel(q.NameQuery.Method),
-			Value:  q.NameQuery.Name,
-		}, nil
+		return query.NewOrgNameSearchQuery(object.TextMethodToQuery(q.NameQuery.Method), q.NameQuery.Name)
 	default:
 		return nil, errors.ThrowInvalidArgument(nil, "ADMIN-ADvsd", "List.Query.Invalid")
 	}
@@ -71,9 +62,10 @@ func OrgViewsToPb(orgs []*query.Org) []*org_pb.Org {
 
 func OrgViewToPb(org *query.Org) *org_pb.Org {
 	return &org_pb.Org{
-		Id:    org.ID,
-		State: OrgStateToPb(org.State),
-		Name:  org.Name,
+		Id:            org.ID,
+		State:         OrgStateToPb(org.State),
+		Name:          org.Name,
+		PrimaryDomain: org.Domain,
 		Details: object.ToViewDetailsPb(
 			org.Sequence,
 			org.CreationDate,
@@ -83,7 +75,7 @@ func OrgViewToPb(org *query.Org) *org_pb.Org {
 	}
 }
 
-func OrgsToPb(orgs []*grant_model.Org) []*org_pb.Org {
+func OrgsToPb(orgs []*query.Org) []*org_pb.Org {
 	o := make([]*org_pb.Org, len(orgs))
 	for i, org := range orgs {
 		o[i] = OrgToPb(org)
@@ -91,17 +83,13 @@ func OrgsToPb(orgs []*grant_model.Org) []*org_pb.Org {
 	return o
 }
 
-func OrgToPb(org *grant_model.Org) *org_pb.Org {
+func OrgToPb(org *query.Org) *org_pb.Org {
 	return &org_pb.Org{
-		Id:   org.OrgID,
-		Name: org.OrgName,
-		// State: OrgStateToPb(org.State), //TODO: not provided
-		// Details: object.ChangeToDetailsPb(//TODO: not provided
-		// 	org.Sequence,//TODO: not provided
-		// 	org.CreationDate,//TODO: not provided
-		// 	org.EventDate,//TODO: not provided
-		// 	org.ResourceOwner,//TODO: not provided
-		// ),//TODO: not provided
+		Id:            org.ID,
+		Name:          org.Name,
+		PrimaryDomain: org.Domain,
+		Details:       object.ToViewDetailsPb(org.Sequence, org.CreationDate, org.ChangeDate, org.ResourceOwner),
+		State:         OrgStateToPb(org.State),
 	}
 }
 

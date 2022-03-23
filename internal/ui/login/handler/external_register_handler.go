@@ -111,12 +111,15 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	iam, err := l.authRepo.GetIAM(r.Context())
+	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
 	}
 	resourceOwner := iam.GlobalOrgID
+	if authReq.RequestedOrgID != "" {
+		resourceOwner = authReq.RequestedOrgID
+	}
 	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
@@ -134,7 +137,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *iam_model.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := iam.GlobalOrgID
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
@@ -155,11 +158,12 @@ func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
 	}
+
 	data := externalRegisterData{
 		baseData: l.getBaseData(r, authReq, "ExternalRegisterOverview", errID, errMessage),
 		externalRegisterFormData: externalRegisterFormData{
 			Email:     human.EmailAddress,
-			Username:  human.PreferredLoginName,
+			Username:  human.Username,
 			Firstname: human.FirstName,
 			Lastname:  human.LastName,
 			Nickname:  human.NickName,
@@ -190,7 +194,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	iam, err := l.authRepo.GetIAM(r.Context())
+	iam, err := l.query.IAMByID(r.Context(), domain.IAMID)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -227,6 +231,9 @@ func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPol
 		if tokens.IDTokenClaims.IsEmailVerified() && tokens.IDTokenClaims.GetEmail() != "" {
 			username = tokens.IDTokenClaims.GetEmail()
 		}
+	}
+	if username == "" {
+		username = tokens.IDTokenClaims.GetEmail()
 	}
 
 	if orgIamPolicy.UserLoginMustBeDomain {

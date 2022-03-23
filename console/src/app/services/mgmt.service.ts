@@ -50,6 +50,8 @@ import {
   AddOrgOIDCIDPResponse,
   AddOrgRequest,
   AddOrgResponse,
+  AddPersonalAccessTokenRequest,
+  AddPersonalAccessTokenResponse,
   AddProjectGrantMemberRequest,
   AddProjectGrantMemberResponse,
   AddProjectGrantRequest,
@@ -74,6 +76,8 @@ import {
   ClearFlowResponse,
   CreateActionRequest,
   CreateActionResponse,
+  DeactivateActionRequest,
+  DeactivateActionResponse,
   DeactivateAppRequest,
   DeactivateAppResponse,
   DeactivateOrgIDPRequest,
@@ -212,6 +216,8 @@ import {
   ListOrgMemberRolesResponse,
   ListOrgMembersRequest,
   ListOrgMembersResponse,
+  ListPersonalAccessTokensRequest,
+  ListPersonalAccessTokensResponse,
   ListProjectChangesRequest,
   ListProjectChangesResponse,
   ListProjectGrantMemberRolesRequest,
@@ -238,6 +244,8 @@ import {
   ListUserMetadataResponse,
   ListUsersRequest,
   ListUsersResponse,
+  ReactivateActionRequest,
+  ReactivateActionResponse,
   ReactivateAppRequest,
   ReactivateAppResponse,
   ReactivateOrgIDPRequest,
@@ -290,6 +298,8 @@ import {
   RemoveOrgIDPResponse,
   RemoveOrgMemberRequest,
   RemoveOrgMemberResponse,
+  RemovePersonalAccessTokenRequest,
+  RemovePersonalAccessTokenResponse,
   RemoveProjectGrantMemberRequest,
   RemoveProjectGrantMemberResponse,
   RemoveProjectGrantRequest,
@@ -899,32 +909,36 @@ export class ManagementService {
     return this.grpcService.mgmt.listHumanLinkedIDPs(req, null).then((resp) => resp.toObject());
   }
 
-  public getAction(
-    id: string,
-  ): Promise<GetActionResponse.AsObject> {
+  public getAction(id: string): Promise<GetActionResponse.AsObject> {
     const req = new GetActionRequest();
     req.setId(id);
-    return this.grpcService.mgmt.getAction(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.getAction(req, null).then((resp) => resp.toObject());
   }
 
-  public createAction(
-    req: CreateActionRequest,
-  ): Promise<CreateActionResponse.AsObject> {
-    return this.grpcService.mgmt.createAction(req, null).then(resp => resp.toObject());
+  public createAction(req: CreateActionRequest): Promise<CreateActionResponse.AsObject> {
+    return this.grpcService.mgmt.createAction(req, null).then((resp) => resp.toObject());
   }
 
-  public updateAction(
-    req: UpdateActionRequest,
-  ): Promise<UpdateActionResponse.AsObject> {
-    return this.grpcService.mgmt.updateAction(req, null).then(resp => resp.toObject());
+  public updateAction(req: UpdateActionRequest): Promise<UpdateActionResponse.AsObject> {
+    return this.grpcService.mgmt.updateAction(req, null).then((resp) => resp.toObject());
   }
 
-  public deleteAction(
-    id: string,
-  ): Promise<DeleteActionResponse.AsObject> {
+  public deleteAction(id: string): Promise<DeleteActionResponse.AsObject> {
     const req = new DeleteActionRequest();
     req.setId(id);
-    return this.grpcService.mgmt.deleteAction(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.deleteAction(req, null).then((resp) => resp.toObject());
+  }
+
+  public deactivateAction(id: string): Promise<DeactivateActionResponse.AsObject> {
+    const req = new DeactivateActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.deactivateAction(req, null).then((resp) => resp.toObject());
+  }
+
+  public reactivateAction(id: string): Promise<ReactivateActionResponse.AsObject> {
+    const req = new ReactivateActionRequest();
+    req.setId(id);
+    return this.grpcService.mgmt.reactivateAction(req, null).then((resp) => resp.toObject());
   }
 
   public listActions(
@@ -949,23 +963,19 @@ export class ManagementService {
       metadata.setAsc(asc);
     }
     req.setQuery(metadata);
-    return this.grpcService.mgmt.listActions(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.listActions(req, null).then((resp) => resp.toObject());
   }
 
-  public getFlow(
-    type: FlowType
-  ): Promise<GetFlowResponse.AsObject> {
+  public getFlow(type: FlowType): Promise<GetFlowResponse.AsObject> {
     const req = new GetFlowRequest();
     req.setType(type);
-    return this.grpcService.mgmt.getFlow(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.getFlow(req, null).then((resp) => resp.toObject());
   }
 
-  public clearFlow(
-    type: FlowType
-  ): Promise<ClearFlowResponse.AsObject> {
+  public clearFlow(type: FlowType): Promise<ClearFlowResponse.AsObject> {
     const req = new ClearFlowRequest();
     req.setType(type);
-    return this.grpcService.mgmt.clearFlow(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.clearFlow(req, null).then((resp) => resp.toObject());
   }
 
   public setTriggerActions(
@@ -977,7 +987,45 @@ export class ManagementService {
     req.setActionIdsList(actionIdsList);
     req.setFlowType(type);
     req.setTriggerType(triggerType);
-    return this.grpcService.mgmt.setTriggerActions(req, null).then(resp => resp.toObject());
+    return this.grpcService.mgmt.setTriggerActions(req, null).then((resp) => resp.toObject());
+  }
+
+  public addPersonalAccessToken(userId: string, date?: Timestamp): Promise<AddPersonalAccessTokenResponse.AsObject> {
+    const req = new AddPersonalAccessTokenRequest();
+    req.setUserId(userId);
+    if (date) {
+      req.setExpirationDate(date);
+    }
+    return this.grpcService.mgmt.addPersonalAccessToken(req, null).then((resp) => resp.toObject());
+  }
+
+  public removePersonalAccessToken(tokenId: string, userId: string): Promise<RemovePersonalAccessTokenResponse.AsObject> {
+    const req = new RemovePersonalAccessTokenRequest();
+    req.setTokenId(tokenId);
+    req.setUserId(userId);
+    return this.grpcService.mgmt.removePersonalAccessToken(req, null).then((resp) => resp.toObject());
+  }
+
+  public listPersonalAccessTokens(
+    userId: string,
+    limit?: number,
+    offset?: number,
+    asc?: boolean,
+  ): Promise<ListPersonalAccessTokensResponse.AsObject> {
+    const req = new ListPersonalAccessTokensRequest();
+    const metadata = new ListQuery();
+    req.setUserId(userId);
+    if (limit) {
+      metadata.setLimit(limit);
+    }
+    if (offset) {
+      metadata.setOffset(offset);
+    }
+    if (asc) {
+      metadata.setAsc(asc);
+    }
+    req.setQuery(metadata);
+    return this.grpcService.mgmt.listPersonalAccessTokens(req, null).then((resp) => resp.toObject());
   }
 
   public getIAM(): Promise<GetIAMResponse.AsObject> {
@@ -1468,10 +1516,13 @@ export class ManagementService {
     return this.grpcService.mgmt.getHumanEmail(req, null).then((resp) => resp.toObject());
   }
 
-  public updateHumanEmail(userId: string, email: string): Promise<UpdateHumanEmailResponse.AsObject> {
+  public updateHumanEmail(userId: string, email: string, isVerified?: boolean): Promise<UpdateHumanEmailResponse.AsObject> {
     const req = new UpdateHumanEmailRequest();
     req.setUserId(userId);
     req.setEmail(email);
+    if (isVerified) {
+      req.setIsEmailVerified(isVerified);
+    }
     return this.grpcService.mgmt.updateHumanEmail(req, null).then((resp) => resp.toObject());
   }
 

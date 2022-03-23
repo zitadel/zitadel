@@ -2,6 +2,7 @@ package command
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -31,7 +32,7 @@ func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, policy *domain.P
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events)
+	pushedEvents, err := c.eventstore.Push(ctx, events)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +43,7 @@ func (c *Commands) AddDefaultPrivacyPolicy(ctx context.Context, policy *domain.P
 	return writeModelToPrivacyPolicy(&addedPolicy.PrivacyPolicyWriteModel), nil
 }
 
-func (c *Commands) addDefaultPrivacyPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPrivacyPolicyWriteModel, policy *domain.PrivacyPolicy) (eventstore.EventPusher, error) {
+func (c *Commands) addDefaultPrivacyPolicy(ctx context.Context, iamAgg *eventstore.Aggregate, addedPolicy *IAMPrivacyPolicyWriteModel, policy *domain.PrivacyPolicy) (eventstore.Command, error) {
 	err := c.eventstore.FilterToQueryReducer(ctx, addedPolicy)
 	if err != nil {
 		return nil, err
@@ -51,7 +52,7 @@ func (c *Commands) addDefaultPrivacyPolicy(ctx context.Context, iamAgg *eventsto
 		return nil, caos_errs.ThrowAlreadyExists(nil, "IAM-M00rJ", "Errors.IAM.PrivacyPolicy.AlreadyExists")
 	}
 
-	return iam_repo.NewPrivacyPolicyAddedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink), nil
+	return iam_repo.NewPrivacyPolicyAddedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink), nil
 }
 
 func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domain.PrivacyPolicy) (*domain.PrivacyPolicy, error) {
@@ -64,11 +65,11 @@ func (c *Commands) ChangeDefaultPrivacyPolicy(ctx context.Context, policy *domai
 	}
 
 	iamAgg := IAMAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, iamAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-4M9vs", "Errors.IAM.LabelPolicy.NotChanged")
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

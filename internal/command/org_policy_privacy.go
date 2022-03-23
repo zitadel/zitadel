@@ -42,13 +42,14 @@ func (c *Commands) AddPrivacyPolicy(ctx context.Context, resourceOwner string, p
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&addedPolicy.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(
+	pushedEvents, err := c.eventstore.Push(
 		ctx,
 		org.NewPrivacyPolicyAddedEvent(
 			ctx,
 			orgAgg,
 			policy.TOSLink,
-			policy.PrivacyLink))
+			policy.PrivacyLink,
+			policy.HelpLink))
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +75,12 @@ func (c *Commands) ChangePrivacyPolicy(ctx context.Context, resourceOwner string
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PrivacyPolicyWriteModel.WriteModel)
-	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink)
+	changedEvent, hasChanged := existingPolicy.NewChangedEvent(ctx, orgAgg, policy.TOSLink, policy.PrivacyLink, policy.HelpLink)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Org-4N9fs", "Errors.Org.PrivacyPolicy.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +100,7 @@ func (c *Commands) RemovePrivacyPolicy(ctx context.Context, orgID string) (*doma
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, event)
+	pushedEvents, err := c.eventstore.Push(ctx, event)
 	if err != nil {
 		return nil, err
 	}

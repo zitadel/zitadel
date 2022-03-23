@@ -194,8 +194,11 @@
     },
     "DIALOG": {
       "DELETE_TITLE": "Delete User",
+      "DELETE_SELF_TITLE": "Delete Account",
       "DELETE_DESCRIPTION": "You are about to permanently delete a user. Are you sure?",
+      "DELETE_SELF_DESCRIPTION": "You are about to permanently delete your personal account. This will log you out and delete your user. This action cannot be undone!",
       "DELETE_AUTH_DESCRIPTION": "You are about to permanently delete your personal account. Are you sure?",
+      "TYPEUSERNAME": "Type '{{value}}', to confirm and delete the user.",
       "DELETE_BTN": "Delete permanently"
     },
     "SENDEMAILDIALOG": {
@@ -325,7 +328,8 @@
       "GENDERLANGSECTION": "Gender and Language",
       "PHONESECTION": "Phonenumbers",
       "PASSWORDSECTION": "Initial Password",
-      "ADDRESSANDPHONESECTION": "Phonenumber"
+      "ADDRESSANDPHONESECTION": "Phonenumber",
+      "INITMAILDESCRIPTION": "If both options are selected, no email for initialization will be sent. If only one of the options is selected, a mail to provide / verify the data will be sent."
     },
     "CODEDIALOG": {
       "TITLE": "Verify Phone Number",
@@ -374,6 +378,8 @@
       "DESCRIPTION": "Description",
       "KEYSTITLE": "Keys",
       "KEYSDESC": "Define your keys and add an optional expiration date.",
+      "TOKENSTITLE": "Access Tokens",
+      "TOKENSDESC": "Personal access tokens function like ordinary OAuth access tokens.",
       "ID": "Key ID",
       "TYPE": "Type",
       "EXPIRATIONDATE": "Expiration date",
@@ -399,6 +405,8 @@
       "OLD": "Current Password",
       "NEW": "New Password",
       "CONFIRM": "Confirm New Password",
+      "NEWINITIAL": "Password",
+      "CONFIRMINITIAL": "Confirm Password",
       "RESET": "Reset Current Password",
       "SET": "Set New Password",
       "RESENDNOTIFICATION": "Resend Password Reset Link",
@@ -419,6 +427,8 @@
       "EMAIL": {
         "TITLE": "E-mail",
         "VALID": "validated",
+        "ISVERIFIED": "Email Verified",
+        "ISVERIFIEDDESC": "If the email is indicated as verified, no email verification request will be made.",
         "RESEND": "Resend Verification E-mail",
         "EDITTITLE": "Change Email",
         "EDITDESC": "Enter the new email in the field below."
@@ -525,6 +535,25 @@
         "PROJECT": "Project",
         "GRANTEDPROJECT": "Granted Project"
       }
+    },
+    "PERSONALACCESSTOKEN": {
+      "ID": "ID",
+      "TOKEN": "Token",
+      "ADD": {
+        "TITLE": "Generate new Personal Access Token",
+        "DESCRIPTION": "Define a custom expiration for the token.",
+        "CHOOSEEXPIRY": "Select an expiration date",
+        "CHOOSEDATEAFTER": "Enter a valid expiration after"
+      },
+      "ADDED": {
+        "TITLE": "Personal Access Token",
+        "DESCRIPTION": "Make sure to copy your personal access token. You won't be able to see it again!"
+      },
+      "DELETE": {
+        "TITLE": "Delete Token",
+        "DESCRIPTION": "You are about to delete the personal access token. Are you sure?"
+      },
+      "DELETED": "Token deleted with success."
     }
   },
   "FLOWS": {
@@ -556,6 +585,7 @@
     "FLOWTYPE": "Flow Type",
     "TRIGGERTYPE": "Trigger Type",
     "ACTIONS": "Actions",
+    "ACTIONSMAX": "Based on your Tier, you have available a limited Number of Actions ({{value}}). Make sure to deaktivate those you are not in need or consider upgrading your tier.",
     "DIALOG": {
       "ADD": {
         "TITLE": "Create an Action"
@@ -573,7 +603,9 @@
       }
     },
     "TOAST": {
-      "ACTIONSSET": "Actions set"
+      "ACTIONSSET": "Actions set",
+      "ACTIONREACTIVATED": "Actions reactivated with success",
+      "ACTIONDEACTIVATED": "Actions deactivated with success"
     }
   },
   "IAM": {
@@ -639,6 +671,7 @@
       "LISTDESCRIPTION": "Choose an organisation.",
       "ACTIVE": "Active",
       "CREATE": "Create Organisation",
+      "USERSELFACCOUNT": "Use your personal account as organisation owner",
       "ORGDETAIL_TITLE": "Enter the name and domain of your new organisation.",
       "ORGDETAIL_TITLE_WITHOUT_DOMAIN": "Enter the name of your new organisation.",
       "ORGDETAILUSER_TITLE": "Configure Organisation Owner",
@@ -662,7 +695,8 @@
       "SELECTORGTOOLTIP": "Select this organisation.",
       "PRIMARYDOMAIN": "Primary Domain",
       "STATE": "State",
-      "USEPASSWORD": "Set Initial Password"
+      "USEPASSWORD": "Set Initial Password",
+      "USEPASSWORDDESC": "The user does not have to set the password during initialization."
     },
     "DOMAINS": {
       "NEW": "Add Domain",
@@ -746,7 +780,16 @@
       "CUSTOMTEXTMESSAGE": "Custom notification mail texts",
       "PRIVACYPOLICY": "Custom Privacy Policy and TOS Links",
       "METADATAUSER": "User Metadata",
-      "FLOWS": "Actions and Flows"
+      "FLOWS": "Actions and Flows",
+      "FLOW": {
+        "ACTIONSALLOWED": {
+          "0": "Not allowed",
+          "1": "Limited Actions",
+          "2": "Unlimited Actions"
+        },
+        "TYPE": "Type of use",
+        "COUNT": "Number"
+      }
     },
     "TIERSTATES": {
       "0": "Active",
@@ -830,6 +873,7 @@
       "DESCRIPTION": "Set your Privacy Policy and Terms of Service Links",
       "TOSLINK": "Link to Terms of Service",
       "POLICYLINK": "Link to Privacy Policy",
+      "HELPLINK": "Link to Help",
       "SAVED": "Saved successfully!",
       "RESET_TITLE": "Restore Default Values",
       "RESET_DESCRIPTION": "You are about to restore the default Links for TOS and Privacy Policy. Do you really want to continue?"
@@ -1162,7 +1206,7 @@
       "OPTIONS": "Options",
       "ASSERTION": "Assert Roles on Authentication",
       "ASSERTION_DESCRIPTION": "Role information is sent from Userinfo endpoint and depending on your application settings in tokens and other types.",
-      "CHECK": "Check roles on Authentication",
+      "CHECK": "Check authorization on Authentication",
       "CHECK_DESCRIPTION": "If set, users are only allowed to authenticate if any role is assigned to their account."
     },
     "HAS_PROJECT": "Check for Project on Authentication",
@@ -1189,13 +1233,15 @@
       "MEMBERSADDED": "Managers added.",
       "MEMBERADDED": "Manager added.",
       "MEMBERCHANGED": "Manager changed.",
+      "ROLESCREATED": "Roles created.",
       "ROLEREMOVED": "Role removed.",
       "ROLECHANGED": "Role changed.",
       "REACTIVATED": "Reactivated.",
       "DEACTIVATED": "Deactivated.",
+      "CREATED": "Project created.",
       "UPDATED": "Project changed.",
       "GRANTUPDATED": "Grant changed.",
-      "DELETED": "Deleted Project."
+      "DELETED": "Project deleted."
     }
   },
   "NEXTSTEPS": {
@@ -1529,6 +1575,7 @@
       "OIDCUPDATED": "OIDC configuration updated.",
       "APIUPDATED": "API configuration updated",
       "UPDATED": "App updated.",
+      "CREATED": "App created.",
       "CLIENTSECRETREGENERATED": "client secret generated.",
       "DELETED": "App deleted.",
       "CONFIGCHANGED": "Changes detected!"

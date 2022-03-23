@@ -1,5 +1,7 @@
 package backup
 
+/* Deprecated in V2
+
 import (
 	"github.com/caos/zitadel/operator/common"
 	"github.com/caos/zitadel/operator/helpers"
@@ -197,3 +199,4 @@ func TestBackup_JobSpec2(t *testing.T) {
 		command,
 	))
 }
+*/

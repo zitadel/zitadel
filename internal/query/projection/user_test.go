@@ -14,12 +14,12 @@ import (
 
 func TestUserProjection_reduces(t *testing.T) {
 	type args struct {
-		event func(t *testing.T) eventstore.EventReader
+		event func(t *testing.T) eventstore.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		reduce func(event eventstore.EventReader) (*handler.Statement, error)
+		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
 	}{
 		{
@@ -50,15 +50,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
+								domain.UserTypeHuman,
 							},
 						},
 						{
@@ -107,15 +108,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
+								domain.UserTypeHuman,
 							},
 						},
 						{
@@ -159,15 +161,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
+								domain.UserTypeHuman,
 							},
 						},
 						{
@@ -216,15 +219,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
+								domain.UserTypeHuman,
 							},
 						},
 						{
@@ -273,15 +277,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
+								domain.UserTypeHuman,
 							},
 						},
 						{
@@ -325,15 +330,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"user-name",
+								domain.UserTypeHuman,
 							},
 						},
 						{
@@ -348,6 +354,118 @@ func TestUserProjection_reduces(t *testing.T) {
 								&sql.NullInt16{},
 								"email@zitadel.ch",
 								&sql.NullString{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceHumanInitCodeAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanInitialCodeAddedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitialCodeAddedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeAdded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateInitial,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1InitCodeAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1InitialCodeAddedType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitialCodeAddedEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeAdded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateInitial,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceHumanInitCodeSucceeded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.HumanInitializedCheckSucceededType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitializedCheckSucceededEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeSucceeded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateActive,
+								"agg-id",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "reduceUserV1InitCodeAdded",
+			args: args{
+				event: getEvent(testEvent(
+					repository.EventType(user.UserV1InitializedCheckSucceededType),
+					user.AggregateType,
+					[]byte(`{}`),
+				), user.HumanInitializedCheckSucceededEventMapper),
+			},
+			reduce: (&UserProjection{}).reduceHumanInitCodeSucceeded,
+			want: wantReduce{
+				aggregateType:    user.AggregateType,
+				sequence:         15,
+				previousSequence: 10,
+				projection:       UserTable,
+				executer: &testExecuter{
+					executions: []execution{
+						{
+							expectedStmt: "UPDATE zitadel.projections.users SET (state) = ($1) WHERE (id = $2)",
+							expectedArgs: []interface{}{
+								domain.UserStateActive,
+								"agg-id",
 							},
 						},
 					},
@@ -1031,7 +1149,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (avater_key) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								"users/agg-id/avatar",
 								"agg-id",
@@ -1067,7 +1185,7 @@ func TestUserProjection_reduces(t *testing.T) {
 							},
 						},
 						{
-							expectedStmt: "UPDATE zitadel.projections.users_humans SET (avater_key) = ($1) WHERE (user_id = $2)",
+							expectedStmt: "UPDATE zitadel.projections.users_humans SET (avatar_key) = ($1) WHERE (user_id = $2)",
 							expectedArgs: []interface{}{
 								nil,
 								"agg-id",
@@ -1098,15 +1216,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"username",
+								domain.UserTypeMachine,
 							},
 						},
 						{
@@ -1143,15 +1262,16 @@ func TestUserProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO zitadel.projections.users (id, creation_date, change_date, resource_owner, state, sequence, username, type) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
 								anyArg{},
 								anyArg{},
 								"ro-id",
-								domain.UserStateInitial,
+								domain.UserStateActive,
 								uint64(15),
 								"username",
+								domain.UserTypeMachine,
 							},
 						},
 						{

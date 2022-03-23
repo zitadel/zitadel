@@ -11,9 +11,7 @@ import (
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	org_model "github.com/caos/zitadel/internal/org/model"
 	"github.com/caos/zitadel/internal/query"
-	usr_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -35,17 +33,17 @@ func (s *Server) GetOrgByDomainGlobal(ctx context.Context, req *mgmt_pb.GetOrgBy
 }
 
 func (s *Server) ListOrgChanges(ctx context.Context, req *mgmt_pb.ListOrgChangesRequest) (*mgmt_pb.ListOrgChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
 	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	response, err := s.org.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, features.AuditLogRetention)
+	response, err := s.query.OrgChanges(ctx, authz.GetCtxData(ctx).OrgID, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgChangesResponse{
-		Result: change_grpc.OrgChangesToPb(response.Changes),
+		Result: change_grpc.ChangesToPb(response.Changes, s.assetAPIPrefix),
 	}, nil
 }
 
@@ -209,40 +207,32 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 }
 
 func (s *Server) ListOrgMemberRoles(ctx context.Context, req *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	roles := s.org.GetOrgMemberRoles()
+	iam, err := s.query.IAMByID(ctx, domain.IAMID)
+	if err != nil {
+		return nil, err
+	}
+	roles := s.query.GetOrgMemberRoles(authz.GetCtxData(ctx).OrgID == iam.GlobalOrgID)
 	return &mgmt_pb.ListOrgMemberRolesResponse{
 		Result: roles,
 	}, nil
 }
 
 func (s *Server) ListOrgMembers(ctx context.Context, req *mgmt_pb.ListOrgMembersRequest) (*mgmt_pb.ListOrgMembersResponse, error) {
-	queries, err := ListOrgMembersRequestToModel(req)
+	queries, err := ListOrgMembersRequestToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	members, err := s.org.SearchMyOrgMembers(ctx, queries)
+	members, err := s.query.OrgMembers(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListOrgMembersResponse{
-		Result: member_grpc.OrgMembersToPb(members.Result),
+		Result: member_grpc.MembersToPb(s.assetAPIPrefix, members.Members),
 		Details: object.ToListDetails(
-			members.TotalResult,
+			members.Count,
 			members.Sequence,
 			members.Timestamp,
 		),
-	}, nil
-}
-
-func ListOrgMembersRequestToModel(req *mgmt_pb.ListOrgMembersRequest) (*org_model.OrgMemberSearchRequest, error) {
-	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := member_grpc.MemberQueriesToOrgMember(req.Queries)
-	return &org_model.OrgMemberSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
 	}, nil
 }
 
@@ -285,29 +275,25 @@ func (s *Server) RemoveOrgMember(ctx context.Context, req *mgmt_pb.RemoveOrgMemb
 }
 
 func (s *Server) getClaimedUserIDsOfOrgDomain(ctx context.Context, orgDomain, orgID string) ([]string, error) {
-	queries := []*usr_model.UserSearchQuery{
-		{
-			Key:    usr_model.UserSearchKeyPreferredLoginName,
-			Method: domain.SearchMethodEndsWithIgnoreCase,
-			Value:  "@" + orgDomain,
-		},
-	}
-	if orgID != "" {
-		queries = append(queries,
-			&usr_model.UserSearchQuery{
-				Key:    usr_model.UserSearchKeyResourceOwner,
-				Method: domain.SearchMethodNotEquals,
-				Value:  orgID,
-			})
-	}
-	users, err := s.user.SearchUsers(ctx, &usr_model.UserSearchRequest{
-		Queries: queries,
-	}, false)
+	queries := make([]query.SearchQuery, 0, 2)
+	loginName, err := query.NewUserPreferredLoginNameSearchQuery("@"+orgDomain, query.TextEndsWithIgnoreCase)
 	if err != nil {
 		return nil, err
 	}
-	userIDs := make([]string, len(users.Result))
-	for i, user := range users.Result {
+	queries = append(queries, loginName)
+	if orgID != "" {
+		owner, err := query.NewUserResourceOwnerSearchQuery(orgID, query.TextNotEquals)
+		if err != nil {
+			return nil, err
+		}
+		queries = append(queries, owner)
+	}
+	users, err := s.query.SearchUsers(ctx, &query.UserSearchQueries{Queries: queries})
+	if err != nil {
+		return nil, err
+	}
+	userIDs := make([]string, len(users.Users))
+	for i, user := range users.Users {
 		userIDs[i] = user.ID
 	}
 	return userIDs, nil

@@ -25,7 +25,7 @@ func NewOrgLoginPolicyWriteModel(orgID string) *OrgLoginPolicyWriteModel {
 	}
 }
 
-func (wm *OrgLoginPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgLoginPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.LoginPolicyAddedEvent:

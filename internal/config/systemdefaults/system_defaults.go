@@ -1,13 +1,15 @@
 package systemdefaults
 
 import (
+	"github.com/caos/zitadel/internal/notification/channels/log"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/config/types"
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/notification/providers/chat"
-	"github.com/caos/zitadel/internal/notification/providers/email"
-	"github.com/caos/zitadel/internal/notification/providers/twilio"
+	"github.com/caos/zitadel/internal/notification/channels/chat"
+	"github.com/caos/zitadel/internal/notification/channels/fs"
+	"github.com/caos/zitadel/internal/notification/channels/smtp"
+	"github.com/caos/zitadel/internal/notification/channels/twilio"
 	"github.com/caos/zitadel/internal/notification/templates"
 )
 
@@ -69,7 +71,7 @@ type DomainVerification struct {
 type Notifications struct {
 	DebugMode    bool
 	Endpoints    Endpoints
-	Providers    Providers
+	Providers    Channels
 	TemplateData TemplateData
 }
 
@@ -81,10 +83,12 @@ type Endpoints struct {
 	PasswordlessRegistration string
 }
 
-type Providers struct {
-	Chat   chat.ChatConfig
-	Email  email.EmailConfig
-	Twilio twilio.TwilioConfig
+type Channels struct {
+	Chat       chat.ChatConfig
+	Email      smtp.EmailConfig
+	Twilio     twilio.TwilioConfig
+	FileSystem fs.FSConfig
+	Log        log.LogConfig
 }
 
 type TemplateData struct {

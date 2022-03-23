@@ -7,8 +7,6 @@ import (
 	"github.com/caos/zitadel/internal/api/grpc/server"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
-	"github.com/caos/zitadel/internal/management/repository"
-	"github.com/caos/zitadel/internal/management/repository/eventsourcing"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/pkg/grpc/management"
 )
@@ -23,29 +21,16 @@ type Server struct {
 	management.UnimplementedManagementServiceServer
 	command        *command.Commands
 	query          *query.Queries
-	project        repository.ProjectRepository
-	org            repository.OrgRepository
-	user           repository.UserRepository
-	usergrant      repository.UserGrantRepository
-	iam            repository.IamRepository
-	authZ          authz.Config
 	systemDefaults systemdefaults.SystemDefaults
+	assetAPIPrefix string
 }
 
-type Config struct {
-	Repository eventsourcing.Config
-}
-
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, sd systemdefaults.SystemDefaults) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, sd systemdefaults.SystemDefaults, assetAPIPrefix string) *Server {
 	return &Server{
 		command:        command,
 		query:          query,
-		project:        repo,
-		org:            repo,
-		user:           repo,
-		usergrant:      repo,
-		iam:            repo,
 		systemDefaults: sd,
+		assetAPIPrefix: assetAPIPrefix,
 	}
 }
 

@@ -18,19 +18,23 @@ import (
 type KeyProjection struct {
 	crdb.StatementHandler
 	encryptionAlgorithm crypto.EncryptionAlgorithm
+	keyChan             chan<- interface{}
+	certChan            chan<- interface{}
 }
 
 const (
 	KeyProjectionTable = "zitadel.projections.keys"
 	KeyPrivateTable    = KeyProjectionTable + "_" + privateKeyTableSuffix
 	KeyPublicTable     = KeyProjectionTable + "_" + publicKeyTableSuffix
+	CertificateTable   = KeyProjectionTable + "_" + certificateTableSuffix
 )
 
-func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig) (_ *KeyProjection, err error) {
+func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, keyConfig systemdefaults.KeyConfig, keyChan chan<- interface{}) (_ *KeyProjection, err error) {
 	p := &KeyProjection{}
 	config.ProjectionName = KeyProjectionTable
 	config.Reducers = p.reducers()
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
+	p.keyChan = keyChan
 	p.encryptionAlgorithm, err = crypto.NewAESCrypto(keyConfig.EncryptionConfig)
 	if err != nil {
 		return nil, err
@@ -70,18 +74,24 @@ const (
 	KeyPublicColumnID     = "id"
 	KeyPublicColumnExpiry = "expiry"
 	KeyPublicColumnKey    = "key"
+
+	certificateTableSuffix       = "certificate"
+	CertificateColumnID          = "id"
+	CertificateColumnExpiry      = "expiry"
+	CertificateColumnKey         = "key"
+	CertificateColumnCertificate = "certificate"
 )
 
-func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *KeyProjection) reduceKeyPairAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*keypair.AddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-GEdg3", "seq", event.Sequence(), "expectedType", keypair.AddedEventType).Error("wrong event type")
 		return nil, errors.ThrowInvalidArgument(nil, "HANDL-SAbr2", "reduce.wrong.event.type")
 	}
-	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) {
+	if e.PrivateKey.Expiry.Before(time.Now()) && e.PublicKey.Expiry.Before(time.Now()) && (e.Certificate == nil || ( e.Certificate != nil && e.Certificate.Expiry.Before(time.Now()))) {
 		return crdb.NewNoOpStatement(e), nil
 	}
-	creates := []func(eventstore.EventReader) crdb.Exec{
+	creates := []func(eventstore.Event) crdb.Exec{
 		crdb.AddCreateStatement(
 			[]handler.Column{
 				handler.NewCol(KeyColumnID, e.Aggregate().ID),
@@ -103,6 +113,9 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 			},
 			crdb.WithTableSuffix(privateKeyTableSuffix),
 		))
+		if p.keyChan != nil {
+			p.keyChan <- true
+		}
 	}
 	if e.PublicKey.Expiry.After(time.Now()) {
 		publicKey, err := crypto.Decrypt(e.PublicKey.Key, p.encryptionAlgorithm)
@@ -118,6 +131,20 @@ func (p *KeyProjection) reduceKeyPairAdded(event eventstore.EventReader) (*handl
 			},
 			crdb.WithTableSuffix(publicKeyTableSuffix),
 		))
+	}
+	if e.Certificate != nil && e.Certificate.Expiry.After(time.Now()) {
+		creates = append(creates, crdb.AddCreateStatement(
+			[]handler.Column{
+				handler.NewCol(CertificateColumnID, e.Aggregate().ID),
+				handler.NewCol(CertificateColumnExpiry, e.PrivateKey.Expiry),
+				handler.NewCol(CertificateColumnKey, e.PrivateKey.Key),
+				handler.NewCol(CertificateColumnCertificate, e.Certificate.Key),
+			},
+			crdb.WithTableSuffix(certificateTableSuffix),
+		))
+		if p.certChan != nil {
+			p.certChan <- true
+		}
 	}
 	return crdb.NewMultiStatement(e, creates...), nil
 }

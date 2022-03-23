@@ -141,7 +141,7 @@ const (
 	AppSAMLConfigColumnMetadataURL = "metadata_url"
 )
 
-func (p *AppProjection) reduceAppAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAppAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-OzK4m", "seq", event.Sequence(), "expectedType", project.ApplicationAddedType).Error("wrong event type")
@@ -162,7 +162,7 @@ func (p *AppProjection) reduceAppAdded(event eventstore.EventReader) (*handler.S
 	), nil
 }
 
-func (p *AppProjection) reduceAppChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAppChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-4Fjh2", "seq", event.Sequence(), "expectedType", project.ApplicationChangedType).Error("wrong event type")
@@ -184,7 +184,7 @@ func (p *AppProjection) reduceAppChanged(event eventstore.EventReader) (*handler
 	), nil
 }
 
-func (p *AppProjection) reduceAppDeactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAppDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationDeactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-hZ9to", "seq", event.Sequence(), "expectedType", project.ApplicationDeactivatedType).Error("wrong event type")
@@ -203,7 +203,7 @@ func (p *AppProjection) reduceAppDeactivated(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *AppProjection) reduceAppReactivated(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAppReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationReactivatedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-AbK3B", "seq", event.Sequence(), "expectedType", project.ApplicationReactivatedType).Error("wrong event type")
@@ -222,7 +222,7 @@ func (p *AppProjection) reduceAppReactivated(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *AppProjection) reduceAppRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAppRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-tdRId", "seq", event.Sequence(), "expectedType", project.ApplicationRemovedType).Error("wrong event type")
@@ -236,7 +236,7 @@ func (p *AppProjection) reduceAppRemoved(event eventstore.EventReader) (*handler
 	), nil
 }
 
-func (p *AppProjection) reduceProjectRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-ZxQnj", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
@@ -250,7 +250,7 @@ func (p *AppProjection) reduceProjectRemoved(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *AppProjection) reduceAPIConfigAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-tdRId", "seq", event.Sequence(), "expectedType", project.APIConfigAddedType).Error("wrong event type")
@@ -279,7 +279,7 @@ func (p *AppProjection) reduceAPIConfigAdded(event eventstore.EventReader) (*han
 	), nil
 }
 
-func (p *AppProjection) reduceAPIConfigChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-C6b4f", "seq", event.Sequence(), "expectedType", project.APIConfigChangedType).Error("wrong event type")
@@ -316,7 +316,7 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.EventReader) (*h
 	), nil
 }
 
-func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigSecretChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-dssSI", "seq", event.Sequence(), "expectedType", project.APIConfigSecretChangedType).Error("wrong event type")
@@ -345,7 +345,7 @@ func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.EventReade
 	), nil
 }
 
-func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-nlDQv", "seq", event.Sequence(), "expectedType", project.OIDCConfigAddedType).Error("wrong event type")
@@ -387,7 +387,7 @@ func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-nlDQv", "seq", event.Sequence(), "expectedType", project.OIDCConfigChangedType).Error("wrong event type")
@@ -463,7 +463,7 @@ func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.EventReader) (*
 	), nil
 }
 
-func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigSecretChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-nlDQv", "seq", event.Sequence(), "expectedType", project.OIDCConfigSecretChangedType).Error("wrong event type")
@@ -492,7 +492,7 @@ func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.EventRead
 	), nil
 }
 
-func (p *AppProjection) reduceSAMLConfigAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceSAMLConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.SAMLConfigAddedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-nlDOv", "seq", event.Sequence(), "expectedType", project.SAMLConfigAddedType).Error("wrong event type")
@@ -521,7 +521,7 @@ func (p *AppProjection) reduceSAMLConfigAdded(event eventstore.EventReader) (*ha
 	), nil
 }
 
-func (p *AppProjection) reduceSAMLConfigChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *AppProjection) reduceSAMLConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.SAMLConfigChangedEvent)
 	if !ok {
 		logging.LogWithFields("HANDL-nlDOv", "seq", event.Sequence(), "expectedType", project.SAMLConfigChangedType).Error("wrong event type")

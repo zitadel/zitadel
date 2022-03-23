@@ -2,15 +2,17 @@ package configuration
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 
 	"github.com/caos/orbos/pkg/secret/read"
 
 	"github.com/caos/orbos/pkg/kubernetes"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 )
 
 const (
@@ -19,9 +21,8 @@ const (
 
 func literalsConfigMap(
 	desired *Configuration,
-	users map[string]string,
+	dbConn db.Connection,
 	certPath, secretPath, googleServiceAccountJSONPath, zitadelKeysPath string,
-	queried map[string]interface{},
 ) map[string]string {
 
 	tls := ""
@@ -29,6 +30,12 @@ func literalsConfigMap(
 		tls = "TRUE"
 	} else {
 		tls = "FALSE"
+	}
+
+	crSSL := dbConn.SSL()
+	sslMode := "disable"
+	if crSSL.RootCert {
+		sslMode = "verify-full"
 	}
 
 	literalsConfigMap := map[string]string{
@@ -39,15 +46,13 @@ func literalsConfigMap(
 		"ZITADEL_MIGRATE_ES_V1":          strconv.FormatBool(desired.MigrateEventStoreV1),
 		"SMTP_TLS":                       tls,
 		"CAOS_OIDC_DEV":                  "true",
-		"CR_SSL_MODE":                    "require",
-		"CR_ROOT_CERT":                   certPath + "/ca.crt",
-	}
-
-	if users != nil {
-		for user := range users {
-			literalsConfigMap["CR_"+strings.ToUpper(user)+"_CERT"] = certPath + "/client." + user + ".crt"
-			literalsConfigMap["CR_"+strings.ToUpper(user)+"_KEY"] = certPath + "/client." + user + ".key"
-		}
+		"CR_SSL_MODE":                    sslMode, //"require",
+		"ZITADEL_EVENTSTORE_HOST":        dbConn.Host(),
+		"ZITADEL_EVENTSTORE_PORT":        dbConn.Port(),
+		"CR_OPTIONS":                     dbConn.Options(),
+		"CR_ROOT_CERT":                   fmt.Sprintf("%s/%s", certPath, db.CACert),
+		"CR_USER_CERT":                   fmt.Sprintf("%s/%s", certPath, db.UserCert(dbConn.User())),
+		"CR_USER_KEY":                    fmt.Sprintf("%s/%s", certPath, db.UserKey(dbConn.User())),
 	}
 
 	if desired != nil {
@@ -137,12 +142,6 @@ func literalsConfigMap(
 	sentryEnv, _, doIngest := mntr.Environment()
 	literalsConfigMap["SENTRY_ENVIRONMENT"] = sentryEnv
 	literalsConfigMap["SENTRY_USAGE"] = strconv.FormatBool(doIngest)
-
-	db, err := database.GetDatabaseInQueried(queried)
-	if err == nil {
-		literalsConfigMap["ZITADEL_EVENTSTORE_HOST"] = db.Host
-		literalsConfigMap["ZITADEL_EVENTSTORE_PORT"] = db.Port
-	}
 
 	return literalsConfigMap
 }

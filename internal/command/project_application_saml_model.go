@@ -38,7 +38,7 @@ func NewSAMLApplicationWriteModel(projectID, resourceOwner string) *SAMLApplicat
 	}
 }
 
-func (wm *SAMLApplicationWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *SAMLApplicationWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *project.ApplicationAddedEvent:

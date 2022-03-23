@@ -1,10 +1,9 @@
 package deployment
 
 import (
+	"github.com/caos/zitadel/operator/common"
 	"sort"
 	"strings"
-
-	"github.com/caos/zitadel/operator/common"
 
 	"github.com/caos/orbos/pkg/kubernetes/k8s"
 	corev1 "k8s.io/api/core/v1"
@@ -18,88 +17,87 @@ func GetContainer(
 	runAsNonRoot bool,
 	resources *k8s.Resources,
 	cmName string,
-	certPath string,
 	secretName string,
 	secretPath string,
 	consoleCMName string,
 	secretVarsName string,
-	secretPasswordsName string,
-	users []string,
-	dbSecrets string,
+	dbcerts corev1.VolumeMount,
 	command string,
 	customImageRegistry string,
+	secretPasswordsName string,
+	users []string,
 ) corev1.Container {
 
-	envVars := []corev1.EnvVar{
-		{Name: "POD_IP",
-			ValueFrom: &corev1.EnvVarSource{
-				FieldRef: &corev1.ObjectFieldSelector{
-					FieldPath: "status.podIP",
-				},
-			}},
-		{Name: "CHAT_URL",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_GOOGLE_CHAT_URL",
-				},
-			}},
-		{Name: "TWILIO_TOKEN",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_TWILIO_AUTH_TOKEN",
-				},
-			}},
-		{Name: "TWILIO_SERVICE_SID",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_TWILIO_SID",
-				},
-			}},
-		{Name: "SMTP_PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_EMAILAPPKEY",
-				},
-			}},
-		{Name: "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
-				},
-			}},
-		{Name: "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
-				},
-			}},
-		{Name: "HTTP_PROXY",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "HTTP_PROXY",
-				},
-			}},
-		{Name: "HTTPS_PROXY",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "HTTPS_PROXY",
-				},
-			}},
-		{Name: "SENTRY_DSN",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
-					Key:                  "SENTRY_DSN",
-				},
-			}},
+	envVars := []corev1.EnvVar{{
+		Name: "POD_IP",
+		ValueFrom: &corev1.EnvVarSource{
+			FieldRef: &corev1.ObjectFieldSelector{
+				FieldPath: "status.podIP",
+			},
+		}}, {
+		Name: "CHAT_URL",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "ZITADEL_GOOGLE_CHAT_URL",
+			},
+		}}, {
+		Name: "TWILIO_TOKEN",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "ZITADEL_TWILIO_AUTH_TOKEN",
+			},
+		}}, {
+		Name: "TWILIO_SERVICE_SID",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "ZITADEL_TWILIO_SID",
+			},
+		}}, {
+		Name: "SMTP_PASSWORD",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "ZITADEL_EMAILAPPKEY",
+			},
+		}}, {
+		Name: "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "ZITADEL_ASSET_STORAGE_ACCESS_KEY_ID",
+			},
+		}}, {
+		Name: "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "ZITADEL_ASSET_STORAGE_SECRET_ACCESS_KEY",
+			},
+		}}, {
+		Name: "HTTP_PROXY",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "HTTP_PROXY",
+			},
+		}}, {
+		Name: "HTTPS_PROXY",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "HTTPS_PROXY",
+			},
+		}}, {
+		Name: "SENTRY_DSN",
+		ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: secretVarsName},
+				Key:                  "SENTRY_DSN",
+			},
+		}},
 	}
 
 	sort.Strings(users)
@@ -118,14 +116,12 @@ func GetContainer(
 	volMounts := []corev1.VolumeMount{
 		{Name: secretName, MountPath: secretPath},
 		{Name: consoleCMName, MountPath: "/console/environment.json", SubPath: "environment.json"},
-		{Name: dbSecrets, MountPath: certPath},
+		dbcerts,
 	}
 
 	return corev1.Container{
 		Resources: corev1.ResourceRequirements(*resources),
-		//Command:   []string{"/bin/sh", "-c"},
-		//Args:      []string{"tail -f /dev/null;"},
-		Args: []string{command},
+		Args:      []string{command},
 		SecurityContext: &corev1.SecurityContext{
 			RunAsUser:    &runAsUser,
 			RunAsNonRoot: &runAsNonRoot,

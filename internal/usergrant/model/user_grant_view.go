@@ -102,11 +102,3 @@ func (r *UserGrantSearchRequest) GetSearchQuery(key UserGrantSearchKey) (int, *U
 	}
 	return -1, nil
 }
-
-func (r *UserGrantSearchRequest) AppendMyOrgQuery(orgID string) {
-	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyResourceOwner, Method: domain.SearchMethodEquals, Value: orgID})
-}
-
-func (r *UserGrantSearchRequest) AppendProjectIDQuery(projectID string) {
-	r.Queries = append(r.Queries, &UserGrantSearchQuery{Key: UserGrantSearchKeyProjectID, Method: domain.SearchMethodEquals, Value: projectID})
-}

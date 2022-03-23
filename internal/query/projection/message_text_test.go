@@ -10,17 +10,16 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/iam"
 	"github.com/caos/zitadel/internal/repository/org"
-	"golang.org/x/text/language"
 )
 
 func TestMessageTextProjection_reduces(t *testing.T) {
 	type args struct {
-		event func(t *testing.T) eventstore.EventReader
+		event func(t *testing.T) eventstore.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		reduce func(event eventstore.EventReader) (*handler.Statement, error)
+		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
 	}{
 		{
@@ -574,7 +573,7 @@ func TestMessageTextProjection_reduces(t *testing.T) {
 							expectedArgs: []interface{}{
 								"agg-id",
 								"InitCode",
-								language.English,
+								"en",
 							},
 						},
 					},

@@ -25,7 +25,7 @@ func NewOrgFeaturesWriteModel(orgID string) *OrgFeaturesWriteModel {
 	}
 }
 
-func (wm *OrgFeaturesWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgFeaturesWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.FeaturesSetEvent:
@@ -78,8 +78,9 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	metadataUser,
 	customTextMessage,
 	customTextLogin,
-	lockoutPolicy,
-	actions bool,
+	lockoutPolicy bool,
+	actionsAllowed domain.ActionsAllowed,
+	maxActions int,
 ) (*org.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -144,8 +145,11 @@ func (wm *OrgFeaturesWriteModel) NewSetEvent(
 	if wm.LockoutPolicy != lockoutPolicy {
 		changes = append(changes, features.ChangeLockoutPolicy(lockoutPolicy))
 	}
-	if wm.Actions != actions {
-		changes = append(changes, features.ChangeActions(actions))
+	if wm.ActionsAllowed != actionsAllowed {
+		changes = append(changes, features.ChangeActionsAllowed(actionsAllowed))
+	}
+	if wm.MaxActions != maxActions {
+		changes = append(changes, features.ChangeMaxActions(maxActions))
 	}
 
 	if len(changes) == 0 {

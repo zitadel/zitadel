@@ -121,6 +121,7 @@ title: zitadel/policy.proto
 | tos_link |  string | - |  |
 | privacy_link |  string | - |  |
 | is_default |  bool | - |  |
+| help_link |  string | - |  |
 
 
 

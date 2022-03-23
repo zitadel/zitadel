@@ -91,11 +91,11 @@ func EnsureZitadelOperatorArtifacts(
 	}
 
 	if !gitops {
-		crd := `apiVersion: apiextensions.k8s.io/v1beta1
+		crd := `apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.2.2
+    controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
   name: zitadels.caos.ch
 spec:
@@ -105,110 +105,30 @@ spec:
     listKind: ZitadelList
     plural: zitadels
     singular: zitadel
-  scope: ""
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            iam:
-              type: object
-            kind:
-              type: string
-            spec:
-              properties:
-                customImageRegistry:
-                  description: 'Use this registry to pull the zitadel operator image
-                    from @default: ghcr.io'
-                  type: string
-                databaseCrd:
-                  properties:
-                    name:
-                      type: string
-                    namespace:
-                      type: string
-                  type: object
-                gitops:
-                  type: boolean
-                nodeSelector:
-                  additionalProperties:
-                    type: string
-                  type: object
-                selfReconciling:
-                  type: boolean
-                tolerations:
-                  items:
-                    description: The pod this Toleration is attached to tolerates
-                      any taint that matches the triple <key,value,effect> using the
-                      matching operator <operator>.
-                    properties:
-                      effect:
-                        description: Effect indicates the taint effect to match. Empty
-                          means match all taint effects. When specified, allowed values
-                          are NoSchedule, PreferNoSchedule and NoExecute.
-                        type: string
-                      key:
-                        description: Key is the taint key that the toleration applies
-                          to. Empty means match all taint keys. If the key is empty,
-                          operator must be Exists; this combination means to match
-                          all values and all keys.
-                        type: string
-                      operator:
-                        description: Operator represents a key's relationship to the
-                          value. Valid operators are Exists and Equal. Defaults to
-                          Equal. Exists is equivalent to wildcard for value, so that
-                          a pod can tolerate all taints of a particular category.
-                        type: string
-                      tolerationSeconds:
-                        description: TolerationSeconds represents the period of time
-                          the toleration (which must be of effect NoExecute, otherwise
-                          this field is ignored) tolerates the taint. By default,
-                          it is not set, which means tolerate the taint forever (do
-                          not evict). Zero and negative values will be treated as
-                          0 (evict immediately) by the system.
-                        format: int64
-                        type: integer
-                      value:
-                        description: Value is the taint value the toleration matches
-                          to. If the operator is Exists, the value should be empty,
-                          otherwise just a regular string.
-                        type: string
-                    type: object
-                  type: array
-                verbose:
-                  type: boolean
-                version:
-                  type: string
-              required:
-              - selfReconciling
-              - verbose
-              type: object
-            version:
-              type: string
-          required:
-          - iam
-          - kind
-          - spec
-          - version
-          type: object
-        status:
-          type: object
-      type: object
-  version: v1
+  scope: Namespaced
   versions:
   - name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            type: object
+        type: object
     served: true
     storage: true
 status:
@@ -447,11 +367,11 @@ func EnsureDatabaseArtifacts(
 	}
 
 	if !gitops {
-		crd := `apiVersion: apiextensions.k8s.io/v1beta1
+		crd := `apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.2.2
+    controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
   name: databases.caos.ch
 spec:
@@ -461,103 +381,46 @@ spec:
     listKind: DatabaseList
     plural: databases
     singular: database
-  scope: ""
-  validation:
-    openAPIV3Schema:
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-concepts/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          properties:
-            database:
-              type: object
-            kind:
-              type: string
-            spec:
-              properties:
-                customImageRegistry:
-                  description: 'Use this registry to pull the Database operator image
-                    from @default: ghcr.io'
-                  type: string
-                gitOps:
-                  type: boolean
-                nodeSelector:
-                  additionalProperties:
-                    type: string
-                  type: object
-                selfReconciling:
-                  type: boolean
-                tolerations:
-                  items:
-                    description: The pod this Toleration is attached to tolerates
-                      any taint that matches the triple <key,value,effect> using the
-                      matching operator <operator>.
-                    properties:
-                      effect:
-                        description: Effect indicates the taint effect to match. Empty
-                          means match all taint effects. When specified, allowed values
-                          are NoSchedule, PreferNoSchedule and NoExecute.
-                        type: string
-                      key:
-                        description: Key is the taint key that the toleration applies
-                          to. Empty means match all taint keys. If the key is empty,
-                          operator must be Exists; this combination means to match
-                          all values and all keys.
-                        type: string
-                      operator:
-                        description: Operator represents a key's relationship to the
-                          value. Valid operators are Exists and Equal. Defaults to
-                          Equal. Exists is equivalent to wildcard for value, so that
-                          a pod can tolerate all taints of a particular category.
-                        type: string
-                      tolerationSeconds:
-                        description: TolerationSeconds represents the period of time
-                          the toleration (which must be of effect NoExecute, otherwise
-                          this field is ignored) tolerates the taint. By default,
-                          it is not set, which means tolerate the taint forever (do
-                          not evict). Zero and negative values will be treated as
-                          0 (evict immediately) by the system.
-                        format: int64
-                        type: integer
-                      value:
-                        description: Value is the taint value the toleration matches
-                          to. If the operator is Exists, the value should be empty,
-                          otherwise just a regular string.
-                        type: string
-                    type: object
-                  type: array
-                verbose:
-                  type: boolean
-                version:
-                  type: string
-              required:
-              - selfReconciling
-              - verbose
-              type: object
-            version:
-              type: string
-          required:
-          - database
-          - kind
-          - spec
-          - version
-          type: object
-        status:
-          type: object
-      type: object
-  version: v1
+  scope: Namespaced
   versions:
   - name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              apiVersion:
+                description: Don't access X_ApiVersion, it is only exported for (de-)serialization.
+                  Use Version and OverwriteVersion methods instead.
+                type: string
+              kind:
+                type: string
+              spec:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              version:
+                description: Don't access X_Version, it is only exported for (de-)serialization.
+                  Use Version and OverwriteVersion methods instead.
+                type: string
+            required:
+            - kind
+            - spec
+            type: object
+          status:
+            type: object
+        type: object
     served: true
     storage: true
 status:

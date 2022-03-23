@@ -6,6 +6,7 @@ import (
 	"github.com/caos/zitadel/internal/api/authz"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	object_pb "github.com/caos/zitadel/internal/api/grpc/object"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -18,11 +19,11 @@ func (s *Server) GetOrgIDPByID(ctx context.Context, req *mgmt_pb.GetOrgIDPByIDRe
 }
 
 func (s *Server) ListOrgIDPs(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (*mgmt_pb.ListOrgIDPsResponse, error) {
-	queries, err := listIDPsToModel(req)
+	queries, err := listIDPsToModel(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := s.query.SearchIDPs(ctx, authz.GetCtxData(ctx).OrgID, queries)
+	resp, err := s.query.IDPs(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -79,15 +80,21 @@ func (s *Server) ReactivateOrgIDP(ctx context.Context, req *mgmt_pb.ReactivateOr
 }
 
 func (s *Server) RemoveOrgIDP(ctx context.Context, req *mgmt_pb.RemoveOrgIDPRequest) (*mgmt_pb.RemoveOrgIDPResponse, error) {
-	idpProviders, err := s.org.GetIDPProvidersByIDPConfigID(ctx, authz.GetCtxData(ctx).OrgID, req.IdpId)
+	idp, err := s.query.IDPByIDAndResourceOwner(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	externalIDPs, err := s.user.ExternalIDPsByIDPConfigID(ctx, req.IdpId)
+	idpQuery, err := query.NewIDPUserLinkIDPIDSearchQuery(req.IdpId)
 	if err != nil {
 		return nil, err
 	}
-	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, len(idpProviders) > 0, externalIDPViewsToDomain(externalIDPs)...)
+	userLinks, err := s.query.IDPUserLinks(ctx, &query.IDPUserLinksSearchQuery{
+		Queries: []query.SearchQuery{idpQuery},
+	})
+	if err != nil {
+		return nil, err
+	}
+	_, err = s.command.RemoveIDPConfig(ctx, req.IdpId, authz.GetCtxData(ctx).OrgID, idp != nil, userLinksToDomain(userLinks.Links)...)
 	if err != nil {
 		return nil, err
 	}

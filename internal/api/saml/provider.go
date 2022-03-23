@@ -12,9 +12,9 @@ import (
 	"github.com/caos/oidc/pkg/op"
 	http_utils "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/api/saml/key"
 	"github.com/caos/zitadel/internal/api/saml/xml/metadata/md"
 	"github.com/caos/zitadel/internal/auth/repository"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
@@ -109,7 +109,7 @@ func NewProvider(
 		query:           query,
 		defaultLoginURL: conf.StorageConfig.DefaultLoginURL,
 	}
-	
+
 	getCACert(storage)
 	cert, key := getMetadataCert(storage)
 

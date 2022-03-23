@@ -12,7 +12,7 @@ import (
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
+	"github.com/caos/zitadel/pkg/databases/db"
 )
 
 func Adapt(
@@ -22,7 +22,7 @@ func Adapt(
 	currentTree *tree.Tree,
 	nodeselector map[string]string,
 	tolerations []core.Toleration,
-	dbClient database.Client,
+	dbConn db.Connection,
 	namespace string,
 	action string,
 	version *string,
@@ -51,7 +51,7 @@ func Adapt(
 			apiLabels,
 			nodeselector,
 			tolerations,
-			dbClient,
+			dbConn,
 			namespace,
 			action,
 			version,

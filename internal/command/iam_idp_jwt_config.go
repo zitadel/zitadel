@@ -37,7 +37,7 @@ func (c *Commands) ChangeDefaultIDPJWTConfig(ctx context.Context, config *domain
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "IAM-3n9gg", "Errors.IAM.IDPConfig.NotChanged")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

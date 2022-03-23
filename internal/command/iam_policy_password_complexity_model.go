@@ -25,7 +25,7 @@ func NewIAMPasswordComplexityPolicyWriteModel() *IAMPasswordComplexityPolicyWrit
 	}
 }
 
-func (wm *IAMPasswordComplexityPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMPasswordComplexityPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.PasswordComplexityPolicyAddedEvent:

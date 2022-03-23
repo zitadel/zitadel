@@ -6,6 +6,7 @@ declare const tinycolor: any;
 export interface Color {
   name: string;
   hex: string;
+  rgb: string;
   darkContrast: boolean;
 }
 
@@ -23,11 +24,8 @@ export class ThemeService {
   }
 
   public updateTheme(colors: Color[], type: string, theme: string): void {
-    colors.forEach(color => {
-      document.documentElement.style.setProperty(
-        `--theme-${theme}-${type}-${color.name}`,
-        color.hex,
-      );
+    colors.forEach((color) => {
+      document.documentElement.style.setProperty(`--theme-${theme}-${type}-${color.name}`, color.hex);
       document.documentElement.style.setProperty(
         `--theme-${theme}-${type}-contrast-${color.name}`,
         color.darkContrast ? 'hsla(0, 0%, 0%, 0.87)' : '#ffffff',
@@ -48,6 +46,12 @@ export class ThemeService {
   public saveBackgroundColor(color: string, isDark: boolean): void {
     this.backgroundColorPalette = this.computeColors(color);
     this.updateTheme(this.backgroundColorPalette, 'background', isDark ? 'dark' : 'light');
+  }
+
+  public saveTextColor(colorHex: string, isDark: boolean): void {
+    this.primaryColorPalette = this.computeColors(colorHex);
+    const theme = isDark ? 'dark' : 'light';
+    document.documentElement.style.setProperty(`--theme-${theme}-${'text'}`, colorHex);
   }
 
   private computeColors(hex: string): Color[] {
@@ -74,7 +78,18 @@ export class ThemeService {
     return {
       name: name,
       hex: c.toHexString(),
+      rgb: c.toRgbString(),
       darkContrast: c.isLight(),
     };
+  }
+
+  public isLight(hex: string): boolean {
+    const color = tinycolor(hex);
+    return color.isLight();
+  }
+
+  public isDark(hex: string): boolean {
+    const color = tinycolor(hex);
+    return color.isDark();
   }
 }

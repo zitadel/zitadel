@@ -21,22 +21,24 @@ const (
 
 type Server struct {
 	auth.UnimplementedAuthServiceServer
-	command  *command.Commands
-	query    *query.Queries
-	repo     repository.Repository
-	defaults systemdefaults.SystemDefaults
+	command         *command.Commands
+	query           *query.Queries
+	repo            repository.Repository
+	defaults        systemdefaults.SystemDefaults
+	assetsAPIDomain string
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository, defaults systemdefaults.SystemDefaults) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, authRepo repository.Repository, defaults systemdefaults.SystemDefaults, assetsAPIDomain string) *Server {
 	return &Server{
-		command:  command,
-		query:    query,
-		repo:     authRepo,
-		defaults: defaults,
+		command:         command,
+		query:           query,
+		repo:            authRepo,
+		defaults:        defaults,
+		assetsAPIDomain: assetsAPIDomain,
 	}
 }
 

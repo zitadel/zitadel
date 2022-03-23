@@ -3,8 +3,9 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"github.com/caos/zitadel/internal/eventstore"
 	"time"
+
+	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
@@ -45,7 +46,7 @@ func NewHumanEmailChangedEvent(ctx context.Context, aggregate *eventstore.Aggreg
 	}
 }
 
-func HumanEmailChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanEmailChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	emailChangedEvent := &HumanEmailChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -81,7 +82,7 @@ func NewHumanEmailVerifiedEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanEmailVerifiedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanEmailVerifiedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	emailVerified := &HumanEmailVerifiedEvent{
 		BaseEvent:       *eventstore.BaseEventFromRepo(event),
 		IsEmailVerified: true,
@@ -111,7 +112,7 @@ func NewHumanEmailVerificationFailedEvent(ctx context.Context, aggregate *events
 	}
 }
 
-func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanEmailVerificationFailedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanEmailVerificationFailedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -148,7 +149,7 @@ func NewHumanEmailCodeAddedEvent(
 	}
 }
 
-func HumanEmailCodeAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanEmailCodeAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	codeAdded := &HumanEmailCodeAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -182,7 +183,7 @@ func NewHumanEmailCodeSentEvent(ctx context.Context, aggregate *eventstore.Aggre
 	}
 }
 
-func HumanEmailCodeSentEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func HumanEmailCodeSentEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &HumanEmailCodeSentEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

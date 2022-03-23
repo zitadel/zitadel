@@ -1,6 +1,9 @@
 package management
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	idp_grpc "github.com/caos/zitadel/internal/api/grpc/idp"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
@@ -8,7 +11,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
-	user_model "github.com/caos/zitadel/internal/user/model"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -83,12 +85,17 @@ func updateJWTConfigToDomain(req *mgmt_pb.UpdateOrgIDPJWTConfigRequest) *domain.
 	}
 }
 
-func listIDPsToModel(req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
+func listIDPsToModel(ctx context.Context, req *mgmt_pb.ListOrgIDPsRequest) (queries *query.IDPSearchQueries, err error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
 	q, err := idpQueriesToModel(req.Queries)
 	if err != nil {
 		return nil, err
 	}
+	resourceOwnerQuery, err := query.NewIDPResourceOwnerListSearchQuery(domain.IAMID, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	q = append(q, resourceOwnerQuery)
 	return &query.IDPSearchQueries{
 		SearchRequest: query.SearchRequest{
 			Offset:        offset,
@@ -148,18 +155,18 @@ func idpConfigTypeToDomain(idpType iam_model.IDPProviderType) domain.IdentityPro
 	}
 }
 
-func externalIDPViewsToDomain(idps []*user_model.ExternalIDPView) []*domain.UserIDPLink {
-	externalIDPs := make([]*domain.UserIDPLink, len(idps))
+func userLinksToDomain(idps []*query.IDPUserLink) []*domain.UserIDPLink {
+	links := make([]*domain.UserIDPLink, len(idps))
 	for i, idp := range idps {
-		externalIDPs[i] = &domain.UserIDPLink{
+		links[i] = &domain.UserIDPLink{
 			ObjectRoot: models.ObjectRoot{
 				AggregateID:   idp.UserID,
 				ResourceOwner: idp.ResourceOwner,
 			},
-			IDPConfigID:    idp.IDPConfigID,
-			ExternalUserID: idp.ExternalUserID,
-			DisplayName:    idp.UserDisplayName,
+			IDPConfigID:    idp.IDPID,
+			ExternalUserID: idp.ProvidedUserID,
+			DisplayName:    idp.ProvidedUsername,
 		}
 	}
-	return externalIDPs
+	return links
 }

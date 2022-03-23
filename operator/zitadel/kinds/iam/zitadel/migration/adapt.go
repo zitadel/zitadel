@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"sort"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"github.com/rakyll/statik/fs"
 	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -23,18 +25,17 @@ import (
 
 	"github.com/caos/zitadel/operator"
 	"github.com/caos/zitadel/operator/helpers"
-	"github.com/caos/zitadel/operator/zitadel/kinds/iam/zitadel/database"
 	_ "github.com/caos/zitadel/statik"
 )
 
 const (
 	migrationConfigmap = "migrate-db"
 	migrationsPath     = "/migrate"
-	rootUserInternal   = "root"
-	rootUserPath       = "/certificates"
 	envMigrationUser   = "FLYWAY_USER"
 	envMigrationPW     = "FLYWAY_PASSWORD"
 	jobNamePrefix      = "cockroachdb-cluster-migration-"
+	rootUserInternal   = "root"
+	rootUserPath       = "/certificates"
 	createFile         = "create.sql"
 	grantFile          = "grant.sql"
 	deleteFile         = "delete.sql"
@@ -43,6 +44,7 @@ const (
 func AdaptFunc(
 	monitor mntr.Monitor,
 	componentLabels *labels.Component,
+	dbConn db.Connection,
 	namespace string,
 	reason string,
 	secretPasswordName string,
@@ -75,14 +77,15 @@ func AdaptFunc(
 	}
 
 	return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
-			dbCurrent, err := database.GetDatabaseInQueried(queried)
-			if err != nil {
-				return nil, err
-			}
-			dbHost := dbCurrent.Host
-			dbPort := dbCurrent.Port
 
 			allScripts := getMigrationFiles(monitor, "/cockroach/")
+
+			chownedVolumeMount := corev1.VolumeMount{
+				Name:      "chowned-certs",
+				MountPath: "/chownedcerts",
+			}
+
+			certVolumes, chownCertsContainer := db.InitChownCerts(customImageRegistry, "101:101", []string{dbConn.User()}, chownedVolumeMount)
 
 			nameLabels := labels.MustForNameK8SMap(componentLabels, jobName)
 			jobDef := &batchv1.Job{
@@ -103,39 +106,35 @@ func AdaptFunc(
 							},
 						},
 						Spec: corev1.PodSpec{
-							NodeSelector:   nodeselector,
-							Tolerations:    tolerations,
-							InitContainers: getPreContainer(dbHost, dbPort, migrationUser, secretPasswordName, customImageRegistry),
+							NodeSelector: nodeselector,
+							Tolerations:  tolerations,
+							InitContainers: []corev1.Container{
+								chownCertsContainer,
+								getReadyPreContainer(dbConn, customImageRegistry),
+								//								getFlywayUserPreContainer(dbConn, customImageRegistry, migrationUser, secretPasswordName, chownedVolumeMount),
+							},
 							Containers: []corev1.Container{
-								getMigrationContainer(dbHost, dbPort, migrationUser, secretPasswordName, users, customImageRegistry),
+								getMigrationContainer(dbConn, customImageRegistry, chownedVolumeMount, users, secretPasswordName),
 							},
 							RestartPolicy:                 "Never",
 							DNSPolicy:                     "ClusterFirst",
 							SchedulerName:                 "default-scheduler",
 							TerminationGracePeriodSeconds: helpers.PointerInt64(30),
-							Volumes: []corev1.Volume{{
+							Volumes: append(certVolumes, corev1.Volume{
 								Name: migrationConfigmap,
 								VolumeSource: corev1.VolumeSource{
 									ConfigMap: &corev1.ConfigMapVolumeSource{
 										LocalObjectReference: corev1.LocalObjectReference{Name: migrationConfigmap},
 									},
 								},
-							}, {
-								Name: rootUserInternal,
-								VolumeSource: corev1.VolumeSource{
-									Secret: &corev1.SecretVolumeSource{
-										SecretName:  "cockroachdb.client.root",
-										DefaultMode: helpers.PointerInt32(0400),
-									},
-								},
-							}, {
+							}, corev1.Volume{
 								Name: secretPasswordName,
 								VolumeSource: corev1.VolumeSource{
 									Secret: &corev1.SecretVolumeSource{
 										SecretName: secretPasswordName,
 									},
 								},
-							}},
+							}),
 						},
 					},
 				},
@@ -164,21 +163,30 @@ func AdaptFunc(
 		nil
 }
 
-func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, userPasswordsSecret string) []corev1.EnvVar {
-	envVars := []corev1.EnvVar{
-		{
-			Name:  envMigrationUser,
-			Value: migrationUser,
-		}, {
+func baseEnvVars(envMigrationUser, envMigrationPW, migrationUser, migrationUserPasswordSecret, migrationUserPasswordSecretKey string) []corev1.EnvVar {
+
+	envVars := []corev1.EnvVar{{
+		Name:  envMigrationUser,
+		Value: migrationUser,
+	}}
+
+	if migrationUserPasswordSecret != "" {
+		envVars = append(envVars, corev1.EnvVar{
 			Name: envMigrationPW,
 			ValueFrom: &corev1.EnvVarSource{
 				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: userPasswordsSecret},
-					Key:                  migrationUser,
+					LocalObjectReference: corev1.LocalObjectReference{Name: migrationUserPasswordSecret},
+					Key:                  migrationUserPasswordSecretKey,
 				},
 			},
-		},
+		})
+	} else {
+		envVars = append(envVars, corev1.EnvVar{
+			Name:  envMigrationPW,
+			Value: "",
+		})
 	}
+
 	return envVars
 }
 
@@ -201,11 +209,6 @@ const migrationFileRegex = `(V|U)(\.|\d)+(__)(\w|\_|\ )+(\.sql)`
 func getMigrationFiles(monitor mntr.Monitor, root string) []migration {
 	migrations := make([]migration, 0)
 	files := []string{}
-	/*
-		absPath, err := filepath.Abs(root)
-		if err != nil {
-			return migrations
-		}*/
 
 	statikFS, err := fs.New()
 	if err != nil {

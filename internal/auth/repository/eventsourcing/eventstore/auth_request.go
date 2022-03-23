@@ -24,7 +24,6 @@ import (
 	user_model "github.com/caos/zitadel/internal/user/model"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	user_view_model "github.com/caos/zitadel/internal/user/repository/view/model"
-	grant_view_model "github.com/caos/zitadel/internal/usergrant/repository/view/model"
 )
 
 type AuthRequestRepo struct {
@@ -46,6 +45,7 @@ type AuthRequestRepo struct {
 	IDPProviderViewProvider   idpProviderViewProvider
 	UserGrantProvider         userGrantProvider
 	ProjectProvider           projectProvider
+	ApplicationProvider       applicationProvider
 
 	IdGenerator id.Generator
 
@@ -102,13 +102,17 @@ type orgViewProvider interface {
 }
 
 type userGrantProvider interface {
-	ProjectByClientID(ctx context.Context, appID string) (*query.Project, error)
-	UserGrantsByProjectAndUserID(string, string) ([]*grant_view_model.UserGrantView, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
+	UserGrantsByProjectAndUserID(string, string) ([]*query.UserGrant, error)
 }
 
 type projectProvider interface {
-	ProjectByClientID(ctx context.Context, appID string) (*query.Project, error)
+	ProjectByClientID(context.Context, string) (*query.Project, error)
 	OrgProjectMappingByIDs(orgID, projectID string) (*project_view_model.OrgProjectMapping, error)
+}
+
+type applicationProvider interface {
+	AppByOIDCClientID(context.Context, string) (*query.App, error)
 }
 
 func (repo *AuthRequestRepo) Health(ctx context.Context) error {
@@ -546,7 +550,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
-	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
+	privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
 	if err != nil {
 		return err
 	}
@@ -798,6 +802,13 @@ func (repo *AuthRequestRepo) nextSteps(ctx context.Context, request *domain.Auth
 		return append(steps, &domain.GrantRequiredStep{}), nil
 	}
 
+	ok, err = repo.hasSucceededPage(ctx, request, repo.ApplicationProvider)
+	if err != nil {
+		return nil, err
+	}
+	if ok {
+		steps = append(steps, &domain.LoginSucceededStep{})
+	}
 	return append(steps, &domain.RedirectToCallbackStep{}), nil
 }
 
@@ -806,17 +817,19 @@ func (repo *AuthRequestRepo) usersForUserSelection(request *domain.AuthRequest) 
 	if err != nil {
 		return nil, err
 	}
-	users := make([]domain.UserSelection, len(userSessions))
-	for i, session := range userSessions {
-		users[i] = domain.UserSelection{
-			UserID:            session.UserID,
-			DisplayName:       session.DisplayName,
-			UserName:          session.UserName,
-			LoginName:         session.LoginName,
-			ResourceOwner:     session.ResourceOwner,
-			AvatarKey:         session.AvatarKey,
-			UserSessionState:  model.UserSessionStateToDomain(session.State),
-			SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+	users := make([]domain.UserSelection, 0)
+	for _, session := range userSessions {
+		if request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner {
+			users = append(users, domain.UserSelection{
+				UserID:            session.UserID,
+				DisplayName:       session.DisplayName,
+				UserName:          session.UserName,
+				LoginName:         session.LoginName,
+				ResourceOwner:     session.ResourceOwner,
+				AvatarKey:         session.AvatarKey,
+				UserSessionState:  model.UserSessionStateToDomain(session.State),
+				SelectionPossible: request.RequestedOrgID == "" || request.RequestedOrgID == session.ResourceOwner,
+			})
 		}
 	}
 	return users, nil
@@ -908,8 +921,11 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView) bool {
 	return checkVerificationTime(user.MFAInitSkipped, repo.MFAInitSkippedLifeTime)
 }
 
-func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
+func (repo *AuthRequestRepo) GetPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
 	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, orgID)
+	if errors.IsNotFound(err) {
+		return new(domain.PrivacyPolicy), nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -929,6 +945,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 		Default:     p.IsDefault,
 		TOSLink:     p.TOSLink,
 		PrivacyLink: p.PrivacyLink,
+		HelpLink:    p.HelpLink,
 	}
 }
 
@@ -979,11 +996,19 @@ func labelPolicyToDomain(p *query.LabelPolicy) *domain.LabelPolicy {
 }
 
 func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID string) ([]*domain.CustomText, error) {
-	loginTexts, err := repo.View.CustomTextsByAggregateIDAndTemplate(aggregateID, domain.LoginCustomText)
+	loginTexts, err := repo.Query.CustomTextListByTemplate(ctx, aggregateID, domain.LoginCustomText)
 	if err != nil {
 		return nil, err
 	}
-	return iam_view_model.CustomTextViewsToDomain(loginTexts), err
+	return query.CustomTextsToDomain(loginTexts), err
+}
+
+func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *domain.AuthRequest, provider applicationProvider) (bool, error) {
+	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+	if err != nil {
+		return false, err
+	}
+	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {
@@ -1182,12 +1207,7 @@ func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, 
 func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *user_model.UserView, userGrantProvider userGrantProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC:
-		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
-		if err != nil {
-			return false, err
-		}
-	case domain.AuthRequestTypeSAML:
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
 		project, err = userGrantProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err
@@ -1208,12 +1228,7 @@ func userGrantRequired(ctx context.Context, request *domain.AuthRequest, user *u
 func projectRequired(ctx context.Context, request *domain.AuthRequest, projectProvider projectProvider) (_ bool, err error) {
 	var project *query.Project
 	switch request.Request.Type() {
-	case domain.AuthRequestTypeOIDC:
-		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
-		if err != nil {
-			return false, err
-		}
-	case domain.AuthRequestTypeSAML:
+	case domain.AuthRequestTypeOIDC, domain.AuthRequestTypeSAML:
 		project, err = projectProvider.ProjectByClientID(ctx, request.ApplicationID)
 		if err != nil {
 			return false, err

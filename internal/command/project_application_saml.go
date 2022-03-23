@@ -22,7 +22,7 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 		return nil, err
 	}
 	addedApplication.AppID = application.AppID
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (c *Commands) AddSAMLApplication(ctx context.Context, application *domain.S
 	return result, nil
 }
 
-func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstore.Aggregate, samlApp *domain.SAMLApp, resourceOwner string) (events []eventstore.EventPusher, err error) {
+func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstore.Aggregate, samlApp *domain.SAMLApp, resourceOwner string) (events []eventstore.Command, err error) {
 	if samlApp.AppName == "" || !samlApp.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "PROJECT-1n9df", "Errors.Application.Invalid")
 	}
@@ -43,7 +43,7 @@ func (c *Commands) addSAMLApplication(ctx context.Context, projectAgg *eventstor
 		return nil, err
 	}
 
-	events = []eventstore.EventPusher{
+	events = []eventstore.Command{
 		project.NewApplicationAddedEvent(ctx, projectAgg, samlApp.AppID, samlApp.AppName),
 	}
 
@@ -123,7 +123,7 @@ func (c *Commands) ChangeSAMLApplication(ctx context.Context, saml *domain.SAMLA
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-1m88i", "Errors.NoChangesFound")
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, changedEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, changedEvent)
 	if err != nil {
 		return nil, err
 	}

@@ -44,7 +44,7 @@ func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (c *Commands) AddOrg(ctx context.Context, name, userID, resourceOwner strin
 		return nil, err
 	}
 	events = append(events, orgMemberEvent)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 		return nil, caos_errs.ThrowNotFound(nil, "ORG-4VSdf", "Errors.Org.NotChanged")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	events = append(events, org.NewOrgChangedEvent(ctx, orgAgg, orgWriteModel.Name, name))
 	changeDomainEvents, err := c.changeDefaultDomain(ctx, orgID, name)
 	if err != nil {
@@ -105,7 +105,7 @@ func (c *Commands) ChangeOrg(ctx context.Context, orgID, name string) (*domain.O
 	if len(changeDomainEvents) > 0 {
 		events = append(events, changeDomainEvents...)
 	}
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func (c *Commands) DeactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-Dbs2g", "Errors.Org.AlreadyDeactivated")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgDeactivatedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c *Commands) ReactivateOrg(ctx context.Context, orgID string) (*domain.Obj
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "EVENT-bfnrh", "Errors.Org.AlreadyActive")
 	}
 	orgAgg := OrgAggregateFromWriteModel(&orgWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
+	pushedEvents, err := c.eventstore.Push(ctx, org.NewOrgReactivatedEvent(ctx, orgAgg))
 	if err != nil {
 		return nil, err
 	}
@@ -170,13 +170,13 @@ func (c *Commands) setUpOrg(
 	pwPolicy *domain.PasswordComplexityPolicy,
 	claimedUserIDs []string,
 	selfregistered bool,
-) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.EventPusher, err error) {
+) (orgAgg *eventstore.Aggregate, org *OrgWriteModel, human *HumanWriteModel, orgMember *OrgMemberWriteModel, events []eventstore.Command, err error) {
 	orgAgg, orgWriteModel, addOrgEvents, err := c.addOrg(ctx, organisation, claimedUserIDs)
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
 
-	var userEvents []eventstore.EventPusher
+	var userEvents []eventstore.Command
 	if selfregistered {
 		userEvents, human, err = c.registerHuman(ctx, orgAgg.ID, admin, nil, loginPolicy, pwPolicy)
 	} else {
@@ -197,7 +197,7 @@ func (c *Commands) setUpOrg(
 	return orgAgg, orgWriteModel, human, addedMember, addOrgEvents, nil
 }
 
-func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs []string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.EventPusher, err error) {
+func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimedUserIDs []string) (_ *eventstore.Aggregate, _ *OrgWriteModel, _ []eventstore.Command, err error) {
 	if organisation == nil || !organisation.IsValid() {
 		return nil, nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMM-deLSk", "Errors.Org.Invalid")
 	}
@@ -210,7 +210,7 @@ func (c *Commands) addOrg(ctx context.Context, organisation *domain.Org, claimed
 	addedOrg := NewOrgWriteModel(organisation.AggregateID)
 
 	orgAgg := OrgAggregateFromWriteModel(&addedOrg.WriteModel)
-	events := []eventstore.EventPusher{
+	events := []eventstore.Command{
 		org.NewOrgAddedEvent(ctx, orgAgg, organisation.Name),
 	}
 	for _, orgDomain := range organisation.Domains {

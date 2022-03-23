@@ -11,8 +11,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	events = append(events, c.createSelectLoginTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createLoginTextEvents(ctx, agg, existingText, text, defaultText)...)
 	events = append(events, c.createPasswordTextEvents(ctx, agg, existingText, text, defaultText)...)
@@ -50,8 +50,8 @@ func (c *Commands) createAllLoginTextEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createSelectLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createSelectLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeySelectAccountTitle, existingText.SelectAccountTitle, text.SelectAccount.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -87,8 +87,8 @@ func (c *Commands) createSelectLoginTextEvents(ctx context.Context, agg *eventst
 	return events
 }
 
-func (c *Commands) createLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createLoginTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLoginTitle, existingText.LoginTitle, text.Login.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -136,8 +136,8 @@ func (c *Commands) createLoginTextEvents(ctx context.Context, agg *eventstore.Ag
 	return events
 }
 
-func (c *Commands) createPasswordTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordTitle, existingText.PasswordTitle, text.Password.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -189,8 +189,8 @@ func (c *Commands) createPasswordTextEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createUsernameChangeTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createUsernameChangeTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyUsernameChangeTitle, existingText.UsernameChangeTitle, text.UsernameChange.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -214,8 +214,8 @@ func (c *Commands) createUsernameChangeTextEvents(ctx context.Context, agg *even
 	return events
 }
 
-func (c *Commands) createUsernameChangeDoneTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createUsernameChangeDoneTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyUsernameChangeDoneTitle, existingText.UsernameChangeDoneTitle, text.UsernameChangeDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -231,8 +231,8 @@ func (c *Commands) createUsernameChangeDoneTextEvents(ctx context.Context, agg *
 	return events
 }
 
-func (c *Commands) createPasswordInitTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordInitTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitPasswordTitle, existingText.InitPasswordTitle, text.InitPassword.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -264,8 +264,8 @@ func (c *Commands) createPasswordInitTextEvents(ctx context.Context, agg *events
 	return events
 }
 
-func (c *Commands) createPasswordInitDoneTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordInitDoneTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitPasswordDoneTitle, existingText.InitPasswordDoneTitle, text.InitPasswordDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -285,8 +285,8 @@ func (c *Commands) createPasswordInitDoneTextEvents(ctx context.Context, agg *ev
 	return events
 }
 
-func (c *Commands) createEmailVerificationTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createEmailVerificationTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyEmailVerificationTitle, existingText.EmailVerificationTitle, text.EmailVerification.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -310,8 +310,8 @@ func (c *Commands) createEmailVerificationTextEvents(ctx context.Context, agg *e
 	return events
 }
 
-func (c *Commands) createEmailVerificationDoneTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createEmailVerificationDoneTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyEmailVerificationDoneTitle, existingText.EmailVerificationDoneTitle, text.EmailVerificationDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -335,8 +335,8 @@ func (c *Commands) createEmailVerificationDoneTextEvents(ctx context.Context, ag
 	return events
 }
 
-func (c *Commands) createInitUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createInitUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitializeUserTitle, existingText.InitializeTitle, text.InitUser.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -368,8 +368,8 @@ func (c *Commands) createInitUserEvents(ctx context.Context, agg *eventstore.Agg
 	return events
 }
 
-func (c *Commands) createInitUserDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createInitUserDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitUserDoneTitle, existingText.InitializeDoneTitle, text.InitUserDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -389,8 +389,8 @@ func (c *Commands) createInitUserDoneEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createInitMFAPromptEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createInitMFAPromptEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitMFAPromptTitle, existingText.InitMFAPromptTitle, text.InitMFAPrompt.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -418,8 +418,8 @@ func (c *Commands) createInitMFAPromptEvents(ctx context.Context, agg *eventstor
 	return events
 }
 
-func (c *Commands) createInitMFAOTPEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createInitMFAOTPEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitMFAOTPTitle, existingText.InitMFAOTPTitle, text.InitMFAOTP.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -451,8 +451,8 @@ func (c *Commands) createInitMFAOTPEvents(ctx context.Context, agg *eventstore.A
 	return events
 }
 
-func (c *Commands) createInitMFAU2FEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createInitMFAU2FEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitMFAU2FTitle, existingText.InitMFAU2FTitle, text.InitMFAU2F.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -480,8 +480,8 @@ func (c *Commands) createInitMFAU2FEvents(ctx context.Context, agg *eventstore.A
 	return events
 }
 
-func (c *Commands) createInitMFADoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createInitMFADoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyInitMFADoneTitle, existingText.InitMFADoneTitle, text.InitMFADone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -501,8 +501,8 @@ func (c *Commands) createInitMFADoneEvents(ctx context.Context, agg *eventstore.
 	return events
 }
 
-func (c *Commands) crateMFAProviderEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) crateMFAProviderEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyMFAProvidersChooseOther, existingText.MFAProvidersChooseOther, text.MFAProvider.ChooseOther, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -518,8 +518,8 @@ func (c *Commands) crateMFAProviderEvents(ctx context.Context, agg *eventstore.A
 	return events
 }
 
-func (c *Commands) createVerifyMFAOTPEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createVerifyMFAOTPEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyVerifyMFAOTPTitle, existingText.VerifyMFAOTPTitle, text.VerifyMFAOTP.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -539,8 +539,8 @@ func (c *Commands) createVerifyMFAOTPEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createVerifyMFAU2FEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createVerifyMFAU2FEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyVerifyMFAU2FTitle, existingText.VerifyMFAU2FTitle, text.VerifyMFAU2F.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -564,8 +564,8 @@ func (c *Commands) createVerifyMFAU2FEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createPasswordlessEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordlessEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessTitle, existingText.PasswordlessTitle, text.Passwordless.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -593,8 +593,8 @@ func (c *Commands) createPasswordlessEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createPasswordlessRegistrationEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordlessRegistrationEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessRegistrationTitle, existingText.PasswordlessRegistrationTitle, text.PasswordlessRegistration.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -622,8 +622,8 @@ func (c *Commands) createPasswordlessRegistrationEvents(ctx context.Context, agg
 	return events
 }
 
-func (c *Commands) createPasswordlessPromptEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordlessPromptEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessPromptTitle, existingText.PasswordlessPromptTitle, text.PasswordlessPrompt.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -651,8 +651,8 @@ func (c *Commands) createPasswordlessPromptEvents(ctx context.Context, agg *even
 	return events
 }
 
-func (c *Commands) createPasswordlessRegistrationDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordlessRegistrationDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordlessRegistrationDoneTitle, existingText.PasswordlessRegistrationDoneTitle, text.PasswordlessRegistrationDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -676,8 +676,8 @@ func (c *Commands) createPasswordlessRegistrationDoneEvents(ctx context.Context,
 	return events
 }
 
-func (c *Commands) createPasswordChangeEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordChangeEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordChangeTitle, existingText.PasswordChangeTitle, text.PasswordChange.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -709,8 +709,8 @@ func (c *Commands) createPasswordChangeEvents(ctx context.Context, agg *eventsto
 	return events
 }
 
-func (c *Commands) createPasswordChangeDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordChangeDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordChangeDoneTitle, existingText.PasswordChangeDoneTitle, text.PasswordChangeDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -726,8 +726,8 @@ func (c *Commands) createPasswordChangeDoneEvents(ctx context.Context, agg *even
 	return events
 }
 
-func (c *Commands) createPasswordResetDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createPasswordResetDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyPasswordResetDoneTitle, existingText.PasswordResetDoneTitle, text.PasswordResetDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -743,8 +743,8 @@ func (c *Commands) createPasswordResetDoneEvents(ctx context.Context, agg *event
 	return events
 }
 
-func (c *Commands) createRegistrationOptionEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createRegistrationOptionEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationOptionTitle, existingText.RegistrationOptionTitle, text.RegisterOption.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -764,8 +764,8 @@ func (c *Commands) createRegistrationOptionEvents(ctx context.Context, agg *even
 	return events
 }
 
-func (c *Commands) createRegistrationUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createRegistrationUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegistrationUserTitle, existingText.RegistrationUserTitle, text.RegistrationUser.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -841,8 +841,8 @@ func (c *Commands) createRegistrationUserEvents(ctx context.Context, agg *events
 	return events
 }
 
-func (c *Commands) createExternalRegistrationUserOverviewEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createExternalRegistrationUserOverviewEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalRegistrationUserOverviewTitle, existingText.ExternalRegistrationUserOverviewTitle, text.ExternalRegistrationUserOverview.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -910,8 +910,8 @@ func (c *Commands) createExternalRegistrationUserOverviewEvents(ctx context.Cont
 	return events
 }
 
-func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyRegisterOrgTitle, existingText.RegisterOrgTitle, text.RegistrationOrg.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -975,8 +975,8 @@ func (c *Commands) createRegistrationOrgEvents(ctx context.Context, agg *eventst
 	return events
 }
 
-func (c *Commands) createLinkingUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createLinkingUserEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLinkingUserDoneTitle, existingText.LinkingUserDoneTitle, text.LinkingUsersDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -996,8 +996,8 @@ func (c *Commands) createLinkingUserEvents(ctx context.Context, agg *eventstore.
 	return events
 }
 
-func (c *Commands) createExternalUserNotFoundEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createExternalUserNotFoundEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyExternalNotFoundTitle, existingText.ExternalUserNotFoundTitle, text.ExternalNotFoundOption.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -1037,8 +1037,8 @@ func (c *Commands) createExternalUserNotFoundEvents(ctx context.Context, agg *ev
 	return events
 }
 
-func (c *Commands) createSuccessLoginEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createSuccessLoginEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeySuccessLoginTitle, existingText.SuccessLoginTitle, text.LoginSuccess.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -1058,8 +1058,8 @@ func (c *Commands) createSuccessLoginEvents(ctx context.Context, agg *eventstore
 	return events
 }
 
-func (c *Commands) createLogoutDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createLogoutDoneEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyLogoutDoneTitle, existingText.LogoutDoneTitle, text.LogoutDone.Title, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -1075,8 +1075,8 @@ func (c *Commands) createLogoutDoneEvents(ctx context.Context, agg *eventstore.A
 	return events
 }
 
-func (c *Commands) createFooterTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.EventPusher {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) createFooterTextEvents(ctx context.Context, agg *eventstore.Aggregate, existingText *CustomLoginTextReadModel, text *domain.CustomLoginText, defaultText bool) []eventstore.Command {
+	events := make([]eventstore.Command, 0)
 	event := c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterTOS, existingText.FooterTOS, text.Footer.TOS, text.Language, defaultText)
 	if event != nil {
 		events = append(events, event)
@@ -1089,14 +1089,10 @@ func (c *Commands) createFooterTextEvents(ctx context.Context, agg *eventstore.A
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterHelpLink, existingText.FooterHelpLink, text.Footer.HelpLink, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
 	return events
 }
 
-func (c *Commands) createCustomLoginTextEvent(ctx context.Context, agg *eventstore.Aggregate, textKey, existingText, newText string, lang language.Tag, defaultText bool) eventstore.EventPusher {
+func (c *Commands) createCustomLoginTextEvent(ctx context.Context, agg *eventstore.Aggregate, textKey, existingText, newText string, lang language.Tag, defaultText bool) eventstore.Command {
 	if existingText == newText {
 		return nil
 	}

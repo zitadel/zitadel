@@ -289,7 +289,7 @@ service ManagementService {
     // Changes the username
     rpc UpdateUserName(UpdateUserNameRequest) returns (UpdateUserNameResponse) {
         option (google.api.http) = {
-            get: "/users/{user_id}/username"
+            put: "/users/{user_id}/username"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -668,10 +668,57 @@ service ManagementService {
         };
     }
 
-    // Removed a machine key
+    // Removes a machine key
     rpc RemoveMachineKey(RemoveMachineKeyRequest) returns (RemoveMachineKeyResponse) {
         option (google.api.http) = {
             delete: "/users/{user_id}/keys/{key_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Returns a personal access token of a (machine) user
+    rpc GetPersonalAccessTokenByIDs(GetPersonalAccessTokenByIDsRequest) returns (GetPersonalAccessTokenByIDsResponse) {
+        option (google.api.http) = {
+            get: "/users/{user_id}/pats/{token_id}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Returns all personal access tokens of a (machine) user which match the query
+    // Limit should always be set, there is a default limit set by the service
+    rpc ListPersonalAccessTokens(ListPersonalAccessTokensRequest) returns (ListPersonalAccessTokensResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/pats/_search"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.read"
+        };
+    }
+
+    // Generates a new personal access token for a machine user, details should be stored after return
+    rpc AddPersonalAccessToken(AddPersonalAccessTokenRequest) returns (AddPersonalAccessTokenResponse) {
+        option (google.api.http) = {
+            post: "/users/{user_id}/pats"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "user.write"
+        };
+    }
+
+    // Removes a personal access token
+    rpc RemovePersonalAccessToken(RemovePersonalAccessTokenRequest) returns (RemovePersonalAccessTokenResponse) {
+        option (google.api.http) = {
+            delete: "/users/{user_id}/pats/{token_id}"
         };
 
         option (zitadel.v1.auth_option) = {
@@ -2114,6 +2161,7 @@ service ManagementService {
 
     // Add a custom privacy policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc AddCustomPrivacyPolicy(AddCustomPrivacyPolicyRequest) returns (AddCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             post: "/policies/privacy"
@@ -2128,6 +2176,7 @@ service ManagementService {
 
     // Update the privacy complexity policy for the organisation
     // With this policy privacy relevant things can be configured (e.g. tos link)
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdateCustomPrivacyPolicy(UpdateCustomPrivacyPolicyRequest) returns (UpdateCustomPrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy"
@@ -2823,30 +2872,29 @@ service ManagementService {
         };
     }
 
-//TODO: enable in next release
-//    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_deactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
-//
-//    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
-//        option (google.api.http) = {
-//            post: "/actions/{id}/_reactivate"
-//            body: "*"
-//        };
-//
-//        option (zitadel.v1.auth_option) = {
-//            permission: "org.action.write"
-//            feature: "actions"
-//        };
-//    }
+    rpc DeactivateAction(DeactivateActionRequest) returns (DeactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_deactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
+
+    rpc ReactivateAction(ReactivateActionRequest) returns (ReactivateActionResponse) {
+        option (google.api.http) = {
+            post: "/actions/{id}/_reactivate"
+            body: "*"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "org.action.write"
+            feature: "actions"
+        };
+    }
 
     rpc DeleteAction(DeleteActionRequest) returns (DeleteActionResponse) {
         option (google.api.http) = {
@@ -2962,7 +3010,9 @@ message ListUserChangesRequest {
 }
 
 message ListUserChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3426,6 +3476,51 @@ message RemoveMachineKeyResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message GetPersonalAccessTokenByIDsRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message GetPersonalAccessTokenByIDsResponse {
+    zitadel.user.v1.PersonalAccessToken token = 1;
+}
+
+message ListPersonalAccessTokensRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    //list limitations and ordering
+    zitadel.v1.ListQuery query = 2;
+}
+
+message ListPersonalAccessTokensResponse {
+    zitadel.v1.ListDetails details = 1;
+    repeated zitadel.user.v1.PersonalAccessToken result = 2;
+}
+
+message AddPersonalAccessTokenRequest {
+    string user_id = 1 [(validate.rules).string.min_len = 1];
+    google.protobuf.Timestamp expiration_date = 2 [
+        (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+            example: "\"2519-04-01T08:45:00.000000Z\"";
+            description: "The date the token will expire and no logins will be possible";
+        }
+    ];
+}
+
+message AddPersonalAccessTokenResponse {
+    string token_id = 1;
+    string token = 2;
+    zitadel.v1.ObjectDetails details = 3;
+}
+
+message RemovePersonalAccessTokenRequest {
+    string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+    string token_id = 2 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message RemovePersonalAccessTokenResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message ListHumanLinkedIDPsRequest {
     string user_id = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
     //list limitations and ordering
@@ -3478,7 +3573,9 @@ message ListOrgChangesRequest {
 }
 
 message ListOrgChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3665,7 +3762,9 @@ message ListProjectChangesRequest {
 }
 
 message ListProjectChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -3872,7 +3971,9 @@ message ListAppChangesRequest {
 }
 
 message ListAppChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 
@@ -4588,6 +4689,7 @@ message GetDefaultPrivacyPolicyResponse {
 message AddCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message AddCustomPrivacyPolicyResponse {
@@ -4597,6 +4699,7 @@ message AddCustomPrivacyPolicyResponse {
 message UpdateCustomPrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdateCustomPrivacyPolicyResponse {

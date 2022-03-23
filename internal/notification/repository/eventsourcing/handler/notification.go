@@ -7,8 +7,6 @@ import (
 	"time"
 
 	"github.com/caos/logging"
-	"golang.org/x/text/language"
-
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/command"
 	sd "github.com/caos/zitadel/internal/config/systemdefaults"
@@ -17,12 +15,11 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	queryv1 "github.com/caos/zitadel/internal/eventstore/v1/query"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	"github.com/caos/zitadel/internal/i18n"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
-	iam_es_model "github.com/caos/zitadel/internal/iam/repository/view/model"
 	"github.com/caos/zitadel/internal/notification/types"
+	"github.com/caos/zitadel/internal/query"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/user/repository/view"
@@ -30,14 +27,8 @@ import (
 )
 
 const (
-	notificationTable    = "notification.notifications"
-	NotifyUserID         = "NOTIFICATION"
-	labelPolicyTableOrg  = "management.label_policies"
-	labelPolicyTableDef  = "adminapi.label_policies"
-	mailTemplateTableOrg = "management.mail_templates"
-	mailTemplateTableDef = "adminapi.mail_templates"
-	messageTextTableOrg  = "management.message_texts"
-	messageTextTableDef  = "adminapi.message_texts"
+	notificationTable = "notification.notifications"
+	NotifyUserID      = "NOTIFICATION"
 )
 
 type Notification struct {
@@ -48,11 +39,13 @@ type Notification struct {
 	statikDir      http.FileSystem
 	subscription   *v1.Subscription
 	apiDomain      string
+	queries        *query.Queries
 }
 
 func newNotification(
 	handler handler,
 	command *command.Commands,
+	query *query.Queries,
 	defaults sd.SystemDefaults,
 	aesCrypto crypto.EncryptionAlgorithm,
 	statikDir http.FileSystem,
@@ -65,6 +58,7 @@ func newNotification(
 		statikDir:      statikDir,
 		AesCrypto:      aesCrypto,
 		apiDomain:      apiDomain,
+		queries:        query,
 	}
 
 	h.subscribe()
@@ -76,7 +70,7 @@ func (k *Notification) subscribe() {
 	k.subscription = k.es.Subscribe(k.AggregateTypes()...)
 	go func() {
 		for event := range k.subscription.Events {
-			query.ReduceEvent(k, event)
+			queryv1.ReduceEvent(k, event)
 		}
 	}()
 }
@@ -406,39 +400,13 @@ func getSetNotifyContextData(orgID string) context.Context {
 }
 
 // Read organization specific colors
-func (n *Notification) getLabelPolicy(ctx context.Context) (*iam_model.LabelPolicyView, error) {
-	// read from Org
-	policy, err := n.view.StylingByAggregateIDAndState(authz.GetCtxData(ctx).OrgID, labelPolicyTableOrg, int32(domain.LabelPolicyStateActive))
-	if errors.IsNotFound(err) {
-		// read from default
-		policy, err = n.view.StylingByAggregateIDAndState(n.systemDefaults.IamID, labelPolicyTableDef, int32(domain.LabelPolicyStateActive))
-		if err != nil {
-			return nil, err
-		}
-		policy.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.LabelPolicyViewToModel(policy), err
+func (n *Notification) getLabelPolicy(ctx context.Context) (*query.LabelPolicy, error) {
+	return n.queries.ActiveLabelPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
 // Read organization specific template
-func (n *Notification) getMailTemplate(ctx context.Context) (*iam_model.MailTemplateView, error) {
-	// read from Org
-	template, err := n.view.MailTemplateByAggregateID(authz.GetCtxData(ctx).OrgID, mailTemplateTableOrg)
-	if errors.IsNotFound(err) {
-		// read from default
-		template, err = n.view.MailTemplateByAggregateID(n.systemDefaults.IamID, mailTemplateTableDef)
-		if err != nil {
-			return nil, err
-		}
-		template.Default = true
-	}
-	if err != nil {
-		return nil, err
-	}
-	return iam_es_model.MailTemplateViewToModel(template), err
+func (n *Notification) getMailTemplate(ctx context.Context) (*query.MailTemplate, error) {
+	return n.queries.MailTemplateByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 }
 
 func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.Translator, error) {
@@ -446,97 +414,27 @@ func (n *Notification) getTranslatorWithOrgTexts(orgID, textType string) (*i18n.
 	if err != nil {
 		return nil, err
 	}
-	allCustomTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(domain.IAMID, textType)
+	ctx := context.TODO()
+	allCustomTexts, err := n.queries.CustomTextListByTemplate(ctx, domain.IAMID, textType)
 	if err != nil {
 		return translator, nil
 	}
-	customTexts, err := n.view.CustomTextsByAggregateIDAndTemplate(orgID, textType)
+	customTexts, err := n.queries.CustomTextListByTemplate(ctx, orgID, textType)
 	if err != nil {
 		return translator, nil
 	}
-	allCustomTexts = append(allCustomTexts, customTexts...)
+	allCustomTexts.CustomTexts = append(allCustomTexts.CustomTexts, customTexts.CustomTexts...)
 
-	for _, text := range allCustomTexts {
+	for _, text := range allCustomTexts.CustomTexts {
 		msg := i18n.Message{
 			ID:   text.Template + "." + text.Key,
 			Text: text.Text,
 		}
-		translator.AddMessages(language.Make(text.Language), msg)
+		translator.AddMessages(text.Language, msg)
 	}
 	return translator, nil
 }
 
-// Read organization specific texts
-func (n *Notification) getMessageText(user *model.NotifyUser, textType, lang string) (*iam_model.MessageTextView, error) {
-	langTag := language.Make(lang)
-	if langTag == language.Und {
-		langTag = language.English
-	}
-	langBase, _ := langTag.Base()
-
-	defaultMessageText, err := n.view.MessageTextByIDs(n.systemDefaults.IamID, textType, langBase.String(), messageTextTableDef)
-	if err != nil {
-		return nil, err
-	}
-	defaultMessageText.Default = true
-
-	// read from Org
-	orgMessageText, err := n.view.MessageTextByIDs(user.ResourceOwner, textType, langBase.String(), messageTextTableOrg)
-	if errors.IsNotFound(err) {
-		return iam_es_model.MessageTextViewToModel(defaultMessageText), nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	mergedText := mergeMessageTexts(defaultMessageText, orgMessageText)
-	return iam_es_model.MessageTextViewToModel(mergedText), err
-}
-
 func (n *Notification) getUserByID(userID string) (*model.NotifyUser, error) {
-	user, usrErr := n.view.NotifyUserByID(userID)
-	if usrErr != nil && !errors.IsNotFound(usrErr) {
-		return nil, usrErr
-	}
-	if user == nil {
-		user = &model.NotifyUser{}
-	}
-	events, err := n.getUserEvents(userID, user.Sequence)
-	if err != nil {
-		return user, usrErr
-	}
-	userCopy := *user
-	for _, event := range events {
-		if err := userCopy.AppendEvent(event); err != nil {
-			return user, nil
-		}
-	}
-	if userCopy.State == int32(model.UserStateDeleted) {
-		return nil, errors.ThrowNotFound(nil, "HANDLER-3n8fs", "Errors.User.NotFound")
-	}
-	return &userCopy, nil
-}
-
-func mergeMessageTexts(defaultText *iam_es_model.MessageTextView, orgText *iam_es_model.MessageTextView) *iam_es_model.MessageTextView {
-	if orgText.Subject == "" {
-		orgText.Subject = defaultText.Subject
-	}
-	if orgText.Title == "" {
-		orgText.Title = defaultText.Title
-	}
-	if orgText.PreHeader == "" {
-		orgText.PreHeader = defaultText.PreHeader
-	}
-	if orgText.Text == "" {
-		orgText.Text = defaultText.Text
-	}
-	if orgText.Greeting == "" {
-		orgText.Greeting = defaultText.Greeting
-	}
-	if orgText.ButtonText == "" {
-		orgText.ButtonText = defaultText.ButtonText
-	}
-	if orgText.FooterText == "" {
-		orgText.FooterText = defaultText.FooterText
-	}
-	return orgText
+	return n.view.NotifyUserByID(userID)
 }

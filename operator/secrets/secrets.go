@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/caos/zitadel/pkg/databases/db"
+
 	"github.com/caos/orbos/pkg/kubernetes"
 
 	crddb "github.com/caos/zitadel/operator/api/database"
@@ -14,7 +16,6 @@ import (
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/git"
-	"github.com/caos/orbos/pkg/orb"
 	"github.com/caos/orbos/pkg/secret"
 	"github.com/caos/orbos/pkg/tree"
 )
@@ -30,7 +31,7 @@ func GetAllSecretsFunc(
 	gitops bool,
 	gitClient *git.Client,
 	k8sClient kubernetes.ClientInt,
-	orb *orb.Orb,
+	dbConn db.Connection,
 ) func() (
 	map[string]*secret.Secret,
 	map[string]*secret.Existing,
@@ -43,7 +44,7 @@ func GetAllSecretsFunc(
 		map[string]*tree.Tree,
 		error,
 	) {
-		return getAllSecrets(monitor, printLogs, gitops, orb, gitClient, k8sClient)
+		return getAllSecrets(monitor, printLogs, gitops, gitClient, k8sClient, dbConn)
 	}
 }
 
@@ -51,9 +52,9 @@ func getAllSecrets(
 	monitor mntr.Monitor,
 	printLogs,
 	gitops bool,
-	orb *orb.Orb,
 	gitClient *git.Client,
 	k8sClient kubernetes.ClientInt,
+	dbConn db.Connection,
 ) (
 	map[string]*secret.Secret,
 	map[string]*secret.Existing,
@@ -75,7 +76,7 @@ func getAllSecrets(
 		allExisting,
 		func() (t *tree.Tree, err error) { return crdzit.ReadCrd(k8sClient) },
 		func(t *tree.Tree) (map[string]*secret.Secret, map[string]*secret.Existing, bool, error) {
-			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc(orb, "secret", nil, gitops, []string{})(monitor, t, &tree.Tree{})
+			_, _, _, secrets, existing, migrate, err := orbzit.AdaptFunc("secret", nil, gitops, []string{}, dbConn)(monitor, t, &tree.Tree{})
 			return secrets, existing, migrate, err
 		},
 	); err != nil {

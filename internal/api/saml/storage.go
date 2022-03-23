@@ -3,15 +3,19 @@ package saml
 import (
 	"context"
 	"github.com/caos/zitadel/internal/api/http/middleware"
+	"github.com/caos/zitadel/internal/api/saml/key"
 	"github.com/caos/zitadel/internal/api/saml/xml"
 	"github.com/caos/zitadel/internal/api/saml/xml/protocol/samlp"
 	"github.com/caos/zitadel/internal/auth/repository"
-	"github.com/caos/zitadel/internal/auth/repository/eventsourcing/eventstore/key"
 	"github.com/caos/zitadel/internal/command"
+	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/errors"
+	"github.com/caos/zitadel/internal/eventstore"
+	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	key_model "github.com/caos/zitadel/internal/key/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/tracing"
+	"time"
 )
 
 type StorageConfig struct {
@@ -36,9 +40,22 @@ type UserStorage interface {
 }
 
 type ProviderStorage struct {
-	repo    repository.Repository
-	command *command.Commands
-	query   *query.Queries
+	certChan                  <-chan interface{}
+	certificateRotationCheck  time.Duration
+	certificateGracefulPeriod time.Duration
+
+	currentCACertificate       query.Certificate
+	currentMetadataCertificate query.Certificate
+	currentResponseCertificate query.Certificate
+
+	locker               crdb.Locker
+	certificateAlgorithm string
+	encAlg               crypto.EncryptionAlgorithm
+
+	eventstore *eventstore.Eventstore
+	repo       repository.Repository
+	command    *command.Commands
+	query      *query.Queries
 
 	SignAlgorithm   string
 	defaultLoginURL string
@@ -78,15 +95,15 @@ func (p *ProviderStorage) Health(context.Context) error {
 }
 
 func (p *ProviderStorage) GetCA(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
-	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLCA)
+	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLCA)
 }
 
 func (p *ProviderStorage) GetMetadataSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
-	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLMetadataSigning)
+	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLMetadataSigning)
 }
 
 func (p *ProviderStorage) GetResponseSigningKey(ctx context.Context, certAndKeyChan chan<- key.CertificateAndKey) {
-	p.repo.GetCertificateAndKey(ctx, certAndKeyChan, p.SignAlgorithm, key_model.KeyUsageSAMLResponseSinging)
+	p.GetCertificateAndKey(ctx, certAndKeyChan, key_model.KeyUsageSAMLResponseSinging)
 }
 
 func (p *ProviderStorage) CreateAuthRequest(ctx context.Context, req *samlp.AuthnRequest, acsUrl, protocolBinding, relayState, issuerID string) (_ AuthRequestInt, err error) {
@@ -136,15 +153,15 @@ func (p *ProviderStorage) GetAttributesFromNameID(ctx context.Context, nameID st
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	user, err := p.repo.UserByID(ctx, nameID)
+	user, err := p.query.GetUserByID(ctx, nameID)
 	if err != nil {
 		return nil, err
 	}
 
 	return map[string]interface{}{
-		"Email":             user.Email,
-		"FirstName":         user.FirstName,
-		"LastName":          user.LastName,
+		"Email":             user.Human.Email,
+		"FirstName":         user.Human.FirstName,
+		"LastName":          user.Human.LastName,
 		"PreferredUsername": user.PreferredLoginName,
 	}, nil
 }
@@ -152,7 +169,7 @@ func (p *ProviderStorage) GetAttributesFromNameID(ctx context.Context, nameID st
 func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSetter, userID, applicationID string, attributes []int) (err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
-	user, err := p.repo.UserByID(ctx, userID)
+	user, err := p.query.GetUserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -160,13 +177,13 @@ func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSet
 	for _, attribute := range attributes {
 		switch attribute {
 		case AttributeEmail:
-			userinfo.SetEmail(user.Email)
+			userinfo.SetEmail(user.Human.Email)
 		case AttributeSurname:
-			userinfo.SetSurname(user.LastName)
+			userinfo.SetSurname(user.Human.LastName)
 		case AttributeFullName:
-			userinfo.SetFullName(user.DisplayName)
+			userinfo.SetFullName(user.Human.DisplayName)
 		case AttributeGivenName:
-			userinfo.SetGivenName(user.FirstName)
+			userinfo.SetGivenName(user.Human.FirstName)
 		case AttributeUsername:
 			userinfo.SetUsername(user.PreferredLoginName)
 		case AttributeUserID:
@@ -176,10 +193,10 @@ func (p *ProviderStorage) SetUserinfo(ctx context.Context, userinfo AttributeSet
 		}
 	}
 	if attributes == nil || len(attributes) == 0 {
-		userinfo.SetEmail(user.Email)
-		userinfo.SetSurname(user.LastName)
-		userinfo.SetGivenName(user.FirstName)
-		userinfo.SetFullName(user.DisplayName)
+		userinfo.SetEmail(user.Human.Email)
+		userinfo.SetSurname(user.Human.LastName)
+		userinfo.SetGivenName(user.Human.FirstName)
+		userinfo.SetFullName(user.Human.DisplayName)
 		userinfo.SetUsername(user.PreferredLoginName)
 		userinfo.SetUserID(userID)
 	}

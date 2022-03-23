@@ -1574,6 +1574,7 @@ service AdminService {
 
     //Updates the default privacy policy of ZITADEL
     // it impacts all organisations without a customised policy
+    // Variable {{.Lang}} can be set to have different links based on the language
     rpc UpdatePrivacyPolicy(UpdatePrivacyPolicyRequest) returns (UpdatePrivacyPolicyResponse) {
         option (google.api.http) = {
             put: "/policies/privacy";
@@ -1645,6 +1646,18 @@ service AdminService {
         };
     }
 
+    // Removes the custom init message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomInitMessageTextToDefault(ResetCustomInitMessageTextToDefaultRequest) returns (ResetCustomInitMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/init/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for password reset message (translation file)
     rpc GetDefaultPasswordResetMessageText(GetDefaultPasswordResetMessageTextRequest) returns (GetDefaultPasswordResetMessageTextResponse) {
         option (google.api.http) = {
@@ -1683,6 +1696,18 @@ service AdminService {
 
     }
 
+    // Removes the custom password reset message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomPasswordResetMessageTextToDefault(ResetCustomPasswordResetMessageTextToDefaultRequest) returns (ResetCustomPasswordResetMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyemail/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for verify email message (translation files)
     rpc GetDefaultVerifyEmailMessageText(GetDefaultVerifyEmailMessageTextRequest) returns (GetDefaultVerifyEmailMessageTextResponse) {
         option (google.api.http) = {
@@ -1717,6 +1742,18 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom verify email message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomVerifyEmailMessageTextToDefault(ResetCustomVerifyEmailMessageTextToDefaultRequest) returns (ResetCustomVerifyEmailMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyemail/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
         };
     }
 
@@ -1757,6 +1794,18 @@ service AdminService {
         };
     }
 
+    // Removes the custom verify phone text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomVerifyPhoneMessageTextToDefault(ResetCustomVerifyPhoneMessageTextToDefaultRequest) returns (ResetCustomVerifyPhoneMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/verifyphone/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for domain claimed message (translation file)
     rpc GetDefaultDomainClaimedMessageText(GetDefaultDomainClaimedMessageTextRequest) returns (GetDefaultDomainClaimedMessageTextResponse) {
         option (google.api.http) = {
@@ -1794,6 +1843,18 @@ service AdminService {
         };
     }
 
+    // Removes the custom domain claimed message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomDomainClaimedMessageTextToDefault(ResetCustomDomainClaimedMessageTextToDefaultRequest) returns (ResetCustomDomainClaimedMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/domainclaimed/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "iam.policy.delete"
+        };
+    }
+
     //Returns the default text for passwordless registration message (translation file)
     rpc GetDefaultPasswordlessRegistrationMessageText(GetDefaultPasswordlessRegistrationMessageTextRequest) returns (GetDefaultPasswordlessRegistrationMessageTextResponse) {
         option (google.api.http) = {
@@ -1828,6 +1889,18 @@ service AdminService {
 
         option (zitadel.v1.auth_option) = {
             permission: "iam.policy.write";
+        };
+    }
+
+    // Removes the custom passwordless link message text of the system
+    // The default text from the translation file will trigger after
+    rpc ResetCustomPasswordlessRegistrationMessageTextToDefault(ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest) returns (ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse) {
+        option (google.api.http) = {
+            delete: "/text/message/passwordless_registration/{language}"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "policy.delete"
         };
     }
 
@@ -2822,6 +2895,8 @@ message SetDefaultFeaturesRequest {
     bool custom_text_login = 21;
     bool lockout_policy = 22;
     bool actions = 23;
+    zitadel.features.v1.ActionsAllowed actions_allowed = 24;
+    int32 max_actions = 25;
 }
 
 message SetDefaultFeaturesResponse {
@@ -2862,6 +2937,8 @@ message SetOrgFeaturesRequest {
     bool custom_text_login = 22;
     bool lockout_policy = 23;
     bool actions = 24;
+    zitadel.features.v1.ActionsAllowed actions_allowed = 25;
+    int32 max_actions = 26;
 }
 
 message SetOrgFeaturesResponse {
@@ -3331,6 +3408,7 @@ message GetPrivacyPolicyResponse {
 message UpdatePrivacyPolicyRequest {
     string tos_link = 1;
     string privacy_link = 2;
+    string help_link = 3;
 }
 
 message UpdatePrivacyPolicyResponse {
@@ -3373,6 +3451,14 @@ message SetDefaultInitMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ResetCustomInitMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomInitMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultPasswordResetMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3406,6 +3492,14 @@ message SetDefaultPasswordResetMessageTextRequest {
 }
 
 message SetDefaultPasswordResetMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordResetMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordResetMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3445,6 +3539,14 @@ message SetDefaultVerifyEmailMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ResetCustomVerifyEmailMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifyEmailMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultVerifyPhoneMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3478,6 +3580,14 @@ message SetDefaultVerifyPhoneMessageTextRequest {
 }
 
 message SetDefaultVerifyPhoneMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomVerifyPhoneMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomVerifyPhoneMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
@@ -3517,6 +3627,14 @@ message SetDefaultDomainClaimedMessageTextResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 
+message ResetCustomDomainClaimedMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomDomainClaimedMessageTextToDefaultResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
 message GetDefaultPasswordlessRegistrationMessageTextRequest {
     string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
 }
@@ -3550,6 +3668,14 @@ message SetDefaultPasswordlessRegistrationMessageTextRequest {
 }
 
 message SetDefaultPasswordlessRegistrationMessageTextResponse {
+    zitadel.v1.ObjectDetails details = 1;
+}
+
+message ResetCustomPasswordlessRegistrationMessageTextToDefaultRequest {
+    string language = 1 [(validate.rules).string = {min_len: 1, max_len: 200}];
+}
+
+message ResetCustomPasswordlessRegistrationMessageTextToDefaultResponse {
     zitadel.v1.ObjectDetails details = 1;
 }
 

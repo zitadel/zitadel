@@ -18,11 +18,10 @@ import (
 	http_util "github.com/caos/zitadel/internal/api/http"
 	"github.com/caos/zitadel/internal/api/oidc"
 	auth_es "github.com/caos/zitadel/internal/auth/repository/eventsourcing"
-	authz_es "github.com/caos/zitadel/internal/authz/repository/eventsourcing"
+	authz_repo "github.com/caos/zitadel/internal/authz/repository"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
-	iam_model "github.com/caos/zitadel/internal/iam/model"
 	"github.com/caos/zitadel/internal/query"
 	"github.com/caos/zitadel/internal/telemetry/metrics"
 	"github.com/caos/zitadel/internal/telemetry/metrics/otel"
@@ -34,6 +33,7 @@ type Config struct {
 	GRPC grpc_util.Config
 	OIDC oidc.OPHandlerConfig
 	SAML saml.ProviderConfig
+	Domain string
 }
 
 type API struct {
@@ -48,7 +48,7 @@ type API struct {
 
 type health interface {
 	Health(ctx context.Context) error
-	IamByID(ctx context.Context) (*iam_model.IAM, error)
+	IAMByID(ctx context.Context, id string) (*query.IAM, error)
 	VerifierClientID(ctx context.Context, appName string) (string, string, error)
 }
 
@@ -61,21 +61,21 @@ type admin interface {
 	GetSpoolerDiv(database, viewName string) int64
 }
 
-func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo *authz_es.EsRepository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
+func Create(config Config, authZ authz.Config, q *query.Queries, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, adminRepo *admin_es.EsRepository, sd systemdefaults.SystemDefaults) *API {
 	api := &API{
 		serverPort: config.GRPC.ServerPort,
 	}
 
 	repo := struct {
-		authz_es.EsRepository
+		authz_repo.Repository
 		query.Queries
 	}{
-		*authZRepo,
+		authZRepo,
 		*q,
 	}
 
 	api.verifier = authz.Start(&repo)
-	api.health = authZRepo
+	api.health = &repo
 	api.auth = authRepo
 	api.admin = adminRepo
 	api.grpcServer = server.CreateServer(api.verifier, authZ, sd.DefaultLanguage)
@@ -110,14 +110,14 @@ func (a *API) healthHandler() http.Handler {
 			return nil
 		},
 		func(ctx context.Context) error {
-			iam, err := a.health.IamByID(ctx)
+			iam, err := a.health.IAMByID(ctx, domain.IAMID)
 			if err != nil && !errors.IsNotFound(err) {
 				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
 			}
-			if iam == nil || iam.SetUpStarted < domain.StepCount-1 {
+			if iam == nil || iam.SetupStarted < domain.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-HBfs3", "IAM NOT SET UP")
 			}
-			if iam.SetUpDone < domain.StepCount-1 {
+			if iam.SetupDone < domain.StepCount-1 {
 				return errors.ThrowPreconditionFailed(nil, "API-DASs2", "IAM SETUP RUNNING")
 			}
 			return nil

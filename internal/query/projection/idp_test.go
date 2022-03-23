@@ -15,12 +15,12 @@ import (
 
 func TestIDPProjection_reduces(t *testing.T) {
 	type args struct {
-		event func(t *testing.T) eventstore.EventReader
+		event func(t *testing.T) eventstore.Event
 	}
 	tests := []struct {
 		name   string
 		args   args
-		reduce func(event eventstore.EventReader) (*handler.Statement, error)
+		reduce func(event eventstore.Event) (*handler.Statement, error)
 		want   wantReduce
 	}{
 		{

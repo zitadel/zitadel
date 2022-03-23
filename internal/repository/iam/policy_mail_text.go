@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/policy"
@@ -42,7 +43,7 @@ func NewMailTextAddedEvent(
 	}
 }
 
-func MailTextAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTextAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.MailTextAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -74,7 +75,7 @@ func NewMailTextChangedEvent(
 	return &MailTextChangedEvent{MailTextChangedEvent: *changedEvent}, nil
 }
 
-func MailTextChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func MailTextChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.MailTextChangedEventMapper(event)
 	if err != nil {
 		return nil, err

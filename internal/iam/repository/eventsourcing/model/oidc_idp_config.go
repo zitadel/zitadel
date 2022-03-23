@@ -2,12 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"reflect"
+
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/crypto"
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/iam/model"
 	"github.com/lib/pq"
-	"reflect"
 )
 
 type OIDCIDPConfig struct {
@@ -45,19 +46,6 @@ func (c *OIDCIDPConfig) Changes(changed *OIDCIDPConfig) map[string]interface{} {
 	return changes
 }
 
-func OIDCIDPConfigFromModel(config *model.OIDCIDPConfig) *OIDCIDPConfig {
-	return &OIDCIDPConfig{
-		ObjectRoot:            config.ObjectRoot,
-		IDPConfigID:           config.IDPConfigID,
-		ClientID:              config.ClientID,
-		ClientSecret:          config.ClientSecret,
-		Issuer:                config.Issuer,
-		Scopes:                config.Scopes,
-		IDPDisplayNameMapping: int32(config.IDPDisplayNameMapping),
-		UsernameMapping:       int32(config.UsernameMapping),
-	}
-}
-
 func OIDCIDPConfigToModel(config *OIDCIDPConfig) *model.OIDCIDPConfig {
 	return &model.OIDCIDPConfig{
 		ObjectRoot:            config.ObjectRoot,
@@ -69,33 +57,6 @@ func OIDCIDPConfigToModel(config *OIDCIDPConfig) *model.OIDCIDPConfig {
 		IDPDisplayNameMapping: model.OIDCMappingField(config.IDPDisplayNameMapping),
 		UsernameMapping:       model.OIDCMappingField(config.UsernameMapping),
 	}
-}
-
-func (iam *IAM) appendAddOIDCIDPConfigEvent(event *es_models.Event) error {
-	config := new(OIDCIDPConfig)
-	err := config.SetData(event)
-	if err != nil {
-		return err
-	}
-	config.ObjectRoot.CreationDate = event.CreationDate
-	if i, idpConfig := GetIDPConfig(iam.IDPs, config.IDPConfigID); idpConfig != nil {
-		iam.IDPs[i].Type = int32(model.IDPConfigTypeOIDC)
-		iam.IDPs[i].OIDCIDPConfig = config
-	}
-	return nil
-}
-
-func (iam *IAM) appendChangeOIDCIDPConfigEvent(event *es_models.Event) error {
-	config := new(OIDCIDPConfig)
-	err := config.SetData(event)
-	if err != nil {
-		return err
-	}
-
-	if i, idpConfig := GetIDPConfig(iam.IDPs, config.IDPConfigID); idpConfig != nil {
-		iam.IDPs[i].OIDCIDPConfig.SetData(event)
-	}
-	return nil
 }
 
 func (o *OIDCIDPConfig) SetData(event *es_models.Event) error {

@@ -19,28 +19,30 @@ const (
 type FeaturesSetEvent struct {
 	eventstore.BaseEvent `json:"-"`
 
-	TierName                 *string               `json:"tierName,omitempty"`
-	TierDescription          *string               `json:"tierDescription,omitempty"`
-	State                    *domain.FeaturesState `json:"state,omitempty"`
-	StateDescription         *string               `json:"stateDescription,omitempty"`
-	AuditLogRetention        *time.Duration        `json:"auditLogRetention,omitempty"`
-	LoginPolicyFactors       *bool                 `json:"loginPolicyFactors,omitempty"`
-	LoginPolicyIDP           *bool                 `json:"loginPolicyIDP,omitempty"`
-	LoginPolicyPasswordless  *bool                 `json:"loginPolicyPasswordless,omitempty"`
-	LoginPolicyRegistration  *bool                 `json:"loginPolicyRegistration,omitempty"`
-	LoginPolicyUsernameLogin *bool                 `json:"loginPolicyUsernameLogin,omitempty"`
-	LoginPolicyPasswordReset *bool                 `json:"loginPolicyPasswordReset,omitempty"`
-	PasswordComplexityPolicy *bool                 `json:"passwordComplexityPolicy,omitempty"`
-	LabelPolicy              *bool                 `json:"labelPolicy,omitempty"`
-	LabelPolicyPrivateLabel  *bool                 `json:"labelPolicyPrivateLabel,omitempty"`
-	LabelPolicyWatermark     *bool                 `json:"labelPolicyWatermark,omitempty"`
-	CustomDomain             *bool                 `json:"customDomain,omitempty"`
-	PrivacyPolicy            *bool                 `json:"privacyPolicy,omitempty"`
-	MetadataUser             *bool                 `json:"metadataUser,omitempty"`
-	CustomTextMessage        *bool                 `json:"customTextMessage,omitempty"`
-	CustomTextLogin          *bool                 `json:"customTextLogin,omitempty"`
-	LockoutPolicy            *bool                 `json:"lockoutPolicy,omitempty"`
-	Actions                  *bool                 `json:"actions,omitempty"`
+	TierName                 *string                `json:"tierName,omitempty"`
+	TierDescription          *string                `json:"tierDescription,omitempty"`
+	State                    *domain.FeaturesState  `json:"state,omitempty"`
+	StateDescription         *string                `json:"stateDescription,omitempty"`
+	AuditLogRetention        *time.Duration         `json:"auditLogRetention,omitempty"`
+	LoginPolicyFactors       *bool                  `json:"loginPolicyFactors,omitempty"`
+	LoginPolicyIDP           *bool                  `json:"loginPolicyIDP,omitempty"`
+	LoginPolicyPasswordless  *bool                  `json:"loginPolicyPasswordless,omitempty"`
+	LoginPolicyRegistration  *bool                  `json:"loginPolicyRegistration,omitempty"`
+	LoginPolicyUsernameLogin *bool                  `json:"loginPolicyUsernameLogin,omitempty"`
+	LoginPolicyPasswordReset *bool                  `json:"loginPolicyPasswordReset,omitempty"`
+	PasswordComplexityPolicy *bool                  `json:"passwordComplexityPolicy,omitempty"`
+	LabelPolicy              *bool                  `json:"labelPolicy,omitempty"`
+	LabelPolicyPrivateLabel  *bool                  `json:"labelPolicyPrivateLabel,omitempty"`
+	LabelPolicyWatermark     *bool                  `json:"labelPolicyWatermark,omitempty"`
+	CustomDomain             *bool                  `json:"customDomain,omitempty"`
+	PrivacyPolicy            *bool                  `json:"privacyPolicy,omitempty"`
+	MetadataUser             *bool                  `json:"metadataUser,omitempty"`
+	CustomTextMessage        *bool                  `json:"customTextMessage,omitempty"`
+	CustomTextLogin          *bool                  `json:"customTextLogin,omitempty"`
+	LockoutPolicy            *bool                  `json:"lockoutPolicy,omitempty"`
+	Actions                  *bool                  `json:"actions,omitempty"`
+	ActionsAllowed           *domain.ActionsAllowed `json:"actionsAllowed,omitempty"`
+	MaxActions               *int                   `json:"maxActions,omitempty"`
 }
 
 func (e *FeaturesSetEvent) Data() interface{} {
@@ -189,13 +191,19 @@ func ChangeLockoutPolicy(lockoutPolicy bool) func(event *FeaturesSetEvent) {
 	}
 }
 
-func ChangeActions(actions bool) func(event *FeaturesSetEvent) {
+func ChangeActionsAllowed(allowedType domain.ActionsAllowed) func(event *FeaturesSetEvent) {
 	return func(e *FeaturesSetEvent) {
-		e.Actions = &actions
+		e.ActionsAllowed = &allowedType
 	}
 }
 
-func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangeMaxActions(maxActions int) func(event *FeaturesSetEvent) {
+	return func(e *FeaturesSetEvent) {
+		e.MaxActions = &maxActions
+	}
+}
+
+func FeaturesSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &FeaturesSetEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -230,7 +238,7 @@ func NewFeaturesRemovedEvent(base *eventstore.BaseEvent) *FeaturesRemovedEvent {
 	}
 }
 
-func FeaturesRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FeaturesRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &FeaturesRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -45,7 +45,8 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 		features.CustomTextMessage,
 		features.CustomTextLogin,
 		features.LockoutPolicy,
-		features.Actions,
+		features.ActionsAllowed,
+		features.MaxActions,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")
@@ -57,7 +58,7 @@ func (c *Commands) SetOrgFeatures(ctx context.Context, resourceOwner string, fea
 	}
 	events = append(events, setEvent)
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +93,7 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain
 	}
 
 	events = append(events, removedEvent)
-	pushedEvents, err := c.eventstore.PushEvents(ctx, events...)
+	pushedEvents, err := c.eventstore.Push(ctx, events...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (c *Commands) RemoveOrgFeatures(ctx context.Context, orgID string) (*domain
 	return writeModelToObjectDetails(&existingFeatures.WriteModel), nil
 }
 
-func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
+func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
 	events, err := c.setAllowedLoginPolicy(ctx, orgID, features)
 	if err != nil {
 		return nil, err
@@ -177,7 +178,7 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeOrgUserMetadatas...)
 		}
 	}
-	if !features.Actions {
+	if features.ActionsAllowed == domain.ActionsNotAllowed {
 		removeOrgActions, err := c.removeActionsFromOrg(ctx, orgID)
 		if err != nil {
 			return nil, err
@@ -186,11 +187,20 @@ func (c *Commands) ensureOrgSettingsToFeatures(ctx context.Context, orgID string
 			events = append(events, removeOrgActions...)
 		}
 	}
+	if features.ActionsAllowed == domain.ActionsMaxAllowed {
+		deactivateActions, err := c.deactivateNotAllowedActionsFromOrg(ctx, orgID, features.MaxActions)
+		if err != nil {
+			return nil, err
+		}
+		if len(deactivateActions) > 0 {
+			events = append(events, deactivateActions...)
+		}
+	}
 	return events, nil
 }
 
-func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLoginPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -238,12 +248,12 @@ func (c *Commands) setAllowedLoginPolicy(ctx context.Context, orgID string, feat
 	return events, nil
 }
 
-func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.EventPusher, error) {
+func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context, orgID string) ([]eventstore.Command, error) {
 	orgAuthFactors, err := c.orgLoginPolicyAuthFactorsWriteModel(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
-	events := make([]eventstore.EventPusher, 0)
+	events := make([]eventstore.Command, 0)
 	for _, factor := range domain.SecondFactorTypes() {
 		state := orgAuthFactors.SecondFactors[factor]
 		if state == nil || state.IAM == state.Org {
@@ -296,8 +306,8 @@ func (c *Commands) setDefaultAuthFactorsInCustomLoginPolicy(ctx context.Context,
 	return events, nil
 }
 
-func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.EventPusher, error) {
-	events := make([]eventstore.EventPusher, 0)
+func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, features *domain.Features) ([]eventstore.Command, error) {
+	events := make([]eventstore.Command, 0)
 	existingPolicy, err := c.orgLabelPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -350,4 +360,22 @@ func (c *Commands) setAllowedLabelPolicy(ctx context.Context, orgID string, feat
 		events = append(events, org.NewLabelPolicyActivatedEvent(ctx, OrgAggregateFromWriteModel(&existingPolicy.WriteModel)))
 	}
 	return events, nil
+}
+
+func (c *Commands) getOrgFeaturesOrDefault(ctx context.Context, orgID string) (*domain.Features, error) {
+	existingFeatures := NewOrgFeaturesWriteModel(orgID)
+	err := c.eventstore.FilterToQueryReducer(ctx, existingFeatures)
+	if err != nil {
+		return nil, err
+	}
+	if existingFeatures.State != domain.FeaturesStateUnspecified && existingFeatures.State != domain.FeaturesStateRemoved {
+		return writeModelToFeatures(&existingFeatures.FeaturesWriteModel), nil
+	}
+
+	existingIAMFeatures := NewIAMFeaturesWriteModel()
+	err = c.eventstore.FilterToQueryReducer(ctx, existingIAMFeatures)
+	if err != nil {
+		return nil, err
+	}
+	return writeModelToFeatures(&existingIAMFeatures.FeaturesWriteModel), nil
 }

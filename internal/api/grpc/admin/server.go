@@ -20,28 +20,24 @@ var _ admin.AdminServiceServer = (*Server)(nil)
 
 type Server struct {
 	admin.UnimplementedAdminServiceServer
-	command       *command.Commands
-	query         *query.Queries
-	iam           repository.IAMRepository
-	administrator repository.AdministratorRepository
-	repo          repository.Repository
-	users         repository.UserRepository
-	iamDomain     string
+	command         *command.Commands
+	query           *query.Queries
+	administrator   repository.AdministratorRepository
+	iamDomain       string
+	assetsAPIDomain string
 }
 
 type Config struct {
 	Repository eventsourcing.Config
 }
 
-func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, iamDomain string) *Server {
+func CreateServer(command *command.Commands, query *query.Queries, repo repository.Repository, iamDomain, assetsAPIDomain string) *Server {
 	return &Server{
-		command:       command,
-		query:         query,
-		iam:           repo,
-		administrator: repo,
-		repo:          repo,
-		users:         repo,
-		iamDomain:     iamDomain,
+		command:         command,
+		query:           query,
+		administrator:   repo,
+		iamDomain:       iamDomain,
+		assetsAPIDomain: assetsAPIDomain,
 	}
 }
 

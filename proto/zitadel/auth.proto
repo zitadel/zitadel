@@ -638,7 +638,9 @@ message ListMyUserChangesRequest {
 }
 
 message ListMyUserChangesResponse {
-    zitadel.v1.ListDetails details = 1;
+    reserved 1;
+    reserved "details";
+    // zitadel.v1.ListDetails details = 1; was always returned empty (as we cannot get the necessary infos)
     repeated zitadel.change.v1.Change result = 2;
 }
 

@@ -6,7 +6,10 @@ title: CRD Mode on an existing Kubernetes cluster
 I'd like to see an automatically operated ZITADEL instance running on my own [Kubernetes](https://kubernetes.io/) cluster
 :::
 
-First, download the template configuration files [database.yml](./templates/crd/database.yml) and [zitadel.yml](./templates/crd/zitadel.yml). Then adjust the values in database.yml and zitadel.yml to match your environment. Especially the values for the domain, cluster DNS, storage class, email and Twilio are important.  
+First, download the template configuration file [zitadel.yml](./templates/crd/zitadel.yml).
+If you want to have a managed in-cluster CockroachDB, also download the file [database.yml](./templates/crd/database.yml).
+Then adjust the values in zitadel.yml and optionally in database.yml to match your environment.
+Especially the values for the domain, cluster DNS, storage class, email and Twilio are important.  
 
 ```bash
 # Download the zitadelctl binary
@@ -33,7 +36,7 @@ EOF
 # Write the Twiilio sender ID and auth token so that ZITADEL is able to send your users SMS.
 TWILIO_SID=<My Twilio Sender ID>
 TWILIO_AUTH_TOKEN=<My Twilio auth token>
-zitadelctl writesecret zitadel.twiliosid.existing --value $SID
+zitadelctl writesecret zitadel.twiliosid.existing --value $TWILIO_SID
 zitadelctl writesecret zitadel.twilioauthtoken.existing --value $TWILIO_AUTH_TOKEN
 
 # Write your email relays app key so that ZITADEL is able to verify your users email addresses

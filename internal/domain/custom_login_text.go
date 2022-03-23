@@ -294,15 +294,15 @@ const (
 	LoginKeyFooterTOS           = LoginKeyFooter + "Tos"
 	LoginKeyFooterPrivacyPolicy = LoginKeyFooter + "PrivacyPolicy"
 	LoginKeyFooterHelp          = LoginKeyFooter + "Help"
-	LoginKeyFooterHelpLink      = LoginKeyFooter + "HelpLink"
 )
 
 type CustomLoginText struct {
 	models.ObjectRoot
 
-	State    PolicyState
-	Default  bool
-	Language language.Tag
+	State     PolicyState
+	Default   bool
+	Language  language.Tag
+	IsDefault bool
 
 	SelectAccount                    SelectAccountScreenText
 	Login                            LoginScreenText
@@ -636,7 +636,6 @@ type FooterText struct {
 	TOS           string
 	PrivacyPolicy string
 	Help          string
-	HelpLink      string
 }
 
 type PasswordlessPromptScreenText struct {

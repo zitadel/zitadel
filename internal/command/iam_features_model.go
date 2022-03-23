@@ -25,7 +25,7 @@ func NewIAMFeaturesWriteModel() *IAMFeaturesWriteModel {
 	}
 }
 
-func (wm *IAMFeaturesWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMFeaturesWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.FeaturesSetEvent:
@@ -72,8 +72,9 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	metadataUser,
 	customTextMessage,
 	customTextLogin,
-	lockoutPolicy,
-	actions bool,
+	lockoutPolicy bool,
+	actionsAllowed domain.ActionsAllowed,
+	maxActions int,
 ) (*iam.FeaturesSetEvent, bool) {
 
 	changes := make([]features.FeaturesChanges, 0)
@@ -138,8 +139,11 @@ func (wm *IAMFeaturesWriteModel) NewSetEvent(
 	if wm.LockoutPolicy != lockoutPolicy {
 		changes = append(changes, features.ChangeLockoutPolicy(lockoutPolicy))
 	}
-	if wm.Actions != actions {
-		changes = append(changes, features.ChangeActions(actions))
+	if wm.ActionsAllowed != actionsAllowed {
+		changes = append(changes, features.ChangeActionsAllowed(actionsAllowed))
+	}
+	if wm.MaxActions != maxActions {
+		changes = append(changes, features.ChangeMaxActions(maxActions))
 	}
 	if len(changes) == 0 {
 		return nil, false

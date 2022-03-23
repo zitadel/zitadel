@@ -8,6 +8,7 @@ import (
 	change_grpc "github.com/caos/zitadel/internal/api/grpc/change"
 	object_grpc "github.com/caos/zitadel/internal/api/grpc/object"
 	project_grpc "github.com/caos/zitadel/internal/api/grpc/project"
+	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 )
 
@@ -41,17 +42,17 @@ func (s *Server) ListApps(ctx context.Context, req *mgmt_pb.ListAppsRequest) (*m
 }
 
 func (s *Server) ListAppChanges(ctx context.Context, req *mgmt_pb.ListAppChangesRequest) (*mgmt_pb.ListAppChangesResponse, error) {
-	sequence, limit, asc := change_grpc.ChangeQueryToModel(req.Query)
+	sequence, limit, asc := change_grpc.ChangeQueryToQuery(req.Query)
 	features, err := s.query.FeaturesByOrgID(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.project.ApplicationChanges(ctx, req.ProjectId, req.AppId, sequence, limit, asc, features.AuditLogRetention)
+	res, err := s.query.ApplicationChanges(ctx, req.ProjectId, req.AppId, sequence, limit, asc, features.AuditLogRetention)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppChangesResponse{
-		Result: change_grpc.AppChangesToPb(res.Changes),
+		Result: change_grpc.ChangesToPb(res.Changes, s.assetAPIPrefix),
 	}, nil
 }
 
@@ -207,7 +208,19 @@ func (s *Server) RegenerateAPIClientSecret(ctx context.Context, req *mgmt_pb.Reg
 }
 
 func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (*mgmt_pb.GetAppKeyResponse, error) {
-	key, err := s.project.GetClientKey(ctx, req.ProjectId, req.AppId, req.KeyId)
+	resourceOwner, err := query.NewAuthNKeyResourceOwnerQuery(authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	aggregateID, err := query.NewAuthNKeyAggregateIDQuery(req.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+	objectID, err := query.NewAuthNKeyObjectIDQuery(req.AppId)
+	if err != nil {
+		return nil, err
+	}
+	key, err := s.query.GetAuthNKeyByID(ctx, req.KeyId, resourceOwner, aggregateID, objectID)
 	if err != nil {
 		return nil, err
 	}
@@ -217,18 +230,18 @@ func (s *Server) GetAppKey(ctx context.Context, req *mgmt_pb.GetAppKeyRequest) (
 }
 
 func (s *Server) ListAppKeys(ctx context.Context, req *mgmt_pb.ListAppKeysRequest) (*mgmt_pb.ListAppKeysResponse, error) {
-	queries, err := ListAPIClientKeysRequestToModel(req)
+	queries, err := ListAPIClientKeysRequestToQuery(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	keys, err := s.project.SearchClientKeys(ctx, queries)
+	keys, err := s.query.SearchAuthNKeys(ctx, queries)
 	if err != nil {
 		return nil, err
 	}
 	return &mgmt_pb.ListAppKeysResponse{
-		Result: authn_grpc.KeyViewsToPb(keys.Result),
+		Result: authn_grpc.KeysToPb(keys.AuthNKeys),
 		Details: object_grpc.ToListDetails(
-			keys.TotalResult,
+			keys.Count,
 			keys.Sequence,
 			keys.Timestamp,
 		),

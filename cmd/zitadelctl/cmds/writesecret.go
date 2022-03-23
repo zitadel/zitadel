@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/caos/zitadel/pkg/databases"
+
 	"github.com/caos/orbos/pkg/kubernetes/cli"
 
 	"github.com/caos/orbos/pkg/secret"
@@ -62,6 +64,11 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 		}
 		err = nil
 
+		dbClient, err := databases.NewConnection(rv.Monitor, k8sClient, rv.Gitops, rv.OrbConfig)
+		if err != nil {
+			return err
+		}
+
 		return secret.Write(
 			monitor,
 			k8sClient,
@@ -69,7 +76,7 @@ cat ~/googlecloudstoragesa.json | zitadelctl writesecret database.bucket.service
 			s,
 			"zitadelctl",
 			fmt.Sprintf(rv.Version),
-			secrets.GetAllSecretsFunc(monitor, path != "", rv.Gitops, gitClient, k8sClient, orbConfig),
+			secrets.GetAllSecretsFunc(monitor, path != "", rv.Gitops, gitClient, k8sClient, dbClient),
 			secrets.PushFunc(monitor, rv.Gitops, gitClient, k8sClient),
 		)
 	}

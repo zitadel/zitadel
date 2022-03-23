@@ -1,12 +1,14 @@
 package management
 
 import (
+	"context"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	member_grpc "github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore/v1/models"
-	proj_model "github.com/caos/zitadel/internal/project/model"
 	"github.com/caos/zitadel/internal/query"
 	mgmt_pb "github.com/caos/zitadel/pkg/grpc/management"
 	proj_pb "github.com/caos/zitadel/pkg/grpc/project"
@@ -118,27 +120,26 @@ func UpdateProjectGrantRequestToDomain(req *mgmt_pb.UpdateProjectGrantRequest) *
 	}
 }
 
-func ListProjectGrantMembersRequestToModel(req *mgmt_pb.ListProjectGrantMembersRequest) *proj_model.ProjectGrantMemberSearchRequest {
+func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.ListProjectGrantMembersRequest) (*query.ProjectGrantMembersQuery, error) {
 	offset, limit, asc := object.ListQueryToModel(req.Query)
-	queries := member_grpc.MemberQueriesToProjectGrantMember(req.Queries)
-	queries = append(queries,
-		&proj_model.ProjectGrantMemberSearchQuery{
-			Key:    proj_model.ProjectGrantMemberSearchKeyProjectID,
-			Method: domain.SearchMethodEquals,
-			Value:  req.ProjectId,
-		},
-		&proj_model.ProjectGrantMemberSearchQuery{
-			Key:    proj_model.ProjectGrantMemberSearchKeyGrantID,
-			Method: domain.SearchMethodEquals,
-			Value:  req.GrantId,
-		})
-	return &proj_model.ProjectGrantMemberSearchRequest{
-		Offset: offset,
-		Limit:  limit,
-		Asc:    asc,
-		//SortingColumn: //TODO: sorting
-		Queries: queries,
+	queries, err := member_grpc.MemberQueriesToQuery(req.Queries)
+	if err != nil {
+		return nil, err
 	}
+	return &query.ProjectGrantMembersQuery{
+		MembersQuery: query.MembersQuery{
+			SearchRequest: query.SearchRequest{
+				Offset: offset,
+				Limit:  limit,
+				Asc:    asc,
+				//SortingColumn: //TODO: sorting
+			},
+			Queries: queries,
+		},
+		ProjectID: req.ProjectId,
+		GrantID:   req.GrantId,
+		OrgID:     authz.GetCtxData(ctx).OrgID,
+	}, nil
 }
 
 func AddProjectGrantMemberRequestToDomain(req *mgmt_pb.AddProjectGrantMemberRequest) *domain.ProjectGrantMember {

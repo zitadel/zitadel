@@ -51,7 +51,7 @@ func NewSAMLConfigAddedEvent(
 	}
 }
 
-func SAMLConfigAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SAMLConfigAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SAMLConfigAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -120,7 +120,7 @@ func ChangeMetadataURL(metadataURL string) func(event *SAMLConfigChangedEvent) {
 	}
 }
 
-func SAMLConfigChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func SAMLConfigChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &SAMLConfigChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}

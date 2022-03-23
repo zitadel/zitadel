@@ -2,6 +2,8 @@ package handler
 
 import (
 	"github.com/caos/zitadel/internal/domain"
+	"github.com/caos/zitadel/internal/query"
+
 	"net/http"
 )
 
@@ -15,7 +17,12 @@ func (l *Login) handlePasswordReset(w http.ResponseWriter, r *http.Request) {
 		l.renderError(w, r, authReq, err)
 		return
 	}
-	user, err := l.authRepo.UserByLoginName(setContext(r.Context(), authReq.UserOrgID), authReq.LoginName)
+	loginName, err := query.NewUserLoginNamesSearchQuery(authReq.LoginName)
+	if err != nil {
+		l.renderInitPassword(w, r, authReq, authReq.UserID, "", err)
+		return
+	}
+	user, err := l.query.GetUser(setContext(r.Context(), authReq.UserOrgID), loginName)
 	if err != nil {
 		l.renderPasswordResetDone(w, r, authReq, err)
 		return

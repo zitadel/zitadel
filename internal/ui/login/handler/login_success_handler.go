@@ -21,8 +21,12 @@ func (l *Login) redirectToLoginSuccess(w http.ResponseWriter, r *http.Request, i
 
 func (l *Login) handleLoginSuccess(w http.ResponseWriter, r *http.Request) {
 	authRequest, _ := l.getAuthRequest(r)
-	if authRequest != nil {
-		if !(len(authRequest.PossibleSteps) == 1 && authRequest.PossibleSteps[0].Type() == domain.NextStepRedirectToCallback) {
+	if authRequest == nil {
+		l.renderSuccessAndCallback(w, r, nil, nil)
+		return
+	}
+	for _, step := range authRequest.PossibleSteps {
+		if step.Type() != domain.NextStepLoginSucceeded && step.Type() != domain.NextStepRedirectToCallback {
 			l.renderNextStep(w, r, authRequest)
 			return
 		}
@@ -46,4 +50,9 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	l.renderer.RenderTemplate(w, r, l.getTranslator(authReq), l.renderer.Templates[tmplLoginSuccess], data, nil)
+}
+
+func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
+	callback := l.oidcAuthCallbackURL + authReq.ID
+	http.Redirect(w, r, callback, http.StatusFound)
 }

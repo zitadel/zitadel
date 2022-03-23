@@ -41,7 +41,7 @@ func (c *Commands) GenerateSAMLCACertificate(ctx context.Context) error {
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSAMLCA,
@@ -74,7 +74,7 @@ func (c *Commands) GenerateSAMLResponseCertificate(ctx context.Context, reason s
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSAMLResponseSinging,
@@ -107,7 +107,7 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, reason s
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSAMLMetadataSigning,
@@ -117,7 +117,7 @@ func (c *Commands) GenerateSAMLMetadataCertificate(ctx context.Context, reason s
 	return err
 }
 
-func (c *Commands) GenerateOIDCSigningPair(ctx context.Context, algorithm string) error {
+func (c *Commands) GenerateSigningKeyPair(ctx context.Context, algorithm string) error {
 	ctx = setOIDCCtx(ctx)
 	privateCrypto, publicCrypto, err := crypto.GenerateEncryptedKeyPair(c.keySize, c.keyAlgorithm)
 	if err != nil {
@@ -135,7 +135,7 @@ func (c *Commands) GenerateOIDCSigningPair(ctx context.Context, algorithm string
 
 	keyPairWriteModel := NewKeyPairWriteModel(keyID, domain.IAMID)
 	keyAgg := KeyPairAggregateFromWriteModel(&keyPairWriteModel.WriteModel)
-	_, err = c.eventstore.PushEvents(ctx, keypair.NewAddedEvent(
+	_, err = c.eventstore.Push(ctx, keypair.NewAddedEvent(
 		ctx,
 		keyAgg,
 		domain.KeyUsageSigning,

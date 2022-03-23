@@ -2,6 +2,7 @@ package org
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/repository/features"
@@ -34,7 +35,7 @@ func NewFeaturesSetEvent(
 	return &FeaturesSetEvent{FeaturesSetEvent: *changedEvent}, nil
 }
 
-func FeaturesSetEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FeaturesSetEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := features.FeaturesSetEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -61,7 +62,7 @@ func NewFeaturesRemovedEvent(
 	}
 }
 
-func FeaturesRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func FeaturesRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := features.FeaturesRemovedEventMapper(event)
 	if err != nil {
 		return nil, err

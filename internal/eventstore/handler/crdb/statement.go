@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
@@ -23,7 +25,7 @@ func WithTableSuffix(name string) func(*execConfig) {
 	}
 }
 
-func NewCreateStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) *handler.Statement {
+func NewCreateStatement(event eventstore.Event, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -48,7 +50,7 @@ func NewCreateStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, opts ...execOption) *handler.Statement {
+func NewUpsertStatement(event eventstore.Event, values []handler.Column, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	columnNames := strings.Join(cols, ", ")
 	valuesPlaceholder := strings.Join(params, ", ")
@@ -73,7 +75,7 @@ func NewUpsertStatement(event eventstore.EventReader, values []handler.Column, o
 	}
 }
 
-func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {
+func NewUpdateStatement(event eventstore.Event, values []handler.Column, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	cols, params, args := columnsToQuery(values)
 	wheres, whereArgs := conditionsToWhere(conditions, len(params))
 	args = append(args, whereArgs...)
@@ -106,7 +108,7 @@ func NewUpdateStatement(event eventstore.EventReader, values []handler.Column, c
 	}
 }
 
-func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condition, opts ...execOption) *handler.Statement {
+func NewDeleteStatement(event eventstore.Event, conditions []handler.Condition, opts ...execOption) *handler.Statement {
 	wheres, args := conditionsToWhere(conditions, 0)
 
 	wheresPlaceholders := strings.Join(wheres, " AND ")
@@ -131,7 +133,7 @@ func NewDeleteStatement(event eventstore.EventReader, conditions []handler.Condi
 	}
 }
 
-func NewNoOpStatement(event eventstore.EventReader) *handler.Statement {
+func NewNoOpStatement(event eventstore.Event) *handler.Statement {
 	return &handler.Statement{
 		AggregateType:    event.Aggregate().Type,
 		Sequence:         event.Sequence(),
@@ -139,7 +141,7 @@ func NewNoOpStatement(event eventstore.EventReader) *handler.Statement {
 	}
 }
 
-func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.EventReader) Exec) *handler.Statement {
+func NewMultiStatement(event eventstore.Event, opts ...func(eventstore.Event) Exec) *handler.Statement {
 	if len(opts) == 0 {
 		return NewNoOpStatement(event)
 	}
@@ -157,26 +159,26 @@ func NewMultiStatement(event eventstore.EventReader, opts ...func(eventstore.Eve
 
 type Exec func(ex handler.Executer, projectionName string) error
 
-func AddCreateStatement(columns []handler.Column, opts ...execOption) func(eventstore.EventReader) Exec {
-	return func(event eventstore.EventReader) Exec {
+func AddCreateStatement(columns []handler.Column, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
 		return NewCreateStatement(event, columns, opts...).Execute
 	}
 }
 
-func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.EventReader) Exec {
-	return func(event eventstore.EventReader) Exec {
+func AddUpsertStatement(values []handler.Column, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
 		return NewUpsertStatement(event, values, opts...).Execute
 	}
 }
 
-func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
-	return func(event eventstore.EventReader) Exec {
+func AddUpdateStatement(values []handler.Column, conditions []handler.Condition, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
 		return NewUpdateStatement(event, values, conditions, opts...).Execute
 	}
 }
 
-func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.EventReader) Exec {
-	return func(event eventstore.EventReader) Exec {
+func AddDeleteStatement(conditions []handler.Condition, opts ...execOption) func(eventstore.Event) Exec {
+	return func(event eventstore.Event) Exec {
 		return NewDeleteStatement(event, conditions, opts...).Execute
 	}
 }
@@ -201,12 +203,31 @@ func NewArrayRemoveCol(column string, value interface{}) handler.Column {
 	}
 }
 
+func NewArrayIntersectCol(column string, value interface{}) handler.Column {
+	var arrayType string
+	switch value.(type) {
+	case pq.StringArray:
+		arrayType = "STRING"
+	case pq.Int32Array,
+		pq.Int64Array:
+		arrayType = "INT"
+		//TODO: handle more types if necessary
+	}
+	return handler.Column{
+		Name:  column,
+		Value: value,
+		ParameterOpt: func(placeholder string) string {
+			return "SELECT ARRAY( SELECT UNNEST(" + column + ") INTERSECT SELECT UNNEST (" + placeholder + "::" + arrayType + "[]))"
+		},
+	}
+}
+
 //NewCopyStatement creates a new upsert statement which updates a column from an existing row
 // cols represent the columns which are objective to change.
 // if the value of a col is empty the data will be copied from the selected row
 // if the value of a col is not empty the data will be set by the static value
 // conds represent the conditions for the selection subquery
-func NewCopyStatement(event eventstore.EventReader, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
+func NewCopyStatement(event eventstore.Event, cols []handler.Column, conds []handler.Condition, opts ...execOption) *handler.Statement {
 	columnNames := make([]string, len(cols))
 	selectColumns := make([]string, len(cols))
 	argCounter := 0

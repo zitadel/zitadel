@@ -34,7 +34,7 @@ func TestFailedEventsToPbFields(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := admin_grpc.FailedEventsToPb(tt.args.failedEvents)
+			got := admin_grpc.FailedEventsViewToPb(tt.args.failedEvents)
 			for _, g := range got {
 				test.AssertFieldsMapped(t, g)
 			}
@@ -64,7 +64,7 @@ func TestFailedEventToPbFields(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		converted := admin_grpc.FailedEventToPb(tt.args.failedEvent)
+		converted := admin_grpc.FailedEventViewToPb(tt.args.failedEvent)
 		test.AssertFieldsMapped(t, converted)
 	}
 }

@@ -4,7 +4,8 @@
    
     <ng-template cnslHasRole [hasRole]="['project.role.write:' + projectId, 'project.role.write']" actions>
         <a *ngIf="actionsVisible" [disabled]="disabled" [routerLink]="[ '/projects', projectId, 'roles', 'create']"
-            color="primary" mat-raised-button>
+            color="primary" mat-raised-button
+            [attr.data-e2e]="'add-new-role'">
             <mat-icon class="icon">add</mat-icon>{{ 'ACTIONS.NEW' | translate }}
         </a>
     </ng-template>

@@ -16,7 +16,7 @@ func (c *Commands) SetDefaultFeatures(ctx context.Context, features *domain.Feat
 		return nil, err
 	}
 
-	pushedEvents, err := c.eventstore.PushEvents(ctx, setEvent)
+	pushedEvents, err := c.eventstore.Push(ctx, setEvent)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,8 @@ func (c *Commands) setDefaultFeatures(ctx context.Context, existingFeatures *IAM
 		features.CustomTextMessage,
 		features.CustomTextLogin,
 		features.LockoutPolicy,
-		features.Actions,
+		features.ActionsAllowed,
+		features.MaxActions,
 	)
 	if !hasChanged {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "Features-GE4h2", "Errors.Features.NotChanged")

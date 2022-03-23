@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -72,7 +73,7 @@ func NewUserGrantAddedEvent(
 	}
 }
 
-func UserGrantAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserGrantAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -112,7 +113,7 @@ func NewUserGrantChangedEvent(
 	}
 }
 
-func UserGrantChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserGrantChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -152,7 +153,7 @@ func NewUserGrantCascadeChangedEvent(
 	}
 }
 
-func UserGrantCascadeChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantCascadeChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &UserGrantChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -199,7 +200,7 @@ func NewUserGrantRemovedEvent(
 	}
 }
 
-func UserGrantRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserGrantRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -239,7 +240,7 @@ func NewUserGrantCascadeRemovedEvent(
 	}
 }
 
-func UserGrantCascadeRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantCascadeRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserGrantCascadeRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -267,7 +268,7 @@ func NewUserGrantDeactivatedEvent(ctx context.Context, aggregate *eventstore.Agg
 	}
 }
 
-func UserGrantDeactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantDeactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserGrantDeactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil
@@ -295,7 +296,7 @@ func NewUserGrantReactivatedEvent(ctx context.Context, aggregate *eventstore.Agg
 	}
 }
 
-func UserGrantReactivatedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func UserGrantReactivatedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &UserGrantReactivatedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

@@ -74,6 +74,7 @@ type Subdomains struct {
 	Issuer       string `yaml:"issuer"`
 	Subscription string `yaml:"subscription"`
 }
+
 type Passwords struct {
 	Migration            *secret.Secret   `yaml:"migration"`
 	Management           *secret.Secret   `yaml:"management"`

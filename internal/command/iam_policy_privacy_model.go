@@ -25,7 +25,7 @@ func NewIAMPrivacyPolicyWriteModel() *IAMPrivacyPolicyWriteModel {
 	}
 }
 
-func (wm *IAMPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMPrivacyPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.PrivacyPolicyAddedEvent:
@@ -56,7 +56,8 @@ func (wm *IAMPrivacyPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) (*iam.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)
@@ -65,6 +66,9 @@ func (wm *IAMPrivacyPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.PrivacyLink != privacyLink {
 		changes = append(changes, policy.ChangePrivacyLink(privacyLink))
+	}
+	if wm.HelpLink != helpLink {
+		changes = append(changes, policy.ChangeHelpLink(helpLink))
 	}
 	if len(changes) == 0 {
 		return nil, false

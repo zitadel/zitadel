@@ -7,11 +7,8 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./warn-dialog.component.scss'],
 })
 export class WarnDialogComponent {
-
-  constructor(
-    public dialogRef: MatDialogRef<WarnDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-  ) { }
+  public confirm: string = '';
+  constructor(public dialogRef: MatDialogRef<WarnDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   public closeDialog(): void {
     this.dialogRef.close(false);

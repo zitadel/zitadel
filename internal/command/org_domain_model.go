@@ -29,7 +29,7 @@ func NewOrgDomainWriteModel(orgID string, domain string) *OrgDomainWriteModel {
 	}
 }
 
-func (wm *OrgDomainWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgDomainWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.DomainAddedEvent:
@@ -78,6 +78,10 @@ func (wm *OrgDomainWriteModel) Reduce() error {
 			wm.Primary = e.Domain == wm.Domain
 		case *org.DomainRemovedEvent:
 			wm.State = domain.OrgDomainStateRemoved
+			wm.Verified = false
+			wm.Primary = false
+			wm.ValidationType = domain.OrgDomainValidationTypeUnspecified
+			wm.ValidationCode = nil
 		}
 	}
 	return nil
@@ -185,7 +189,7 @@ func NewOrgDomainVerifiedWriteModel(domain string) *OrgDomainVerifiedWriteModel 
 	}
 }
 
-func (wm *OrgDomainVerifiedWriteModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *OrgDomainVerifiedWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *org.DomainVerifiedEvent:

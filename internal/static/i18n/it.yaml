@@ -4,6 +4,9 @@ Errors:
   OriginNotAllowed: Origine non consentita
   IDMissing: ID mancante
   ResourceOwnerMissing: Resource Owner mancante
+  RemoveFailed: Non può essere cancellato
+  ProjectionName:
+    Invalid: Nome della proiezione non valido
   Assets:
     EmptyKey: Asset key vuoto
     Store:
@@ -36,6 +39,7 @@ Errors:
     DomainNotAllowedAsUsername: Il dominio è già riservato e non può essere utilizzato
     AlreadyInactive: Utente già inattivo
     NotInactive: L'utente non è inattivo
+    CantDeactivateInitial: Gli utenti con lo stato iniziale possono solo essere cancellati e non disattivati
     ShouldBeActiveOrInitial: L'utente non è attivo o inizializzato
     AlreadyInitialised: L'utente è già inizializzato
     NotInitialised: L'utente non è ancora inizializzato
@@ -62,8 +66,11 @@ Errors:
     Machine:
       Key:
         NotFound: Machine Key non trovato
+    PAT:
+      NotFound: Personal Access Token non trovato
     NotHuman: L'utente deve essere personale
     NotMachine: L'utente deve essere tecnico
+    WrongType: Non consentito per questo tipo di utente
     NotAllowedToLink: L'utente non è autorizzato a collegarsi con un provider di accesso esterno
     Username:
       AlreadyExists: Nome utente già preso
@@ -168,22 +175,22 @@ Errors:
       NotChanged: Il testo predefinito non è stato cambiato
       AlreadyExists: Il testo predefinito già eistente
       Invalid: Il testo predefinito non è valido
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità della password non trovati
       Empty: Mancano le impostazioni di complessità della password
       NotExisting: Impostazioni di complessità della password non esistenti
       AlreadyExists: Impostazioni di complessità della password sono già esistenti
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Impostazioni di blocco della password non trovati
       Empty: Mancano le impostazioni di blocco della password
       NotExisting: Le impostazioni di blocco della password non esistenti
       AlreadyExists: Le impostazioni di blocco della password sono già esistenti
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Impostazioni di validità della password
       Empty: Impostazioni di validità della password mancanti
       NotExisting: Impostazioni di validità della password non esistenti
       AlreadyExists: Impostazioni di validità della password sono già esistenti
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Mancano le impostazioni Org IAM
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
@@ -335,6 +342,7 @@ Errors:
     NotExisting: La configurazione del IDP non esiste
   Changes:
     NotFound: Nessuna storia trovata
+    AuditRetention: La storia è al di fuori della Ritenzione Audit Log
   Token:
     NotFound: Token non trovato
   UserSession:
@@ -370,6 +378,7 @@ Errors:
     NotFound: L'azione non trovata
     NotActive: L'azione non è attiva
     NotInactive: L'azione non è inattiva
+    MaxAllowed: Non sono permesse altre azioni attive
   Flow:
     FlowTypeMissing: FlowType mancante
     Empty: Flow è già vuoto
@@ -562,6 +571,10 @@ EventTypes:
       cascade:
         removed: Autorizzazione rimossa
         changed: Autorizzazione cambiata
+    metadata:
+      set: Set di metadati utente
+      removed: Metadati utente rimossi
+      removed.all: Tutti i metadati utente rimossi
   org:
     added: Organizzazione aggiunta
     changed: Organizzazione cambiata

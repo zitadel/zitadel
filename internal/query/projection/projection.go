@@ -13,11 +13,11 @@ import (
 
 const (
 	CurrentSeqTable   = "projections.current_sequences"
-	locksTable        = "projections.locks"
-	failedEventsTable = "projections.failed_events"
+	LocksTable        = "projections.locks"
+	FailedEventsTable = "projections.failed_events"
 )
 
-func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, defaults systemdefaults.SystemDefaults) error {
+func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, config Config, defaults systemdefaults.SystemDefaults, keyChan chan<- interface{}) error {
 	projectionConfig := crdb.StatementHandlerConfig{
 		ProjectionHandlerConfig: handler.ProjectionHandlerConfig{
 			HandlerConfig: handler.HandlerConfig{
@@ -28,8 +28,8 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		},
 		Client:            sqlClient,
 		SequenceTable:     CurrentSeqTable,
-		LockTable:         locksTable,
-		FailedEventsTable: failedEventsTable,
+		LockTable:         LocksTable,
+		FailedEventsTable: FailedEventsTable,
 		MaxFailureCount:   config.MaxFailureCount,
 		BulkLimit:         config.BulkLimit,
 	}
@@ -63,8 +63,13 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewIAMMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam_members"]))
 	NewProjectMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_members"]))
 	NewProjectGrantMemberProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["project_grant_members"]))
-	_, err := NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), defaults.KeyConfig)
 	NewAuthNKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["authn_keys"]))
+	NewPersonalAccessTokenProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["personal_access_tokens"]))
+	NewUserGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_grants"]))
+	NewUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
+	NewUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
+	NewIAMProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam"]))
+	_, err := NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), defaults.KeyConfig, keyChan)
 
 	return err
 }

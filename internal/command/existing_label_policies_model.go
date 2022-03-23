@@ -18,7 +18,7 @@ func NewExistingLabelPoliciesReadModel(ctx context.Context) *ExistingLabelPolici
 	return &ExistingLabelPoliciesReadModel{}
 }
 
-func (rm *ExistingLabelPoliciesReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (rm *ExistingLabelPoliciesReadModel) AppendEvents(events ...eventstore.Event) {
 	rm.WriteModel.AppendEvents(events...)
 }
 

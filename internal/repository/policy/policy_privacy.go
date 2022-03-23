@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -19,6 +20,7 @@ type PrivacyPolicyAddedEvent struct {
 
 	TOSLink     string `json:"tosLink,omitempty"`
 	PrivacyLink string `json:"privacyLink,omitempty"`
+	HelpLink    string `json:"helpLink,omitempty"`
 }
 
 func (e *PrivacyPolicyAddedEvent) Data() interface{} {
@@ -32,16 +34,18 @@ func (e *PrivacyPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 func NewPrivacyPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		BaseEvent:   *base,
 		TOSLink:     tosLink,
 		PrivacyLink: privacyLink,
+		HelpLink:    helpLink,
 	}
 }
 
-func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PrivacyPolicyAddedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -58,6 +62,7 @@ type PrivacyPolicyChangedEvent struct {
 
 	TOSLink     *string `json:"tosLink,omitempty"`
 	PrivacyLink *string `json:"privacyLink,omitempty"`
+	HelpLink    *string `json:"helpLink,omitempty"`
 }
 
 func (e *PrivacyPolicyChangedEvent) Data() interface{} {
@@ -98,7 +103,13 @@ func ChangePrivacyLink(privacyLink string) func(*PrivacyPolicyChangedEvent) {
 	}
 }
 
-func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func ChangeHelpLink(helpLink string) func(*PrivacyPolicyChangedEvent) {
+	return func(e *PrivacyPolicyChangedEvent) {
+		e.HelpLink = &helpLink
+	}
+}
+
+func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e := &PrivacyPolicyChangedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}
@@ -129,7 +140,7 @@ func NewPrivacyPolicyRemovedEvent(base *eventstore.BaseEvent) *PrivacyPolicyRemo
 	}
 }
 
-func PrivacyPolicyRemovedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyRemovedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	return &PrivacyPolicyRemovedEvent{
 		BaseEvent: *eventstore.BaseEventFromRepo(event),
 	}, nil

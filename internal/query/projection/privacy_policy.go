@@ -28,6 +28,7 @@ const (
 	PrivacyPolicyStateCol         = "state"
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
+	PrivacyPolicyHelpLinkCol      = "help_link"
 	PrivacyPolicyIsDefaultCol     = "is_default"
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
 )
@@ -75,7 +76,7 @@ func (p *PrivacyPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PrivacyPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
@@ -99,12 +100,13 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.EventReader) (*ha
 			handler.NewCol(PrivacyPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(PrivacyPolicyPrivacyLinkCol, policyEvent.PrivacyLink),
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
+			handler.NewCol(PrivacyPolicyHelpLinkCol, policyEvent.HelpLink),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 		}), nil
 }
 
-func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
 	var policyEvent policy.PrivacyPolicyChangedEvent
 	switch e := event.(type) {
 	case *org.PrivacyPolicyChangedEvent:
@@ -125,6 +127,9 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*
 	if policyEvent.TOSLink != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicyTOSLinkCol, *policyEvent.TOSLink))
 	}
+	if policyEvent.HelpLink != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyHelpLinkCol, *policyEvent.HelpLink))
+	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,
 		cols,
@@ -133,7 +138,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.EventReader) (*
 		}), nil
 }
 
-func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.EventReader) (*handler.Statement, error) {
+func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PrivacyPolicyRemovedEvent)
 	if !ok {
 		logging.LogWithFields("PROJE-hN5Ip", "seq", event.Sequence(), "expectedType", org.PrivacyPolicyRemovedEventType).Error("wrong event type")

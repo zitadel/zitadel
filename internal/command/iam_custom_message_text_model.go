@@ -25,11 +25,15 @@ func NewIAMCustomMessageTextWriteModel(messageTextType string, lang language.Tag
 	}
 }
 
-func (wm *IAMCustomMessageTextReadModel) AppendEvents(events ...eventstore.EventReader) {
+func (wm *IAMCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *iam.CustomTextSetEvent:
 			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextSetEvent)
+		case *iam.CustomTextRemovedEvent:
+			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextRemovedEvent)
+		case *iam.CustomTextTemplateRemovedEvent:
+			wm.CustomMessageTextReadModel.AppendEvents(&e.CustomTextTemplateRemovedEvent)
 		}
 	}
 }
@@ -44,6 +48,6 @@ func (wm *IAMCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder 
 		AddQuery().
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.CustomMessageTextReadModel.AggregateID).
-		EventTypes(iam.CustomTextSetEventType).
+		EventTypes(iam.CustomTextSetEventType, iam.CustomTextRemovedEventType, iam.CustomTextTemplateRemovedEventType).
 		Builder()
 }

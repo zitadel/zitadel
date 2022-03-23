@@ -2,6 +2,7 @@ package iam
 
 import (
 	"context"
+
 	"github.com/caos/zitadel/internal/eventstore"
 
 	"github.com/caos/zitadel/internal/eventstore/repository"
@@ -21,7 +22,8 @@ func NewPrivacyPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		PrivacyPolicyAddedEvent: *policy.NewPrivacyPolicyAddedEvent(
@@ -30,11 +32,12 @@ func NewPrivacyPolicyAddedEvent(
 				aggregate,
 				PrivacyPolicyAddedEventType),
 			tosLink,
-			privacyLink),
+			privacyLink,
+			helpLink),
 	}
 }
 
-func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.PrivacyPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
@@ -65,7 +68,7 @@ func NewPrivacyPolicyChangedEvent(
 	return &PrivacyPolicyChangedEvent{PrivacyPolicyChangedEvent: *changedEvent}, nil
 }
 
-func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.EventReader, error) {
+func PrivacyPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.PrivacyPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package spooler
 
 import (
 	"database/sql"
+
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/eventstore/v1"

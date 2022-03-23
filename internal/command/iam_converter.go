@@ -125,6 +125,7 @@ func writeModelToPrivacyPolicy(wm *PrivacyPolicyWriteModel) *domain.PrivacyPolic
 		ObjectRoot:  writeModelToObjectRoot(wm.WriteModel),
 		TOSLink:     wm.TOSLink,
 		PrivacyLink: wm.PrivacyLink,
+		HelpLink:    wm.HelpLink,
 	}
 }
 
@@ -195,6 +196,7 @@ func writeModelToFeatures(wm *FeaturesWriteModel) *domain.Features {
 		CustomTextMessage:        wm.CustomTextMessage,
 		CustomTextLogin:          wm.CustomTextLogin,
 		LockoutPolicy:            wm.LockoutPolicy,
-		Actions:                  wm.Actions,
+		ActionsAllowed:           wm.ActionsAllowed,
+		MaxActions:               wm.MaxActions,
 	}
 }

@@ -5,8 +5,9 @@ import (
 	"reflect"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/lib/pq"
+
+	"github.com/caos/zitadel/internal/domain"
 )
 
 type SearchResponse struct {
@@ -44,6 +45,51 @@ const sqlPlaceholder = "?"
 
 type SearchQuery interface {
 	toQuery(sq.SelectBuilder) sq.SelectBuilder
+	comp() sq.Sqlizer
+}
+
+type NotNullQuery struct {
+	Column Column
+}
+
+func NewNotNullQuery(col Column) (*NotNullQuery, error) {
+	if col.isZero() {
+		return nil, ErrMissingColumn
+	}
+	return &NotNullQuery{
+		Column: col,
+	}, nil
+}
+
+func (q *NotNullQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *NotNullQuery) comp() sq.Sqlizer {
+	return sq.NotEq{q.Column.identifier(): nil}
+}
+
+type orQuery struct {
+	queries []SearchQuery
+}
+
+func newOrQuery(queries ...SearchQuery) (*orQuery, error) {
+	if len(queries) == 0 {
+		return nil, ErrMissingColumn
+	}
+	return &orQuery{queries: queries}, nil
+}
+
+func (q *orQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
+	return query.Where(q.comp())
+}
+
+func (q *orQuery) comp() sq.Sqlizer {
+	or := make(sq.Or, len(q.queries))
+	for i, query := range q.queries {
+		or[i] = query.comp()
+	}
+	return or
 }
 
 type TextQuery struct {
@@ -73,32 +119,31 @@ func NewTextQuery(col Column, value string, compare TextComparison) (*TextQuery,
 }
 
 func (q *TextQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	where, args := q.comp()
-	return query.Where(where, args...)
+	return query.Where(q.comp())
 }
 
-func (s *TextQuery) comp() (comparison interface{}, args []interface{}) {
+func (s *TextQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case TextEquals:
-		return sq.Eq{s.Column.identifier(): s.Text}, nil
+		return sq.Eq{s.Column.identifier(): s.Text}
 	case TextEqualsIgnoreCase:
-		return sq.ILike{s.Column.identifier(): s.Text}, nil
+		return sq.ILike{s.Column.identifier(): s.Text}
 	case TextStartsWith:
-		return sq.Like{s.Column.identifier(): s.Text + "%"}, nil
+		return sq.Like{s.Column.identifier(): s.Text + "%"}
 	case TextStartsWithIgnoreCase:
-		return sq.ILike{s.Column.identifier(): s.Text + "%"}, nil
+		return sq.ILike{s.Column.identifier(): s.Text + "%"}
 	case TextEndsWith:
-		return sq.Like{s.Column.identifier(): "%" + s.Text}, nil
+		return sq.Like{s.Column.identifier(): "%" + s.Text}
 	case TextEndsWithIgnoreCase:
-		return sq.ILike{s.Column.identifier(): "%" + s.Text}, nil
+		return sq.ILike{s.Column.identifier(): "%" + s.Text}
 	case TextContains:
-		return sq.Like{s.Column.identifier(): "%" + s.Text + "%"}, nil
+		return sq.Like{s.Column.identifier(): "%" + s.Text + "%"}
 	case TextContainsIgnoreCase:
-		return sq.ILike{s.Column.identifier(): "%" + s.Text + "%"}, nil
+		return sq.ILike{s.Column.identifier(): "%" + s.Text + "%"}
 	case TextListContains:
-		return s.Column.identifier() + " @> ? ", []interface{}{pq.StringArray{s.Text}}
+		return &listContains{col: s.Column, args: []interface{}{pq.StringArray{s.Text}}}
 	}
-	return nil, nil
+	return nil
 }
 
 type TextComparison int
@@ -113,6 +158,7 @@ const (
 	TextContains
 	TextContainsIgnoreCase
 	TextListContains
+	TextNotEquals
 
 	textCompareMax
 )
@@ -170,24 +216,23 @@ func NewNumberQuery(c Column, value interface{}, compare NumberComparison) (*Num
 }
 
 func (q *NumberQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	where, args := q.comp()
-	return query.Where(where, args...)
+	return query.Where(q.comp())
 }
 
-func (s *NumberQuery) comp() (comparison interface{}, args []interface{}) {
+func (s *NumberQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case NumberEquals:
-		return sq.Eq{s.Column.identifier(): s.Number}, nil
+		return sq.Eq{s.Column.identifier(): s.Number}
 	case NumberNotEquals:
-		return sq.NotEq{s.Column.identifier(): s.Number}, nil
+		return sq.NotEq{s.Column.identifier(): s.Number}
 	case NumberLess:
-		return sq.Lt{s.Column.identifier(): s.Number}, nil
+		return sq.Lt{s.Column.identifier(): s.Number}
 	case NumberGreater:
-		return sq.Gt{s.Column.identifier(): s.Number}, nil
+		return sq.Gt{s.Column.identifier(): s.Number}
 	case NumberListContains:
-		return s.Column.identifier() + " @> ? ", []interface{}{pq.Array(s.Number)}
+		return &listContains{col: s.Column, args: []interface{}{pq.GenericArray{s.Number}}}
 	}
-	return nil, nil
+	return nil
 }
 
 type NumberComparison int
@@ -241,16 +286,15 @@ func NewListQuery(column Column, value []interface{}, compare ListComparison) (*
 }
 
 func (q *ListQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	where, args := q.comp()
-	return query.Where(where, args...)
+	return query.Where(q.comp())
 }
 
-func (s *ListQuery) comp() (interface{}, []interface{}) {
+func (s *ListQuery) comp() sq.Sqlizer {
 	switch s.Compare {
 	case ListIn:
-		return sq.Eq{s.Column.identifier(): s.List}, nil
+		return sq.Eq{s.Column.identifier(): s.List}
 	}
-	return nil, nil
+	return nil
 }
 
 type ListComparison int
@@ -283,12 +327,11 @@ func NewBoolQuery(c Column, value bool) (*BoolQuery, error) {
 }
 
 func (q *BoolQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
-	where, args := q.comp()
-	return query.Where(where, args...)
+	return query.Where(q.comp())
 }
 
-func (s *BoolQuery) comp() (comparison interface{}, args []interface{}) {
-	return sq.Eq{s.Column.identifier(): s.Value}, nil
+func (s *BoolQuery) comp() sq.Sqlizer {
+	return sq.Eq{s.Column.identifier(): s.Value}
 }
 
 var (
@@ -349,4 +392,13 @@ func (c Column) isZero() bool {
 
 func join(join, from Column) string {
 	return join.table.identifier() + " ON " + from.identifier() + " = " + join.identifier()
+}
+
+type listContains struct {
+	col  Column
+	args []interface{}
+}
+
+func (q *listContains) ToSql() (string, []interface{}, error) {
+	return q.col.identifier() + " @> ? ", q.args, nil
 }

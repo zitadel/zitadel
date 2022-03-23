@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
+import { CopyToClipboardModule } from 'src/app/directives/copy-to-clipboard/copy-to-clipboard.module';
 
 import { HasRoleModule } from '../../../directives/has-role/has-role.module';
 import { DetailLayoutModule } from '../../../modules/detail-layout/detail-layout.module';
@@ -32,6 +33,7 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     FormsModule,
     InputModule,
     FormFieldModule,
+    CopyToClipboardModule,
     MatButtonModule,
     HasFeaturePipeModule,
     MatIconModule,
@@ -49,4 +51,4 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
     InfoSectionModule,
   ],
 })
-export class PrivacyPolicyModule { }
+export class PrivacyPolicyModule {}

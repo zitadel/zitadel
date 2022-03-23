@@ -38,7 +38,8 @@ type Features struct {
 	CustomTextMessage        bool
 	CustomTextLogin          bool
 	LockoutPolicy            bool
-	Actions                  bool
+	ActionsAllowed           domain.ActionsAllowed
+	MaxActions               int32
 }
 
 var (
@@ -141,8 +142,12 @@ var (
 		name:  projection.FeatureLockoutPolicyCol,
 		table: featureTable,
 	}
-	FeatureActions = Column{
-		name:  projection.FeatureActionsCol,
+	FeatureActionsAllowed = Column{
+		name:  projection.FeatureActionsAllowedCol,
+		table: featureTable,
+	}
+	FeatureMaxActions = Column{
+		name:  projection.FeatureMaxActionsCol,
 		table: featureTable,
 	}
 )
@@ -207,7 +212,8 @@ func prepareFeaturesQuery() (sq.SelectBuilder, func(*sql.Row) (*Features, error)
 			FeatureCustomTextMessage.identifier(),
 			FeatureCustomTextLogin.identifier(),
 			FeatureLockoutPolicy.identifier(),
-			FeatureActions.identifier(),
+			FeatureActionsAllowed.identifier(),
+			FeatureMaxActions.identifier(),
 		).From(featureTable.identifier()).PlaceholderFormat(sq.Dollar),
 		func(row *sql.Row) (*Features, error) {
 			p := new(Features)
@@ -239,7 +245,8 @@ func prepareFeaturesQuery() (sq.SelectBuilder, func(*sql.Row) (*Features, error)
 				&p.CustomTextMessage,
 				&p.CustomTextLogin,
 				&p.LockoutPolicy,
-				&p.Actions,
+				&p.ActionsAllowed,
+				&p.MaxActions,
 			)
 			if err != nil {
 				if errs.Is(err, sql.ErrNoRows) {
@@ -301,7 +308,7 @@ func (f *Features) EnabledFeatureTypes() []string {
 	if f.LockoutPolicy {
 		list = append(list, domain.FeatureLockoutPolicy)
 	}
-	if f.Actions {
+	if f.ActionsAllowed != domain.ActionsNotAllowed {
 		list = append(list, domain.FeatureActions)
 	}
 	return list

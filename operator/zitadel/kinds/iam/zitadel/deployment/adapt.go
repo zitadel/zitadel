@@ -1,7 +1,10 @@
 package deployment
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/caos/zitadel/pkg/databases/db"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -16,7 +19,6 @@ import (
 )
 
 const (
-	rootSecret    = "client-root"
 	dbSecrets     = "db-secrets"
 	containerName = "zitadel"
 	RunAsUser     = int64(1000)
@@ -70,6 +72,7 @@ func AdaptFunc(
 			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+
 				users := make([]string, 0)
 				for user := range necessaryUsers {
 					users = append(users, user)
@@ -147,6 +150,14 @@ func deploymentDef(
 	secretPasswordsName string,
 	customImageRegistry string,
 ) *appsv1.Deployment {
+
+	chownedVolumeMount := corev1.VolumeMount{
+		Name:      "chowned-certs",
+		MountPath: certPath,
+	}
+
+	certVolumes, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", RunAsUser, RunAsUser), users, chownedVolumeMount)
+
 	deploymentDef := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:        nameLabels.Name(),
@@ -172,18 +183,10 @@ func deploymentDef(
 					Annotations: map[string]string{},
 				},
 				Spec: corev1.PodSpec{
-					NodeSelector: nodeSelector,
-					Tolerations:  tolerations,
-					Affinity:     affinity.K8s(),
-					InitContainers: []corev1.Container{
-						GetInitContainer(
-							rootSecret,
-							dbSecrets,
-							users,
-							RunAsUser,
-							customImageRegistry,
-						),
-					},
+					NodeSelector:   nodeSelector,
+					Tolerations:    tolerations,
+					Affinity:       affinity.K8s(),
+					InitContainers: []corev1.Container{chownCertsContainer},
 					Containers: []corev1.Container{
 						GetContainer(
 							containerName,
@@ -192,24 +195,22 @@ func deploymentDef(
 							true,
 							GetResourcesFromDefault(resources),
 							cmName,
-							certPath,
 							secretName,
 							secretPath,
 							consoleCMName,
 							secretVarsName,
-							secretPasswordsName,
-							users,
-							dbSecrets,
+							chownedVolumeMount,
 							"start",
 							customImageRegistry,
+							secretPasswordsName,
+							users,
 						),
 					},
-					Volumes: GetVolumes(
+					Volumes: append(GetVolumes(
 						secretName,
 						secretPasswordsName,
 						consoleCMName,
-						users,
-					),
+					), certVolumes...),
 				},
 			},
 		},
