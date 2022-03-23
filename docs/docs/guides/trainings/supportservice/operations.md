@@ -4,7 +4,9 @@ title: Operations Trainings
 
 ## ORBOS Basics
 
-In this hands-on training you will gain an understanding about GitOps and ORBOS and learn how to install and manage ORBOS. We will share best practices around installation, management and configuration.
+In this hands-on training, you will gain an understanding about GitOps and ORBOS.
+You'll also learn how to install and manage ORBOS.
+We share best practices around installation, management and configuration.
 
 **Audience**: DevOps Engineer  
 **Duration**: 1.5 days
@@ -26,7 +28,7 @@ In this hands-on training you will gain an understanding about GitOps and ORBOS 
 
 ## ZITADEL and DB Operator 
 
-In this hands-on training you will gain an in-depth understanding of the ZITADEL and DB Operators with our standard toolset.
+In this hands-on training, you will gain an in-depth understanding of the ZITADEL and DB Operators with our standard toolset.
 
 **Audience**: DevOps Engineer  
 **Duration**: 1.5 days
@@ -47,7 +49,8 @@ In this hands-on training you will gain an in-depth understanding of the ZITADEL
 
 ## ORBOS Tooling
 
-In this training you will learn how to customize tooling or more detailed aspects of the product. This is optional when using our recommended tooling and configuration to operate ZITADEL in standard scenarios.
+In this training you will learn how to customize tooling or more detailed aspects of the product.
+This is optional when using our recommended tooling and configuration to operate ZITADEL in standard scenarios.
 
 **Audience**: DevOps Engineer  
 **Duration**: 1.5 days

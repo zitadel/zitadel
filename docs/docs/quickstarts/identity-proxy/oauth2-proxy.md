@@ -4,7 +4,7 @@ title: OAuth 2.0 Proxy
 
 [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) is a project which allows services to delegate the authentication flow to a IDP, for example **ZITADEL**
 
-## Configure Zitadel
+## Configure ZITADEL
 
 ### Setup Application and get Keys
 

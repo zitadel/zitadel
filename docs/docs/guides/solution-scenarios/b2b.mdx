@@ -4,79 +4,118 @@ title: B2B
 
 import { B2B } from '../../../src/components/b2b';
 
+In _Business to business (B2B)_ scenarios, an organization interacts with other organizations.
+This is different from typical [B2C](./b2c) cases, where the organization often interacts with end users and other individuals.
+
 ## Business to Business
 
-B2B describes the situation where an organization interacts with other organizations.
-This **multiple organization architecture** usually adds some form of complexity to an Identity and Access Management System.
-In ZITADEL a B2B organization represents a business partner or partner who typically has its own branding and has different access settings like an additional federated login for its users.
+This *multi-organization architecture* usually adds complexity to an identity and access management system.
+In ZITADEL, a B2B organization represents a business partner or a partner who typically has their own branding and different access settings, like an additional federated login for its users.
 
-B2B can be a simple scenario where an organization only shares one of its projects with another organization or have a more complex case where an organization is offering a portal application to all its partners with included (self)administration.
+B2B can be a simple scenario, e.g. where an organization shares only one of its projects with another organization.
+B2B can also be a more complex case, e.g. where an organization offers a portal application to all its partners with included (self)administration.
 
 <!-- This guide describes an application  -->
 ## Sample scenario
 
-Octagon is a fictitious company which is used throughout this guide to explain the details and key concepts of such a B2B scenario.
-Octagon tries to solve multiple tasks in the banking field. Its portfolio includes several applications for their employees, customers, and partners. Some of which are web-based, some of which are used by machine users only.
+To explain the details and key concepts of a B2B scenario, this topic uses a fictional company, Octagon, as an example.
+
+Octagon tries to solve multiple tasks in the banking field.
+Its portfolio includes several applications for their employees, customers, and partners.
+Some of these applications are web-based, other applications are used by machine users only.
+
+When describing multiple-organization scenarios, this topic sometimes also refers to a sub-organization of Octagon, Pentagon.
 
 ### Portal Application
 
-Octagon has a **Portal application** where its employees can access their account and list all applications they are allowed to use.
-Employees work for a department within Octagon or for Octagon itself. 
-Some of the users have enhanced features because they supervise certain teams. Those can onboard new employees and manage their roles and features.
+Octagon has a portal application, where its employees can access their account and list all applications they are allowed to use.
+
+Employees work for a department within Octagon, or for Octagon itself. 
+Some users supervise teams.
+These users have enhanced permissions, letting them onboard new employees and manage their roles and access.
 Target groups of the application can be split into:
-- **Employees:** users who are using the application as a starting point for their work.
-- **Supervisors:** users who are mainly using the application to manage users and their access of their department.
-- **Administrators:** this users are able to grant additional organizations or departments and elect supervisors.
+- Employees: users who use the application as a starting point for their work.
+- Supervisors: users who use the application to manage users and their access of their department.
+- Administrators: users who can grant additional organizations or departments and elect supervisors.
 
 ### Planning considerations
 
-In order to define the need of the **Portal Application** some planning considerations about organizations have to be made:
+To define the portal application's needs, the application's builders need to consider how the organization is made:
 
-- **Login and Access:** Does a user have a preset organization to login? Does the application show the default login page or does each organization use its own branding?
-- **Organizations:** Does a user have access in multiple organizations? Is a user required to use a different federated login for those organizations?
-- **Roles** Does the application need users to have specific roles assigned within their organizations? Which roles are needed to enable certain features of the application?
+- Login and Access: Does a user have a preset organization to log in?
+  Does the application show the default login page, or does each organization use its own branding?
+- Organizations: Does a user have access to multiple organizations?
+  Is a user required to use a different federated login for those organizations?
+- Roles: Does the application need users to have specific roles assigned within their organizations?
+  Which roles are needed to enable certain features of the application?
 
 ### Login
 
-You can decide whether a organization is preselected for the login or if the user is redirected to the default login screen. You can send the user to a specific organization by defining the organization in a custom scope. (primary domain)
-Settings to the branding or the login options of the organization can be made from the organization section in [Console](https://console.zitadel.ch/org). 
-The behaviour of the login branding can be set in your projects detail page. You can choose the branding of the selected organization, the user resource owner, or the projects resource owner.
+You can decide whether an organization is preselected for the login, or redirected to the default login screen.
+
+To set the behavior of the login, go to your projects detail page.
+To send the user to a specific organization, define the organization in a custom scope (primary domain).
+
+To change the branding or the login options of the organization, head to the organization section in the [console](https://console.zitadel.ch/org). 
+You can choose the branding of the selected organization, the user resource owner, or the project's resource owner.
 
 ### Organizations
 
-Generally a user belongs to and is managed by one organization, however the user can receive authorizations from multiple other organizations (delegated authorizations). Anyways, a user should be able to use the same identity to switch between organizations.
-If this feature is not desired, a separate user for each organization should be created.
+Generally a user belongs to and is managed by one organization.
+However the user can receive authorizations from multiple other organizations (delegated authorizations).
+Anyway, a user should be able to use the same identity to switch between organizations.
+If you don't want this feature, create a separate user for each organization.
 
-Adding a user from a different organization to the audience of a project can be as easy as adding a new user authorization (user grant). A user grant combines a user from any organization with a project and 0-N roles.
+To add a user from a different organization to a project's audience, you can add a new user authorization (user grant).
+A user grant combines a user from any organization with a project and 0-N roles.
 
-In our sample scenario, we assume to have the following users:
+Our sample organizations have these users:
 
-- **Dimitri:** a team leader who is employed by Pentagon, an Octagon department. Dimitri uses his Microsoft Account in combination with his one time password to access the portal. Pentagon therefore has set up Microsoft as Identity Provider. Pentagon also requires its users to secure their accounts with additional factors.
-- **Michael:** a trainee of Pentagon only using the portal to access his workspace apps. Michael uses his Google Account in combination with his laptops fingerprint.
-- **Bill:** is employed at Octagon as Administrator of the Portal Application. Bill also uses a Microsoft Account in combination with a Security Key to secure his account.
+- Dimitri: a team leader who is employed by Pentagon, an Octagon department.
+  Dimitri uses his Microsoft Account in combination with his one-time password to access the portal.
+  Pentagon therefore has set up Microsoft as identity provider.
+  Pentagon also requires its users to secure their accounts with additional factors.
+- Michael: a trainee of Pentagon using the portal only to access his workspace apps.
+  Michael uses his Google Account in combination with his laptop's fingerprint.
+- Bill: an employee of Octagon, working as Administrator of the portal application.
+  Bill also uses a Microsoft Account in combination with a Security Key to secure his account.
 
-After having determined the constellation of the organizations and its users, all the necessary data (Portal project with roles and app, users, login requirements, identity providers, branding) should be set up in [Console](https://console.zitadel.ch/org).
-A B2B sample application for NextJS can be found in our [Example Repo](https://github.com/caos/zitadel-examples).
+After you understand the constellation of the organizations and its users, use the ZITADEL
+[console](https://console.zitadel.ch/org) to set up all the necessary data:
+- portal project with roles and app
+- users
+- login requirements
+- identity providers
+- branding
 
-To allow another organization to use a project, a project grant has to be created. Upon creation, roles for a grant can be limited to a subset of the total project roles.
+A sample B2B application for NextJS can be found in our [example repository](https://github.com/caos/zitadel-examples).
 
-In our scenario, Octagon creates a project grant for Pentagon. Pentagon is limited to use `writer` and `reader` role. The `admin` role is reserved for the Octagon organization itself.
+To allow another organization to use a project, create a project grant. Upon creation, you can limit roles for a grant to a subset of the total project roles.
+
+In our scenario, Octagon creates a project grant for Pentagon.
+Pentagon is limited to use the roles `writer` and `reader`.
+The `admin` role is reserved for the Octagon organization itself.
 
 <B2B></B2B>
 
 ### Roles
 
-In this scenario, Dimitri and Michael share the same organization Pentagon, where as Bill belongs to Octagon. Octagon is owner of the Portal project with its Web App, having Bill configured as user grant with `admin` role. Dimitri owns the `writer` role, whereas Michael only is `reader`.
+In this scenario, Dimitri and Michael both belong to the organization Pentagon.
+Bill belongs to Octagon.
+Octagon is owner of the portal project with its Web App, where Bill is configured as user grant with `admin` role.
+Dimitri owns the `writer` role, whereas Michael is only a `reader`.
 
-> Note: Roles are meant for internal business logic and therefore need to be validated separately, none of the users described are allowed to create user grants, at least if they do not own a ZITADEL manager role.
+> Note: Roles are meant for internal business logic and therefore need to be validated separately. None of the users described are allowed to create user grants, at least if they do not own a ZITADEL manager role.
 
-If you made a dashboard where some users are able to create user grants, the Management API to do such operations should be triggered with the personal access token of the users, not with a token of a machine user, to create a meaningful audit log. 
-If you had such a use case, ZITADEL manager roles must be assigned to those users.
+If you made a dashboard where some users can create user grants, trigger the Management API to do operations with the users' personal access token.
+If you have such a use case, assign ZITADEL manager roles to the relevant users.
+To create a meaningful audit log, do not use a machine user's token.
 
 ### Noteworthy
 
-Due to the fact that ZITADEL includes unlimited users, projects, and applications and comes with all security features in the FREE tier, ZITADEL can be considered a great alternative to other SaaS IAM systems such as Auth0 or Okta.
-In such a case with this high potential of scalability where user counts can grow explosively, ZITADEL does not become the bottleneck and therefore is the valid choice. You can learn more on ZITADELs benefits and the pricing [here](https://zitadel.ch/pricing).
+Because ZITADEL includes unlimited users, projects, and applications, and because it comes with all security features in the FREE tier, ZITADEL is a great alternative to other SaaS IAM systems such as Auth0 or Okta.
+In cases of potentially high scalability demands, where user counts can grow explosively, ZITADEL does not become the bottleneck.
+[Read more about ZITADELs benefits and pricing](https://zitadel.ch/pricing).
 
 ### Learn more
 

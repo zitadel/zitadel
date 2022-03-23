@@ -4,23 +4,31 @@ title: Get started
 
 import Column from "../../../src/components/column";
 
-Most applications need to know the identity of a user allowing to securely store user data in the cloud and provide the same personalised experience across all of the user's devices.
+*Authentication* is how an application can verify that its users are who they claim to be.
+Most applications need authentication to securely store user data in the cloud and to provide the same personalized experience across all user devices.
 
-ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries to authenticate users in your application. It supports authentication using passwords and applies additional security with the help of a second factor, for example OTP, to ensure a safe and secure access.
-It additionally leverages industry standards like OAuth 2.0 and OpenID Connect such that it can be easily integrated in your custom backend.
+ZITADEL's authentication provides backend services, easy-to-use SDKs, and ready-made UI libraries.
 
-This provides a quick start guide on how to register your organization as well as creating your first project.
+It supports password authentication,
+with two-factor authentication methods like One Time Password (OTP).
+You easily integrate ZITADEL in your custom backend,
+as it leverages industry standards like OAuth 2.0 and OpenID Connect.
+
 
 ## Trying out ZITADEL on zitadel.ch
+
+To register your organization and create your first project, follow this quick-start guide.
 
 <Column>
 <div>
 
-To create a ZITADEL project, you have to register as an organization first. Click [here](https://accounts.zitadel.ch/register/org) to register.
-You will receive an email prompting you to verify your mail.
-Then go to your [Console Projects](https://console.zitadel.ch/projects) view and create a new project.
+1. Follow this link to [register your organization](https://accounts.zitadel.ch/register/org).
+You will receive an email to verify your account.
 
-Now you can proceed adding users to your organization as well as integrating your applications. We refer to our guides as well as our [Quickstarts](../../quickstarts/introduction) to do so.
+2. Go to your [projects](https://console.zitadel.ch/projects) view and create a new project.
+
+Now you can add users to your organization, and integrate your applications.
+To do so, refer to [the Quickstart guides](../../quickstarts/introduction).
 
 </div>
 <img width="400px" src="/img/accounts_org_register_light.png" alt="register view"/>
@@ -28,19 +36,26 @@ Now you can proceed adding users to your organization as well as integrating you
 
 ### Verify your domain name (optional)
 
-If you verify a domain you get the benefit that your organisations users can use this domain as the **preferred logonname**.
+If you verify a domain, your organisation's users can use this domain as the *preferred loginname*.
 
 ### Elect Managers
 
-ZITADEL allows you to give other users control over ZITADEL Console itself. This can be restricted to some kind of write and/or read. This can be especially useful for directing administration over several users. You can have managers able to edit project settings and others able to create/add users only.
-Read the [guides](../overview) for more information.
+ZITADEL allows you to give other users control over the ZITADEL console itself.
+You can restrict this access to `read` or `write`.
+This is especially useful to granularly assign administration responsibilities to different users.
+For example, you can permit managers to edit project settings, and permit others to only create users.
+[The guides provide more information](../overview).
 
-> Note: ZITADEL Managers are always located on the right sidepanel of console.
+> Note: ZITADEL Managers are always located on the right sidepanel of the console.
 
 ### Integrating an application
 
-After creating your project you can start integrating your applications.
-After choosing your [project](https://console.zitadel.ch/projects) add a client application on the top of the page.
-The wizard should provide some guidance what client is the proper for you. If you are still unsure consult our [Guide Project](projects).
+After creating your project, you can start integrating your applications.
+
+1. [Choose your project](https://console.zitadel.ch/projects).
+1. Add a client by selecting **New** In the **APPLICATIONS** section on the top of the page.
+
+The wizard provides some guidance what about client is right for you.
+If you are still unsure, consult our [Guide Project](projects).
 
 ## Learn more

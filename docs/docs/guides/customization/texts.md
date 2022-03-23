@@ -2,37 +2,40 @@
 title: Customized Texts
 ---
 
-You are able to customize the texts used from ZITADEL.
+You can customize the texts sent by ZITADEL.
 
 ## Message Texts
-Sometimes the users will get an email or phone message from ZITADEL (e.g Password Reset Request).
-ZITADEL already has some good standard texts, but maybe you would like to customize it for your organization.
+Sometimes users get an email or phone message from ZITADEL (e.g Password Reset Request).
+ZITADEL already has some good standard texts, but you might like to customize them for your organization.
+To do that, follow these steps:
 
-Go to the message text policy on your organization and you will find the different kinds of messages that are sent from ZITADEL. 
-Choose the template and the language you like to edit. 
-You can now change all the texts from a message. 
-As soon as you click into a input field you will see some attribute chips below the field. 
-These are the parameters you can include on this specific message.
+1. Go to the message text policy in your organization. You will find the different kinds of messages ZITADEL sends. 
+1. Choose the template and the language you like to edit. 
+1. Change all the texts as you wish.
+  As soon as you select an input field, you will see some attribute chips below the field. 
+  These are the parameters you can include for this specific message.
 
 ![Message Texts](/img/console_message_texts.png)
 
 ## Login Texts
 
-Like the message texts you are also able to change the texts on the login interface. 
-First choose the screen and the language you like to edit. 
-You will see the default texts in the input field and you can overwrite them by typing into the box.
+Like the message texts, you can also change the texts on the login interface. 
+
+1. Choose the screen and the language you would like to edit. 
+   You will see the default texts in the input field.
+1. Overwrite the defaults by typing into the box.
 
 ![Message Texts](/img/console_login_texts.png)
 
 ## Reset to default
 
-If you don't like your customization anymore click the "reset policy" button.
+If you don't like your customization anymore, select the **reset policy** button.
 All your settings will be removed and the default settings of the system will trigger.
 
 ## Internationalization
 
-ZITADELs support for languages will be extended with time. 
-If you need support for a specific language we highly recommend you to write translation files for the missing language.
+ZITADEL's support for languages will be extended with time. 
+If you need support for a specific language, we highly recommend you to write translation files for the missing language.
 
 ZITADEL loads translations from three files:
 
@@ -41,5 +44,5 @@ ZITADEL loads translations from three files:
  - [Email Notifcation texts](https://github.com/caos/zitadel/tree/main/internal/notification/static/i18n)
  - [Common translations](https://github.com/caos/zitadel/tree/main/internal/static/i18n) for success or error toasts
 
- Make sure you set the locale as the name. Later on, language header will determine which file gets displayed.
+ Make sure you set the locale as the name. Later on, a language header will determine which file gets displayed.
 

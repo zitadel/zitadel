@@ -4,7 +4,7 @@ title: Application Support Trainings
 
 ## ZITADEL Support
 
-In this session your second level support will gain an understanding on how to extract relevant information for technical support questions and root cause analysis.
+In this session your second-level support will gain an understanding of how to extract relevant information for technical support questions and root cause analysis.
 
 **Audience**: 2nd Level Support Staff  
 **Duration**: 0.5 day
@@ -23,7 +23,8 @@ In this session your second level support will gain an understanding on how to e
 
 ## ZITADEL Administrator
 
-In this hands-on training your employees will get a complete overview of the system and learn how to configure and use ZITADEL. Your support staff will gain the required knowledge to provide user-support, while your solution owners gain an understanding about integration of clients.
+In this hands-on training, your employees will get a complete overview of the system and learn how to configure and use ZITADEL.
+Your support staff will gain the required knowledge to provide user-support, while your solution owners gain an understanding about integration of clients.
 
 **Audience**: 1st / 2nd Level Support Staff, Solution Owner, QA Manager (optional)  
 **Duration**: 1.5 days
