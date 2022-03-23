@@ -84,7 +84,7 @@ func (l *Login) handleJWTExtraction(w http.ResponseWriter, r *http.Request, auth
 		return
 	}
 	metadata := externalUser.Metadatas
-	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, authReq.AgentID, authReq.InstanceID, externalUser, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, authReq.AgentID, authReq.InstanceID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		l.jwtExtractionUserNotFound(w, r, authReq, idpConfig, tokens, err)
 		return
