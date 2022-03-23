@@ -4,13 +4,13 @@ title: User Register
 
 ## Organization and user registration
 
-Zitadel allows users to register a organization and/or user with just a few steps.
+ZITADEL allows users to register a organization and/or user with just a few steps.
 
 A. Register an organization
 
  1. Create an organization
  2. Verify your email
- 3. Login to Zitadel and manage the organization
+ 3. Login to ZITADEL and manage the organization
 
 B. Create User
  1. An administrator can create and manage users within console.

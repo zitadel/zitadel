@@ -4,14 +4,14 @@ title: Social Login
 
 ## Identity Linking
 
-To link an external Identity Provider with a Zitadel Account you have to:
+To link an external identity provider with a ZITADEL account you have to:
 
 1. choose your IDP
 2. Login to your IDP
 
 you can then either
 
-1. link the Identity to an existing ZITADEL useraccount
+1. link the identity to an existing ZITADEL useraccount
 2. auto register a new ZITADEL useraccount
 
 

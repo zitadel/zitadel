@@ -12,6 +12,7 @@ type Configuration struct {
 	Cache               *Cache         `yaml:"cache,omitempty"`
 	Secrets             *Secrets       `yaml:"secrets,omitempty"`
 	Notifications       *Notifications `yaml:"notifications,omitempty"`
+	Passwords           *Passwords     `yaml:"passwords,omitempty"`
 	DebugMode           bool           `yaml:"debugMode"`
 	LogLevel            string         `yaml:"logLevel"`
 	MigrateEventStoreV1 bool           `yaml:"migrateEventstoreV1"`
@@ -71,6 +72,25 @@ type Subdomains struct {
 	Console      string `yaml:"console"`
 	Issuer       string `yaml:"issuer"`
 	Subscription string `yaml:"subscription"`
+}
+
+type Passwords struct {
+	Migration            *secret.Secret   `yaml:"migration"`
+	Management           *secret.Secret   `yaml:"management"`
+	Auth                 *secret.Secret   `yaml:"auth"`
+	Authz                *secret.Secret   `yaml:"authz"`
+	Adminapi             *secret.Secret   `yaml:"adminapi"`
+	Notification         *secret.Secret   `yaml:"notification"`
+	Eventstore           *secret.Secret   `yaml:"eventstore"`
+	Queries              *secret.Secret   `yaml:"queries"`
+	ExistingMigration    *secret.Existing `yaml:"existingMigration"`
+	ExistingManagement   *secret.Existing `yaml:"existingManagement"`
+	ExistingAuth         *secret.Existing `yaml:"existingAuth"`
+	ExistingAuthz        *secret.Existing `yaml:"existingAuthz"`
+	ExistingAdminapi     *secret.Existing `yaml:"existingAdminapi"`
+	ExistingNotification *secret.Existing `yaml:"existingNotification"`
+	ExistingEventstore   *secret.Existing `yaml:"existingEventstore"`
+	ExistingQueries      *secret.Existing `yaml:"existingQueries"`
 }
 
 type Secrets struct {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/caos/orbos/pkg/kubernetes/resources/secret"
 	"github.com/caos/zitadel/operator"
+	macherrs "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/caos/orbos/mntr"
 	"github.com/caos/orbos/pkg/kubernetes"
@@ -64,7 +65,23 @@ func AdaptFunc(
 				return nil, err
 			}
 
-			queryPWSecret, err := secret.AdaptFuncToEnsure(namespace, pwSecretSelectable, map[string]string{pwSecretKey: pwValue})
+			existingSecret, err := k8sClient.GetSecret(namespace, pwSecretSelectable.Name())
+			if err != nil && !macherrs.IsNotFound(err) {
+				return nil, err
+			}
+			err = nil
+			data := make(map[string]string)
+			if existingSecret != nil {
+				for k, v := range existingSecret.Data {
+					data[k] = string(v)
+				}
+			}
+
+			if _, ok := data[pwSecretKey]; !ok {
+				data[pwSecretKey] = pwValue
+			}
+
+			queryPWSecret, err := secret.AdaptFuncToEnsure(namespace, pwSecretSelectable, data)
 			if err != nil {
 				return nil, err
 			}

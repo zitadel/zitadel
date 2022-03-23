@@ -22,7 +22,7 @@ const (
 	jobPrefix          = "backup-"
 	jobSuffix          = "-restore"
 	internalSecretName = "client-certs"
-	rootSecretName     = db.CertsSecret
+	rootSecretName     = "cockroachdb.node"
 	timeout            = 45 * time.Minute
 )
 

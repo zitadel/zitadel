@@ -36,7 +36,7 @@ title: zitadel/management.proto
 > **rpc** GetIAM([GetIAMRequest](#getiamrequest))
 [GetIAMResponse](#getiamresponse)
 
-Returns some needed settings of the IAM (Global Organisation ID, Zitadel Project ID)
+Returns some needed settings of the IAM (global organisation ID, ZITADEL project ID)
 
 
 

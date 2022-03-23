@@ -42,7 +42,8 @@ func AdaptFunc(
 	dbConn db.Connection,
 ) (
 	func(
-		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
+		necessaryUsers map[string]string,
+		getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
 	) operator.QueryFunc,
 	operator.DestroyFunc,
 	error,
@@ -62,11 +63,18 @@ func AdaptFunc(
 	}
 
 	return func(
-			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (map[string]string, error),
+			necessaryUsers map[string]string,
+			getConfigurationHashes func(k8sClient kubernetes.ClientInt, queried map[string]interface{}, necessaryUsers map[string]string) (map[string]string, error),
 		) operator.QueryFunc {
 			return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
+				users := make([]string, 0)
+				for user := range necessaryUsers {
+					users = append(users, user)
+				}
+
 				jobDef := jobDef(
 					nameLabels,
+					users,
 					version,
 					resources,
 					cmName,
@@ -83,7 +91,7 @@ func AdaptFunc(
 					dbConn,
 				)
 
-				hashes, err := getConfigurationHashes(k8sClient, queried)
+				hashes, err := getConfigurationHashes(k8sClient, queried, necessaryUsers)
 				if err != nil {
 					return nil, err
 				}
@@ -113,6 +121,7 @@ func AdaptFunc(
 
 func jobDef(
 	name *labels.Name,
+	users []string,
 	version *string,
 	resources *k8s.Resources,
 	cmName string,
@@ -134,10 +143,7 @@ func jobDef(
 		MountPath: certPath,
 	}
 
-	srcVolume, destVolume, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), corev1.VolumeMount{
-		Name:      "certs",
-		MountPath: "/certificates",
-	}, chownedVolumeMount)
+	certVolumes, chownCertsContainer := db.InitChownCerts(customImageRegistry, fmt.Sprintf("%d:%d", deployment.RunAsUser, deployment.RunAsUser), users, chownedVolumeMount)
 
 	containers := []corev1.Container{
 		deployment.GetContainer(
@@ -154,7 +160,8 @@ func jobDef(
 			chownedVolumeMount,
 			"setup",
 			customImageRegistry,
-			dbConn,
+			secretPasswordsName,
+			users,
 		)}
 
 	return &batchv1.Job{
@@ -181,8 +188,7 @@ func jobDef(
 					TerminationGracePeriodSeconds: helpers.PointerInt64(30),
 					Volumes: append(
 						deployment.GetVolumes(secretName, secretPasswordsName, consoleCMName),
-						srcVolume,
-						destVolume,
+						certVolumes...,
 					),
 				},
 			},

@@ -123,7 +123,7 @@ $ docker compose -f ./build/local/docker-compose-local.yml up -d --no-deps --bui
 
 ### Initial login credentials
 
-**username**: `zitadel-admin@caos-ag.zitadel.ch`
+**username**: `zitadel-admin@caos-ag.localhost`
 
 **password**: `Password1!`  
 

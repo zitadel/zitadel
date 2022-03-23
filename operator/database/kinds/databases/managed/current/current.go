@@ -27,11 +27,7 @@ type CurrentDB struct {
 	CA                *cacurr.Current
 }
 
-func (c *Current) GetCA() *cacurr.Current {
-	return c.Current.CA
-}
-
-func (c *Current) GetCertificateKey() *rsa.PrivateKey {
+func (c *Current) CAKey() *rsa.PrivateKey {
 	return c.Current.CA.CertificateKey
 }
 
@@ -39,7 +35,7 @@ func (c *Current) SetCertificateKey(key *rsa.PrivateKey) {
 	c.Current.CA.CertificateKey = key
 }
 
-func (c *Current) GetCertificate() []byte {
+func (c *Current) CACert() []byte {
 	return c.Current.CA.Certificate
 }
 

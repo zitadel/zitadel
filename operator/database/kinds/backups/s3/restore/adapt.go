@@ -24,8 +24,8 @@ const (
 	jobPrefix           = "backup-"
 	jobSuffix           = "-restore"
 	internalSecretName  = "client-certs"
-	rootSecretName      = db.CertsSecret
 	timeout             = 15 * time.Minute
+	rootSecretName      = "cockroachdb.node"
 )
 
 func AdaptFunc(

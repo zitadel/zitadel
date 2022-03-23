@@ -86,6 +86,7 @@ func AdaptFunc(
 		secretName := "zitadel-secret"
 		consoleCMName := "console-config"
 		secretVarsName := "zitadel-secrets-vars"
+
 		secretPasswordName := "zitadel-passwords"
 		//paths which are used in the configuration and also are used for mounting the used files
 		certPath := "/home/zitadel/dbsecrets-zitadel"
@@ -97,6 +98,7 @@ func AdaptFunc(
 		httpPort := 80
 		uiServiceName := "ui-v1"
 		uiPort := 80
+		usersWithoutPWs := getUserListWithoutPasswords(desiredKind)
 
 		zitadelComponent := labels.MustForComponent(apiLabels, "ZITADEL")
 		zitadelDeploymentName := labels.MustForName(zitadelComponent, "zitadel")
@@ -142,6 +144,8 @@ func AdaptFunc(
 			namespace,
 			action,
 			secretPasswordName,
+			migrationUser,
+			usersWithoutPWs,
 			nodeselector,
 			tolerations,
 			customImageRegistry,
@@ -196,7 +200,6 @@ func AdaptFunc(
 			configuration.GetReadyFunc(monitor, namespace, secretName, secretVarsName, secretPasswordName, cmName, consoleCMName),
 			setup.GetDoneFunc(monitor, namespace, action),
 			customImageRegistry,
-			dbConn,
 		)
 		if err != nil {
 			return nil, nil, nil, nil, nil, false, err
@@ -247,8 +250,12 @@ func AdaptFunc(
 		}
 
 		queryCfg := func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (ensureFunc operator.EnsureFunc, err error) {
+			users, err := getAllUsers(k8sClient, desiredKind)
+			if err != nil {
+				return nil, err
+			}
 			return concatQueriers(
-				getQueryC,
+				getQueryC(users),
 				operator.EnsureFuncToQueryFunc(configuration.GetReadyFunc(
 					monitor,
 					namespace,
@@ -265,10 +272,15 @@ func AdaptFunc(
 
 		return func(k8sClient kubernetes.ClientInt, queried map[string]interface{}) (operator.EnsureFunc, error) {
 
+				allZitadelUsers, err := getZitadelUserList(k8sClient, desiredKind)
+				if err != nil {
+					return nil, err
+				}
+
 				queryReadyM := operator.EnsureFuncToQueryFunc(migration.GetDoneFunc(monitor, namespace, action))
-				querySetup := getQuerySetup(getConfigurationHashes)
+				querySetup := getQuerySetup(allZitadelUsers, getConfigurationHashes)
 				queryReadySetup := operator.EnsureFuncToQueryFunc(setup.GetDoneFunc(monitor, namespace, action))
-				queryD := queryD(getConfigurationHashes)
+				queryD := queryD(allZitadelUsers, getConfigurationHashes)
 
 				queriers := make([]operator.QueryFunc, 0)
 				for _, feature := range features {
