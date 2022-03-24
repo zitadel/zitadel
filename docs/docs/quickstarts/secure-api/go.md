@@ -2,22 +2,25 @@
 title: Go
 ---
 
-This integration guide shows you how to integrate **ZITADEL** into your Go API. It demonstrates how to secure your API using
-OAuth 2 Token Introspection.
+This guide shows you how to integrate ZITADEL with your Go API.
+You'll use *OAuth 2 Token Introspection* to secure your API.
 
-At the end of the guide you should have an API with a protected endpoint.
+At the end of the guide, you should have an API with a protected endpoint.
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-go) will provides an interceptor for both GRPC and HTTP.
-This will handle the OAuth 2.0 introspection request including authentication using JWT with Private Key using our [OIDC client library](https://github.com/caos/oidc).
-All that is required, is an API and its key JSON. But for complete
+The client [SDK](https://github.com/caos/zitadel-go) provides an interceptor for both gRPC and HTTP.
+Both interceptors handle the OAuth 2.0 introspection request. 
+For authentication, they use *JWT with Private Key*.
+The SDK imports our [OIDC client library](https://github.com/caos/oidc).
+
+All you need is an API and its JSON key.
 
 ## Go Setup
 
 ### Add Go SDK to your project
 
-You need to add the SDK into Go Modules by:
+Add the SDK into Go Modules with this command:
 
 ```bash
 go get github.com/caos/zitadel-go
@@ -25,9 +28,11 @@ go get github.com/caos/zitadel-go
 
 ### Create example API
 
-Create a new go file with the content below. This will create an API with two endpoints. On path `/public` it will always write
-back `ok` and the current timestamp. On `/protected` it will respond the same but only if a valid access_token is sent. The token
-must not be expired and the API has to be part of the audience (either client_id or project_id).
+Create a new go file with the content below.
+This creates an API with two endpoints.
+The path `/public` always responds with `ok` and the current timestamp.
+The path `/protected` responds with the same, but only if a valid `access_token` is sent.
+The token must not be expired, and the API has to be part of the audience (either `client_id` or `project_id`).
 
 ```go
 package main
@@ -63,17 +68,18 @@ func writeOK(w http.ResponseWriter, r *http.Request) {
 
 ```
 
-#### Key JSON
+#### JSON key
 
-To provide the key JSON to the SDK, simply set an environment variable `ZITADEL_KEY_PATH` with the path to the JSON as value.
+To provide the JSON key to the SDK, set an environment variable `ZITADEL_KEY_PATH`.
+Use the path to the file containing the JSON key as the variables value.
 
 ```bash
 export ZITADEL_KEY_PATH=/Users/test/apikey.json
 ```
 
-For development purposes you should be able to set this in your IDE.
+For development purposes, you should be able to set this in your IDE.
 
-If you're not able to set it via environment variable, you can also exchange the `middleware.OSKeyPath()` and pass it directly:
+If you can't set it via environment variable, you can also exchange the `middleware.OSKeyPath()` and pass it directly:
 
 ```go
 introspection, err := http_mw.NewIntrospectionInterceptor(
@@ -84,17 +90,17 @@ introspection, err := http_mw.NewIntrospectionInterceptor(
 
 #### Custom ZITADEL instance
 
-If your client will not use ZITADEL Cloud (zitadel.ch), be sure to provide the correct Issuer:
+If your client does not use ZITADEL Cloud (zitadel.ch), be sure to provide the correct Issuer:
 ```go
 introspection, err := http_mw.NewIntrospectionInterceptor(
 	"https://issuer.custom.ch",
-	middleware.OSKeyPath(), 
+	middleware.OSKeyPath(),
 )
 ```
 
 ### Test API
 
-After you have configured everything correctly, you can simply start the example by:
+After you have configured everything correctly, you can start the example with this command:
 
 ```bash
 go run main.go
@@ -106,7 +112,7 @@ You can now call the API by browser or curl. Try the public endpoint first:
 curl -i localhost:5001/public
 ```
 
-it should return something like: 
+This should return something like:
 
 ```
 HTTP/1.1 200 OK
@@ -117,13 +123,13 @@ Content-Type: text/plain; charset=utf-8
 OK 2021-08-24 13:11:17.135719 +0200 CEST m=+30704.913892168
 ```
 
-and the protected:
+And the protected:
 
 ```bash
 curl -i localhost:5001/protected
 ```
 
-it will return:
+This returns:
 
 ```
 HTTP/1.1 401 Unauthorized
@@ -134,8 +140,9 @@ Content-Length: 21
 "auth header missing"
 ```
 
-Get a valid access_token for the API. You can achieve this by login into an application of the same project or
-by explicitly requesting the project_id for the audience by scope `urn:zitadel:iam:org:project:id:{projectid}:aud`.
+Get a valid `access_token` for the API.
+To do this, log in to an application of the same project.
+You can also explicitly request the `project_id` for the audience by scope `urn:zitadel:iam:org:project:id:{projectid}:aud`.
 
 If you provide a valid Bearer Token:
 
@@ -143,7 +150,7 @@ If you provide a valid Bearer Token:
 curl -i -H "Authorization: Bearer ${token}" localhost:5001/protected
 ```
 
-it will return an OK response as well:
+This will return an OK response as well:
 ```
 HTTP/1.1 200 OK
 Date: Tue, 24 Aug 2021 11:13:33 GMT

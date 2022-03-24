@@ -24,5 +24,5 @@ This doesn't count for hardware tokens, as these are device independent.
 :::
 
 
-![Add Passwordless](/img/manuals/console_add_passwordless_direct.gif)
+![Add passwordless](/img/manuals/console_add_passwordless_direct.gif)
 

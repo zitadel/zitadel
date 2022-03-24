@@ -3,13 +3,13 @@ package handler
 import (
 	"context"
 
+	"github.com/caos/logging"
+
 	caos_errs "github.com/caos/zitadel/internal/errors"
-	"github.com/caos/zitadel/internal/eventstore/v1"
+	v1 "github.com/caos/zitadel/internal/eventstore/v1"
 	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	org_view "github.com/caos/zitadel/internal/org/repository/view"
 	query2 "github.com/caos/zitadel/internal/query"
-
-	"github.com/caos/logging"
 
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
@@ -166,23 +166,16 @@ func (u *NotifyUser) ProcessOrg(event *es_models.Event) (err error) {
 }
 
 func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, _, domains, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
-	}
-	policy := new(query2.OrgIAMPolicy)
-	if policy == nil {
-		policy, err = u.getDefaultOrgIAMPolicy(context.Background())
-		if err != nil {
-			return err
-		}
 	}
 	users, err := u.view.NotifyUsersByOrgID(event.AggregateID)
 	if err != nil {
 		return err
 	}
 	for _, user := range users {
-		user.SetLoginNames(policy, org.Domains)
+		user.SetLoginNames(userLoginMustBeDomain, domains)
 		err := u.view.PutNotifyUser(user, event)
 		if err != nil {
 			return err
@@ -192,16 +185,11 @@ func (u *NotifyUser) fillLoginNamesOnOrgUsers(event *es_models.Event) error {
 }
 
 func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) error {
-	org, err := u.getOrgByID(context.Background(), event.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, _, err := u.loginNameInformation(context.Background(), event.ResourceOwner)
 	if err != nil {
 		return err
 	}
-
-	policy, err := u.getDefaultOrgIAMPolicy(context.Background())
-	if err != nil {
-		return err
-	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		return nil
 	}
 	users, err := u.view.NotifyUsersByOrgID(event.AggregateID)
@@ -209,7 +197,7 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 		return err
 	}
 	for _, user := range users {
-		user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+		user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 		err := u.view.PutNotifyUser(user, event)
 		if err != nil {
 			return err
@@ -219,17 +207,12 @@ func (u *NotifyUser) fillPreferredLoginNamesOnOrgUsers(event *es_models.Event) e
 }
 
 func (u *NotifyUser) fillLoginNames(user *view_model.NotifyUser) (err error) {
-	org, err := u.getOrgByID(context.Background(), user.ResourceOwner)
+	userLoginMustBeDomain, primaryDomain, domains, err := u.loginNameInformation(context.Background(), user.ResourceOwner)
 	if err != nil {
 		return err
 	}
-
-	policy, err := u.getDefaultOrgIAMPolicy(context.Background())
-	if err != nil {
-		return err
-	}
-	user.SetLoginNames(policy, org.Domains)
-	user.PreferredLoginName = user.GenerateLoginName(org.GetPrimaryDomain().Domain, policy.UserLoginMustBeDomain)
+	user.SetLoginNames(userLoginMustBeDomain, domains)
+	user.PreferredLoginName = user.GenerateLoginName(primaryDomain, userLoginMustBeDomain)
 	return nil
 }
 
@@ -264,6 +247,17 @@ func (u *NotifyUser) getOrgByID(ctx context.Context, orgID string) (*org_model.O
 	return org_es_model.OrgToModel(esOrg), nil
 }
 
-func (u *NotifyUser) getDefaultOrgIAMPolicy(ctx context.Context) (*query2.OrgIAMPolicy, error) {
-	return u.queries.DefaultOrgIAMPolicy(ctx)
+func (u *NotifyUser) loginNameInformation(ctx context.Context, orgID string) (userLoginMustBeDomain bool, primaryDomain string, domains []*org_model.OrgDomain, err error) {
+	org, err := u.getOrgByID(ctx, orgID)
+	if err != nil {
+		return false, "", nil, err
+	}
+	if org.OrgIamPolicy == nil {
+		policy, err := u.queries.DefaultOrgIAMPolicy(ctx)
+		if err != nil {
+			return false, "", nil, err
+		}
+		userLoginMustBeDomain = policy.UserLoginMustBeDomain
+	}
+	return userLoginMustBeDomain, org.GetPrimaryDomain().Domain, org.Domains, nil
 }

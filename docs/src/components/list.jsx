@@ -12,6 +12,9 @@ export const ICONTYPE = {
   ARCHITECTURE: <div className="rounded rounded-architecture">
   <i className={`las la-sitemap`}></i>
 </div>,
+  DOLLAR: <div className="rounded rounded-architecture">
+    <i className={`las la-dollar-sign`}></i>
+  </div>,
   LOGIN: <div className="rounded rounded-login">
     <i className={`las la-sign-in-alt`}></i>
   </div>,

@@ -13,7 +13,7 @@ title: Service Users
             In this module you will:
             <ul>
                 <li>Learn about Service Users</li>
-                <li>Create a Service User in ZITADEL Console</li>
+                <li>Create a Service User in the ZITADEL console</li>
                 <li>Authorize a Service User with JWT signed with your private key</li>
             </ul>
         </td>
@@ -35,9 +35,9 @@ import UserDescription from '../../concepts/structure/_user_description.mdx';
 
 ## Exercise: Create a Service User
 
-1. Navigate to Service Users
-2. Click on **New**
-3. Enter a user name and a display name
+1. Navigate to Service Users.
+2. Click on **New**.
+3. Enter a user name and a display name.
 
 ![Create new service user](/img/console_serviceusers_create.gif)
 
@@ -45,27 +45,32 @@ import UserDescription from '../../concepts/structure/_user_description.mdx';
 
 In ZITADEL we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 
-You need to follow these steps to authenticate a service user and receive a access token:
+To authenticate a service user and receive an access token, follow these steps:
 
 1. Generate a private-public key pair in ZITADEL
-2. Create a JSON Web Token (JWT) and sign with private key
+2. Create a JSON Web Token (JWT) and sign it with your private key
 3. With this JWT, request an OAuth token from ZITADEL
 
-With this token you can make subsequent requests, just like a human user.
+With this token, you can make subsequent requests, just like a human user.
 
 ## Exercise: Get an access token
 
-In this exercise we will authenticate a service user and receive an access_token to use against a API.
+In this exercise we will authenticate a service user and receive an `access_token` to use against a API.
 
 > **Information:** Are you stuck? Don't hesitate to reach out to us on [Github Discussions](https://github.com/caos/zitadel/discussions) or [contact us](https://zitadel.ch/contact/) privately.
 
 ### 1. Generate a private-public key pair in ZITADEL
 
-Select your service user and in the section KEYS click **New**. Enter an expiration date and click **Add**. Make sure to download the json by clicking **Download**.
+1. Select your service user and in the section KEYS, select **New**.
+1. Enter an expiration date and select **Add**.
+1. Make sure to download the JSON by selecting **Download**.
 
 ![Create private key](/img/console_serviceusers_new_key.gif)
 
-The downloaded json should look something like outlined below. The value of `key` contains the *private* key for your service account. Please make sure to keep this key securely stored and handle with care. The public key is automatically stored in ZITADEL.
+The downloaded json should look something like the following snippet.
+The value of `key` contains the *private* key for your service account.
+Make sure to keep this key securely stored and handle it with care.
+The public key is automatically stored in ZITADEL.
 
 ```json
 {
@@ -115,7 +120,7 @@ If you use Go, you might want to use the [provided tool](https://github.com/caos
 
 ### 3. With this JWT, request an OAuth token from ZITADEL
 
-With the encoded JWT from the prior step, you will need to craft a POST request to ZITADEL's token endpoint:
+With the encoded JWT from the prior step, craft a POST request to ZITADEL's token endpoint:
 
 ```bash
 curl --request POST \
@@ -145,7 +150,7 @@ Content-Type: application/json
 
 ### 4. Verify that you have a valid access token
 
-For this example let's call the userinfo endpoint to verfiy that our access token works.
+For this example, call the `userinfo` endpoint to verfiy that our access token works.
 
 ```bash
 curl --request POST \
@@ -198,9 +203,9 @@ Content-Type: application/json
 
 ## Summary
 
-* With service users you can secure machine-to-machine communication
-* Because there is no interactive logon, you need to use a JWT signed with your private key to authorize the user
-* After successful authorization you can use an access token like for human users
+* With service users, you can secure machine-to-machine communication.
+* Because there is no interactive login, you need to use a JWT signed with your private key to authorize the user.
+* After successful authorization, you can use an access token like you would for human users.
 
 Where to go from here:
 

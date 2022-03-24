@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
