@@ -560,7 +560,7 @@ func (repo *AuthRequestRepo) fillPolicies(ctx context.Context, request *domain.A
 		return err
 	}
 	request.LockoutPolicy = lockoutPolicyToDomain(lockoutPolicy)
-	privacyPolicy, err := repo.getPrivacyPolicy(ctx, orgID)
+	privacyPolicy, err := repo.GetPrivacyPolicy(ctx, orgID)
 	if err != nil {
 		return err
 	}
@@ -936,8 +936,11 @@ func (repo *AuthRequestRepo) mfaSkippedOrSetUp(user *user_model.UserView, reques
 	return checkVerificationTime(user.MFAInitSkipped, request.LoginPolicy.MFAInitSkipLifetime)
 }
 
-func (repo *AuthRequestRepo) getPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
+func (repo *AuthRequestRepo) GetPrivacyPolicy(ctx context.Context, orgID string) (*domain.PrivacyPolicy, error) {
 	policy, err := repo.PrivacyPolicyProvider.PrivacyPolicyByOrg(ctx, orgID)
+	if errors.IsNotFound(err) {
+		return new(domain.PrivacyPolicy), nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -957,6 +960,7 @@ func privacyPolicyToDomain(p *query.PrivacyPolicy) *domain.PrivacyPolicy {
 		Default:     p.IsDefault,
 		TOSLink:     p.TOSLink,
 		PrivacyLink: p.PrivacyLink,
+		HelpLink:    p.HelpLink,
 	}
 }
 

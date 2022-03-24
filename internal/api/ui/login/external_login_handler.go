@@ -203,7 +203,7 @@ func (l *Login) handleExternalUserAuthenticated(w http.ResponseWriter, r *http.R
 	}
 
 	instanceID := authz.GetInstance(r.Context()).ID
-	err = l.authRepo.CheckExternalUserLogin(r.Context(), authReq.ID, userAgentID, instanceID, externalUser, domain.BrowserInfoFromRequest(r))
+	err = l.authRepo.CheckExternalUserLogin(setContext(r.Context(), ""), authReq.ID, userAgentID, instanceID, externalUser, domain.BrowserInfoFromRequest(r))
 	if err != nil {
 		if errors.IsNotFound(err) {
 			err = nil

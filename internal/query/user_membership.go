@@ -70,6 +70,14 @@ func NewMembershipOrgIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipOrgID, value, TextEquals)
 }
 
+func NewMembershipResourceOwnersSearchQuery(ids ...string) (SearchQuery, error) {
+	list := make([]interface{}, len(ids))
+	for i, value := range ids {
+		list[i] = value
+	}
+	return NewListQuery(membershipResourceOwner, list, ListIn)
+}
+
 func NewMembershipProjectIDQuery(value string) (SearchQuery, error) {
 	return NewTextQuery(membershipProjectID, value, TextEquals)
 }

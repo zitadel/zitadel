@@ -34,7 +34,7 @@ func (c *Commands) AddHuman(ctx context.Context, orgID string, human *domain.Hum
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	events, addedHuman, err := c.addHuman(ctx, orgID, human, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 	if err != nil {
@@ -63,7 +63,7 @@ func (c *Commands) ImportHuman(ctx context.Context, orgID string, human *domain.
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexity.NotFound")
+		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-4N8gs", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	events, addedHuman, addedCode, code, err := c.importHuman(ctx, orgID, human, passwordless, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, passwordlessCodeGenerator)
 	if err != nil {
@@ -128,7 +128,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, orgID string, human *domai
 	}
 	pwPolicy, err := c.getOrgPasswordComplexityPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexity.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Org.PasswordComplexityPolicy.NotFound")
 	}
 	loginPolicy, err := c.getOrgLoginPolicy(ctx, orgID)
 	if err != nil {

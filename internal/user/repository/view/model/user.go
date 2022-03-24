@@ -8,8 +8,6 @@ import (
 	"github.com/caos/logging"
 	"github.com/lib/pq"
 
-	"github.com/caos/zitadel/internal/query"
-
 	req_model "github.com/caos/zitadel/internal/auth_request/model"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -230,14 +228,14 @@ func (u *UserView) GenerateLoginName(domain string, appendDomain bool) string {
 	return u.UserName + "@" + domain
 }
 
-func (u *UserView) SetLoginNames(policy *query.DomainPolicy, domains []*org_model.OrgDomain) {
+func (u *UserView) SetLoginNames(userLoginMustBeDomain bool, domains []*org_model.OrgDomain) {
 	loginNames := make([]string, 0)
 	for _, d := range domains {
 		if d.Verified {
 			loginNames = append(loginNames, u.GenerateLoginName(d.Domain, true))
 		}
 	}
-	if !policy.UserLoginMustBeDomain {
+	if !userLoginMustBeDomain {
 		loginNames = append(loginNames, u.UserName)
 	}
 	u.LoginNames = loginNames

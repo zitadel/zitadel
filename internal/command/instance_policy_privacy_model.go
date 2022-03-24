@@ -55,7 +55,8 @@ func (wm *InstancePrivacyPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) (*instance.PrivacyPolicyChangedEvent, bool) {
 
 	changes := make([]policy.PrivacyPolicyChanges, 0)
@@ -64,6 +65,9 @@ func (wm *InstancePrivacyPolicyWriteModel) NewChangedEvent(
 	}
 	if wm.PrivacyLink != privacyLink {
 		changes = append(changes, policy.ChangePrivacyLink(privacyLink))
+	}
+	if wm.HelpLink != helpLink {
+		changes = append(changes, policy.ChangeHelpLink(helpLink))
 	}
 	if len(changes) == 0 {
 		return nil, false

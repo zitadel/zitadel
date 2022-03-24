@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Server) ListMyZitadelPermissions(ctx context.Context, _ *auth_pb.ListMyZitadelPermissionsRequest) (*auth_pb.ListMyZitadelPermissionsResponse, error) {
-	perms, err := s.query.MyZitadelPermissions(ctx, authz.GetCtxData(ctx).UserID)
+	perms, err := s.query.MyZitadelPermissions(ctx, authz.GetCtxData(ctx).OrgID, authz.GetCtxData(ctx).UserID)
 	if err != nil {
 		return nil, err
 	}

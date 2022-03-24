@@ -5,11 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/caos/zitadel/internal/static/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
+
+	"github.com/caos/zitadel/internal/repository/user"
+	"github.com/caos/zitadel/internal/static/mock"
 
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -266,6 +267,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helpLink",
 							),
 						),
 					),
@@ -470,6 +472,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helplink",
 							),
 						),
 					),
@@ -686,6 +689,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helplink",
 							),
 						),
 					),
@@ -912,6 +916,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helplink",
 							),
 						),
 					),
@@ -1203,6 +1208,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helplink",
 							),
 						),
 					),
@@ -1420,6 +1426,7 @@ func TestCommandSide_SetOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helplink",
 							),
 						),
 					),
@@ -1684,6 +1691,7 @@ func TestCommandSide_RemoveOrgFeatures(t *testing.T) {
 								&instance.NewAggregate().Aggregate,
 								"toslink",
 								"privacylink",
+								"helplink",
 							),
 						),
 					),

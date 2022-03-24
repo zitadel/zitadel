@@ -80,7 +80,7 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) erro
 		return err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.OrgIAM.NotFound")
+		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.OrgIAMPolicy.NotFound")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)

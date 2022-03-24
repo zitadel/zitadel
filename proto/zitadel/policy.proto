@@ -229,4 +229,5 @@ message PrivacyPolicy {
     string tos_link = 2;
     string privacy_link = 3;
     bool is_default = 4;
+    string help_link = 5;
 }

@@ -126,11 +126,6 @@ func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.Lis
 	if err != nil {
 		return nil, err
 	}
-	ownerQuery, err := query.NewMemberResourceOwnerSearchQuery(authz.GetCtxData(ctx).OrgID)
-	if err != nil {
-		return nil, err
-	}
-	queries = append(queries, ownerQuery)
 	return &query.ProjectGrantMembersQuery{
 		MembersQuery: query.MembersQuery{
 			SearchRequest: query.SearchRequest{
@@ -143,6 +138,7 @@ func ListProjectGrantMembersRequestToModel(ctx context.Context, req *mgmt_pb.Lis
 		},
 		ProjectID: req.ProjectId,
 		GrantID:   req.GrantId,
+		OrgID:     authz.GetCtxData(ctx).OrgID,
 	}, nil
 }
 

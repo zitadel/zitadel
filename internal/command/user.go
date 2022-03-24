@@ -188,7 +188,7 @@ func (c *Commands) RemoveUser(ctx context.Context, userID, resourceOwner string,
 
 	orgIAMPolicy, err := c.getOrgDomainPolicy(ctx, existingUser.ResourceOwner)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAM.NotExisting")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAMPolicy.NotExisting")
 	}
 	var events []eventstore.Command
 	userAgg := UserAggregateFromWriteModel(&existingUser.WriteModel)

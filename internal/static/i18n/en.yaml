@@ -193,22 +193,22 @@ Errors:
       NotChanged: Default Message Text has not been changed
       AlreadyExists: Default Message Text already exists
       Invalid: Default Message Text is invalid
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Password Complexity Policy not found
       Empty: Password Complexity Policy is empty
       NotExisting: Password Complexity Policy doesn't exist
       AlreadyExists: Password Complexity Policy already exists
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Password Lockout Policy not found
       Empty: Password Lockout Policy is empty
       NotExisting: Password Lockout Policy doesn't exist
       AlreadyExists: Password Lockout Policy already exists
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Password Age Policy not found
       Empty: Password Age Policy is empty
       NotExisting: Password Age Policy doesn't exist
       AlreadyExists: Password Age Policy already exists
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy doesn't exist
       AlreadyExists: Org IAM Policy already exists
@@ -589,6 +589,10 @@ EventTypes:
       cascade:
         removed: Authorization removed
         changed: Authorization changed
+    metadata:
+      set: User metadata set
+      removed: User metadata removed
+      removed.all: All user metadata removed
   org:
     added: Organization added
     changed: Organization changed

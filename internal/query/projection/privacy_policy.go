@@ -26,6 +26,7 @@ const (
 	PrivacyPolicyInstanceIDCol    = "instance_id"
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
+	PrivacyPolicyHelpLinkCol      = "help_link"
 )
 
 type PrivacyPolicyProjection struct {
@@ -48,6 +49,7 @@ func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyHelpLinkCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
 		),
@@ -114,6 +116,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(PrivacyPolicyPrivacyLinkCol, policyEvent.PrivacyLink),
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
+			handler.NewCol(PrivacyPolicyHelpLinkCol, policyEvent.HelpLink),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
@@ -139,6 +142,9 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	if policyEvent.TOSLink != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicyTOSLinkCol, *policyEvent.TOSLink))
+	}
+	if policyEvent.HelpLink != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyHelpLinkCol, *policyEvent.HelpLink))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,
