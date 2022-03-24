@@ -1692,6 +1692,19 @@ remove a list of user grants in one request
     GET: /features
 
 
+### GetOrgIAMPolicy
+
+> **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
+[GetOrgIAMPolicyResponse](#getorgiampolicyresponse)
+
+deprecated: please use DomainPolicy instead
+Returns the domain policy (this policy is managed by the iam administrator)
+
+
+
+    GET: /policies/orgiam
+
+
 ### GetDomainPolicy
 
 > **rpc** GetDomainPolicy([GetDomainPolicyRequest](#getdomainpolicyrequest))
@@ -4836,6 +4849,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | org |  zitadel.org.v1.Org | - |  |
+
+
+
+
+### GetOrgIAMPolicyRequest
+
+
+
+
+
+### GetOrgIAMPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.DomainPolicy | - |  |
 
 
 

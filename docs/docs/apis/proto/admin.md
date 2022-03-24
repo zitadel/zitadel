@@ -476,6 +476,7 @@ all fields are updated. If no value is provided the field will be empty afterwar
 > **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
 [GetOrgIAMPolicyResponse](#getorgiampolicyresponse)
 
+deprecated: please use DomainPolicy instead
 Returns the Org IAM policy defined by the administrators of ZITADEL
 
 
@@ -488,6 +489,7 @@ Returns the Org IAM policy defined by the administrators of ZITADEL
 > **rpc** UpdateOrgIAMPolicy([UpdateOrgIAMPolicyRequest](#updateorgiampolicyrequest))
 [UpdateOrgIAMPolicyResponse](#updateorgiampolicyresponse)
 
+deprecated: please use DomainPolicy instead
 Updates the default OrgIAM policy.
 it impacts all organisations without a customised policy
 
@@ -501,6 +503,7 @@ it impacts all organisations without a customised policy
 > **rpc** GetCustomOrgIAMPolicy([GetCustomOrgIAMPolicyRequest](#getcustomorgiampolicyrequest))
 [GetCustomOrgIAMPolicyResponse](#getcustomorgiampolicyresponse)
 
+deprecated: please use DomainPolicy instead
 Returns the customised policy or the default if not customised
 
 
@@ -513,6 +516,7 @@ Returns the customised policy or the default if not customised
 > **rpc** AddCustomOrgIAMPolicy([AddCustomOrgIAMPolicyRequest](#addcustomorgiampolicyrequest))
 [AddCustomOrgIAMPolicyResponse](#addcustomorgiampolicyresponse)
 
+deprecated: please use DomainPolicy instead
 Defines a custom OrgIAM policy as specified
 
 
@@ -525,6 +529,7 @@ Defines a custom OrgIAM policy as specified
 > **rpc** UpdateCustomOrgIAMPolicy([UpdateCustomOrgIAMPolicyRequest](#updatecustomorgiampolicyrequest))
 [UpdateCustomOrgIAMPolicyResponse](#updatecustomorgiampolicyresponse)
 
+deprecated: please use DomainPolicy instead
 Updates a custom OrgIAM policy as specified
 
 
@@ -537,6 +542,7 @@ Updates a custom OrgIAM policy as specified
 > **rpc** ResetCustomOrgIAMPolicyToDefault([ResetCustomOrgIAMPolicyToDefaultRequest](#resetcustomorgiampolicytodefaultrequest))
 [ResetCustomOrgIAMPolicyToDefaultResponse](#resetcustomorgiampolicytodefaultresponse)
 
+deprecated: please use DomainPolicy instead
 Resets the org iam policy of the organisation to default
 ZITADEL will fallback to the default policy defined by the ZITADEL administrators
 
