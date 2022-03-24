@@ -9,22 +9,24 @@ It covers how to:
 - Fetch some data from the user info endpoint.
 
 > This documentation refers to our [example](https://github.com/caos/zitadel-examples/tree/main/angular) in GitHub.
-> Note that we've written the ZITADEL Console in Angular.
+> Note that we've written the ZITADEL console in Angular.
 > You can also use that as a reference.
 
 ## Set up application and get keys
 
-Before you build your application, you'll need to head to the ZITADEL Console and add some information about your application.
+Before you build your application, you'll need to head to the ZITADEL console and add some information about your application.
 To start, we recommend creating a new app from scratch.
 To do so:
 
-1. Navigate to your [Project](https://console.zitadel.ch/projects).
+1. Navigate to your [project](https://console.zitadel.ch/projects).
 1. At the top of the page, add a new application.
 1. Select **Web application type** and continue.
 
-For all applications, we recommend combining an
+For all applications, we recommend combining
 [Authorization Code](../../apis/openidoauth/grant-types#authorization-code)
-with a [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
+with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
+
+[Read more about the different app types](https://docs.zitadel.ch/docs/guides/authorization/oauth-recommended-flows#different-client-profiles).
 
 ![Create app in console](/img/angular/app-create-light.png)
 
@@ -40,7 +42,7 @@ To do so, add an optional redirect in the Post Logout URIs field.
 
 Continue and create the application.
 
-### Copy Client ID and secret
+### Copy client ID
 
 After you create your app, a pop-up will show the app's client ID.
 Copy the client ID, as you will need it to configure your Angular client.
@@ -58,17 +60,18 @@ To do so, run this command:
 npm install angular-oauth2-oidc
 ```
 
-### Create and Configure Auth Module
+### Create and configure AuthModule
 
-1. Import the necessary modules:
-   * Add `AuthModule` to your Angular imports in `AppModule`
-   * Add the `AuthConfig` in the providers' section.
-   * Import the _HTTPClientModule_.
+1. Add `OAuthModule` and `HTTPClientModule` to your Angular imports in `AppModule`
 
 2. In the `AuthConfig` object, add the following values:
    * For `scope`, set `openid`, `profile` and `email`.
    * For `responseType`, use `code`
    * Set `oidc` to `true`.
+
+3. Provide the `AuthConfig` object in the providers' section.
+
+
 ```ts
 ...
 import { AuthConfig, OAuthModule } from 'angular-oauth2-oidc';
@@ -99,19 +102,17 @@ const authConfig: AuthConfig = {
 ...
 ```
 
-3. Create an authentication service to provide the functions to authenticate your user.
+4. Create an authentication service to provide the functions to authenticate your user.
+   You can use Angular’s schematics to do so:
 
-  You can use Angular’s schematics to do so:
+   ```bash
+   ng g service services/authentication
+   ```
 
-  ```bash
-  ng g service services/authentication
-      ```
-
-4. Copy the following code to your service.
-
-  This code provides a function `authenticate()`, which redirects the user to ZITADEL.
-  After successful login, ZITADEL redirects the user back to the redirect URI configured in _AuthModule_ and ZITADEL Console.
-  Make sure both correspond, otherwise ZITADEL throws an error.
+5. Copy the following code to your service.
+   This code provides a function `authenticate()`, which redirects the user to ZITADEL.
+   After successful login, ZITADEL redirects the user back to the redirect URI configured in `AuthModule` and the ZITADEL console.
+   Make sure both correspond, otherwise ZITADEL throws an error.
 
 ```ts
 import { Injectable } from '@angular/core';
@@ -183,7 +184,7 @@ const newState = setState ? await this.statehandler.createState().toPromise() : 
 ...
 ```
 
-If you decide to use the _StatehandlerService_, provide it in the `app.module`.
+If you decide to use the `StatehandlerService`, provide it in the `AppModule`.
 Make sure it gets initialized first using Angular’s `APP_INITIALIZER`.
 You can find the service implementation in the [example](https://github.com/caos/zitadel-examples/tree/main/angular).
 
@@ -215,7 +216,7 @@ providers: [
 ...
 ```
 
-### Add Login to Your Application
+### Add login to your application
 
 To log a user in, you probably need a _component_ or _guard_.
 
@@ -233,7 +234,7 @@ Generate a component like this:
 ng g component components/login
 ```
 
-Inject the _AuthenticationService_ and call `authenticate()` on some click event.
+Inject the `AuthenticationService` and call `authenticate()` on some click event.
 
 Same for the guard:
 
@@ -241,7 +242,7 @@ Same for the guard:
 ng g guard guards/auth
 ```
 
-This code shows the _AuthGuard_ used in ZITADEL Console.
+This code shows the `AuthGuard` used in the ZITADEL console.
 
 ```ts
 import { Injectable } from '@angular/core';
@@ -267,7 +268,7 @@ export class AuthGuard implements CanActivate {
 }
 ```
 
-Add the guard to your _RouterModule_ similar to this:
+Add the guard to your `RouterModule` similar to this:
 
 ```ts
 ...
@@ -291,7 +292,7 @@ const routes: Routes = [
 ....
 ```
 
-### Add Logout to Your Application
+### Add logout to your application
 
 To log the current user out, call `auth.signout()`.
 
@@ -309,12 +310,12 @@ export class SomeComponentWithLogout {
 }
 ```
 
-### Show User Information
+### Show user information
 
 To fetch user data, call ZITADEL's user info endpoint.
-This data contains sensitive information and artifacts about the current user's identity, and the scopes you defined in your _AuthConfig_.
+This data contains sensitive information and artifacts about the current user's identity, and the scopes you defined in your `AuthConfig`.
 
-Our _AuthenticationService_ already includes a method called `getOIDCUser()`.
+Our `AuthenticationService` already includes a method called `getOIDCUser()`.
 You can call it wherever you need this information.
 
 ```ts
@@ -341,7 +342,7 @@ You have successfully integrated your Angular application with ZITADEL!
 
 If you get stuck, check out our [example](https://github.com/caos/zitadel-examples/tree/main/angular) application.
 It includes all the mentioned functionality of this quickstart.
-You can start by cloning the repository and replacing the _AuthConfig_ in the _AppModule_ with your own configuration.
+You can start by cloning the repository and replacing the `AuthConfig` in the `AppModule` with your own configuration.
 
 If you run into issues, contact us or raise an issue on [GitHub](https://github.com/caos/zitadel).
 
@@ -350,6 +351,6 @@ If you run into issues, contact us or raise an issue on [GitHub](https://github.
 ### What's next?
 
 Now that you have enabled authentication, it's time to add authorization to your application using ZITADEL APIs.
-Refer to the [docs](../../apis/introduction) or check out our ZITADEL Console code on [GitHub](https://github.com/caos/zitadel), which uses gRPC to access data.
+Refer to the [docs](../../apis/introduction) or check out our ZITADEL console code on [GitHub](https://github.com/caos/zitadel), which uses gRPC to access data.
 
 For more information about creating an Angular application, refer to [Angular](https://angular.io/start) and for more information about the OAuth/OIDC library used above, consider reading their docs at [angular-oauth2-oidc](https://github.com/manfredsteyer/angular-oauth2-oidc).

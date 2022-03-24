@@ -35,8 +35,8 @@ authenticate the user in exchange for an authorization_code (authorization code 
 
 | Parameter     | Description                                                                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| client_id     | The id of your client as shown in Console.                                                                                                        |
-| redirect_uri  | Callback uri of the authorization request where the code or tokens will be sent to. Must match exactly one of the preregistered in Console.       |
+| client_id     | The id of your client as shown in the console.                                                                                                        |
+| redirect_uri  | Callback URI of the authorization request where the code or tokens will be sent to. Must match exactly one of the ZITADEL applications redirect URI.       |
 | response_type | Determines whether a `code`, `id_token token` or just `id_token` will be returned. Most use cases will need `code`. See flow guide for more info. |
 | scope         | `openid` is required, see [Scopes](scopes) for more possible values. Scopes are space delimited, e.g. `openid email profile`                      |
 
@@ -45,7 +45,7 @@ Following the [OIDC Core 1.0 specs](https://openid.net/specs/openid-connect-core
 the id_token will not contain any claims of the scopes `profile`, `email`, `phone` and `address`. 
 
 Send the access_token to the [userinfo_endpoint](#userinfo_endpoint) or [introspection_endpoint](#introspection_endpoint) the retrieve these claims
-or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in Console) to true.
+or set the `id_token_userinfo_assertion` Option ("User Info inside ID Token" in the console) to true.
 :::
 
 Depending on your authorization method you will have to provide additional parameters or headers:
@@ -136,7 +136,7 @@ the error will be display directly to the user on the auth server
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | invalid_request           | The request is missing a required parameter, includes an invalid parameter value, includes a parameter more than once, or is otherwise malformed.                            |
 | invalid_scope             | The requested scope is invalid. Typically the required `openid` value is missing.                                                                                            |
-| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in Console that the requested `response_type` is allowed in your application configuration. |
+| unauthorized_client       | The client is not authorized to request an access_token using this method. Check in the console that the requested `response_type` is allowed in your application configuration. |
 | unsupported_response_type | The authorization server does not support the requested response_type.                                                                                                       |
 | server_error              | The authorization server encountered an unexpected condition that prevented it from fulfilling the request.                                                                  |
 

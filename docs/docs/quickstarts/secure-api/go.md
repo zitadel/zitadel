@@ -2,16 +2,17 @@
 title: Go
 ---
 
-This guide shows you how to integrate ZITADEL into your Go API.
-You'll use an OAuth 2 Token Introspection to secure your API.
+This guide shows you how to integrate ZITADEL with your Go API.
+You'll use *OAuth 2 Token Introspection* to secure your API.
 
 At the end of the guide, you should have an API with a protected endpoint.
 
 ## Prerequisites
 
-The client [SDK](https://github.com/caos/zitadel-go) provides an interceptor for both GRPC and HTTP.
-This uses a JWT to handle the OAuth 2.0 introspection request, including authentication.
-The Private Key uses our [OIDC client library](https://github.com/caos/oidc).
+The client [SDK](https://github.com/caos/zitadel-go) provides an interceptor for both gRPC and HTTP.
+Both interceptors handle the OAuth 2.0 introspection request. 
+For authentication, they use *JWT with Private Key*.
+The SDK imports our [OIDC client library](https://github.com/caos/oidc).
 
 All you need is an API and its JSON key.
 
@@ -69,7 +70,8 @@ func writeOK(w http.ResponseWriter, r *http.Request) {
 
 #### JSON key
 
-To provide the JSON key to the SDK, set an environment variable `ZITADEL_KEY_PATH`, using the path to the JSON as the value.
+To provide the JSON key to the SDK, set an environment variable `ZITADEL_KEY_PATH`.
+Use the path to the file containing the JSON key as the variables value.
 
 ```bash
 export ZITADEL_KEY_PATH=/Users/test/apikey.json

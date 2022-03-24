@@ -24,7 +24,7 @@ that matches the selected custom URL scheme.
 As an example, if you want to use `ch.myexample.app://sign-me-in` as a redirect URI on ZITADEL and in your app,
 register the `ch.myexample.app://` custom URL within Android and iOS.
 
-:::caution Use a Custom Redirect URI!
+:::caution Use a custom redirect URI!
 
 You'll need the custom redirect URI to be compliant with the OAuth 2.0
 authentication for mobile devices ([RFC 8252 specification](https://tools.ietf.org/html/rfc8252)).
@@ -32,7 +32,7 @@ Otherwise your app might get rejected.
 
 :::
 
-### Hello World
+### Hello world
 
 After you create the basic Flutter app, the app shows the following screen:
 
@@ -59,7 +59,7 @@ You'll also enable new language features.
 
 For this quickstart, the minimal Flutter SDK version is set to the default: `sdk: ">=2.7.0 <3.0.0"`.
 
-### Install Dependencies
+### Install dependencies
 
 To authenticate users with ZITADEL in a mobile application, you'll need some specific packages.
 
@@ -115,10 +115,11 @@ defaultConfig {
 #### Important on iOS
 
 Similar to Android,
-to use custom redirect schemes in iOS, you need to register the custom URL.
+to use custom redirect schemes in iOS,
+you need to register the custom URL.
 
-In the `Info.plist` file of the Runner
-project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
+In the `Info.plist` file of the Runner project,
+you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
 
 ```xml title="<projectRoot>/ios/Runner/Info.plist"
 <key>CFBundleURLTypes</key>
@@ -134,13 +135,12 @@ project, you can add the `CFBundleTypeRole` and the `CFBundleUrlSchemes`.
 </array>
 ```
 
-### Add Authentication
+### Add authentication
 
 :::note
 
-The auth redirect scheme "`ch.myexample.app`" registers all auth URLs with the given
-scheme for the app.
-So, a URL that points to `ch.myexample.app://signin` works with the same registration.
+The auth redirect scheme "`ch.myexample.app`" registers all auth URLs with the given scheme for the app.
+So, both URLs `ch.myexample.app://signin` and `ch.myexample.app://logout` work with the same registration.
 
 :::
 
@@ -163,8 +163,8 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-Second, the `MyHomePage` class will remain a stateful widget with
-its title, we don't change any code here.
+Second, the `MyHomePage` class will remain a stateful widget with its title.
+Don't change any code here.
 
 ```dart
 class MyHomePage extends StatefulWidget {
@@ -177,12 +177,12 @@ class MyHomePage extends StatefulWidget {
 }
 ```
 
-Now we will change the `_MyHomePageState` class.
-This enables authentication via ZITADEL and removes the counter button of the hello
-world application.
-We'll show the username of the authenticated user.
+Now, change the `_MyHomePageState` class.
+This enables authentication via ZITADEL
+and removes the counter button of the hello world application.
+Show the username of the authenticated user.
 
-1. Define the needed elements for our state:
+1. Define the needed elements for your state:
 
 ```dart
 final _appAuth = FlutterAppAuth();
@@ -193,7 +193,7 @@ var _authenticated = false;
 var _username = '';
 ```
 
-2. Then add the builder method.
+2. Add the builder method.
 If you're not authenticated, this shows the login button.
 If the login process is going on, it shows a loading bar.
 If you are authenticated, it shows your name.
@@ -242,7 +242,7 @@ Widget build(BuildContext context) {
 }
 ```
 
-3. Finally add the `_authenticate` method.
+3. Finally, add the `_authenticate` method.
 This calls the authorization endpoint,
 then fetches the user info and stores the tokens in secure storage.
 
@@ -301,7 +301,7 @@ Now, you can log in as a valid ZITADEL user.
 
 #### Result
 
-In the end, our state class looks like:
+In the end, your state class looks like:
 
 ```dart
 class _MyHomePageState extends State<MyHomePage> {

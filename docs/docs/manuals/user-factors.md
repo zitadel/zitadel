@@ -17,7 +17,7 @@ An OTP application creates a dynamic Token that changes periodically and needs t
 2. Click Add AuthFactor
 3. Choose OTP Option
 4. Scan the QR Code with you chosen authenticator app
-5. Enter the code from your app in the ZITADEL Console
+5. Enter the code from your app in the ZITADEL console
 
 :::info
 Some example Authenticator Apps for OTP are: Google Authenticator, Microsoft Authenticator, Authy. You can choose the one you like the most.

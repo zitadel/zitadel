@@ -46,7 +46,7 @@ If a request calls for a specific id the call will, most of the times, be revali
 
 ### Component HTTP Server
 
-The http server is responsible for serving the management GUI called **ZITADEL Console**, serving the static assets and as well rendering server side html (login, password-reset, verification, ...)
+The HTTP server is responsible for serving the management GUI called ZITADEL console, serving the static assets and as well rendering server side html (login, password-reset, verification, ...)
 
 ## Cluster Architecture
 

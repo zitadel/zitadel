@@ -8,11 +8,11 @@ Users belong to one, and only one, organization in ZITADEL. It is not possible t
 
 ## Managing Users
 
-Users can be created, changed, and deleted via our APIs or manually in Console.
+Users can be created, changed, and deleted via our APIs or manually in the console.
 
 ### Self-service
 
-Depending on the organization's policies users may self-register and thus create accounts on their own. Users can self-manage their user information or authentication methods. A self-service UI is provided in Console, yet you can also integrate our APIs with your user interface.
+Depending on the organization's policies users may self-register and thus create accounts on their own. Users can self-manage their user information or authentication methods. A self-service UI is provided in the console, yet you can also integrate our APIs with your user interface.
 
 ### Metadata
 

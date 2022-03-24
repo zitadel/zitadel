@@ -2,17 +2,17 @@
 title: OAuth 2.0 Proxy
 ---
 
-The [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) project lets services delegate the authentication flow to an IDP like ZITADEL
+The [OAuth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy) project lets services delegate the authentication flow to an identity provider like ZITADEL
 
 ## Configure ZITADEL
 
-### Setup Application and get Keys
+### Setup application and get keys
 
 Before you build your application, head to the ZITADEL console and add some information about your app.
 To start, we recommend creating a new app from scratch.
 To do so:
 
-1. Navigate to your [Project](https://console.zitadel.ch/projects).
+1. Navigate to your [project](https://console.zitadel.ch/projects).
 1. At the top of the page, add a new application.
 1. Select **Web Application** and continue.
 
@@ -24,30 +24,29 @@ For the OAuth 2.0 Proxy, we recommend using [Authorization Code](../../apis/open
 
 Set a redirect URL.
 After users authenticate, ZITADEL will redirect them to this URL.
-Set your URL to the domain where the proxy will deploy.
-You can also use the default, `http://127.0.0.1:4180/oauth2/callback`.
+The redirect URL here must match with the redirect URL in the [proxy configuration](#authentication-example).
 
 > If you are following along with the sample project,
-> set the Allowed Callback URL to <http://localhost:4200/auth/callback>.
+> set the **Allowed Callback URL** to <http://localhost:4200/auth/callback>.
 > You will also have to set dev mode to `true`.
 > This enables unsecure http for the moment.
 
 After users log out, you can redirect users back to a route on your application.
-To do so, add an optional redirect in the post redirectURI field.
+To do so, add an optional redirect in the post redirectURL field.
 
 **Continue** and **Create** the application.
 
 ### Client ID and Secret
 
 After you create your app, a popup will show your clientID and secret.
-Copy these&mdash;
+Copy these &mdash;
 you'll use them in the next step.
 
 > Note: If you lose your secret, you can regenerate it later.
 
-## OAuth 2.0 Proxy Setup
+## OAuth 2.0 Proxy setup
 
-### Authentication Example
+Use this example configuration for your OAuth 2.0 Proxy setup:
 
 ```toml
 provider = "oidc"

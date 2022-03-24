@@ -2,26 +2,26 @@
 title: React
 ---
 
-This guide shows you how to integrate ZITADEL with into your React application.
+This guide shows you how to integrate ZITADEL with your React application.
 
 It covers how to:
 - Add a user login to your application
 - Fetch some data from the user info endpoint.
 
-## Setup Application and get Keys
+## Set up application and get keys
 
-Before you build your application, you'll need to do a few configuration steps in the ZITADEL Console.
+Before you build your application, you'll need to do a few configuration steps in the ZITADEL console.
 You will need to provide some information about your app.
 We recommend creating a new app to start from scratch.
 To do so:
 
-1. Navigate to your [Project](https://console.zitadel.ch/projects).
+1. Navigate to your [project](https://console.zitadel.ch/projects).
 2. At the top of the page, add a new application.
-3. Select User Agent and continue.
+3. Give it a name, select **User Agent** and **Continue**.
 
-For all applications, we recommend combining an
+For all applications, we recommend combining
 [Authorization Code](../../apis/openidoauth/grant-types#authorization-code)
-with a [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
+with [Proof Key for Code Exchange (PKCE)](../../apis/openidoauth/grant-types#proof-key-for-code-exchange).
 
 [Read more about the different app types](https://docs.zitadel.ch/docs/guides/authorization/oauth-recommended-flows#different-client-profiles).
 
@@ -42,11 +42,11 @@ To configure this, add an optional redirect in the Post Logout URIs field.
 
 ### Client ID
 
-After you create your app, a popup shows you your clientID and secret.
+After you create your app, a popup shows you your clientID.
 Copy your client ID.
 You'll use it in the next step.
 
-## React Setup
+## React setup
 
 ### Create React app
 
@@ -56,28 +56,28 @@ Create a new React app with the following command:
 npx create-react-app my-app
 ```
 
-### Install an oidc client
+### Install an OIDC client
 
-You need to install an oauth / oidc client to connect with ZITADEL. Run the following command:
+You need to install an OAuth / OIDC client to connect with ZITADEL. Run the following command:
 
 ```bash
 npm install oidc-react
 ```
 
-This library helps integrate ZITADEL Authentication into your React Application.
+This library helps integrate ZITADEL authentication with your React Application.
 
 ### Create and configure Auth Module
 
-With the installed oidc pakage, you will need an AuthProvider.
+With the installed OIDC package, you will need an AuthProvider.
 This should contain the OIDC configuration.
 
-The oidc configuration should have the following values:
+The OIDC configuration should have the following values:
    * For `scope`, set `openid`, `profile` and `email`.
    * For `responseType`, use `code`
 
 In the following code, the authority is already set to the issuer of zitadel.ch.
-You can find this in the ZITADEL Console for your application.
-Replace the clientId value `<YOUR-CLIENT-ID>` with the generated client ID of your application in ZITADEL Console.
+You can find this in the ZITADEL console for your application.
+Replace the clientId value `<YOUR-CLIENT-ID>` with the generated client ID of your application in the ZITADEL console.
 
 
 ```ts
@@ -92,7 +92,7 @@ const oidcConfig = {
     },
     authority: 'https://issuer.zitadel.ch',
     clientId:
-        'YOUR-CLIENT-ID',
+        '<YOUR-CLIENT-ID>',
     responseType: 'code',
     redirectUri: 'http://localhost:3000/',
     scope: 'openid profile email'
@@ -113,7 +113,7 @@ function App() {
 export default App;
 ```
 
-### Run application
+### Run the application
 
 Start your React application with the following command:
 
@@ -130,7 +130,7 @@ It should show a popup that says: **You logged in {FirstName} {LastName}**
 
 ## Completion
 
-You have successfully integrated ZITADEL in your React Application!
+You have successfully integrated ZITADEL with your React Application!
 
 ### What's next?
 

@@ -80,7 +80,8 @@ func main() {
 
 #### JSON key
 
-To provide the JSON key to the SDK, simply set an environment variable `ZITADEL_KEY_PATH`, using the path to the file containing the JSON key as the value.
+To provide the JSON key to the SDK, set an environment variable `ZITADEL_KEY_PATH`.
+Use the path to the file containing the JSON key as the variables value.
 
 ```bash
 export ZITADEL_KEY_PATH=/Users/test/servicekey.json

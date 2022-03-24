@@ -7,7 +7,7 @@ import Column from "../../src/components/column";
 
 ## APIs
 
-ZITADEL provides four APIs for different use cases. Three of these APIs are built with GRPC and generate a REST service.
+ZITADEL provides four APIs for different use cases. Three of these APIs are built with gRPC and generate a REST service.
 Each service's proto definition is located in the source control on GitHub.
 As we generate the REST services and Swagger file out of the proto definition we recommend that you rely on the proto file.
 We annotate the corresponding REST methods on each possible call as well as the AuthN and AuthZ requirements.
@@ -35,7 +35,7 @@ The authentication API (aka Auth API) is used for all operations on the currentl
 </div>
 <div class="apicard-right">
 
-### GRPC
+### gRPC
 
 Endpoint:
 [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
@@ -71,7 +71,7 @@ To identify the current organization you can send a header `x-zitadel-orgid` or 
 </div>
 <div class="apicard-right">
 
-### GRPC
+### gRPC
 
 Endpoint:
 [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
@@ -105,7 +105,7 @@ This API is intended to configure and manage the IAM itself.
 </div>
 <div class="apicard-right">
 
-### GRPC
+### gRPC
 
 Endpoint:
 [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService)
@@ -175,7 +175,7 @@ In the table below you can see the URI of those calls.
 | Service | URI                                                                                                                                            |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------- |
 | REST    | [https://api.zitadel.ch/auth/v1/users/me](https://api.zitadel.ch/auth/v1/users/me)                                                             |
-| GRPC    | [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser) |
+| gRPC    | [https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser](https://api.zitadel.ch/caos.zitadel.auth.api.v1.AuthService/GetMyUser) |
 
 ## Domains
 

@@ -2,15 +2,15 @@
 title: Next.js
 ---
 
-This guide shows you how to integrate ZITADEL with your [Next.js](https://nextjs.org/) app.
+This guide shows you how to integrate ZITADEL as an identity provider with your [Next.js](https://nextjs.org/) app.
 
 It covers how to
 - Authenticate as a user
 - Retrieve user information from the OIDC endpoint.
 
-> The template code is part of our [zitadel-example repo](https://github.com/caos/zitadel-examples/tree/main/nextjs).
+> The template code is part of the [zitadel-example repo](https://github.com/caos/zitadel-examples/tree/main/nextjs).
 
-## Get Started
+## Get started
 
 1. To start, create a new NextJS app with `npx create-next-app`. This sets up everything automatically for you.
 
@@ -22,7 +22,7 @@ npx create-next-app --typescript
 yarn create next-app --typescript
 ```
 
-## Install Authentication library
+## Install authentication library
 
 To keep the template as easy as possible, we use [next-auth](https://next-auth.js.org/) as our main authentication library.
 
@@ -40,8 +40,7 @@ yarn add next-auth
 npm run dev
 ```
 
-3. To check the result, open [http://localhost:3000](http://localhost:3000)
-in your browser.
+3. To check the result, open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Configuration
 
@@ -97,7 +96,7 @@ For authentication flow, we recommend using the Authentication Code flow secured
 
 To connect to ZITADEL:
 
-1. Navigate to your [Console Projects](https://console.zitadel.ch/projects).
+1. Navigate to your [console projects](https://console.zitadel.ch/projects).
 1. Create or select an existing project.
 1. To add your app, select **WEB**, then **PKCE**.
 1. Add `http://localhost:3000/api/auth/callback/zitadel` as the redirect URL to your app.
@@ -124,12 +123,12 @@ Now we can start editing the homepage by modifying `pages/index.tsx`.
 
 Add this snippet to your file. This code gets your auth session from next-auth.
 If you are authenticated, it renders a Logout button.
-If you aren't, it shows a Signup button.
+If you aren't, it shows a signup button.
 
 Note that the `signIn` method requires the id of the provider we provided earlier.
 It also lets you add a callback URL.
 If login is successful,
-Auth Next will redirect you to the specified route.
+NextAuth.js will redirect you to the specified route.
 
 ```ts
 import { signIn, signOut, useSession } from 'next-auth/client';
@@ -153,12 +152,12 @@ export default function Page() {
 
 ### Session state
 
-Sharing session states between pages has a multiple benefits:
+Sharing session states between pages has multiple benefits:
 - Improves performance,
 - Reduces network traffic,
 - Avoids component state changes while rendering.
 
-To allow session state sharing, you can use the NextAuth.js Provider in `/pages/_app.tsx`.
+To allow session state sharing, you can use the NextAuth.js provider in `/pages/_app.tsx`.
 Take a look at the template `_app.tsx`.
 
 ```ts
@@ -176,7 +175,7 @@ export default MyApp;
 
 To render the callback page, create a `profile.tsx` in `/pages`.
 
-## Learn More
+## Learn more
 
 To learn more about Next.js, take a look at the following resources:
 
