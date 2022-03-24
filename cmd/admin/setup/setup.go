@@ -28,8 +28,8 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := MustNewConfig(viper.New())
-			steps := MustNewSteps(viper.New())
+			config := MustNewConfig(viper.GetViper())
+			steps := MustNewSteps(viper.GetViper())
 
 			Setup(config, steps)
 		},

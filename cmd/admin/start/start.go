@@ -60,7 +60,7 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			config := MustNewConfig(viper.New())
+			config := MustNewConfig(viper.GetViper())
 			masterKey, _ := cmd.Flags().GetString(flagMasterKey)
 
 			return startZitadel(config, masterKey)

@@ -20,13 +20,13 @@ Last ZITADEL starts.
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
-			initialise.InitAll(initialise.MustNewConfig(viper.New()))
+			initialise.InitAll(initialise.MustNewConfig(viper.GetViper()))
 
-			setupConfig := setup.MustNewConfig(viper.New())
-			setupSteps := setup.MustNewSteps(viper.New())
+			setupConfig := setup.MustNewConfig(viper.GetViper())
+			setupSteps := setup.MustNewSteps(viper.GetViper())
 			setup.Setup(setupConfig, setupSteps)
 
-			startConfig := MustNewConfig(viper.New())
+			startConfig := MustNewConfig(viper.GetViper())
 			startMasterKey, _ := cmd.Flags().GetString(flagMasterKey)
 
 			err := startZitadel(startConfig, startMasterKey)
