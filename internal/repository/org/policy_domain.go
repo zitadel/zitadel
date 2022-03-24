@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	OrgDomainPolicyAddedEventType   = orgEventTypePrefix + policy.DomainPolicyAddedEventType
-	OrgDomainPolicyChangedEventType = orgEventTypePrefix + policy.DomainPolicyChangedEventType
-	OrgDomainPolicyRemovedEventType = orgEventTypePrefix + policy.DomainPolicyRemovedEventType
+	DomainPolicyAddedEventType   = orgEventTypePrefix + policy.DomainPolicyAddedEventType
+	DomainPolicyChangedEventType = orgEventTypePrefix + policy.DomainPolicyChangedEventType
+	DomainPolicyRemovedEventType = orgEventTypePrefix + policy.DomainPolicyRemovedEventType
 )
 
 type DomainPolicyAddedEvent struct {
@@ -29,7 +29,7 @@ func NewDomainPolicyAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				OrgDomainPolicyAddedEventType),
+				DomainPolicyAddedEventType),
 			userLoginMustBeDomain,
 		),
 	}
@@ -57,7 +57,7 @@ func NewDomainPolicyChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			OrgDomainPolicyChangedEventType),
+			DomainPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
@@ -88,7 +88,7 @@ func NewDomainPolicyRemovedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				OrgDomainPolicyRemovedEventType),
+				DomainPolicyRemovedEventType),
 		),
 	}
 }

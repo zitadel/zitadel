@@ -26,7 +26,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			name: "org.reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyAddedEventType),
+					repository.EventType(org.DomainPolicyAddedEventType),
 					org.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
@@ -64,7 +64,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			reduce: (&DomainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyChangedEventType),
+					repository.EventType(org.DomainPolicyChangedEventType),
 					org.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
@@ -96,7 +96,7 @@ func TestDomainPolicyProjection_reduces(t *testing.T) {
 			reduce: (&DomainPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyRemovedEventType),
+					repository.EventType(org.DomainPolicyRemovedEventType),
 					org.AggregateType,
 					nil,
 				), org.DomainPolicyRemovedEventMapper),

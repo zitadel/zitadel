@@ -18,3 +18,16 @@ func DomainPolicyToPb(policy *query.DomainPolicy) *policy_pb.DomainPolicy {
 		),
 	}
 }
+
+func DomainPolicyToOrgIAMPb(policy *query.DomainPolicy) *policy_pb.OrgIAMPolicy {
+	return &policy_pb.OrgIAMPolicy{
+		UserLoginMustBeDomain: policy.UserLoginMustBeDomain,
+		IsDefault:             policy.IsDefault,
+		Details: object.ToViewDetailsPb(
+			policy.Sequence,
+			policy.CreationDate,
+			policy.ChangeDate,
+			policy.ResourceOwner,
+		),
+	}
+}

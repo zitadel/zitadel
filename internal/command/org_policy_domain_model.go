@@ -47,9 +47,9 @@ func (wm *OrgDomainPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.PolicyDomainWriteModel.AggregateID).
-		EventTypes(org.OrgDomainPolicyAddedEventType,
-			org.OrgDomainPolicyChangedEventType,
-			org.OrgDomainPolicyRemovedEventType).
+		EventTypes(org.DomainPolicyAddedEventType,
+			org.DomainPolicyChangedEventType,
+			org.DomainPolicyRemovedEventType).
 		Builder()
 }
 

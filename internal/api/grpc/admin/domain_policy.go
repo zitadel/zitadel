@@ -27,7 +27,7 @@ func (s *Server) GetCustomDomainPolicy(ctx context.Context, req *admin_pb.GetCus
 }
 
 func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCustomDomainPolicyRequest) (*admin_pb.AddCustomDomainPolicyResponse, error) {
-	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, toDomainDomainPolicy(req.UserLoginMustBeDomain))
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain))
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *Server) ResetCustomDomainPolicyTo(ctx context.Context, req *admin_pb.Re
 	return nil, nil //TOOD: return data
 }
 
-func toDomainDomainPolicy(userLoginMustBeDomain bool) *domain.DomainPolicy {
+func domainPolicyToDomain(userLoginMustBeDomain bool) *domain.DomainPolicy {
 	return &domain.DomainPolicy{
 		UserLoginMustBeDomain: userLoginMustBeDomain,
 	}

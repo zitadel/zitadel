@@ -60,15 +60,15 @@ func (p *DomainPolicyProjection) reducers() []handler.AggregateReducer {
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  org.OrgDomainPolicyAddedEventType,
+					Event:  org.DomainPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  org.OrgDomainPolicyChangedEventType,
+					Event:  org.DomainPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 				{
-					Event:  org.OrgDomainPolicyRemovedEventType,
+					Event:  org.DomainPolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 			},
@@ -100,7 +100,7 @@ func (p *DomainPolicyProjection) reduceAdded(event eventstore.Event) (*handler.S
 		policyEvent = e.DomainPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgDomainPolicyAddedEventType, instance.DomainPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyAddedEventType, instance.DomainPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -125,7 +125,7 @@ func (p *DomainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 	case *instance.DomainPolicyChangedEvent:
 		policyEvent = e.DomainPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgDomainPolicyChangedEventType, instance.DomainPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.DomainPolicyChangedEventType, instance.DomainPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(DomainPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -145,7 +145,7 @@ func (p *DomainPolicyProjection) reduceChanged(event eventstore.Event) (*handler
 func (p *DomainPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.DomainPolicyRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JAENd", "reduce.wrong.event.type %s", org.OrgDomainPolicyRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JAENd", "reduce.wrong.event.type %s", org.DomainPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

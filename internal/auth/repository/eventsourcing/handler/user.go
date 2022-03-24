@@ -187,9 +187,9 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
-		es_models.EventType(org.OrgDomainPolicyAddedEventType),
-		es_models.EventType(org.OrgDomainPolicyChangedEventType),
-		es_models.EventType(org.OrgDomainPolicyRemovedEventType):
+		es_models.EventType(org.DomainPolicyAddedEventType),
+		es_models.EventType(org.DomainPolicyChangedEventType),
+		es_models.EventType(org.DomainPolicyRemovedEventType):
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
