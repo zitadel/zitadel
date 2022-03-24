@@ -1004,11 +1004,14 @@ func (repo *AuthRequestRepo) getLoginTexts(ctx context.Context, aggregateID stri
 }
 
 func (repo *AuthRequestRepo) hasSucceededPage(ctx context.Context, request *domain.AuthRequest, provider applicationProvider) (bool, error) {
-	app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
-	if err != nil {
-		return false, err
+	if _, ok := request.Request.(*domain.AuthRequestOIDC); ok{
+		app, err := provider.AppByOIDCClientID(ctx, request.ApplicationID)
+		if err != nil {
+			return false, err
+		}
+		return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
 	}
-	return app.OIDCConfig.AppType == domain.OIDCApplicationTypeNative, nil
+	return false, nil
 }
 
 func setOrgID(orgViewProvider orgViewProvider, request *domain.AuthRequest) error {

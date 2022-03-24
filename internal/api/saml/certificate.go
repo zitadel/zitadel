@@ -121,7 +121,7 @@ func (p *ProviderStorage) lockAndGenerateCertificateAndKey(ctx context.Context, 
 	switch usage {
 	case model.KeyUsageSAMLMetadataSigning, model.KeyUsageSAMLResponseSinging:
 
-		certs, err := p.query.ActiveCertificates(ctx, time.Now().Add(p.certificateGracefulPeriod), usage)
+		certs, err := p.query.ActiveCertificates(ctx, time.Now().Add(p.certificateGracefulPeriod), model.KeyUsageSAMLCA)
 		if err != nil {
 			return fmt.Errorf("error while reading ca certificate: %w", err)
 		}

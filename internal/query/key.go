@@ -227,9 +227,13 @@ func (q *Queries) ActiveCertificates(ctx context.Context, t time.Time, usage mod
 		t = time.Now()
 	}
 	stmt, args, err := query.Where(
-		sq.Gt{
-			CertificateColExpiry.identifier(): t,
-			KeyColUse.identifier(): usage,
+		sq.And{
+			sq.Gt{
+				CertificateColExpiry.identifier(): t,
+			},
+			sq.Eq{
+				KeyColUse.identifier(): usage,
+			},
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-SDfkg", "Errors.Query.SQLStatement")

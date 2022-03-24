@@ -53,6 +53,11 @@ func (l *Login) renderSuccessAndCallback(w http.ResponseWriter, r *http.Request,
 }
 
 func (l *Login) redirectToCallback(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest) {
-	callback := l.oidcAuthCallbackURL + authReq.ID
+	callback := ""
+	if _, ok := authReq.Request.(*domain.AuthRequestOIDC); ok {
+		callback = l.oidcAuthCallbackURL + authReq.ID
+	} else if _, ok := authReq.Request.(*domain.AuthRequestSAML); ok {
+		callback = l.samlAuthCallbackURL + authReq.ID
+	}
 	http.Redirect(w, r, callback, http.StatusFound)
 }

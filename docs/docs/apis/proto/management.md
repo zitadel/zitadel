@@ -1317,6 +1317,18 @@ Changes the configuration of the api application
     PUT: /projects/{project_id}/apps/{app_id}/api_config
 
 
+### UpdateSAMLAppConfig
+
+> **rpc** UpdateSAMLAppConfig([UpdateSAMLAppConfigRequest](#updatesamlappconfigrequest))
+[UpdateSAMLAppConfigResponse](#updatesamlappconfigresponse)
+
+Changes the configuration of the saml application
+
+
+
+    PUT: /projects/{project_id}/apps/{app_id}/saml_config
+
+
 ### DeactivateApp
 
 > **rpc** DeactivateApp([DeactivateAppRequest](#deactivateapprequest))
@@ -3668,7 +3680,6 @@ This is an empty request
 | ----- | ---- | ----------- | ----------- |
 | app_id |  string | - |  |
 | details |  zitadel.v1.ObjectDetails | - |  |
-| entity_id |  string | - |  |
 
 
 

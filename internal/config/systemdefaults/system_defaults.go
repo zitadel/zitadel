@@ -114,4 +114,6 @@ type KeyConfig struct {
 	EncryptionConfig         *crypto.KeyConfig
 	SigningKeyRotationCheck  types.Duration
 	SigningKeyGracefulPeriod types.Duration
+	CertificateRotationCheck  types.Duration
+	CertificateGracefulPeriod types.Duration
 }

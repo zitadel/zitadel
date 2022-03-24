@@ -157,3 +157,5 @@ SystemDefaults:
       EncryptionKeyID: $ZITADEL_OIDC_KEYS_ID
     SigningKeyRotationCheck: 10s
     SigningKeyGracefulPeriod: 10m
+    CertificateRotationCheck: 24h
+    CertificateGracefulPeriod: 24h

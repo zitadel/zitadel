@@ -158,7 +158,8 @@ func startZitadel(configPaths []string) {
 	}
 
 	keyChan := make(chan interface{})
-	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, conf.InternalAuthZ.RolePermissionMappings)
+	certChan := make(chan interface{})
+	queries, err := query.StartQueries(ctx, esQueries, conf.Projections, conf.SystemDefaults, keyChan, certChan, conf.InternalAuthZ.RolePermissionMappings)
 	logging.Log("MAIN-WpeJY").OnError(err).Fatal("cannot start queries")
 
 	authZRepo, err := authz.Start(conf.AuthZ, conf.SystemDefaults, queries)
@@ -190,7 +191,7 @@ func startZitadel(configPaths []string) {
 	}
 
 	verifier := internal_authz.Start(&repo)
-	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store, esQueries, conf.Projections.CRDB, keyChan)
+	startAPI(ctx, conf, verifier, authZRepo, authRepo, commands, queries, store, esQueries, conf.Projections.CRDB, keyChan, certChan)
 	startUI(ctx, conf, authRepo, commands, queries, store)
 
 	if *notificationEnabled {
@@ -215,7 +216,7 @@ func startUI(ctx context.Context, conf *Config, authRepo *auth_es.EsRepository, 
 	uis.Start(ctx)
 }
 
-func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}) {
+func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenVerifier, authZRepo authz_repo.Repository, authRepo *auth_es.EsRepository, command *command.Commands, query *query.Queries, static static.Storage, es *eventstore.Eventstore, projections types.SQL, keyChan <-chan interface{}, certChan <-chan interface{}) {
 	repo, err := admin_es.Start(ctx, conf.Admin, conf.SystemDefaults, command, static, *localDevMode)
 	logging.Log("API-D42tq").OnError(err).Fatal("error starting auth repo")
 
@@ -236,7 +237,7 @@ func startAPI(ctx context.Context, conf *Config, verifier *internal_authz.TokenV
 	}
 
 	if *samlEnabled {
-		idp, err := saml.NewProvider(conf.API.SAML, command, query, authRepo, *localDevMode)
+		idp, err := saml.NewProvider(conf.API.SAML, command, query, authRepo, conf.SystemDefaults.KeyConfig, es, projections, certChan, *localDevMode)
 		if err != nil {
 			logging.Log("API-pwaiks").OnError(err).Fatal("error starting saml")
 		}
