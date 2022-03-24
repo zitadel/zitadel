@@ -2,7 +2,7 @@
 title: Actions
 ---
 
-This page describes how you should compose ZITADEL actions scripts.  
+This page describes how you can write ZITADEL actions scripts.
 
 ## Language
 ZITADEL interpretes the scripts as JavaScript.
@@ -28,13 +28,13 @@ Triggers:
 - Pre creation:  A user selected **Register** on the overview page after external authentication. ZITADEL did not create the user yet.
 - Post creation: A user selected **Register** on the overview page after external authentication. ZITADEL created the user.
 
-Readable state:
+Readable user state:
 - `ctx.accessToken string` This can be an opaque token or a JWT
 - `ctx.idToken string`
 - `ctx.getClaim(string) any`: Returns the requested claim
 - `ctx.claimsJSON() object`: Returns the complete payload of the `ctx.idToken`
 
-Writable state:
+Writable user state:
 - `api.setFirstName(string)`
 - `api.setLastName(string)`
 - `api.setNickName(string)`
