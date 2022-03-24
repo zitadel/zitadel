@@ -52,7 +52,7 @@ func Setup(config *Config, steps *Steps) {
 	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
 	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
-	ctx := authz.WithInstance(context.Background(), "system")
+	ctx := authz.WithInstance(context.Background(), authz.Instance{ID: "system"})
 	migration.Migrate(ctx, eventstoreClient, steps.S1ProjectionTable)
 	migration.Migrate(ctx, eventstoreClient, steps.S2DefaultInstance)
 }

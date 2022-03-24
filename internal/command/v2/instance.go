@@ -129,7 +129,7 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	return nil
 }
 
-func (command *Command) SetUpTenant(ctx context.Context, instance *InstanceSetup) (*domain.ObjectDetails, error) {
+func (command *Command) SetUpInstance(ctx context.Context, instance *InstanceSetup) (*domain.ObjectDetails, error) {
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err

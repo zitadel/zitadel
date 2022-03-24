@@ -41,7 +41,6 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
 	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
-		Limit(1).
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
@@ -51,26 +50,24 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 		return false, err
 	}
 
-	if len(events) == 0 {
-		return true, nil
-	}
-	event, ok := events[0].(*SetupStep)
-	if !ok {
-		return false, errors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
+	var isStarted bool
+	for _, event := range events {
+		e, ok := event.(*SetupStep)
+		if !ok {
+			return false, errors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
+		}
+
+		if e.Name != migration.String() {
+			continue
+		}
+
+		switch event.Type() {
+		case startedType, failedType:
+			isStarted = !isStarted
+		case doneType:
+			return false, nil
+		}
 	}
 
-	if event.Name != migration.String() {
-		return false, nil
-	}
-
-	switch event.Type() {
-	case startedType, doneType:
-		return false, nil
-	case failedType:
-		logging.WithFields("step", event.Name).Info("retry failed setup step")
-		fallthrough
-	default:
-		return true, nil
-	}
-
+	return !isStarted, nil
 }

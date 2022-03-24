@@ -12,7 +12,7 @@ type DefaultInstance struct {
 }
 
 func (mig *DefaultInstance) Execute(ctx context.Context) error {
-	_, err := mig.cmd.SetUpTenant(ctx, &mig.InstanceSetup)
+	_, err := mig.cmd.SetUpInstance(ctx, &mig.InstanceSetup)
 
 	return err
 }

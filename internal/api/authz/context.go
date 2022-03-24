@@ -121,7 +121,7 @@ func GetInstance(ctx context.Context) Instance {
 	return instance
 }
 
-func WithInstance(ctx context.Context, instance string) context.Context {
+func WithInstance(ctx context.Context, instance Instance) context.Context {
 	return context.WithValue(ctx, instanceKey, instance)
 }
 
