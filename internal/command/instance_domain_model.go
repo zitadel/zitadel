@@ -14,11 +14,11 @@ type InstanceDomainWriteModel struct {
 	State     domain.InstanceDomainState
 }
 
-func NewInstanceDomainWriteModel(instanceDomain string) *InstanceDomainWriteModel {
+func NewInstanceDomainWriteModel(instanceID, instanceDomain string) *InstanceDomainWriteModel {
 	return &InstanceDomainWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 		Domain: instanceDomain,
 	}

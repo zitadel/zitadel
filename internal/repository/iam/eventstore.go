@@ -86,5 +86,8 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(CustomTextTemplateRemovedEventType, CustomTextTemplateRemovedEventMapper).
 		RegisterFilterEventMapper(FeaturesSetEventType, FeaturesSetEventMapper).
 		RegisterFilterEventMapper(InstanceDomainAddedEventType, DomainAddedEventMapper).
-		RegisterFilterEventMapper(InstanceDomainRemovedEventType, DomainRemovedEventMapper)
+		RegisterFilterEventMapper(InstanceDomainRemovedEventType, DomainRemovedEventMapper).
+		RegisterFilterEventMapper(InstanceAddedEventType, InstanceAddedEventMapper).
+		RegisterFilterEventMapper(InstanceChangedEventType, InstanceChangedEventMapper).
+		RegisterFilterEventMapper(InstanceRemovedEventType, InstanceRemovedEventMapper)
 }

@@ -10,6 +10,10 @@ import (
 type IAMWriteModel struct {
 	eventstore.WriteModel
 
+	Name            string
+	State           domain.InstanceState
+	GeneratedDomain string
+
 	SetUpStarted domain.Step
 	SetUpDone    domain.Step
 
@@ -18,11 +22,11 @@ type IAMWriteModel struct {
 	DefaultLanguage language.Tag
 }
 
-func NewIAMWriteModel() *IAMWriteModel {
+func NewIAMWriteModel(instanceID string) *IAMWriteModel {
 	return &IAMWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 	}
 }
@@ -30,6 +34,18 @@ func NewIAMWriteModel() *IAMWriteModel {
 func (wm *IAMWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
+		case *iam.InstanceAddedEvent:
+			wm.Name = e.Name
+			wm.State = domain.InstanceStateActive
+		case *iam.InstanceChangedEvent:
+			wm.Name = e.Name
+		case *iam.InstanceRemovedEvent:
+			wm.State = domain.InstanceStateRemoved
+		case *iam.DomainAddedEvent:
+			if !e.Generated {
+				continue
+			}
+			wm.GeneratedDomain = e.Domain
 		case *iam.ProjectSetEvent:
 			wm.ProjectID = e.ProjectID
 		case *iam.GlobalOrgSetEvent:
@@ -54,6 +70,11 @@ func (wm *IAMWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AggregateTypes(iam.AggregateType).
 		AggregateIDs(wm.AggregateID).
 		EventTypes(
+			iam.InstanceAddedEventType,
+			iam.InstanceChangedEventType,
+			iam.InstanceRemovedEventType,
+			iam.InstanceDomainAddedEventType,
+			iam.InstanceDomainRemovedEventType,
 			iam.ProjectSetEventType,
 			iam.GlobalOrgSetEventType,
 			iam.DefaultLanguageSetEventType,

@@ -11,6 +11,9 @@ const (
 type IAM struct {
 	models.ObjectRoot
 
+	Name                            string
+	GeneratedDomain                 *InstanceDomain
+	State                           InstanceState
 	GlobalOrgID                     string
 	IAMProjectID                    string
 	SetUpDone                       Step
@@ -25,27 +28,24 @@ type IAM struct {
 	DefaultPasswordLockoutPolicy    *LockoutPolicy
 }
 
-type InstanceDomain struct {
-	models.ObjectRoot
-
-	Domain    string
-	Generated bool
+func (i *IAM) IsValid() bool {
+	return i.Name != ""
 }
 
-func (i *InstanceDomain) IsValid() bool {
-	return i.Domain != ""
+func (i *IAM) AddGeneratedDomain(iamDomain string) {
+	i.GeneratedDomain = &InstanceDomain{Domain: NewIAMDomainName(i.Name, iamDomain), Generated: true}
 }
 
-type InstanceDomainState int32
+type InstanceState int32
 
 const (
-	InstanceDomainStateUnspecified InstanceDomainState = iota
-	InstanceDomainStateActive
-	InstanceDomainStateRemoved
+	InstanceStateUnspecified InstanceState = iota
+	InstanceStateActive
+	InstanceStateRemoved
 
-	instanceDomainStateCount
+	instanceStateCount
 )
 
-func (f InstanceDomainState) Valid() bool {
-	return f >= 0 && f < instanceDomainStateCount
+func (f InstanceState) Valid() bool {
+	return f >= 0 && f < instanceStateCount
 }
