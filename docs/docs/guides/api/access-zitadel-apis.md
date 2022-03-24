@@ -33,10 +33,10 @@ title: Access ZITADEL APIs
 ZITADEL Managers are Users who have permission to manage ZITADEL itself.
 There are some different levels for managers:
 
-- **IAM Managers**: This is the highest level. Users with IAM Manager roles can manage the whole IAM. 
-- **Org Managers**: Managers in the Organization Level can manage everything within the granted Organization.
-- **Project Mangers**: These users can manage projects.
-- **Project Grant Manager**: The project grant manager is for projects, which are granted by another organization.
+- IAM Managers: This is the highest level. Users with IAM Manager roles can manage the whole IAM. 
+- Org Managers: Managers in the Organization Level can manage everything within the granted Organization.
+- Project Mangers: These users can manage projects.
+- Project Grant Manager: The project grant manager is for projects, which are granted by another organization.
 
 Each level has different Roles. [Read more about ZITADEL Manager Roles](../../concepts/structure/managers.md).
 
@@ -48,13 +48,13 @@ Make sure you have a Service User with a Key. (For more detailed information abo
 1. Navigate to Organization Detail.
 2. On the right side of the console, in the manager's details, select the **+** button.
 3. Search for the user and select it.
-4. Choose the role `ORG_OWNER`.
+4. Choose the role *ORG_OWNER*.
 
 ![Add Org Manager](/img/console_org_manager_add.gif)
 
 ## Authenticating a service user
 
-In ZITADEL, we use the `private_jwt` (**“JWT bearer token with private key”**, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
+In ZITADEL, we use the `private_jwt` (*JWT Bearer Token with private key*, [RFC7523](https://tools.ietf.org/html/rfc7523)) authorization grant for this non-interactive authentication.
 For details, refer to the topic, [Service User](../authentication/serviceusers).
 
 ### Request an OAuth token, with audience for ZITADEL

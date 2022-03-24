@@ -2,13 +2,19 @@
 title: Next.js
 ---
 
-This is our ZITADEL [Next.js](https://nextjs.org/) template. It shows how to authenticate as a user and retrieve user information from the OIDC endpoint.
+This guide shows you how to integrate ZITADEL as an identity provider with your [Next.js](https://nextjs.org/) app.
 
-> The template code is part of our zitadel-example repo. Take a look [here](https://github.com/caos/zitadel-examples/tree/main/nextjs).
+It covers how to
+- Authenticate as a user
+- Retrieve user information from the OIDC endpoint.
 
-## Getting Started
+> The template code is part of the [zitadel-example repo](https://github.com/caos/zitadel-examples/tree/main/nextjs).
 
-First, we start by creating a new NextJS app with `npx create-next-app`, which sets up everything automatically for you. To create a project, run:
+## Get started
+
+1. To start, create a new NextJS app with `npx create-next-app`. This sets up everything automatically for you.
+
+1. Then, create a project with:
 
 ```bash
 npx create-next-app --typescript
@@ -16,9 +22,11 @@ npx create-next-app --typescript
 yarn create next-app --typescript
 ```
 
-# Install Authentication library
+## Install authentication library
 
-To keep the template as easy as possible we use [next-auth](https://next-auth.js.org/) as our main authentication library. To install, run:
+To keep the template as easy as possible, we use [next-auth](https://next-auth.js.org/) as our main authentication library.
+
+1. To install, run:
 
 ```bash
 npm i next-auth
@@ -26,18 +34,21 @@ npm i next-auth
 yarn add next-auth
 ```
 
-To run the app, type:
+2. To run the app, type:
 
 ```bash
 npm run dev
 ```
 
-then open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. To check the result, open [http://localhost:3000](http://localhost:3000) in your browser.
 
-# Configuration
+## Configuration
 
-NextAuth.js exposes a REST API which is used by your client.
-To setup your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
+NextAuth.js exposes a REST API that your client uses.
+
+1. To set up your configuration, create a file called [...nextauth].tsx in `pages/api/auth`.
+
+2. Paste the following snippet in.
 
 ```ts
 import NextAuth from 'next-auth';
@@ -77,20 +88,29 @@ export default NextAuth({
 });
 ```
 
-Replace the endpoints `https://api.zitadel.dev/` with `https://api.zitadel.ch/` if your using a ZITADEL CLOUD tier or your own endpoint if your using a self hosted ENTERPRISE tier respectively.
+3. Replace the `https//api.zitadel.dev` endpoint with your endpoint.
+If you use ZITADEL CLOUD tier, the endpoint is `https://api.zitadel.ch/`.
+If you use a self-hosted ENTERPRISE tier, replace it with your own endpoint.
 
-We recommend using the Authentication Code flow secured by PKCE for the Authentication flow.
-To be able to connect to ZITADEL, navigate to your [Console Projects](https://console.zitadel.ch/projects) create or select an existing project and add your app selecting WEB, then PKCE, and then add `http://localhost:3000/api/auth/callback/zitadel` as redirect url to your app. 
+For authentication flow, we recommend using the Authentication Code flow secured by PKCE.
 
-For simplicity reasons we set the default to the one that next-auth provides us. You'll be able to change the redirect later if you want to.
+To connect to ZITADEL:
 
-Hit Create, then in the detail view of your application make sure to enable dev mode. Dev mode ensures that you can start an auth flow from a non https endpoint for testing.
+1. Navigate to your [console projects](https://console.zitadel.ch/projects).
+1. Create or select an existing project.
+1. To add your app, select **WEB**, then **PKCE**.
+1. Add `http://localhost:3000/api/auth/callback/zitadel` as the redirect URL to your app.
+
+   For simplicity, we use the same default as the one that next-auth provides.
+   You can change the redirect later if you want.
+1. Hit **Create**, then in the detail view of your application, make sure to enable dev mode. Dev mode ensures that you can start an auth flow from a non https endpoint for testing.
 
 > Note that we get a clientId but no clientSecret because it is not needed for our authentication flow.
 
 ## Environment
 
-Create a file `.env` in the root of the project and add the following keys to it.
+1. Create a file `.env` in the root of the project.
+1. Add the following keys to it.
 
 ```
 NEXTAUTH_URL=http://localhost:3000
@@ -100,8 +120,15 @@ ZITADEL_CLIENT_ID=[yourClientId]
 # User interface
 
 Now we can start editing the homepage by modifying `pages/index.tsx`.
-Add this snippet your file. This code gets your auth session from next-auth, renders a Logout button if your authenticated or shows a Signup button if your not.
-Note that signIn method requires the id of the provider we provided earlier, and provides a possibilty to add a callback url, Auth Next will redirect you to the specified route if logged in successfully.
+
+Add this snippet to your file. This code gets your auth session from next-auth.
+If you are authenticated, it renders a Logout button.
+If you aren't, it shows a signup button.
+
+Note that the `signIn` method requires the id of the provider we provided earlier.
+It also lets you add a callback URL.
+If login is successful,
+NextAuth.js will redirect you to the specified route.
 
 ```ts
 import { signIn, signOut, useSession } from 'next-auth/client';
@@ -125,8 +152,13 @@ export default function Page() {
 
 ### Session state
 
-To allow session state to be shared between pages - which improves performance, reduces network traffic and avoids component state changes while rendering - you can use the NextAuth.js Provider in `/pages/_app.tsx`.
-Take a loot at the template `_app.tsx`.
+Sharing session states between pages has multiple benefits:
+- Improves performance,
+- Reduces network traffic,
+- Avoids component state changes while rendering.
+
+To allow session state sharing, you can use the NextAuth.js provider in `/pages/_app.tsx`.
+Take a look at the template `_app.tsx`.
 
 ```ts
 import { Provider } from 'next-auth/client';
@@ -141,9 +173,9 @@ function MyApp({ Component, pageProps }) {
 export default MyApp;
 ```
 
-Last thing: create a `profile.tsx` in /pages which renders the callback page.
+To render the callback page, create a `profile.tsx` in `/pages`.
 
-## Learn More
+## Learn more
 
 To learn more about Next.js, take a look at the following resources:
 

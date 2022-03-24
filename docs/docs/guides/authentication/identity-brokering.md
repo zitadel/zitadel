@@ -92,7 +92,7 @@ Google Example:
 ![Configure identity provider](/img/console_org_identity_provider.gif)
 
 ### 4.Send the primary domain scope on the authorization request
-ZITADEL shows a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.ch/docs/concepts/zitadel/objects/managers) `IAM_OWNER`.
+ZITADEL shows a set of identity providers by default. This configuration can be changed by users with the [manager role] (https://docs.zitadel.ch/docs/concepts/zitadel/objects/managers) *IAM_OWNER*.
 
 An organization's login settings are shown:
 
