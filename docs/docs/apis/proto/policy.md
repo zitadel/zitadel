@@ -85,6 +85,19 @@ title: zitadel/policy.proto
 
 
 
+### OrgIAMPolicy
+deprecated: please use DomainPolicy instead
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+| user_login_must_be_domain |  bool | - |  |
+| is_default |  bool | - |  |
+
+
+
+
 ### PasswordAgePolicy
 
 

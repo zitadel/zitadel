@@ -1750,6 +1750,18 @@ service ManagementService {
         };
     }
 
+    //deprecated: please use DomainPolicy instead
+    // Returns the domain policy (this policy is managed by the iam administrator)
+    rpc GetOrgIAMPolicy(GetOrgIAMPolicyRequest) returns (GetOrgIAMPolicyResponse) {
+        option (google.api.http) = {
+            get: "/policies/orgiam"
+        };
+
+        option (zitadel.v1.auth_option) = {
+            permission: "authenticated"
+        };
+    }
+
     // Returns the domain policy (this policy is managed by the iam administrator)
     rpc GetDomainPolicy(GetDomainPolicyRequest) returns (GetDomainPolicyResponse) {
         option (google.api.http) = {
@@ -4370,6 +4382,12 @@ message GetFeaturesRequest {}
 
 message GetFeaturesResponse {
     zitadel.features.v1.Features features = 1;
+}
+
+message GetOrgIAMPolicyRequest {}
+
+message GetOrgIAMPolicyResponse {
+    zitadel.policy.v1.DomainPolicy policy = 1;
 }
 
 message GetDomainPolicyRequest {}

@@ -471,6 +471,80 @@ all fields are updated. If no value is provided the field will be empty afterwar
     DELETE: /orgs/{org_id}/features
 
 
+### GetOrgIAMPolicy
+
+> **rpc** GetOrgIAMPolicy([GetOrgIAMPolicyRequest](#getorgiampolicyrequest))
+[GetOrgIAMPolicyResponse](#getorgiampolicyresponse)
+
+Returns the Org IAM policy defined by the administrators of ZITADEL
+
+
+
+    GET: /policies/orgiam
+
+
+### UpdateOrgIAMPolicy
+
+> **rpc** UpdateOrgIAMPolicy([UpdateOrgIAMPolicyRequest](#updateorgiampolicyrequest))
+[UpdateOrgIAMPolicyResponse](#updateorgiampolicyresponse)
+
+Updates the default OrgIAM policy.
+it impacts all organisations without a customised policy
+
+
+
+    PUT: /policies/orgiam
+
+
+### GetCustomOrgIAMPolicy
+
+> **rpc** GetCustomOrgIAMPolicy([GetCustomOrgIAMPolicyRequest](#getcustomorgiampolicyrequest))
+[GetCustomOrgIAMPolicyResponse](#getcustomorgiampolicyresponse)
+
+Returns the customised policy or the default if not customised
+
+
+
+    GET: /orgs/{org_id}/policies/orgiam
+
+
+### AddCustomOrgIAMPolicy
+
+> **rpc** AddCustomOrgIAMPolicy([AddCustomOrgIAMPolicyRequest](#addcustomorgiampolicyrequest))
+[AddCustomOrgIAMPolicyResponse](#addcustomorgiampolicyresponse)
+
+Defines a custom OrgIAM policy as specified
+
+
+
+    POST: /orgs/{org_id}/policies/orgiam
+
+
+### UpdateCustomOrgIAMPolicy
+
+> **rpc** UpdateCustomOrgIAMPolicy([UpdateCustomOrgIAMPolicyRequest](#updatecustomorgiampolicyrequest))
+[UpdateCustomOrgIAMPolicyResponse](#updatecustomorgiampolicyresponse)
+
+Updates a custom OrgIAM policy as specified
+
+
+
+    PUT: /orgs/{org_id}/policies/orgiam
+
+
+### ResetCustomOrgIAMPolicyToDefault
+
+> **rpc** ResetCustomOrgIAMPolicyToDefault([ResetCustomOrgIAMPolicyToDefaultRequest](#resetcustomorgiampolicytodefaultrequest))
+[ResetCustomOrgIAMPolicyToDefaultResponse](#resetcustomorgiampolicytodefaultresponse)
+
+Resets the org iam policy of the organisation to default
+ZITADEL will fallback to the default policy defined by the ZITADEL administrators
+
+
+
+    DELETE: /orgs/{org_id}/policies/orgiam
+
+
 ### GetDomainPolicy
 
 > **rpc** GetDomainPolicy([GetDomainPolicyRequest](#getdomainpolicyrequest))
@@ -1428,6 +1502,29 @@ This is an empty request
 
 
 
+### AddCustomOrgIAMPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_login_must_be_domain |  bool | the username has to end with the domain of it's organisation (uniqueness is organisation based) |  |
+
+
+
+
+### AddCustomOrgIAMPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### AddIAMMemberRequest
 
 
@@ -1742,6 +1839,29 @@ This is an empty response
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | custom_text |  zitadel.text.v1.LoginCustomText | - |  |
+
+
+
+
+### GetCustomOrgIAMPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### GetCustomOrgIAMPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
+| is_default |  bool | deprecated: is_default is also defined in zitadel.policy.v1.OrgIAMPolicy |  |
 
 
 
@@ -2203,6 +2323,23 @@ This is an empty request
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
 | features |  zitadel.features.v1.Features | - |  |
+
+
+
+
+### GetOrgIAMPolicyRequest
+
+
+
+
+
+### GetOrgIAMPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
 
 
 
@@ -2958,6 +3095,28 @@ This is an empty request
 
 
 
+### ResetCustomOrgIAMPolicyToDefaultRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+
+
+
+
+### ResetCustomOrgIAMPolicyToDefaultResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### ResetCustomPasswordResetMessageTextToDefaultRequest
 
 
@@ -3526,6 +3685,29 @@ This is an empty request
 
 
 
+### UpdateCustomOrgIAMPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| org_id |  string | - | string.min_len: 1<br /> string.max_len: 200<br />  |
+| user_login_must_be_domain |  bool | - |  |
+
+
+
+
+### UpdateCustomOrgIAMPolicyResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
 ### UpdateDomainPolicyRequest
 
 
@@ -3750,6 +3932,28 @@ This is an empty request
 
 
 ### UpdateOIDCSettingsResponse
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| details |  zitadel.v1.ObjectDetails | - |  |
+
+
+
+
+### UpdateOrgIAMPolicyRequest
+
+
+
+| Field | Type | Description | Validation |
+| ----- | ---- | ----------- | ----------- |
+| user_login_must_be_domain |  bool | - |  |
+
+
+
+
+### UpdateOrgIAMPolicyResponse
 
 
 
