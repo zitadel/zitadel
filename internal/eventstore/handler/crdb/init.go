@@ -63,7 +63,7 @@ type Column struct {
 	Type          ColumnType
 	nullable      bool
 	defaultValue  interface{}
-	deleteCascade []string
+	deleteCascade string
 }
 
 type ColumnOption func(*Column)
@@ -93,7 +93,7 @@ func Default(value interface{}) ColumnOption {
 	}
 }
 
-func DeleteCascade(column ...string) ColumnOption {
+func DeleteCascade(column string) ColumnOption {
 	return func(c *Column) {
 		c.deleteCascade = column
 	}
@@ -307,7 +307,7 @@ func createColumnsStatement(cols []*Column, tableName string) string {
 			column += " DEFAULT " + defaultValue(col.defaultValue)
 		}
 		if len(col.deleteCascade) != 0 {
-			column += fmt.Sprintf(" REFERENCES %s (%s) ON DELETE CASCADE", tableName, strings.Join(col.deleteCascade, ", "))
+			column += fmt.Sprintf(" REFERENCES %s (%s) ON DELETE CASCADE", tableName, col.deleteCascade)
 		}
 		columns[i] = column
 	}

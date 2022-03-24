@@ -89,7 +89,7 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
-			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnInstanceID, AppColumnID)),
+			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
 			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
 			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),

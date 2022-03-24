@@ -59,6 +59,7 @@ func NewKeyProjection(ctx context.Context, config crdb.StatementHandlerConfig, k
 			crdb.NewColumn(KeyColumnUse, crdb.ColumnTypeText, crdb.Default("")),
 		},
 			crdb.NewPrimaryKey(KeyColumnInstanceID, KeyColumnID),
+			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{KeyColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(KeyPrivateColumnID, crdb.ColumnTypeText, crdb.DeleteCascade(KeyColumnID)),
