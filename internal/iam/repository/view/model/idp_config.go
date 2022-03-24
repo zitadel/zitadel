@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 
 	es_model "github.com/caos/zitadel/internal/iam/repository/eventsourcing/model"
@@ -109,8 +109,8 @@ func (i *IDPConfigView) AppendEvent(providerType model.IDPProviderType, event *m
 		err = i.SetData(event)
 	case es_model.OIDCIDPConfigChanged, org_es_model.OIDCIDPConfigChanged,
 		es_model.IDPConfigChanged, org_es_model.IDPConfigChanged,
-		models.EventType(org.IDPJWTConfigAddedEventType), models.EventType(iam.IDPJWTConfigAddedEventType),
-		models.EventType(org.IDPJWTConfigChangedEventType), models.EventType(iam.IDPJWTConfigChangedEventType):
+		models.EventType(org.IDPJWTConfigAddedEventType), models.EventType(instance.IDPJWTConfigAddedEventType),
+		models.EventType(org.IDPJWTConfigChangedEventType), models.EventType(instance.IDPJWTConfigChangedEventType):
 		err = i.SetData(event)
 	case es_model.IDPConfigDeactivated, org_es_model.IDPConfigDeactivated:
 		i.IDPState = int32(model.IDPConfigStateInactive)

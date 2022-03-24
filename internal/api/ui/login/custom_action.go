@@ -16,7 +16,7 @@ func (l *Login) customExternalUserMapping(ctx context.Context, user *domain.Exte
 		resourceOwner = config.AggregateID
 	}
 	if resourceOwner == domain.IAMID {
-		iam, err := l.query.IAM(ctx)
+		iam, err := l.query.Instance(ctx)
 		if err != nil {
 			return nil, err
 		}

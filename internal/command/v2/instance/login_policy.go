@@ -1,4 +1,4 @@
-package iam
+package instance
 
 import (
 	"context"
@@ -7,11 +7,11 @@ import (
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func AddLoginPolicy(
-	a *iam.Aggregate,
+	a *instance.Aggregate,
 	allowUsernamePassword bool,
 	allowRegister bool,
 	allowExternalIDP bool,
@@ -27,7 +27,7 @@ func AddLoginPolicy(
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				iam.NewLoginPolicyAddedEvent(ctx, &a.Aggregate,
+				instance.NewLoginPolicyAddedEvent(ctx, &a.Aggregate,
 					allowUsernamePassword,
 					allowRegister,
 					allowExternalIDP,
@@ -45,21 +45,21 @@ func AddLoginPolicy(
 	}
 }
 
-func AddSecondFactorToLoginPolicy(a *iam.Aggregate, factor domain.SecondFactorType) preparation.Validation {
+func AddSecondFactorToLoginPolicy(a *instance.Aggregate, factor domain.SecondFactorType) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				iam.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor),
+				instance.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor),
 			}, nil
 		}, nil
 	}
 }
 
-func AddMultiFactorToLoginPolicy(a *iam.Aggregate, factor domain.MultiFactorType) preparation.Validation {
+func AddMultiFactorToLoginPolicy(a *instance.Aggregate, factor domain.MultiFactorType) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				iam.NewLoginPolicyMultiFactorAddedEvent(ctx, &a.Aggregate, factor),
+				instance.NewLoginPolicyMultiFactorAddedEvent(ctx, &a.Aggregate, factor),
 			}, nil
 		}, nil
 	}

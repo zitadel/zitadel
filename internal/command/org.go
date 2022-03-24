@@ -33,15 +33,15 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, initCodeGenerator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
-	orgIAMPolicy, err := c.getDefaultOrgIAMPolicy(ctx)
+	domainPolicy, err := c.getDefaultDomainPolicy(ctx)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.IAM.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Instance.DomainPolicy.NotFound")
 	}
 	pwPolicy, err := c.getDefaultPasswordComplexityPolicy(ctx)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.IAM.PasswordComplexity.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-M5Fsd", "Errors.Instance.PasswordComplexity.NotFound")
 	}
-	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, orgIAMPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, claimedUserIDs, selfregistered)
+	_, orgWriteModel, _, _, events, err := c.setUpOrg(ctx, organisation, admin, domainPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator, claimedUserIDs, selfregistered)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (c *Commands) setUpOrg(
 	ctx context.Context,
 	organisation *domain.Org,
 	admin *domain.Human,
-	loginPolicy *domain.OrgIAMPolicy,
+	loginPolicy *domain.DomainPolicy,
 	pwPolicy *domain.PasswordComplexityPolicy,
 	initCodeGenerator crypto.Generator,
 	phoneCodeGenerator crypto.Generator,

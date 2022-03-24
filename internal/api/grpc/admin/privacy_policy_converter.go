@@ -9,5 +9,6 @@ func UpdatePrivacyPolicyToDomain(req *admin_pb.UpdatePrivacyPolicyRequest) *doma
 	return &domain.PrivacyPolicy{
 		TOSLink:     req.TosLink,
 		PrivacyLink: req.PrivacyLink,
+		HelpLink:    req.HelpLink,
 	}
 }

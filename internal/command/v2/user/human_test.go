@@ -77,7 +77,7 @@ func TestAddHumanCommand(t *testing.T) {
 				filter: preparation.NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
-							org.NewOrgIAMPolicyAddedEvent(
+							org.NewDomainPolicyAddedEvent(
 								context.Background(),
 								&org.NewAggregate("id", "ro").Aggregate,
 								true,
@@ -118,7 +118,7 @@ func TestAddHumanCommand(t *testing.T) {
 				filter: preparation.NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
-							org.NewOrgIAMPolicyAddedEvent(
+							org.NewDomainPolicyAddedEvent(
 								context.Background(),
 								&org.NewAggregate("id", "ro").Aggregate,
 								true,

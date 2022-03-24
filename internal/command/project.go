@@ -38,7 +38,7 @@ func (c *Commands) addProject(ctx context.Context, projectAdd *domain.Project, r
 	projectAgg := ProjectAggregateFromWriteModel(&addedProject.WriteModel)
 
 	projectRole := domain.RoleProjectOwner
-	iam, err := c.GetIAM(ctx)
+	iam, err := c.GetInstance(ctx)
 	if err != nil {
 		return nil, nil, err
 	}

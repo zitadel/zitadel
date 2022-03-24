@@ -1,22 +1,23 @@
-package iam
+package instance
 
 import (
 	"context"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func AddPrivacyPolicy(
-	a *iam.Aggregate,
+	a *instance.Aggregate,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
-				iam.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink),
+				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink),
 			}, nil
 		}, nil
 	}

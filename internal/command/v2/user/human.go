@@ -52,7 +52,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 		human.Phone = strings.TrimSpace(human.Phone)
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			orgIAMPolicy, err := orgIAMPolicyWriteModel(ctx, filter)
+			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
 			if err != nil {
 				return nil, err
 			}
@@ -68,7 +68,7 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				human.PreferredLang,
 				human.Gender,
 				human.Email,
-				orgIAMPolicy.UserLoginMustBeDomain,
+				domainPolicy.UserLoginMustBeDomain,
 			)
 			if human.Phone != "" {
 				cmd.AddPhoneData(human.Phone)

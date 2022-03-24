@@ -20,6 +20,7 @@ type PrivacyPolicyAddedEvent struct {
 
 	TOSLink     string `json:"tosLink,omitempty"`
 	PrivacyLink string `json:"privacyLink,omitempty"`
+	HelpLink    string `json:"helpLink,omitempty"`
 }
 
 func (e *PrivacyPolicyAddedEvent) Data() interface{} {
@@ -33,12 +34,14 @@ func (e *PrivacyPolicyAddedEvent) UniqueConstraints() []*eventstore.EventUniqueC
 func NewPrivacyPolicyAddedEvent(
 	base *eventstore.BaseEvent,
 	tosLink,
-	privacyLink string,
+	privacyLink,
+	helpLink string,
 ) *PrivacyPolicyAddedEvent {
 	return &PrivacyPolicyAddedEvent{
 		BaseEvent:   *base,
 		TOSLink:     tosLink,
 		PrivacyLink: privacyLink,
+		HelpLink:    helpLink,
 	}
 }
 
@@ -59,6 +62,7 @@ type PrivacyPolicyChangedEvent struct {
 
 	TOSLink     *string `json:"tosLink,omitempty"`
 	PrivacyLink *string `json:"privacyLink,omitempty"`
+	HelpLink    *string `json:"helpLink,omitempty"`
 }
 
 func (e *PrivacyPolicyChangedEvent) Data() interface{} {
@@ -96,6 +100,12 @@ func ChangeTOSLink(tosLink string) func(*PrivacyPolicyChangedEvent) {
 func ChangePrivacyLink(privacyLink string) func(*PrivacyPolicyChangedEvent) {
 	return func(e *PrivacyPolicyChangedEvent) {
 		e.PrivacyLink = &privacyLink
+	}
+}
+
+func ChangeHelpLink(helpLink string) func(*PrivacyPolicyChangedEvent) {
+	return func(e *PrivacyPolicyChangedEvent) {
+		e.HelpLink = &helpLink
 	}
 }
 

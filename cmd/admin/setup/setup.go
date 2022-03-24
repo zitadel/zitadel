@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	command "github.com/caos/zitadel/internal/command/v2"
 	"github.com/caos/zitadel/internal/database"
@@ -52,7 +51,7 @@ func Setup(config *Config, steps *Steps) {
 	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
 	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
-	ctx := authz.WithInstance(context.Background(), authz.Instance{ID: "system"})
+	ctx := context.Background()
 	migration.Migrate(ctx, eventstoreClient, steps.S1ProjectionTable)
 	migration.Migrate(ctx, eventstoreClient, steps.S2DefaultInstance)
 }

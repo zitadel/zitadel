@@ -18,5 +18,5 @@ func (mig *DefaultInstance) Execute(ctx context.Context) error {
 }
 
 func (mig *DefaultInstance) String() string {
-	return "01_default_tenant"
+	return "02_default_instance"
 }

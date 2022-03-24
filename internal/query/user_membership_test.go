@@ -20,7 +20,7 @@ var (
 			", memberships.sequence" +
 			", memberships.resource_owner" +
 			", memberships.org_id" +
-			", memberships.iam_id" +
+			", memberships.instance_id" +
 			", memberships.project_id" +
 			", memberships.grant_id" +
 			", projections.projects.name" +
@@ -34,7 +34,7 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", members.org_id" +
-			", NULL::STRING AS iam_id" +
+			", NULL::STRING AS instance_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
 			" FROM projections.org_members as members" +
@@ -46,10 +46,10 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
-			", members.iam_id" +
+			", members.instance_id" +
 			", NULL::STRING AS project_id" +
 			", NULL::STRING AS grant_id" +
-			" FROM projections.iam_members as members" +
+			" FROM projections.instance_members as members" +
 			" UNION ALL " +
 			"SELECT members.user_id" +
 			", members.roles" +
@@ -58,7 +58,7 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
-			", NULL::STRING AS iam_id" +
+			", NULL::STRING AS instance_id" +
 			", members.project_id" +
 			", NULL::STRING AS grant_id" +
 			" FROM projections.project_members as members" +
@@ -70,7 +70,7 @@ var (
 			", members.sequence" +
 			", members.resource_owner" +
 			", NULL::STRING AS org_id" +
-			", NULL::STRING AS iam_id" +
+			", NULL::STRING AS instance_id" +
 			", members.project_id" +
 			", members.grant_id" +
 			" FROM projections.project_grant_members as members" +
@@ -85,7 +85,7 @@ var (
 		"sequence",
 		"resource_owner",
 		"org_id",
-		"iam_id",
+		"instance_id",
 		"project_id",
 		"grant_id",
 		"name", //project name
@@ -160,7 +160,7 @@ func Test_MembershipPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareMembershipsQuery one iam member",
+			name:    "prepareMembershipsQuery one instance member",
 			prepare: prepareMembershipsQuery,
 			want: want{
 				sqlExpectations: mockQueries(

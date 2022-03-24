@@ -80,11 +80,13 @@ const (
 	uniqueInsert = `INSERT INTO eventstore.unique_constraints
 					(
 						unique_type,
-						unique_field
+						unique_field,
+						instance_id
 					) 
 					VALUES (  
 						$1,
-						$2
+						$2,
+						$3
 					)`
 
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
@@ -161,7 +163,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 		uniqueConstraint.UniqueField = strings.ToLower(uniqueConstraint.UniqueField)
 		switch uniqueConstraint.Action {
 		case repository.UniqueConstraintAdd:
-			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+			_, err := tx.ExecContext(ctx, uniqueInsert, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,
@@ -174,7 +176,7 @@ func (db *CRDB) handleUniqueConstraints(ctx context.Context, tx *sql.Tx, uniqueC
 				return caos_errs.ThrowInternal(err, "SQL-dM9ds", "unable to create unique constraint ")
 			}
 		case repository.UniqueConstraintRemoved:
-			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField)
+			_, err := tx.ExecContext(ctx, uniqueDelete, uniqueConstraint.UniqueType, uniqueConstraint.UniqueField, uniqueConstraint.InstanceID)
 			if err != nil {
 				logging.WithFields(
 					"unique_type", uniqueConstraint.UniqueType,

@@ -13,10 +13,23 @@ import (
 
 //SetupStep is the command pushed on the eventstore
 type SetupStep struct {
-	eventstore.BaseEvent
-	migration Migration
-	Name      string `json:"name"`
-	Error     error  `json:"error,omitempty"`
+	eventstore.BaseEvent `json:"-"`
+	migration            Migration
+	Name                 string `json:"name"`
+	Error                error  `json:"error,omitempty"`
+}
+
+func (s *SetupStep) UnmarshalJSON(data []byte) error {
+	fields := struct {
+		Name  string            `json:"name,"`
+		Error *errors.CaosError `json:"error"`
+	}{}
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	s.Name = fields.Name
+	s.Error = fields.Error
+	return nil
 }
 
 func setupStartedCmd(migration Migration) eventstore.Command {
@@ -88,7 +101,7 @@ func SetupMapper(event *repository.Event) (eventstore.Event, error) {
 	}
 	err := json.Unmarshal(event.Data, step)
 	if err != nil {
-		return nil, errors.ThrowInternal(err, "IAM-O6rVg", "unable to unmarshal step")
+		return nil, errors.ThrowInternal(err, "IAM-hYp7M", "unable to unmarshal step")
 	}
 
 	return step, nil

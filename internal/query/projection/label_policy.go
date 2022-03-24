@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -154,62 +154,62 @@ func (p *LabelPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.LabelPolicyAddedEventType,
+					Event:  instance.LabelPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.LabelPolicyChangedEventType,
+					Event:  instance.LabelPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 				{
-					Event:  iam.LabelPolicyActivatedEventType,
+					Event:  instance.LabelPolicyActivatedEventType,
 					Reduce: p.reduceActivated,
 				},
 				{
-					Event:  iam.LabelPolicyLogoAddedEventType,
+					Event:  instance.LabelPolicyLogoAddedEventType,
 					Reduce: p.reduceLogoAdded,
 				},
 				{
-					Event:  iam.LabelPolicyLogoRemovedEventType,
+					Event:  instance.LabelPolicyLogoRemovedEventType,
 					Reduce: p.reduceLogoRemoved,
 				},
 				{
-					Event:  iam.LabelPolicyIconAddedEventType,
+					Event:  instance.LabelPolicyIconAddedEventType,
 					Reduce: p.reduceIconAdded,
 				},
 				{
-					Event:  iam.LabelPolicyIconRemovedEventType,
+					Event:  instance.LabelPolicyIconRemovedEventType,
 					Reduce: p.reduceIconRemoved,
 				},
 				{
-					Event:  iam.LabelPolicyLogoDarkAddedEventType,
+					Event:  instance.LabelPolicyLogoDarkAddedEventType,
 					Reduce: p.reduceLogoAdded,
 				},
 				{
-					Event:  iam.LabelPolicyLogoDarkRemovedEventType,
+					Event:  instance.LabelPolicyLogoDarkRemovedEventType,
 					Reduce: p.reduceLogoRemoved,
 				},
 				{
-					Event:  iam.LabelPolicyIconDarkAddedEventType,
+					Event:  instance.LabelPolicyIconDarkAddedEventType,
 					Reduce: p.reduceIconAdded,
 				},
 				{
-					Event:  iam.LabelPolicyIconDarkRemovedEventType,
+					Event:  instance.LabelPolicyIconDarkRemovedEventType,
 					Reduce: p.reduceIconRemoved,
 				},
 				{
-					Event:  iam.LabelPolicyFontAddedEventType,
+					Event:  instance.LabelPolicyFontAddedEventType,
 					Reduce: p.reduceFontAdded,
 				},
 				{
-					Event:  iam.LabelPolicyFontRemovedEventType,
+					Event:  instance.LabelPolicyFontRemovedEventType,
 					Reduce: p.reduceFontRemoved,
 				},
 				{
-					Event:  iam.LabelPolicyAssetsRemovedEventType,
+					Event:  instance.LabelPolicyAssetsRemovedEventType,
 					Reduce: p.reduceAssetsRemoved,
 				},
 			},
@@ -224,11 +224,11 @@ func (p *LabelPolicyProjection) reduceAdded(event eventstore.Event) (*handler.St
 	case *org.LabelPolicyAddedEvent:
 		policyEvent = e.LabelPolicyAddedEvent
 		isDefault = false
-	case *iam.LabelPolicyAddedEvent:
+	case *instance.LabelPolicyAddedEvent:
 		policyEvent = e.LabelPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAddedEventType, iam.LabelPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAddedEventType, instance.LabelPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -260,10 +260,10 @@ func (p *LabelPolicyProjection) reduceChanged(event eventstore.Event) (*handler.
 	switch e := event.(type) {
 	case *org.LabelPolicyChangedEvent:
 		policyEvent = e.LabelPolicyChangedEvent
-	case *iam.LabelPolicyChangedEvent:
+	case *instance.LabelPolicyChangedEvent:
 		policyEvent = e.LabelPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyChangedEventType, iam.LabelPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyChangedEventType, instance.LabelPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(LabelPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -325,10 +325,10 @@ func (p *LabelPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.
 
 func (p *LabelPolicyProjection) reduceActivated(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
-	case *org.LabelPolicyActivatedEvent, *iam.LabelPolicyActivatedEvent:
+	case *org.LabelPolicyActivatedEvent, *instance.LabelPolicyActivatedEvent:
 		// everything ok
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dldEU", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyActivatedEventType, iam.LabelPolicyActivatedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-dldEU", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyActivatedEventType, instance.LabelPolicyActivatedEventType})
 	}
 	return crdb.NewCopyStatement(
 		event,
@@ -368,14 +368,14 @@ func (p *LabelPolicyProjection) reduceLogoAdded(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.LabelPolicyLogoAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyLightLogoURLCol, e.StoreKey)
-	case *iam.LabelPolicyLogoAddedEvent:
+	case *instance.LabelPolicyLogoAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyLightLogoURLCol, e.StoreKey)
 	case *org.LabelPolicyLogoDarkAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyDarkLogoURLCol, e.StoreKey)
-	case *iam.LabelPolicyLogoDarkAddedEvent:
+	case *instance.LabelPolicyLogoDarkAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyDarkLogoURLCol, e.StoreKey)
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-4wbOI", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, iam.LabelPolicyLogoAddedEventType, org.LabelPolicyLogoDarkAddedEventType, iam.LabelPolicyLogoDarkAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-4wbOI", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoAddedEventType, instance.LabelPolicyLogoAddedEventType, org.LabelPolicyLogoDarkAddedEventType, instance.LabelPolicyLogoDarkAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -396,14 +396,14 @@ func (p *LabelPolicyProjection) reduceLogoRemoved(event eventstore.Event) (*hand
 	switch event.(type) {
 	case *org.LabelPolicyLogoRemovedEvent:
 		col = LabelPolicyLightLogoURLCol
-	case *iam.LabelPolicyLogoRemovedEvent:
+	case *instance.LabelPolicyLogoRemovedEvent:
 		col = LabelPolicyLightLogoURLCol
 	case *org.LabelPolicyLogoDarkRemovedEvent:
 		col = LabelPolicyDarkLogoURLCol
-	case *iam.LabelPolicyLogoDarkRemovedEvent:
+	case *instance.LabelPolicyLogoDarkRemovedEvent:
 		col = LabelPolicyDarkLogoURLCol
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, iam.LabelPolicyLogoRemovedEventType, org.LabelPolicyLogoDarkRemovedEventType, iam.LabelPolicyLogoDarkRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kg8H4", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyLogoRemovedEventType, instance.LabelPolicyLogoRemovedEventType, org.LabelPolicyLogoDarkRemovedEventType, instance.LabelPolicyLogoDarkRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -424,14 +424,14 @@ func (p *LabelPolicyProjection) reduceIconAdded(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.LabelPolicyIconAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyLightIconURLCol, e.StoreKey)
-	case *iam.LabelPolicyIconAddedEvent:
+	case *instance.LabelPolicyIconAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyLightIconURLCol, e.StoreKey)
 	case *org.LabelPolicyIconDarkAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyDarkIconURLCol, e.StoreKey)
-	case *iam.LabelPolicyIconDarkAddedEvent:
+	case *instance.LabelPolicyIconDarkAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyDarkIconURLCol, e.StoreKey)
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, iam.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, iam.LabelPolicyIconDarkAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-e2JFz", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconAddedEventType, instance.LabelPolicyIconAddedEventType, org.LabelPolicyIconDarkAddedEventType, instance.LabelPolicyIconDarkAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -452,14 +452,14 @@ func (p *LabelPolicyProjection) reduceIconRemoved(event eventstore.Event) (*hand
 	switch event.(type) {
 	case *org.LabelPolicyIconRemovedEvent:
 		col = LabelPolicyLightIconURLCol
-	case *iam.LabelPolicyIconRemovedEvent:
+	case *instance.LabelPolicyIconRemovedEvent:
 		col = LabelPolicyLightIconURLCol
 	case *org.LabelPolicyIconDarkRemovedEvent:
 		col = LabelPolicyDarkIconURLCol
-	case *iam.LabelPolicyIconDarkRemovedEvent:
+	case *instance.LabelPolicyIconDarkRemovedEvent:
 		col = LabelPolicyDarkIconURLCol
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, iam.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, iam.LabelPolicyIconDarkRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-gfgbY", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyIconRemovedEventType, instance.LabelPolicyIconRemovedEventType, org.LabelPolicyIconDarkRemovedEventType, instance.LabelPolicyIconDarkRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -480,10 +480,10 @@ func (p *LabelPolicyProjection) reduceFontAdded(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.LabelPolicyFontAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyFontURLCol, e.StoreKey)
-	case *iam.LabelPolicyFontAddedEvent:
+	case *instance.LabelPolicyFontAddedEvent:
 		storeKey = handler.NewCol(LabelPolicyFontURLCol, e.StoreKey)
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-65i9W", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontAddedEventType, iam.LabelPolicyFontAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-65i9W", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontAddedEventType, instance.LabelPolicyFontAddedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -504,10 +504,10 @@ func (p *LabelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 	switch event.(type) {
 	case *org.LabelPolicyFontRemovedEvent:
 		col = LabelPolicyFontURLCol
-	case *iam.LabelPolicyFontRemovedEvent:
+	case *instance.LabelPolicyFontRemovedEvent:
 		col = LabelPolicyFontURLCol
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-xf32J", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontRemovedEventType, iam.LabelPolicyFontRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-xf32J", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyFontRemovedEventType, instance.LabelPolicyFontRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(
@@ -525,10 +525,10 @@ func (p *LabelPolicyProjection) reduceFontRemoved(event eventstore.Event) (*hand
 
 func (p *LabelPolicyProjection) reduceAssetsRemoved(event eventstore.Event) (*handler.Statement, error) {
 	switch event.(type) {
-	case *org.LabelPolicyAssetsRemovedEvent, *iam.LabelPolicyAssetsRemovedEvent:
+	case *org.LabelPolicyAssetsRemovedEvent, *instance.LabelPolicyAssetsRemovedEvent:
 		//ok
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qi39A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAssetsRemovedEventType, iam.LabelPolicyAssetsRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qi39A", "reduce.wrong.event.type %v", []eventstore.EventType{org.LabelPolicyAssetsRemovedEventType, instance.LabelPolicyAssetsRemovedEventType})
 	}
 
 	return crdb.NewUpdateStatement(

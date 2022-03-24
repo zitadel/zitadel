@@ -4,15 +4,16 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/ui/console"
-	iam "github.com/caos/zitadel/internal/command/v2/instance"
+	"github.com/caos/zitadel/internal/command/v2/instance"
 	"github.com/caos/zitadel/internal/command/v2/org"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/command/v2/project"
 	"github.com/caos/zitadel/internal/command/v2/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	instance_repo "github.com/caos/zitadel/internal/repository/instance"
 	org_repo "github.com/caos/zitadel/internal/repository/org"
 	project_repo "github.com/caos/zitadel/internal/repository/project"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
@@ -42,7 +43,7 @@ type InstanceSetup struct {
 		ExpireWarnDays uint64
 		MaxAgeDays     uint64
 	}
-	OrgIAMPolicy struct {
+	DomainPolicy struct {
 		UserLoginMustBeDomain bool
 	}
 	LoginPolicy struct {
@@ -61,6 +62,7 @@ type InstanceSetup struct {
 	PrivacyPolicy struct {
 		TOSLink     string
 		PrivacyLink string
+		HelpLink    string
 	}
 	LockoutPolicy struct {
 		MaxAttempts              uint64
@@ -129,7 +131,14 @@ func (s *InstanceSetup) generateIDs() (err error) {
 	return nil
 }
 
-func (command *Command) SetUpInstance(ctx context.Context, instance *InstanceSetup) (*domain.ObjectDetails, error) {
+func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup) (*domain.ObjectDetails, error) {
+	// TODO
+	// instanceID, err := id.SonyFlakeGenerator.Next()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	ctx = authz.SetCtxData(authz.WithInstance(ctx, authz.Instance{ID: "system"}), authz.CtxData{OrgID: domain.IAMID, ResourceOwner: domain.IAMID})
+
 	orgID, err := id.SonyFlakeGenerator.Next()
 	if err != nil {
 		return nil, err
@@ -140,128 +149,128 @@ func (command *Command) SetUpInstance(ctx context.Context, instance *InstanceSet
 		return nil, err
 	}
 
-	if err = instance.generateIDs(); err != nil {
+	if err = setup.generateIDs(); err != nil {
 		return nil, err
 	}
 
-	instance.Org.Human.PasswordChangeRequired = true
+	setup.Org.Human.PasswordChangeRequired = true
 
-	iamAgg := iam_repo.NewAggregate()
+	instanceAgg := instance_repo.NewAggregate()
 	orgAgg := org_repo.NewAggregate(orgID, orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
-	projectAgg := project_repo.NewAggregate(instance.Zitadel.projectID, orgID)
+	projectAgg := project_repo.NewAggregate(setup.Zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
-		iam.AddPasswordComplexityPolicy(
-			iamAgg,
-			instance.PasswordComplexityPolicy.MinLength,
-			instance.PasswordComplexityPolicy.HasLowercase,
-			instance.PasswordComplexityPolicy.HasUppercase,
-			instance.PasswordComplexityPolicy.HasNumber,
-			instance.PasswordComplexityPolicy.HasSymbol,
+		instance.AddPasswordComplexityPolicy(
+			instanceAgg,
+			setup.PasswordComplexityPolicy.MinLength,
+			setup.PasswordComplexityPolicy.HasLowercase,
+			setup.PasswordComplexityPolicy.HasUppercase,
+			setup.PasswordComplexityPolicy.HasNumber,
+			setup.PasswordComplexityPolicy.HasSymbol,
 		),
-		iam.AddPasswordAgePolicy(
-			iamAgg,
-			instance.PasswordAgePolicy.ExpireWarnDays,
-			instance.PasswordAgePolicy.MaxAgeDays,
+		instance.AddPasswordAgePolicy(
+			instanceAgg,
+			setup.PasswordAgePolicy.ExpireWarnDays,
+			setup.PasswordAgePolicy.MaxAgeDays,
 		),
-		iam.AddOrgIAMPolicy(
-			iamAgg,
-			instance.OrgIAMPolicy.UserLoginMustBeDomain,
+		instance.AddDomainPolicy(
+			instanceAgg,
+			setup.DomainPolicy.UserLoginMustBeDomain,
 		),
-		iam.AddLoginPolicy(
-			iamAgg,
-			instance.LoginPolicy.AllowUsernamePassword,
-			instance.LoginPolicy.AllowRegister,
-			instance.LoginPolicy.AllowExternalIDP,
-			instance.LoginPolicy.ForceMFA,
-			instance.LoginPolicy.HidePasswordReset,
-			instance.LoginPolicy.PasswordlessType,
-			instance.LoginPolicy.PasswordCheckLifetime,
-			instance.LoginPolicy.ExternalLoginCheckLifetime,
-			instance.LoginPolicy.MfaInitSkipLifetime,
-			instance.LoginPolicy.SecondFactorCheckLifetime,
-			instance.LoginPolicy.MultiFactorCheckLifetime,
+		instance.AddLoginPolicy(
+			instanceAgg,
+			setup.LoginPolicy.AllowUsernamePassword,
+			setup.LoginPolicy.AllowRegister,
+			setup.LoginPolicy.AllowExternalIDP,
+			setup.LoginPolicy.ForceMFA,
+			setup.LoginPolicy.HidePasswordReset,
+			setup.LoginPolicy.PasswordlessType,
+			setup.LoginPolicy.PasswordCheckLifetime,
+			setup.LoginPolicy.ExternalLoginCheckLifetime,
+			setup.LoginPolicy.MfaInitSkipLifetime,
+			setup.LoginPolicy.SecondFactorCheckLifetime,
+			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		iam.AddSecondFactorToLoginPolicy(iamAgg, domain.SecondFactorTypeOTP),
-		iam.AddSecondFactorToLoginPolicy(iamAgg, domain.SecondFactorTypeU2F),
-		iam.AddMultiFactorToLoginPolicy(iamAgg, domain.MultiFactorTypeU2FWithPIN),
+		instance.AddSecondFactorToLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		instance.AddSecondFactorToLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
+		instance.AddMultiFactorToLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		iam.AddPrivacyPolicy(iamAgg, instance.PrivacyPolicy.TOSLink, instance.PrivacyPolicy.PrivacyLink),
-		iam.AddLockoutPolicy(iamAgg, instance.LockoutPolicy.MaxAttempts, instance.LockoutPolicy.ShouldShowLockoutFailure),
+		instance.AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		instance.AddLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
-		iam.AddEmailTemplate(iamAgg, instance.EmailTemplate),
+		instance.AddEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
-	for _, msg := range instance.MessageTexts {
-		validations = append(validations, iam.SetCustomTexts(iamAgg, msg))
+	for _, msg := range setup.MessageTexts {
+		validations = append(validations, instance.SetCustomTexts(instanceAgg, msg))
 	}
 
 	validations = append(validations,
-		org.AddOrg(orgAgg, instance.Org.Name, command.iamDomain),
-		org.AddDomain(orgAgg, instance.Org.Domain),
-		user.AddHumanCommand(userAgg, &instance.Org.Human, command.userPasswordAlg),
+		org.AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
+		org.AddDomain(orgAgg, setup.Org.Domain),
+		user.AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
 		org.AddMember(orgAgg, userID, domain.RoleOrgOwner),
 
 		project.AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
 		project.AddApp(
 			projectAgg,
-			instance.Zitadel.mgmtID,
+			setup.Zitadel.mgmtID,
 			mgmtAppName,
 		),
 		project.AddAPIConfig(
 			*projectAgg,
-			instance.Zitadel.mgmtID,
-			instance.Zitadel.mgmtClientID,
+			setup.Zitadel.mgmtID,
+			setup.Zitadel.mgmtClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
 		project.AddApp(
 			projectAgg,
-			instance.Zitadel.adminID,
+			setup.Zitadel.adminID,
 			adminAppName,
 		),
 		project.AddAPIConfig(
 			*projectAgg,
-			instance.Zitadel.adminID,
-			instance.Zitadel.adminClientID,
+			setup.Zitadel.adminID,
+			setup.Zitadel.adminClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
 		project.AddApp(
 			projectAgg,
-			instance.Zitadel.authID,
+			setup.Zitadel.authID,
 			authAppName,
 		),
 		project.AddAPIConfig(
 			*projectAgg,
-			instance.Zitadel.authID,
-			instance.Zitadel.authClientID,
+			setup.Zitadel.authID,
+			setup.Zitadel.authClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
 		project.AddApp(
 			projectAgg,
-			instance.Zitadel.consoleID,
+			setup.Zitadel.consoleID,
 			consoleAppName,
 		),
 		project.AddOIDCConfig(
 			*projectAgg,
 			domain.OIDCVersionV1,
-			instance.Zitadel.consoleID,
-			instance.Zitadel.consoleClientID,
+			setup.Zitadel.consoleID,
+			setup.Zitadel.consoleClientID,
 			nil,
-			[]string{instance.Zitadel.BaseURL + consoleRedirectPath},
+			[]string{setup.Zitadel.BaseURL + consoleRedirectPath},
 			[]domain.OIDCResponseType{domain.OIDCResponseTypeCode},
 			[]domain.OIDCGrantType{domain.OIDCGrantTypeAuthorizationCode},
 			domain.OIDCApplicationTypeUserAgent,
 			domain.OIDCAuthMethodTypeNone,
-			[]string{instance.Zitadel.BaseURL + consolePostLogoutPath},
-			instance.Zitadel.IsDevMode,
+			[]string{setup.Zitadel.BaseURL + consolePostLogoutPath},
+			setup.Zitadel.IsDevMode,
 			domain.OIDCTokenTypeBearer,
 			false,
 			false,

@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -134,18 +134,18 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			reduce: (&CustomTextProjection{}).reduceSet,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.CustomTextSetEventType),
-					iam.AggregateType,
+					repository.EventType(instance.CustomTextSetEventType),
+					instance.AggregateType,
 					[]byte(`{
 					"key": "Text",
 						"language": "en",
 						"template": "InitCode",
 						"text": "Test"
 					}`),
-				), iam.CustomTextSetEventMapper),
+				), instance.CustomTextSetEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       CustomTextTable,
@@ -175,17 +175,17 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			reduce: (&CustomTextProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.CustomTextTemplateRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.CustomTextTemplateRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), iam.CustomTextRemovedEventMapper),
+				), instance.CustomTextRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       CustomTextTable,
@@ -209,17 +209,17 @@ func TestCustomTextProjection_reduces(t *testing.T) {
 			reduce: (&CustomTextProjection{}).reduceTemplateRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.CustomTextTemplateRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.CustomTextTemplateRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"key": "Text",
 						"language": "en",
 						"template": "InitCode"
 					}`),
-				), iam.CustomTextTemplateRemovedEventMapper),
+				), instance.CustomTextTemplateRemovedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       CustomTextTable,

@@ -21,7 +21,7 @@ CREATE TABLE auth.failed_events (
     view_name TEXT,
     failed_sequence BIGINT,
     failure_count SMALLINT,
-    error TEXT,
+    err_msg TEXT,
 
     PRIMARY KEY (view_name, failed_sequence)
 );

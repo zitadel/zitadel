@@ -41,6 +41,7 @@ S2DefaultInstance:
     PrivacyPolicy:
       TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
       PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
+      HelpLink: ''
     LockoutPolicy:
       MaxAttempts: 0
       ShouldShowLockoutFailure: true

@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -126,9 +126,9 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 			args: args{
 				filter: func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 					return []eventstore.Event{
-						iam.NewPasswordComplexityPolicyAddedEvent(
+						instance.NewPasswordComplexityPolicyAddedEvent(
 							context.Background(),
-							&iam.NewAggregate().Aggregate,
+							&instance.NewAggregate().Aggregate,
 							8,
 							true,
 							true,
@@ -244,9 +244,9 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 					}).
 					Append(func(_ context.Context, _ *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
-							iam.NewPasswordComplexityPolicyAddedEvent(
+							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&iam.NewAggregate().Aggregate,
+								&instance.NewAggregate().Aggregate,
 								8,
 								true,
 								true,

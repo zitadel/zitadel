@@ -909,11 +909,11 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 		},
 		{
 			name:    "wrong instance",
-			builder: NewSearchQueryBuilder(ColumnsEvent).Tenant("instance"),
+			builder: NewSearchQueryBuilder(ColumnsEvent).InstanceID("instance"),
 			args: args{
 				event: &BaseEvent{
 					aggregate: Aggregate{
-						Tenant: "different instance",
+						InstanceID: "different instance",
 					},
 				},
 				existingLen: 0,
@@ -939,7 +939,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			builder: NewSearchQueryBuilder(ColumnsEvent).
 				Limit(1000).
 				ResourceOwner("ro").
-				Tenant("instance").
+				InstanceID("instance").
 				AddQuery().
 				SequenceGreater(1000).
 				Builder(),
@@ -947,7 +947,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 				event: &BaseEvent{
 					aggregate: Aggregate{
 						ResourceOwner: "ro",
-						Tenant:        "instance",
+						InstanceID:    "instance",
 					},
 					sequence: 1001,
 				},
@@ -962,7 +962,7 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 				event: &BaseEvent{
 					aggregate: Aggregate{
 						ResourceOwner: "ro",
-						Tenant:        "instance",
+						InstanceID:    "instance",
 					},
 					sequence: 1001,
 				},

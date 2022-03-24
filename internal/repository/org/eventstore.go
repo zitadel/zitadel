@@ -44,9 +44,9 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(LoginPolicyIDPProviderAddedEventType, IdentityProviderAddedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderRemovedEventType, IdentityProviderRemovedEventMapper).
 		RegisterFilterEventMapper(LoginPolicyIDPProviderCascadeRemovedEventType, IdentityProviderCascadeRemovedEventMapper).
-		RegisterFilterEventMapper(OrgIAMPolicyAddedEventType, OrgIAMPolicyAddedEventMapper).
-		RegisterFilterEventMapper(OrgIAMPolicyChangedEventType, OrgIAMPolicyChangedEventMapper).
-		RegisterFilterEventMapper(OrgIAMPolicyRemovedEventType, OrgIAMPolicyRemovedEventMapper).
+		RegisterFilterEventMapper(OrgDomainPolicyAddedEventType, DomainPolicyAddedEventMapper).
+		RegisterFilterEventMapper(OrgDomainPolicyChangedEventType, DomainPolicyChangedEventMapper).
+		RegisterFilterEventMapper(OrgDomainPolicyRemovedEventType, DomainPolicyRemovedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyAddedEventType, PasswordAgePolicyAddedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyChangedEventType, PasswordAgePolicyChangedEventMapper).
 		RegisterFilterEventMapper(PasswordAgePolicyRemovedEventType, PasswordAgePolicyRemovedEventMapper).

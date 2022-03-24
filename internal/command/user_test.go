@@ -14,7 +14,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/member"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/project"
@@ -202,7 +202,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -244,7 +244,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1026,7 +1026,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1090,7 +1090,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1147,7 +1147,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							iam.NewOrgIAMPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1164,8 +1164,8 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 								),
 							),
 							eventFromEventPusher(
-								iam.NewMemberCascadeRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate,
+								instance.NewMemberCascadeRemovedEvent(context.Background(),
+									&instance.NewAggregate().Aggregate,
 									"user1",
 								),
 							),

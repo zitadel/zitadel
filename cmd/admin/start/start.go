@@ -239,7 +239,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 
 //TODO:!!??!!
 func consoleClientID(ctx context.Context, queries *query.Queries) (string, error) {
-	iam, err := queries.IAM(ctx)
+	iam, err := queries.Instance(ctx)
 	if err != nil {
 		return "", err
 	}

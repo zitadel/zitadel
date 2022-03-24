@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -90,10 +90,10 @@ func (p *IDPUserLinkProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.IDPConfigRemovedEventType,
+					Event:  instance.IDPConfigRemovedEventType,
 					Reduce: p.reduceIDPConfigRemoved,
 				},
 			},
@@ -184,10 +184,10 @@ func (p *IDPUserLinkProjection) reduceIDPConfigRemoved(event eventstore.Event) (
 	switch e := event.(type) {
 	case *org.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
-	case *iam.IDPConfigRemovedEvent:
+	case *instance.IDPConfigRemovedEvent:
 		idpID = e.ConfigID
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, iam.IDPConfigRemovedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-iCKSj", "reduce.wrong.event.type %v", []eventstore.EventType{org.IDPConfigRemovedEventType, instance.IDPConfigRemovedEventType})
 	}
 
 	return crdb.NewDeleteStatement(event,

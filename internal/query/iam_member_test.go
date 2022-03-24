@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	iamMembersQuery = regexp.QuoteMeta("SELECT" +
+	instanceMembersQuery = regexp.QuoteMeta("SELECT" +
 		" members.creation_date" +
 		", members.change_date" +
 		", members.sequence" +
@@ -27,7 +27,7 @@ var (
 		", projections.users_machines.name" +
 		", projections.users_humans.avatar_key" +
 		", COUNT(*) OVER () " +
-		"FROM projections.iam_members as members " +
+		"FROM projections.instance_members as members " +
 		"LEFT JOIN projections.users_humans " +
 		"ON members.user_id = projections.users_humans.user_id " +
 		"LEFT JOIN projections.users_machines " +
@@ -35,7 +35,7 @@ var (
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
 		"WHERE projections.login_names.is_primary = $1")
-	iamMembersColumns = []string{
+	instanceMembersColumns = []string{
 		"creation_date",
 		"change_date",
 		"sequence",
@@ -65,11 +65,11 @@ func Test_IAMMemberPrepares(t *testing.T) {
 		object  interface{}
 	}{
 		{
-			name:    "prepareIAMMembersQuery no result",
-			prepare: prepareIAMMembersQuery,
+			name:    "prepareInstanceMembersQuery no result",
+			prepare: prepareInstanceMembersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					iamMembersQuery,
+					instanceMembersQuery,
 					nil,
 					nil,
 				),
@@ -79,12 +79,12 @@ func Test_IAMMemberPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareIAMMembersQuery human found",
-			prepare: prepareIAMMembersQuery,
+			name:    "prepareInstanceMembersQuery human found",
+			prepare: prepareInstanceMembersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					iamMembersQuery,
-					iamMembersColumns,
+					instanceMembersQuery,
+					instanceMembersColumns,
 					[][]driver.Value{
 						{
 							testNow,
@@ -127,12 +127,12 @@ func Test_IAMMemberPrepares(t *testing.T) {
 			},
 		},
 		{
-			name:    "prepareIAMMembersQuery machine found",
-			prepare: prepareIAMMembersQuery,
+			name:    "prepareInstanceMembersQuery machine found",
+			prepare: prepareInstanceMembersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					iamMembersQuery,
-					iamMembersColumns,
+					instanceMembersQuery,
+					instanceMembersColumns,
 					[][]driver.Value{
 						{
 							testNow,
@@ -176,11 +176,11 @@ func Test_IAMMemberPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareIAMMembersQuery multiple users",
-			prepare: prepareIAMMembersQuery,
+			prepare: prepareInstanceMembersQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					iamMembersQuery,
-					iamMembersColumns,
+					instanceMembersQuery,
+					instanceMembersColumns,
 					[][]driver.Value{
 						{
 							testNow,
@@ -253,10 +253,10 @@ func Test_IAMMemberPrepares(t *testing.T) {
 		},
 		{
 			name:    "prepareIAMMembersQuery sql err",
-			prepare: prepareIAMMembersQuery,
+			prepare: prepareInstanceMembersQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					iamMembersQuery,
+					instanceMembersQuery,
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

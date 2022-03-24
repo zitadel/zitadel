@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 var (
@@ -28,11 +28,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 		want   wantReduce
 	}{
 		{
-			name: "iam.reduceSMSTwilioAdded",
+			name: "instance.reduceSMSTwilioAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigTwilioAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigTwilioAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
@@ -43,11 +43,11 @@ func TestSMSProjection_reduces(t *testing.T) {
 						},
 						"senderNumber": "sender-number"
 					}`),
-				), iam.SMSConfigTwilioAddedEventMapper),
+				), instance.SMSConfigTwilioAddedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioAdded,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -80,21 +80,21 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigTwilioChanged",
+			name: "instance.reduceSMSConfigTwilioChanged",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigTwilioChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigTwilioChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id",
 						"sid": "sid",
 						"senderNumber": "sender-number"
 					}`),
-				), iam.SMSConfigTwilioChangedEventMapper),
+				), instance.SMSConfigTwilioChangedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigTwilioChanged,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -121,19 +121,19 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigActivated",
+			name: "instance.reduceSMSConfigActivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigActivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigActivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id"
 					}`),
-				), iam.SMSConfigActivatedEventMapper),
+				), instance.SMSConfigActivatedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigActivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -153,19 +153,19 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigDeactivated",
+			name: "instance.reduceSMSConfigDeactivated",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigDeactivatedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigDeactivatedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id"
 					}`),
-				), iam.SMSConfigDeactivatedEventMapper),
+				), instance.SMSConfigDeactivatedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigDeactivated,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,
@@ -185,19 +185,19 @@ func TestSMSProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name: "iam.reduceSMSConfigRemoved",
+			name: "instance.reduceSMSConfigRemoved",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.SMSConfigRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.SMSConfigRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"id": "id"
 					}`),
-				), iam.SMSConfigRemovedEventMapper),
+				), instance.SMSConfigRemovedEventMapper),
 			},
 			reduce: (&SMSConfigProjection{}).reduceSMSConfigRemoved,
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
 				projection:       SMSConfigProjectionTable,

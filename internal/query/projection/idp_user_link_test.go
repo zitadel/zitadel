@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
 )
@@ -213,16 +213,16 @@ func TestIDPUserLinkProjection_reduces(t *testing.T) {
 			name: "iam.IDPConfigRemovedEvent",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.IDPConfigRemovedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.IDPConfigRemovedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"idpConfigId": "idp-config-id"
 					}`),
-				), iam.IDPConfigRemovedEventMapper),
+				), instance.IDPConfigRemovedEventMapper),
 			},
 			reduce: (&IDPUserLinkProjection{}).reduceIDPConfigRemoved,
 			want: wantReduce{
-				aggregateType:    iam.AggregateType,
+				aggregateType:    instance.AggregateType,
 				sequence:         15,
 				previousSequence: 10,
 				projection:       IDPUserLinkTable,

@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -26,6 +26,7 @@ const (
 	PrivacyPolicyInstanceIDCol    = "instance_id"
 	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
 	PrivacyPolicyTOSLinkCol       = "tos_link"
+	PrivacyPolicyHelpLinkCol      = "help_link"
 )
 
 type PrivacyPolicyProjection struct {
@@ -48,6 +49,7 @@ func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandle
 			crdb.NewColumn(PrivacyPolicyInstanceIDCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
 			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyHelpLinkCol, crdb.ColumnTypeText),
 		},
 			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
 		),
@@ -76,14 +78,14 @@ func (p *PrivacyPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.PrivacyPolicyAddedEventType,
+					Event:  instance.PrivacyPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.PrivacyPolicyChangedEventType,
+					Event:  instance.PrivacyPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -98,11 +100,11 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 	case *org.PrivacyPolicyAddedEvent:
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = false
-	case *iam.PrivacyPolicyAddedEvent:
+	case *instance.PrivacyPolicyAddedEvent:
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, instance.PrivacyPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -114,6 +116,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyStateCol, domain.PolicyStateActive),
 			handler.NewCol(PrivacyPolicyPrivacyLinkCol, policyEvent.PrivacyLink),
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
+			handler.NewCol(PrivacyPolicyHelpLinkCol, policyEvent.HelpLink),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
 			handler.NewCol(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
@@ -125,10 +128,10 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
-	case *iam.PrivacyPolicyChangedEvent:
+	case *instance.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, instance.PrivacyPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(PrivacyPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -139,6 +142,9 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	}
 	if policyEvent.TOSLink != nil {
 		cols = append(cols, handler.NewCol(PrivacyPolicyTOSLinkCol, *policyEvent.TOSLink))
+	}
+	if policyEvent.HelpLink != nil {
+		cols = append(cols, handler.NewCol(PrivacyPolicyHelpLinkCol, *policyEvent.HelpLink))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,

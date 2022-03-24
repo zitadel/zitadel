@@ -40,7 +40,7 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 
 func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
 	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		OrderDesc().
+		OrderAsc().
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
