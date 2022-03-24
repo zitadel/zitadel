@@ -103,7 +103,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 		},
 			crdb.NewPrimaryKey(LoginNameUserInstanceIDCol, LoginNameUserIDCol),
 			loginNameUserSuffix,
-			crdb.NewIndex("ro_idx", []string{LoginNameUserResourceOwnerCol}),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{LoginNameUserResourceOwnerCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(LoginNameDomainNameCol, crdb.ColumnTypeText),
@@ -122,7 +122,7 @@ func NewLoginNameProjection(ctx context.Context, config crdb.StatementHandlerCon
 		},
 			crdb.NewPrimaryKey(LoginNamePoliciesInstanceIDCol, LoginNamePoliciesResourceOwnerCol),
 			loginNamePolicySuffix,
-			crdb.NewIndex("is_default_idx", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol}),
+			crdb.WithIndex(crdb.NewIndex("is_default_idx", []string{LoginNamePoliciesResourceOwnerCol, LoginNamePoliciesIsDefaultCol})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
