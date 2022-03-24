@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -25,7 +25,7 @@ func (rm *ExistingLabelPoliciesReadModel) AppendEvents(events ...eventstore.Even
 func (rm *ExistingLabelPoliciesReadModel) Reduce() error {
 	for _, event := range rm.Events {
 		switch e := event.(type) {
-		case *iam.LabelPolicyAddedEvent,
+		case *instance.LabelPolicyAddedEvent,
 			*org.LabelPolicyAddedEvent:
 			rm.aggregateIDs = append(rm.aggregateIDs, e.Aggregate().ID)
 		case *org.LabelPolicyRemovedEvent:
@@ -44,8 +44,8 @@ func (rm *ExistingLabelPoliciesReadModel) Reduce() error {
 func (rm *ExistingLabelPoliciesReadModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
-		AggregateTypes(iam.AggregateType).
-		EventTypes(iam.LabelPolicyAddedEventType).
+		AggregateTypes(instance.AggregateType).
+		EventTypes(instance.LabelPolicyAddedEventType).
 		Or().
 		AggregateTypes(org.AggregateType).
 		EventTypes(

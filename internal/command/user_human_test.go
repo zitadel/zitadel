@@ -102,7 +102,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -137,7 +137,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -178,7 +178,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -272,7 +272,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -359,7 +359,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -440,7 +440,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -539,7 +539,7 @@ func TestCommandSide_AddHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -732,7 +732,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -767,7 +767,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -808,7 +808,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -896,7 +896,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -978,7 +978,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1082,7 +1082,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1190,7 +1190,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1294,7 +1294,7 @@ func TestCommandSide_ImportHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1495,7 +1495,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -1533,7 +1533,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -1579,7 +1579,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -1641,7 +1641,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -1703,7 +1703,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								false,
 							),
@@ -1782,7 +1782,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								false,
 							),
@@ -1919,7 +1919,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -2024,7 +2024,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -2123,7 +2123,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -2244,7 +2244,7 @@ func TestCommandSide_RegisterHuman(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),

@@ -22,9 +22,9 @@ func (s *Step8) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep8(ctx context.Context, step *Step8) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		secondFactorModel := NewIAMSecondFactorWriteModel(domain.SecondFactorTypeU2F)
-		iamAgg := IAMAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		secondFactorModel := NewInstanceSecondFactorWriteModel(domain.SecondFactorTypeU2F)
+		iamAgg := InstanceAggregateFromWriteModel(&secondFactorModel.SecondFactorWriteModel.WriteModel)
 		if !step.U2F {
 			return []eventstore.Command{}, nil
 		}

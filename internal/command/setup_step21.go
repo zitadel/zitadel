@@ -20,7 +20,7 @@ func (s *Step21) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep21(ctx context.Context, step *Step21) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
 		events := make([]eventstore.Command, 0)
 		globalMembers := newGlobalOrgMemberWriteModel(iam.GlobalOrgID, domain.RoleOrgProjectCreator)
 		orgAgg := OrgAggregateFromWriteModel(&globalMembers.WriteModel)

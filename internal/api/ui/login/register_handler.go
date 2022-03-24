@@ -62,7 +62,7 @@ func (l *Login) handleRegisterCheck(w http.ResponseWriter, r *http.Request) {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
 	}
-	iam, err := l.query.IAM(r.Context())
+	iam, err := l.query.Instance(r.Context())
 	if err != nil {
 		l.renderRegister(w, r, authRequest, data, err)
 		return
@@ -127,7 +127,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 	}
 
 	if resourceOwner == "" {
-		iam, err := l.query.IAM(r.Context())
+		iam, err := l.query.Instance(r.Context())
 		if err != nil {
 			l.renderRegister(w, r, authRequest, formData, err)
 			return
@@ -153,7 +153,7 @@ func (l *Login) renderRegister(w http.ResponseWriter, r *http.Request, authReque
 		}
 	}
 
-	orgIAMPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	orgIAMPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegister(w, r, authRequest, formData, err)
 		return

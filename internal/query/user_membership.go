@@ -107,7 +107,7 @@ func (q *Queries) Memberships(ctx context.Context, queries *MembershipSearchQuer
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-T84X9", "Errors.Query.InvalidRequest")
 	}
-	latestSequence, err := q.latestSequence(ctx, orgMemberTable, iamMemberTable, projectMemberTable, projectGrantMemberTable)
+	latestSequence, err := q.latestSequence(ctx, orgMemberTable, instanceMemberTable, projectMemberTable, projectGrantMemberTable)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ var (
 		table: membershipAlias,
 	}
 	membershipIAMID = Column{
-		name:  projection.IAMMemberIAMIDCol,
+		name:  projection.InstanceMemberIAMIDCol,
 		table: membershipAlias,
 	}
 	membershipProjectID = Column{
@@ -299,17 +299,17 @@ func prepareOrgMember() string {
 
 func prepareIAMMember() string {
 	stmt, _ := sq.Select(
-		IAMMemberUserID.identifier(),
-		IAMMemberRoles.identifier(),
-		IAMMemberCreationDate.identifier(),
-		IAMMemberChangeDate.identifier(),
-		IAMMemberSequence.identifier(),
-		IAMMemberResourceOwner.identifier(),
+		InstanceMemberUserID.identifier(),
+		InstanceMemberRoles.identifier(),
+		InstanceMemberCreationDate.identifier(),
+		InstanceMemberChangeDate.identifier(),
+		InstanceMemberSequence.identifier(),
+		InstanceMemberResourceOwner.identifier(),
 		"NULL::STRING AS "+membershipOrgID.name,
-		IAMMemberIAMID.identifier(),
+		InstanceMemberIAMID.identifier(),
 		"NULL::STRING AS "+membershipProjectID.name,
 		"NULL::STRING AS "+membershipGrantID.name,
-	).From(iamMemberTable.identifier()).MustSql()
+	).From(instanceMemberTable.identifier()).MustSql()
 	return stmt
 }
 

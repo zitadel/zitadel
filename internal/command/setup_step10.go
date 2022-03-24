@@ -22,9 +22,9 @@ func (s *Step10) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep10(ctx context.Context, step *Step10) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		mailTemplateEvent, err := c.addDefaultMailTemplate(ctx, iamAgg, NewIAMMailTemplateWriteModel(), &step.DefaultMailTemplate)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		mailTemplateEvent, err := c.addDefaultMailTemplate(ctx, iamAgg, NewInstanceMailTemplateWriteModel(), &step.DefaultMailTemplate)
 		if err != nil {
 			return nil, err
 		}

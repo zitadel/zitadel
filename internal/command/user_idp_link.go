@@ -43,7 +43,7 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 	}
 	_, err := c.getOrgIDPConfigByID(ctx, link.IDPConfigID, human.ResourceOwner)
 	if caos_errs.IsNotFound(err) {
-		_, err = c.getIAMIDPConfigByID(ctx, link.IDPConfigID)
+		_, err = c.getInstanceIDPConfigByID(ctx, link.IDPConfigID)
 	}
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")

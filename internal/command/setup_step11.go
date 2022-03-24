@@ -6,7 +6,7 @@ import (
 	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	iam_repo "github.com/caos/zitadel/internal/repository/instance"
 )
 
 type Step11 struct {
@@ -22,8 +22,8 @@ func (s *Step11) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep11(ctx context.Context, step *Step11) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
 		var uniqueContraintMigrations []*domain.UniqueConstraintMigration
 		if step.MigrateV1EventstoreToV2 {
 			uniqueConstraints := NewUniqueConstraintReadModel(ctx, c)

@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -78,14 +78,14 @@ func (p *PrivacyPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.PrivacyPolicyAddedEventType,
+					Event:  instance.PrivacyPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.PrivacyPolicyChangedEventType,
+					Event:  instance.PrivacyPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -100,11 +100,11 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 	case *org.PrivacyPolicyAddedEvent:
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = false
-	case *iam.PrivacyPolicyAddedEvent:
+	case *instance.PrivacyPolicyAddedEvent:
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, instance.PrivacyPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -128,10 +128,10 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
-	case *iam.PrivacyPolicyChangedEvent:
+	case *instance.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, instance.PrivacyPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(PrivacyPolicyChangeDateCol, policyEvent.CreationDate()),

@@ -23,9 +23,9 @@ func (s *Step6) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep6(ctx context.Context, step *Step6) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := c.addDefaultLabelPolicy(ctx, iamAgg, NewIAMLabelPolicyWriteModel(), &step.DefaultLabelPolicy)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		event, err := c.addDefaultLabelPolicy(ctx, iamAgg, NewInstanceLabelPolicyWriteModel(), &step.DefaultLabelPolicy)
 		if err != nil {
 			return nil, err
 		}

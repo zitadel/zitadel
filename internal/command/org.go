@@ -33,9 +33,9 @@ func (c *Commands) checkOrgExists(ctx context.Context, orgID string) error {
 }
 
 func (c *Commands) SetUpOrg(ctx context.Context, organisation *domain.Org, admin *domain.Human, initCodeGenerator crypto.Generator, phoneCodeGenerator crypto.Generator, claimedUserIDs []string, selfregistered bool) (*domain.ObjectDetails, error) {
-	orgIAMPolicy, err := c.getDefaultOrgIAMPolicy(ctx)
+	orgIAMPolicy, err := c.getDefaultDomainPolicy(ctx)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.IAM.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.IAM.DomainPolicy.NotFound")
 	}
 	pwPolicy, err := c.getDefaultPasswordComplexityPolicy(ctx)
 	if err != nil {
@@ -167,7 +167,7 @@ func (c *Commands) setUpOrg(
 	ctx context.Context,
 	organisation *domain.Org,
 	admin *domain.Human,
-	loginPolicy *domain.OrgIAMPolicy,
+	loginPolicy *domain.DomainPolicy,
 	pwPolicy *domain.PasswordComplexityPolicy,
 	initCodeGenerator crypto.Generator,
 	phoneCodeGenerator crypto.Generator,

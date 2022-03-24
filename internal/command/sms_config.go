@@ -7,7 +7,7 @@ import (
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/notification/channels/twilio"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 )
 
 func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *twilio.TwilioConfig) (string, *domain.ObjectDetails, error) {
@@ -28,8 +28,8 @@ func (c *Commands) AddSMSConfigTwilio(ctx context.Context, config *twilio.Twilio
 		}
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTwilioAddedEvent(
+	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioAddedEvent(
 		ctx,
 		iamAgg,
 		id,
@@ -57,7 +57,7 @@ func (c *Commands) ChangeSMSConfigTwilio(ctx context.Context, id string, config 
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-2m9fw", "Errors.SMSConfig.NotFound")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 
 	changedEvent, hasChanged, err := smsConfigWriteModel.NewChangedEvent(
 		ctx,
@@ -90,12 +90,12 @@ func (c *Commands) ChangeSMSConfigTwilioToken(ctx context.Context, id, token str
 	if !smsConfigWriteModel.State.Exists() || smsConfigWriteModel.Twilio == nil {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-fj9wf", "Errors.SMSConfig.NotFound")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
 	newtoken, err := crypto.Encrypt([]byte(token), c.smsCrypto)
 	if err != nil {
 		return nil, err
 	}
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTokenChangedEvent(
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTokenChangedEvent(
 		ctx,
 		iamAgg,
 		id,
@@ -125,8 +125,8 @@ func (c *Commands) ActivateSMSConfigTwilio(ctx context.Context, id string) (*dom
 	if smsConfigWriteModel.State == domain.SMSConfigStateActive {
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.AlreadyActive")
 	}
-	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigTwilioActivatedEvent(
+	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigTwilioActivatedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -155,8 +155,8 @@ func (c *Commands) DeactivateSMSConfigTwilio(ctx context.Context, id string) (*d
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-dm9e3", "Errors.SMSConfig.AlreadyDeactivated")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigDeactivatedEvent(
+	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigDeactivatedEvent(
 		ctx,
 		iamAgg,
 		id))
@@ -182,8 +182,8 @@ func (c *Commands) RemoveSMSConfigTwilio(ctx context.Context, id string) (*domai
 		return nil, caos_errs.ThrowNotFound(nil, "COMMAND-sn9we", "Errors.SMSConfig.NotFound")
 	}
 
-	iamAgg := IAMAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
-	pushedEvents, err := c.eventstore.Push(ctx, iam.NewSMSConfigRemovedEvent(
+	iamAgg := InstanceAggregateFromWriteModel(&smsConfigWriteModel.WriteModel)
+	pushedEvents, err := c.eventstore.Push(ctx, instance.NewSMSConfigRemovedEvent(
 		ctx,
 		iamAgg,
 		id))

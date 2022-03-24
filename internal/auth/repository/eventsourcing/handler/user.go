@@ -15,6 +15,7 @@ import (
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
 	"github.com/caos/zitadel/internal/org/repository/view"
 	query2 "github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/repository/org"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
@@ -186,9 +187,9 @@ func (u *User) ProcessOrg(event *es_models.Event) (err error) {
 	switch event.Type {
 	case org_es_model.OrgDomainVerified,
 		org_es_model.OrgDomainRemoved,
-		org_es_model.OrgIAMPolicyAdded,
-		org_es_model.OrgIAMPolicyChanged,
-		org_es_model.OrgIAMPolicyRemoved:
+		es_models.EventType(org.OrgDomainPolicyAddedEventType),
+		es_models.EventType(org.OrgDomainPolicyChangedEventType),
+		es_models.EventType(org.OrgDomainPolicyRemovedEventType):
 		return u.fillLoginNamesOnOrgUsers(event)
 	case org_es_model.OrgDomainPrimarySet:
 		return u.fillPreferredLoginNamesOnOrgUsers(event)
@@ -266,8 +267,8 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string) (userLogi
 	if err != nil {
 		return false, "", nil, err
 	}
-	if org.OrgIamPolicy == nil {
-		policy, err := u.queries.DefaultOrgIAMPolicy(ctx)
+	if org.DomainPolicy == nil {
+		policy, err := u.queries.DefaultDomainPolicy(ctx)
 		if err != nil {
 			return false, "", nil, err
 		}

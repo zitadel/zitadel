@@ -7,7 +7,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -1098,9 +1098,9 @@ func (c *Commands) createCustomLoginTextEvent(ctx context.Context, agg *eventsto
 	}
 	if defaultText {
 		if newText != "" {
-			return iam.NewCustomTextSetEvent(ctx, agg, domain.LoginCustomText, textKey, newText, lang)
+			return instance.NewCustomTextSetEvent(ctx, agg, domain.LoginCustomText, textKey, newText, lang)
 		}
-		return iam.NewCustomTextRemovedEvent(ctx, agg, domain.LoginCustomText, textKey, lang)
+		return instance.NewCustomTextRemovedEvent(ctx, agg, domain.LoginCustomText, textKey, lang)
 	}
 	if newText != "" {
 		return org.NewCustomTextSetEvent(ctx, agg, domain.LoginCustomText, textKey, newText, lang)

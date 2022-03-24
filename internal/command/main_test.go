@@ -15,7 +15,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore/repository"
 	"github.com/caos/zitadel/internal/eventstore/repository/mock"
 	action_repo "github.com/caos/zitadel/internal/repository/action"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	iam_repo "github.com/caos/zitadel/internal/repository/instance"
 	key_repo "github.com/caos/zitadel/internal/repository/keypair"
 	"github.com/caos/zitadel/internal/repository/org"
 	proj_repo "github.com/caos/zitadel/internal/repository/project"

@@ -49,7 +49,7 @@ Errors:
     NotFoundOnOrg: User could not be found on chosen organisation
     NotAllowedOrg: User is no member of the required organisation
     UserIDMissing: User ID missing
-    OrgIamPolicyNil: Organisation Policy is empty
+    DomainPolicyNil: Organisation Policy is empty
     EmailAsUsernameNotAllowed: Email is not allowed as username
     Invalid: Userdata is invalid
     DomainNotAllowedAsUsername: Domain is already reserved and cannot be used
@@ -325,7 +325,7 @@ Errors:
       AlreadyExists: Default Password Lockout Policy already existing
       Empty: Default Password Lockout Policy empty
       NotChanged: Default Password Lockout Policy has not been changed
-    OrgIAMPolicy:
+    DomainPolicy:
       NotFound: Org IAM Policy not found
       Empty: Org IAM Policy is empty
       NotExisting: Org IAM Policy not existing

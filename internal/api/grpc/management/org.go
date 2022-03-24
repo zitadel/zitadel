@@ -102,13 +102,13 @@ func (s *Server) ReactivateOrg(ctx context.Context, req *mgmt_pb.ReactivateOrgRe
 	}, err
 }
 
-func (s *Server) GetOrgIAMPolicy(ctx context.Context, req *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
-	policy, err := s.query.OrgIAMPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPolicyRequest) (*mgmt_pb.GetDomainPolicyResponse, error) {
+	policy, err := s.query.DomainPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
 	if err != nil {
 		return nil, err
 	}
-	return &mgmt_pb.GetOrgIAMPolicyResponse{
-		Policy: policy_grpc.OrgIAMPolicyToPb(policy),
+	return &mgmt_pb.GetDomainPolicyResponse{
+		Policy: policy_grpc.DomainPolicyToPb(policy),
 	}, nil
 }
 
@@ -207,7 +207,7 @@ func (s *Server) SetPrimaryOrgDomain(ctx context.Context, req *mgmt_pb.SetPrimar
 }
 
 func (s *Server) ListOrgMemberRoles(ctx context.Context, _ *mgmt_pb.ListOrgMemberRolesRequest) (*mgmt_pb.ListOrgMemberRolesResponse, error) {
-	iam, err := s.query.IAM(ctx)
+	iam, err := s.query.Instance(ctx)
 	if err != nil {
 		return nil, err
 	}

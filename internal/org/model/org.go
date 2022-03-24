@@ -17,7 +17,7 @@ type Org struct {
 	Domains []*OrgDomain
 
 	Members                  []*OrgMember
-	OrgIamPolicy             *iam_model.OrgIAMPolicy
+	DomainPolicy             *iam_model.DomainPolicy
 	LoginPolicy              *iam_model.LoginPolicy
 	LabelPolicy              *iam_model.LabelPolicy
 	MailTemplate             *iam_model.MailTemplate

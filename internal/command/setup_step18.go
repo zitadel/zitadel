@@ -21,9 +21,9 @@ func (s *Step18) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep18(ctx context.Context, step *Step18) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		addedPolicy := NewIAMLockoutPolicyWriteModel()
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		addedPolicy := NewInstanceLockoutPolicyWriteModel()
 		events, err := c.addDefaultLockoutPolicy(ctx, iamAgg, addedPolicy, &step.LockoutPolicy)
 		if err != nil {
 			return nil, err

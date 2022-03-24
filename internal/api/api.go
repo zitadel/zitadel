@@ -32,7 +32,7 @@ type API struct {
 
 type health interface {
 	Health(ctx context.Context) error
-	IAM(ctx context.Context) (*query.IAM, error)
+	Instance(ctx context.Context) (*query.Instance, error)
 }
 
 func New(
@@ -107,7 +107,7 @@ func (a *API) healthHandler() http.Handler {
 			return nil
 		},
 		func(ctx context.Context) error {
-			iam, err := a.health.IAM(ctx)
+			iam, err := a.health.Instance(ctx)
 			if err != nil && !errors.IsNotFound(err) {
 				return errors.ThrowPreconditionFailed(err, "API-dsgT2", "IAM SETUP CHECK FAILED")
 			}

@@ -8,11 +8,11 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
-func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
+func TestDomainPolicyProjection_reduces(t *testing.T) {
 	type args struct {
 		event func(t *testing.T) eventstore.Event
 	}
@@ -26,23 +26,23 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			name: "org.reduceAdded",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyAddedEventType),
+					repository.EventType(org.OrgDomainPolicyAddedEventType),
 					org.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
 }`),
-				), org.OrgIAMPolicyAddedEventMapper),
+				), org.OrgDomainPolicyAddedEventMapper),
 			},
-			reduce: (&OrgIAMPolicyProjection{}).reduceAdded,
+			reduce: (&DomainPolicyProjection{}).reduceAdded,
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgIAMPolicyTable,
+				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -61,25 +61,25 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceChanged",
-			reduce: (&OrgIAMPolicyProjection{}).reduceChanged,
+			reduce: (&DomainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyChangedEventType),
+					repository.EventType(org.OrgDomainPolicyChangedEventType),
 					org.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
 		}`),
-				), org.OrgIAMPolicyChangedEventMapper),
+				), org.OrgDomainPolicyChangedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgIAMPolicyTable,
+				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_iam_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -93,23 +93,23 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 		},
 		{
 			name:   "org.reduceRemoved",
-			reduce: (&OrgIAMPolicyProjection{}).reduceRemoved,
+			reduce: (&DomainPolicyProjection{}).reduceRemoved,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgIAMPolicyRemovedEventType),
+					repository.EventType(org.OrgDomainPolicyRemovedEventType),
 					org.AggregateType,
 					nil,
-				), org.OrgIAMPolicyRemovedEventMapper),
+				), org.OrgDomainPolicyRemovedEventMapper),
 			},
 			want: wantReduce{
 				aggregateType:    eventstore.AggregateType("org"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgIAMPolicyTable,
+				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM projections.org_iam_policies WHERE (id = $1)",
+							expectedStmt: "DELETE FROM projections.domain_policies WHERE (id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -119,26 +119,26 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceAdded",
-			reduce: (&OrgIAMPolicyProjection{}).reduceAdded,
+			name:   "instance.reduceAdded",
+			reduce: (&DomainPolicyProjection{}).reduceAdded,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyAddedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.InstanceDomainPolicyAddedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
 					}`),
-				), iam.OrgIAMPolicyAddedEventMapper),
+				), instance.InstanceDomainPolicyAddedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgIAMPolicyTable,
+				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO projections.org_iam_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+							expectedStmt: "INSERT INTO projections.domain_policies (creation_date, change_date, sequence, id, state, user_login_must_be_domain, is_default, resource_owner, instance_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								anyArg{},
@@ -156,26 +156,26 @@ func TestOrgIAMPolicyProjection_reduces(t *testing.T) {
 			},
 		},
 		{
-			name:   "iam.reduceChanged",
-			reduce: (&OrgIAMPolicyProjection{}).reduceChanged,
+			name:   "instance.reduceChanged",
+			reduce: (&DomainPolicyProjection{}).reduceChanged,
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(iam.OrgIAMPolicyChangedEventType),
-					iam.AggregateType,
+					repository.EventType(instance.InstanceDomainPolicyChangedEventType),
+					instance.AggregateType,
 					[]byte(`{
 						"userLoginMustBeDomain": true
 					}`),
-				), iam.OrgIAMPolicyChangedEventMapper),
+				), instance.InstanceDomainPolicyChangedEventMapper),
 			},
 			want: wantReduce{
-				aggregateType:    eventstore.AggregateType("iam"),
+				aggregateType:    eventstore.AggregateType("instance"),
 				sequence:         15,
 				previousSequence: 10,
-				projection:       OrgIAMPolicyTable,
+				projection:       DomainPolicyTable,
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE projections.org_iam_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
+							expectedStmt: "UPDATE projections.domain_policies SET (change_date, sequence, user_login_must_be_domain) = ($1, $2, $3) WHERE (id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

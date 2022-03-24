@@ -23,9 +23,9 @@ func (s *Step3) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep3(ctx context.Context, step *Step3) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := c.addDefaultPasswordAgePolicy(ctx, iamAgg, NewIAMPasswordAgePolicyWriteModel(), &domain.PasswordAgePolicy{
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		event, err := c.addDefaultPasswordAgePolicy(ctx, iamAgg, NewInstancePasswordAgePolicyWriteModel(), &domain.PasswordAgePolicy{
 			MaxAgeDays:     step.DefaultPasswordAgePolicy.MaxAgeDays,
 			ExpireWarnDays: step.DefaultPasswordAgePolicy.ExpireWarnDays,
 		})

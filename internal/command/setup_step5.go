@@ -11,7 +11,7 @@ import (
 )
 
 type Step5 struct {
-	DefaultOrgIAMPolicy domain.OrgIAMPolicy
+	DefaultOrgIAMPolicy domain.DomainPolicy
 }
 
 func (s *Step5) Step() domain.Step {
@@ -23,9 +23,9 @@ func (s *Step5) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep5(ctx context.Context, step *Step5) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
-		event, err := c.addDefaultOrgIAMPolicy(ctx, iamAgg, NewIAMOrgIAMPolicyWriteModel(), &domain.OrgIAMPolicy{
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
+		event, err := c.addDefaultDomainPolicy(ctx, iamAgg, NewInstanceDomainPolicyWriteModel(), &domain.DomainPolicy{
 			UserLoginMustBeDomain: step.DefaultOrgIAMPolicy.UserLoginMustBeDomain,
 		})
 		if err != nil {

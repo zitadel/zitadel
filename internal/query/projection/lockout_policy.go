@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -76,14 +76,14 @@ func (p *LockoutPolicyProjection) reducers() []handler.AggregateReducer {
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.LockoutPolicyAddedEventType,
+					Event:  instance.LockoutPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.LockoutPolicyChangedEventType,
+					Event:  instance.LockoutPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -98,11 +98,11 @@ func (p *LockoutPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 	case *org.LockoutPolicyAddedEvent:
 		policyEvent = e.LockoutPolicyAddedEvent
 		isDefault = false
-	case *iam.LockoutPolicyAddedEvent:
+	case *instance.LockoutPolicyAddedEvent:
 		policyEvent = e.LockoutPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, iam.LockoutPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-d8mZO", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyAddedEventType, instance.LockoutPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -125,10 +125,10 @@ func (p *LockoutPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	switch e := event.(type) {
 	case *org.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
-	case *iam.LockoutPolicyChangedEvent:
+	case *instance.LockoutPolicyChangedEvent:
 		policyEvent = e.LockoutPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, iam.LockoutPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-pT3mQ", "reduce.wrong.event.type, %v", []eventstore.EventType{org.LockoutPolicyChangedEventType, instance.LockoutPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(LockoutPolicyChangeDateCol, policyEvent.CreationDate()),

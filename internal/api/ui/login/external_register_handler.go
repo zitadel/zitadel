@@ -114,7 +114,7 @@ func (l *Login) handleExternalRegisterCallback(w http.ResponseWriter, r *http.Re
 }
 
 func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, idpConfig *iam_model.IDPConfigView, userAgentID string, tokens *oidc.Tokens) {
-	iam, err := l.query.IAM(r.Context())
+	iam, err := l.query.Instance(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -123,7 +123,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	if authReq.RequestedOrgID != "" {
 		resourceOwner = authReq.RequestedOrgID
 	}
-	orgIamPolicy, err := l.getOrgIamPolicy(r, resourceOwner)
+	orgIamPolicy, err := l.getOrgDomainPolicy(r, resourceOwner)
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -140,7 +140,7 @@ func (l *Login) handleExternalUserRegister(w http.ResponseWriter, r *http.Reques
 	l.registerExternalUser(w, r, authReq, iam, user, externalIDP)
 }
 
-func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.IAM, user *domain.Human, externalIDP *domain.UserIDPLink) {
+func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, iam *query.Instance, user *domain.Human, externalIDP *domain.UserIDPLink) {
 	resourceOwner := iam.GlobalOrgID
 	memberRoles := []string{domain.RoleSelfManagementGlobal}
 
@@ -166,7 +166,7 @@ func (l *Login) registerExternalUser(w http.ResponseWriter, r *http.Request, aut
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.OrgIAMPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
+func (l *Login) renderExternalRegisterOverview(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, orgIAMPolicy *query.DomainPolicy, human *domain.Human, idp *domain.UserIDPLink, err error) {
 	var errID, errMessage string
 	if err != nil {
 		errID, errMessage = l.getErrorMessage(r, err)
@@ -207,7 +207,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	iam, err := l.query.IAM(r.Context())
+	iam, err := l.query.Instance(r.Context())
 	if err != nil {
 		l.renderRegisterOption(w, r, authReq, err)
 		return
@@ -247,7 +247,7 @@ func (l *Login) handleExternalRegisterCheck(w http.ResponseWriter, r *http.Reque
 	l.renderNextStep(w, r, authReq)
 }
 
-func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.OrgIAMPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink) {
+func (l *Login) mapTokenToLoginHumanAndExternalIDP(orgIamPolicy *query.DomainPolicy, tokens *oidc.Tokens, idpConfig *iam_model.IDPConfigView) (*domain.Human, *domain.UserIDPLink) {
 	username := tokens.IDTokenClaims.GetPreferredUsername()
 	switch idpConfig.OIDCUsernameMapping {
 	case iam_model.OIDCMappingFieldEmail:

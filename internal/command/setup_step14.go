@@ -7,7 +7,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	iam_repo "github.com/caos/zitadel/internal/repository/iam"
+	iam_repo "github.com/caos/zitadel/internal/repository/instance"
 	org_repo "github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -24,8 +24,8 @@ func (s *Step14) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep14(ctx context.Context, step *Step14) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
-		iamAgg := IAMAggregateFromWriteModel(&iam.WriteModel)
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
+		iamAgg := InstanceAggregateFromWriteModel(&iam.WriteModel)
 		var events []eventstore.Command
 		if step.ActivateExistingLabelPolicies {
 			existingPolicies := NewExistingLabelPoliciesReadModel(ctx)

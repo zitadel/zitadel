@@ -819,7 +819,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 					),
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgIAMPolicyAddedEvent(context.Background(),
+							org.NewOrgDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org2", "org2").Aggregate,
 								false))),
 					expectPush(

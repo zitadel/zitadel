@@ -6,8 +6,8 @@ import (
 
 func TestOrgIAMPolicyChanges(t *testing.T) {
 	type args struct {
-		existing *OrgIAMPolicy
-		new      *OrgIAMPolicy
+		existing *DomainPolicy
+		new      *DomainPolicy
 	}
 	type res struct {
 		changesLen int
@@ -20,8 +20,8 @@ func TestOrgIAMPolicyChanges(t *testing.T) {
 		{
 			name: "org iam policy all attributes change",
 			args: args{
-				existing: &OrgIAMPolicy{UserLoginMustBeDomain: true},
-				new:      &OrgIAMPolicy{UserLoginMustBeDomain: false},
+				existing: &DomainPolicy{UserLoginMustBeDomain: true},
+				new:      &DomainPolicy{UserLoginMustBeDomain: false},
 			},
 			res: res{
 				changesLen: 1,
@@ -30,8 +30,8 @@ func TestOrgIAMPolicyChanges(t *testing.T) {
 		{
 			name: "no changes",
 			args: args{
-				existing: &OrgIAMPolicy{UserLoginMustBeDomain: true},
-				new:      &OrgIAMPolicy{UserLoginMustBeDomain: true},
+				existing: &DomainPolicy{UserLoginMustBeDomain: true},
+				new:      &DomainPolicy{UserLoginMustBeDomain: true},
 			},
 			res: res{
 				changesLen: 0,

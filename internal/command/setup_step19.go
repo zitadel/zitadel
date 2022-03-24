@@ -23,7 +23,7 @@ func (s *Step19) execute(ctx context.Context, commandSide *Commands) error {
 }
 
 func (c *Commands) SetupStep19(ctx context.Context, step *Step19) error {
-	fn := func(iam *IAMWriteModel) ([]eventstore.Command, error) {
+	fn := func(iam *InstanceWriteModel) ([]eventstore.Command, error) {
 		events := make([]eventstore.Command, 0)
 		orgs := newOrgsWithUsernameNotDomain()
 		if err := c.eventstore.FilterToQueryReducer(ctx, orgs); err != nil {
@@ -90,14 +90,14 @@ func (wm *orgsWithUsernameNotDomain) AppendEvents(events ...eventstore.Event) {
 			wm.orgEvents[e.Aggregate().ID] = append(wm.orgEvents[e.Aggregate().ID], e)
 		case *org.OrgRemovedEvent:
 			delete(wm.orgEvents, e.Aggregate().ID)
-		case *org.OrgIAMPolicyAddedEvent:
+		case *org.OrgDomainPolicyAddedEvent:
 			wm.orgEvents[e.Aggregate().ID] = append(wm.orgEvents[e.Aggregate().ID], e)
-		case *org.OrgIAMPolicyChangedEvent:
+		case *org.OrgDomainPolicyChangedEvent:
 			if e.UserLoginMustBeDomain == nil {
 				continue
 			}
 			wm.orgEvents[e.Aggregate().ID] = append(wm.orgEvents[e.Aggregate().ID], e)
-		case *org.OrgIAMPolicyRemovedEvent:
+		case *org.OrgDomainPolicyRemovedEvent:
 			delete(wm.orgEvents, e.Aggregate().ID)
 		}
 	}
@@ -107,11 +107,11 @@ func (wm *orgsWithUsernameNotDomain) Reduce() error {
 	for _, events := range wm.orgEvents {
 		for _, event := range events {
 			switch e := event.(type) {
-			case *org.OrgIAMPolicyAddedEvent:
+			case *org.OrgDomainPolicyAddedEvent:
 				if !e.UserLoginMustBeDomain {
 					wm.orgs[e.Aggregate().ID] = true
 				}
-			case *org.OrgIAMPolicyChangedEvent:
+			case *org.OrgDomainPolicyChangedEvent:
 				if !*e.UserLoginMustBeDomain {
 					wm.orgs[e.Aggregate().ID] = true
 				}
@@ -129,9 +129,9 @@ func (wm *orgsWithUsernameNotDomain) Query() *eventstore.SearchQueryBuilder {
 		EventTypes(
 			org.OrgAddedEventType,
 			org.OrgRemovedEventType,
-			org.OrgIAMPolicyAddedEventType,
-			org.OrgIAMPolicyChangedEventType,
-			org.OrgIAMPolicyRemovedEventType).
+			org.OrgDomainPolicyAddedEventType,
+			org.OrgDomainPolicyChangedEventType,
+			org.OrgDomainPolicyRemovedEventType).
 		Builder()
 }
 

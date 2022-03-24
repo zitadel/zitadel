@@ -152,7 +152,7 @@ func (s *Server) ListMyProjectOrgs(ctx context.Context, req *auth_pb.ListMyProje
 		return nil, err
 	}
 
-	iam, err := s.query.IAM(ctx)
+	iam, err := s.query.Instance(ctx)
 	if err != nil {
 		return nil, err
 	}

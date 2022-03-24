@@ -13,9 +13,9 @@ func (c *Commands) AddMachine(ctx context.Context, orgID string, machine *domain
 	if !machine.IsValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-bm9Ds", "Errors.User.Invalid")
 	}
-	orgIAMPolicy, err := c.getOrgIAMPolicy(ctx, orgID)
+	orgIAMPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
 	if err != nil {
-		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.OrgIAMPolicy.NotFound")
+		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-3M9fs", "Errors.Org.DomainPolicy.NotFound")
 	}
 	if !orgIAMPolicy.UserLoginMustBeDomain {
 		return nil, caos_errs.ThrowPreconditionFailed(nil, "COMMAND-6M0ds", "Errors.User.Invalid")

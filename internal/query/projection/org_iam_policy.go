@@ -8,80 +8,80 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
 const (
-	OrgIAMPolicyTable = "projections.org_iam_policies"
+	DomainPolicyTable = "projections.domain_policies"
 
-	OrgIAMPolicyIDCol                    = "id"
-	OrgIAMPolicyCreationDateCol          = "creation_date"
-	OrgIAMPolicyChangeDateCol            = "change_date"
-	OrgIAMPolicySequenceCol              = "sequence"
-	OrgIAMPolicyStateCol                 = "state"
-	OrgIAMPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
-	OrgIAMPolicyIsDefaultCol             = "is_default"
-	OrgIAMPolicyResourceOwnerCol         = "resource_owner"
-	OrgIAMPolicyInstanceIDCol            = "instance_id"
+	DomainPolicyIDCol                    = "id"
+	DomainPolicyCreationDateCol          = "creation_date"
+	DomainPolicyChangeDateCol            = "change_date"
+	DomainPolicySequenceCol              = "sequence"
+	DomainPolicyStateCol                 = "state"
+	DomainPolicyUserLoginMustBeDomainCol = "user_login_must_be_domain"
+	DomainPolicyIsDefaultCol             = "is_default"
+	DomainPolicyResourceOwnerCol         = "resource_owner"
+	DomainPolicyInstanceIDCol            = "instance_id"
 )
 
-type OrgIAMPolicyProjection struct {
+type DomainPolicyProjection struct {
 	crdb.StatementHandler
 }
 
-func NewOrgIAMPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *OrgIAMPolicyProjection {
-	p := new(OrgIAMPolicyProjection)
-	config.ProjectionName = OrgIAMPolicyTable
+func NewDomainPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *DomainPolicyProjection {
+	p := new(DomainPolicyProjection)
+	config.ProjectionName = DomainPolicyTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
 		crdb.NewTable([]*crdb.Column{
-			crdb.NewColumn(OrgIAMPolicyIDCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OrgIAMPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(OrgIAMPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
-			crdb.NewColumn(OrgIAMPolicySequenceCol, crdb.ColumnTypeInt64),
-			crdb.NewColumn(OrgIAMPolicyStateCol, crdb.ColumnTypeEnum),
-			crdb.NewColumn(OrgIAMPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
-			crdb.NewColumn(OrgIAMPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
-			crdb.NewColumn(OrgIAMPolicyResourceOwnerCol, crdb.ColumnTypeText),
-			crdb.NewColumn(OrgIAMPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DomainPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(DomainPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(DomainPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(DomainPolicyUserLoginMustBeDomainCol, crdb.ColumnTypeBool),
+			crdb.NewColumn(DomainPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(DomainPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(DomainPolicyInstanceIDCol, crdb.ColumnTypeText),
 		},
-			crdb.NewPrimaryKey(OrgIAMPolicyInstanceIDCol, OrgIAMPolicyIDCol),
+			crdb.NewPrimaryKey(DomainPolicyInstanceIDCol, DomainPolicyIDCol),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
 
-func (p *OrgIAMPolicyProjection) reducers() []handler.AggregateReducer {
+func (p *DomainPolicyProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: org.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  org.OrgIAMPolicyAddedEventType,
+					Event:  org.OrgDomainPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  org.OrgIAMPolicyChangedEventType,
+					Event:  org.OrgDomainPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 				{
-					Event:  org.OrgIAMPolicyRemovedEventType,
+					Event:  org.OrgDomainPolicyRemovedEventType,
 					Reduce: p.reduceRemoved,
 				},
 			},
 		},
 		{
-			Aggregate: iam.AggregateType,
+			Aggregate: instance.AggregateType,
 			EventRedusers: []handler.EventReducer{
 				{
-					Event:  iam.OrgIAMPolicyAddedEventType,
+					Event:  instance.InstanceDomainPolicyAddedEventType,
 					Reduce: p.reduceAdded,
 				},
 				{
-					Event:  iam.OrgIAMPolicyChangedEventType,
+					Event:  instance.InstanceDomainPolicyChangedEventType,
 					Reduce: p.reduceChanged,
 				},
 			},
@@ -89,67 +89,67 @@ func (p *OrgIAMPolicyProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *OrgIAMPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
-	var policyEvent policy.OrgIAMPolicyAddedEvent
+func (p *DomainPolicyProjection) reduceAdded(event eventstore.Event) (*handler.Statement, error) {
+	var policyEvent policy.DomainPolicyAddedEvent
 	var isDefault bool
 	switch e := event.(type) {
-	case *org.OrgIAMPolicyAddedEvent:
-		policyEvent = e.OrgIAMPolicyAddedEvent
+	case *org.OrgDomainPolicyAddedEvent:
+		policyEvent = e.DomainPolicyAddedEvent
 		isDefault = false
-	case *iam.OrgIAMPolicyAddedEvent:
-		policyEvent = e.OrgIAMPolicyAddedEvent
+	case *instance.InstanceDomainPolicyAddedEvent:
+		policyEvent = e.DomainPolicyAddedEvent
 		isDefault = true
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyAddedEventType, iam.OrgIAMPolicyAddedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-CSE7A", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgDomainPolicyAddedEventType, instance.InstanceDomainPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
 		[]handler.Column{
-			handler.NewCol(OrgIAMPolicyCreationDateCol, policyEvent.CreationDate()),
-			handler.NewCol(OrgIAMPolicyChangeDateCol, policyEvent.CreationDate()),
-			handler.NewCol(OrgIAMPolicySequenceCol, policyEvent.Sequence()),
-			handler.NewCol(OrgIAMPolicyIDCol, policyEvent.Aggregate().ID),
-			handler.NewCol(OrgIAMPolicyStateCol, domain.PolicyStateActive),
-			handler.NewCol(OrgIAMPolicyUserLoginMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
-			handler.NewCol(OrgIAMPolicyIsDefaultCol, isDefault),
-			handler.NewCol(OrgIAMPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
-			handler.NewCol(OrgIAMPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
+			handler.NewCol(DomainPolicyCreationDateCol, policyEvent.CreationDate()),
+			handler.NewCol(DomainPolicyChangeDateCol, policyEvent.CreationDate()),
+			handler.NewCol(DomainPolicySequenceCol, policyEvent.Sequence()),
+			handler.NewCol(DomainPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCol(DomainPolicyStateCol, domain.PolicyStateActive),
+			handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, policyEvent.UserLoginMustBeDomain),
+			handler.NewCol(DomainPolicyIsDefaultCol, isDefault),
+			handler.NewCol(DomainPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(DomainPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
-func (p *OrgIAMPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
-	var policyEvent policy.OrgIAMPolicyChangedEvent
+func (p *DomainPolicyProjection) reduceChanged(event eventstore.Event) (*handler.Statement, error) {
+	var policyEvent policy.DomainPolicyChangedEvent
 	switch e := event.(type) {
-	case *org.OrgIAMPolicyChangedEvent:
-		policyEvent = e.OrgIAMPolicyChangedEvent
-	case *iam.OrgIAMPolicyChangedEvent:
-		policyEvent = e.OrgIAMPolicyChangedEvent
+	case *org.OrgDomainPolicyChangedEvent:
+		policyEvent = e.DomainPolicyChangedEvent
+	case *instance.InstanceDomainPolicyChangedEvent:
+		policyEvent = e.DomainPolicyChangedEvent
 	default:
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgIAMPolicyChangedEventType, iam.OrgIAMPolicyChangedEventType})
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-qgVug", "reduce.wrong.event.type %v", []eventstore.EventType{org.OrgDomainPolicyChangedEventType, instance.InstanceDomainPolicyChangedEventType})
 	}
 	cols := []handler.Column{
-		handler.NewCol(OrgIAMPolicyChangeDateCol, policyEvent.CreationDate()),
-		handler.NewCol(OrgIAMPolicySequenceCol, policyEvent.Sequence()),
+		handler.NewCol(DomainPolicyChangeDateCol, policyEvent.CreationDate()),
+		handler.NewCol(DomainPolicySequenceCol, policyEvent.Sequence()),
 	}
 	if policyEvent.UserLoginMustBeDomain != nil {
-		cols = append(cols, handler.NewCol(OrgIAMPolicyUserLoginMustBeDomainCol, *policyEvent.UserLoginMustBeDomain))
+		cols = append(cols, handler.NewCol(DomainPolicyUserLoginMustBeDomainCol, *policyEvent.UserLoginMustBeDomain))
 	}
 	return crdb.NewUpdateStatement(
 		&policyEvent,
 		cols,
 		[]handler.Condition{
-			handler.NewCond(OrgIAMPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(DomainPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }
 
-func (p *OrgIAMPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
-	policyEvent, ok := event.(*org.OrgIAMPolicyRemovedEvent)
+func (p *DomainPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
+	policyEvent, ok := event.(*org.OrgDomainPolicyRemovedEvent)
 	if !ok {
-		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JAENd", "reduce.wrong.event.type %s", org.OrgIAMPolicyRemovedEventType)
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-JAENd", "reduce.wrong.event.type %s", org.OrgDomainPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,
 		[]handler.Condition{
-			handler.NewCond(OrgIAMPolicyIDCol, policyEvent.Aggregate().ID),
+			handler.NewCond(DomainPolicyIDCol, policyEvent.Aggregate().ID),
 		}), nil
 }

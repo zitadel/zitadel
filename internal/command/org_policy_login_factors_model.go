@@ -3,7 +3,7 @@ package command
 import (
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
-	"github.com/caos/zitadel/internal/repository/iam"
+	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
 )
 
@@ -132,10 +132,10 @@ type factorState struct {
 func (wm *OrgAuthFactorsAllowedWriteModel) Reduce() error {
 	for _, event := range wm.Events {
 		switch e := event.(type) {
-		case *iam.LoginPolicySecondFactorAddedEvent:
+		case *instance.LoginPolicySecondFactorAddedEvent:
 			wm.ensureSecondFactor(e.MFAType)
 			wm.SecondFactors[e.MFAType].IAM = domain.FactorStateActive
-		case *iam.LoginPolicySecondFactorRemovedEvent:
+		case *instance.LoginPolicySecondFactorRemovedEvent:
 			wm.ensureSecondFactor(e.MFAType)
 			wm.SecondFactors[e.MFAType].IAM = domain.FactorStateRemoved
 		case *org.LoginPolicySecondFactorAddedEvent:
@@ -144,10 +144,10 @@ func (wm *OrgAuthFactorsAllowedWriteModel) Reduce() error {
 		case *org.LoginPolicySecondFactorRemovedEvent:
 			wm.ensureSecondFactor(e.MFAType)
 			wm.SecondFactors[e.MFAType].Org = domain.FactorStateRemoved
-		case *iam.LoginPolicyMultiFactorAddedEvent:
+		case *instance.LoginPolicyMultiFactorAddedEvent:
 			wm.ensureMultiFactor(e.MFAType)
 			wm.MultiFactors[e.MFAType].IAM = domain.FactorStateActive
-		case *iam.LoginPolicyMultiFactorRemovedEvent:
+		case *instance.LoginPolicyMultiFactorRemovedEvent:
 			wm.ensureMultiFactor(e.MFAType)
 			wm.MultiFactors[e.MFAType].IAM = domain.FactorStateRemoved
 		case *org.LoginPolicyMultiFactorAddedEvent:
@@ -185,13 +185,13 @@ func (wm *OrgAuthFactorsAllowedWriteModel) ensureMultiFactor(multiFactor domain.
 func (wm *OrgAuthFactorsAllowedWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		AddQuery().
-		AggregateTypes(iam.AggregateType).
+		AggregateTypes(instance.AggregateType).
 		AggregateIDs(domain.IAMID).
 		EventTypes(
-			iam.LoginPolicySecondFactorAddedEventType,
-			iam.LoginPolicySecondFactorRemovedEventType,
-			iam.LoginPolicyMultiFactorAddedEventType,
-			iam.LoginPolicyMultiFactorRemovedEventType,
+			instance.LoginPolicySecondFactorAddedEventType,
+			instance.LoginPolicySecondFactorRemovedEventType,
+			instance.LoginPolicyMultiFactorAddedEventType,
+			instance.LoginPolicyMultiFactorRemovedEventType,
 		).
 		Or().
 		AggregateTypes(org.AggregateType).
