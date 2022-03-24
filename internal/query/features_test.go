@@ -29,33 +29,33 @@ func Test_FeaturesPrepares(t *testing.T) {
 			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
-						` zitadel.projections.features.change_date,`+
-						` zitadel.projections.features.sequence,`+
-						` zitadel.projections.features.is_default,`+
-						` zitadel.projections.features.tier_name,`+
-						` zitadel.projections.features.tier_description,`+
-						` zitadel.projections.features.state,`+
-						` zitadel.projections.features.state_description,`+
-						` zitadel.projections.features.audit_log_retention,`+
-						` zitadel.projections.features.login_policy_factors,`+
-						` zitadel.projections.features.login_policy_idp,`+
-						` zitadel.projections.features.login_policy_passwordless,`+
-						` zitadel.projections.features.login_policy_registration,`+
-						` zitadel.projections.features.login_policy_username_login,`+
-						` zitadel.projections.features.login_policy_password_reset,`+
-						` zitadel.projections.features.password_complexity_policy,`+
-						` zitadel.projections.features.label_policy_private_label,`+
-						` zitadel.projections.features.label_policy_watermark,`+
-						` zitadel.projections.features.custom_domain,`+
-						` zitadel.projections.features.privacy_policy,`+
-						` zitadel.projections.features.metadata_user,`+
-						` zitadel.projections.features.custom_text_message,`+
-						` zitadel.projections.features.custom_text_login,`+
-						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions_allowed,`+
-						` zitadel.projections.features.max_actions`+
-						` FROM zitadel.projections.features`),
+					regexp.QuoteMeta(`SELECT projections.features.aggregate_id,`+
+						` projections.features.change_date,`+
+						` projections.features.sequence,`+
+						` projections.features.is_default,`+
+						` projections.features.tier_name,`+
+						` projections.features.tier_description,`+
+						` projections.features.state,`+
+						` projections.features.state_description,`+
+						` projections.features.audit_log_retention,`+
+						` projections.features.login_policy_factors,`+
+						` projections.features.login_policy_idp,`+
+						` projections.features.login_policy_passwordless,`+
+						` projections.features.login_policy_registration,`+
+						` projections.features.login_policy_username_login,`+
+						` projections.features.login_policy_password_reset,`+
+						` projections.features.password_complexity_policy,`+
+						` projections.features.label_policy_private_label,`+
+						` projections.features.label_policy_watermark,`+
+						` projections.features.custom_domain,`+
+						` projections.features.privacy_policy,`+
+						` projections.features.metadata_user,`+
+						` projections.features.custom_text_message,`+
+						` projections.features.custom_text_login,`+
+						` projections.features.lockout_policy,`+
+						` projections.features.actions_allowed,`+
+						` projections.features.max_actions`+
+						` FROM projections.features`),
 					nil,
 					nil,
 				),
@@ -73,33 +73,33 @@ func Test_FeaturesPrepares(t *testing.T) {
 			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
-						` zitadel.projections.features.change_date,`+
-						` zitadel.projections.features.sequence,`+
-						` zitadel.projections.features.is_default,`+
-						` zitadel.projections.features.tier_name,`+
-						` zitadel.projections.features.tier_description,`+
-						` zitadel.projections.features.state,`+
-						` zitadel.projections.features.state_description,`+
-						` zitadel.projections.features.audit_log_retention,`+
-						` zitadel.projections.features.login_policy_factors,`+
-						` zitadel.projections.features.login_policy_idp,`+
-						` zitadel.projections.features.login_policy_passwordless,`+
-						` zitadel.projections.features.login_policy_registration,`+
-						` zitadel.projections.features.login_policy_username_login,`+
-						` zitadel.projections.features.login_policy_password_reset,`+
-						` zitadel.projections.features.password_complexity_policy,`+
-						` zitadel.projections.features.label_policy_private_label,`+
-						` zitadel.projections.features.label_policy_watermark,`+
-						` zitadel.projections.features.custom_domain,`+
-						` zitadel.projections.features.privacy_policy,`+
-						` zitadel.projections.features.metadata_user,`+
-						` zitadel.projections.features.custom_text_message,`+
-						` zitadel.projections.features.custom_text_login,`+
-						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions_allowed,`+
-						` zitadel.projections.features.max_actions`+
-						` FROM zitadel.projections.features`),
+					regexp.QuoteMeta(`SELECT projections.features.aggregate_id,`+
+						` projections.features.change_date,`+
+						` projections.features.sequence,`+
+						` projections.features.is_default,`+
+						` projections.features.tier_name,`+
+						` projections.features.tier_description,`+
+						` projections.features.state,`+
+						` projections.features.state_description,`+
+						` projections.features.audit_log_retention,`+
+						` projections.features.login_policy_factors,`+
+						` projections.features.login_policy_idp,`+
+						` projections.features.login_policy_passwordless,`+
+						` projections.features.login_policy_registration,`+
+						` projections.features.login_policy_username_login,`+
+						` projections.features.login_policy_password_reset,`+
+						` projections.features.password_complexity_policy,`+
+						` projections.features.label_policy_private_label,`+
+						` projections.features.label_policy_watermark,`+
+						` projections.features.custom_domain,`+
+						` projections.features.privacy_policy,`+
+						` projections.features.metadata_user,`+
+						` projections.features.custom_text_message,`+
+						` projections.features.custom_text_login,`+
+						` projections.features.lockout_policy,`+
+						` projections.features.actions_allowed,`+
+						` projections.features.max_actions`+
+						` FROM projections.features`),
 					[]string{
 						"aggregate_id",
 						"change_date",
@@ -192,33 +192,33 @@ func Test_FeaturesPrepares(t *testing.T) {
 			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
-						` zitadel.projections.features.change_date,`+
-						` zitadel.projections.features.sequence,`+
-						` zitadel.projections.features.is_default,`+
-						` zitadel.projections.features.tier_name,`+
-						` zitadel.projections.features.tier_description,`+
-						` zitadel.projections.features.state,`+
-						` zitadel.projections.features.state_description,`+
-						` zitadel.projections.features.audit_log_retention,`+
-						` zitadel.projections.features.login_policy_factors,`+
-						` zitadel.projections.features.login_policy_idp,`+
-						` zitadel.projections.features.login_policy_passwordless,`+
-						` zitadel.projections.features.login_policy_registration,`+
-						` zitadel.projections.features.login_policy_username_login,`+
-						` zitadel.projections.features.login_policy_password_reset,`+
-						` zitadel.projections.features.password_complexity_policy,`+
-						` zitadel.projections.features.label_policy_private_label,`+
-						` zitadel.projections.features.label_policy_watermark,`+
-						` zitadel.projections.features.custom_domain,`+
-						` zitadel.projections.features.privacy_policy,`+
-						` zitadel.projections.features.metadata_user,`+
-						` zitadel.projections.features.custom_text_message,`+
-						` zitadel.projections.features.custom_text_login,`+
-						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions_allowed,`+
-						` zitadel.projections.features.max_actions`+
-						` FROM zitadel.projections.features`),
+					regexp.QuoteMeta(`SELECT projections.features.aggregate_id,`+
+						` projections.features.change_date,`+
+						` projections.features.sequence,`+
+						` projections.features.is_default,`+
+						` projections.features.tier_name,`+
+						` projections.features.tier_description,`+
+						` projections.features.state,`+
+						` projections.features.state_description,`+
+						` projections.features.audit_log_retention,`+
+						` projections.features.login_policy_factors,`+
+						` projections.features.login_policy_idp,`+
+						` projections.features.login_policy_passwordless,`+
+						` projections.features.login_policy_registration,`+
+						` projections.features.login_policy_username_login,`+
+						` projections.features.login_policy_password_reset,`+
+						` projections.features.password_complexity_policy,`+
+						` projections.features.label_policy_private_label,`+
+						` projections.features.label_policy_watermark,`+
+						` projections.features.custom_domain,`+
+						` projections.features.privacy_policy,`+
+						` projections.features.metadata_user,`+
+						` projections.features.custom_text_message,`+
+						` projections.features.custom_text_login,`+
+						` projections.features.lockout_policy,`+
+						` projections.features.actions_allowed,`+
+						` projections.features.max_actions`+
+						` FROM projections.features`),
 					[]string{
 						"aggregate_id",
 						"change_date",
@@ -311,33 +311,33 @@ func Test_FeaturesPrepares(t *testing.T) {
 			prepare: prepareFeaturesQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.features.aggregate_id,`+
-						` zitadel.projections.features.change_date,`+
-						` zitadel.projections.features.sequence,`+
-						` zitadel.projections.features.is_default,`+
-						` zitadel.projections.features.tier_name,`+
-						` zitadel.projections.features.tier_description,`+
-						` zitadel.projections.features.state,`+
-						` zitadel.projections.features.state_description,`+
-						` zitadel.projections.features.audit_log_retention,`+
-						` zitadel.projections.features.login_policy_factors,`+
-						` zitadel.projections.features.login_policy_idp,`+
-						` zitadel.projections.features.login_policy_passwordless,`+
-						` zitadel.projections.features.login_policy_registration,`+
-						` zitadel.projections.features.login_policy_username_login,`+
-						` zitadel.projections.features.login_policy_password_reset,`+
-						` zitadel.projections.features.password_complexity_policy,`+
-						` zitadel.projections.features.label_policy_private_label,`+
-						` zitadel.projections.features.label_policy_watermark,`+
-						` zitadel.projections.features.custom_domain,`+
-						` zitadel.projections.features.privacy_policy,`+
-						` zitadel.projections.features.metadata_user,`+
-						` zitadel.projections.features.custom_text_message,`+
-						` zitadel.projections.features.custom_text_login,`+
-						` zitadel.projections.features.lockout_policy,`+
-						` zitadel.projections.features.actions_allowed,`+
-						` zitadel.projections.features.max_actions`+
-						` FROM zitadel.projections.features`),
+					regexp.QuoteMeta(`SELECT projections.features.aggregate_id,`+
+						` projections.features.change_date,`+
+						` projections.features.sequence,`+
+						` projections.features.is_default,`+
+						` projections.features.tier_name,`+
+						` projections.features.tier_description,`+
+						` projections.features.state,`+
+						` projections.features.state_description,`+
+						` projections.features.audit_log_retention,`+
+						` projections.features.login_policy_factors,`+
+						` projections.features.login_policy_idp,`+
+						` projections.features.login_policy_passwordless,`+
+						` projections.features.login_policy_registration,`+
+						` projections.features.login_policy_username_login,`+
+						` projections.features.login_policy_password_reset,`+
+						` projections.features.password_complexity_policy,`+
+						` projections.features.label_policy_private_label,`+
+						` projections.features.label_policy_watermark,`+
+						` projections.features.custom_domain,`+
+						` projections.features.privacy_policy,`+
+						` projections.features.metadata_user,`+
+						` projections.features.custom_text_message,`+
+						` projections.features.custom_text_login,`+
+						` projections.features.lockout_policy,`+
+						` projections.features.actions_allowed,`+
+						` projections.features.max_actions`+
+						` FROM projections.features`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

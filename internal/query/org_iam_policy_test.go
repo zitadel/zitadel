@@ -28,15 +28,15 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 			prepare: prepareOrgIAMPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_iam_policies.id,`+
-						` zitadel.projections.org_iam_policies.sequence,`+
-						` zitadel.projections.org_iam_policies.creation_date,`+
-						` zitadel.projections.org_iam_policies.change_date,`+
-						` zitadel.projections.org_iam_policies.resource_owner,`+
-						` zitadel.projections.org_iam_policies.user_login_must_be_domain,`+
-						` zitadel.projections.org_iam_policies.is_default,`+
-						` zitadel.projections.org_iam_policies.state`+
-						` FROM zitadel.projections.org_iam_policies`),
+					regexp.QuoteMeta(`SELECT projections.org_iam_policies.id,`+
+						` projections.org_iam_policies.sequence,`+
+						` projections.org_iam_policies.creation_date,`+
+						` projections.org_iam_policies.change_date,`+
+						` projections.org_iam_policies.resource_owner,`+
+						` projections.org_iam_policies.user_login_must_be_domain,`+
+						` projections.org_iam_policies.is_default,`+
+						` projections.org_iam_policies.state`+
+						` FROM projections.org_iam_policies`),
 					nil,
 					nil,
 				),
@@ -54,15 +54,15 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 			prepare: prepareOrgIAMPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_iam_policies.id,`+
-						` zitadel.projections.org_iam_policies.sequence,`+
-						` zitadel.projections.org_iam_policies.creation_date,`+
-						` zitadel.projections.org_iam_policies.change_date,`+
-						` zitadel.projections.org_iam_policies.resource_owner,`+
-						` zitadel.projections.org_iam_policies.user_login_must_be_domain,`+
-						` zitadel.projections.org_iam_policies.is_default,`+
-						` zitadel.projections.org_iam_policies.state`+
-						` FROM zitadel.projections.org_iam_policies`),
+					regexp.QuoteMeta(`SELECT projections.org_iam_policies.id,`+
+						` projections.org_iam_policies.sequence,`+
+						` projections.org_iam_policies.creation_date,`+
+						` projections.org_iam_policies.change_date,`+
+						` projections.org_iam_policies.resource_owner,`+
+						` projections.org_iam_policies.user_login_must_be_domain,`+
+						` projections.org_iam_policies.is_default,`+
+						` projections.org_iam_policies.state`+
+						` FROM projections.org_iam_policies`),
 					[]string{
 						"id",
 						"sequence",
@@ -101,15 +101,15 @@ func Test_OrgIAMPolicyPrepares(t *testing.T) {
 			prepare: prepareOrgIAMPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_iam_policies.id,`+
-						` zitadel.projections.org_iam_policies.sequence,`+
-						` zitadel.projections.org_iam_policies.creation_date,`+
-						` zitadel.projections.org_iam_policies.change_date,`+
-						` zitadel.projections.org_iam_policies.resource_owner,`+
-						` zitadel.projections.org_iam_policies.user_login_must_be_domain,`+
-						` zitadel.projections.org_iam_policies.is_default,`+
-						` zitadel.projections.org_iam_policies.state`+
-						` FROM zitadel.projections.org_iam_policies`),
+					regexp.QuoteMeta(`SELECT projections.org_iam_policies.id,`+
+						` projections.org_iam_policies.sequence,`+
+						` projections.org_iam_policies.creation_date,`+
+						` projections.org_iam_policies.change_date,`+
+						` projections.org_iam_policies.resource_owner,`+
+						` projections.org_iam_policies.user_login_must_be_domain,`+
+						` projections.org_iam_policies.is_default,`+
+						` projections.org_iam_policies.state`+
+						` FROM projections.org_iam_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

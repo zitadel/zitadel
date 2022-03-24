@@ -105,11 +105,11 @@ func (q *Queries) ClearCurrentSequence(ctx context.Context, projectionName strin
 
 func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error {
 	projectionQuery, args, err := sq.Select("count(*)").
-		From("[show tables from zitadel.projections]").
+		From("[show tables from projections]").
 		Where(
 			sq.And{
 				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
-				sq.Eq{"concat('zitadel.projections.', table_name)": projectionName},
+				sq.Eq{"concat('projections.', table_name)": projectionName},
 			}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
@@ -139,13 +139,13 @@ func (q *Queries) checkAndLock(ctx context.Context, projectionName string) error
 }
 
 func tablesForReset(ctx context.Context, tx *sql.Tx, projectionName string) ([]string, error) {
-	tablesQuery, args, err := sq.Select("concat('zitadel.projections.', table_name)").
-		From("[show tables from zitadel.projections]").
+	tablesQuery, args, err := sq.Select("concat('projections.', table_name)").
+		From("[show tables from projections]").
 		Where(
 			sq.And{
 				sq.Eq{"type": "table"},
 				sq.NotEq{"table_name": []string{"locks", "current_sequences", "failed_events"}},
-				sq.Like{"concat('zitadel.projections.', table_name)": projectionName + "%"},
+				sq.Like{"concat('projections.', table_name)": projectionName + "%"},
 			}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()

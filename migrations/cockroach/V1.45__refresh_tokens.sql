@@ -1,2 +1,0 @@
-ALTER TABLE auth.refresh_tokens ALTER COLUMN id SET NOT NULL;
-ALTER TABLE auth.refresh_tokens ALTER PRIMARY KEY USING COLUMNS(id);

@@ -42,9 +42,10 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.mail_templates (aggregate_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.mail_templates (aggregate_id, instance_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -77,7 +78,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),
@@ -107,7 +108,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "DELETE FROM zitadel.projections.mail_templates WHERE (aggregate_id = $1)",
+							expectedStmt: "DELETE FROM projections.mail_templates WHERE (aggregate_id = $1)",
 							expectedArgs: []interface{}{
 								"agg-id",
 							},
@@ -136,9 +137,10 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "INSERT INTO zitadel.projections.mail_templates (aggregate_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+							expectedStmt: "INSERT INTO projections.mail_templates (aggregate_id, instance_id, creation_date, change_date, sequence, state, is_default, template) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 							expectedArgs: []interface{}{
 								"agg-id",
+								"instance-id",
 								anyArg{},
 								anyArg{},
 								uint64(15),
@@ -171,7 +173,7 @@ func TestMailTemplateProjection_reduces(t *testing.T) {
 				executer: &testExecuter{
 					executions: []execution{
 						{
-							expectedStmt: "UPDATE zitadel.projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
+							expectedStmt: "UPDATE projections.mail_templates SET (change_date, sequence, template) = ($1, $2, $3) WHERE (aggregate_id = $4)",
 							expectedArgs: []interface{}{
 								anyArg{},
 								uint64(15),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 
@@ -40,6 +41,10 @@ var (
 		name:  projection.MemberResourceOwner,
 		table: orgMemberTable,
 	}
+	OrgMemberInstanceID = Column{
+		name:  projection.MemberInstanceID,
+		table: orgMemberTable,
+	}
 	OrgMemberOrgID = Column{
 		name:  projection.OrgMemberOrgIDCol,
 		table: orgMemberTable,
@@ -59,7 +64,10 @@ func (q *OrgMembersQuery) toQuery(query sq.SelectBuilder) sq.SelectBuilder {
 
 func (q *Queries) OrgMembers(ctx context.Context, queries *OrgMembersQuery) (*Members, error) {
 	query, scan := prepareOrgMembersQuery()
-	stmt, args, err := queries.toQuery(query).ToSql()
+	stmt, args, err := queries.toQuery(query).
+		Where(sq.Eq{
+			OrgMemberInstanceID.identifier(): authz.GetInstance(ctx).ID,
+		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-PDAVB", "Errors.Query.InvalidRequest")
 	}

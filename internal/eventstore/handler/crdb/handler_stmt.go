@@ -26,7 +26,8 @@ type StatementHandlerConfig struct {
 	MaxFailureCount   uint
 	BulkLimit         uint64
 
-	Reducers []handler.AggregateReducer
+	Reducers  []handler.AggregateReducer
+	InitCheck *handler.Check
 }
 
 type StatementHandler struct {
@@ -74,6 +75,9 @@ func NewStatementHandler(
 		bulkLimit:               config.BulkLimit,
 		Locker:                  NewLocker(config.Client, config.LockTable, config.ProjectionHandlerConfig.ProjectionName),
 	}
+
+	err := h.Init(ctx, config.InitCheck)
+	logging.OnError(err).Fatal("unable to initialize projections")
 
 	go h.ProjectionHandler.Process(
 		ctx,
@@ -214,7 +218,7 @@ func (h *StatementHandler) executeStmts(
 			continue
 		}
 		if stmt.PreviousSequence > 0 && stmt.PreviousSequence != sequences[stmt.AggregateType] {
-			logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "seq", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
+			logging.WithFields("projection", h.ProjectionName, "aggregateType", stmt.AggregateType, "sequence", stmt.Sequence, "prevSeq", stmt.PreviousSequence, "currentSeq", sequences[stmt.AggregateType]).Warn("sequences do not match")
 			break
 		}
 		err := h.executeStmt(tx, stmt)

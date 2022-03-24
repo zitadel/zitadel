@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/domain"
@@ -14,20 +13,104 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
+const (
+	AppProjectionTable = "projections.apps"
+	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
+	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
+
+	AppColumnID            = "id"
+	AppColumnName          = "name"
+	AppColumnProjectID     = "project_id"
+	AppColumnCreationDate  = "creation_date"
+	AppColumnChangeDate    = "change_date"
+	AppColumnResourceOwner = "resource_owner"
+	AppColumnInstanceID    = "instance_id"
+	AppColumnState         = "state"
+	AppColumnSequence      = "sequence"
+
+	appAPITableSuffix              = "api_configs"
+	AppAPIConfigColumnAppID        = "app_id"
+	AppAPIConfigColumnClientID     = "client_id"
+	AppAPIConfigColumnClientSecret = "client_secret"
+	AppAPIConfigColumnAuthMethod   = "auth_method"
+
+	appOIDCTableSuffix                          = "oidc_configs"
+	AppOIDCConfigColumnAppID                    = "app_id"
+	AppOIDCConfigColumnVersion                  = "version"
+	AppOIDCConfigColumnClientID                 = "client_id"
+	AppOIDCConfigColumnClientSecret             = "client_secret"
+	AppOIDCConfigColumnRedirectUris             = "redirect_uris"
+	AppOIDCConfigColumnResponseTypes            = "response_types"
+	AppOIDCConfigColumnGrantTypes               = "grant_types"
+	AppOIDCConfigColumnApplicationType          = "application_type"
+	AppOIDCConfigColumnAuthMethodType           = "auth_method_type"
+	AppOIDCConfigColumnPostLogoutRedirectUris   = "post_logout_redirect_uris"
+	AppOIDCConfigColumnDevMode                  = "is_dev_mode"
+	AppOIDCConfigColumnAccessTokenType          = "access_token_type"
+	AppOIDCConfigColumnAccessTokenRoleAssertion = "access_token_role_assertion"
+	AppOIDCConfigColumnIDTokenRoleAssertion     = "id_token_role_assertion"
+	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
+	AppOIDCConfigColumnClockSkew                = "clock_skew"
+	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
+)
+
 type AppProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	AppProjectionTable = "zitadel.projections.apps"
-	AppAPITable        = AppProjectionTable + "_" + appAPITableSuffix
-	AppOIDCTable       = AppProjectionTable + "_" + appOIDCTableSuffix
-)
 
 func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *AppProjection {
 	p := new(AppProjection)
 	config.ProjectionName = AppProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewMultiTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(AppColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnName, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AppColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(AppColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
+		},
+			crdb.NewPrimaryKey(AppColumnInstanceID, ActionIDCol),
+			crdb.NewIndex("project_id_idx", []string{AppColumnProjectID}),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnInstanceID, AppColumnID)),
+			crdb.NewColumn(AppAPIConfigColumnClientID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppAPIConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(AppAPIConfigColumnAuthMethod, crdb.ColumnTypeEnum),
+		},
+			crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
+			appAPITableSuffix,
+			crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID}),
+		),
+		crdb.NewSuffixedTable([]*crdb.Column{
+			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnInstanceID, AppColumnID)),
+			crdb.NewColumn(AppOIDCConfigColumnVersion, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnClientID, crdb.ColumnTypeText),
+			crdb.NewColumn(AppOIDCConfigColumnClientSecret, crdb.ColumnTypeJSONB, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnResponseTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()), //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnGrantTypes, crdb.ColumnTypeEnumArray, crdb.Nullable()),    //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnApplicationType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnAuthMethodType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnPostLogoutRedirectUris, crdb.ColumnTypeTextArray, crdb.Nullable()),
+			crdb.NewColumn(AppOIDCConfigColumnDevMode, crdb.ColumnTypeBool),
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenType, crdb.ColumnTypeEnum),
+			crdb.NewColumn(AppOIDCConfigColumnAccessTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenRoleAssertion, crdb.ColumnTypeBool, crdb.Nullable()),     //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnIDTokenUserinfoAssertion, crdb.ColumnTypeBool, crdb.Nullable()), //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnClockSkew, crdb.ColumnTypeInt64, crdb.Nullable()),               //TODO: null?
+			crdb.NewColumn(AppOIDCConfigColumnAdditionalOrigins, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),
+			appOIDCTableSuffix,
+			crdb.NewIndex("client_id_idx", []string{AppOIDCConfigColumnClientID}),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -90,47 +173,10 @@ func (p *AppProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	AppColumnID            = "id"
-	AppColumnName          = "name"
-	AppColumnProjectID     = "project_id"
-	AppColumnCreationDate  = "creation_date"
-	AppColumnChangeDate    = "change_date"
-	AppColumnResourceOwner = "resource_owner"
-	AppColumnState         = "state"
-	AppColumnSequence      = "sequence"
-
-	appAPITableSuffix              = "api_configs"
-	AppAPIConfigColumnAppID        = "app_id"
-	AppAPIConfigColumnClientID     = "client_id"
-	AppAPIConfigColumnClientSecret = "client_secret"
-	AppAPIConfigColumnAuthMethod   = "auth_method"
-
-	appOIDCTableSuffix                          = "oidc_configs"
-	AppOIDCConfigColumnAppID                    = "app_id"
-	AppOIDCConfigColumnVersion                  = "version"
-	AppOIDCConfigColumnClientID                 = "client_id"
-	AppOIDCConfigColumnClientSecret             = "client_secret"
-	AppOIDCConfigColumnRedirectUris             = "redirect_uris"
-	AppOIDCConfigColumnResponseTypes            = "response_types"
-	AppOIDCConfigColumnGrantTypes               = "grant_types"
-	AppOIDCConfigColumnApplicationType          = "application_type"
-	AppOIDCConfigColumnAuthMethodType           = "auth_method_type"
-	AppOIDCConfigColumnPostLogoutRedirectUris   = "post_logout_redirect_uris"
-	AppOIDCConfigColumnDevMode                  = "is_dev_mode"
-	AppOIDCConfigColumnAccessTokenType          = "access_token_type"
-	AppOIDCConfigColumnAccessTokenRoleAssertion = "access_token_role_assertion"
-	AppOIDCConfigColumnIDTokenRoleAssertion     = "id_token_role_assertion"
-	AppOIDCConfigColumnIDTokenUserinfoAssertion = "id_token_userinfo_assertion"
-	AppOIDCConfigColumnClockSkew                = "clock_skew"
-	AppOIDCConfigColumnAdditionalOrigins        = "additional_origins"
-)
-
 func (p *AppProjection) reduceAppAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-OzK4m", "seq", event.Sequence(), "expectedType", project.ApplicationAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-1xYE6", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-1xYE6", "reduce.wrong.event.type %s", project.ApplicationAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -141,6 +187,7 @@ func (p *AppProjection) reduceAppAdded(event eventstore.Event) (*handler.Stateme
 			handler.NewCol(AppColumnCreationDate, e.CreationDate()),
 			handler.NewCol(AppColumnChangeDate, e.CreationDate()),
 			handler.NewCol(AppColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(AppColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(AppColumnState, domain.AppStateActive),
 			handler.NewCol(AppColumnSequence, e.Sequence()),
 		},
@@ -150,8 +197,7 @@ func (p *AppProjection) reduceAppAdded(event eventstore.Event) (*handler.Stateme
 func (p *AppProjection) reduceAppChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-4Fjh2", "seq", event.Sequence(), "expectedType", project.ApplicationChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ZJ8JA", "reduce.wrong.event.type %s", project.ApplicationChangedType)
 	}
 	if e.Name == "" {
 		return crdb.NewNoOpStatement(event), nil
@@ -172,8 +218,7 @@ func (p *AppProjection) reduceAppChanged(event eventstore.Event) (*handler.State
 func (p *AppProjection) reduceAppDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationDeactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-hZ9to", "seq", event.Sequence(), "expectedType", project.ApplicationDeactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-MVWxZ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-MVWxZ", "reduce.wrong.event.type %s", project.ApplicationDeactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -191,8 +236,7 @@ func (p *AppProjection) reduceAppDeactivated(event eventstore.Event) (*handler.S
 func (p *AppProjection) reduceAppReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationReactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-AbK3B", "seq", event.Sequence(), "expectedType", project.ApplicationReactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-D0HZO", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-D0HZO", "reduce.wrong.event.type %s", project.ApplicationReactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -210,8 +254,7 @@ func (p *AppProjection) reduceAppReactivated(event eventstore.Event) (*handler.S
 func (p *AppProjection) reduceAppRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ApplicationRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-tdRId", "seq", event.Sequence(), "expectedType", project.ApplicationRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Y99aq", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.ApplicationRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -224,8 +267,7 @@ func (p *AppProjection) reduceAppRemoved(event eventstore.Event) (*handler.State
 func (p *AppProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-ZxQnj", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DlUlO", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DlUlO", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -238,8 +280,7 @@ func (p *AppProjection) reduceProjectRemoved(event eventstore.Event) (*handler.S
 func (p *AppProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-tdRId", "seq", event.Sequence(), "expectedType", project.APIConfigAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Y99aq", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Y99aq", "reduce.wrong.event.type %s", project.APIConfigAddedType)
 	}
 	return crdb.NewMultiStatement(
 		e,
@@ -267,8 +308,7 @@ func (p *AppProjection) reduceAPIConfigAdded(event eventstore.Event) (*handler.S
 func (p *AppProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-C6b4f", "seq", event.Sequence(), "expectedType", project.APIConfigChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-vnZKi", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-vnZKi", "reduce.wrong.event.type %s", project.APIConfigChangedType)
 	}
 	cols := make([]handler.Column, 0, 2)
 	if e.ClientSecret != nil {
@@ -304,8 +344,7 @@ func (p *AppProjection) reduceAPIConfigChanged(event eventstore.Event) (*handler
 func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.APIConfigSecretChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-dssSI", "seq", event.Sequence(), "expectedType", project.APIConfigSecretChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ttb0I", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ttb0I", "reduce.wrong.event.type %s", project.APIConfigSecretChangedType)
 	}
 	return crdb.NewMultiStatement(
 		e,
@@ -333,8 +372,7 @@ func (p *AppProjection) reduceAPIConfigSecretChanged(event eventstore.Event) (*h
 func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-nlDQv", "seq", event.Sequence(), "expectedType", project.OIDCConfigAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GNHU1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigAddedType)
 	}
 	return crdb.NewMultiStatement(
 		e,
@@ -375,8 +413,7 @@ func (p *AppProjection) reduceOIDCConfigAdded(event eventstore.Event) (*handler.
 func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-nlDQv", "seq", event.Sequence(), "expectedType", project.OIDCConfigChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GNHU1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigChangedType)
 	}
 
 	cols := make([]handler.Column, 0, 15)
@@ -451,8 +488,7 @@ func (p *AppProjection) reduceOIDCConfigChanged(event eventstore.Event) (*handle
 func (p *AppProjection) reduceOIDCConfigSecretChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.OIDCConfigSecretChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-nlDQv", "seq", event.Sequence(), "expectedType", project.OIDCConfigSecretChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-GNHU1", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-GNHU1", "reduce.wrong.event.type %s", project.OIDCConfigSecretChangedType)
 	}
 	return crdb.NewMultiStatement(
 		e,

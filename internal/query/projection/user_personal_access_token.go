@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/lib/pq"
 
 	"github.com/caos/zitadel/internal/errors"
@@ -13,18 +12,46 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 )
 
+const (
+	PersonalAccessTokenProjectionTable = "projections.personal_access_tokens"
+
+	PersonalAccessTokenColumnID            = "id"
+	PersonalAccessTokenColumnCreationDate  = "creation_date"
+	PersonalAccessTokenColumnChangeDate    = "change_date"
+	PersonalAccessTokenColumnSequence      = "sequence"
+	PersonalAccessTokenColumnResourceOwner = "resource_owner"
+	PersonalAccessTokenColumnInstanceID    = "instance_id"
+	PersonalAccessTokenColumnUserID        = "user_id"
+	PersonalAccessTokenColumnExpiration    = "expiration"
+	PersonalAccessTokenColumnScopes        = "scopes"
+)
+
 type PersonalAccessTokenProjection struct {
 	crdb.StatementHandler
 }
-
-const (
-	PersonalAccessTokenProjectionTable = "zitadel.projections.personal_access_tokens"
-)
 
 func NewPersonalAccessTokenProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PersonalAccessTokenProjection {
 	p := new(PersonalAccessTokenProjection)
 	config.ProjectionName = PersonalAccessTokenProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(PersonalAccessTokenColumnID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(PersonalAccessTokenColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnUserID, crdb.ColumnTypeText),
+			crdb.NewColumn(PersonalAccessTokenColumnExpiration, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PersonalAccessTokenColumnScopes, crdb.ColumnTypeTextArray, crdb.Nullable()),
+		},
+			crdb.NewPrimaryKey(PersonalAccessTokenColumnInstanceID, PersonalAccessTokenColumnID),
+			crdb.NewIndex("user_idx", []string{PersonalAccessTokenColumnUserID}),
+			crdb.NewIndex("ro_idx", []string{PersonalAccessTokenColumnResourceOwner}),
+		),
+	)
+
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -51,22 +78,10 @@ func (p *PersonalAccessTokenProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	PersonalAccessTokenColumnID            = "id"
-	PersonalAccessTokenColumnCreationDate  = "creation_date"
-	PersonalAccessTokenColumnChangeDate    = "change_date"
-	PersonalAccessTokenColumnResourceOwner = "resource_owner"
-	PersonalAccessTokenColumnSequence      = "sequence"
-	PersonalAccessTokenColumnUserID        = "user_id"
-	PersonalAccessTokenColumnExpiration    = "expiration"
-	PersonalAccessTokenColumnScopes        = "scopes"
-)
-
 func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Dbfg2", "seq", event.Sequence(), "expectedType", user.PersonalAccessTokenAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-DVgf7", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-DVgf7", "reduce.wrong.event.type %s", user.PersonalAccessTokenAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -75,6 +90,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 			handler.NewCol(PersonalAccessTokenColumnCreationDate, e.CreationDate()),
 			handler.NewCol(PersonalAccessTokenColumnChangeDate, e.CreationDate()),
 			handler.NewCol(PersonalAccessTokenColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(PersonalAccessTokenColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(PersonalAccessTokenColumnSequence, e.Sequence()),
 			handler.NewCol(PersonalAccessTokenColumnUserID, e.Aggregate().ID),
 			handler.NewCol(PersonalAccessTokenColumnExpiration, e.Expiration),
@@ -86,8 +102,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenAdded(event eve
 func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.PersonalAccessTokenRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Edf32", "seq", event.Sequence(), "expectedType", user.PersonalAccessTokenRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g7u3F", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g7u3F", "reduce.wrong.event.type %s", user.PersonalAccessTokenRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -100,8 +115,7 @@ func (p *PersonalAccessTokenProjection) reducePersonalAccessTokenRemoved(event e
 func (p *PersonalAccessTokenProjection) reduceUserRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*user.UserRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-GEg43", "seq", event.Sequence(), "expectedType", user.UserRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-Dff3h", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-Dff3h", "reduce.wrong.event.type %s", user.UserRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

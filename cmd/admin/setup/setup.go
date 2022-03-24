@@ -5,14 +5,15 @@ import (
 	_ "embed"
 
 	"github.com/caos/logging"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	http_util "github.com/caos/zitadel/internal/api/http"
 	command "github.com/caos/zitadel/internal/command/v2"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/migration"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -42,13 +43,15 @@ func Setup(config *Config, steps *Steps) {
 
 	eventstoreClient, err := eventstore.Start(dbClient)
 	logging.OnError(err).Fatal("unable to start eventstore")
+	migration.RegisterMappers(eventstoreClient)
 
 	cmd := command.New(eventstoreClient, "localhost", config.SystemDefaults)
 
-	steps.S1DefaultInstance.cmd = cmd
-	steps.S1DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
-	steps.S1DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
+	steps.S2DefaultInstance.cmd = cmd
+	steps.S1ProjectionTable = &ProjectionTable{dbClient: dbClient}
+	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
+	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
-	ctx := authz.WithTenant(context.Background(), "system")
-	migration.Migrate(ctx, eventstoreClient, steps.S1DefaultInstance)
+	ctx := authz.WithInstance(context.Background(), "system")
+	migration.Migrate(ctx, eventstoreClient, steps.S2DefaultInstance)
 }

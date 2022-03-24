@@ -7,6 +7,8 @@ import (
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
 )
@@ -29,6 +31,10 @@ var (
 	}
 	OIDCSettingsColumnResourceOwner = Column{
 		name:  projection.OIDCSettingsColumnResourceOwner,
+		table: oidcSettingsTable,
+	}
+	OIDCSettingsColumnInstanceID = Column{
+		name:  projection.OIDCSettingsColumnInstanceID,
 		table: oidcSettingsTable,
 	}
 	OIDCSettingsColumnSequence = Column{
@@ -70,6 +76,7 @@ func (q *Queries) OIDCSettingsByAggID(ctx context.Context, aggregateID string) (
 	stmt, scan := prepareOIDCSettingsQuery()
 	query, args, err := stmt.Where(sq.Eq{
 		OIDCSettingsColumnAggregateID.identifier(): aggregateID,
+		OIDCSettingsColumnInstanceID.identifier():  authz.GetInstance(ctx).ID,
 	}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInternal(err, "QUERY-s9nle", "Errors.Query.SQLStatment")

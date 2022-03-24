@@ -28,16 +28,16 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.password_age_policies.id,`+
-						` zitadel.projections.password_age_policies.sequence,`+
-						` zitadel.projections.password_age_policies.creation_date,`+
-						` zitadel.projections.password_age_policies.change_date,`+
-						` zitadel.projections.password_age_policies.resource_owner,`+
-						` zitadel.projections.password_age_policies.expire_warn_days,`+
-						` zitadel.projections.password_age_policies.max_age_days,`+
-						` zitadel.projections.password_age_policies.is_default,`+
-						` zitadel.projections.password_age_policies.state`+
-						` FROM zitadel.projections.password_age_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_age_policies.id,`+
+						` projections.password_age_policies.sequence,`+
+						` projections.password_age_policies.creation_date,`+
+						` projections.password_age_policies.change_date,`+
+						` projections.password_age_policies.resource_owner,`+
+						` projections.password_age_policies.expire_warn_days,`+
+						` projections.password_age_policies.max_age_days,`+
+						` projections.password_age_policies.is_default,`+
+						` projections.password_age_policies.state`+
+						` FROM projections.password_age_policies`),
 					nil,
 					nil,
 				),
@@ -55,16 +55,16 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.password_age_policies.id,`+
-						` zitadel.projections.password_age_policies.sequence,`+
-						` zitadel.projections.password_age_policies.creation_date,`+
-						` zitadel.projections.password_age_policies.change_date,`+
-						` zitadel.projections.password_age_policies.resource_owner,`+
-						` zitadel.projections.password_age_policies.expire_warn_days,`+
-						` zitadel.projections.password_age_policies.max_age_days,`+
-						` zitadel.projections.password_age_policies.is_default,`+
-						` zitadel.projections.password_age_policies.state`+
-						` FROM zitadel.projections.password_age_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_age_policies.id,`+
+						` projections.password_age_policies.sequence,`+
+						` projections.password_age_policies.creation_date,`+
+						` projections.password_age_policies.change_date,`+
+						` projections.password_age_policies.resource_owner,`+
+						` projections.password_age_policies.expire_warn_days,`+
+						` projections.password_age_policies.max_age_days,`+
+						` projections.password_age_policies.is_default,`+
+						` projections.password_age_policies.state`+
+						` FROM projections.password_age_policies`),
 					[]string{
 						"id",
 						"sequence",
@@ -106,16 +106,16 @@ func Test_PasswordAgePolicyPrepares(t *testing.T) {
 			prepare: preparePasswordAgePolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.password_age_policies.id,`+
-						` zitadel.projections.password_age_policies.sequence,`+
-						` zitadel.projections.password_age_policies.creation_date,`+
-						` zitadel.projections.password_age_policies.change_date,`+
-						` zitadel.projections.password_age_policies.resource_owner,`+
-						` zitadel.projections.password_age_policies.expire_warn_days,`+
-						` zitadel.projections.password_age_policies.max_age_days,`+
-						` zitadel.projections.password_age_policies.is_default,`+
-						` zitadel.projections.password_age_policies.state`+
-						` FROM zitadel.projections.password_age_policies`),
+					regexp.QuoteMeta(`SELECT projections.password_age_policies.id,`+
+						` projections.password_age_policies.sequence,`+
+						` projections.password_age_policies.creation_date,`+
+						` projections.password_age_policies.change_date,`+
+						` projections.password_age_policies.resource_owner,`+
+						` projections.password_age_policies.expire_warn_days,`+
+						` projections.password_age_policies.max_age_days,`+
+						` projections.password_age_policies.is_default,`+
+						` projections.password_age_policies.state`+
+						` FROM projections.password_age_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

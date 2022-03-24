@@ -16,6 +16,7 @@ const (
 	failedEventsColumnFailedSequence = "failed_sequence"
 	failedEventsColumnFailureCount   = "failure_count"
 	failedEventsColumnError          = "error"
+	failedEventsColumnInstanceID     = "instance_id"
 )
 
 var (
@@ -36,6 +37,10 @@ var (
 	}
 	FailedEventsColumnError = Column{
 		name:  failedEventsColumnError,
+		table: failedEventsTable,
+	}
+	FailedEventsColumnInstanceID = Column{
+		name:  failedEventsColumnInstanceID,
 		table: failedEventsTable,
 	}
 )

@@ -3,26 +3,59 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
+	"github.com/lib/pq"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/handler"
 	"github.com/caos/zitadel/internal/eventstore/handler/crdb"
 	"github.com/caos/zitadel/internal/repository/project"
-	"github.com/lib/pq"
+)
+
+const (
+	ProjectGrantProjectionTable = "projections.project_grants"
+
+	ProjectGrantColumnGrantID       = "grant_id"
+	ProjectGrantColumnCreationDate  = "creation_date"
+	ProjectGrantColumnChangeDate    = "change_date"
+	ProjectGrantColumnSequence      = "sequence"
+	ProjectGrantColumnState         = "state"
+	ProjectGrantColumnResourceOwner = "resource_owner"
+	ProjectGrantColumnInstanceID    = "instance_id"
+	ProjectGrantColumnProjectID     = "project_id"
+	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
+	ProjectGrantColumnRoleKeys      = "granted_role_keys"
+	ProjectGrantColumnCreator       = "creator_id" //TODO: necessary?
 )
 
 type ProjectGrantProjection struct {
 	crdb.StatementHandler
 }
 
-const ProjectGrantProjectionTable = "zitadel.projections.project_grants"
-
 func NewProjectGrantProjection(ctx context.Context, config crdb.StatementHandlerConfig) *ProjectGrantProjection {
 	p := new(ProjectGrantProjection)
 	config.ProjectionName = ProjectGrantProjectionTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(ProjectGrantColumnGrantID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnCreationDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectGrantColumnChangeDate, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(ProjectGrantColumnSequence, crdb.ColumnTypeInt64),
+			crdb.NewColumn(ProjectGrantColumnState, crdb.ColumnTypeEnum),
+			crdb.NewColumn(ProjectGrantColumnResourceOwner, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnInstanceID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnProjectID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnGrantedOrgID, crdb.ColumnTypeText),
+			crdb.NewColumn(ProjectGrantColumnRoleKeys, crdb.ColumnTypeTextArray),
+			crdb.NewColumn(ProjectGrantColumnCreator, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(ProjectGrantColumnInstanceID, ProjectGrantColumnGrantID),
+			crdb.NewIndex("ro_idx", []string{ProjectGrantColumnResourceOwner}),
+			crdb.NewIndex("granted_org_idx", []string{ProjectGrantColumnGrantedOrgID}),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -65,24 +98,10 @@ func (p *ProjectGrantProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-const (
-	ProjectGrantColumnProjectID     = "project_id"
-	ProjectGrantColumnGrantID       = "grant_id"
-	ProjectGrantColumnCreationDate  = "creation_date"
-	ProjectGrantColumnChangeDate    = "change_date"
-	ProjectGrantColumnResourceOwner = "resource_owner"
-	ProjectGrantColumnState         = "state"
-	ProjectGrantColumnSequence      = "sequence"
-	ProjectGrantColumnGrantedOrgID  = "granted_org_id"
-	ProjectGrantColumnRoleKeys      = "granted_role_keys"
-	ProjectGrantColumnCreator       = "creator_id"
-)
-
 func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantAddedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Mi4g9", "seq", event.Sequence(), "expectedType", project.GrantAddedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g92Fg", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g92Fg", "reduce.wrong.event.type %s", project.GrantAddedType)
 	}
 	return crdb.NewCreateStatement(
 		e,
@@ -92,6 +111,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 			handler.NewCol(ProjectGrantColumnCreationDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnChangeDate, e.CreationDate()),
 			handler.NewCol(ProjectGrantColumnResourceOwner, e.Aggregate().ResourceOwner),
+			handler.NewCol(ProjectGrantColumnInstanceID, e.Aggregate().InstanceID),
 			handler.NewCol(ProjectGrantColumnState, domain.ProjectGrantStateActive),
 			handler.NewCol(ProjectGrantColumnSequence, e.Sequence()),
 			handler.NewCol(ProjectGrantColumnGrantedOrgID, e.GrantedOrgID),
@@ -104,8 +124,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantAdded(event eventstore.Event)
 func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-M00fH", "seq", event.Sequence(), "expectedType", project.GrantChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-g0fg4", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-g0fg4", "reduce.wrong.event.type %s", project.GrantChangedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -124,8 +143,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantChanged(event eventstore.Even
 func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantCascadeChangedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-K0fwR", "seq", event.Sequence(), "expectedType", project.GrantCascadeChangedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-ll9Ts", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-ll9Ts", "reduce.wrong.event.type %s", project.GrantCascadeChangedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -144,8 +162,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantCascadeChanged(event eventsto
 func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantDeactivateEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Ple9f", "seq", event.Sequence(), "expectedType", project.GrantDeactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-0fj2f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-0fj2f", "reduce.wrong.event.type %s", project.GrantDeactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -164,8 +181,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantDeactivated(event eventstore.
 func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantReactivatedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Ip0hr", "seq", event.Sequence(), "expectedType", project.GrantReactivatedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-2M0ve", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2M0ve", "reduce.wrong.event.type %s", project.GrantReactivatedType)
 	}
 	return crdb.NewUpdateStatement(
 		e,
@@ -184,8 +200,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantReactivated(event eventstore.
 func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.GrantRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-M0pfs", "seq", event.Sequence(), "expectedType", project.GrantRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-o0w4f", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-o0w4f", "reduce.wrong.event.type %s", project.GrantRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,
@@ -199,8 +214,7 @@ func (p *ProjectGrantProjection) reduceProjectGrantRemoved(event eventstore.Even
 func (p *ProjectGrantProjection) reduceProjectRemoved(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*project.ProjectRemovedEvent)
 	if !ok {
-		logging.LogWithFields("HANDL-Ms0fe", "seq", event.Sequence(), "expectedType", project.ProjectRemovedType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "HANDL-gn9rw", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-gn9rw", "reduce.wrong.event.type %s", project.ProjectRemovedType)
 	}
 	return crdb.NewDeleteStatement(
 		e,

@@ -28,16 +28,16 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.lockout_policies.id,`+
-						` zitadel.projections.lockout_policies.sequence,`+
-						` zitadel.projections.lockout_policies.creation_date,`+
-						` zitadel.projections.lockout_policies.change_date,`+
-						` zitadel.projections.lockout_policies.resource_owner,`+
-						` zitadel.projections.lockout_policies.show_failure,`+
-						` zitadel.projections.lockout_policies.max_password_attempts,`+
-						` zitadel.projections.lockout_policies.is_default,`+
-						` zitadel.projections.lockout_policies.state`+
-						` FROM zitadel.projections.lockout_policies`),
+					regexp.QuoteMeta(`SELECT projections.lockout_policies.id,`+
+						` projections.lockout_policies.sequence,`+
+						` projections.lockout_policies.creation_date,`+
+						` projections.lockout_policies.change_date,`+
+						` projections.lockout_policies.resource_owner,`+
+						` projections.lockout_policies.show_failure,`+
+						` projections.lockout_policies.max_password_attempts,`+
+						` projections.lockout_policies.is_default,`+
+						` projections.lockout_policies.state`+
+						` FROM projections.lockout_policies`),
 					nil,
 					nil,
 				),
@@ -55,16 +55,16 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT zitadel.projections.lockout_policies.id,`+
-						` zitadel.projections.lockout_policies.sequence,`+
-						` zitadel.projections.lockout_policies.creation_date,`+
-						` zitadel.projections.lockout_policies.change_date,`+
-						` zitadel.projections.lockout_policies.resource_owner,`+
-						` zitadel.projections.lockout_policies.show_failure,`+
-						` zitadel.projections.lockout_policies.max_password_attempts,`+
-						` zitadel.projections.lockout_policies.is_default,`+
-						` zitadel.projections.lockout_policies.state`+
-						` FROM zitadel.projections.lockout_policies`),
+					regexp.QuoteMeta(`SELECT projections.lockout_policies.id,`+
+						` projections.lockout_policies.sequence,`+
+						` projections.lockout_policies.creation_date,`+
+						` projections.lockout_policies.change_date,`+
+						` projections.lockout_policies.resource_owner,`+
+						` projections.lockout_policies.show_failure,`+
+						` projections.lockout_policies.max_password_attempts,`+
+						` projections.lockout_policies.is_default,`+
+						` projections.lockout_policies.state`+
+						` FROM projections.lockout_policies`),
 					[]string{
 						"id",
 						"sequence",
@@ -106,16 +106,16 @@ func Test_LockoutPolicyPrepares(t *testing.T) {
 			prepare: prepareLockoutPolicyQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.lockout_policies.id,`+
-						` zitadel.projections.lockout_policies.sequence,`+
-						` zitadel.projections.lockout_policies.creation_date,`+
-						` zitadel.projections.lockout_policies.change_date,`+
-						` zitadel.projections.lockout_policies.resource_owner,`+
-						` zitadel.projections.lockout_policies.show_failure,`+
-						` zitadel.projections.lockout_policies.max_password_attempts,`+
-						` zitadel.projections.lockout_policies.is_default,`+
-						` zitadel.projections.lockout_policies.state`+
-						` FROM zitadel.projections.lockout_policies`),
+					regexp.QuoteMeta(`SELECT projections.lockout_policies.id,`+
+						` projections.lockout_policies.sequence,`+
+						` projections.lockout_policies.creation_date,`+
+						` projections.lockout_policies.change_date,`+
+						` projections.lockout_policies.resource_owner,`+
+						` projections.lockout_policies.show_failure,`+
+						` projections.lockout_policies.max_password_attempts,`+
+						` projections.lockout_policies.is_default,`+
+						` projections.lockout_policies.state`+
+						` FROM projections.lockout_policies`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

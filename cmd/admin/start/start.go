@@ -38,7 +38,6 @@ import (
 	"github.com/caos/zitadel/internal/command"
 	cryptoDB "github.com/caos/zitadel/internal/crypto/database"
 	"github.com/caos/zitadel/internal/database"
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/notification"
@@ -240,7 +239,7 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 
 //TODO:!!??!!
 func consoleClientID(ctx context.Context, queries *query.Queries) (string, error) {
-	iam, err := queries.IAMByID(ctx, domain.IAMID)
+	iam, err := queries.IAM(ctx)
 	if err != nil {
 		return "", err
 	}

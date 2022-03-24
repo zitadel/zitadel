@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 
-	"github.com/caos/logging"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
@@ -14,28 +13,45 @@ import (
 	"github.com/caos/zitadel/internal/repository/policy"
 )
 
-type PrivacyPolicyProjection struct {
-	crdb.StatementHandler
-}
-
 const (
-	PrivacyPolicyTable = "zitadel.projections.privacy_policies"
+	PrivacyPolicyTable = "projections.privacy_policies"
 
+	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyCreationDateCol  = "creation_date"
 	PrivacyPolicyChangeDateCol    = "change_date"
 	PrivacyPolicySequenceCol      = "sequence"
-	PrivacyPolicyIDCol            = "id"
 	PrivacyPolicyStateCol         = "state"
-	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
-	PrivacyPolicyTOSLinkCol       = "tos_link"
 	PrivacyPolicyIsDefaultCol     = "is_default"
 	PrivacyPolicyResourceOwnerCol = "resource_owner"
+	PrivacyPolicyInstanceIDCol    = "instance_id"
+	PrivacyPolicyPrivacyLinkCol   = "privacy_link"
+	PrivacyPolicyTOSLinkCol       = "tos_link"
 )
+
+type PrivacyPolicyProjection struct {
+	crdb.StatementHandler
+}
 
 func NewPrivacyPolicyProjection(ctx context.Context, config crdb.StatementHandlerConfig) *PrivacyPolicyProjection {
 	p := new(PrivacyPolicyProjection)
 	config.ProjectionName = PrivacyPolicyTable
 	config.Reducers = p.reducers()
+	config.InitCheck = crdb.NewTableCheck(
+		crdb.NewTable([]*crdb.Column{
+			crdb.NewColumn(PrivacyPolicyIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyCreationDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PrivacyPolicyChangeDateCol, crdb.ColumnTypeTimestamp),
+			crdb.NewColumn(PrivacyPolicySequenceCol, crdb.ColumnTypeInt64),
+			crdb.NewColumn(PrivacyPolicyStateCol, crdb.ColumnTypeEnum),
+			crdb.NewColumn(PrivacyPolicyIsDefaultCol, crdb.ColumnTypeBool, crdb.Default(false)),
+			crdb.NewColumn(PrivacyPolicyResourceOwnerCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyInstanceIDCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyPrivacyLinkCol, crdb.ColumnTypeText),
+			crdb.NewColumn(PrivacyPolicyTOSLinkCol, crdb.ColumnTypeText),
+		},
+			crdb.NewPrimaryKey(PrivacyPolicyInstanceIDCol, PrivacyPolicyIDCol),
+		),
+	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)
 	return p
 }
@@ -86,8 +102,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 		policyEvent = e.PrivacyPolicyAddedEvent
 		isDefault = true
 	default:
-		logging.LogWithFields("PROJE-BrdLn", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-kRNh8", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-kRNh8", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyAddedEventType, iam.PrivacyPolicyAddedEventType})
 	}
 	return crdb.NewCreateStatement(
 		&policyEvent,
@@ -101,6 +116,7 @@ func (p *PrivacyPolicyProjection) reduceAdded(event eventstore.Event) (*handler.
 			handler.NewCol(PrivacyPolicyTOSLinkCol, policyEvent.TOSLink),
 			handler.NewCol(PrivacyPolicyIsDefaultCol, isDefault),
 			handler.NewCol(PrivacyPolicyResourceOwnerCol, policyEvent.Aggregate().ResourceOwner),
+			handler.NewCol(PrivacyPolicyInstanceIDCol, policyEvent.Aggregate().InstanceID),
 		}), nil
 }
 
@@ -112,8 +128,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 	case *iam.PrivacyPolicyChangedEvent:
 		policyEvent = e.PrivacyPolicyChangedEvent
 	default:
-		logging.LogWithFields("PROJE-1nQWm", "seq", event.Sequence(), "expectedTypes", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType}).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-91weZ", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-91weZ", "reduce.wrong.event.type %v", []eventstore.EventType{org.PrivacyPolicyChangedEventType, iam.PrivacyPolicyChangedEventType})
 	}
 	cols := []handler.Column{
 		handler.NewCol(PrivacyPolicyChangeDateCol, policyEvent.CreationDate()),
@@ -136,8 +151,7 @@ func (p *PrivacyPolicyProjection) reduceChanged(event eventstore.Event) (*handle
 func (p *PrivacyPolicyProjection) reduceRemoved(event eventstore.Event) (*handler.Statement, error) {
 	policyEvent, ok := event.(*org.PrivacyPolicyRemovedEvent)
 	if !ok {
-		logging.LogWithFields("PROJE-hN5Ip", "seq", event.Sequence(), "expectedType", org.PrivacyPolicyRemovedEventType).Error("wrong event type")
-		return nil, errors.ThrowInvalidArgument(nil, "PROJE-FvtGO", "reduce.wrong.event.type")
+		return nil, errors.ThrowInvalidArgumentf(nil, "PROJE-FvtGO", "reduce.wrong.event.type %s", org.PrivacyPolicyRemovedEventType)
 	}
 	return crdb.NewDeleteStatement(
 		policyEvent,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/caos/zitadel/internal/domain"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 )
 
@@ -19,7 +20,8 @@ func (l *Login) getAuthRequest(r *http.Request) (*domain.AuthRequest, error) {
 		return nil, nil
 	}
 	userAgentID, _ := http_mw.UserAgentIDFromCtx(r.Context())
-	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID)
+	instanceID := authz.GetInstance(r.Context()).ID
+	return l.authRepo.AuthRequestByID(r.Context(), authRequestID, userAgentID, instanceID)
 }
 
 func (l *Login) getAuthRequestAndParseData(r *http.Request, data interface{}) (*domain.AuthRequest, error) {

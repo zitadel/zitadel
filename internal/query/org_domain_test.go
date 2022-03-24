@@ -27,16 +27,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_domains.creation_date,`+
-						` zitadel.projections.org_domains.change_date,`+
-						` zitadel.projections.org_domains.sequence,`+
-						` zitadel.projections.org_domains.domain,`+
-						` zitadel.projections.org_domains.org_id,`+
-						` zitadel.projections.org_domains.is_verified,`+
-						` zitadel.projections.org_domains.is_primary,`+
-						` zitadel.projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
+						` projections.org_domains.change_date,`+
+						` projections.org_domains.sequence,`+
+						` projections.org_domains.domain,`+
+						` projections.org_domains.org_id,`+
+						` projections.org_domains.is_verified,`+
+						` projections.org_domains.is_primary,`+
+						` projections.org_domains.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.org_domains`),
+						` FROM projections.org_domains`),
 					nil,
 					nil,
 				),
@@ -48,16 +48,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_domains.creation_date,`+
-						` zitadel.projections.org_domains.change_date,`+
-						` zitadel.projections.org_domains.sequence,`+
-						` zitadel.projections.org_domains.domain,`+
-						` zitadel.projections.org_domains.org_id,`+
-						` zitadel.projections.org_domains.is_verified,`+
-						` zitadel.projections.org_domains.is_primary,`+
-						` zitadel.projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
+						` projections.org_domains.change_date,`+
+						` projections.org_domains.sequence,`+
+						` projections.org_domains.domain,`+
+						` projections.org_domains.org_id,`+
+						` projections.org_domains.is_verified,`+
+						` projections.org_domains.is_primary,`+
+						` projections.org_domains.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.org_domains`),
+						` FROM projections.org_domains`),
 					[]string{
 						"id",
 						"creation_date",
@@ -106,16 +106,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_domains.creation_date,`+
-						` zitadel.projections.org_domains.change_date,`+
-						` zitadel.projections.org_domains.sequence,`+
-						` zitadel.projections.org_domains.domain,`+
-						` zitadel.projections.org_domains.org_id,`+
-						` zitadel.projections.org_domains.is_verified,`+
-						` zitadel.projections.org_domains.is_primary,`+
-						` zitadel.projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
+						` projections.org_domains.change_date,`+
+						` projections.org_domains.sequence,`+
+						` projections.org_domains.domain,`+
+						` projections.org_domains.org_id,`+
+						` projections.org_domains.is_verified,`+
+						` projections.org_domains.is_primary,`+
+						` projections.org_domains.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.org_domains`),
+						` FROM projections.org_domains`),
 					[]string{
 						"id",
 						"creation_date",
@@ -184,16 +184,16 @@ func Test_OrgDomainPrepares(t *testing.T) {
 			prepare: prepareDomainsQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT zitadel.projections.org_domains.creation_date,`+
-						` zitadel.projections.org_domains.change_date,`+
-						` zitadel.projections.org_domains.sequence,`+
-						` zitadel.projections.org_domains.domain,`+
-						` zitadel.projections.org_domains.org_id,`+
-						` zitadel.projections.org_domains.is_verified,`+
-						` zitadel.projections.org_domains.is_primary,`+
-						` zitadel.projections.org_domains.validation_type,`+
+					regexp.QuoteMeta(`SELECT projections.org_domains.creation_date,`+
+						` projections.org_domains.change_date,`+
+						` projections.org_domains.sequence,`+
+						` projections.org_domains.domain,`+
+						` projections.org_domains.org_id,`+
+						` projections.org_domains.is_verified,`+
+						` projections.org_domains.is_primary,`+
+						` projections.org_domains.validation_type,`+
 						` COUNT(*) OVER ()`+
-						` FROM zitadel.projections.org_domains`),
+						` FROM projections.org_domains`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

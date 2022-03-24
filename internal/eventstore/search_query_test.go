@@ -224,9 +224,9 @@ func TestSearchQuerybuilderSetters(t *testing.T) {
 
 func TestSearchQuerybuilderBuild(t *testing.T) {
 	type args struct {
-		columns Columns
-		setters []func(*SearchQueryBuilder) *SearchQueryBuilder
-		tenant  string
+		columns    Columns
+		setters    []func(*SearchQueryBuilder) *SearchQueryBuilder
+		instanceID string
 	}
 	type res struct {
 		isErr func(err error) bool
@@ -622,7 +622,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 			},
 		},
 		{
-			name: "filter aggregate type and tenant",
+			name: "filter aggregate type and instanceID",
 			args: args{
 				columns: ColumnsEvent,
 				setters: []func(*SearchQueryBuilder) *SearchQueryBuilder{
@@ -630,7 +630,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 						testSetAggregateTypes("user"),
 					),
 				},
-				tenant: "tenant",
+				instanceID: "instanceID",
 			},
 			res: res{
 				isErr: nil,
@@ -641,7 +641,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 					Filters: [][]*repository.Filter{
 						{
 							repository.NewFilter(repository.FieldAggregateType, repository.AggregateType("user"), repository.OperationEquals),
-							repository.NewFilter(repository.FieldTenant, "tenant", repository.OperationEquals),
+							repository.NewFilter(repository.FieldInstanceID, "instanceID", repository.OperationEquals),
 						},
 					},
 				},
@@ -668,7 +668,7 @@ func TestSearchQuerybuilderBuild(t *testing.T) {
 			for _, f := range tt.args.setters {
 				builder = f(builder)
 			}
-			query, err := builder.build(tt.args.tenant)
+			query, err := builder.build(tt.args.instanceID)
 			if tt.res.isErr != nil && !tt.res.isErr(err) {
 				t.Errorf("wrong error(%T): %v", err, err)
 				return

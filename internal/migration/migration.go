@@ -2,9 +2,9 @@ package migration
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/caos/logging"
+
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 )
@@ -41,6 +41,7 @@ func Migrate(ctx context.Context, es *eventstore.Eventstore, migration Migration
 func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migration) (should bool, err error) {
 	events, err := es.Filter(ctx, eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		OrderDesc().
+		Limit(1).
 		AddQuery().
 		AggregateTypes(aggregateType).
 		AggregateIDs(aggregateID).
@@ -53,32 +54,23 @@ func shouldExec(ctx context.Context, es *eventstore.Eventstore, migration Migrat
 	if len(events) == 0 {
 		return true, nil
 	}
+	event, ok := events[0].(*SetupStep)
+	if !ok {
+		return false, errors.ThrowInternal(nil, "MIGRA-IJY3D", "Errors.Internal")
+	}
 
-	if events[len(events)-1].Type() == startedType {
+	if event.Name != migration.String() {
 		return false, nil
 	}
 
-	for _, e := range events {
-		step := new(SetupStep)
-
-		err = json.Unmarshal(e.DataAsBytes(), step)
-		if err != nil {
-			return false, err
-		}
-
-		if step.Name != migration.String() {
-			continue
-		}
-
-		switch e.Type() {
-		case startedType, doneType:
-			//TODO: if started should we wait until done/failed?
-			return false, nil
-		case failedType:
-			//TODO: how to allow retries?
-			logging.WithFields("migration", migration.String()).Error("failed before")
-			return false, errors.ThrowInternal(nil, "MIGRA-mjI2E", "migration failed before")
-		}
+	switch event.Type() {
+	case startedType, doneType:
+		return false, nil
+	case failedType:
+		logging.WithFields("step", event.Name).Info("retry failed setup step")
+		fallthrough
+	default:
+		return true, nil
 	}
-	return true, nil
+
 }

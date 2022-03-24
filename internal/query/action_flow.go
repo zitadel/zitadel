@@ -8,6 +8,8 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/query/projection"
@@ -21,12 +23,24 @@ var (
 		name:  projection.FlowTypeCol,
 		table: flowsTriggersTable,
 	}
+	FlowsTriggersColumnChangeDate = Column{
+		name:  projection.FlowChangeDateCol,
+		table: flowsTriggersTable,
+	}
+	FlowsTriggersColumnSequence = Column{
+		name:  projection.FlowSequenceCol,
+		table: flowsTriggersTable,
+	}
 	FlowsTriggersColumnTriggerType = Column{
 		name:  projection.FlowTriggerTypeCol,
 		table: flowsTriggersTable,
 	}
 	FlowsTriggersColumnResourceOwner = Column{
 		name:  projection.FlowResourceOwnerCol,
+		table: flowsTriggersTable,
+	}
+	FlowsTriggersColumnInstanceID = Column{
+		name:  projection.FlowInstanceIDCol,
 		table: flowsTriggersTable,
 	}
 	FlowsTriggersColumnTriggerSequence = Column{
@@ -40,10 +54,9 @@ var (
 )
 
 type Flow struct {
-	CreationDate  time.Time //TODO: add in projection
-	ChangeDate    time.Time //TODO: add in projection
-	ResourceOwner string    //TODO: add in projection
-	Sequence      uint64    //TODO: add in projection
+	ChangeDate    time.Time
+	ResourceOwner string
+	Sequence      uint64
 	Type          domain.FlowType
 
 	TriggerActions map[domain.TriggerType][]*Action
@@ -55,6 +68,7 @@ func (q *Queries) GetFlow(ctx context.Context, flowType domain.FlowType, orgID s
 		sq.Eq{
 			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
+			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
 		}).ToSql()
 	if err != nil {
 		return nil, errors.ThrowInvalidArgument(err, "QUERY-HBRh3", "Errors.Query.InvalidRequest")
@@ -74,6 +88,7 @@ func (q *Queries) GetActiveActionsByFlowAndTriggerType(ctx context.Context, flow
 			FlowsTriggersColumnFlowType.identifier():      flowType,
 			FlowsTriggersColumnTriggerType.identifier():   triggerType,
 			FlowsTriggersColumnResourceOwner.identifier(): orgID,
+			FlowsTriggersColumnInstanceID.identifier():    authz.GetInstance(ctx).ID,
 			ActionColumnState.identifier():                domain.ActionStateActive,
 		},
 	).ToSql()
@@ -92,7 +107,8 @@ func (q *Queries) GetFlowTypesOfActionID(ctx context.Context, actionID string) (
 	stmt, scan := prepareFlowTypesQuery()
 	query, args, err := stmt.Where(
 		sq.Eq{
-			FlowsTriggersColumnActionID.identifier(): actionID,
+			FlowsTriggersColumnActionID.identifier():   actionID,
+			FlowsTriggersColumnInstanceID.identifier(): authz.GetInstance(ctx).ID,
 		},
 	).ToSql()
 	if err != nil {
@@ -185,6 +201,9 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 			FlowsTriggersColumnTriggerType.identifier(),
 			FlowsTriggersColumnTriggerSequence.identifier(),
 			FlowsTriggersColumnFlowType.identifier(),
+			FlowsTriggersColumnChangeDate.identifier(),
+			FlowsTriggersColumnSequence.identifier(),
+			FlowsTriggersColumnResourceOwner.identifier(),
 		).
 			From(flowsTriggersTable.name).
 			LeftJoin(join(ActionColumnID, FlowsTriggersColumnActionID)).
@@ -194,7 +213,6 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 				TriggerActions: make(map[domain.TriggerType][]*Action),
 			}
 			for rows.Next() {
-				// action := new(Action)
 				var (
 					actionID            sql.NullString
 					actionCreationDate  pq.NullTime
@@ -207,7 +225,6 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 
 					triggerType     domain.TriggerType
 					triggerSequence int
-					flowType        domain.FlowType
 				)
 				err := rows.Scan(
 					&actionID,
@@ -220,12 +237,14 @@ func prepareFlowQuery() (sq.SelectBuilder, func(*sql.Rows) (*Flow, error)) {
 					&actionScript,
 					&triggerType,
 					&triggerSequence,
-					&flowType,
+					&flow.Type,
+					&flow.ChangeDate,
+					&flow.Sequence,
+					&flow.ResourceOwner,
 				)
 				if err != nil {
 					return nil, err
 				}
-				flow.Type = flowType
 				if !actionID.Valid {
 					continue
 				}
