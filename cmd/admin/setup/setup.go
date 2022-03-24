@@ -29,7 +29,7 @@ Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
 			config := MustNewConfig(viper.GetViper())
-			steps := MustNewSteps(viper.GetViper())
+			steps := MustNewSteps(viper.New())
 
 			Setup(config, steps)
 		},

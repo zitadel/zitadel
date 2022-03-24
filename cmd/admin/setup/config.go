@@ -18,12 +18,16 @@ type Config struct {
 	ExternalPort   uint16
 	ExternalDomain string
 	ExternalSecure bool
+	Log            *logging.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
 	err := v.Unmarshal(config)
 	logging.OnError(err).Fatal("unable to read config")
+
+	err = config.Log.SetLogger()
+	logging.OnError(err).Fatal("unable to set logger")
 
 	return config
 }

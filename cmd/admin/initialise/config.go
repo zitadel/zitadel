@@ -9,12 +9,17 @@ import (
 type Config struct {
 	Database  database.Config
 	AdminUser database.User
+	Log       *logging.Config
 }
 
 func MustNewConfig(v *viper.Viper) *Config {
 	config := new(Config)
-	err := viper.Unmarshal(config)
+	err := v.Unmarshal(config)
 	logging.OnError(err).Fatal("unable to read config")
+
+	err = config.Log.SetLogger()
+	logging.OnError(err).Fatal("unable to set logger")
+
 	return config
 }
 

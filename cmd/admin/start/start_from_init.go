@@ -23,7 +23,7 @@ Requirements:
 			initialise.InitAll(initialise.MustNewConfig(viper.GetViper()))
 
 			setupConfig := setup.MustNewConfig(viper.GetViper())
-			setupSteps := setup.MustNewSteps(viper.GetViper())
+			setupSteps := setup.MustNewSteps(viper.New())
 			setup.Setup(setupConfig, setupSteps)
 
 			startConfig := MustNewConfig(viper.GetViper())
