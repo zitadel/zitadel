@@ -1089,10 +1089,6 @@ func (c *Commands) createFooterTextEvents(ctx context.Context, agg *eventstore.A
 	if event != nil {
 		events = append(events, event)
 	}
-	event = c.createCustomLoginTextEvent(ctx, agg, domain.LoginKeyFooterHelpLink, existingText.FooterHelpLink, text.Footer.HelpLink, text.Language, defaultText)
-	if event != nil {
-		events = append(events, event)
-	}
 	return events
 }
 

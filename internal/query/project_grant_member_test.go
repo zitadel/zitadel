@@ -34,6 +34,8 @@ var (
 		"ON members.user_id = projections.users_machines.user_id " +
 		"LEFT JOIN projections.login_names " +
 		"ON members.user_id = projections.login_names.user_id " +
+		"LEFT JOIN projections.project_grants " +
+		"ON members.grant_id = projections.project_grants.grant_id " +
 		"WHERE projections.login_names.is_primary = $1")
 	projectGrantMembersColumns = []string{
 		"creation_date",

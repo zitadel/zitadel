@@ -12,4 +12,5 @@ type PrivacyPolicy struct {
 
 	TOSLink     string
 	PrivacyLink string
+	HelpLink    string
 }

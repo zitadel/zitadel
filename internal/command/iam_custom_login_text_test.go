@@ -1143,11 +1143,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 								),
 							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelpLink, "HelpLink", language.English,
-								),
-							),
 						},
 					),
 				),
@@ -1441,7 +1436,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
-						HelpLink:      "HelpLink",
 					},
 				},
 			},
@@ -2547,11 +2541,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 							),
 						),
-						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelpLink, "HelpLink", language.English,
-							),
-						),
 					),
 					expectPush(
 						[]*repository.Event{
@@ -3643,11 +3632,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							eventFromEventPusher(
 								iam.NewCustomTextRemovedEvent(context.Background(),
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, language.English,
-								),
-							),
-							eventFromEventPusher(
-								iam.NewCustomTextRemovedEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelpLink, language.English,
 								),
 							),
 						},
@@ -4798,11 +4782,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 							),
 						),
 						eventFromEventPusher(
-							iam.NewCustomTextSetEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelpLink, "HelpLink", language.English,
-							),
-						),
-						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeySelectAccountTitle, language.English,
 							),
@@ -5890,11 +5869,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						eventFromEventPusher(
 							iam.NewCustomTextRemovedEvent(context.Background(),
 								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, language.English,
-							),
-						),
-						eventFromEventPusher(
-							iam.NewCustomTextRemovedEvent(context.Background(),
-								&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelpLink, language.English,
 							),
 						),
 					),
@@ -6990,11 +6964,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelp, "Help", language.English,
 								),
 							),
-							eventFromEventPusher(
-								iam.NewCustomTextSetEvent(context.Background(),
-									&iam.NewAggregate().Aggregate, domain.LoginCustomText, domain.LoginKeyFooterHelpLink, "HelpLink", language.English,
-								),
-							),
 						},
 					),
 				),
@@ -7288,7 +7257,6 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 						TOS:           "TOS",
 						PrivacyPolicy: "PrivacyPolicy",
 						Help:          "Help",
-						HelpLink:      "HelpLink",
 					},
 				},
 			},

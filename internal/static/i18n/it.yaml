@@ -191,22 +191,22 @@ Errors:
       NotChanged: Il testo predefinito non è stato cambiato
       AlreadyExists: Il testo predefinito già eistente
       Invalid: Il testo predefinito non è valido
-    PasswordComplexity:
+    PasswordComplexityPolicy:
       NotFound: Impostazioni di complessità della password non trovati
       Empty: Mancano le impostazioni di complessità della password
       NotExisting: Impostazioni di complessità della password non esistenti
       AlreadyExists: Impostazioni di complessità della password sono già esistenti
-    PasswordLockout:
+    PasswordLockoutPolicy:
       NotFound: Impostazioni di blocco della password non trovati
       Empty: Mancano le impostazioni di blocco della password
       NotExisting: Le impostazioni di blocco della password non esistenti
       AlreadyExists: Le impostazioni di blocco della password sono già esistenti
-    PasswordAge:
+    PasswordAgePolicy:
       NotFound: Impostazioni di validità della password
       Empty: Impostazioni di validità della password mancanti
       NotExisting: Impostazioni di validità della password non esistenti
       AlreadyExists: Impostazioni di validità della password sono già esistenti
-    OrgIAM:
+    OrgIAMPolicy:
       Empty: Mancano le impostazioni Org IAM
       NotExisting: Impostazioni Org IAM non esistenti
       AlreadyExists: Impostazioni Org IAM già esistenti
@@ -587,6 +587,10 @@ EventTypes:
       cascade:
         removed: Autorizzazione rimossa
         changed: Autorizzazione cambiata
+    metadata:
+      set: Set di metadati utente
+      removed: Metadati utente rimossi
+      removed.all: Tutti i metadati utente rimossi
   org:
     added: Organizzazione aggiunta
     changed: Organizzazione cambiata

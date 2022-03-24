@@ -35,6 +35,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						` projections.privacy_policies.resource_owner,`+
 						` projections.privacy_policies.privacy_link,`+
 						` projections.privacy_policies.tos_link,`+
+						` projections.privacy_policies.help_link,`+
 						` projections.privacy_policies.is_default,`+
 						` projections.privacy_policies.state`+
 						` FROM projections.privacy_policies`),
@@ -43,7 +44,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 				),
 				err: func(err error) (error, bool) {
 					if !errs.IsNotFound(err) {
-						return fmt.Errorf("err should be zitadel.NotFoundError got: %w", err), false
+						return fmt.Errorf("err should be NotFoundError got: %w", err), false
 					}
 					return nil, true
 				},
@@ -62,6 +63,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						` projections.privacy_policies.resource_owner,`+
 						` projections.privacy_policies.privacy_link,`+
 						` projections.privacy_policies.tos_link,`+
+						` projections.privacy_policies.help_link,`+
 						` projections.privacy_policies.is_default,`+
 						` projections.privacy_policies.state`+
 						` FROM projections.privacy_policies`),
@@ -73,6 +75,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						"resource_owner",
 						"privacy_link",
 						"tos_link",
+						"help_link",
 						"is_default",
 						"state",
 					},
@@ -84,6 +87,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						"ro",
 						"privacy.ch",
 						"tos.ch",
+						"help.ch",
 						true,
 						domain.PolicyStateActive,
 					},
@@ -98,6 +102,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 				State:         domain.PolicyStateActive,
 				PrivacyLink:   "privacy.ch",
 				TOSLink:       "tos.ch",
+				HelpLink:      "help.ch",
 				IsDefault:     true,
 			},
 		},
@@ -113,6 +118,7 @@ func Test_PrivacyPolicyPrepares(t *testing.T) {
 						` projections.privacy_policies.resource_owner,`+
 						` projections.privacy_policies.privacy_link,`+
 						` projections.privacy_policies.tos_link,`+
+						` projections.privacy_policies.help_link,`+
 						` projections.privacy_policies.is_default,`+
 						` projections.privacy_policies.state`+
 						` FROM projections.privacy_policies`),

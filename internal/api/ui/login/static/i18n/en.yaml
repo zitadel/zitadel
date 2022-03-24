@@ -298,7 +298,6 @@ Footer:
   Tos: TOS
   PrivacyPolicy: Privacy policy
   Help: Help
-  HelpLink: https://docs.zitadel.ch/docs/manuals/user-login
 
 Errors:
   Internal: An internal error occured
