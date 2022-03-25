@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
@@ -22,7 +21,7 @@ func TestAddOrg(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want preparation.Want
+		want Want
 	}{
 		{
 			name: "invalid domain",
@@ -30,7 +29,7 @@ func TestAddOrg(t *testing.T) {
 				a:    agg,
 				name: "",
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-mruNY", "Errors.Invalid.Argument"),
 			},
 		},
@@ -40,7 +39,7 @@ func TestAddOrg(t *testing.T) {
 				a:    agg,
 				name: "caos ag",
 			},
-			want: preparation.Want{
+			want: Want{
 				Commands: []eventstore.Command{
 					org.NewOrgAddedEvent(ctx, &agg.Aggregate, "caos ag"),
 					org.NewDomainAddedEvent(ctx, &agg.Aggregate, "caos-ag.localhost"),
@@ -52,7 +51,7 @@ func TestAddOrg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddOrg(tt.args.a, tt.args.name, "localhost"), nil, tt.want)
+			AssertValidation(t, AddOrg(tt.args.a, tt.args.name, "localhost"), nil, tt.want)
 		})
 	}
 }

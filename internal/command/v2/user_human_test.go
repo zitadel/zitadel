@@ -26,7 +26,7 @@ func TestAddHumanCommand(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want preparation.Want
+		want Want
 	}{
 		{
 			name: "invalid email",
@@ -36,7 +36,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Email: "invalid",
 				},
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-Ec7dM", "Errors.Invalid.Argument"),
 			},
 		},
@@ -48,7 +48,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Email: "support@zitadel.ch",
 				},
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-UCej2", "Errors.Invalid.Argument"),
 			},
 		},
@@ -61,7 +61,7 @@ func TestAddHumanCommand(t *testing.T) {
 					FirstName: "hurst",
 				},
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "USER-DiAq8", "Errors.Invalid.Argument"),
 			},
 		},
@@ -75,7 +75,7 @@ func TestAddHumanCommand(t *testing.T) {
 					LastName:  "giraffe",
 					Password:  "short",
 				},
-				filter: preparation.NewMultiFilter().Append(
+				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
 							org.NewDomainPolicyAddedEvent(
@@ -101,7 +101,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Filter(),
 			},
-			want: preparation.Want{
+			want: Want{
 				CreateErr: errors.ThrowInvalidArgument(nil, "COMMA-HuJf6", "Errors.User.PasswordComplexityPolicy.MinLength"),
 			},
 		},
@@ -116,7 +116,7 @@ func TestAddHumanCommand(t *testing.T) {
 					Password:  "",
 				},
 				passwordAlg: crypto.CreateMockHashAlg(gomock.NewController(t)),
-				filter: preparation.NewMultiFilter().Append(
+				filter: NewMultiFilter().Append(
 					func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
 							org.NewDomainPolicyAddedEvent(
@@ -142,7 +142,7 @@ func TestAddHumanCommand(t *testing.T) {
 						}).
 					Filter(),
 			},
-			want: preparation.Want{
+			want: Want{
 				Commands: []eventstore.Command{
 					user.NewHumanAddedEvent(
 						context.Background(),
@@ -163,7 +163,7 @@ func TestAddHumanCommand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg), tt.args.filter, tt.want)
+			AssertValidation(t, AddHumanCommand(tt.args.a, tt.args.human, tt.args.passwordAlg), tt.args.filter, tt.want)
 		})
 	}
 }

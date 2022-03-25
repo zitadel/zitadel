@@ -199,7 +199,7 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "err from filter default",
 			args: args{
-				filter: preparation.NewMultiFilter().
+				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
 					}).
@@ -214,7 +214,7 @@ func Test_DomainPolicy(t *testing.T) {
 		{
 			name: "default found",
 			args: args{
-				filter: preparation.NewMultiFilter().
+				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
 					}).

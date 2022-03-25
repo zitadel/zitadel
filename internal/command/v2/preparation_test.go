@@ -1,5 +1,5 @@
 // this is a helper file for tests
-package preparation
+package command
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/eventstore"
 )
 
@@ -18,7 +19,7 @@ type Want struct {
 }
 
 //AssertValidation checks if the validation works as inteded
-func AssertValidation(t *testing.T, validation Validation, filter FilterToQueryReducer, want Want) {
+func AssertValidation(t *testing.T, validation preparation.Validation, filter preparation.FilterToQueryReducer, want Want) {
 	t.Helper()
 
 	creates, err := validation()
@@ -60,19 +61,19 @@ func eventTypes(cmds []eventstore.Command) []eventstore.EventType {
 
 type MultiFilter struct {
 	count   int
-	filters []FilterToQueryReducer
+	filters []preparation.FilterToQueryReducer
 }
 
 func NewMultiFilter() *MultiFilter {
 	return new(MultiFilter)
 }
 
-func (mf *MultiFilter) Append(filter FilterToQueryReducer) *MultiFilter {
+func (mf *MultiFilter) Append(filter preparation.FilterToQueryReducer) *MultiFilter {
 	mf.filters = append(mf.filters, filter)
 	return mf
 }
 
-func (mf *MultiFilter) Filter() FilterToQueryReducer {
+func (mf *MultiFilter) Filter() preparation.FilterToQueryReducer {
 	return func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 		mf.count++
 		return mf.filters[mf.count-1](ctx, queryFactory)

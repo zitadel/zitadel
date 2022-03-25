@@ -25,7 +25,7 @@ func TestAddProject(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want preparation.Want
+		want Want
 	}{
 		{
 			name: "invalid name",
@@ -35,7 +35,7 @@ func TestAddProject(t *testing.T) {
 				owner:                  "owner",
 				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-C01yo", "Errors.Invalid.Argument"),
 			},
 		},
@@ -47,7 +47,7 @@ func TestAddProject(t *testing.T) {
 				owner:                  "owner",
 				privateLabelingSetting: -1,
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-AO52V", "Errors.Invalid.Argument"),
 			},
 		},
@@ -59,7 +59,7 @@ func TestAddProject(t *testing.T) {
 				owner:                  "",
 				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowPreconditionFailed(nil, "PROJE-hzxwo", "Errors.Invalid.Argument"),
 			},
 		},
@@ -71,7 +71,7 @@ func TestAddProject(t *testing.T) {
 				owner:                  "CAOS AG",
 				privateLabelingSetting: domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
 			},
-			want: preparation.Want{
+			want: Want{
 				Commands: []eventstore.Command{
 					project.NewProjectAddedEvent(ctx, &agg.Aggregate,
 						"ZITADEL",
@@ -89,7 +89,7 @@ func TestAddProject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddProject(tt.args.a, tt.args.name, tt.args.owner, false, false, false, tt.args.privateLabelingSetting), nil, tt.want)
+			AssertValidation(t, AddProject(tt.args.a, tt.args.name, tt.args.owner, false, false, false, tt.args.privateLabelingSetting), nil, tt.want)
 		})
 	}
 }

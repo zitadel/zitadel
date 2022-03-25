@@ -25,7 +25,7 @@ func TestAddMember(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want preparation.Want
+		want Want
 	}{
 		{
 			name: "no user id",
@@ -33,7 +33,7 @@ func TestAddMember(t *testing.T) {
 				a:      agg,
 				userID: "",
 			},
-			want: preparation.Want{
+			want: Want{
 				ValidationErr: errors.ThrowInvalidArgument(nil, "ORG-4Mlfs", "Errors.Invalid.Argument"),
 			},
 		},
@@ -53,13 +53,13 @@ func TestAddMember(t *testing.T) {
 			args: args{
 				a:      agg,
 				userID: "userID",
-				filter: preparation.NewMultiFilter().
+				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
 					}).
 					Filter(),
 			},
-			want: preparation.Want{
+			want: Want{
 				CreateErr: errors.ThrowNotFound(nil, "ORG-GoXOn", "Errors.User.NotFound"),
 			},
 		},
@@ -68,7 +68,7 @@ func TestAddMember(t *testing.T) {
 			args: args{
 				a:      agg,
 				userID: "userID",
-				filter: preparation.NewMultiFilter().
+				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
 							user.NewMachineAddedEvent(
@@ -92,7 +92,7 @@ func TestAddMember(t *testing.T) {
 					}).
 					Filter(),
 			},
-			want: preparation.Want{
+			want: Want{
 				CreateErr: errors.ThrowAlreadyExists(nil, "ORG-poWwe", "Errors.Org.Member.AlreadyExists"),
 			},
 		},
@@ -101,7 +101,7 @@ func TestAddMember(t *testing.T) {
 			args: args{
 				a:      agg,
 				userID: "userID",
-				filter: preparation.NewMultiFilter().
+				filter: NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
 							user.NewMachineAddedEvent(
@@ -119,7 +119,7 @@ func TestAddMember(t *testing.T) {
 					}).
 					Filter(),
 			},
-			want: preparation.Want{
+			want: Want{
 				Commands: []eventstore.Command{
 					org.NewMemberAddedEvent(ctx, &agg.Aggregate, "userID"),
 				},
@@ -128,7 +128,7 @@ func TestAddMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddOrgMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+			AssertValidation(t, AddOrgMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
 		})
 	}
 }
