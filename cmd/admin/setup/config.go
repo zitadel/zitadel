@@ -4,11 +4,13 @@ import (
 	"bytes"
 
 	"github.com/caos/logging"
+	"github.com/mitchellh/mapstructure"
+	"github.com/spf13/viper"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/config/hook"
 	"github.com/caos/zitadel/internal/config/systemdefaults"
 	"github.com/caos/zitadel/internal/database"
-	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -44,8 +46,12 @@ func MustNewSteps(v *viper.Viper) *Steps {
 
 	steps := new(Steps)
 	err = v.Unmarshal(steps,
-		viper.DecodeHook(hook.Base64ToBytesHookFunc()),
-		viper.DecodeHook(hook.TagToLanguageHookFunc()),
+		viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+			hook.Base64ToBytesHookFunc(),
+			hook.TagToLanguageHookFunc(),
+			mapstructure.StringToTimeDurationHookFunc(),
+			mapstructure.StringToSliceHookFunc(","),
+		)),
 	)
 	logging.OnError(err).Fatal("unable to read steps")
 	return steps
