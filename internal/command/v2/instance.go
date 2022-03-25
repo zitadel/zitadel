@@ -211,8 +211,8 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 		AddAPIApp(
 			*projectAgg,
-			mgmtAppName,
 			setup.Zitadel.mgmtID,
+			mgmtAppName,
 			setup.Zitadel.mgmtClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
