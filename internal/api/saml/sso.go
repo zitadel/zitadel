@@ -26,51 +26,41 @@ type AuthRequestForm struct {
 }
 
 func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request) {
+	response := &Response{
+		PostTemplate: p.postTemplate,
+		ErrorFunc: func(err error) {
+			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
+		},
+		Issuer: p.EntityID,
+	}
+
 	authRequestForm, err := getAuthRequestFromRequest(r)
 	if err != nil {
 		logging.Log("SAML-837n2s").Error(err)
 		http.Error(w, fmt.Errorf("failed to parse form: %w", err).Error(), http.StatusInternalServerError)
 		return
 	}
+	if authRequestForm.RelayState == "" {
+		logging.Log("SAML-86272s").Error(err)
+		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("empty relaystate").Error()))
+		return
+	}
+	response.SigAlg = authRequestForm.SigAlg
+	response.RelayState = authRequestForm.RelayState
 
 	if err := verifyForm(authRequestForm); err != nil {
 		logging.Log("SAML-827n2s").Error(err)
-		if err := sendBackResponse(
-			"",
-			r,
-			p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
-				"",
-				"",
-				p.EntityID,
-				fmt.Errorf("failed to validate form: %w", err).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to validate form: %w", err).Error()))
 		return
 	}
 
 	authNRequest, err := decodeAuthNRequest(authRequestForm.Encoding, authRequestForm.AuthRequest)
 	if err != nil {
 		logging.Log("SAML-837s2s").Error(err)
-		if err := sendBackResponse(
-			authNRequest.ProtocolBinding,
-			r,
-			p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
-				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
-				p.EntityID,
-				fmt.Errorf("failed to decode request: %w", err).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to decode request: %w", err).Error()))
 		return
 	}
+	response.RequestID = authNRequest.Id
 
 	sp, err := p.GetServiceProvider(r.Context(), authNRequest.Issuer.Text)
 	if err != nil {
@@ -80,22 +70,10 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 	}
 	if sp == nil {
 		logging.Log("SAML-837nas").Error(err)
-		if err := sendBackResponse(
-			authNRequest.ProtocolBinding,
-			r,
-			p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
-				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
-				p.EntityID,
-				fmt.Errorf("unknown service provider: %w", err).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("unknown service provider: %w", err).Error()))
 		return
 	}
+	response.Audience = sp.GetEntityID()
 
 	if sp.metadata.SPSSODescriptor.AuthnRequestsSigned == "true" ||
 		p.Metadata.WantAuthnRequestsSigned == "true" ||
@@ -110,21 +88,7 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			authRequestForm.AuthRequest, err = authNRequestIntoStringWithoutSignature(authRequestForm.Encoding, authRequestForm.AuthRequest)
 			if err != nil {
 				logging.Log("SAML-i1o2mh").Error(err)
-				logging.Log("SAML-817n2s").Error(err)
-				if err := sendBackResponse(
-					authNRequest.ProtocolBinding,
-					r,
-					p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
-						authNRequest.Id,
-						authNRequest.AssertionConsumerServiceURL,
-						p.EntityID,
-						fmt.Errorf("failed to handle signature in request: %w", err).Error(),
-					),
-					"",
-					"",
-				); err != nil {
-					http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-				}
+				response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to send response: %w", err).Error()))
 				return
 			}
 		case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
@@ -138,77 +102,39 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 			authRequestForm.Sig,
 		); err != nil {
 			logging.Log("SAML-817n2s").Error(err)
-			if err := sendBackResponse(
-				authNRequest.ProtocolBinding,
-				r, p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
-					authNRequest.Id,
-					authNRequest.AssertionConsumerServiceURL,
-					p.EntityID,
-					fmt.Errorf("failed to verify signature: %w", err).Error(),
-				),
-				"",
-				"",
-			); err != nil {
-				http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-			}
+			response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify signature: %w", err).Error()))
 			return
 		}
 	}
 
 	if err := p.verifyRequestDestination(authNRequest); err != nil {
 		logging.Log("SAML-83722s").Error(err)
-		if err := sendBackResponse(
-			authNRequest.ProtocolBinding,
-			r, p.postTemplate, w, authRequestForm.RelayState, "", makeDeniedResponse(
-				authNRequest.Id,
-				authNRequest.AssertionConsumerServiceURL,
-				p.EntityID,
-				fmt.Errorf("failed to verify request destination: %w", err).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request destination: %w", err).Error()))
 		return
 	}
 
-	acsURL := ""
-	protocolBinding := ""
 	for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
 		if acs.Binding == authNRequest.ProtocolBinding {
-			acsURL = acs.Location
-			protocolBinding = acs.Binding
+			response.AcsUrl = acs.Location
+			response.ProtocolBinding = acs.Binding
 			break
 		}
 	}
-	if acsURL == "" {
+	if response.AcsUrl == "" {
 		for _, acs := range sp.metadata.SPSSODescriptor.AssertionConsumerService {
-			acsURL = acs.Location
-			protocolBinding = acs.Binding
+			response.AcsUrl = acs.Location
+			response.ProtocolBinding = acs.Binding
 			break
 		}
 	}
-	if acsURL == "" || protocolBinding == "" {
+	if response.AcsUrl == "" {
+		logging.Log("SAML-83712s").Error(err)
+		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("missing assertion consumer url").Error()))
+		return
+	}
+	if response.ProtocolBinding == "" {
 		logging.Log("SAML-83711s").Error(err)
-		if err := sendBackResponse(
-			protocolBinding,
-			r,
-			p.postTemplate,
-			w,
-			authRequestForm.RelayState,
-			acsURL,
-			makeUnsupportedBindingResponse(
-				authNRequest.Id,
-				acsURL,
-				p.EntityID,
-				fmt.Errorf("unsupported binding").Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("missing binding").Error()))
 		return
 	}
 
@@ -217,81 +143,30 @@ func (p *IdentityProvider) ssoHandleFunc(w http.ResponseWriter, r *http.Request)
 		string(sp.metadata.EntityID),
 	); err != nil {
 		logging.Log("SAML-8kj22s").Error(err)
-		if err := sendBackResponse(
-			protocolBinding,
-			r,
-			p.postTemplate,
-			w,
-			authRequestForm.RelayState,
-			acsURL,
-			makeDeniedResponse(
-				authNRequest.Id,
-				acsURL,
-				p.EntityID,
-				fmt.Errorf("failed to verify request content: %w", err).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeDeniedResponse(fmt.Errorf("failed to verify request content: %w", err).Error()))
 		return
 	}
 
 	authRequest, err := p.storage.CreateAuthRequest(
 		r.Context(),
 		authNRequest,
-		acsURL,
-		protocolBinding,
+		response.AcsUrl,
+		response.ProtocolBinding,
 		authRequestForm.RelayState,
 		sp.ID,
 	)
 	if err != nil {
 		logging.Log("SAML-8opi22s").Error(err)
-		if err := sendBackResponse(
-			protocolBinding,
-			r,
-			p.postTemplate,
-			w,
-			authRequestForm.RelayState,
-			acsURL,
-			makeResponderFailResponse(
-				authNRequest.Id,
-				acsURL,
-				p.EntityID,
-				fmt.Errorf("failed to persist request %w", err).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeResponderFailResponse(fmt.Errorf("failed to persist request %w", err).Error()))
 		return
 	}
 
-	switch protocolBinding {
+	switch response.AcsUrl {
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
 		http.Redirect(w, r, sp.LoginURL(authRequest.GetID()), http.StatusSeeOther)
 	default:
 		logging.Log("SAML-67722s").Error(err)
-		if err := sendBackResponse(
-			protocolBinding,
-			r,
-			p.postTemplate,
-			w,
-			authRequestForm.RelayState,
-			acsURL,
-			makeUnsupportedBindingResponse(
-				authNRequest.Id,
-				acsURL,
-				p.EntityID,
-				fmt.Errorf("unsupported binding: %s", authNRequest.ProtocolBinding).Error(),
-			),
-			"",
-			"",
-		); err != nil {
-			http.Error(w, fmt.Errorf("failed to send response: %w", err).Error(), http.StatusInternalServerError)
-		}
+		response.sendBackResponse(r, w, response.makeUnsupportedBindingResponse(fmt.Errorf("unsupported binding: %s", authNRequest.ProtocolBinding).Error()))
 	}
 	return
 }

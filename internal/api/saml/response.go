@@ -29,35 +29,50 @@ const (
 )
 
 type Response struct {
-	Template        *template.Template
+	PostTemplate    *template.Template
 	ProtocolBinding string
 	RelayState      string
-	SAMLResponse    string
 	AcsUrl          string
 	Signature       string
 	SigAlg          string
+	ErrorFunc       func(err error)
+
+	RequestID string
+	Issuer    string
+	Audience  string
+	SendIP    string
 }
 
-func (r *Response) DoResponse(request *http.Request, w http.ResponseWriter) error {
+func (r *Response) doResponse(request *http.Request, w http.ResponseWriter, response string) {
+	if r.AcsUrl == "" {
+		if _, err := w.Write([]byte(response)); err != nil {
+			r.ErrorFunc(err)
+			return
+		}
+	}
+
 	switch r.ProtocolBinding {
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST":
 		data := AuthResponseForm{
 			url.QueryEscape(r.RelayState),
-			r.SAMLResponse,
+			response,
 			r.AcsUrl,
 		}
 
-		return r.Template.Execute(w, data)
+		if err := r.PostTemplate.Execute(w, data); err != nil {
+			r.ErrorFunc(err)
+			return
+		}
 	case "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect":
-		redirectURL := fmt.Sprintf("%s?SAMLResponse=%s&RelayState= %s", r.AcsUrl, url.QueryEscape(r.SAMLResponse), url.QueryEscape(r.RelayState))
+		redirectURL := fmt.Sprintf("%s?SAMLResponse=%s&RelayState= %s", r.AcsUrl, url.QueryEscape(response), url.QueryEscape(r.RelayState))
 		if r.Signature != "" && r.SigAlg != "" {
 			redirectURL = fmt.Sprintf("%s&Signature=%s&SigAlg=%s", redirectURL, url.QueryEscape(r.Signature), url.QueryEscape(r.SigAlg))
 		}
 		http.Redirect(w, request, redirectURL, http.StatusFound)
+		return
 	default:
 		//TODO: no binding
 	}
-	return nil
 }
 
 type AuthResponseForm struct {
@@ -66,176 +81,129 @@ type AuthResponseForm struct {
 	AssertionConsumerServiceURL string
 }
 
-func sendBackResponse(
-	protocolBinding string,
-	r *http.Request,
-	template *template.Template,
+func (r *Response) sendBackResponse(
+	req *http.Request,
 	w http.ResponseWriter,
-	relayState string,
-	acsURL string,
 	resp *samlp.Response,
-	signature string,
-	sigAlg string,
-) error {
+) {
 	var xmlbuff bytes.Buffer
 
 	memWriter := bufio.NewWriter(&xmlbuff)
 	_, err := memWriter.Write([]byte(xml.Header))
 	if err != nil {
-		return err
+		r.ErrorFunc(err)
+		return
 	}
 
 	encoder := xml.NewEncoder(memWriter)
 	err = encoder.Encode(resp)
 	if err != nil {
-		return err
+		r.ErrorFunc(err)
+		return
 	}
 
 	err = memWriter.Flush()
 	if err != nil {
-		return err
+		r.ErrorFunc(err)
+		return
 	}
 
 	samlMessage := base64.StdEncoding.EncodeToString(xmlbuff.Bytes())
 
-	response := &Response{
-		Template:        template,
-		ProtocolBinding: protocolBinding,
-		RelayState:      relayState,
-		SAMLResponse:    samlMessage,
-		AcsUrl:          acsURL,
-		Signature:       signature,
-		SigAlg:          sigAlg,
-	}
-	return response.DoResponse(r, w)
+	r.doResponse(req, w, samlMessage)
 }
 
-func makeUnsupportedBindingResponse(
-	requestID string,
-	acsURL string,
-	issuer string,
+func (r *Response) makeUnsupportedBindingResponse(
 	message string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
-		requestID,
-		acsURL,
+		r.RequestID,
+		r.AcsUrl,
 		nowStr,
 		StatusCodeUnsupportedBinding,
 		message,
-		&saml.NameIDType{
-			Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-			Text:   issuer,
-		},
+		r.Issuer,
 	)
 }
 
-func makeResponderFailResponse(
-	requestID string,
-	acsURL string,
-	issuer string,
+func (r *Response) makeResponderFailResponse(
 	message string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
-		requestID,
-		acsURL,
+		r.RequestID,
+		r.AcsUrl,
 		nowStr,
 		StatusCodeResponder,
 		message,
-		&saml.NameIDType{
-			Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-			Text:   issuer,
-		},
+		r.Issuer,
 	)
 }
 
-func makeDeniedResponse(
-	requestID string,
-	acsURL string,
-	issuer string,
+func (r *Response) makeDeniedResponse(
 	message string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
-		requestID,
-		acsURL,
+		r.RequestID,
+		r.AcsUrl,
 		nowStr,
 		StatusCodeRequestDenied,
 		message,
-		&saml.NameIDType{
-			Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-			Text:   issuer,
-		},
+		r.Issuer,
 	)
 }
 
-func makeFailedResponse(
-	requestID string,
-	acsURL string,
-	issuer string,
+func (r *Response) makeFailedResponse(
 	message string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	return makeResponse(
-		requestID,
-		acsURL,
+		r.RequestID,
+		r.AcsUrl,
 		nowStr,
 		StatusCodeAuthNFailed,
 		message,
-		&saml.NameIDType{
-			Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-			Text:   issuer,
-		},
+		r.Issuer,
 	)
 }
 
-func makeSuccessfulResponse(
-	request AuthRequestInt,
-	entityID string,
-	sendIP string,
+func (r *Response) makeSuccessfulResponse(
 	attributes *Attributes,
-	audience string,
 ) *samlp.Response {
 	now := time.Now().UTC()
 	nowStr := now.Format(DefaultTimeFormat)
 	fiveFromNowStr := now.Add(5 * time.Minute).Format(DefaultTimeFormat)
 
-	issuer := &saml.NameIDType{
-		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
-		Text:   entityID,
-	}
-
-	return makeAssertionResponse(
-		request.GetAuthRequestID(),
-		request.GetAccessConsumerServiceURL(),
-		sendIP,
+	return r.makeAssertionResponse(
 		nowStr,
 		fiveFromNowStr,
-		issuer,
 		attributes,
-		audience,
 	)
 }
 
-func makeAssertionResponse(
-	requestID string,
-	acsURL string,
-	sendIP string,
+func (r *Response) makeAssertionResponse(
 	issueInstant string,
 	untilInstant string,
-	issuer *saml.NameIDType,
 	attributes *Attributes,
-	audience string,
 ) *samlp.Response {
-	response := makeResponse(requestID, acsURL, issueInstant, StatusCodeSuccess, "", issuer)
-	assertion := makeAssertion(requestID, acsURL, sendIP, issueInstant, untilInstant, issuer, attributes.GetNameID(), attributes.GetSAML(), audience)
+
+	response := makeResponse(r.RequestID, r.AcsUrl, issueInstant, StatusCodeSuccess, "", r.Issuer)
+	assertion := makeAssertion(r.RequestID, r.AcsUrl, r.SendIP, issueInstant, untilInstant, r.Issuer, attributes.GetNameID(), attributes.GetSAML(), r.Audience)
 	response.Assertion = *assertion
 	return response
+}
+
+func getIssuer(entityID string) *saml.NameIDType {
+	return &saml.NameIDType{
+		Format: "urn:oasis:names:tc:SAML:2.0:nameid-format:entity",
+		Text:   entityID,
+	}
 }
 
 func makeAssertion(
@@ -244,27 +212,25 @@ func makeAssertion(
 	sendIP string,
 	issueInstant string,
 	untilInstant string,
-	issuer *saml.NameIDType,
+	issuer string,
 	nameID *saml.NameIDType,
 	attributes []*saml.AttributeType,
 	audience string,
 ) *saml.Assertion {
 	id := NewID()
-	return &saml.Assertion{
+	issuerP := getIssuer(issuer)
+
+	ret := &saml.Assertion{
 		Version:      "2.0",
 		Id:           id,
 		IssueInstant: issueInstant,
-		Issuer:       *issuer,
+		Issuer:       *issuerP,
 		Subject: &saml.SubjectType{
 			NameID: nameID,
 			SubjectConfirmation: []saml.SubjectConfirmationType{
-				/*{
-					Method: "urn:oasis:names:tc:SAML:2.0:cm:sender-vouches",
-				},*/
 				{
 					Method: "urn:oasis:names:tc:SAML:2.0:cm:bearer",
 					SubjectConfirmationData: &saml.SubjectConfirmationDataType{
-						Address:      sendIP,
 						InResponseTo: requestID,
 						Recipient:    acsURL,
 						NotBefore:    issueInstant,
@@ -293,6 +259,10 @@ func makeAssertion(
 			},
 		},
 	}
+	if sendIP != "" {
+		ret.Subject.SubjectConfirmation[0].SubjectConfirmationData.Address = sendIP
+	}
+	return ret
 }
 
 func makeResponse(
@@ -301,7 +271,7 @@ func makeResponse(
 	issueInstant string,
 	status string,
 	message string,
-	issuer *saml.NameIDType,
+	issuer string,
 ) *samlp.Response {
 	return &samlp.Response{
 		Version:      "2.0",
@@ -315,6 +285,6 @@ func makeResponse(
 		},
 		InResponseTo: requestID,
 		Destination:  acsURL,
-		Issuer:       issuer,
+		Issuer:       getIssuer(issuer),
 	}
 }
