@@ -26,6 +26,7 @@ func AddLoginPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{
 				instance.NewLoginPolicyAddedEvent(ctx, &a.Aggregate,
 					allowUsernamePassword,
@@ -48,6 +49,7 @@ func AddLoginPolicy(
 func AddSecondFactorToLoginPolicy(a *instance.Aggregate, factor domain.SecondFactorType) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{
 				instance.NewLoginPolicySecondFactorAddedEvent(ctx, &a.Aggregate, factor),
 			}, nil
@@ -58,6 +60,7 @@ func AddSecondFactorToLoginPolicy(a *instance.Aggregate, factor domain.SecondFac
 func AddMultiFactorToLoginPolicy(a *instance.Aggregate, factor domain.MultiFactorType) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{
 				instance.NewLoginPolicyMultiFactorAddedEvent(ctx, &a.Aggregate, factor),
 			}, nil

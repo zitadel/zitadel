@@ -15,6 +15,7 @@ func AddLockoutPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{
 				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxAttempts, showLockoutFailure),
 			}, nil

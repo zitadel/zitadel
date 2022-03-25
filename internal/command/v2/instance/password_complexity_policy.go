@@ -18,6 +18,7 @@ func AddPasswordComplexityPolicy(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{
 				instance.NewPasswordComplexityPolicyAddedEvent(ctx, &a.Aggregate,
 					minLength,

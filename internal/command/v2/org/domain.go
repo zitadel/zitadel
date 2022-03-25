@@ -27,6 +27,7 @@ func VerifyDomain(a *org.Aggregate, domain string) preparation.Validation {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-yqlVQ", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{org.NewDomainVerifiedEvent(ctx, &a.Aggregate, domain)}, nil
 		}, nil
 	}
@@ -38,6 +39,7 @@ func SetDomainPrimary(a *org.Aggregate, domain string) preparation.Validation {
 			return nil, errors.ThrowInvalidArgument(nil, "ORG-gmNqY", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists and verified
 			return []eventstore.Command{org.NewDomainPrimarySetEvent(ctx, &a.Aggregate, domain)}, nil
 		}, nil
 	}

@@ -3,6 +3,7 @@ package preparation
 import (
 	"context"
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/caos/zitadel/internal/eventstore"
@@ -136,6 +137,27 @@ func Test_create(t *testing.T) {
 			}
 			if len(gotCmds) != tt.want.len {
 				t.Errorf("create() len = %d, want %d", len(gotCmds), tt.want.len)
+			}
+		})
+	}
+}
+
+func Test_transactionFilter(t *testing.T) {
+	type args struct {
+		filter   FilterToQueryReducer
+		commands []eventstore.Command
+	}
+	tests := []struct {
+		name string
+		args args
+		want FilterToQueryReducer
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := transactionFilter(tt.args.filter, tt.args.commands); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("transactionFilter() = %v, want %v", got, tt.want)
 			}
 		})
 	}

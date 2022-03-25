@@ -3,12 +3,13 @@ package instance
 import (
 	"context"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/command"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
-	"golang.org/x/text/language"
 )
 
 func AddEmailTemplate(
@@ -17,6 +18,7 @@ func AddEmailTemplate(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			//TODO: check if already exists
 			return []eventstore.Command{
 				instance.NewMailTemplateAddedEvent(ctx, &a.Aggregate,
 					tempalte,

@@ -4,13 +4,14 @@ import (
 	"context"
 	"strings"
 
+	"golang.org/x/text/language"
+
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/crypto"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
-	"golang.org/x/text/language"
 )
 
 type AddHuman struct {
@@ -67,11 +68,11 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				human.DisplayName,
 				human.PreferredLang,
 				human.Gender,
-				human.Email,
+				human.Email, //TODO: pass if verified
 				domainPolicy.UserLoginMustBeDomain,
 			)
 			if human.Phone != "" {
-				cmd.AddPhoneData(human.Phone)
+				cmd.AddPhoneData(human.Phone) //TODO: pass if verified
 			}
 			if human.Password != "" {
 				passwordComplexity, err := passwordComplexityPolicyWriteModel(ctx, filter)
