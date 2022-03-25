@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -8,16 +8,19 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddLockoutPolicy(
+func AddPasswordAgePolicy(
 	a *instance.Aggregate,
-	maxAttempts uint64,
-	showLockoutFailure bool,
+	expireWarnDays,
+	maxAgeDays uint64,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
 			return []eventstore.Command{
-				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxAttempts, showLockoutFailure),
+				instance.NewPasswordAgePolicyAddedEvent(ctx, &a.Aggregate,
+					expireWarnDays,
+					maxAgeDays,
+				),
 			}, nil
 		}, nil
 	}

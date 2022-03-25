@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -8,25 +8,16 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddPasswordComplexityPolicy(
+func AddDefaultLockoutPolicy(
 	a *instance.Aggregate,
-	minLength uint64,
-	hasLowercase,
-	hasUppercase,
-	hasNumber,
-	hasSymbol bool,
+	maxAttempts uint64,
+	showLockoutFailure bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
 			return []eventstore.Command{
-				instance.NewPasswordComplexityPolicyAddedEvent(ctx, &a.Aggregate,
-					minLength,
-					hasLowercase,
-					hasUppercase,
-					hasNumber,
-					hasSymbol,
-				),
+				instance.NewLockoutPolicyAddedEvent(ctx, &a.Aggregate, maxAttempts, showLockoutFailure),
 			}, nil
 		}, nil
 	}

@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddLabelPolicy(
+func AddDefaultLabelPolicy(
 	a *instance.Aggregate,
 	primaryColor,
 	backgroundColor,

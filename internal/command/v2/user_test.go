@@ -1,15 +1,16 @@
-package user
+package command
 
 import (
 	"context"
 	"testing"
+
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/user"
-	"golang.org/x/text/language"
 )
 
 func TestExistsUser(t *testing.T) {

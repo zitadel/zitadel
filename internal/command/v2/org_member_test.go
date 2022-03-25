@@ -1,4 +1,4 @@
-package org
+package command
 
 import (
 	"context"
@@ -128,7 +128,7 @@ func TestAddMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
+			preparation.AssertValidation(t, AddOrgMember(tt.args.a, tt.args.userID, tt.args.roles...), tt.args.filter, tt.want)
 		})
 	}
 }
@@ -236,7 +236,7 @@ func TestIsMember(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotExists, err := IsMember(context.Background(), tt.args.filter, tt.args.orgID, tt.args.userID)
+			gotExists, err := IsOrgMember(context.Background(), tt.args.filter, tt.args.orgID, tt.args.userID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ExistsUser() error = %v, wantErr %v", err, tt.wantErr)
 				return

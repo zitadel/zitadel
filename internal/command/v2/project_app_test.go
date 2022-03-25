@@ -1,4 +1,4 @@
-package project
+package command
 
 import (
 	"context"
@@ -274,7 +274,7 @@ func TestAddAPIConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			preparation.AssertValidation(t,
-				AddAPI(*tt.args.a,
+				AddAPIApp(*tt.args.a,
 					tt.args.appID,
 					tt.args.name,
 					tt.args.clientID,

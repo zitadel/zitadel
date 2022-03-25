@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -8,17 +8,17 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddPrivacyPolicy(
+func AddDefaultDomainPolicy(
 	a *instance.Aggregate,
-	tosLink,
-	privacyLink,
-	helpLink string,
+	userLoginMustBeDomain bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
 			return []eventstore.Command{
-				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink),
+				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
+					userLoginMustBeDomain,
+				),
 			}, nil
 		}, nil
 	}

@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddLoginPolicy(
+func AddDefaultLoginPolicy(
 	a *instance.Aggregate,
 	allowUsernamePassword bool,
 	allowRegister bool,
@@ -46,7 +46,7 @@ func AddLoginPolicy(
 	}
 }
 
-func AddSecondFactorToLoginPolicy(a *instance.Aggregate, factor domain.SecondFactorType) preparation.Validation {
+func AddSecondFactorToDefaultLoginPolicy(a *instance.Aggregate, factor domain.SecondFactorType) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
@@ -57,7 +57,7 @@ func AddSecondFactorToLoginPolicy(a *instance.Aggregate, factor domain.SecondFac
 	}
 }
 
-func AddMultiFactorToLoginPolicy(a *instance.Aggregate, factor domain.MultiFactorType) preparation.Validation {
+func AddMultiFactorToDefaultLoginPolicy(a *instance.Aggregate, factor domain.MultiFactorType) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists

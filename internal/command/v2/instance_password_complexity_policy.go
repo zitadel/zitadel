@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -8,16 +8,24 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddDomainPolicy(
+func AddPasswordComplexityPolicy(
 	a *instance.Aggregate,
-	userLoginMustBeDomain bool,
+	minLength uint64,
+	hasLowercase,
+	hasUppercase,
+	hasNumber,
+	hasSymbol bool,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
 			return []eventstore.Command{
-				instance.NewDomainPolicyAddedEvent(ctx, &a.Aggregate,
-					userLoginMustBeDomain,
+				instance.NewPasswordComplexityPolicyAddedEvent(ctx, &a.Aggregate,
+					minLength,
+					hasLowercase,
+					hasUppercase,
+					hasNumber,
+					hasSymbol,
 				),
 			}, nil
 		}, nil

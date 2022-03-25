@@ -1,8 +1,11 @@
-package user
+package command
 
 import (
 	"context"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/command/v2/preparation"
 	"github.com/caos/zitadel/internal/crypto"
@@ -10,8 +13,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/org"
 	"github.com/caos/zitadel/internal/repository/user"
-	"github.com/golang/mock/gomock"
-	"golang.org/x/text/language"
 )
 
 func TestAddHumanCommand(t *testing.T) {

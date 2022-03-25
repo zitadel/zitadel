@@ -1,4 +1,4 @@
-package user
+package command
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 
 func passwordComplexityPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PasswordComplexityPolicyWriteModel, error) {
 	wm, err := customPasswordComplexityPolicy(ctx, filter)
-	if err != nil || wm != nil {
+	if err != nil || wm != nil && wm.State.Exists() {
 		return wm, err
 	}
 	wm, err = defaultPasswordComplexityPolicy(ctx, filter)

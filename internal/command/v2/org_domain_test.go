@@ -1,4 +1,4 @@
-package org
+package command
 
 import (
 	"context"
@@ -46,7 +46,7 @@ func TestAddDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddDomain(tt.args.a, tt.args.domain), nil, tt.want)
+			preparation.AssertValidation(t, AddOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
 		})
 	}
 }
@@ -87,7 +87,7 @@ func TestVerifyDomain(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, VerifyDomain(tt.args.a, tt.args.domain), nil, tt.want)
+			preparation.AssertValidation(t, VerifyOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
 		})
 	}
 }
@@ -128,7 +128,7 @@ func TestSetDomainPrimary(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, SetDomainPrimary(tt.args.a, tt.args.domain), nil, tt.want)
+			preparation.AssertValidation(t, SetPrimaryOrgDomain(tt.args.a, tt.args.domain), nil, tt.want)
 		})
 	}
 }

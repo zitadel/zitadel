@@ -1,4 +1,4 @@
-package project
+package command
 
 import (
 	"context"
@@ -81,7 +81,7 @@ func AddOIDCApp(
 	}
 }
 
-func AddAPI(
+func AddAPIApp(
 	a project.Aggregate,
 	appID,
 	name,

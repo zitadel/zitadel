@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -28,13 +28,13 @@ func AddEmailTemplate(
 	}
 }
 
-func SetCustomTexts(
+func SetInstanceCustomTexts(
 	a *instance.Aggregate,
 	msg *domain.CustomMessageText,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existing, err := existingCustomMessageText(ctx, filter, msg.MessageTextType, msg.Language)
+			existing, err := existingInstanceCustomMessageText(ctx, filter, msg.MessageTextType, msg.Language)
 			if err != nil {
 				return nil, err
 			}
@@ -95,7 +95,7 @@ func SetCustomTexts(
 	}
 }
 
-func existingCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, textType string, lang language.Tag) (*command.InstanceCustomMessageTextWriteModel, error) {
+func existingInstanceCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, textType string, lang language.Tag) (*command.InstanceCustomMessageTextWriteModel, error) {
 	writeModel := command.NewInstanceCustomMessageTextWriteModel(textType, lang)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {

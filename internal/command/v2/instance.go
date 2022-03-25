@@ -6,15 +6,11 @@ import (
 
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/ui/console"
-	"github.com/caos/zitadel/internal/command/v2/instance"
-	"github.com/caos/zitadel/internal/command/v2/org"
 	"github.com/caos/zitadel/internal/command/v2/preparation"
-	"github.com/caos/zitadel/internal/command/v2/project"
-	"github.com/caos/zitadel/internal/command/v2/user"
 	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/id"
-	instance_repo "github.com/caos/zitadel/internal/repository/instance"
-	org_repo "github.com/caos/zitadel/internal/repository/org"
+	"github.com/caos/zitadel/internal/repository/instance"
+	"github.com/caos/zitadel/internal/repository/org"
 	project_repo "github.com/caos/zitadel/internal/repository/project"
 	user_repo "github.com/caos/zitadel/internal/repository/user"
 )
@@ -155,13 +151,13 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 	setup.Org.Human.PasswordChangeRequired = true
 
-	instanceAgg := instance_repo.NewAggregate()
-	orgAgg := org_repo.NewAggregate(orgID, orgID)
+	instanceAgg := instance.NewAggregate()
+	orgAgg := org.NewAggregate(orgID, orgID)
 	userAgg := user_repo.NewAggregate(userID, orgID)
 	projectAgg := project_repo.NewAggregate(setup.Zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
-		instance.AddPasswordComplexityPolicy(
+		AddPasswordComplexityPolicy(
 			instanceAgg,
 			setup.PasswordComplexityPolicy.MinLength,
 			setup.PasswordComplexityPolicy.HasLowercase,
@@ -169,16 +165,16 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			setup.PasswordComplexityPolicy.HasNumber,
 			setup.PasswordComplexityPolicy.HasSymbol,
 		),
-		instance.AddPasswordAgePolicy(
+		AddPasswordAgePolicy(
 			instanceAgg,
 			setup.PasswordAgePolicy.ExpireWarnDays,
 			setup.PasswordAgePolicy.MaxAgeDays,
 		),
-		instance.AddDomainPolicy(
+		AddDefaultDomainPolicy(
 			instanceAgg,
 			setup.DomainPolicy.UserLoginMustBeDomain,
 		),
-		instance.AddLoginPolicy(
+		AddDefaultLoginPolicy(
 			instanceAgg,
 			setup.LoginPolicy.AllowUsernamePassword,
 			setup.LoginPolicy.AllowRegister,
@@ -192,28 +188,28 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			setup.LoginPolicy.SecondFactorCheckLifetime,
 			setup.LoginPolicy.MultiFactorCheckLifetime,
 		),
-		instance.AddSecondFactorToLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
-		instance.AddSecondFactorToLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
-		instance.AddMultiFactorToLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
+		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeOTP),
+		AddSecondFactorToDefaultLoginPolicy(instanceAgg, domain.SecondFactorTypeU2F),
+		AddMultiFactorToDefaultLoginPolicy(instanceAgg, domain.MultiFactorTypeU2FWithPIN),
 
-		instance.AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
-		instance.AddLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
+		AddPrivacyPolicy(instanceAgg, setup.PrivacyPolicy.TOSLink, setup.PrivacyPolicy.PrivacyLink, setup.PrivacyPolicy.HelpLink),
+		AddDefaultLockoutPolicy(instanceAgg, setup.LockoutPolicy.MaxAttempts, setup.LockoutPolicy.ShouldShowLockoutFailure),
 
-		instance.AddEmailTemplate(instanceAgg, setup.EmailTemplate),
+		AddEmailTemplate(instanceAgg, setup.EmailTemplate),
 	}
 
 	for _, msg := range setup.MessageTexts {
-		validations = append(validations, instance.SetCustomTexts(instanceAgg, msg))
+		validations = append(validations, SetInstanceCustomTexts(instanceAgg, msg))
 	}
 
 	validations = append(validations,
-		org.AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
-		user.AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
-		org.AddMember(orgAgg, userID, domain.RoleOrgOwner),
+		AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
+		AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
+		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
 
-		project.AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
+		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
-		project.AddAPI(
+		AddAPIApp(
 			*projectAgg,
 			mgmtAppName,
 			setup.Zitadel.mgmtID,
@@ -222,7 +218,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		project.AddAPI(
+		AddAPIApp(
 			*projectAgg,
 			setup.Zitadel.adminID,
 			adminAppName,
@@ -231,7 +227,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		project.AddAPI(
+		AddAPIApp(
 			*projectAgg,
 			setup.Zitadel.authID,
 			authAppName,
@@ -240,7 +236,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		project.AddOIDCApp(
+		AddOIDCApp(
 			*projectAgg,
 			domain.OIDCVersionV1,
 			setup.Zitadel.consoleID,

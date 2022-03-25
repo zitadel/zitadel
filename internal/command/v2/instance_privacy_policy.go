@@ -1,4 +1,4 @@
-package instance
+package command
 
 import (
 	"context"
@@ -8,19 +8,17 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func AddPasswordAgePolicy(
+func AddPrivacyPolicy(
 	a *instance.Aggregate,
-	expireWarnDays,
-	maxAgeDays uint64,
+	tosLink,
+	privacyLink,
+	helpLink string,
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			//TODO: check if already exists
 			return []eventstore.Command{
-				instance.NewPasswordAgePolicyAddedEvent(ctx, &a.Aggregate,
-					expireWarnDays,
-					maxAgeDays,
-				),
+				instance.NewPrivacyPolicyAddedEvent(ctx, &a.Aggregate, tosLink, privacyLink, helpLink),
 			}, nil
 		}, nil
 	}
