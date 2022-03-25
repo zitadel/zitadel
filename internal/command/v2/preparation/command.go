@@ -12,7 +12,7 @@ import (
 type Validation func() (CreateCommands, error)
 
 // CreateCommands builds the commands
-// the filter param es an extended version of the eventstore filter method
+// the filter param is an extended version of the eventstore filter method
 // it filters for events including the commands on the current context
 type CreateCommands func(context.Context, FilterToQueryReducer) ([]eventstore.Command, error)
 
