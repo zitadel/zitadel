@@ -99,3 +99,76 @@ func updateCustomDomainPolicyToDomain(req *admin_pb.UpdateCustomDomainPolicyRequ
 		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
 	}
 }
+
+func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCustomOrgIAMPolicyRequest) (*admin_pb.AddCustomOrgIAMPolicyResponse, error) {
+	policy, err := s.command.AddOrgDomainPolicy(ctx, req.OrgId, domainPolicyToDomain(req.UserLoginMustBeDomain))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.AddCustomOrgIAMPolicyResponse{
+		Details: object.AddToDetailsPb(
+			policy.Sequence,
+			policy.ChangeDate,
+			policy.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) UpdateOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateOrgIAMPolicyRequest) (*admin_pb.UpdateOrgIAMPolicyResponse, error) {
+	config, err := s.command.ChangeDefaultDomainPolicy(ctx, updateOrgIAMPolicyToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateOrgIAMPolicyResponse{
+		Details: object.ChangeToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) UpdateCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateCustomOrgIAMPolicyRequest) (*admin_pb.UpdateCustomOrgIAMPolicyResponse, error) {
+	config, err := s.command.ChangeOrgDomainPolicy(ctx, req.OrgId, updateCustomOrgIAMPolicyToDomain(req))
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.UpdateCustomOrgIAMPolicyResponse{
+		Details: object.ChangeToDetailsPb(
+			config.Sequence,
+			config.ChangeDate,
+			config.ResourceOwner,
+		),
+	}, nil
+}
+
+func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *admin_pb.GetOrgIAMPolicyRequest) (*admin_pb.GetOrgIAMPolicyResponse, error) {
+	policy, err := s.query.DefaultDomainPolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetOrgIAMPolicyResponse{Policy: policy_grpc.DomainPolicyToOrgIAMPb(policy)}, nil
+}
+
+func (s *Server) GetCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.GetCustomOrgIAMPolicyRequest) (*admin_pb.GetCustomOrgIAMPolicyResponse, error) {
+	policy, err := s.query.DomainPolicyByOrg(ctx, req.OrgId)
+	if err != nil {
+		return nil, err
+	}
+	return &admin_pb.GetCustomOrgIAMPolicyResponse{Policy: policy_grpc.DomainPolicyToOrgIAMPb(policy)}, nil
+}
+
+func updateOrgIAMPolicyToDomain(req *admin_pb.UpdateOrgIAMPolicyRequest) *domain.DomainPolicy {
+	return &domain.DomainPolicy{
+		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
+	}
+}
+
+func updateCustomOrgIAMPolicyToDomain(req *admin_pb.UpdateCustomOrgIAMPolicyRequest) *domain.DomainPolicy {
+	return &domain.DomainPolicy{
+		ObjectRoot: models.ObjectRoot{
+			AggregateID: req.OrgId,
+		},
+		UserLoginMustBeDomain: req.UserLoginMustBeDomain,
+	}
+}

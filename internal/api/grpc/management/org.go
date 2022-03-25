@@ -112,6 +112,16 @@ func (s *Server) GetDomainPolicy(ctx context.Context, req *mgmt_pb.GetDomainPoli
 	}, nil
 }
 
+func (s *Server) GetOrgIAMPolicy(ctx context.Context, _ *mgmt_pb.GetOrgIAMPolicyRequest) (*mgmt_pb.GetOrgIAMPolicyResponse, error) {
+	policy, err := s.query.DomainPolicyByOrg(ctx, authz.GetCtxData(ctx).OrgID)
+	if err != nil {
+		return nil, err
+	}
+	return &mgmt_pb.GetOrgIAMPolicyResponse{
+		Policy: policy_grpc.DomainPolicyToOrgIAMPb(policy),
+	}, nil
+}
+
 func (s *Server) ListOrgDomains(ctx context.Context, req *mgmt_pb.ListOrgDomainsRequest) (*mgmt_pb.ListOrgDomainsResponse, error) {
 	queries, err := ListOrgDomainsRequestToModel(req)
 	if err != nil {

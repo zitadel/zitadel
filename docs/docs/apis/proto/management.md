@@ -4865,7 +4865,7 @@ This is an empty request
 
 | Field | Type | Description | Validation |
 | ----- | ---- | ----------- | ----------- |
-| policy |  zitadel.policy.v1.DomainPolicy | - |  |
+| policy |  zitadel.policy.v1.OrgIAMPolicy | - |  |
 
 
 

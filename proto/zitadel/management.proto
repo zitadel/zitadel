@@ -4387,7 +4387,7 @@ message GetFeaturesResponse {
 message GetOrgIAMPolicyRequest {}
 
 message GetOrgIAMPolicyResponse {
-    zitadel.policy.v1.DomainPolicy policy = 1;
+    zitadel.policy.v1.OrgIAMPolicy policy = 1;
 }
 
 message GetDomainPolicyRequest {}
