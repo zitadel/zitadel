@@ -5,18 +5,18 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	v1 "github.com/caos/zitadel/internal/eventstore/v1"
-	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
-	org_view "github.com/caos/zitadel/internal/org/repository/view"
-	query2 "github.com/caos/zitadel/internal/query"
-	"github.com/caos/zitadel/internal/repository/org"
-
 	es_models "github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/eventstore/v1/query"
+	es_sdk "github.com/caos/zitadel/internal/eventstore/v1/sdk"
 	"github.com/caos/zitadel/internal/eventstore/v1/spooler"
 	org_model "github.com/caos/zitadel/internal/org/model"
 	org_es_model "github.com/caos/zitadel/internal/org/repository/eventsourcing/model"
+	org_view "github.com/caos/zitadel/internal/org/repository/view"
+	query2 "github.com/caos/zitadel/internal/query"
+	"github.com/caos/zitadel/internal/repository/org"
 	es_model "github.com/caos/zitadel/internal/user/repository/eventsourcing/model"
 	view_model "github.com/caos/zitadel/internal/user/repository/view/model"
 )
@@ -251,7 +251,7 @@ func (u *NotifyUser) loginNameInformation(ctx context.Context, orgID string) (us
 		return false, "", nil, err
 	}
 	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(ctx)
+		policy, err := u.queries.DefaultDomainPolicy(authz.WithInstance(ctx, authz.Instance{ID: org.InstanceID}))
 		if err != nil {
 			return false, "", nil, err
 		}

@@ -268,7 +268,7 @@ func (u *User) loginNameInformation(ctx context.Context, orgID string) (userLogi
 		return false, "", nil, err
 	}
 	if org.DomainPolicy == nil {
-		policy, err := u.queries.DefaultDomainPolicy(ctx)
+		policy, err := u.queries.DefaultDomainPolicy(withInstanceID(ctx, org.InstanceID))
 		if err != nil {
 			return false, "", nil, err
 		}
