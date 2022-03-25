@@ -13,34 +13,11 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func AddApp(a *project.Aggregate, id, name string) preparation.Validation {
-	return func() (preparation.CreateCommands, error) {
-		if id == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "PROJE-0wTYg", "Errors.Invalid.Argument")
-		}
-		if name = strings.TrimSpace(name); name == "" {
-			return nil, errors.ThrowInvalidArgument(nil, "PROJE-P7gKR", "Errors.Invalid.Argument")
-		}
-		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := ExistsProject(ctx, filter, a.ID, a.ResourceOwner); !exists || err != nil {
-				return nil, errors.ThrowAlreadyExists(err, "PROJE-5LQ0U", "Errors.Project.NotFound")
-			}
-			return []eventstore.Command{
-				project.NewApplicationAddedEvent(
-					ctx,
-					&a.Aggregate,
-					id,
-					name,
-				),
-			}, nil
-		}, nil
-	}
-}
-
-func AddOIDCConfig(
+func AddOIDCApp(
 	a project.Aggregate,
 	version domain.OIDCVersion,
-	appID string,
+	appID,
+	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	redirectUris []string,
@@ -61,14 +38,23 @@ func AddOIDCConfig(
 		if appID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-NnavI", "Errors.Invalid.Argument")
 		}
+		if name = strings.TrimSpace(name); name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument")
+		}
 		if clientID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-ghTsJ", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := ExistsApp(ctx, filter, a.ID, appID, a.ResourceOwner); err != nil || !exists {
-				return nil, errors.ThrowNotFound(err, "PROJE-sLDbG", "Errors.Project.Application.NotFound")
+			if exists, err := ExistsProject(ctx, filter, a.ID, a.ResourceOwner); !exists || err != nil {
+				return nil, errors.ThrowNotFound(err, "PROJE-5LQ0U", "Errors.Project.NotFound")
 			}
 			return []eventstore.Command{
+				project.NewApplicationAddedEvent(
+					ctx,
+					&a.Aggregate,
+					appID,
+					name,
+				),
 				project.NewOIDCConfigAddedEvent(
 					ctx,
 					&a.Aggregate,
@@ -95,9 +81,10 @@ func AddOIDCConfig(
 	}
 }
 
-func AddAPIConfig(
+func AddAPI(
 	a project.Aggregate,
-	appID string,
+	appID,
+	name,
 	clientID string,
 	clientSecret *crypto.CryptoValue,
 	authMethodType domain.APIAuthMethodType,
@@ -106,14 +93,23 @@ func AddAPIConfig(
 		if appID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XHsKt", "Errors.Invalid.Argument")
 		}
+		if name = strings.TrimSpace(name); name == "" {
+			return nil, errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument")
+		}
 		if clientID == "" {
 			return nil, errors.ThrowInvalidArgument(nil, "PROJE-XXED5", "Errors.Invalid.Argument")
 		}
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			if exists, err := ExistsApp(ctx, filter, a.ID, appID, a.ResourceOwner); err != nil || !exists {
-				return nil, errors.ThrowNotFound(err, "PROJE-EpG1p", "Errors.Project.Application.NotFound")
+			if exists, err := ExistsProject(ctx, filter, a.ID, a.ResourceOwner); !exists || err != nil {
+				return nil, errors.ThrowNotFound(err, "PROJE-Sf2gb", "Errors.Project.NotFound")
 			}
 			return []eventstore.Command{
+				project.NewApplicationAddedEvent(
+					ctx,
+					&a.Aggregate,
+					appID,
+					name,
+				),
 				project.NewAPIConfigAddedEvent(
 					ctx,
 					&a.Aggregate,

@@ -213,54 +213,38 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 		project.AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
 
-		project.AddApp(
-			projectAgg,
-			setup.Zitadel.mgmtID,
-			mgmtAppName,
-		),
-		project.AddAPIConfig(
+		project.AddAPI(
 			*projectAgg,
+			mgmtAppName,
 			setup.Zitadel.mgmtID,
 			setup.Zitadel.mgmtClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		project.AddApp(
-			projectAgg,
-			setup.Zitadel.adminID,
-			adminAppName,
-		),
-		project.AddAPIConfig(
+		project.AddAPI(
 			*projectAgg,
 			setup.Zitadel.adminID,
+			adminAppName,
 			setup.Zitadel.adminClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		project.AddApp(
-			projectAgg,
-			setup.Zitadel.authID,
-			authAppName,
-		),
-		project.AddAPIConfig(
+		project.AddAPI(
 			*projectAgg,
 			setup.Zitadel.authID,
+			authAppName,
 			setup.Zitadel.authClientID,
 			nil,
 			domain.APIAuthMethodTypePrivateKeyJWT,
 		),
 
-		project.AddApp(
-			projectAgg,
-			setup.Zitadel.consoleID,
-			consoleAppName,
-		),
-		project.AddOIDCConfig(
+		project.AddOIDCApp(
 			*projectAgg,
 			domain.OIDCVersionV1,
 			setup.Zitadel.consoleID,
+			consoleAppName,
 			setup.Zitadel.consoleClientID,
 			nil,
 			[]string{setup.Zitadel.BaseURL + consoleRedirectPath},

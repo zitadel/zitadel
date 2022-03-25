@@ -11,103 +11,11 @@ import (
 	"github.com/caos/zitadel/internal/repository/project"
 )
 
-func TestAddApp(t *testing.T) {
-	type args struct {
-		a      *project.Aggregate
-		id     string
-		name   string
-		filter preparation.FilterToQueryReducer
-	}
-
-	ctx := context.Background()
-	agg := project.NewAggregate("test", "test")
-
-	tests := []struct {
-		name string
-		args args
-		want preparation.Want
-	}{
-		{
-			name: "invalid id",
-			args: args{
-				a:    agg,
-				id:   "",
-				name: "name",
-			},
-			want: preparation.Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-0wTYg", "Errors.Invalid.Argument"),
-			},
-		},
-		{
-			name: "invalid name",
-			args: args{
-				a:    agg,
-				id:   "id",
-				name: "",
-			},
-			want: preparation.Want{
-				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-P7gKR", "Errors.Invalid.Argument"),
-			},
-		},
-		{
-			name: "project not exists",
-			args: args{
-				a:    agg,
-				id:   "id",
-				name: "name",
-				filter: preparation.NewMultiFilter().
-					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-						return nil, nil
-					}).
-					Filter(),
-			},
-			want: preparation.Want{
-				CreateErr: errors.ThrowAlreadyExists(nil, "PROJE-5LQ0U", "Errors.Project.NotFound"),
-			},
-		},
-		{
-			name: "correct",
-			args: args{
-				a:    agg,
-				id:   "appID",
-				name: "Console",
-				filter: preparation.NewMultiFilter().
-					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
-						return []eventstore.Event{
-							project.NewProjectAddedEvent(
-								ctx,
-								&agg.Aggregate,
-								"ZITADEL",
-								false,
-								false,
-								false,
-								domain.PrivateLabelingSettingAllowLoginUserResourceOwnerPolicy,
-							),
-						}, nil
-					}).
-					Filter(),
-			},
-			want: preparation.Want{
-				Commands: []eventstore.Command{
-					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
-						"appID",
-						"Console",
-					),
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			preparation.AssertValidation(t, AddApp(tt.args.a, tt.args.id, tt.args.name), tt.args.filter, tt.want)
-		})
-	}
-}
-
-func TestAddOIDCConfig(t *testing.T) {
+func TestAddOIDCApp(t *testing.T) {
 	type args struct {
 		a        *project.Aggregate
 		appID    string
+		name     string
 		clientID string
 		filter   preparation.FilterToQueryReducer
 	}
@@ -125,6 +33,7 @@ func TestAddOIDCConfig(t *testing.T) {
 			args: args{
 				a:        agg,
 				appID:    "",
+				name:     "name",
 				clientID: "clientID",
 			},
 			want: preparation.Want{
@@ -132,10 +41,23 @@ func TestAddOIDCConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "invalid name",
+			args: args{
+				a:        agg,
+				appID:    "appID",
+				name:     "",
+				clientID: "clientID",
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-Fef31", "Errors.Invalid.Argument"),
+			},
+		},
+		{
 			name: "invalid clientID",
 			args: args{
 				a:        agg,
 				appID:    "appID",
+				name:     "name",
 				clientID: "",
 			},
 			want: preparation.Want{
@@ -143,11 +65,12 @@ func TestAddOIDCConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "app not exists",
+			name: "project not exists",
 			args: args{
 				a:        agg,
 				appID:    "id",
-				clientID: "name",
+				name:     "name",
+				clientID: "clientID",
 				filter: preparation.NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
@@ -155,7 +78,7 @@ func TestAddOIDCConfig(t *testing.T) {
 					Filter(),
 			},
 			want: preparation.Want{
-				CreateErr: errors.ThrowNotFound(nil, "PROJE-sLDbG", "Errors.Project.Application.NotFound"),
+				CreateErr: errors.ThrowNotFound(nil, "PROJE-5LQ0U", "Errors.Project.NotFound"),
 			},
 		},
 		{
@@ -163,15 +86,19 @@ func TestAddOIDCConfig(t *testing.T) {
 			args: args{
 				a:        agg,
 				appID:    "appID",
+				name:     "name",
 				clientID: "clientID",
 				filter: preparation.NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
-							project.NewApplicationAddedEvent(
+							project.NewProjectAddedEvent(
 								ctx,
 								&agg.Aggregate,
-								"appID",
-								"Console",
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
 							),
 						}, nil
 					}).
@@ -179,6 +106,10 @@ func TestAddOIDCConfig(t *testing.T) {
 			},
 			want: preparation.Want{
 				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(ctx, &agg.Aggregate,
+						"appID",
+						"name",
+					),
 					project.NewOIDCConfigAddedEvent(ctx, &agg.Aggregate,
 						domain.OIDCVersionV1,
 						"appID",
@@ -205,9 +136,10 @@ func TestAddOIDCConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			preparation.AssertValidation(t,
-				AddOIDCConfig(*tt.args.a,
+				AddOIDCApp(*tt.args.a,
 					domain.OIDCVersionV1,
 					tt.args.appID,
+					tt.args.name,
 					tt.args.clientID,
 					nil,
 					nil,
@@ -232,6 +164,7 @@ func TestAddAPIConfig(t *testing.T) {
 	type args struct {
 		a        *project.Aggregate
 		appID    string
+		name     string
 		clientID string
 		filter   preparation.FilterToQueryReducer
 	}
@@ -249,6 +182,7 @@ func TestAddAPIConfig(t *testing.T) {
 			args: args{
 				a:        agg,
 				appID:    "",
+				name:     "name",
 				clientID: "clientID",
 			},
 			want: preparation.Want{
@@ -256,10 +190,23 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
+			name: "invalid name",
+			args: args{
+				a:        agg,
+				appID:    "appID",
+				name:     "",
+				clientID: "clientID",
+			},
+			want: preparation.Want{
+				ValidationErr: errors.ThrowInvalidArgument(nil, "PROJE-F7g21", "Errors.Invalid.Argument"),
+			},
+		},
+		{
 			name: "invalid clientID",
 			args: args{
 				a:        agg,
 				appID:    "appID",
+				name:     "name",
 				clientID: "",
 			},
 			want: preparation.Want{
@@ -267,11 +214,12 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 		},
 		{
-			name: "app not exists",
+			name: "project not exists",
 			args: args{
 				a:        agg,
 				appID:    "id",
-				clientID: "name",
+				name:     "name",
+				clientID: "clientID",
 				filter: preparation.NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return nil, nil
@@ -279,7 +227,7 @@ func TestAddAPIConfig(t *testing.T) {
 					Filter(),
 			},
 			want: preparation.Want{
-				CreateErr: errors.ThrowNotFound(nil, "PROJE-EpG1p", "Errors.Project.Application.NotFound"),
+				CreateErr: errors.ThrowNotFound(nil, "PROJE-Sf2gb", "Errors.Project.NotFound"),
 			},
 		},
 		{
@@ -287,15 +235,19 @@ func TestAddAPIConfig(t *testing.T) {
 			args: args{
 				a:        agg,
 				appID:    "appID",
+				name:     "name",
 				clientID: "clientID",
 				filter: preparation.NewMultiFilter().
 					Append(func(ctx context.Context, queryFactory *eventstore.SearchQueryBuilder) ([]eventstore.Event, error) {
 						return []eventstore.Event{
-							project.NewApplicationAddedEvent(
+							project.NewProjectAddedEvent(
 								ctx,
 								&agg.Aggregate,
-								"appID",
-								"Console",
+								"project",
+								false,
+								false,
+								false,
+								domain.PrivateLabelingSettingUnspecified,
 							),
 						}, nil
 					}).
@@ -303,6 +255,12 @@ func TestAddAPIConfig(t *testing.T) {
 			},
 			want: preparation.Want{
 				Commands: []eventstore.Command{
+					project.NewApplicationAddedEvent(
+						ctx,
+						&agg.Aggregate,
+						"appID",
+						"name",
+					),
 					project.NewAPIConfigAddedEvent(ctx, &agg.Aggregate,
 						"appID",
 						"clientID",
@@ -316,8 +274,9 @@ func TestAddAPIConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			preparation.AssertValidation(t,
-				AddAPIConfig(*tt.args.a,
+				AddAPI(*tt.args.a,
 					tt.args.appID,
+					tt.args.name,
 					tt.args.clientID,
 					nil,
 					domain.APIAuthMethodTypeBasic,
