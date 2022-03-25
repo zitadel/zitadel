@@ -13,9 +13,8 @@ import (
 )
 
 type OrgSetup struct {
-	Name   string
-	Domain string
-	Human  user.AddHuman
+	Name  string
+	Human user.AddHuman
 }
 
 func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.ObjectDetails, error) {
@@ -34,7 +33,6 @@ func (command *Command) SetUpOrg(ctx context.Context, o *OrgSetup) (*domain.Obje
 
 	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter,
 		org.AddOrg(orgAgg, o.Name, command.iamDomain),
-		org.AddDomain(orgAgg, o.Domain),
 		user.AddHumanCommand(userAgg, &o.Human, command.userPasswordAlg),
 		org.AddMember(orgAgg, userID, domain.RoleOrgOwner),
 	)

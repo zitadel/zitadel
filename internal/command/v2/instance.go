@@ -208,7 +208,6 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 	validations = append(validations,
 		org.AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
-		org.AddDomain(orgAgg, setup.Org.Domain),
 		user.AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
 		org.AddMember(orgAgg, userID, domain.RoleOrgOwner),
 

@@ -2,7 +2,6 @@ S2DefaultInstance:
   InstanceSetup:
     Org:
       Name: ZITADEL
-      Domain: localhost
       Human:
         UserName: zitadel-admin
         FirstName: ZITADEL
