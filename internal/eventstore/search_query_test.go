@@ -956,13 +956,41 @@ func TestSearchQueryBuilder_Matches(t *testing.T) {
 			want: true,
 		},
 		{
-			name:    "matching empty builder",
+			name:    "matching builder resourceOwner and Instance",
 			builder: NewSearchQueryBuilder(ColumnsEvent),
 			args: args{
 				event: &BaseEvent{
 					aggregate: Aggregate{
 						ResourceOwner: "ro",
 						InstanceID:    "instance",
+					},
+					sequence: 1001,
+				},
+				existingLen: 999,
+			},
+			want: true,
+		},
+		{
+			name:    "matching builder resourceOwner only",
+			builder: NewSearchQueryBuilder(ColumnsEvent),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						ResourceOwner: "ro",
+					},
+					sequence: 1001,
+				},
+				existingLen: 999,
+			},
+			want: true,
+		},
+		{
+			name:    "matching builder instanceID only",
+			builder: NewSearchQueryBuilder(ColumnsEvent),
+			args: args{
+				event: &BaseEvent{
+					aggregate: Aggregate{
+						InstanceID: "instance",
 					},
 					sequence: 1001,
 				},

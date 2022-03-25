@@ -57,7 +57,7 @@ func (builder *SearchQueryBuilder) Matches(event Event, existingLen int) (matche
 	if builder.resourceOwner != "" && event.Aggregate().ResourceOwner != builder.resourceOwner {
 		return false
 	}
-	if event.Aggregate().InstanceID != "" && event.Aggregate().InstanceID != builder.instanceID {
+	if event.Aggregate().InstanceID != "" && builder.instanceID != "" && event.Aggregate().InstanceID != builder.instanceID {
 		return false
 	}
 
