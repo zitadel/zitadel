@@ -100,7 +100,7 @@ func NewProvider(ctx context.Context, config Config, issuer, defaultLogoutRedire
 		options...,
 	)
 	if err != nil {
-		return nil, caos_errs.ThrowInternalf(err, "OIDC-DAtg3", "cannot create provider: %w")
+		return nil, caos_errs.ThrowInternal(err, "OIDC-DAtg3", "cannot create provider")
 	}
 	return provider, nil
 }
