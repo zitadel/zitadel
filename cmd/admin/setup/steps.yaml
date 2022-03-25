@@ -4,9 +4,9 @@ S2DefaultInstance:
       Name: ZITADEL
       Domain: localhost
       Human:
-        UserName: admin
-        FirstName: admin
-        LastName: admin
+        UserName: zitadel-admin
+        FirstName: ZITADEL
+        LastName: Admin
         NickName:
         DisplayName:
         Email: admin@zitadel.ch
@@ -32,12 +32,11 @@ S2DefaultInstance:
       ForceMFA: false
       HidePasswordReset: false
       PasswordlessType: 1 #1: allowed 0: not allowed
-      # TODO: lifetimes
-      PasswordCheckLifetime:
-      ExternalLoginCheckLifetime:
-      MfaInitSkipLifetime:
-      SecondFactorCheckLifetime:
-      MultiFactorCheckLifetime:
+      PasswordCheckLifetime: 240h #10d
+      ExternalLoginCheckLifetime: 240h #10d
+      MfaInitSkipLifetime: 720h #30d
+      SecondFactorCheckLifetime: 18h
+      MultiFactorCheckLifetime: 12h
     PrivacyPolicy:
       TOSLink: https://docs.zitadel.ch/docs/legal/terms-of-service
       PrivacyLink: https://docs.zitadel.ch/docs/legal/privacy-policy
