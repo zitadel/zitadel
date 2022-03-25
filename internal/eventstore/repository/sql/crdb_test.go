@@ -267,11 +267,12 @@ func TestCRDB_columnName(t *testing.T) {
 
 func TestCRDB_Push_OneAggregate(t *testing.T) {
 	type args struct {
-		ctx               context.Context
-		events            []*repository.Event
-		uniqueConstraints *repository.UniqueConstraint
-		uniqueDataType    string
-		uniqueDataField   string
+		ctx                  context.Context
+		events               []*repository.Event
+		uniqueConstraints    *repository.UniqueConstraint
+		uniqueDataType       string
+		uniqueDataField      string
+		uniqueDataInstanceID string
 	}
 	type eventsRes struct {
 		pushedEventsCount int
@@ -419,7 +420,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				client: testCRDBClient,
 			}
 			if tt.args.uniqueDataType != "" && tt.args.uniqueDataField != "" {
-				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField)
+				err := fillUniqueData(tt.args.uniqueDataType, tt.args.uniqueDataField, tt.args.uniqueDataInstanceID)
 				if err != nil {
 					t.Error("unable to prefill insert unique data: ", err)
 					return
@@ -440,7 +441,7 @@ func TestCRDB_Push_OneAggregate(t *testing.T) {
 				t.Errorf("expected push count %d got %d", tt.res.eventsRes.pushedEventsCount, eventCount)
 			}
 			if tt.args.uniqueConstraints != nil {
-				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField)
+				countUniqueRow := testCRDBClient.QueryRow("SELECT COUNT(*) FROM eventstore.unique_constraints where unique_type = $1 AND unique_field = $2 AND instance_id = $3", tt.args.uniqueConstraints.UniqueType, tt.args.uniqueConstraints.UniqueField, tt.args.uniqueConstraints.InstanceID)
 				var uniqueCount int
 				err := countUniqueRow.Scan(&uniqueCount)
 				if err != nil {
@@ -1117,6 +1118,7 @@ func generateRemoveUniqueConstraint(t *testing.T, table, uniqueField string) *re
 	e := &repository.UniqueConstraint{
 		UniqueType:  table,
 		UniqueField: uniqueField,
+		InstanceID:  "",
 		Action:      repository.UniqueConstraintRemoved,
 	}
 

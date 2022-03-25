@@ -90,7 +90,7 @@ const (
 					)`
 
 	uniqueDelete = `DELETE FROM eventstore.unique_constraints
-					WHERE unique_type = $1 and unique_field = $2`
+					WHERE unique_type = $1 and unique_field = $2 and instance_id = $3`
 )
 
 type CRDB struct {
