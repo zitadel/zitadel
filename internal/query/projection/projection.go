@@ -3,7 +3,6 @@ package projection
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/caos/zitadel/internal/crypto"
@@ -35,7 +34,6 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 		BulkLimit:         config.BulkLimit,
 	}
 
-	now := time.Now()
 	NewOrgProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["orgs"]))
 	NewActionProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["actions"]))
 	NewFlowProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["flows"]))
@@ -69,14 +67,13 @@ func Start(ctx context.Context, sqlClient *sql.DB, es *eventstore.Eventstore, co
 	NewUserGrantProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_grants"]))
 	NewUserMetadataProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_metadata"]))
 	NewUserAuthMethodProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["user_auth_method"]))
-	NewIAMProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["iam"]))
+	NewInstanceProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["instances"]))
 	NewSecretGeneratorProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["secret_generators"]))
 	NewSMTPConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["smtp_configs"]))
 	NewSMSConfigProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["sms_config"]))
 	NewOIDCSettingsProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["oidc_settings"]))
 	NewDebugNotificationProviderProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["debug_notification_provider"]))
 	NewKeyProjection(ctx, applyCustomConfig(projectionConfig, config.Customizations["keys"]), keyEncryptionAlgorithm, keyChan)
-	fmt.Println(time.Now().Sub(now))
 	return nil
 }
 

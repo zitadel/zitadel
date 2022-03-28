@@ -30,15 +30,15 @@ func Test_InstancePrepares(t *testing.T) {
 			prepare: prepareIAMQuery,
 			want: want{
 				sqlExpectations: mockQueries(
-					regexp.QuoteMeta(`SELECT projections.instance.id,`+
-						` projections.instance.change_date,`+
-						` projections.instance.sequence,`+
-						` projections.instance.global_org_id,`+
-						` projections.instance.iam_project_id,`+
-						` projections.instance.setup_started,`+
-						` projections.instance.setup_done,`+
-						` projections.instance.default_language`+
-						` FROM projections.instance`),
+					regexp.QuoteMeta(`SELECT projections.instances.id,`+
+						` projections.instances.change_date,`+
+						` projections.instances.sequence,`+
+						` projections.instances.global_org_id,`+
+						` projections.instances.iam_project_id,`+
+						` projections.instances.setup_started,`+
+						` projections.instances.setup_done,`+
+						` projections.instances.default_language`+
+						` FROM projections.instances`),
 					nil,
 					nil,
 				),
@@ -56,15 +56,15 @@ func Test_InstancePrepares(t *testing.T) {
 			prepare: prepareIAMQuery,
 			want: want{
 				sqlExpectations: mockQuery(
-					regexp.QuoteMeta(`SELECT projections.instance.id,`+
-						` projections.instance.change_date,`+
-						` projections.instance.sequence,`+
-						` projections.instance.global_org_id,`+
-						` projections.instance.iam_project_id,`+
-						` projections.instance.setup_started,`+
-						` projections.instance.setup_done,`+
-						` projections.instance.default_language`+
-						` FROM projections.instance`),
+					regexp.QuoteMeta(`SELECT projections.instances.id,`+
+						` projections.instances.change_date,`+
+						` projections.instances.sequence,`+
+						` projections.instances.global_org_id,`+
+						` projections.instances.iam_project_id,`+
+						` projections.instances.setup_started,`+
+						` projections.instances.setup_done,`+
+						` projections.instances.default_language`+
+						` FROM projections.instances`),
 					[]string{
 						"id",
 						"change_date",
@@ -103,15 +103,15 @@ func Test_InstancePrepares(t *testing.T) {
 			prepare: prepareIAMQuery,
 			want: want{
 				sqlExpectations: mockQueryErr(
-					regexp.QuoteMeta(`SELECT projections.instance.id,`+
-						` projections.instance.change_date,`+
-						` projections.instance.sequence,`+
-						` projections.instance.global_org_id,`+
-						` projections.instance.iam_project_id,`+
-						` projections.instance.setup_started,`+
-						` projections.instance.setup_done,`+
-						` projections.instance.default_language`+
-						` FROM projections.instance`),
+					regexp.QuoteMeta(`SELECT projections.instances.id,`+
+						` projections.instances.change_date,`+
+						` projections.instances.sequence,`+
+						` projections.instances.global_org_id,`+
+						` projections.instances.iam_project_id,`+
+						` projections.instances.setup_started,`+
+						` projections.instances.setup_done,`+
+						` projections.instances.default_language`+
+						` FROM projections.instances`),
 					sql.ErrConnDone,
 				),
 				err: func(err error) (error, bool) {

@@ -8,12 +8,12 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-type InstanceCustomMessageTextReadModel struct {
+type InstanceCustomMessageTextWriteModel struct {
 	CustomMessageTextReadModel
 }
 
-func NewInstanceCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *InstanceCustomMessageTextReadModel {
-	return &InstanceCustomMessageTextReadModel{
+func NewInstanceCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *InstanceCustomMessageTextWriteModel {
+	return &InstanceCustomMessageTextWriteModel{
 		CustomMessageTextReadModel{
 			WriteModel: eventstore.WriteModel{
 				AggregateID:   domain.IAMID,
@@ -25,7 +25,7 @@ func NewInstanceCustomMessageTextWriteModel(messageTextType string, lang languag
 	}
 }
 
-func (wm *InstanceCustomMessageTextReadModel) AppendEvents(events ...eventstore.Event) {
+func (wm *InstanceCustomMessageTextWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
 		case *instance.CustomTextSetEvent:
@@ -38,11 +38,11 @@ func (wm *InstanceCustomMessageTextReadModel) AppendEvents(events ...eventstore.
 	}
 }
 
-func (wm *InstanceCustomMessageTextReadModel) Reduce() error {
+func (wm *InstanceCustomMessageTextWriteModel) Reduce() error {
 	return wm.CustomMessageTextReadModel.Reduce()
 }
 
-func (wm *InstanceCustomMessageTextReadModel) Query() *eventstore.SearchQueryBuilder {
+func (wm *InstanceCustomMessageTextWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
 		ResourceOwner(wm.ResourceOwner).
 		AddQuery().

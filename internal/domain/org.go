@@ -15,7 +15,7 @@ type Org struct {
 }
 
 func (o *Org) IsValid() bool {
-	return o.Name != ""
+	return o != nil && o.Name != ""
 }
 
 func (o *Org) AddIAMDomain(iamDomain string) {

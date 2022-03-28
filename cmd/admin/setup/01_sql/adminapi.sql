@@ -3,27 +3,27 @@ CREATE SCHEMA adminapi;
 CREATE TABLE adminapi.locks (
     locker_id TEXT,
     locked_until TIMESTAMPTZ(3),
-    projection_name TEXT,
+    view_name TEXT,
 
-    PRIMARY KEY (projection_name)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE adminapi.current_sequences (
-    projection_name TEXT,
-    aggregate_type TEXT,
+    view_name TEXT,
     current_sequence BIGINT,
-    timestamp TIMESTAMPTZ,
+    event_timestamp TIMESTAMPTZ,
+    last_successful_spooler_run TIMESTAMPTZ,
 
-    PRIMARY KEY (projection_name, aggregate_type)
+    PRIMARY KEY (view_name)
 );
 
 CREATE TABLE adminapi.failed_events (
-    projection_name TEXT,
+    view_name TEXT,
     failed_sequence BIGINT,
     failure_count SMALLINT,
-    error TEXT,
+    err_msg TEXT,
 
-    PRIMARY KEY (projection_name, failed_sequence)
+    PRIMARY KEY (view_name, failed_sequence)
 );
 
 CREATE TABLE adminapi.styling (

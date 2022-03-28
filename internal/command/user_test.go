@@ -202,7 +202,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -244,7 +244,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1026,7 +1026,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1090,7 +1090,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),
@@ -1147,7 +1147,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 					expectFilter(),
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&user.NewAggregate("user1", "org1").Aggregate,
 								true,
 							),

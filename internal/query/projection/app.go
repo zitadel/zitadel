@@ -75,7 +75,8 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(AppColumnSequence, crdb.ColumnTypeInt64),
 		},
 			crdb.NewPrimaryKey(AppColumnInstanceID, ActionIDCol),
-			crdb.NewIndex("project_id_idx", []string{AppColumnProjectID}),
+			crdb.WithIndex(crdb.NewIndex("project_id_idx", []string{AppColumnProjectID})),
+			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{AppColumnID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppAPIConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
@@ -85,7 +86,7 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppAPIConfigColumnAppID),
 			appAPITableSuffix,
-			crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID}),
+			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppAPIConfigColumnClientID})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(AppOIDCConfigColumnAppID, crdb.ColumnTypeText, crdb.DeleteCascade(AppColumnID)),
@@ -108,7 +109,7 @@ func NewAppProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 		},
 			crdb.NewPrimaryKey(AppOIDCConfigColumnAppID),
 			appOIDCTableSuffix,
-			crdb.NewIndex("client_id_idx", []string{AppOIDCConfigColumnClientID}),
+			crdb.WithIndex(crdb.NewIndex("client_id_idx", []string{AppOIDCConfigColumnClientID})),
 		),
 	)
 	p.StatementHandler = crdb.NewStatementHandler(ctx, config)

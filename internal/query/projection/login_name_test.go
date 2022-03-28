@@ -209,12 +209,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "org.OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyAddedEventType),
+					repository.EventType(org.DomainPolicyAddedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), org.OrgDomainPolicyAddedEventMapper),
+				), org.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -241,12 +241,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "org.OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyChangedEventType),
+					repository.EventType(org.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), org.OrgDomainPolicyChangedEventMapper),
+				), org.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -271,10 +271,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "org.OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyChangedEventType),
+					repository.EventType(org.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), org.OrgDomainPolicyChangedEventMapper),
+				), org.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -291,10 +291,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "org.OrgDomainPolicyRemovedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(org.OrgDomainPolicyRemovedEventType),
+					repository.EventType(org.DomainPolicyRemovedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), org.OrgDomainPolicyRemovedEventMapper),
+				), org.DomainPolicyRemovedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceDomainPolicyRemoved,
 			want: wantReduce{
@@ -418,12 +418,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "iam.OrgDomainPolicyAddedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceDomainPolicyAddedEventType),
+					repository.EventType(instance.DomainPolicyAddedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": true
 				}`),
-				), instance.InstanceDomainPolicyAddedEventMapper),
+				), instance.DomainPolicyAddedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceOrgIAMPolicyAdded,
 			want: wantReduce{
@@ -450,12 +450,12 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "iam.OrgDomainPolicyChangedEventType",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceDomainPolicyChangedEventType),
+					repository.EventType(instance.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{
 					"userLoginMustBeDomain": false
 				}`),
-				), instance.InstanceDomainPolicyChangedEventMapper),
+				), instance.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{
@@ -480,10 +480,10 @@ func TestLoginNameProjection_reduces(t *testing.T) {
 			name: "iam.OrgDomainPolicyChangedEventType no change",
 			args: args{
 				event: getEvent(testEvent(
-					repository.EventType(instance.InstanceDomainPolicyChangedEventType),
+					repository.EventType(instance.DomainPolicyChangedEventType),
 					user.AggregateType,
 					[]byte(`{}`),
-				), instance.InstanceDomainPolicyChangedEventMapper),
+				), instance.DomainPolicyChangedEventMapper),
 			},
 			reduce: (&LoginNameProjection{}).reduceDomainPolicyChanged,
 			want: wantReduce{

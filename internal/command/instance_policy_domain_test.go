@@ -33,13 +33,13 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "orgiam policy already existing, already exists error",
+			name: "domain policy already existing, already exists error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate().Aggregate,
 								true,
 							),
@@ -66,7 +66,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+								instance.NewDomainPolicyAddedEvent(context.Background(),
 									&instance.NewAggregate().Aggregate,
 									true,
 								),
@@ -111,7 +111,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 	}
 }
 
-func TestCommandSide_ChangeDefaultOrgIAMPolicy(t *testing.T) {
+func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -130,7 +130,7 @@ func TestCommandSide_ChangeDefaultOrgIAMPolicy(t *testing.T) {
 		res    res
 	}{
 		{
-			name: "orgiampolicy not existing, not found error",
+			name: "domain policy not existing, not found error",
 			fields: fields{
 				eventstore: eventstoreExpect(
 					t,
@@ -154,7 +154,7 @@ func TestCommandSide_ChangeDefaultOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate().Aggregate,
 								true,
 							),
@@ -179,7 +179,7 @@ func TestCommandSide_ChangeDefaultOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							instance.NewInstnaceDomainPolicyAddedEvent(context.Background(),
+							instance.NewDomainPolicyAddedEvent(context.Background(),
 								&instance.NewAggregate().Aggregate,
 								true,
 							),
@@ -188,7 +188,7 @@ func TestCommandSide_ChangeDefaultOrgIAMPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newDefaultOrgIAMPolicyChangedEvent(context.Background(), false),
+								newDefaultDomainPolicyChangedEvent(context.Background(), false),
 							),
 						},
 					),
@@ -230,8 +230,8 @@ func TestCommandSide_ChangeDefaultOrgIAMPolicy(t *testing.T) {
 	}
 }
 
-func newDefaultOrgIAMPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain bool) *instance.InstanceDomainPolicyChangedEvent {
-	event, _ := instance.NewInstanceDomainPolicyChangedEvent(ctx,
+func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain bool) *instance.DomainPolicyChangedEvent {
+	event, _ := instance.NewDomainPolicyChangedEvent(ctx,
 		&instance.NewAggregate().Aggregate,
 		[]policy.OrgPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),

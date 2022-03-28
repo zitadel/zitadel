@@ -1,7 +1,6 @@
 package setup
 
 import (
-	"bytes"
 	"context"
 	_ "embed"
 
@@ -9,6 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	http_util "github.com/caos/zitadel/internal/api/http"
+	command "github.com/caos/zitadel/internal/command/v2"
 	"github.com/caos/zitadel/internal/database"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/migration"
@@ -27,32 +28,30 @@ func New() *cobra.Command {
 Requirements:
 - cockroachdb`,
 		Run: func(cmd *cobra.Command, args []string) {
-			config := new(Config)
-			err := viper.Unmarshal(config)
-			logging.OnError(err).Fatal("unable to read config")
+			config := MustNewConfig(viper.GetViper())
+			steps := MustNewSteps(viper.New())
 
-			v := viper.New()
-			v.SetConfigType("yaml")
-			err = v.ReadConfig(bytes.NewBuffer(defaultSteps))
-			logging.OnError(err).Fatal("unable to read setup steps")
-
-			steps := new(Steps)
-			err = v.Unmarshal(steps)
-			logging.OnError(err).Fatal("unable to read steps")
-
-			setup(config, steps)
+			Setup(config, steps)
 		},
 	}
 }
 
-func setup(config *Config, steps *Steps) {
+func Setup(config *Config, steps *Steps) {
 	dbClient, err := database.Connect(config.Database)
 	logging.OnError(err).Fatal("unable to connect to database")
 
 	eventstoreClient, err := eventstore.Start(dbClient)
 	logging.OnError(err).Fatal("unable to start eventstore")
+	migration.RegisterMappers(eventstoreClient)
 
+	cmd := command.New(eventstoreClient, "localhost", config.SystemDefaults)
+
+	steps.S2DefaultInstance.cmd = cmd
 	steps.S1ProjectionTable = &ProjectionTable{dbClient: dbClient}
+	steps.S2DefaultInstance.InstanceSetup.Zitadel.IsDevMode = !config.ExternalSecure
+	steps.S2DefaultInstance.InstanceSetup.Zitadel.BaseURL = http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
 
-	migration.Migrate(context.Background(), eventstoreClient, steps.S1ProjectionTable)
+	ctx := context.Background()
+	migration.Migrate(ctx, eventstoreClient, steps.S1ProjectionTable)
+	migration.Migrate(ctx, eventstoreClient, steps.S2DefaultInstance)
 }

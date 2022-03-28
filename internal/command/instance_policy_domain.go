@@ -37,7 +37,7 @@ func (c *Commands) addDefaultDomainPolicy(ctx context.Context, instanceAgg *even
 	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "INSTANCE-Lk0dS", "Errors.IAM.DomainPolicy.AlreadyExists")
 	}
-	return iam_repo.NewInstnaceDomainPolicyAddedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain), nil
+	return iam_repo.NewDomainPolicyAddedEvent(ctx, instanceAgg, policy.UserLoginMustBeDomain), nil
 }
 
 func (c *Commands) ChangeDefaultDomainPolicy(ctx context.Context, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {

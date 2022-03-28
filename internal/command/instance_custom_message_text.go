@@ -27,7 +27,7 @@ func (c *Commands) SetDefaultMessageText(ctx context.Context, messageText *domai
 	return writeModelToObjectDetails(&existingMessageText.WriteModel), nil
 }
 
-func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.Command, *InstanceCustomMessageTextReadModel, error) {
+func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *eventstore.Aggregate, msg *domain.CustomMessageText) ([]eventstore.Command, *InstanceCustomMessageTextWriteModel, error) {
 	if !msg.IsValid() {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
 	}
@@ -113,7 +113,7 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
-func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*InstanceCustomMessageTextReadModel, error) {
+func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
 	writeModel := NewInstanceCustomMessageTextWriteModel(messageType, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {

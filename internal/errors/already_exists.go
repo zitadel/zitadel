@@ -26,6 +26,14 @@ func ThrowAlreadyExistsf(parent error, id, format string, a ...interface{}) erro
 
 func (err *AlreadyExistsError) IsAlreadyExists() {}
 
+func (err *AlreadyExistsError) Is(target error) bool {
+	t, ok := target.(*AlreadyExistsError)
+	if !ok {
+		return false
+	}
+	return err.CaosError.Is(t.CaosError)
+}
+
 func IsErrorAlreadyExists(err error) bool {
 	_, ok := err.(AlreadyExists)
 	return ok

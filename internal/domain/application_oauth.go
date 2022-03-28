@@ -19,13 +19,22 @@ type oAuthApplication interface {
 
 //ClientID random_number@projectname (eg. 495894098234@zitadel)
 func SetNewClientID(a oAuthApplication, idGenerator id.Generator, project *Project) error {
-	rndID, err := idGenerator.Next()
+	clientID, err := NewClientID(idGenerator, project.Name)
 	if err != nil {
 		return err
 	}
 
-	a.setClientID(fmt.Sprintf("%v@%v", rndID, strings.ReplaceAll(strings.ToLower(project.Name), " ", "_")))
+	a.setClientID(clientID)
 	return nil
+}
+
+func NewClientID(idGenerator id.Generator, projectName string) (string, error) {
+	rndID, err := idGenerator.Next()
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s@%s", rndID, strings.ReplaceAll(strings.ToLower(projectName), " ", "_")), nil
 }
 
 func SetNewClientSecretIfNeeded(a oAuthApplication, generator crypto.Generator) (string, error) {

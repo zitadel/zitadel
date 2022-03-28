@@ -90,19 +90,20 @@ func commandsToRepository(instanceID string, cmds []Command) (events []*reposito
 			Data:          data,
 		}
 		if len(cmd.UniqueConstraints()) > 0 {
-			constraints = append(constraints, uniqueConstraintsToRepository(cmd.UniqueConstraints())...)
+			constraints = append(constraints, uniqueConstraintsToRepository(instanceID, cmd.UniqueConstraints())...)
 		}
 	}
 
 	return events, constraints, nil
 }
 
-func uniqueConstraintsToRepository(constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
+func uniqueConstraintsToRepository(instanceID string, constraints []*EventUniqueConstraint) (uniqueConstraints []*repository.UniqueConstraint) {
 	uniqueConstraints = make([]*repository.UniqueConstraint, len(constraints))
 	for i, constraint := range constraints {
 		uniqueConstraints[i] = &repository.UniqueConstraint{
 			UniqueType:   constraint.UniqueType,
 			UniqueField:  constraint.UniqueField,
+			InstanceID:   instanceID,
 			Action:       uniqueConstraintActionToRepository(constraint.Action),
 			ErrorMessage: constraint.ErrorMessage,
 		}

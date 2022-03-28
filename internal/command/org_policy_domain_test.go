@@ -58,7 +58,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgDomainPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -86,7 +86,7 @@ func TestCommandSide_AddDomainPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgDomainPolicyAddedEvent(context.Background(),
+								org.NewDomainPolicyAddedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate,
 									true,
 								),
@@ -194,7 +194,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgDomainPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -220,7 +220,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgDomainPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -229,7 +229,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								newOrgIAMPolicyChangedEvent(context.Background(), "org1", false),
+								newDomainPolicyChangedEvent(context.Background(), "org1", false),
 							),
 						},
 					),
@@ -272,7 +272,7 @@ func TestCommandSide_ChangeDomainPolicy(t *testing.T) {
 	}
 }
 
-func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
+func TestCommandSide_RemoveDomainPolicy(t *testing.T) {
 	type fields struct {
 		eventstore *eventstore.Eventstore
 	}
@@ -327,7 +327,7 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 					t,
 					expectFilter(
 						eventFromEventPusher(
-							org.NewOrgDomainPolicyAddedEvent(context.Background(),
+							org.NewDomainPolicyAddedEvent(context.Background(),
 								&org.NewAggregate("org1", "org1").Aggregate,
 								true,
 							),
@@ -336,7 +336,7 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(
-								org.NewOrgDomainPolicyRemovedEvent(context.Background(),
+								org.NewDomainPolicyRemovedEvent(context.Background(),
 									&org.NewAggregate("org1", "org1").Aggregate),
 							),
 						},
@@ -370,8 +370,8 @@ func TestCommandSide_RemoveOrgIAMPolicy(t *testing.T) {
 	}
 }
 
-func newOrgIAMPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain bool) *org.OrgDomainPolicyChangedEvent {
-	event, _ := org.NewOrgDomainPolicyChangedEvent(ctx,
+func newDomainPolicyChangedEvent(ctx context.Context, orgID string, userLoginMustBeDomain bool) *org.DomainPolicyChangedEvent {
+	event, _ := org.NewDomainPolicyChangedEvent(ctx,
 		&org.NewAggregate(orgID, orgID).Aggregate,
 		[]policy.OrgPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),

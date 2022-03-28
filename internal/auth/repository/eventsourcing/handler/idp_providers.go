@@ -121,9 +121,9 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 		}
 		config := new(query2.IDP)
 		if event.AggregateID == domain.IAMID {
-			config, err = i.getDefaultIDPConfig(context.TODO(), esConfig.IDPConfigID)
+			config, err = i.getDefaultIDPConfig(event.InstanceID, esConfig.IDPConfigID)
 		} else {
-			config, err = i.getOrgIDPConfig(context.TODO(), event.AggregateID, esConfig.IDPConfigID)
+			config, err = i.getOrgIDPConfig(event.InstanceID, event.AggregateID, esConfig.IDPConfigID)
 		}
 		if err != nil {
 			return err
@@ -146,9 +146,9 @@ func (i *IDPProvider) processIdpProvider(event *es_models.Event) (err error) {
 func (i *IDPProvider) fillData(provider *iam_view_model.IDPProviderView) (err error) {
 	var config *query2.IDP
 	if provider.IDPProviderType == int32(iam_model.IDPProviderTypeSystem) {
-		config, err = i.getDefaultIDPConfig(context.Background(), provider.IDPConfigID)
+		config, err = i.getDefaultIDPConfig(provider.InstanceID, provider.IDPConfigID)
 	} else {
-		config, err = i.getOrgIDPConfig(context.Background(), provider.AggregateID, provider.IDPConfigID)
+		config, err = i.getOrgIDPConfig(provider.InstanceID, provider.AggregateID, provider.IDPConfigID)
 	}
 	if err != nil {
 		return err
@@ -186,10 +186,10 @@ func (i *IDPProvider) OnSuccess() error {
 	return spooler.HandleSuccess(i.view.UpdateIDPProviderSpoolerRunTimestamp)
 }
 
-func (i *IDPProvider) getOrgIDPConfig(ctx context.Context, aggregateID, idpConfigID string) (*query2.IDP, error) {
-	return i.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, aggregateID)
+func (i *IDPProvider) getOrgIDPConfig(instanceID, aggregateID, idpConfigID string) (*query2.IDP, error) {
+	return i.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, aggregateID)
 }
 
-func (u *IDPProvider) getDefaultIDPConfig(ctx context.Context, idpConfigID string) (*query2.IDP, error) {
-	return u.queries.IDPByIDAndResourceOwner(ctx, idpConfigID, domain.IAMID)
+func (u *IDPProvider) getDefaultIDPConfig(instanceID, idpConfigID string) (*query2.IDP, error) {
+	return u.queries.IDPByIDAndResourceOwner(withInstanceID(context.Background(), instanceID), idpConfigID, domain.IAMID)
 }

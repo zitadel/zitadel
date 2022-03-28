@@ -10,66 +10,66 @@ import (
 )
 
 var (
-	InstanceDomainPolicyAddedEventType   = instanceEventTypePrefix + policy.DomainPolicyAddedEventType
-	InstanceDomainPolicyChangedEventType = instanceEventTypePrefix + policy.DomainPolicyChangedEventType
+	DomainPolicyAddedEventType   = instanceEventTypePrefix + policy.DomainPolicyAddedEventType
+	DomainPolicyChangedEventType = instanceEventTypePrefix + policy.DomainPolicyChangedEventType
 )
 
-type InstanceDomainPolicyAddedEvent struct {
+type DomainPolicyAddedEvent struct {
 	policy.DomainPolicyAddedEvent
 }
 
-func NewInstnaceDomainPolicyAddedEvent(
+func NewDomainPolicyAddedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	userLoginMustBeDomain bool,
-) *InstanceDomainPolicyAddedEvent {
-	return &InstanceDomainPolicyAddedEvent{
+) *DomainPolicyAddedEvent {
+	return &DomainPolicyAddedEvent{
 		DomainPolicyAddedEvent: *policy.NewDomainPolicyAddedEvent(
 			eventstore.NewBaseEventForPush(
 				ctx,
 				aggregate,
-				InstanceDomainPolicyAddedEventType),
+				DomainPolicyAddedEventType),
 			userLoginMustBeDomain,
 		),
 	}
 }
 
-func InstanceDomainPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyAddedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.DomainPolicyAddedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &InstanceDomainPolicyAddedEvent{DomainPolicyAddedEvent: *e.(*policy.DomainPolicyAddedEvent)}, nil
+	return &DomainPolicyAddedEvent{DomainPolicyAddedEvent: *e.(*policy.DomainPolicyAddedEvent)}, nil
 }
 
-type InstanceDomainPolicyChangedEvent struct {
+type DomainPolicyChangedEvent struct {
 	policy.DomainPolicyChangedEvent
 }
 
-func NewInstanceDomainPolicyChangedEvent(
+func NewDomainPolicyChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
 	changes []policy.OrgPolicyChanges,
-) (*InstanceDomainPolicyChangedEvent, error) {
+) (*DomainPolicyChangedEvent, error) {
 	changedEvent, err := policy.NewDomainPolicyChangedEvent(
 		eventstore.NewBaseEventForPush(
 			ctx,
 			aggregate,
-			InstanceDomainPolicyChangedEventType),
+			DomainPolicyChangedEventType),
 		changes,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return &InstanceDomainPolicyChangedEvent{DomainPolicyChangedEvent: *changedEvent}, nil
+	return &DomainPolicyChangedEvent{DomainPolicyChangedEvent: *changedEvent}, nil
 }
 
-func InstanceDomainPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
+func DomainPolicyChangedEventMapper(event *repository.Event) (eventstore.Event, error) {
 	e, err := policy.DomainPolicyChangedEventMapper(event)
 	if err != nil {
 		return nil, err
 	}
 
-	return &InstanceDomainPolicyChangedEvent{DomainPolicyChangedEvent: *e.(*policy.DomainPolicyChangedEvent)}, nil
+	return &DomainPolicyChangedEvent{DomainPolicyChangedEvent: *e.(*policy.DomainPolicyChangedEvent)}, nil
 }

@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	InstanceProjectionTable = "projections.instance"
+	InstanceProjectionTable = "projections.instances"
 
 	InstanceColumnID              = "id"
 	InstanceColumnChangeDate      = "change_date"
@@ -23,12 +23,12 @@ const (
 	InstanceColumnDefaultLanguage = "default_language"
 )
 
-type IAMProjection struct {
+type InstanceProjection struct {
 	crdb.StatementHandler
 }
 
-func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *IAMProjection {
-	p := new(IAMProjection)
+func NewInstanceProjection(ctx context.Context, config crdb.StatementHandlerConfig) *InstanceProjection {
+	p := new(InstanceProjection)
 	config.ProjectionName = InstanceProjectionTable
 	config.Reducers = p.reducers()
 	config.InitCheck = crdb.NewTableCheck(
@@ -49,7 +49,7 @@ func NewIAMProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 	return p
 }
 
-func (p *IAMProjection) reducers() []handler.AggregateReducer {
+func (p *InstanceProjection) reducers() []handler.AggregateReducer {
 	return []handler.AggregateReducer{
 		{
 			Aggregate: instance.AggregateType,
@@ -79,7 +79,7 @@ func (p *IAMProjection) reducers() []handler.AggregateReducer {
 	}
 }
 
-func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.GlobalOrgSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-2n9f2", "reduce.wrong.event.type %s", instance.GlobalOrgSetEventType)
@@ -95,7 +95,7 @@ func (p *IAMProjection) reduceGlobalOrgSet(event eventstore.Event) (*handler.Sta
 	), nil
 }
 
-func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.ProjectSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.ProjectSetEventType)
@@ -111,7 +111,7 @@ func (p *IAMProjection) reduceIAMProjectSet(event eventstore.Event) (*handler.St
 	), nil
 }
 
-func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.DefaultLanguageSetEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-30o0e", "reduce.wrong.event.type %s", instance.DefaultLanguageSetEventType)
@@ -127,7 +127,7 @@ func (p *IAMProjection) reduceDefaultLanguageSet(event eventstore.Event) (*handl
 	), nil
 }
 
-func (p *IAMProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
+func (p *InstanceProjection) reduceSetupEvent(event eventstore.Event) (*handler.Statement, error) {
 	e, ok := event.(*instance.SetupStepEvent)
 	if !ok {
 		return nil, errors.ThrowInvalidArgumentf(nil, "HANDL-d9nfw", "reduce.wrong.event.type %v", []eventstore.EventType{instance.SetupDoneEventType, instance.SetupStartedEventType})

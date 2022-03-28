@@ -39,7 +39,7 @@ func (c *Commands) addOrgDomainPolicy(ctx context.Context, orgAgg *eventstore.Ag
 	if addedPolicy.State == domain.PolicyStateActive {
 		return nil, caos_errs.ThrowAlreadyExists(nil, "ORG-1M8ds", "Errors.Org.DomainPolicy.AlreadyExists")
 	}
-	return org.NewOrgDomainPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain), nil
+	return org.NewDomainPolicyAddedEvent(ctx, orgAgg, policy.UserLoginMustBeDomain), nil
 }
 
 func (c *Commands) ChangeOrgDomainPolicy(ctx context.Context, resourceOwner string, policy *domain.DomainPolicy) (*domain.DomainPolicy, error) {
@@ -80,11 +80,11 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) erro
 		return err
 	}
 	if existingPolicy.State == domain.PolicyStateUnspecified || existingPolicy.State == domain.PolicyStateRemoved {
-		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.OrgIAMPolicy.NotFound")
+		return caos_errs.ThrowNotFound(nil, "ORG-Dvsh3", "Errors.Org.DomainPolicy.NotFound")
 	}
 
 	orgAgg := OrgAggregateFromWriteModel(&existingPolicy.PolicyDomainWriteModel.WriteModel)
-	_, err = c.eventstore.Push(ctx, org.NewOrgDomainPolicyRemovedEvent(ctx, orgAgg))
+	_, err = c.eventstore.Push(ctx, org.NewDomainPolicyRemovedEvent(ctx, orgAgg))
 	return err
 }
 

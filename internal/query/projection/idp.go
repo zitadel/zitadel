@@ -77,7 +77,8 @@ func NewIDPProjection(ctx context.Context, config crdb.StatementHandlerConfig) *
 			crdb.NewColumn(IDPTypeCol, crdb.ColumnTypeEnum),
 		},
 			crdb.NewPrimaryKey(IDPInstanceIDCol, IDPIDCol),
-			crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol}),
+			crdb.WithIndex(crdb.NewIndex("ro_idx", []string{IDPResourceOwnerCol})),
+			crdb.WithConstraint(crdb.NewConstraint("id_unique", []string{IDPIDCol})),
 		),
 		crdb.NewSuffixedTable([]*crdb.Column{
 			crdb.NewColumn(OIDCConfigIDPIDCol, crdb.ColumnTypeText, crdb.DeleteCascade(IDPIDCol)),

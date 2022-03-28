@@ -27,11 +27,11 @@ func NewOrgDomainPolicyWriteModel(orgID string) *OrgDomainPolicyWriteModel {
 func (wm *OrgDomainPolicyWriteModel) AppendEvents(events ...eventstore.Event) {
 	for _, event := range events {
 		switch e := event.(type) {
-		case *org.OrgDomainPolicyAddedEvent:
+		case *org.DomainPolicyAddedEvent:
 			wm.PolicyDomainWriteModel.AppendEvents(&e.DomainPolicyAddedEvent)
-		case *org.OrgDomainPolicyChangedEvent:
+		case *org.DomainPolicyChangedEvent:
 			wm.PolicyDomainWriteModel.AppendEvents(&e.DomainPolicyChangedEvent)
-		case *org.OrgDomainPolicyRemovedEvent:
+		case *org.DomainPolicyRemovedEvent:
 			wm.PolicyDomainWriteModel.AppendEvents(&e.DomainPolicyRemovedEvent)
 		}
 	}
@@ -47,16 +47,16 @@ func (wm *OrgDomainPolicyWriteModel) Query() *eventstore.SearchQueryBuilder {
 		AddQuery().
 		AggregateTypes(org.AggregateType).
 		AggregateIDs(wm.PolicyDomainWriteModel.AggregateID).
-		EventTypes(org.OrgDomainPolicyAddedEventType,
-			org.OrgDomainPolicyChangedEventType,
-			org.OrgDomainPolicyRemovedEventType).
+		EventTypes(org.DomainPolicyAddedEventType,
+			org.DomainPolicyChangedEventType,
+			org.DomainPolicyRemovedEventType).
 		Builder()
 }
 
 func (wm *OrgDomainPolicyWriteModel) NewChangedEvent(
 	ctx context.Context,
 	aggregate *eventstore.Aggregate,
-	userLoginMustBeDomain bool) (*org.OrgDomainPolicyChangedEvent, bool) {
+	userLoginMustBeDomain bool) (*org.DomainPolicyChangedEvent, bool) {
 	changes := make([]policy.OrgPolicyChanges, 0)
 	if wm.UserLoginMustBeDomain != userLoginMustBeDomain {
 		changes = append(changes, policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain))
@@ -64,7 +64,7 @@ func (wm *OrgDomainPolicyWriteModel) NewChangedEvent(
 	if len(changes) == 0 {
 		return nil, false
 	}
-	changedEvent, err := org.NewOrgDomainPolicyChangedEvent(ctx, aggregate, changes)
+	changedEvent, err := org.NewDomainPolicyChangedEvent(ctx, aggregate, changes)
 	if err != nil {
 		return nil, false
 	}
