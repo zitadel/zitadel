@@ -59,7 +59,7 @@ func (c *Commands) addInstanceDomain(a *instance.Aggregate, instanceDomain strin
 				return nil, err
 			}
 			if domainWriteModel.State == domain.InstanceDomainStateActive {
-				return nil, caos_errs.ThrowNotFound(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
+				return nil, caos_errs.ThrowAlreadyExists(nil, "INST-i2nl", "Errors.Instance.Domain.AlreadyExists")
 			}
 			return []eventstore.Command{instance.NewDomainAddedEvent(ctx, &a.Aggregate, instanceDomain, generated)}, nil
 		}, nil

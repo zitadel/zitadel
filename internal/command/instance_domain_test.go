@@ -8,7 +8,6 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/eventstore/repository"
-	"github.com/caos/zitadel/internal/eventstore/v1/models"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +23,7 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 		claimedUserIDs []string
 	}
 	type res struct {
-		want *domain.InstanceDomain
+		want *domain.ObjectDetails
 		err  func(error) bool
 	}
 	tests := []struct {
@@ -97,12 +96,8 @@ func TestCommandSide_AddInstanceDomain(t *testing.T) {
 				domain:     "domain.ch",
 			},
 			res: res{
-				want: &domain.InstanceDomain{
-					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "INSTANCE",
-						ResourceOwner: "INSTANCE",
-					},
-					Domain: "domain.ch",
+				want: &domain.ObjectDetails{
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},

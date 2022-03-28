@@ -57,10 +57,10 @@ func (wm *InstanceDomainWriteModel) Reduce() error {
 
 func (wm *InstanceDomainWriteModel) Query() *eventstore.SearchQueryBuilder {
 	return eventstore.NewSearchQueryBuilder(eventstore.ColumnsEvent).
-		ResourceOwner(domain.IAMID).
+		ResourceOwner(wm.ResourceOwner).
 		AddQuery().
 		AggregateTypes(instance.AggregateType).
-		AggregateIDs(domain.IAMID).
+		AggregateIDs(wm.AggregateID).
 		EventTypes(
 			instance.InstanceDomainAddedEventType,
 			instance.InstanceDomainRemovedEventType).
