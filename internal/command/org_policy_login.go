@@ -178,7 +178,7 @@ func (c *Commands) RemoveLoginPolicy(ctx context.Context, orgID string) (*domain
 	return writeModelToObjectDetails(&existingPolicy.LoginPolicyWriteModel.WriteModel), nil
 }
 
-func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
+func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, instanceID, resourceOwner string, idpProvider *domain.IDPProvider) (*domain.IDPProvider, error) {
 	if resourceOwner == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "Org-M0fs9", "Errors.ResourceOwnerMissing")
 	}
@@ -196,7 +196,7 @@ func (c *Commands) AddIDPProviderToLoginPolicy(ctx context.Context, resourceOwne
 	if idpProvider.Type == domain.IdentityProviderTypeOrg {
 		_, err = c.getOrgIDPConfigByID(ctx, idpProvider.IDPConfigID, resourceOwner)
 	} else {
-		_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
+		_, err = c.getInstanceIDPConfigByID(ctx, instanceID, idpProvider.IDPConfigID)
 	}
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "Org-3N9fs", "Errors.IDPConfig.NotExisting")

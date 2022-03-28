@@ -24,8 +24,9 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx    context.Context
-			config *domain.JWTIDPConfig
+			ctx        context.Context
+			instanceID string
+			config     *domain.JWTIDPConfig
 		}
 	)
 	type res struct {
@@ -46,8 +47,9 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.JWTIDPConfig{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				config:     &domain.JWTIDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -62,7 +64,8 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.JWTIDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -108,7 +111,8 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.JWTIDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -148,7 +152,8 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.JWTIDPConfig{
 					IDPConfigID:  "config1",
 					JWTEndpoint:  "jwt-endpoint",
@@ -205,7 +210,8 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.JWTIDPConfig{
 					IDPConfigID:  "config1",
 					JWTEndpoint:  "jwt-endpoint-changed",
@@ -217,8 +223,8 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 			res: res{
 				want: &domain.JWTIDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:  "config1",
 					JWTEndpoint:  "jwt-endpoint-changed",
@@ -235,7 +241,7 @@ func TestCommandSide_ChangeDefaultIDPJWTConfig(t *testing.T) {
 				eventstore:            tt.fields.eventstore,
 				idpConfigSecretCrypto: tt.fields.secretCrypto,
 			}
-			got, err := r.ChangeDefaultIDPJWTConfig(tt.args.ctx, tt.args.config)
+			got, err := r.ChangeDefaultIDPJWTConfig(tt.args.ctx, tt.args.instanceID, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

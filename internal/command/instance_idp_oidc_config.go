@@ -7,11 +7,11 @@ import (
 	caos_errs "github.com/caos/zitadel/internal/errors"
 )
 
-func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
+func (c *Commands) ChangeDefaultIDPOIDCConfig(ctx context.Context, instanceID string, config *domain.OIDCIDPConfig) (*domain.OIDCIDPConfig, error) {
 	if config.IDPConfigID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-9djf8", "Errors.IDMissing")
 	}
-	existingConfig := NewInstanceIDPOIDCConfigWriteModel(config.IDPConfigID)
+	existingConfig := NewInstanceIDPOIDCConfigWriteModel(instanceID, config.IDPConfigID)
 	err := c.eventstore.FilterToQueryReducer(ctx, existingConfig)
 	if err != nil {
 		return nil, err

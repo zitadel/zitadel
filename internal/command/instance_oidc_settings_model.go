@@ -19,11 +19,11 @@ type InstanceOIDCSettingsWriteModel struct {
 	State                      domain.OIDCSettingsState
 }
 
-func NewInstanceOIDCSettingsWriteModel() *InstanceOIDCSettingsWriteModel {
+func NewInstanceOIDCSettingsWriteModel(instanceID string) *InstanceOIDCSettingsWriteModel {
 	return &InstanceOIDCSettingsWriteModel{
 		WriteModel: eventstore.WriteModel{
-			AggregateID:   domain.IAMID,
-			ResourceOwner: domain.IAMID,
+			AggregateID:   instanceID,
+			ResourceOwner: instanceID,
 		},
 	}
 }

@@ -26,8 +26,9 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 		secretCrypto crypto.EncryptionAlgorithm
 	}
 	type args struct {
-		ctx    context.Context
-		config *domain.IDPConfig
+		ctx        context.Context
+		instanceID string
+		config     *domain.IDPConfig
 	}
 	type res struct {
 		want *domain.IDPConfig
@@ -47,8 +48,9 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.IDPConfig{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				config:     &domain.IDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -91,14 +93,15 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "IAM")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
 					),
 				),
 				idGenerator:  id_mock.NewIDGeneratorExpectIDs(t, "config1"),
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.IDPConfig{
 					Name:         "name1",
 					StylingType:  domain.IDPConfigStylingTypeGoogle,
@@ -118,8 +121,8 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			res: res{
 				want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:  "config1",
 					Name:         "name1",
@@ -157,13 +160,14 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 								),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "IAM")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
 					),
 				),
 				idGenerator: id_mock.NewIDGeneratorExpectIDs(t, "config1"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.IDPConfig{
 					Name:        "name1",
 					StylingType: domain.IDPConfigStylingTypeGoogle,
@@ -178,8 +182,8 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 			res: res{
 				want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID: "config1",
 					Name:        "name1",
@@ -196,7 +200,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 				idGenerator:           tt.fields.idGenerator,
 				idpConfigSecretCrypto: tt.fields.secretCrypto,
 			}
-			got, err := r.AddDefaultIDPConfig(tt.args.ctx, tt.args.config)
+			got, err := r.AddDefaultIDPConfig(tt.args.ctx, tt.args.instanceID, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -215,8 +219,9 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		config *domain.IDPConfig
+		ctx        context.Context
+		instanceID string
+		config     *domain.IDPConfig
 	}
 	type res struct {
 		want *domain.IDPConfig
@@ -236,8 +241,9 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.IDPConfig{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				config:     &domain.IDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -252,7 +258,8 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.IDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -303,13 +310,14 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 								newDefaultIDPConfigChangedEvent(context.Background(), "config1", "name1", "name2", domain.IDPConfigStylingTypeUnspecified, false),
 							),
 						},
-						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "IAM")),
-						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name2", "IAM")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewRemoveIDPConfigNameUniqueConstraint("name1", "INSTANCE")),
+						uniqueConstraintsFromEventConstraint(idpconfig.NewAddIDPConfigNameUniqueConstraint("name2", "INSTANCE")),
 					),
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.IDPConfig{
 					IDPConfigID:  "config1",
 					Name:         "name2",
@@ -320,8 +328,8 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 			res: res{
 				want: &domain.IDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:  "config1",
 					Name:         "name2",
@@ -337,7 +345,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultIDPConfig(tt.args.ctx, tt.args.config)
+			got, err := r.ChangeDefaultIDPConfig(tt.args.ctx, tt.args.instanceID, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

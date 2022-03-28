@@ -24,8 +24,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx    context.Context
-			config *domain.OIDCIDPConfig
+			ctx        context.Context
+			instanceID string
+			config     *domain.OIDCIDPConfig
 		}
 	)
 	type res struct {
@@ -46,8 +47,9 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.OIDCIDPConfig{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				config:     &domain.OIDCIDPConfig{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -62,7 +64,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -117,7 +120,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID: "config1",
 				},
@@ -166,7 +170,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID:           "config1",
 					ClientID:              "clientid1",
@@ -244,7 +249,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				secretCrypto: crypto.CreateMockEncryptionAlg(gomock.NewController(t)),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.OIDCIDPConfig{
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",
@@ -260,8 +266,8 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 			res: res{
 				want: &domain.OIDCIDPConfig{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					IDPConfigID:           "config1",
 					ClientID:              "clientid-changed",
@@ -281,7 +287,7 @@ func TestCommandSide_ChangeDefaultIDPOIDCConfig(t *testing.T) {
 				eventstore:            tt.fields.eventstore,
 				idpConfigSecretCrypto: tt.fields.secretCrypto,
 			}
-			got, err := r.ChangeDefaultIDPOIDCConfig(tt.args.ctx, tt.args.config)
+			got, err := r.ChangeDefaultIDPOIDCConfig(tt.args.ctx, tt.args.instanceID, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

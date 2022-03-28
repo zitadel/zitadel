@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	"github.com/caos/zitadel/internal/domain"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -19,7 +20,7 @@ func (s *Server) GetOIDCSettings(ctx context.Context, _ *admin_pb.GetOIDCSetting
 }
 
 func (s *Server) UpdateOIDCSettings(ctx context.Context, req *admin_pb.UpdateOIDCSettingsRequest) (*admin_pb.UpdateOIDCSettingsResponse, error) {
-	result, err := s.command.ChangeOIDCSettings(ctx, UpdateOIDCConfigToConfig(req))
+	result, err := s.command.ChangeOIDCSettings(ctx, authz.GetInstance(ctx).ID, UpdateOIDCConfigToConfig(req))
 	if err != nil {
 		return nil, err
 	}

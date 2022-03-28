@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/idpconfig"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
@@ -14,12 +13,12 @@ type InstanceIDPJWTConfigWriteModel struct {
 	JWTConfigWriteModel
 }
 
-func NewInstanceIDPJWTConfigWriteModel(idpConfigID string) *InstanceIDPJWTConfigWriteModel {
+func NewInstanceIDPJWTConfigWriteModel(instanceID, idpConfigID string) *InstanceIDPJWTConfigWriteModel {
 	return &InstanceIDPJWTConfigWriteModel{
 		JWTConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			IDPConfigID: idpConfigID,
 		},

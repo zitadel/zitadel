@@ -122,7 +122,7 @@ func (c *Commands) AddIDPProviderToDefaultLoginPolicy(ctx context.Context, insta
 		return nil, caos_errs.ThrowNotFound(nil, "INSTANCE-GVDfe", "Errors.IAM.LoginPolicy.NotFound")
 	}
 
-	_, err = c.getInstanceIDPConfigByID(ctx, idpProvider.IDPConfigID)
+	_, err = c.getInstanceIDPConfigByID(ctx, instanceID, idpProvider.IDPConfigID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "INSTANCE-m8fsd", "Errors.IDPConfig.NotExisting")
 	}

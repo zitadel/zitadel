@@ -23,8 +23,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx    context.Context
-		member *domain.Member
+		ctx        context.Context
+		instanceID string
+		member     *domain.Member
 	}
 	type res struct {
 		want *domain.Member
@@ -44,8 +45,9 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				member: &domain.Member{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				member:     &domain.Member{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -60,7 +62,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -94,7 +97,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -141,7 +145,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -181,7 +186,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 								[]string{"IAM_OWNER"}...,
 							)),
 						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("IAM", "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -191,7 +196,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -231,7 +237,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 								[]string{"IAM_OWNER"}...,
 							)),
 						},
-						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("IAM", "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewAddMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 				zitadelRoles: []authz.RoleMapping{
@@ -241,7 +247,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -250,8 +257,8 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 			res: res{
 				want: &domain.Member{
 					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "IAM",
-						AggregateID:   "IAM",
+						ResourceOwner: "INSTANCE",
+						AggregateID:   "INSTANCE",
 					},
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -265,7 +272,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.AddInstanceMember(tt.args.ctx, tt.args.member)
+			got, err := r.AddInstanceMember(tt.args.ctx, tt.args.instanceID, tt.args.member)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -285,8 +292,9 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 		zitadelRoles []authz.RoleMapping
 	}
 	type args struct {
-		ctx    context.Context
-		member *domain.Member
+		ctx        context.Context
+		instanceID string
+		member     *domain.Member
 	}
 	type res struct {
 		want *domain.Member
@@ -306,8 +314,9 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				member: &domain.Member{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				member:     &domain.Member{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -321,7 +330,8 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -345,7 +355,8 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -377,7 +388,8 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER"},
@@ -421,7 +433,8 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				},
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				member: &domain.Member{
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
@@ -430,8 +443,8 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 			res: res{
 				want: &domain.Member{
 					ObjectRoot: models.ObjectRoot{
-						ResourceOwner: "IAM",
-						AggregateID:   "IAM",
+						ResourceOwner: "INSTANCE",
+						AggregateID:   "INSTANCE",
 					},
 					UserID: "user1",
 					Roles:  []string{"IAM_OWNER", "IAM_OWNER_VIEWER"},
@@ -445,7 +458,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 				eventstore:   tt.fields.eventstore,
 				zitadelRoles: tt.fields.zitadelRoles,
 			}
-			got, err := r.ChangeInstanceMember(tt.args.ctx, tt.args.member)
+			got, err := r.ChangeInstanceMember(tt.args.ctx, tt.args.instanceID, tt.args.member)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -464,8 +477,9 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		userID string
+		ctx        context.Context
+		instanceID string
+		userID     string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -485,8 +499,9 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				userID:     "",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -501,8 +516,9 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				userID:     "user1",
 			},
 			res: res{
 				want: nil,
@@ -529,17 +545,18 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 								"user1",
 							)),
 						},
-						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("IAM", "user1")),
+						uniqueConstraintsFromEventConstraint(member.NewRemoveMemberUniqueConstraint("INSTANCE", "user1")),
 					),
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				userID:     "user1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -549,7 +566,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveInstanceMember(tt.args.ctx, tt.args.userID)
+			got, err := r.RemoveInstanceMember(tt.args.ctx, tt.args.instanceID, tt.args.userID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

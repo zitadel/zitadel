@@ -183,9 +183,9 @@ func (c *Commands) setUpOrg(
 
 	var userEvents []eventstore.Command
 	if selfregistered {
-		userEvents, human, err = c.registerHuman(ctx, orgAgg.ID, admin, nil, loginPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
+		userEvents, human, err = c.registerHuman(ctx, instanceID, orgAgg.ID, admin, nil, loginPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 	} else {
-		userEvents, human, err = c.addHuman(ctx, orgAgg.ID, admin, loginPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
+		userEvents, human, err = c.addHuman(ctx, instanceID, orgAgg.ID, admin, loginPolicy, pwPolicy, initCodeGenerator, phoneCodeGenerator)
 	}
 	if err != nil {
 		return nil, nil, nil, nil, nil, err

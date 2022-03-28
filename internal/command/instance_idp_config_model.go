@@ -14,12 +14,12 @@ type InstanceIDPConfigWriteModel struct {
 	IDPConfigWriteModel
 }
 
-func NewInstanceIDPConfigWriteModel(configID string) *InstanceIDPConfigWriteModel {
+func NewInstanceIDPConfigWriteModel(instanceID, configID string) *InstanceIDPConfigWriteModel {
 	return &InstanceIDPConfigWriteModel{
 		IDPConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			ConfigID: configID,
 		},

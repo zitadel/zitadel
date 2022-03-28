@@ -13,7 +13,7 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+func (c *Commands) AddDefaultIDPConfig(ctx context.Context, instanceID string, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.OIDCConfig == nil && config.JWTConfig == nil {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "IDP-s8nn3", "Errors.IDPConfig.Invalid")
 	}
@@ -21,7 +21,7 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 	if err != nil {
 		return nil, err
 	}
-	addedConfig := NewInstanceIDPConfigWriteModel(idpConfigID)
+	addedConfig := NewInstanceIDPConfigWriteModel(instanceID, idpConfigID)
 
 	instanceAgg := InstanceAggregateFromWriteModel(&addedConfig.WriteModel)
 	events := []eventstore.Command{
@@ -76,11 +76,11 @@ func (c *Commands) AddDefaultIDPConfig(ctx context.Context, config *domain.IDPCo
 	return writeModelToIDPConfig(&addedConfig.IDPConfigWriteModel), nil
 }
 
-func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.IDPConfig) (*domain.IDPConfig, error) {
+func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, instanceID string, config *domain.IDPConfig) (*domain.IDPConfig, error) {
 	if config.IDPConfigID == "" {
 		return nil, errors.ThrowInvalidArgument(nil, "INSTANCE-4m9gs", "Errors.IDMissing")
 	}
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, config.IDPConfigID)
+	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, instanceID, config.IDPConfigID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +104,8 @@ func (c *Commands) ChangeDefaultIDPConfig(ctx context.Context, config *domain.ID
 	return writeModelToIDPConfig(&existingIDP.IDPConfigWriteModel), nil
 }
 
-func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.ObjectDetails, error) {
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, instanceID, idpID string) (*domain.ObjectDetails, error) {
+	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, instanceID, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +124,8 @@ func (c *Commands) DeactivateDefaultIDPConfig(ctx context.Context, idpID string)
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string) (*domain.ObjectDetails, error) {
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, instanceID, idpID string) (*domain.ObjectDetails, error) {
+	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, instanceID, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -144,8 +144,8 @@ func (c *Commands) ReactivateDefaultIDPConfig(ctx context.Context, idpID string)
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
-	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, instanceID, idpID string, idpProviders []*domain.IDPProvider, externalIDPs ...*domain.UserIDPLink) (*domain.ObjectDetails, error) {
+	existingIDP, err := c.isntanceIDPConfigWriteModelByID(ctx, instanceID, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +179,8 @@ func (c *Commands) RemoveDefaultIDPConfig(ctx context.Context, idpID string, idp
 	return writeModelToObjectDetails(&existingIDP.IDPConfigWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (*domain.IDPConfig, error) {
-	config, err := c.isntanceIDPConfigWriteModelByID(ctx, idpID)
+func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, instanceID, idpID string) (*domain.IDPConfig, error) {
+	config, err := c.isntanceIDPConfigWriteModelByID(ctx, instanceID, idpID)
 	if err != nil {
 		return nil, err
 	}
@@ -190,11 +190,11 @@ func (c *Commands) getInstanceIDPConfigByID(ctx context.Context, idpID string) (
 	return writeModelToIDPConfig(&config.IDPConfigWriteModel), nil
 }
 
-func (c *Commands) isntanceIDPConfigWriteModelByID(ctx context.Context, idpID string) (policy *InstanceIDPConfigWriteModel, err error) {
+func (c *Commands) isntanceIDPConfigWriteModelByID(ctx context.Context, instanceID, idpID string) (policy *InstanceIDPConfigWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceIDPConfigWriteModel(idpID)
+	writeModel := NewInstanceIDPConfigWriteModel(instanceID, idpID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

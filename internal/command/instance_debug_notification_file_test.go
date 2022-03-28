@@ -20,8 +20,9 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx      context.Context
-		provider *fs.FSConfig
+		ctx        context.Context
+		instanceID string
+		provider   *fs.FSConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -49,7 +50,8 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &fs.FSConfig{
 					Compact: true,
 					Enabled: true,
@@ -78,14 +80,15 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &fs.FSConfig{
 					Compact: true,
 				},
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: domain.IAMID,
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -95,7 +98,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDebugNotificationProviderFile(tt.args.ctx, tt.args.provider)
+			got, err := r.AddDebugNotificationProviderFile(tt.args.ctx, tt.args.instanceID, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -114,8 +117,9 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx      context.Context
-		provider *fs.FSConfig
+		ctx        context.Context
+		instanceID string
+		provider   *fs.FSConfig
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -136,7 +140,8 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &fs.FSConfig{
 					Compact: true,
 					Enabled: true,
@@ -162,7 +167,8 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &fs.FSConfig{
 					Compact: true,
 					Enabled: false,
@@ -188,7 +194,8 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &fs.FSConfig{
 					Compact: true,
 					Enabled: true,
@@ -222,7 +229,8 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &fs.FSConfig{
 					Compact: false,
 					Enabled: false,
@@ -230,7 +238,7 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -240,7 +248,7 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultNotificationFile(tt.args.ctx, tt.args.provider)
+			got, err := r.ChangeDefaultNotificationFile(tt.args.ctx, tt.args.instanceID, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -259,7 +267,8 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx context.Context
+		ctx        context.Context
+		instanceID string
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -280,7 +289,8 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -310,11 +320,12 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
-					ResourceOwner: "IAM",
+					ResourceOwner: "INSTANCE",
 				},
 			},
 		},
@@ -324,7 +335,7 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveDefaultNotificationFile(tt.args.ctx)
+			got, err := r.RemoveDefaultNotificationFile(tt.args.ctx, tt.args.instanceID)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

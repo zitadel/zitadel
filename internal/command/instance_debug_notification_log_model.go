@@ -6,7 +6,6 @@ import (
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/settings"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
@@ -14,12 +13,12 @@ type InstanceDebugNotificationLogWriteModel struct {
 	DebugNotificationWriteModel
 }
 
-func NewInstanceDebugNotificationLogWriteModel() *InstanceDebugNotificationLogWriteModel {
+func NewInstanceDebugNotificationLogWriteModel(instanceID string) *InstanceDebugNotificationLogWriteModel {
 	return &InstanceDebugNotificationLogWriteModel{
 		DebugNotificationWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 		},
 	}

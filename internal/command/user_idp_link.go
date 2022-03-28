@@ -11,7 +11,7 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOwner string, links []*domain.UserIDPLink) (err error) {
+func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, instanceID, userID, resourceOwner string, links []*domain.UserIDPLink) (err error) {
 	if userID == "" {
 		return caos_errs.ThrowInvalidArgument(nil, "COMMAND-03j8f", "Errors.IDMissing")
 	}
@@ -24,7 +24,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 		linkWriteModel := NewUserIDPLinkWriteModel(userID, link.IDPConfigID, link.ExternalUserID, resourceOwner)
 		userAgg := UserAggregateFromWriteModel(&linkWriteModel.WriteModel)
 
-		events[i], err = c.addUserIDPLink(ctx, userAgg, link)
+		events[i], err = c.addUserIDPLink(ctx, instanceID, userAgg, link)
 		if err != nil {
 			return err
 		}
@@ -34,7 +34,7 @@ func (c *Commands) BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOw
 	return err
 }
 
-func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggregate, link *domain.UserIDPLink) (eventstore.Command, error) {
+func (c *Commands) addUserIDPLink(ctx context.Context, instanceID string, human *eventstore.Aggregate, link *domain.UserIDPLink) (eventstore.Command, error) {
 	if link.AggregateID != "" && human.ID != link.AggregateID {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-33M0g", "Errors.IDMissing")
 	}
@@ -43,7 +43,7 @@ func (c *Commands) addUserIDPLink(ctx context.Context, human *eventstore.Aggrega
 	}
 	_, err := c.getOrgIDPConfigByID(ctx, link.IDPConfigID, human.ResourceOwner)
 	if caos_errs.IsNotFound(err) {
-		_, err = c.getInstanceIDPConfigByID(ctx, link.IDPConfigID)
+		_, err = c.getInstanceIDPConfigByID(ctx, instanceID, link.IDPConfigID)
 	}
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-39nfs", "Errors.IDPConfig.NotExisting")

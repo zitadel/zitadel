@@ -87,7 +87,7 @@ type userEventProvider interface {
 }
 
 type userCommandProvider interface {
-	BulkAddedUserIDPLinks(ctx context.Context, userID, resourceOwner string, externalIDPs []*domain.UserIDPLink) error
+	BulkAddedUserIDPLinks(ctx context.Context, instanceID, userID, resourceOwner string, externalIDPs []*domain.UserIDPLink) error
 }
 
 type orgViewProvider interface {
@@ -420,7 +420,7 @@ func (repo *AuthRequestRepo) LinkExternalUsers(ctx context.Context, authReqID, u
 	if err != nil {
 		return err
 	}
-	err = linkExternalIDPs(ctx, repo.UserCommandProvider, request)
+	err = linkExternalIDPs(ctx, repo.UserCommandProvider, instanceID, request)
 	if err != nil {
 		return err
 	}
@@ -1185,7 +1185,7 @@ func userByID(ctx context.Context, viewProvider userViewProvider, eventProvider 
 	return user_view_model.UserToModel(&userCopy, viewProvider.PrefixAvatarURL()), nil
 }
 
-func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, request *domain.AuthRequest) error {
+func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvider, instanceID string, request *domain.AuthRequest) error {
 	externalIDPs := make([]*domain.UserIDPLink, len(request.LinkingUsers))
 	for i, linkingUser := range request.LinkingUsers {
 		externalIDP := &domain.UserIDPLink{
@@ -1200,7 +1200,7 @@ func linkExternalIDPs(ctx context.Context, userCommandProvider userCommandProvid
 		UserID: "LOGIN",
 		OrgID:  request.UserOrgID,
 	}
-	return userCommandProvider.BulkAddedUserIDPLinks(authz.SetCtxData(ctx, data), request.UserID, request.UserOrgID, externalIDPs)
+	return userCommandProvider.BulkAddedUserIDPLinks(authz.SetCtxData(ctx, data), instanceID, request.UserID, request.UserOrgID, externalIDPs)
 }
 
 func linkingIDPConfigExistingInAllowedIDPs(linkingUsers []*domain.ExternalUser, idpProviders []*domain.IDPProvider) bool {

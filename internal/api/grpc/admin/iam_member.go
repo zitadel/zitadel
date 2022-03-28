@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/member"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	admin_pb "github.com/caos/zitadel/pkg/grpc/admin"
@@ -34,7 +35,7 @@ func (s *Server) ListIAMMembers(ctx context.Context, req *admin_pb.ListIAMMember
 }
 
 func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberRequest) (*admin_pb.AddIAMMemberResponse, error) {
-	member, err := s.command.AddInstanceMember(ctx, AddIAMMemberToDomain(req))
+	member, err := s.command.AddInstanceMember(ctx, authz.GetInstance(ctx).ID, AddIAMMemberToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (s *Server) AddIAMMember(ctx context.Context, req *admin_pb.AddIAMMemberReq
 }
 
 func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMemberRequest) (*admin_pb.UpdateIAMMemberResponse, error) {
-	member, err := s.command.ChangeInstanceMember(ctx, UpdateIAMMemberToDomain(req))
+	member, err := s.command.ChangeInstanceMember(ctx, authz.GetInstance(ctx).ID, UpdateIAMMemberToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +63,7 @@ func (s *Server) UpdateIAMMember(ctx context.Context, req *admin_pb.UpdateIAMMem
 }
 
 func (s *Server) RemoveIAMMember(ctx context.Context, req *admin_pb.RemoveIAMMemberRequest) (*admin_pb.RemoveIAMMemberResponse, error) {
-	objectDetails, err := s.command.RemoveInstanceMember(ctx, req.UserId)
+	objectDetails, err := s.command.RemoveInstanceMember(ctx, authz.GetInstance(ctx).ID, req.UserId)
 	if err != nil {
 		return nil, err
 	}

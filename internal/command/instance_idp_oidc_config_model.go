@@ -16,12 +16,12 @@ type InstanceIDPOIDCConfigWriteModel struct {
 	OIDCConfigWriteModel
 }
 
-func NewInstanceIDPOIDCConfigWriteModel(idpConfigID string) *InstanceIDPOIDCConfigWriteModel {
+func NewInstanceIDPOIDCConfigWriteModel(instanceID, idpConfigID string) *InstanceIDPOIDCConfigWriteModel {
 	return &InstanceIDPOIDCConfigWriteModel{
 		OIDCConfigWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			IDPConfigID: idpConfigID,
 		},

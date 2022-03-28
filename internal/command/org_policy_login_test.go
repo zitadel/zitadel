@@ -705,6 +705,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		provider      *domain.IDPProvider
+		instanceID    string
 		resourceOwner string
 	}
 	type res struct {
@@ -725,7 +726,8 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 					Name:        "name",
@@ -745,6 +747,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider:      &domain.IDPProvider{},
 			},
@@ -762,6 +765,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
@@ -801,6 +805,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
@@ -860,6 +865,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			},
 			args: args{
 				ctx:           context.Background(),
+				instanceID:    "INSTANCE",
 				resourceOwner: "org1",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
@@ -920,7 +926,8 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				provider: &domain.IDPProvider{
 					IDPConfigID: "config1",
 					Name:        "name",
@@ -945,7 +952,7 @@ func TestCommandSide_AddIDPProviderLoginPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.resourceOwner, tt.args.provider)
+			got, err := r.AddIDPProviderToLoginPolicy(tt.args.ctx, tt.args.instanceID, tt.args.resourceOwner, tt.args.provider)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

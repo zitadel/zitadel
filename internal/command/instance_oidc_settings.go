@@ -8,8 +8,8 @@ import (
 	"github.com/caos/zitadel/internal/repository/instance"
 )
 
-func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
-	oidcSettingWriteModel, err := c.getOIDCSettings(ctx)
+func (c *Commands) AddOIDCSettings(ctx context.Context, instanceID string, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
+	oidcSettingWriteModel, err := c.getOIDCSettings(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +34,8 @@ func (c *Commands) AddOIDCSettings(ctx context.Context, settings *domain.OIDCSet
 	return writeModelToObjectDetails(&oidcSettingWriteModel.WriteModel), nil
 }
 
-func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
-	oidcSettingWriteModel, err := c.getOIDCSettings(ctx)
+func (c *Commands) ChangeOIDCSettings(ctx context.Context, instanceID string, settings *domain.OIDCSettings) (*domain.ObjectDetails, error) {
+	oidcSettingWriteModel, err := c.getOIDCSettings(ctx, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,8 +68,8 @@ func (c *Commands) ChangeOIDCSettings(ctx context.Context, settings *domain.OIDC
 	return writeModelToObjectDetails(&oidcSettingWriteModel.WriteModel), nil
 }
 
-func (c *Commands) getOIDCSettings(ctx context.Context) (_ *InstanceOIDCSettingsWriteModel, err error) {
-	writeModel := NewInstanceOIDCSettingsWriteModel()
+func (c *Commands) getOIDCSettings(ctx context.Context, instanceID string) (_ *InstanceOIDCSettingsWriteModel, err error) {
+	writeModel := NewInstanceOIDCSettingsWriteModel(instanceID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

@@ -13,11 +13,11 @@ import (
 	"github.com/caos/zitadel/internal/telemetry/tracing"
 )
 
-func (c *Commands) AddInstanceMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+func (c *Commands) AddInstanceMember(ctx context.Context, instanceID string, member *domain.Member) (*domain.Member, error) {
 	if member.UserID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-Mf83b", "Errors.IAM.MemberInvalid")
 	}
-	addedMember := NewInstanceMemberWriteModel(member.UserID)
+	addedMember := NewInstanceMemberWriteModel(instanceID, member.UserID)
 	instanceAgg := InstanceAggregateFromWriteModel(&addedMember.MemberWriteModel.WriteModel)
 	err := c.checkUserExists(ctx, addedMember.UserID, "")
 	if err != nil {
@@ -58,7 +58,7 @@ func (c *Commands) addInstanceMember(ctx context.Context, instanceAgg *eventstor
 }
 
 //ChangeInstanceMember updates an existing member
-func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+func (c *Commands) ChangeInstanceMember(ctx context.Context, instanceID string, member *domain.Member) (*domain.Member, error) {
 	if !member.IsIAMValid() {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IAM.MemberInvalid")
 	}
@@ -66,7 +66,7 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-3m9fs", "Errors.IAM.MemberInvalid")
 	}
 
-	existingMember, err := c.instanceMemberWriteModelByID(ctx, member.UserID)
+	existingMember, err := c.instanceMemberWriteModelByID(ctx, instanceID, member.UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -87,11 +87,11 @@ func (c *Commands) ChangeInstanceMember(ctx context.Context, member *domain.Memb
 	return memberWriteModelToMember(&existingMember.MemberWriteModel), nil
 }
 
-func (c *Commands) RemoveInstanceMember(ctx context.Context, userID string) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveInstanceMember(ctx context.Context, instanceID, userID string) (*domain.ObjectDetails, error) {
 	if userID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-LiaZi", "Errors.IDMissing")
 	}
-	memberWriteModel, err := c.instanceMemberWriteModelByID(ctx, userID)
+	memberWriteModel, err := c.instanceMemberWriteModelByID(ctx, instanceID, userID)
 	if err != nil && !errors.IsNotFound(err) {
 		return nil, err
 	}
@@ -124,11 +124,11 @@ func (c *Commands) removeInstanceMember(ctx context.Context, instanceAgg *events
 	}
 }
 
-func (c *Commands) instanceMemberWriteModelByID(ctx context.Context, userID string) (member *InstanceMemberWriteModel, err error) {
+func (c *Commands) instanceMemberWriteModelByID(ctx context.Context, instanceID, userID string) (member *InstanceMemberWriteModel, err error) {
 	ctx, span := tracing.NewSpan(ctx)
 	defer func() { span.EndWithError(err) }()
 
-	writeModel := NewInstanceMemberWriteModel(userID)
+	writeModel := NewInstanceMemberWriteModel(instanceID, userID)
 	err = c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err
