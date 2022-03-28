@@ -19,8 +19,9 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		config *domain.CustomLoginText
+		ctx        context.Context
+		instanceID string
+		config     *domain.CustomLoginText
 	}
 	type res struct {
 		want *domain.ObjectDetails
@@ -40,8 +41,9 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				config: &domain.CustomLoginText{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				config:     &domain.CustomLoginText{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -1148,7 +1150,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.CustomLoginText{
 					Language: language.English,
 					SelectAccount: domain.SelectAccountScreenText{
@@ -3639,7 +3642,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.CustomLoginText{
 					Language:                         language.English,
 					SelectAccount:                    domain.SelectAccountScreenText{},
@@ -6970,7 +6974,8 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				config: &domain.CustomLoginText{
 					Language: language.English,
 					SelectAccount: domain.SelectAccountScreenText{
@@ -7273,7 +7278,7 @@ func TestCommandSide_SetCustomIAMLoginText(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.SetCustomInstanceLoginText(tt.args.ctx, tt.args.config.AggregateID, tt.args.config)
+			got, err := r.SetCustomInstanceLoginText(tt.args.ctx, tt.args.instanceID, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
