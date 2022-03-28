@@ -251,7 +251,7 @@ func (s *Server) ImportHumanUser(ctx context.Context, req *mgmt_pb.ImportHumanUs
 }
 
 func (s *Server) AddMachineUser(ctx context.Context, req *mgmt_pb.AddMachineUserRequest) (*mgmt_pb.AddMachineUserResponse, error) {
-	machine, err := s.command.AddMachine(ctx, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
+	machine, err := s.command.AddMachine(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, AddMachineUserRequestToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -326,7 +326,7 @@ func (s *Server) RemoveUser(ctx context.Context, req *mgmt_pb.RemoveUserRequest)
 	if err != nil {
 		return nil, err
 	}
-	objectDetails, err := s.command.RemoveUser(ctx, req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
+	objectDetails, err := s.command.RemoveUser(ctx, authz.GetInstance(ctx).ID, req.Id, authz.GetCtxData(ctx).OrgID, memberships.Memberships, userGrantsToIDs(grants.UserGrants)...)
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +344,7 @@ func userGrantsToIDs(userGrants []*query.UserGrant) []string {
 }
 
 func (s *Server) UpdateUserName(ctx context.Context, req *mgmt_pb.UpdateUserNameRequest) (*mgmt_pb.UpdateUserNameResponse, error) {
-	objectDetails, err := s.command.ChangeUsername(ctx, authz.GetCtxData(ctx).OrgID, req.UserId, req.UserName)
+	objectDetails, err := s.command.ChangeUsername(ctx, authz.GetInstance(ctx).ID, authz.GetCtxData(ctx).OrgID, req.UserId, req.UserName)
 	if err != nil {
 		return nil, err
 	}

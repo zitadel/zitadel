@@ -9,12 +9,12 @@ import (
 	"github.com/caos/zitadel/internal/errors"
 )
 
-func domainPolicyWriteModel(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PolicyDomainWriteModel, error) {
+func domainPolicyWriteModel(ctx context.Context, instanceID string, filter preparation.FilterToQueryReducer) (*command.PolicyDomainWriteModel, error) {
 	wm, err := orgDomainPolicy(ctx, filter)
 	if err != nil || wm != nil && wm.State.Exists() {
 		return wm, err
 	}
-	wm, err = instanceDomainPolicy(ctx, filter)
+	wm, err = instanceDomainPolicy(ctx, instanceID, filter)
 	if err != nil || wm != nil {
 		return wm, err
 	}
@@ -35,8 +35,8 @@ func orgDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReduce
 	return &policy.PolicyDomainWriteModel, err
 }
 
-func instanceDomainPolicy(ctx context.Context, filter preparation.FilterToQueryReducer) (*command.PolicyDomainWriteModel, error) {
-	policy := command.NewInstanceDomainPolicyWriteModel()
+func instanceDomainPolicy(ctx context.Context, instanceID string, filter preparation.FilterToQueryReducer) (*command.PolicyDomainWriteModel, error) {
+	policy := command.NewInstanceDomainPolicyWriteModel(instanceID)
 	events, err := filter(ctx, policy.Query())
 	if err != nil {
 		return nil, err

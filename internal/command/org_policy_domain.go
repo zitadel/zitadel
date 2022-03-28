@@ -88,7 +88,7 @@ func (c *Commands) RemoveOrgDomainPolicy(ctx context.Context, orgID string) erro
 	return err
 }
 
-func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domain.DomainPolicy, error) {
+func (c *Commands) getOrgDomainPolicy(ctx context.Context, instanceID, orgID string) (*domain.DomainPolicy, error) {
 	policy, err := c.orgDomainPolicyWriteModelByID(ctx, orgID)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (c *Commands) getOrgDomainPolicy(ctx context.Context, orgID string) (*domai
 	if policy.State == domain.PolicyStateActive {
 		return orgWriteModelToDomainPolicy(policy), nil
 	}
-	return c.getDefaultDomainPolicy(ctx)
+	return c.getDefaultDomainPolicy(ctx, instanceID)
 }
 
 func (c *Commands) orgDomainPolicyWriteModelByID(ctx context.Context, orgID string) (policy *OrgDomainPolicyWriteModel, err error) {

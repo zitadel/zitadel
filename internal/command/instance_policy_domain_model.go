@@ -5,7 +5,6 @@ import (
 
 	"github.com/caos/zitadel/internal/eventstore"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/policy"
 )
@@ -14,12 +13,12 @@ type InstanceDomainPolicyWriteModel struct {
 	PolicyDomainWriteModel
 }
 
-func NewInstanceDomainPolicyWriteModel() *InstanceDomainPolicyWriteModel {
+func NewInstanceDomainPolicyWriteModel(instanceID string) *InstanceDomainPolicyWriteModel {
 	return &InstanceDomainPolicyWriteModel{
 		PolicyDomainWriteModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 		},
 	}

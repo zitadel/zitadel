@@ -3,6 +3,7 @@ package login
 import (
 	"net/http"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -91,7 +92,7 @@ func (l *Login) handleMFACreation(w http.ResponseWriter, r *http.Request, authRe
 }
 
 func (l *Login) handleOTPCreation(w http.ResponseWriter, r *http.Request, authReq *domain.AuthRequest, data *mfaVerifyData) {
-	otp, err := l.command.AddHumanOTP(setContext(r.Context(), authReq.UserOrgID), authReq.UserID, authReq.UserOrgID)
+	otp, err := l.command.AddHumanOTP(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).ID, authReq.UserID, authReq.UserOrgID)
 	if err != nil {
 		l.renderError(w, r, authReq, err)
 		return

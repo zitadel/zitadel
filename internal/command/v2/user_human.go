@@ -53,7 +53,7 @@ func AddHumanCommand(instanceID string, a *user.Aggregate, human *AddHuman, pass
 		human.Phone = strings.TrimSpace(human.Phone)
 
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			domainPolicy, err := domainPolicyWriteModel(ctx, filter)
+			domainPolicy, err := domainPolicyWriteModel(ctx, instanceID, filter)
 			if err != nil {
 				return nil, err
 			}

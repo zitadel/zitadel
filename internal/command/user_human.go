@@ -28,7 +28,7 @@ func (c *Commands) AddHuman(ctx context.Context, instanceID, orgID string, human
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-XYFk9", "Errors.ResourceOwnerMissing")
 	}
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, orgID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.DomainPolicy.NotFound")
 	}
@@ -57,7 +57,7 @@ func (c *Commands) ImportHuman(ctx context.Context, instanceID, orgID string, hu
 	if orgID == "" {
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-5N8fs", "Errors.ResourceOwnerMissing")
 	}
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, orgID)
 	if err != nil {
 		return nil, nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-2N9fs", "Errors.Org.DomainPolicy.NotFound")
 	}
@@ -122,7 +122,7 @@ func (c *Commands) RegisterHuman(ctx context.Context, instanceID, orgID string, 
 	if orgID == "" {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "COMMAND-GEdf2", "Errors.ResourceOwnerMissing")
 	}
-	domainPolicy, err := c.getOrgDomainPolicy(ctx, orgID)
+	domainPolicy, err := c.getOrgDomainPolicy(ctx, instanceID, orgID)
 	if err != nil {
 		return nil, caos_errs.ThrowPreconditionFailed(err, "COMMAND-33M9f", "Errors.Org.DomainPolicy.NotFound")
 	}

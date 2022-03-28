@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/caos/logging"
+	"github.com/caos/zitadel/internal/api/authz"
 
 	http_mw "github.com/caos/zitadel/internal/api/http/middleware"
 	"github.com/caos/zitadel/internal/domain"
@@ -87,9 +88,9 @@ func (l *Login) renderPasswordlessRegistration(w http.ResponseWriter, r *http.Re
 	var webAuthNToken *domain.WebAuthNToken
 	if err == nil {
 		if authReq != nil {
-			webAuthNToken, err = l.authRepo.BeginPasswordlessSetup(setContext(r.Context(), authReq.UserOrgID), userID, authReq.UserOrgID, domain.AuthenticatorAttachment(requestedPlatformType))
+			webAuthNToken, err = l.authRepo.BeginPasswordlessSetup(setContext(r.Context(), authReq.UserOrgID), authz.GetInstance(r.Context()).ID, userID, authReq.UserOrgID, domain.AuthenticatorAttachment(requestedPlatformType))
 		} else {
-			webAuthNToken, err = l.authRepo.BeginPasswordlessInitCodeSetup(setContext(r.Context(), orgID), userID, orgID, codeID, code, domain.AuthenticatorAttachment(requestedPlatformType))
+			webAuthNToken, err = l.authRepo.BeginPasswordlessInitCodeSetup(setContext(r.Context(), orgID), authz.GetInstance(r.Context()).ID, userID, orgID, codeID, code, domain.AuthenticatorAttachment(requestedPlatformType))
 		}
 	}
 	if err != nil {

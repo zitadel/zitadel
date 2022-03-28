@@ -27,6 +27,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 	}
 	type args struct {
 		ctx            context.Context
+		instanceID     string
 		domain         *domain.OrgDomain
 		claimedUserIDs []string
 	}
@@ -48,8 +49,9 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				domain: &domain.OrgDomain{},
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				domain:     &domain.OrgDomain{},
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -77,7 +79,8 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -113,7 +116,8 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -137,7 +141,7 @@ func TestCommandSide_AddOrgDomain(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
+			got, err := r.AddOrgDomain(tt.args.ctx, tt.args.instanceID, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -433,6 +437,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 	}
 	type args struct {
 		ctx            context.Context
+		instanceID     string
 		domain         *domain.OrgDomain
 		claimedUserIDs []string
 	}
@@ -454,7 +459,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -473,7 +479,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					Domain: "domain.ch",
 				},
@@ -498,7 +505,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -539,7 +547,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -574,7 +583,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -632,7 +642,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				domainValidationFunc: invalidDomainVerification,
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -691,7 +702,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				domainValidationFunc: validDomainVerification,
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -753,7 +765,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				domainValidationFunc: validDomainVerification,
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -845,7 +858,8 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				idGenerator:          id_mock.NewIDGeneratorExpectIDs(t, "tempid"),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				domain: &domain.OrgDomain{
 					ObjectRoot: models.ObjectRoot{
 						AggregateID: "org1",
@@ -872,7 +886,7 @@ func TestCommandSide_ValidateOrgDomain(t *testing.T) {
 				iamDomain:                   "zitadel.ch",
 				idGenerator:                 tt.fields.idGenerator,
 			}
-			got, err := r.ValidateOrgDomain(tt.args.ctx, tt.args.domain, tt.args.claimedUserIDs)
+			got, err := r.ValidateOrgDomain(tt.args.ctx, tt.args.instanceID, tt.args.domain, tt.args.claimedUserIDs)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

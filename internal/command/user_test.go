@@ -27,10 +27,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 	}
 	type (
 		args struct {
-			ctx      context.Context
-			orgID    string
-			userID   string
-			username string
+			ctx        context.Context
+			instanceID string
+			orgID      string
+			userID     string
+			username   string
 		}
 	)
 	type res struct {
@@ -51,10 +52,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "",
-				username: "username",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "",
+				username:   "username",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -68,10 +70,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "",
-				userID:   "user1",
-				username: "username",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "",
+				userID:     "user1",
+				username:   "username",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -85,10 +88,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "user1",
-				username: "",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
+				username:   "",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -103,10 +107,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "user1",
-				username: "username",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
+				username:   "username",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -136,10 +141,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "user1",
-				username: "username",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
+				username:   "username",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -169,10 +175,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "user1",
-				username: "username",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
+				username:   "username",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -211,10 +218,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "user1",
-				username: "test@test.ch",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
+				username:   "test@test.ch",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -267,10 +275,11 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:      context.Background(),
-				orgID:    "org1",
-				userID:   "user1",
-				username: "username1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
+				username:   "username1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -284,7 +293,7 @@ func TestCommandSide_UsernameChange(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeUsername(tt.args.ctx, tt.args.orgID, tt.args.userID, tt.args.username)
+			got, err := r.ChangeUsername(tt.args.ctx, tt.args.instanceID, tt.args.orgID, tt.args.userID, tt.args.username)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -919,6 +928,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 	type (
 		args struct {
 			ctx                    context.Context
+			instanceID             string
 			orgID                  string
 			userID                 string
 			cascadeUserMemberships []*query.Membership
@@ -943,9 +953,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "",
 			},
 			res: res{
 				err: caos_errs.IsErrorInvalidArgument,
@@ -960,9 +971,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
 			},
 			res: res{
 				err: caos_errs.IsNotFound,
@@ -994,9 +1006,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
 			},
 			res: res{
 				err: caos_errs.IsPreconditionFailed,
@@ -1048,9 +1061,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1113,9 +1127,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
 			},
 			res: res{
 				want: &domain.ObjectDetails{
@@ -1198,9 +1213,10 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx:    context.Background(),
-				orgID:  "org1",
-				userID: "user1",
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
+				orgID:      "org1",
+				userID:     "user1",
 				cascadeUserMemberships: []*query.Membership{
 					{
 						IAM: &query.IAMMembership{
@@ -1246,7 +1262,7 @@ func TestCommandSide_RemoveUser(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.RemoveUser(tt.args.ctx, tt.args.userID, tt.args.orgID, tt.args.cascadeUserMemberships, tt.args.cascadeUserGrants...)
+			got, err := r.RemoveUser(tt.args.ctx, tt.args.instanceID, tt.args.userID, tt.args.orgID, tt.args.cascadeUserMemberships, tt.args.cascadeUserGrants...)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

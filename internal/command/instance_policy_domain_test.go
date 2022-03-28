@@ -19,8 +19,9 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.DomainPolicy
+		ctx        context.Context
+		instanceID string
+		policy     *domain.DomainPolicy
 	}
 	type res struct {
 		want *domain.DomainPolicy
@@ -48,7 +49,8 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
@@ -76,7 +78,8 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
@@ -84,8 +87,8 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 			res: res{
 				want: &domain.DomainPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					UserLoginMustBeDomain: true,
 				},
@@ -97,7 +100,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.AddDefaultDomainPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.AddDefaultDomainPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}
@@ -116,8 +119,9 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 		eventstore *eventstore.Eventstore
 	}
 	type args struct {
-		ctx    context.Context
-		policy *domain.DomainPolicy
+		ctx        context.Context
+		instanceID string
+		policy     *domain.DomainPolicy
 	}
 	type res struct {
 		want *domain.DomainPolicy
@@ -138,7 +142,8 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
@@ -163,7 +168,8 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: true,
 				},
@@ -195,7 +201,8 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 				),
 			},
 			args: args{
-				ctx: context.Background(),
+				ctx:        context.Background(),
+				instanceID: "INSTANCE",
 				policy: &domain.DomainPolicy{
 					UserLoginMustBeDomain: false,
 				},
@@ -203,8 +210,8 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			res: res{
 				want: &domain.DomainPolicy{
 					ObjectRoot: models.ObjectRoot{
-						AggregateID:   "IAM",
-						ResourceOwner: "IAM",
+						AggregateID:   "INSTANCE",
+						ResourceOwner: "INSTANCE",
 					},
 					UserLoginMustBeDomain: false,
 				},
@@ -216,7 +223,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.ChangeDefaultDomainPolicy(tt.args.ctx, tt.args.policy)
+			got, err := r.ChangeDefaultDomainPolicy(tt.args.ctx, tt.args.instanceID, tt.args.policy)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

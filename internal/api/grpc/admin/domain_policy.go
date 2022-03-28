@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/api/grpc/object"
 	policy_grpc "github.com/caos/zitadel/internal/api/grpc/policy"
 	"github.com/caos/zitadel/internal/domain"
@@ -41,7 +42,7 @@ func (s *Server) AddCustomDomainPolicy(ctx context.Context, req *admin_pb.AddCus
 }
 
 func (s *Server) UpdateDomainPolicy(ctx context.Context, req *admin_pb.UpdateDomainPolicyRequest) (*admin_pb.UpdateDomainPolicyResponse, error) {
-	config, err := s.command.ChangeDefaultDomainPolicy(ctx, updateDomainPolicyToDomain(req))
+	config, err := s.command.ChangeDefaultDomainPolicy(ctx, authz.GetInstance(ctx).ID, updateDomainPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +116,7 @@ func (s *Server) AddCustomOrgIAMPolicy(ctx context.Context, req *admin_pb.AddCus
 }
 
 func (s *Server) UpdateOrgIAMPolicy(ctx context.Context, req *admin_pb.UpdateOrgIAMPolicyRequest) (*admin_pb.UpdateOrgIAMPolicyResponse, error) {
-	config, err := s.command.ChangeDefaultDomainPolicy(ctx, updateOrgIAMPolicyToDomain(req))
+	config, err := s.command.ChangeDefaultDomainPolicy(ctx, authz.GetInstance(ctx).ID, updateOrgIAMPolicyToDomain(req))
 	if err != nil {
 		return nil, err
 	}
