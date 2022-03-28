@@ -7,6 +7,8 @@ Port: 8080
 ExternalPort: 8080
 ExternalDomain: localhost
 ExternalSecure: true
+HTTP2HostHeader: ":authority"
+HTTP1HostHeader: "host"
 
 Database:
   Host: localhost

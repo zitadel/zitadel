@@ -9,6 +9,7 @@ func RegisterEventMappers(es *eventstore.Eventstore) {
 		RegisterFilterEventMapper(SetupDoneEventType, SetupStepMapper).
 		RegisterFilterEventMapper(GlobalOrgSetEventType, GlobalOrgSetMapper).
 		RegisterFilterEventMapper(ProjectSetEventType, ProjectSetMapper).
+		RegisterFilterEventMapper(ConsoleSetEventType, ConsoleSetMapper).
 		RegisterFilterEventMapper(DefaultLanguageSetEventType, DefaultLanguageSetMapper).
 		RegisterFilterEventMapper(SecretGeneratorAddedEventType, SecretGeneratorAddedEventMapper).
 		RegisterFilterEventMapper(SecretGeneratorChangedEventType, SecretGeneratorChangedEventMapper).

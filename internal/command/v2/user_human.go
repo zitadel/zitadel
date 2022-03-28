@@ -91,7 +91,9 @@ func AddHumanCommand(a *user.Aggregate, human *AddHuman, passwordAlg crypto.Hash
 				cmd.AddPasswordData(secret, human.PasswordChangeRequired)
 			}
 
-			return []eventstore.Command{cmd}, nil
+			return []eventstore.Command{cmd,
+				user.NewHumanEmailVerifiedEvent(ctx, &a.Aggregate),
+			}, nil
 		}, nil
 	}
 }

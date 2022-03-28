@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -139,7 +138,7 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	verifier := internal_authz.Start(repo)
 
-	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure)
+	apis := api.New(config.Port, router, &repo, config.InternalAuthZ, config.ExternalSecure, config.HTTP2HostHeader)
 	authRepo, err := auth_es.Start(config.Auth, config.SystemDefaults, commands, queries, dbClient, assets.HandlerPrefix, keys.OIDC, keys.User)
 	if err != nil {
 		return fmt.Errorf("error starting auth repo: %w", err)
@@ -164,9 +163,10 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	if err != nil {
 		return err
 	}
+	instanceInterceptor := middleware.InstanceInterceptor(queries, config.HTTP1HostHeader)
 
 	issuer := oidc.Issuer(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor)
+	oidcProvider, err := oidc.NewProvider(ctx, config.OIDC, issuer, login.DefaultLoggedOutPath, commands, queries, authRepo, config.SystemDefaults.KeyConfig, keys.OIDC, keys.OIDCKey, eventstore, dbClient, keyChan, userAgentInterceptor, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start oidc provider: %w", err)
 	}
@@ -178,18 +178,14 @@ func startAPIs(ctx context.Context, router *mux.Router, commands *command.Comman
 	}
 	apis.RegisterHandler(openapi.HandlerPrefix, openAPIHandler)
 
-	consoleID, err := consoleClientID(ctx, queries)
-	if err != nil {
-		return fmt.Errorf("unable to get client_id for console: %w", err)
-	}
 	baseURL := http_util.BuildHTTP(config.ExternalDomain, config.ExternalPort, config.ExternalSecure)
-	c, err := console.Start(config.Console, config.ExternalDomain, baseURL, issuer, consoleID)
+	c, err := console.Start(config.Console, config.ExternalDomain, baseURL, issuer, instanceInterceptor.Handler)
 	if err != nil {
 		return fmt.Errorf("unable to start console: %w", err)
 	}
 	apis.RegisterHandler(console.HandlerPrefix, c)
 
-	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, baseURL, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
+	l, err := login.CreateLogin(config.Login, commands, queries, authRepo, store, config.SystemDefaults, console.HandlerPrefix, config.ExternalDomain, baseURL, oidc.AuthCallback, config.ExternalSecure, userAgentInterceptor, instanceInterceptor.Handler, keys.User, keys.IDPConfig, keys.CSRFCookieKey)
 	if err != nil {
 		return fmt.Errorf("unable to start login: %w", err)
 	}
@@ -235,30 +231,4 @@ func shutdownServer(ctx context.Context, server *http.Server) error {
 	}
 	logging.New().Info("server shutdown gracefully")
 	return nil
-}
-
-//TODO:!!??!!
-func consoleClientID(ctx context.Context, queries *query.Queries) (string, error) {
-	iam, err := queries.Instance(ctx)
-	if err != nil {
-		return "", err
-	}
-	projectID, err := query.NewAppProjectIDSearchQuery(iam.IAMProjectID)
-	if err != nil {
-		return "", err
-	}
-	name, err := query.NewAppNameSearchQuery(query.TextContainsIgnoreCase, "console") //TODO:!!??!!
-	if err != nil {
-		return "", err
-	}
-	apps, err := queries.SearchApps(ctx, &query.AppSearchQueries{
-		Queries: []query.SearchQuery{projectID, name},
-	})
-	if err != nil {
-		return "", err
-	}
-	if len(apps.Apps) != 1 || apps.Apps[0].OIDCConfig == nil {
-		return "", errors.New("invalid app")
-	}
-	return apps.Apps[0].OIDCConfig.ClientID, nil
 }

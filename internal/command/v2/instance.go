@@ -207,9 +207,9 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 		AddOrg(orgAgg, setup.Org.Name, command.iamDomain),
 		AddHumanCommand(userAgg, &setup.Org.Human, command.userPasswordAlg),
 		AddOrgMember(orgAgg, userID, domain.RoleOrgOwner),
+		AddInstanceMember(instanceAgg, userID, domain.RoleIAMOwner),
 
 		AddProject(projectAgg, zitadelProjectName, userID, false, false, false, domain.PrivateLabelingSettingUnspecified),
-
 		SetIAMProject(instanceAgg, projectAgg.ID),
 
 		AddAPIApp(
@@ -260,6 +260,7 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 			0,
 			nil,
 		),
+		SetIAMConsoleID(instanceAgg, setup.Zitadel.consoleClientID),
 	)
 
 	cmds, err := preparation.PrepareCommands(ctx, command.es.Filter, validations...)
@@ -284,6 +285,17 @@ func SetIAMProject(a *instance.Aggregate, projectID string) preparation.Validati
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
 			return []eventstore.Command{
 				instance.NewIAMProjectSetEvent(ctx, &a.Aggregate, projectID),
+			}, nil
+		}, nil
+	}
+}
+
+//SetIAMConsoleID defines the command to set the clientID of the Console App onto the instance
+func SetIAMConsoleID(a *instance.Aggregate, clientID string) preparation.Validation {
+	return func() (preparation.CreateCommands, error) {
+		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
+			return []eventstore.Command{
+				instance.NewIAMConsoleSetEvent(ctx, &a.Aggregate, clientID),
 			}, nil
 		}, nil
 	}

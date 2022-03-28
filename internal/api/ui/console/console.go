@@ -11,6 +11,8 @@ import (
 
 	"github.com/caos/logging"
 
+	"github.com/caos/zitadel/internal/api/authz"
+
 	"github.com/caos/zitadel/internal/api/http/middleware"
 )
 
@@ -51,12 +53,7 @@ func (i *spaHandler) Open(name string) (http.File, error) {
 	return i.fileSystem.Open("/index.html")
 }
 
-func Start(config Config, domain, url, issuer, clientID string) (http.Handler, error) {
-	environmentJSON, err := createEnvironmentJSON(url, issuer, clientID)
-	if err != nil {
-		return nil, fmt.Errorf("unable to marshal env for console: %w", err)
-	}
-
+func Start(config Config, domain, url, issuer string, instanceHandler func(http.Handler) http.Handler) (http.Handler, error) {
 	consoleDir := consoleDefaultDir
 	if config.ConsoleOverwriteDir != "" {
 		consoleDir = config.ConsoleOverwriteDir
@@ -73,10 +70,20 @@ func Start(config Config, domain, url, issuer, clientID string) (http.Handler, e
 
 	handler := &http.ServeMux{}
 	handler.Handle("/", cache(security(http.FileServer(&spaHandler{consoleHTTPDir}))))
-	handler.Handle(envRequestPath, cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write(environmentJSON)
+	handler.Handle(envRequestPath, instanceHandler(cache(security(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		instance := authz.GetInstance(r.Context())
+		if instance.InstanceID() == "" {
+			http.Error(w, "empty instanceID", http.StatusInternalServerError)
+			return
+		}
+		environmentJSON, err := createEnvironmentJSON(url, issuer, instance.ConsoleClientID())
+		if err != nil {
+			http.Error(w, fmt.Sprintf("unable to marshal env for console: %v", err), http.StatusInternalServerError)
+			return
+		}
+		_, err = w.Write(environmentJSON)
 		logging.OnError(err).Error("error serving environment.json")
-	}))))
+	})))))
 	return handler, nil
 }
 
@@ -92,21 +99,23 @@ func csp(zitadelDomain string) *middleware.CSP {
 	return &csp
 }
 
-func createEnvironmentJSON(url, issuer, clientID string) ([]byte, error) {
+func createEnvironmentJSON(api, issuer, clientID string) ([]byte, error) {
 	environment := struct {
 		AuthServiceUrl         string `json:"authServiceUrl,omitempty"`
 		MgmtServiceUrl         string `json:"mgmtServiceUrl,omitempty"`
 		AdminServiceUrl        string `json:"adminServiceUrl,omitempty"`
 		SubscriptionServiceUrl string `json:"subscriptionServiceUrl,omitempty"`
 		AssetServiceUrl        string `json:"assetServiceUrl,omitempty"`
+		API                    string `json:"api,omitempty"`
 		Issuer                 string `json:"issuer,omitempty"`
 		ClientID               string `json:"clientid,omitempty"`
 	}{
-		AuthServiceUrl:         url,
-		MgmtServiceUrl:         url,
-		AdminServiceUrl:        url,
-		SubscriptionServiceUrl: url,
-		AssetServiceUrl:        url,
+		AuthServiceUrl:         api,
+		MgmtServiceUrl:         api,
+		AdminServiceUrl:        api,
+		SubscriptionServiceUrl: api,
+		AssetServiceUrl:        api,
+		API:                    api,
 		Issuer:                 issuer,
 		ClientID:               clientID,
 	}

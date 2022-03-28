@@ -20,7 +20,7 @@ type Server interface {
 	AuthMethods() authz.MethodMapping
 }
 
-func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, queries *query.Queries) *grpc.Server {
+func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, queries *query.Queries, hostHeaderName string) *grpc.Server {
 	metricTypes := []metrics.MetricType{metrics.MetricTypeTotalCount, metrics.MetricTypeRequestCount, metrics.MetricTypeStatusCode}
 	return grpc.NewServer(
 		grpc.UnaryInterceptor(
@@ -30,6 +30,7 @@ func CreateServer(verifier *authz.TokenVerifier, authConfig authz.Config, querie
 				middleware.SentryHandler(),
 				middleware.NoCacheInterceptor(),
 				middleware.ErrorHandler(),
+				middleware.InstanceInterceptor(queries, hostHeaderName),
 				middleware.AuthorizationInterceptor(verifier, authConfig),
 				middleware.TranslationHandler(queries),
 				middleware.ValidationHandler(),
