@@ -12,8 +12,8 @@ import (
 	"github.com/caos/zitadel/internal/id"
 	"github.com/caos/zitadel/internal/repository/instance"
 	"github.com/caos/zitadel/internal/repository/org"
-	project_repo "github.com/caos/zitadel/internal/repository/project"
-	user_repo "github.com/caos/zitadel/internal/repository/user"
+	"github.com/caos/zitadel/internal/repository/project"
+	"github.com/caos/zitadel/internal/repository/user"
 )
 
 const (
@@ -154,8 +154,8 @@ func (command *Command) SetUpInstance(ctx context.Context, setup *InstanceSetup)
 
 	instanceAgg := instance.NewAggregate()
 	orgAgg := org.NewAggregate(orgID, orgID)
-	userAgg := user_repo.NewAggregate(userID, orgID)
-	projectAgg := project_repo.NewAggregate(setup.Zitadel.projectID, orgID)
+	userAgg := user.NewAggregate(userID, orgID)
+	projectAgg := project.NewAggregate(setup.Zitadel.projectID, orgID)
 
 	validations := []preparation.Validation{
 		AddPasswordComplexityPolicy(
