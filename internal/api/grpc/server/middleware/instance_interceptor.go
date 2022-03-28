@@ -2,9 +2,12 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 
 	"github.com/caos/zitadel/internal/api/authz"
 )
@@ -20,41 +23,28 @@ func InstanceInterceptor(verifier authz.InstanceVerifier, headerName string) grp
 }
 
 func setInstance(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler, verifier authz.InstanceVerifier, headerName string) (_ interface{}, err error) {
+	host, err := hostNameFromContext(ctx, headerName)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	}
+	instance, err := verifier.InstanceByHost(ctx, host)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	}
+	return handler(authz.WithInstance(ctx, instance), req)
+}
+
+func hostNameFromContext(ctx context.Context, headerName string) (string, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-
+		return "", fmt.Errorf("cannot read metadata")
 	}
 	host, ok := md[headerName]
 	if !ok {
-
+		return "", fmt.Errorf("cannot find header: %v", headerName)
 	}
 	if len(host) != 1 {
-
+		return "", fmt.Errorf("invalid host header: %v", host)
 	}
-	instance, err := verifier.InstanceByHost(ctx, host[0])
-	if err != nil {
-		return nil, err
-	}
-	return handler(authz.WithInstance(ctx, instance), req)
-	//authOpt, needsToken := verifier.CheckAuthMethod(info.FullMethod)
-	//if !needsToken {
-	//	return handler(ctx, req)
-	//}
-	//
-	//authCtx, span := tracing.NewServerInterceptorSpan(ctx)
-	//defer func() { span.EndWithError(err) }()
-	//
-	//authToken := grpc_util.GetAuthorizationHeader(authCtx)
-	//if authToken == "" {
-	//	return nil, status.Error(codes.Unauthenticated, "auth header missing")
-	//}
-	//
-	//orgID := grpc_util.GetHeader(authCtx, http.ZitadelOrgID)
-	//
-	//ctxSetter, err := authz.CheckUserAuthorization(authCtx, req, authToken, orgID, verifier, authConfig, authOpt, info.FullMethod)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//span.End()
-	//return handler(ctxSetter(ctx), req)
+	return host[0], nil
 }

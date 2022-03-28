@@ -16,8 +16,6 @@ type Instance interface {
 
 type InstanceVerifier interface {
 	InstanceByHost(context.Context, string) (Instance, error)
-	//CheckInstance(ctx context.Context, host string) (*Instance, error)
-	//instanceRepo
 }
 
 type instance struct {
@@ -51,15 +49,3 @@ func WithInstance(ctx context.Context, instance Instance) context.Context {
 func WithInstanceID(ctx context.Context, id string) context.Context {
 	return context.WithValue(ctx, instanceKey, &instance{ID: id})
 }
-
-type instanceRepo interface {
-}
-
-//
-//func (v InstanceVerifier) CheckInstance(ctx context.Context, host string) (Instance, error) {
-//	instance, err := v.instanceRepo.InstanceByHost(ctx, host)
-//	if err != nil {
-//
-//	}
-//	return instance, nil
-//}
