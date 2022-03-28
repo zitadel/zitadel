@@ -57,7 +57,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessageGreeting,
 									"Greeting",
@@ -66,7 +66,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessageSubject,
 									"Subject",
@@ -75,7 +75,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessageTitle,
 									"Title",
@@ -84,7 +84,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessagePreHeader,
 									"PreHeader",
@@ -93,7 +93,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessageText,
 									"Text",
@@ -102,7 +102,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessageButtonText,
 									"ButtonText",
@@ -111,7 +111,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewCustomTextSetEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"Template",
 									domain.MessageFooterText,
 									"Footer",
@@ -148,7 +148,7 @@ func TestCommandSide_SetDefaultMessageText(t *testing.T) {
 			r := &Commands{
 				eventstore: tt.fields.eventstore,
 			}
-			got, err := r.SetDefaultMessageText(tt.args.ctx, tt.args.config)
+			got, err := r.SetDefaultMessageText(tt.args.ctx, tt.args.config.AggregateID, tt.args.config)
 			if tt.res.err == nil {
 				assert.NoError(t, err)
 			}

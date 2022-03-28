@@ -41,7 +41,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -69,7 +69,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -99,7 +99,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderLog(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -185,7 +185,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -211,7 +211,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -247,7 +247,7 @@ func TestCommandSide_ChangeDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -335,7 +335,7 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderLogAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -344,7 +344,7 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewDebugNotificationProviderLogRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate),
+									&instance.NewAggregate("INSTANCE").Aggregate),
 							),
 						},
 					),
@@ -380,7 +380,7 @@ func TestCommandSide_RemoveDebugNotificationProviderLog(t *testing.T) {
 }
 func newDefaultDebugNotificationLogChangedEvent(ctx context.Context, compact bool) *instance.DebugNotificationProviderLogChangedEvent {
 	event, _ := instance.NewDebugNotificationProviderLogChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]settings.DebugNotificationProviderChanges{
 			settings.ChangeCompact(compact),
 		},

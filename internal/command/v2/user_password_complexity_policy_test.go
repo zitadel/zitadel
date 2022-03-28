@@ -128,7 +128,7 @@ func Test_defaultPasswordComplexityPolicy(t *testing.T) {
 					return []eventstore.Event{
 						instance.NewPasswordComplexityPolicyAddedEvent(
 							context.Background(),
-							&instance.NewAggregate().Aggregate,
+							&instance.NewAggregate("INSTANCE").Aggregate,
 							8,
 							true,
 							true,
@@ -246,7 +246,7 @@ func Test_passwordComplexityPolicy(t *testing.T) {
 						return []eventstore.Event{
 							instance.NewPasswordComplexityPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								8,
 								true,
 								true,

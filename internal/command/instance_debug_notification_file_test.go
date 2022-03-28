@@ -41,7 +41,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -69,7 +69,7 @@ func TestCommandSide_AddDefaultDebugNotificationProviderFile(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -154,7 +154,7 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -180,7 +180,7 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -206,7 +206,7 @@ func TestCommandSide_ChangeDebugNotificationProviderFile(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -294,7 +294,7 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDebugNotificationProviderFileAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -303,7 +303,7 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewDebugNotificationProviderFileRemovedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate),
+									&instance.NewAggregate("INSTANCE").Aggregate),
 							),
 						},
 					),
@@ -339,7 +339,7 @@ func TestCommandSide_RemoveDebugNotificationProviderFile(t *testing.T) {
 }
 func newDefaultDebugNotificationFileChangedEvent(ctx context.Context, compact bool) *instance.DebugNotificationProviderFileChangedEvent {
 	event, _ := instance.NewDebugNotificationProviderFileChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]settings.DebugNotificationProviderChanges{
 			settings.ChangeCompact(compact),
 		},

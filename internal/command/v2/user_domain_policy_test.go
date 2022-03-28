@@ -120,7 +120,7 @@ func Test_defaultDomainPolicy(t *testing.T) {
 					return []eventstore.Event{
 						instance.NewDomainPolicyAddedEvent(
 							context.Background(),
-							&instance.NewAggregate().Aggregate,
+							&instance.NewAggregate("INSTANCE").Aggregate,
 							true,
 						),
 					}, nil
@@ -222,7 +222,7 @@ func Test_DomainPolicy(t *testing.T) {
 						return []eventstore.Event{
 							instance.NewDomainPolicyAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						}, nil

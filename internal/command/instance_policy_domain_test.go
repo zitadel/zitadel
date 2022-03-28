@@ -40,7 +40,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -67,7 +67,7 @@ func TestCommandSide_AddDefaultDomainPolicy(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewDomainPolicyAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									true,
 								),
 							),
@@ -155,7 +155,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -180,7 +180,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewDomainPolicyAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								true,
 							),
 						),
@@ -232,7 +232,7 @@ func TestCommandSide_ChangeDefaultDomainPolicy(t *testing.T) {
 
 func newDefaultDomainPolicyChangedEvent(ctx context.Context, userLoginMustBeDomain bool) *instance.DomainPolicyChangedEvent {
 	event, _ := instance.NewDomainPolicyChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		[]policy.OrgPolicyChanges{
 			policy.ChangeUserLoginMustBeDomain(userLoginMustBeDomain),
 		},

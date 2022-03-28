@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 
+	"github.com/caos/zitadel/internal/api/authz"
 	"golang.org/x/text/language"
 
 	"github.com/caos/zitadel/internal/api/grpc/object"
@@ -32,7 +33,7 @@ func (s *Server) GetCustomInitMessageText(ctx context.Context, req *admin_pb.Get
 }
 
 func (s *Server) SetDefaultInitMessageText(ctx context.Context, req *admin_pb.SetDefaultInitMessageTextRequest) (*admin_pb.SetDefaultInitMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, SetInitCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetInitCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,7 @@ func (s *Server) GetCustomPasswordResetMessageText(ctx context.Context, req *adm
 }
 
 func (s *Server) SetDefaultPasswordResetMessageText(ctx context.Context, req *admin_pb.SetDefaultPasswordResetMessageTextRequest) (*admin_pb.SetDefaultPasswordResetMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, SetPasswordResetCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetPasswordResetCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +129,7 @@ func (s *Server) GetCustomVerifyEmailMessageText(ctx context.Context, req *admin
 }
 
 func (s *Server) SetDefaultVerifyEmailMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyEmailMessageTextRequest) (*admin_pb.SetDefaultVerifyEmailMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, SetVerifyEmailCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetVerifyEmailCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +177,7 @@ func (s *Server) GetCustomVerifyPhoneMessageText(ctx context.Context, req *admin
 }
 
 func (s *Server) SetDefaultVerifyPhoneMessageText(ctx context.Context, req *admin_pb.SetDefaultVerifyPhoneMessageTextRequest) (*admin_pb.SetDefaultVerifyPhoneMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, SetVerifyPhoneCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetVerifyPhoneCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +225,7 @@ func (s *Server) GetCustomDomainClaimedMessageText(ctx context.Context, req *adm
 }
 
 func (s *Server) SetDefaultDomainClaimedMessageText(ctx context.Context, req *admin_pb.SetDefaultDomainClaimedMessageTextRequest) (*admin_pb.SetDefaultDomainClaimedMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, SetDomainClaimedCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetDomainClaimedCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +273,7 @@ func (s *Server) GetCustomPasswordlessRegistrationMessageText(ctx context.Contex
 }
 
 func (s *Server) SetDefaultPasswordlessRegistrationMessageText(ctx context.Context, req *admin_pb.SetDefaultPasswordlessRegistrationMessageTextRequest) (*admin_pb.SetDefaultPasswordlessRegistrationMessageTextResponse, error) {
-	result, err := s.command.SetDefaultMessageText(ctx, SetPasswordlessRegistrationCustomTextToDomain(req))
+	result, err := s.command.SetDefaultMessageText(ctx, authz.GetInstance(ctx).ID, SetPasswordlessRegistrationCustomTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}
@@ -319,7 +320,7 @@ func (s *Server) GetCustomLoginTexts(ctx context.Context, req *admin_pb.GetCusto
 }
 
 func (s *Server) SetCustomLoginText(ctx context.Context, req *admin_pb.SetCustomLoginTextsRequest) (*admin_pb.SetCustomLoginTextsResponse, error) {
-	result, err := s.command.SetCustomInstanceLoginText(ctx, SetLoginTextToDomain(req))
+	result, err := s.command.SetCustomInstanceLoginText(ctx, authz.GetInstance(ctx).ID, SetLoginTextToDomain(req))
 	if err != nil {
 		return nil, err
 	}

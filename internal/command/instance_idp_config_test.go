@@ -63,7 +63,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewIDPConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1",
 									"name1",
 									domain.IDPConfigTypeOIDC,
@@ -73,7 +73,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"clientid1",
 									"config1",
 									"issuer",
@@ -138,7 +138,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(
 								instance.NewIDPConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1",
 									"name1",
 									domain.IDPConfigTypeOIDC,
@@ -148,7 +148,7 @@ func TestCommandSide_AddDefaultIDPConfig(t *testing.T) {
 							),
 							eventFromEventPusher(
 								instance.NewIDPJWTConfigAddedEvent(context.Background(),
-									&instance.NewAggregate().Aggregate,
+									&instance.NewAggregate("INSTANCE").Aggregate,
 									"config1",
 									"jwt-endpoint",
 									"issuer",
@@ -269,7 +269,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewIDPConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"config1",
 								"name1",
 								domain.IDPConfigTypeOIDC,
@@ -279,7 +279,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 						),
 						eventFromEventPusher(
 							instance.NewIDPOIDCConfigAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"clientid1",
 								"config1",
 								"issuer",
@@ -353,7 +353,7 @@ func TestCommandSide_ChangeDefaultIDPConfig(t *testing.T) {
 
 func newDefaultIDPConfigChangedEvent(ctx context.Context, configID, oldName, newName string, stylingType domain.IDPConfigStylingType, autoRegister bool) *instance.IDPConfigChangedEvent {
 	event, _ := instance.NewIDPConfigChangedEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		configID,
 		oldName,
 		[]idpconfig.IDPConfigChanges{

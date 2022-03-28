@@ -2,6 +2,8 @@ package command
 
 import (
 	"context"
+	"testing"
+
 	"github.com/caos/zitadel/internal/api/authz"
 	"github.com/caos/zitadel/internal/domain"
 	caos_errs "github.com/caos/zitadel/internal/errors"
@@ -13,7 +15,6 @@ import (
 	"github.com/caos/zitadel/internal/repository/user"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/language"
-	"testing"
 )
 
 func TestCommandSide_AddIAMMember(t *testing.T) {
@@ -127,7 +128,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 							),
 						),
@@ -175,7 +176,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					expectPushFailed(caos_errs.ThrowAlreadyExists(nil, "ERROR", "internal"),
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							)),
@@ -225,7 +226,7 @@ func TestCommandSide_AddIAMMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							)),
@@ -362,7 +363,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							),
@@ -394,7 +395,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							),
@@ -403,7 +404,7 @@ func TestCommandSide_ChangeIAMMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewMemberChangedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER", "IAM_OWNER_VIEWER"}...,
 							)),
@@ -515,7 +516,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewMemberAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 								[]string{"IAM_OWNER"}...,
 							),
@@ -524,7 +525,7 @@ func TestCommandSide_RemoveIAMMember(t *testing.T) {
 					expectPush(
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewMemberRemovedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								"user1",
 							)),
 						},

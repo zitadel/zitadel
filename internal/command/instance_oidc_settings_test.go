@@ -40,7 +40,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 					expectFilter(
 						eventFromEventPusher(
 							instance.NewOIDCSettingsAddedEvent(context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -73,7 +73,7 @@ func TestCommandSide_AddOIDCConfig(t *testing.T) {
 						[]*repository.Event{
 							eventFromEventPusher(instance.NewOIDCSettingsAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -161,7 +161,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewOIDCSettingsAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -193,7 +193,7 @@ func TestCommandSide_ChangeOIDCConfig(t *testing.T) {
 						eventFromEventPusher(
 							instance.NewOIDCSettingsAddedEvent(
 								context.Background(),
-								&instance.NewAggregate().Aggregate,
+								&instance.NewAggregate("INSTANCE").Aggregate,
 								time.Hour*1,
 								time.Hour*1,
 								time.Hour*1,
@@ -257,7 +257,7 @@ func newOIDCConfigChangedEvent(ctx context.Context, accessTokenLifetime, idToken
 		instance.ChangeOIDCSettingsRefreshTokenExpiration(refreshTokenExpiration),
 	}
 	event, _ := instance.NewOIDCSettingsChangeEvent(ctx,
-		&instance.NewAggregate().Aggregate,
+		&instance.NewAggregate("INSTANCE").Aggregate,
 		changes,
 	)
 	return event
