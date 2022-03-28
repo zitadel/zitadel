@@ -34,7 +34,7 @@ func SetInstanceCustomTexts(
 ) preparation.Validation {
 	return func() (preparation.CreateCommands, error) {
 		return func(ctx context.Context, filter preparation.FilterToQueryReducer) ([]eventstore.Command, error) {
-			existing, err := existingInstanceCustomMessageText(ctx, filter, msg.MessageTextType, msg.Language)
+			existing, err := existingInstanceCustomMessageText(ctx, filter, a.ID, msg.MessageTextType, msg.Language)
 			if err != nil {
 				return nil, err
 			}
@@ -95,8 +95,8 @@ func SetInstanceCustomTexts(
 	}
 }
 
-func existingInstanceCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, textType string, lang language.Tag) (*command.InstanceCustomMessageTextWriteModel, error) {
-	writeModel := command.NewInstanceCustomMessageTextWriteModel(textType, lang)
+func existingInstanceCustomMessageText(ctx context.Context, filter preparation.FilterToQueryReducer, instanceID, textType string, lang language.Tag) (*command.InstanceCustomMessageTextWriteModel, error) {
+	writeModel := command.NewInstanceCustomMessageTextWriteModel(textType, instanceID, lang)
 	events, err := filter(ctx, writeModel.Query())
 	if err != nil {
 		return nil, err

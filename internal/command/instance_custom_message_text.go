@@ -32,7 +32,7 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *event
 		return nil, nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-kd9fs", "Errors.CustomMessageText.Invalid")
 	}
 
-	existingMessageText, err := c.defaultCustomMessageTextWriteModelByID(ctx, msg.MessageTextType, msg.Language)
+	existingMessageText, err := c.defaultCustomMessageTextWriteModelByID(ctx, instanceAgg.ID, msg.MessageTextType, msg.Language)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -90,11 +90,11 @@ func (c *Commands) setDefaultMessageText(ctx context.Context, instanceAgg *event
 	return events, existingMessageText, nil
 }
 
-func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextType string, lang language.Tag) (*domain.ObjectDetails, error) {
+func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, instanceID, messageTextType string, lang language.Tag) (*domain.ObjectDetails, error) {
 	if messageTextType == "" || lang == language.Und {
 		return nil, caos_errs.ThrowInvalidArgument(nil, "INSTANCE-fjw9b", "Errors.CustomMessageText.Invalid")
 	}
-	customText, err := c.defaultCustomMessageTextWriteModelByID(ctx, messageTextType, lang)
+	customText, err := c.defaultCustomMessageTextWriteModelByID(ctx, instanceID, messageTextType, lang)
 	if err != nil {
 		return nil, err
 	}
@@ -113,8 +113,8 @@ func (c *Commands) RemoveInstanceMessageTexts(ctx context.Context, messageTextTy
 	return writeModelToObjectDetails(&customText.WriteModel), nil
 }
 
-func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, messageType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
-	writeModel := NewInstanceCustomMessageTextWriteModel(messageType, lang)
+func (c *Commands) defaultCustomMessageTextWriteModelByID(ctx context.Context, instanceID, messageType string, lang language.Tag) (*InstanceCustomMessageTextWriteModel, error) {
+	writeModel := NewInstanceCustomMessageTextWriteModel(instanceID, messageType, lang)
 	err := c.eventstore.FilterToQueryReducer(ctx, writeModel)
 	if err != nil {
 		return nil, err

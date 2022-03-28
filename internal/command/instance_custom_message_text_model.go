@@ -3,7 +3,6 @@ package command
 import (
 	"golang.org/x/text/language"
 
-	"github.com/caos/zitadel/internal/domain"
 	"github.com/caos/zitadel/internal/eventstore"
 	"github.com/caos/zitadel/internal/repository/instance"
 )
@@ -12,12 +11,12 @@ type InstanceCustomMessageTextWriteModel struct {
 	CustomMessageTextReadModel
 }
 
-func NewInstanceCustomMessageTextWriteModel(messageTextType string, lang language.Tag) *InstanceCustomMessageTextWriteModel {
+func NewInstanceCustomMessageTextWriteModel(instanceID, messageTextType string, lang language.Tag) *InstanceCustomMessageTextWriteModel {
 	return &InstanceCustomMessageTextWriteModel{
 		CustomMessageTextReadModel{
 			WriteModel: eventstore.WriteModel{
-				AggregateID:   domain.IAMID,
-				ResourceOwner: domain.IAMID,
+				AggregateID:   instanceID,
+				ResourceOwner: instanceID,
 			},
 			MessageTextType: messageTextType,
 			Language:        lang,
